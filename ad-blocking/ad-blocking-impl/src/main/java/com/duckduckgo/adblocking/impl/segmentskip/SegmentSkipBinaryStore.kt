@@ -17,13 +17,16 @@
 package com.duckduckgo.adblocking.impl.segmentskip
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
@@ -36,23 +39,27 @@ import java.security.MessageDigest
 import javax.inject.Inject
 
 class UnsupportedSegmentSkipFormat : Exception()
-class InvalidSegmentSkipFile : Exception()
+enum class SegmentSkipValidationReason(val pixelValue: String) {
+    DECODE_ERROR("decode_error"),
+    CHECKSUM_MISMATCH("checksum_mismatch"),
+}
+
+class InvalidSegmentSkipFile(val reason: SegmentSkipValidationReason = SegmentSkipValidationReason.DECODE_ERROR) : Exception()
 
 @SingleIn(AppScope::class)
-class SegmentSkipBinaryStore @Inject constructor(context: Context) {
+class SegmentSkipBinaryStore @Inject constructor(
+    context: Context,
+    private val dispatchers: DispatcherProvider,
+) {
     private val file = File(context.filesDir, "sponsor-prefixes.bin")
     private val updateMutex = Mutex()
 
-    @VisibleForTesting internal var beforePublish: (() -> Unit)? = null
+    @Volatile private var loaded: Loaded? = null
 
-    @VisibleForTesting internal var onUpdateCheckpoint: (() -> Unit)? = null
+    suspend fun revision(): Long = currentSnapshot()?.revision ?: 0L
 
-    @Volatile private var snapshot: Snapshot? = if (file.exists()) runCatching { readFull(file) }.getOrNull() else null
-
-    fun revision(): Long = snapshot?.revision ?: 0L
-
-    fun contains(prefix: String): Boolean {
-        val data = snapshot?.data ?: return false
+    suspend fun contains(prefix: String): Boolean {
+        val data = currentSnapshot()?.data ?: return false
         val value = prefix.toLong(16)
         val bucket = (value ushr 16).toInt()
         val suffix = (value and 0xffff).toInt()
@@ -73,11 +80,11 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         requireFull: Boolean = false,
         onPublished: () -> Unit = {},
     ) = updateMutex.withLock {
-        if (revision() > expected) return@withLock
-        check(revision() == expected)
+        val current = loadLocked()?.revision ?: 0L
+        if (current > expected) return@withLock
+        check(current == expected)
         val coroutineContext = currentCoroutineContext()
         val checkCancellation = {
-            onUpdateCheckpoint?.invoke()
             coroutineContext.ensureActive()
         }
         val download = File(file.parentFile, "sponsor-download.tmp")
@@ -104,6 +111,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
                 checkCancellation()
                 publish(download, replacement, checkCancellation, onPublished)
             } else {
+                val snapshot = requireNotNull(loaded).snapshot
                 valid(expected != 0L && snapshot != null)
                 merge(data, header, requireNotNull(snapshot), result, suffixes, checkCancellation)
                 checkCancellation()
@@ -116,15 +124,40 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         }
     }
 
-    private fun publish(next: File, replacement: Snapshot, checkCancellation: () -> Unit, onPublished: () -> Unit) {
-        beforePublish?.invoke()
+    private suspend fun currentSnapshot(): Snapshot? {
+        loaded?.let { return it.snapshot }
+        return updateMutex.withLock { loadLocked() }
+    }
+
+    private suspend fun loadLocked(): Snapshot? {
+        loaded?.let { return it.snapshot }
+        val snapshot = withContext(dispatchers.io()) {
+            val coroutineContext = currentCoroutineContext()
+            val checkCancellation = {
+                coroutineContext.ensureActive()
+            }
+            try {
+                checkCancellation()
+                if (file.exists()) readFull(file, checkCancellation) else null
+            } catch (e: CancellationException) {
+                throw e
+            } catch (_: Exception) {
+                null
+            }
+        }
+        loaded = Loaded(snapshot)
+        return snapshot
+    }
+
+    private suspend fun publish(next: File, replacement: Snapshot, checkCancellation: () -> Unit, onPublished: () -> Unit) {
+        yield()
         checkCancellation()
         check(next.renameTo(file))
-        snapshot = replacement
+        loaded = Loaded(replacement)
         onPublished()
     }
 
-    private fun merge(diff: ByteBuffer, header: Header, old: Snapshot, result: File, suffixes: File, checkCancellation: () -> Unit) {
+    private suspend fun merge(diff: ByteBuffer, header: Header, old: Snapshot, result: File, suffixes: File, checkCancellation: () -> Unit) {
         valid(diff.limit().toLong() == HEADER.toLong() + 4L * (header.inserts.toLong() + header.deletes))
         val inserts = PrefixList(diff, HEADER, header.inserts)
         val deletes = PrefixList(diff, HEADER + header.inserts * 4, header.deletes)
@@ -146,6 +179,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
             var processed = 0
             while (existing != null || added != null || removed != null) {
                 if (processed++ % 4096 == 0) checkCancellation()
+                if (processed == maxOf(1, old.count / 2)) yield()
                 val value = minOf(existing ?: Long.MAX_VALUE, added ?: Long.MAX_VALUE, removed ?: Long.MAX_VALUE)
                 valid(added != value || removed != value)
                 val wasAdded = added == value
@@ -185,13 +219,13 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
                     digest.update(buffer, 0, n)
                 }
             }
-            valid(digest.digest().copyOf(4).contentEquals(header.checksum))
+            if (!digest.digest().copyOf(4).contentEquals(header.checksum)) throw InvalidSegmentSkipFile(SegmentSkipValidationReason.CHECKSUM_MISMATCH)
             output.flush()
             stream.fd.sync()
         }
     }
 
-    private fun readFull(file: File, checkCancellation: () -> Unit = {}): Snapshot {
+    private suspend fun readFull(file: File, checkCancellation: () -> Unit = {}): Snapshot {
         val data = map(file)
         val header = readHeader(data)
         valid(header.type == 0 && header.inserts == 0 && header.deletes == 0)
@@ -200,6 +234,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
         var previous = 0
         for (bucket in 0 until BUCKETS) {
             if (bucket % 256 == 0) checkCancellation()
+            if (bucket == BUCKETS / 2) yield()
             val end = data.getInt(HEADER + (bucket + 1) * 4)
             valid(end >= previous && end <= header.count)
             var last = -1
@@ -219,7 +254,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
             digest.update(chunk)
             content.position(end)
         }
-        valid(digest.digest().copyOf(4).contentEquals(header.checksum))
+        if (!digest.digest().copyOf(4).contentEquals(header.checksum)) throw InvalidSegmentSkipFile(SegmentSkipValidationReason.CHECKSUM_MISMATCH)
         return Snapshot(header.revision, header.count, data)
     }
 
@@ -260,6 +295,7 @@ class SegmentSkipBinaryStore @Inject constructor(context: Context) {
     }
 
     private data class Header(val type: Int, val revision: Long, val checksum: ByteArray, val count: Int, val inserts: Int, val deletes: Int)
+    private data class Loaded(val snapshot: Snapshot?)
     private data class Snapshot(val revision: Long, val count: Int, val data: ByteBuffer)
     private companion object {
         const val HEADER = 28

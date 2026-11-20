@@ -19,9 +19,15 @@ import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
-import kotlinx.coroutines.Job
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Test
@@ -36,16 +42,78 @@ import java.security.MessageDigest
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import kotlin.concurrent.thread
+import kotlin.coroutines.CoroutineContext
 
 @RunWith(AndroidJUnit4::class)
 class SegmentSkipBinaryStoreTest {
     private val context = ApplicationProvider.getApplicationContext<Context>()
     private val file = File(context.filesDir, "sponsor-prefixes.bin")
-    private val store = SegmentSkipBinaryStore(context)
+    private val store = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
 
     @After fun clean() {
         file.delete()
         File(context.filesDir, "sponsor-next.tmp").delete()
+    }
+
+    @Test fun loadsSavedSnapshotOnlyOnFirstAccess() = runBlocking {
+        clean()
+        val fresh = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        file.writeBytes(full(1, listOf(1)))
+        assertEquals(1L, fresh.revision())
+        assertTrue(fresh.contains("00000001"))
+    }
+
+    @Test fun missingOrInvalidSavedSnapshotStartsAtRevisionZero() = runBlocking {
+        clean()
+        val missing = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        assertEquals(0L, missing.revision())
+        assertFalse(missing.contains("00000001"))
+        file.writeBytes(byteArrayOf(1, 2, 3))
+        val invalid = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        assertEquals(0L, invalid.revision())
+        assertFalse(invalid.contains("00000001"))
+    }
+
+    @Test fun concurrentFirstAccessLoadsSnapshotOnce() = runTest {
+        clean()
+        file.writeBytes(full(1, listOf(1)))
+        var ioRequests = 0
+        val io = StandardTestDispatcher(testScheduler)
+        val dispatchers = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher {
+                ioRequests++
+                return io
+            }
+        }
+        val fresh = SegmentSkipBinaryStore(context, dispatchers)
+        val first = async(start = CoroutineStart.UNDISPATCHED) { fresh.revision() }
+        val second = async(start = CoroutineStart.UNDISPATCHED) { fresh.contains("00000001") }
+        assertFalse(first.isCompleted)
+        assertFalse(second.isCompleted)
+        advanceUntilIdle()
+        assertEquals(1L, first.await())
+        assertTrue(second.await())
+        assertTrue(fresh.contains("00000001"))
+        assertEquals(1, ioRequests)
+    }
+
+    @Test fun cancelledFirstLoadCanBeRetried() = runTest {
+        clean()
+        file.writeBytes(full(1, listOf(1)))
+        val io = StandardTestDispatcher(testScheduler)
+        val dispatchers = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher = io
+        }
+        val fresh = SegmentSkipBinaryStore(context, dispatchers)
+        val job = launch(start = CoroutineStart.UNDISPATCHED) { fresh.revision() }
+        assertFalse(job.isCompleted)
+        job.cancel()
+        advanceUntilIdle()
+        assertTrue(job.isCancelled)
+        val retry = async { fresh.revision() }
+        advanceUntilIdle()
+        assertEquals(1L, retry.await())
+        assertTrue(fresh.contains("00000001"))
     }
 
     @Test fun fullDiffAndInvalidUpdates() = runBlocking {
@@ -76,7 +144,7 @@ class SegmentSkipBinaryStoreTest {
         store.apply(0, full(0x80000000L, listOf(1)).inputStream())
         assertEquals(0x80000000L, store.revision())
         store.apply(0x80000000L, diff(0xffffffffL, listOf(2), emptyList(), listOf(1, 2)).inputStream())
-        assertEquals(0xffffffffL, SegmentSkipBinaryStore(context).revision())
+        assertEquals(0xffffffffL, SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).revision())
         assertTrue(store.contains("00000002"))
     }
 
@@ -120,7 +188,7 @@ class SegmentSkipBinaryStoreTest {
         } catch (_: IOException) { }
         assertEquals(1L, store.revision())
         File(context.filesDir, "sponsor-next.tmp").writeBytes(full(2, listOf(2)))
-        val restarted = SegmentSkipBinaryStore(context)
+        val restarted = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
         assertEquals(1L, restarted.revision())
         assertTrue(restarted.contains("00000001"))
         assertFalse(File(context.filesDir, "sponsor-download.tmp").exists())
@@ -129,62 +197,46 @@ class SegmentSkipBinaryStoreTest {
     @Test fun lookupsUseOldFileUntilPublication() = runBlocking {
         clean()
         store.apply(0, full(1, listOf(1)).inputStream())
-        val atPublish = CountDownLatch(1)
-        val resume = CountDownLatch(1)
-        store.beforePublish = {
-            atPublish.countDown()
-            check(resume.await(5, TimeUnit.SECONDS))
+        val dispatcher = PausingDispatcher()
+        val writer = launch(dispatcher, start = CoroutineStart.UNDISPATCHED) {
+            store.apply(1, diff(2, listOf(2), listOf(1), listOf(2)).inputStream())
         }
-        var failure: Throwable? = null
-        val writer = thread {
-            try {
-                runBlocking { store.apply(1, diff(2, listOf(2), listOf(1), listOf(2)).inputStream()) }
-            } catch (e: Throwable) {
-                failure = e
-            }
-        }
-        try {
-            assertTrue(atPublish.await(5, TimeUnit.SECONDS))
-            assertEquals(1L, store.revision())
-            assertTrue(store.contains("00000001"))
-            assertFalse(store.contains("00000002"))
-            assertTrue(SegmentSkipBinaryStore(context).contains("00000001"))
-        } finally {
-            resume.countDown()
-            writer.join(5000)
-        }
-        assertFalse(writer.isAlive)
-        assertNull(failure)
+        assertFalse(writer.isCompleted)
+        dispatcher.runNext()
+        assertFalse(writer.isCompleted)
+        assertEquals(1L, store.revision())
+        assertTrue(store.contains("00000001"))
+        assertFalse(store.contains("00000002"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
+        dispatcher.runQueued()
+        writer.join()
         assertEquals(2L, store.revision())
         assertFalse(store.contains("00000001"))
         assertTrue(store.contains("00000002"))
-        assertTrue(SegmentSkipBinaryStore(context).contains("00000002"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000002"))
     }
 
     @Test fun cancelledValidationAndMergeKeepPreviousFile() = runBlocking {
         clean()
         store.apply(0, full(1, listOf(1)).inputStream())
-        suspend fun cancelAtCheckpoint(response: ByteArray, checkpoint: Int) {
-            var calls = 0
-            lateinit var job: Job
-            store.onUpdateCheckpoint = {
-                if (++calls == checkpoint) job.cancel()
-            }
-            job = launch(DefaultDispatcherProvider().io(), start = kotlinx.coroutines.CoroutineStart.LAZY) {
+        suspend fun cancelDuringUpdate(response: ByteArray) {
+            val dispatcher = PausingDispatcher()
+            val job = launch(dispatcher, start = CoroutineStart.UNDISPATCHED) {
                 store.apply(1, response.inputStream())
             }
-            job.start()
+            assertFalse(job.isCompleted)
+            job.cancel()
+            dispatcher.runQueued()
             job.join()
             assertTrue(job.isCancelled)
             assertEquals(1L, store.revision())
-            assertTrue(SegmentSkipBinaryStore(context).contains("00000001"))
+            assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
             assertFalse(File(context.filesDir, "sponsor-download.tmp").exists())
             assertFalse(File(context.filesDir, "sponsor-next.tmp").exists())
             assertFalse(File(context.filesDir, "sponsor-suffix.tmp").exists())
-            store.onUpdateCheckpoint = null
         }
-        cancelAtCheckpoint(full(2, listOf(2)), 40)
-        cancelAtCheckpoint(diff(2, listOf(2), emptyList(), listOf(1, 2)), 4)
+        cancelDuringUpdate(full(2, listOf(2)))
+        cancelDuringUpdate(diff(2, listOf(2), emptyList(), listOf(1, 2)))
     }
 
     @Test fun staleConcurrentUpdateIsIgnored() = runBlocking {
@@ -199,16 +251,19 @@ class SegmentSkipBinaryStoreTest {
     @Test fun cancellationBeforePublicationLeavesOldFile() = runBlocking {
         clean()
         store.apply(0, full(1, listOf(1)).inputStream())
-        lateinit var job: Job
-        store.beforePublish = { job.cancel() }
-        job = launch(DefaultDispatcherProvider().io(), start = kotlinx.coroutines.CoroutineStart.LAZY) {
+        val dispatcher = PausingDispatcher()
+        val job = launch(dispatcher, start = CoroutineStart.UNDISPATCHED) {
             store.apply(1, full(2, listOf(2)).inputStream())
         }
-        job.start()
+        assertFalse(job.isCompleted)
+        dispatcher.runNext()
+        assertFalse(job.isCompleted)
+        job.cancel()
+        dispatcher.runQueued()
         job.join()
         assertTrue(job.isCancelled)
         assertEquals(1L, store.revision())
-        assertTrue(SegmentSkipBinaryStore(context).contains("00000001"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
     }
 
     @Test fun lookupsContinueWhileUpdateIsBeingDownloaded() = runBlocking {
@@ -235,6 +290,13 @@ class SegmentSkipBinaryStoreTest {
         assertEquals(2L, store.revision())
         assertTrue(store.contains("00000002"))
     }
+}
+
+private class PausingDispatcher : CoroutineDispatcher() {
+    private val tasks = ArrayDeque<Runnable>()
+    override fun dispatch(context: CoroutineContext, block: Runnable) { tasks.addLast(block) }
+    fun runNext() { tasks.removeFirst().run() }
+    fun runQueued() { while (tasks.isNotEmpty()) runNext() }
 }
 
 internal fun full(revision: Long, values: List<Long>): ByteArray {

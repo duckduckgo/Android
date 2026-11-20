@@ -1218,6 +1218,19 @@ class TabSwitcherViewModelTest {
     }
 
     @Test
+    fun whenNewChatRequestedAndOnlySharedConversationExistsThenCreateChat() = runTest {
+        val url = "https://duck.ai/share/shared-id"
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("shared", url = url)))
+        whenever(duckChatMock.isDuckChatUrl(Uri.parse(url))).thenReturn(true)
+        whenever(duckChatMock.getDuckChatUrl(any(), any(), any())).thenReturn("https://duck.ai/")
+
+        testee.onDuckAiNewChatSelected()
+
+        verify(mockTabRepository, never()).select("shared")
+        verify(mockTabRepository).add("https://duck.ai/", true)
+    }
+
+    @Test
     fun whenNewChatRequestedAndOnlyConversationAndWebTabsExistThenCreateChat() = runTest {
         val url = "https://duck.ai/?chatID=conversation"
         whenever(mockTabRepository.getTabs()).thenReturn(

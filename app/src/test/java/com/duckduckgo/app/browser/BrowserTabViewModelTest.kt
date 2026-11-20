@@ -64,7 +64,6 @@ import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
-import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
@@ -676,7 +675,6 @@ class BrowserTabViewModelTest {
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val fakeCustomTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
     private val fakeAppLinkFeature = FakeFeatureToggleFactory.create(AppLinkFeature::class.java)
-    private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
@@ -843,7 +841,6 @@ class BrowserTabViewModelTest {
                     mockAutoCompleteScorer,
                     tabRepositoryProvider,
                     BrowserMode.REGULAR,
-                    mockAutocompleteTabsFeature,
                     fakeAutocompleteSpeedFeature,
                     mockDuckChat,
                     mockHistory,
@@ -885,8 +882,6 @@ class BrowserTabViewModelTest {
             val mockFeatureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
             whenever(mockFeatureToggle.isEnabled()).thenReturn(false)
             whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockFeatureToggle)
-            whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
-            whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
@@ -7399,7 +7394,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
         assertCommandNotIssued<Command.ShowAppLinkPrompt>()
     }
@@ -7922,7 +7917,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertTrue(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertTrue(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7933,7 +7928,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7944,7 +7939,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.google.android.youtube"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7955,7 +7950,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -7965,7 +7960,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -7976,7 +7971,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertFalse(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertFalse(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -8121,7 +8116,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8135,7 +8130,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertTrue(finishCustomTabOnLaunch)
+            assertTrue(leaveTabOnLaunch)
         }
     }
 
@@ -8149,7 +8144,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8164,7 +8159,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8314,7 +8309,7 @@ class BrowserTabViewModelTest {
             mockAppLinksHandler,
         ).handleAppLink(eq(true), eq(urlType), eq(false), eq("com.example.app"), eq(false), any(), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink> { assertTrue(finishCustomTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertTrue(leaveTabOnLaunch) }
         assertCommandNotIssued<Command.ShowAppLinkPrompt>()
     }
 
@@ -8399,7 +8394,7 @@ class BrowserTabViewModelTest {
             assertTrue(trustedCallerOnly)
             assertFalse(showConfirmation)
             assertEquals("com.example.app", trustedCallerPackage)
-            assertTrue(finishCustomTabOnTrustedCallerLaunch)
+            assertTrue(leaveTabOnTrustedCallerLaunch)
         }
         assertCommandNotIssued<NavigationCommand.Navigate>()
     }
@@ -8585,7 +8580,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType, hasGesture = false))
         assertCommandIssued<Command.HandleNonHttpAppLink> {
-            assertTrue(this.finishCustomTabOnTrustedCallerLaunch)
+            assertTrue(this.leaveTabOnTrustedCallerLaunch)
         }
     }
 
@@ -8598,7 +8593,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType, hasGesture = false))
         assertCommandIssued<Command.HandleNonHttpAppLink> {
-            assertFalse(this.finishCustomTabOnTrustedCallerLaunch)
+            assertFalse(this.leaveTabOnTrustedCallerLaunch)
         }
     }
 
@@ -14763,6 +14758,41 @@ class BrowserTabViewModelTest {
         testee.openNewDuckChatFromChatMenu()
 
         assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
+    fun whenOnlySharedConversationExistsThenCreateNewChat() = runTest {
+        val url = "https://duck.ai/share/shared-id"
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("shared", url = url)))
+        whenever(mockDuckChat.isDuckChatUrl(url.toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromChatMenu()
+
+        assertCommandNotIssued<Command.SwitchToTab>()
+        assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpThenOpensNewTabWithEmptyChat() = runTest {
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
+        }
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpAndCurrentChatIsEmptyThenNothingHappens() = runTest {
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("abc", url = "https://duck.ai/")))
+        whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandNotIssued<Command.OpenInNewTab>()
+        assertCommandNotIssued<Command.SwitchToTab>()
     }
 
     @Test

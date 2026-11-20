@@ -22,7 +22,6 @@ import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
-import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
@@ -42,7 +41,6 @@ class CredentialsSync @Inject constructor(
     private val credentialsSyncStore: CredentialsSyncStore,
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val syncCrypto: SyncCrypto,
-    private val credentialsSyncLocalValidationFeature: CredentialsSyncLocalValidationFeature,
     private val passwordStoreEventPlugins: PluginPoint<PasswordStoreEventListener>,
 ) {
 
@@ -224,7 +222,6 @@ class CredentialsSync @Inject constructor(
     }
 
     private fun List<LoginCredentialEntry>.validItems(): List<LoginCredentialEntry> {
-        if (credentialsSyncLocalValidationFeature.self().isEnabled().not()) return this // Skip validation if feature is disabled
         return this.filter {
             (it.title?.length ?: 0) < MAX_ENCRYPTED_TITLE_LENGTH &&
                 (it.domain?.length ?: 0) < MAX_ENCRYPTED_DOMAIN_LENGTH &&

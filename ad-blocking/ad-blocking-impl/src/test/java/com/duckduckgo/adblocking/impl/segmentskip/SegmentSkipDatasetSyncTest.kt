@@ -21,7 +21,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.workDataOf
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames
 import com.duckduckgo.adblocking.impl.BuildConfig
+import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -30,6 +33,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -52,6 +56,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import retrofit2.Call
 import retrofit2.Callback
@@ -73,13 +78,18 @@ class SegmentSkipDatasetSyncTest {
     private lateinit var store: SegmentSkipBinaryStore
     private val service = FakeService()
     private val segmentsProvider: SegmentSkipSegmentsProvider = mock()
+    private val pixel: Pixel = mock()
+    private val freshness: SegmentSkipDatasetFreshness = mock()
+    private val preferences: SegmentSkipUserPreferences = mock()
     private lateinit var sync: SegmentSkipDatasetSync
 
     @Before fun setup() {
         file.delete()
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
-        store = SegmentSkipBinaryStore(context)
-        sync = SegmentSkipDatasetSync(service, store, segmentsProvider)
+        store = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        whenever(preferences.modeFlow()).thenReturn(flowOf(SegmentSkipMode.ALWAYS_ASK))
+        runBlocking { whenever(freshness.isStale(any())).thenReturn(true) }
+        sync = SegmentSkipDatasetSync(service, store, segmentsProvider, pixel, freshness, preferences, feature)
     }
 
     @After fun clean() { file.delete() }
@@ -87,7 +97,7 @@ class SegmentSkipDatasetSyncTest {
     @Test fun binaryRequestUsesHashPrefixEndpoint() {
         val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").build().create(SegmentSkipDatasetService::class.java)
         val url = service.binaryHashPrefixes(42).request().url
-        assertEquals(BuildConfig.SPONSOR_BLOCK_BASE_URL + "/hashPrefix?revision=42", url.toString())
+        assertEquals("${BuildConfig.SPONSOR_BLOCK_BASE_URL}/hashPrefix?revision=42", url.toString())
         assertEquals(setOf("revision"), url.queryParameterNames)
         assertEquals("42", url.queryParameter("revision"))
     }
@@ -115,7 +125,17 @@ class SegmentSkipDatasetSyncTest {
         service.responses[2L] = diff(3, listOf(3), emptyList(), listOf(2, 3))
         sync.sync()
         assertEquals(listOf(0L, 1L, 2L), service.requests)
+        verify(freshness, times(2)).recordSuccess()
         verify(segmentsProvider, times(3)).clearCache()
+        verify(pixel, times(3)).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATED_COUNT, parameters = emptyMap())
+        verify(pixel, times(3)).enqueueFire(
+            AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATED_DAILY,
+            parameters = emptyMap(),
+            type = Pixel.PixelType.Daily(),
+        )
+        sync.sync()
+        verify(freshness, times(3)).recordSuccess()
+        verify(pixel, times(3)).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATED_COUNT, parameters = emptyMap())
         assertEquals(3L, store.revision())
         assertFalse(store.contains("00000001"))
         assertTrue(store.contains("00000002"))
@@ -137,6 +157,11 @@ class SegmentSkipDatasetSyncTest {
         service.responses[0L] = full(2, listOf(2))
         sync.sync()
         assertEquals(listOf(1L, 0L), service.requests)
+        verify(pixel).enqueueFire(
+            AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_VALIDATION_ERROR_COUNT,
+            parameters = mapOf("reason" to "decode_error"),
+        )
+        verify(pixel).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATED_COUNT, parameters = emptyMap())
         assertEquals(2L, store.revision())
         assertTrue(store.contains("00000002"))
     }
@@ -152,8 +177,9 @@ class SegmentSkipDatasetSyncTest {
         } catch (_: InvalidSegmentSkipFile) { }
         assertEquals(1L, store.revision())
         assertTrue(store.contains("00000001"))
-        assertEquals(1L, SegmentSkipBinaryStore(context).revision())
+        assertEquals(1L, SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).revision())
         verify(segmentsProvider, never()).clearCache()
+        verify(freshness, never()).recordSuccess()
         service.responses[0L] = full(2, listOf(2))
         sync.sync()
         assertEquals(2L, store.revision())
@@ -182,7 +208,9 @@ class SegmentSkipDatasetSyncTest {
             fail("Expected download failure")
         } catch (_: IOException) { }
         assertEquals(1L, store.revision())
-        assertTrue(SegmentSkipBinaryStore(context).contains("00000001"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
+        verify(freshness, never()).recordSuccess()
+        verify(pixel).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_FETCH_ERROR_COUNT, parameters = emptyMap())
         service.failure = null
         service.responses[1L] = diff(2, listOf(2), emptyList(), listOf(1, 2))
         sync.sync()
@@ -198,8 +226,100 @@ class SegmentSkipDatasetSyncTest {
             fail("Expected unsupported version")
         } catch (_: UnsupportedSegmentSkipFormat) { }
         assertEquals(listOf(1L), service.requests)
+        verify(pixel).enqueueFire(
+            AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_VALIDATION_ERROR_COUNT,
+            parameters = mapOf("reason" to "decode_error"),
+        )
         assertEquals(1L, store.revision())
         assertTrue(store.contains("00000001"))
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun oneTimeChecksRequestRevisionImmediately() = runTest {
+        whenever(freshness.generation()).thenReturn(0L)
+        for (force in listOf(false, true)) {
+            val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context)
+                .setInputData(workDataOf(SegmentSkipDatasetWorker.FORCE_CHECK to force))
+                .build().also {
+                    it.sync = sync
+                    it.feature = feature
+                    it.dispatchers = coroutineRule.testDispatcherProvider
+                    it.freshness = freshness
+                }
+            val before = service.revisionRequests
+            val check = coroutineRule.testScope.launch { worker.doWork() }
+            coroutineRule.testScope.testScheduler.runCurrent()
+            assertEquals(before + 1, service.revisionRequests)
+            check.join()
+        }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun periodicCheckWaitsAndCanBeCancelled() = runTest {
+        val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context)
+            .setInputData(workDataOf(SegmentSkipDatasetWorker.PERIODIC_CHECK to true))
+            .build().also {
+                it.sync = sync
+                it.feature = feature
+                it.dispatchers = coroutineRule.testDispatcherProvider
+                it.freshness = freshness
+            }
+        val scheduler = coroutineRule.testScope.testScheduler
+        val cancelled = coroutineRule.testScope.launch { worker.doWork() }
+        scheduler.runCurrent()
+        assertEquals(0, service.revisionRequests)
+        cancelled.cancelAndJoin()
+        scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
+        scheduler.runCurrent()
+        assertEquals(0, service.revisionRequests)
+
+        val check = coroutineRule.testScope.launch { worker.doWork() }
+        scheduler.runCurrent()
+        assertEquals(0, service.revisionRequests)
+        scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
+        scheduler.runCurrent()
+        check.join()
+        assertEquals(1, service.revisionRequests)
+    }
+
+    @Test fun consecutivePeriodicChecksRunEvenWhenPreviousCheckIsStillFresh() = runTest {
+        whenever(freshness.isStale(any())).thenReturn(false)
+        val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context)
+            .setInputData(workDataOf(SegmentSkipDatasetWorker.PERIODIC_CHECK to true))
+            .build().also {
+                it.sync = sync
+                it.feature = feature
+                it.dispatchers = coroutineRule.testDispatcherProvider
+                it.freshness = freshness
+            }
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(2, service.revisionRequests)
+    }
+
+    @Test fun disabledWorkerDoesNotRequestRevision() = runTest {
+        whenever(preferences.modeFlow()).thenReturn(flowOf(SegmentSkipMode.OFF))
+        val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context).build().also {
+            it.sync = sync
+            it.feature = feature
+            it.dispatchers = coroutineRule.testDispatcherProvider
+            it.freshness = freshness
+        }
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(0, service.revisionRequests)
+        verify(freshness, never()).recordSuccess()
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = false))
+        whenever(preferences.modeFlow()).thenReturn(flowOf(SegmentSkipMode.ALWAYS_ASK))
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(0, service.revisionRequests)
+    }
+
+    @Test fun enableCheckSkipsWhenAnotherCheckSucceededAfterTrigger() = runTest {
+        whenever(freshness.generation()).thenReturn(4L)
+        sync.sync(enableGeneration = 3L)
+        assertEquals(0, service.revisionRequests)
+        sync.sync(enableGeneration = 4L)
+        assertEquals(1, service.revisionRequests)
     }
 
     @Test fun workerRetriesFailuresAndDefersUnsupportedVersions() = runTest {
@@ -210,6 +330,7 @@ class SegmentSkipDatasetSyncTest {
             it.sync = sync
             it.feature = feature
             it.dispatchers = coroutineRule.testDispatcherProvider
+            it.freshness = freshness
         }
         assertEquals(Result.retry(), worker.doWork())
         service.failure = null
@@ -301,9 +422,103 @@ class SegmentSkipDatasetSyncTest {
         assertTrue(readStarted.await(5, TimeUnit.SECONDS))
         withTimeout(5000) { job.cancelAndJoin() }
         verify(call).cancel()
+        verify(freshness, never()).recordSuccess()
+        verifyNoInteractions(pixel)
         assertEquals(1L, store.revision())
-        assertTrue(SegmentSkipBinaryStore(context).contains("00000001"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
         assertFalse(File(context.filesDir, "sponsor-download.tmp").exists())
+    }
+
+    @Test fun checksumFailureReportsBoundedReason() = runTest {
+        service.latest = 1
+        service.responses[0L] = full(1, listOf(1)).apply { this[12] = (this[12].toInt() xor 1).toByte() }
+
+        try {
+            sync.sync()
+            fail("Expected invalid checksum")
+        } catch (_: InvalidSegmentSkipFile) { }
+
+        assertEquals(0L, store.revision())
+        verify(pixel).enqueueFire(
+            AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_VALIDATION_ERROR_COUNT,
+            parameters = mapOf("reason" to "checksum_mismatch"),
+        )
+    }
+
+    @Test fun localStorageFailureReportsUpdateErrorAndPreservesSnapshot() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        service.responses[1L] = full(2, listOf(2))
+        val blockedDownload = File(context.filesDir, "sponsor-download.tmp")
+        assertTrue(blockedDownload.mkdir())
+
+        try {
+            sync.sync()
+            fail("Expected local failure")
+        } catch (_: IOException) {
+        } finally {
+            blockedDownload.delete()
+        }
+
+        assertEquals(1L, store.revision())
+        assertTrue(store.contains("00000001"))
+        verify(pixel).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATE_ERROR_COUNT, parameters = emptyMap())
+        verify(pixel, never()).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_FETCH_ERROR_COUNT, parameters = emptyMap())
+    }
+
+    @Test fun responseReadFailureReportsFetchErrorAndPreservesSnapshot() = runTest {
+        store.apply(0, full(1, listOf(1)).inputStream())
+        service.latest = 2
+        val input = object : InputStream() {
+            override fun read(): Int = throw IOException("network failure")
+        }
+        val body = object : ResponseBody() {
+            private val buffered = input.source().buffer()
+            override fun contentType(): MediaType? = null
+            override fun contentLength(): Long = -1
+            override fun source(): BufferedSource = buffered
+        }
+        val call: Call<ResponseBody> = mock()
+        doAnswer {
+            it.getArgument<Callback<ResponseBody>>(0).onResponse(call, Response.success(body))
+            null
+        }.whenever(call).enqueue(any())
+        service.overrideCall = call
+
+        try {
+            sync.sync()
+            fail("Expected network failure")
+        } catch (_: IOException) { }
+
+        assertEquals(1L, store.revision())
+        assertTrue(store.contains("00000001"))
+        verify(pixel).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_FETCH_ERROR_COUNT, parameters = emptyMap())
+        verify(pixel, never()).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATE_ERROR_COUNT, parameters = emptyMap())
+    }
+
+    @Test fun responseCleanupAfterPublicationDoesNotReportUpdateError() = runTest {
+        service.latest = 1
+        val input = object : java.io.ByteArrayInputStream(full(1, listOf(1))) {
+            override fun close() { throw IOException("close failed") }
+        }
+        val body = object : ResponseBody() {
+            private val buffered = input.source().buffer()
+            override fun contentType(): MediaType? = null
+            override fun contentLength(): Long = -1
+            override fun source(): BufferedSource = buffered
+        }
+        val call: Call<ResponseBody> = mock()
+        doAnswer {
+            it.getArgument<Callback<ResponseBody>>(0).onResponse(call, Response.success(body))
+            null
+        }.whenever(call).enqueue(any())
+        service.overrideCall = call
+
+        runCatching { sync.sync() }
+
+        assertEquals(1L, store.revision())
+        verify(pixel).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATED_COUNT, parameters = emptyMap())
+        verify(pixel, never()).enqueueFire(AdBlockingPixelNames.SEGMENT_SKIP_PREFIXES_UPDATE_ERROR_COUNT, parameters = emptyMap())
     }
 
     private class FakeService : SegmentSkipDatasetService {

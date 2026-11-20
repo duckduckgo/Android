@@ -29,7 +29,7 @@ import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.
 import java.io.File
 
 /**
- * Leaves the definite "this install was restored" signal that [RealDeviceMigration] prefers over its heuristics.
+ * Leaves the definite "this install was restored" signal that [RealDeviceMigration] checks after the transferred marker.
  *
  * The framework runs this agent in restricted mode, with the base Application instead of ours, so there is no DI graph here:
  * only plain Android APIs, and nothing that could fail the user's transfer. Backup itself is left to the default implementation
@@ -99,7 +99,7 @@ class DeviceMigrationBackupAgent : BackupAgent() {
                     .putBoolean(KEY_RESTORED_FROM_BACKUP, true)
                     .commit()
             } catch (e: Exception) {
-                // Detection falls back to its heuristics; a crash here would fail the whole restore.
+                // Detection still has the transferred marker; a crash here would fail the whole restore.
             }
         }
     }

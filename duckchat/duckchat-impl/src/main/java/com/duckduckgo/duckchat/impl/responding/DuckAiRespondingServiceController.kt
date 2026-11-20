@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.autocomplete
+package com.duckduckgo.duckchat.impl.responding
 
-import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+interface DuckAiRespondingServiceController {
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "autocompleteTabs",
-)
-interface AutocompleteTabsFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun self(): Toggle
+    /**
+     * While enabled, the app is kept alive each time it leaves the foreground, until disabled or the service times out.
+     * Enable it before [com.duckduckgo.browser.api.BrowserLifecycleObserver.onClose], otherwise Android may refuse to start the service.
+     * Disabling it stops a running service, also while the app is in the background.
+     */
+    fun setKeepAliveOnLeave(enabled: Boolean)
 }

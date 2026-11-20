@@ -29,7 +29,7 @@ import org.junit.Rule
 import org.junit.Test
 import retrofit2.Response
 import retrofit2.http.GET
-import retrofit2.http.Query
+import retrofit2.http.Path
 import java.io.IOException
 
 class RealSegmentSkipSegmentsProviderTest {
@@ -50,8 +50,8 @@ class RealSegmentSkipSegmentsProviderTest {
     @Test
     fun whenUsingMockDatasetThenSegmentsStillUseProductionEndpoint() {
         val method = SegmentSkipService::class.java.declaredMethods.single { it.name == "getSegments" }
-        assertEquals("https://protection.duckduckgo.com/api/protection/segments/v1/android/matches", method.getAnnotation(GET::class.java)?.value)
-        assertEquals("hashPrefix", method.parameterAnnotations[0].filterIsInstance<Query>().single().value)
+        assertEquals("https://duckduckgo.com/sponsorblock/v1/segments/{hashPrefix}", method.getAnnotation(GET::class.java)?.value)
+        assertEquals("hashPrefix", method.parameterAnnotations[0].filterIsInstance<Path>().single().value)
     }
 
     @Test

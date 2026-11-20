@@ -21,12 +21,41 @@ import android.content.Context
 import android.content.Intent
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.workDataOf
 import com.duckduckgo.adblocking.impl.BuildConfig
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.di.android.AndroidInjection
+import com.duckduckgo.di.scopes.ReceiverScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@InjectWith(ReceiverScope::class)
 class SegmentSkipMockSyncReceiver : BroadcastReceiver() {
+    @Inject lateinit var freshness: SegmentSkipDatasetFreshness
+
+    @Inject @AppCoroutineScope lateinit var scope: CoroutineScope
+
     override fun onReceive(context: Context, intent: Intent) {
         if (BuildConfig.SPONSOR_BLOCK_BASE_URL == "http://127.0.0.1:8765/sponsorblock/v1") {
-            WorkManager.getInstance(context).enqueue(OneTimeWorkRequestBuilder<SegmentSkipDatasetWorker>().build())
+            AndroidInjection.inject(this, context)
+            val pendingResult = goAsync()
+            scope.launch {
+                try {
+                    val request = OneTimeWorkRequestBuilder<SegmentSkipDatasetWorker>()
+                        .setInputData(
+                            workDataOf(
+                                SegmentSkipDatasetWorker.FORCE_CHECK to true,
+                                SegmentSkipDatasetWorker.ENABLE_GENERATION to freshness.generation(),
+                            ),
+                        )
+                        .build()
+                    WorkManager.getInstance(context).enqueue(request)
+                } finally {
+                    pendingResult.finish()
+                }
+            }
         }
     }
 }

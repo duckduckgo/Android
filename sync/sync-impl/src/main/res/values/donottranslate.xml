@@ -21,6 +21,7 @@
     <string name="syncAuditLogTitle">Device Activity</string>
     <string name="syncAuditLogListLabel">Most recently synced or removed devices:</string>
     <string name="syncAuditLogError">Device activity is temporarily unavailable.</string>
+    <string name="syncAuditLogLoadMoreError">Older activity is temporarily unavailable. Tap to retry.</string>
     <string name="syncAuditLogEmpty">You have no recent activity.</string>
     <string name="syncAuditLogSynced">Synced</string>
     <string name="syncAuditLogRemoved">Removed</string>

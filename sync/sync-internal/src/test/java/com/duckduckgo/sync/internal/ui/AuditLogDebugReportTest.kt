@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.internal.ui
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.AccountInfoKeyUnavailableReason
 import com.duckduckgo.sync.impl.AuditLogEntry
 import com.duckduckgo.sync.impl.AuditLogPage
@@ -32,8 +33,10 @@ import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Skipped
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource
 import com.duckduckgo.sync.impl.auditlog.ResolvedDeviceName
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -44,14 +47,17 @@ import java.time.Instant
 
 class AuditLogDebugReportTest {
 
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
     private val syncApi: SyncApi = mock()
     private val decoder: AuditLogEntryDecoder = mock()
     private val resolver: AuditLogDeviceNameResolver = mock()
 
-    private val report = AuditLogDebugReport(syncApi, decoder, resolver)
+    private val report = AuditLogDebugReport(syncApi, decoder, resolver, coroutineTestRule.testDispatcherProvider)
 
     @Test
-    fun whenFetchFailsThenShowsErrorAndDoesNotDecode() {
+    fun whenFetchFailsThenShowsErrorAndDoesNotDecode() = runTest {
         whenever(syncApi.getAuditLogLatest(TOKEN)).thenReturn(AuditLogResult.RateLimited(418))
 
         val text = report.fetchAndDescribe(TOKEN, OWN_DEVICE_ID)
@@ -61,7 +67,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenPageIsEmptyThenSaysSo() {
+    fun whenPageIsEmptyThenSaysSo() = runTest {
         givenPage(emptyList(), before = null)
 
         val text = report.fetchAndDescribe(TOKEN, OWN_DEVICE_ID)
@@ -71,7 +77,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenOlderEntriesExistThenSaysSo() {
+    fun whenOlderEntriesExistThenSaysSo() = runTest {
         givenPage(emptyList(), before = "older")
 
         val text = report.fetchAndDescribe(TOKEN, OWN_DEVICE_ID)
@@ -80,7 +86,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenLoginIsDecodedThenShowsTypeTimeNameAndNameSource() {
+    fun whenLoginIsDecodedThenShowsTypeTimeNameAndNameSource() = runTest {
         val login = decoded("e1", AuditLogEntryType.LOGIN, device = DeviceV2(deviceId = "other", credentialId = "3party"))
         givenPage(listOf(login), names = mapOf("e1" to ResolvedDeviceName("Work laptop", "desktop", DeviceNameSource.LATER_INFO)))
 
@@ -92,7 +98,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenEntryIsForThisDeviceThenMarksIt() {
+    fun whenEntryIsForThisDeviceThenMarksIt() = runTest {
         val login = decoded("e1", AuditLogEntryType.LOGIN, device = DeviceV2(deviceId = OWN_DEVICE_ID))
         givenPage(listOf(login), names = mapOf("e1" to ResolvedDeviceName("Phone", null, DeviceNameSource.INFO)))
 
@@ -103,7 +109,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenLogoutIsDecodedThenShowsActor() {
+    fun whenLogoutIsDecodedThenShowsActor() = runTest {
         val logout = decoded(
             "e1",
             AuditLogEntryType.LOGOUT,
@@ -120,7 +126,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedIsDecodedThenShowsItWithoutName() {
+    fun whenDeviceInfoAddedIsDecodedThenShowsItWithoutName() = runTest {
         val infoAdded = decoded("e1", AuditLogEntryType.DEVICE_INFO_ADDED, device = DeviceV2(deviceId = "other"))
         givenPage(listOf(infoAdded))
 
@@ -131,7 +137,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenEntryIsSkippedThenShowsReason() {
+    fun whenEntryIsSkippedThenShowsReason() = runTest {
         givenPage(listOf(Skipped("e1", AuditLogEntrySkipReason.PAYLOAD_DECRYPT_ERROR)))
 
         val text = report.fetchAndDescribe(TOKEN, OWN_DEVICE_ID)
@@ -142,7 +148,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenKeyIsUnavailableThenShowsReason() {
+    fun whenKeyIsUnavailableThenShowsReason() = runTest {
         givenPage(
             listOf(Skipped("e1", AuditLogEntrySkipReason.KEY_NOT_FOUND)),
             keyUnavailableReason = AccountInfoKeyUnavailableReason.RATE_LIMITED,
@@ -154,7 +160,7 @@ class AuditLogDebugReportTest {
     }
 
     @Test
-    fun whenSeveralEntriesThenKeepsServerOrderNewestFirst() {
+    fun whenSeveralEntriesThenKeepsServerOrderNewestFirst() = runTest {
         val newer = decoded("newer", AuditLogEntryType.LOGIN, device = DeviceV2(deviceId = "a"))
         val older = decoded("older", AuditLogEntryType.LOGIN, device = DeviceV2(deviceId = "b"))
         givenPage(
@@ -170,7 +176,7 @@ class AuditLogDebugReportTest {
         assertTrue(text, text.indexOf("name: Newer") < text.indexOf("name: Older"))
     }
 
-    private fun givenPage(
+    private suspend fun givenPage(
         decodedEntries: List<DecodedAuditLogEntry>,
         names: Map<String, ResolvedDeviceName> = emptyMap(),
         keyUnavailableReason: AccountInfoKeyUnavailableReason? = null,

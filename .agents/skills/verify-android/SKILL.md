@@ -83,8 +83,10 @@ prints the branch, commit and dirty file count so the evidence names the code un
 ## Prove
 
 A proof is a Python file with a docstring stating the claim and `run(android)`, which drives the app
-through this skill's commands and records `android.check(...)` results. Every recipe has one in
-`proofs/` (shared paths in `proofs/steps.py`); for a change, write a proof of what it changes.
+through this skill's commands and records `android.check(...)` results. A proof is throwaway: write one in
+`proofs/` to verify what one PR changes, and only that, using the shared paths in `proofs/steps.py`. Never
+commit it (`.gitignore` keeps it out): `pr-summary` puts its source in the PR, and what it taught you about
+the app goes into the recipe.
 
 ```bash
 P=.agents/skills/verify-android/prove.py

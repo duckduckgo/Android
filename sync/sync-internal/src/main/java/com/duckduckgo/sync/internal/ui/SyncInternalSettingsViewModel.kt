@@ -59,6 +59,7 @@ import com.duckduckgo.sync.impl.getOrNull
 import com.duckduckgo.sync.impl.internal.SyncInternalEnvDataStore
 import com.duckduckgo.sync.impl.promotion.InternalSyncPromotionDataStore
 import com.duckduckgo.sync.internal.TestSyncWarningPlugin
+import com.duckduckgo.sync.internal.connect.V1ConnectCode
 import com.duckduckgo.sync.internal.promotion.InternalSyncPromotionAppInstall
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadConnectQR
 import com.duckduckgo.sync.internal.ui.SyncInternalSettingsViewModel.Command.ReadQR
@@ -108,6 +109,7 @@ constructor(
     private val gracePeriod: DeviceAuthorizationGracePeriod,
     private val promotionDataStore: InternalSyncPromotionDataStore,
     private val promotionAppInstall: InternalSyncPromotionAppInstall,
+    private val v1ConnectCode: V1ConnectCode,
     @field:SuppressLint("StaticFieldLeak") private val context: Context,
 ) : ViewModel() {
 
@@ -134,19 +136,15 @@ constructor(
         val environment: String = "",
         val recoveryCode: String = "",
         val thirdPartyRecoveryCode: String = "",
-        val syncAutoRestoreEnabled: Boolean = false,
         val blockStoreAvailable: Boolean? = null,
         val blockStoreE2ESupported: Boolean? = null,
         val blockStoreCurrentValue: BlockStoreValue = BlockStoreValue.Loading,
-        val blockStoreFeatureFlagText: String = "",
         val blockStoreAvailabilityText: String = "",
         val blockStoreApiLevelText: String = "",
         val blockStoreDeviceLockText: String = "",
         val blockStoreE2eText: String = "",
         val blockStoreInferredBackupText: String = "",
         val blockStoreCurrentValueText: String = "Loading...",
-        val canUseV2ConnectFlowEnabled: Boolean = false,
-        val canShowV2ConnectCodeEnabled: Boolean = false,
         val checkLinkingCodeResult: String = "",
         val accessCredentialsText: String = "",
         val scopedTokenResult: String = "",
@@ -185,7 +183,6 @@ constructor(
     init {
         viewModelScope.launch(dispatchers.io()) {
             updateViewState()
-            checkSyncAutoRestoreFlag()
             checkBlockStoreAvailability()
             refreshBlockStoreValue()
         }
@@ -214,7 +211,6 @@ constructor(
 
     fun onResume() {
         viewModelScope.launch(dispatchers.io()) {
-            checkSyncAutoRestoreFlag()
             checkBlockStoreAvailability()
             refreshBlockStoreValue()
         }
@@ -272,24 +268,6 @@ constructor(
     fun onEnvironmentChanged(devEnvironment: Boolean) {
         viewModelScope.launch(dispatchers.io()) {
             syncEnvDataStore.useSyncDevEnvironment = devEnvironment
-            updateViewState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    fun onCanUseV2ConnectFlowFlagChanged(enabled: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-ScopedToken: setting canUseV2ConnectFlow flag = $enabled" }
-            setRawToggleState(syncFeature.canUseV2ConnectFlow(), enabled)
-            updateViewState()
-        }
-    }
-
-    @SuppressLint("DenyListedApi")
-    fun onCanShowV2ConnectCodeFlagChanged(enabled: Boolean) {
-        viewModelScope.launch(dispatchers.io()) {
-            logcat { "Sync-ScopedToken: setting canShowV2ConnectCode flag = $enabled" }
-            setRawToggleState(syncFeature.canShowV2ConnectCode(), enabled)
             updateViewState()
         }
     }
@@ -364,8 +342,6 @@ constructor(
                 thirdPartyRecoveryCode = thirdPartyRecoveryCode,
                 useDevEnvironment = syncEnvDataStore.useSyncDevEnvironment,
                 environment = syncEnvDataStore.syncEnvironmentUrl,
-                canUseV2ConnectFlowEnabled = syncFeature.canUseV2ConnectFlow().isEnabled(),
-                canShowV2ConnectCodeEnabled = syncFeature.canShowV2ConnectCode().isEnabled(),
                 v2StoreFieldsText = buildV2StoreFieldsText(),
                 // Clear per-session dev-tool results once signed out so stale keys aren't shown.
                 keysText = if (accountInfo.isSignedIn) viewState.value.keysText else "",
@@ -457,7 +433,7 @@ constructor(
 
     fun onConnectStart() {
         viewModelScope.launch(dispatchers.io()) {
-            val qrCode = when (val qrCodeResult = syncAccountRepository.getConnectQR()) {
+            val qrCode = when (val qrCodeResult = v1ConnectCode.getConnectQR()) {
                 is Error -> {
                     command.send(ShowMessage("$qrCodeResult"))
                     return@launch
@@ -472,12 +448,13 @@ constructor(
             var polling = true
             while (polling) {
                 delay(7000)
-                when (val result = syncAccountRepository.pollConnectionKeys()) {
+                when (val result = v1ConnectCode.pollConnectionKeys()) {
                     is Error -> {
                         command.send(Command.ShowMessage("$result"))
+                        polling = false
                     }
 
-                    is Success -> {
+                    is Success -> if (result.data) {
                         command.send(Command.ShowMessage(result.data.toString()))
                         polling = false
                         updateViewState()
@@ -489,24 +466,9 @@ constructor(
 
     fun onCheckLinkingCodeClicked() {
         viewModelScope.launch(dispatchers.io()) {
-            val useV2 = syncFeature.canUseV2ConnectFlow().isEnabled() && syncFeature.canShowV2ConnectCode().isEnabled()
-            viewState.update { it.copy(checkLinkingCodeResult = "Fetching ${if (useV2) "v2" else "v1"} linking code…") }
-            val result = if (useV2) fetchV2LinkingCode() else fetchV1LinkingCode()
+            viewState.update { it.copy(checkLinkingCodeResult = "Fetching v2 linking code…") }
+            val result = fetchV2LinkingCode()
             viewState.update { it.copy(checkLinkingCodeResult = result) }
-        }
-    }
-
-    private fun fetchV1LinkingCode(): String {
-        val signedIn = syncAccountRepository.isSignedIn()
-        val result = if (signedIn) {
-            syncAccountRepository.generateExchangeInvitationCode()
-        } else {
-            syncAccountRepository.getConnectQR()
-        }
-        val label = if (signedIn) "invitation" else "connect"
-        return when (result) {
-            is Success -> describeQrCode(result.data.qrCode)
-            is Error -> "Failed to fetch v1 $label code: $result"
         }
     }
 
@@ -894,16 +856,6 @@ constructor(
         }
     }
 
-    private fun checkSyncAutoRestoreFlag() {
-        val enabled = syncFeature.syncAutoRestore().isEnabled()
-        viewState.update { state ->
-            state.copy(syncAutoRestoreEnabled = enabled).withBlockStoreChecklistText(
-                apiLevel = appBuildConfig.sdkInt,
-                hasSecureLock = isDeviceSecureLockEnabled(),
-            )
-        }
-    }
-
     private suspend fun checkBlockStoreAvailability() {
         when (val availability = persistentStorage.checkAvailability()) {
             is PersistentStorageAvailability.Unavailable -> {
@@ -1009,11 +961,6 @@ constructor(
         hasSecureLock: Boolean,
     ): ViewState {
         val apiSupportsE2e = apiLevel >= 28
-        val featureFlagText = if (syncAutoRestoreEnabled) {
-            "✅ syncAutoRestore flag: enabled"
-        } else {
-            "❌ syncAutoRestore flag: disabled"
-        }
         val availabilityText = when (blockStoreAvailable) {
             null -> "Checking..."
             true -> "✅ Block Store API: Available"
@@ -1053,7 +1000,6 @@ constructor(
             is BlockStoreValue.HasValue -> value.value
         }
         return copy(
-            blockStoreFeatureFlagText = featureFlagText,
             blockStoreAvailabilityText = availabilityText,
             blockStoreApiLevelText = apiLevelText,
             blockStoreDeviceLockText = deviceLockText,

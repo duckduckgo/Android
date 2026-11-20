@@ -16,16 +16,12 @@
 
 package com.duckduckgo.sync.impl.autorestore
 
-import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.devicemigration.api.DeviceMigration
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
-import com.duckduckgo.sync.impl.SyncFeature
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,7 +38,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi")
 class RealSyncAutoRestoreManagerTest {
 
     @get:Rule
@@ -50,7 +45,6 @@ class RealSyncAutoRestoreManagerTest {
 
     private val persistentStorage: PersistentStorage = mock()
     private val dataStore: SyncAutoRestorePreferenceDataStore = mock()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val deviceMigration: DeviceMigration = mock()
 
     private lateinit var testee: RealSyncAutoRestoreManager
@@ -63,7 +57,6 @@ class RealSyncAutoRestoreManagerTest {
         testee = RealSyncAutoRestoreManager(
             persistentStorage = persistentStorage,
             dataStore = dataStore,
-            syncFeature = syncFeature,
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             moshi = Moshi.Builder().build(),
             deviceMigration = deviceMigration,
@@ -185,24 +178,14 @@ class RealSyncAutoRestoreManagerTest {
     }
 
     @Test
-    fun whenFFEnabledAndStorageAvailableThenIsAutoRestoreAvailableReturnsTrue() = runTest {
-        syncFeature.syncAutoRestore().setRawStoredState(State(enable = true))
+    fun whenStorageAvailableThenIsAutoRestoreAvailableReturnsTrue() = runTest {
         whenever(persistentStorage.checkAvailability()).thenReturn(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
 
         assertTrue(testee.isAutoRestoreAvailable())
     }
 
     @Test
-    fun whenFFDisabledThenIsAutoRestoreAvailableReturnsFalse() = runTest {
-        syncFeature.syncAutoRestore().setRawStoredState(State(enable = false))
-        whenever(persistentStorage.checkAvailability()).thenReturn(PersistentStorageAvailability.Available(isEndToEndEncryptionSupported = true))
-
-        assertFalse(testee.isAutoRestoreAvailable())
-    }
-
-    @Test
-    fun whenFFEnabledAndStorageUnavailableThenIsAutoRestoreAvailableReturnsFalse() = runTest {
-        syncFeature.syncAutoRestore().setRawStoredState(State(enable = true))
+    fun whenStorageUnavailableThenIsAutoRestoreAvailableReturnsFalse() = runTest {
         whenever(persistentStorage.checkAvailability()).thenReturn(PersistentStorageAvailability.Unavailable)
 
         assertFalse(testee.isAutoRestoreAvailable())

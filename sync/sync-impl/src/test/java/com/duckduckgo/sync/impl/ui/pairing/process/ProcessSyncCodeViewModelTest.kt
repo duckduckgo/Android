@@ -18,8 +18,6 @@ package com.duckduckgo.sync.impl.ui.pairing.process
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.AccountErrorCodes.ALREADY_SIGNED_IN
 import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.AccountInfo
@@ -37,7 +35,6 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
 import com.duckduckgo.sync.impl.SyncCodeType
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.RestorePayload
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
@@ -100,7 +97,6 @@ class ProcessSyncCodeViewModelTest {
     private val syncPixels = mock<SyncPixels>()
     private val syncAutoRestoreManager = mock<SyncAutoRestoreManager>()
     private val switchedAccountDetector = mock<SwitchedAccountDetector>()
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private var accountInfo = AccountInfo()
 
@@ -114,7 +110,6 @@ class ProcessSyncCodeViewModelTest {
             launchSource = launchSource,
             accountRepository = accountRepository,
             codeDispatcher = codeDispatcher,
-            syncFeature = syncFeature,
             syncPixels = syncPixels,
             syncAutoRestoreManager = syncAutoRestoreManager,
             switchedAccountDetector = switchedAccountDetector,
@@ -280,8 +275,7 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when processing fails on an already signed in device and seamless switching is enabled then the user is asked to switch`() = runTest {
-        givenSeamlessAccountSwitching(enabled = true)
+    fun `when processing fails on an already signed in device then the user is asked to switch`() = runTest {
         givenLegacyCode(recoveryAuthCode)
         whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code, reason = "boom"))
 
@@ -297,28 +291,7 @@ class ProcessSyncCodeViewModelTest {
     }
 
     @Test
-    fun `when processing fails on an already signed in device and seamless switching is disabled then an error is shown`() = runTest {
-        givenSeamlessAccountSwitching(enabled = false)
-        givenLegacyCode(recoveryAuthCode)
-        whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code, reason = "boom"))
-
-        val testee = createTestee()
-
-        testee.commands.test {
-            assertIs<RunAcknowledgmentAnimation>(awaitItem())
-
-            val command = awaitItem()
-            assertIs<ShowV1Error>(command)
-            assertEquals(R.string.sync_login_authenticated_device_error, command.content.message)
-            assertEquals("boom", command.content.reason)
-
-            cancel()
-        }
-    }
-
-    @Test
-    fun `when polling fails on an already signed in device and seamless switching is enabled then the user is asked to switch`() = runTest {
-        givenSeamlessAccountSwitching(enabled = true)
+    fun `when polling fails on an already signed in device then the user is asked to switch`() = runTest {
         givenLegacyCode(exchangeAuthCode)
         givenProcessCodeSucceeds()
         whenever(accountRepository.pollForRecoveryCodeAndLogin())
@@ -1022,7 +995,6 @@ class ProcessSyncCodeViewModelTest {
 
     @Test
     fun `when the user is asked to switch accounts then the ask to switch pixel is fired`() = runTest {
-        givenSeamlessAccountSwitching(enabled = true)
         givenLegacyCode(recoveryAuthCode)
         whenever(accountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Error(code = ALREADY_SIGNED_IN.code, reason = "boom"))
 
@@ -1089,10 +1061,6 @@ class ProcessSyncCodeViewModelTest {
 
     private fun givenLegacyCode(authCode: SyncAuthCode) {
         whenever(codeDispatcher.route(any())).thenReturn(RouteDecision.Legacy(authCode))
-    }
-
-    private fun givenSeamlessAccountSwitching(enabled: Boolean) {
-        syncFeature.seamlessAccountSwitching().setRawStoredState(State(enabled))
     }
 
     private fun givenV2Outcomes(vararg outcomes: DispatchOutcome) {

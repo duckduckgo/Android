@@ -35,6 +35,14 @@
     <include domain="sharedpref" path="com.duckduckgo.site.permissions.settings.xml" requireFlags="deviceToDeviceTransfer"/>
     <include domain="sharedpref" path="com.duckduckgo.privacy.config.impl.features.gpc.xml" requireFlags="deviceToDeviceTransfer"/>
     <include domain="sharedpref" path="com.duckduckgo.app.voice.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.app.accessibility.settings.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.history.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.autoconsent.store.settings.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="sharedpref" path="com.duckduckgo.favicons.store.v1.xml" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/serp_settings.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/ad_blocking.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/bookmarks.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/fire_clearing_preferences.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
     <include domain="sharedpref" path="com.duckduckgo.savedsites.settings.xml" requireFlags="deviceToDeviceTransfer"/>
     <include domain="file" path="datastore/duck_chat.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
     <include domain="file" path="datastore/duck_player.preferences_pb" requireFlags="deviceToDeviceTransfer"/>

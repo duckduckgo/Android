@@ -143,6 +143,7 @@ import com.duckduckgo.app.browser.customtabs.CustomTabViewModel.Companion.CUSTOM
 import com.duckduckgo.app.browser.databinding.FragmentBrowserTabBinding
 import com.duckduckgo.app.browser.databinding.HttpAuthenticationBinding
 import com.duckduckgo.app.browser.downloader.BlobConverterInjector
+import com.duckduckgo.app.browser.duckchat.SwipeUpNewChatFeature
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.browser.filechooser.FileChooserIntentBuilder
 import com.duckduckgo.app.browser.filechooser.capture.launcher.UploadFromExternalMediaAppLauncher
@@ -349,7 +350,9 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.DuckChatHistoryParams
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.InputMode
+import com.duckduckgo.duckchat.api.isDuckAiConversation
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -768,6 +771,12 @@ class BrowserTabFragment :
     @Inject
     lateinit var sharePromoLinkIntentFactory: SharePromoLinkIntentFactory
 
+    @Inject
+    lateinit var swipeUpNewChatFeature: SwipeUpNewChatFeature
+
+    @Inject
+    lateinit var nativeInputStateProvider: NativeInputStateProvider
+
     private var isActiveTab: Boolean = false
 
     private val downloadMessagesJob = ConflatedJob()
@@ -1083,6 +1092,38 @@ class BrowserTabFragment :
     // see discussion in https://github.com/duckduckgo/Android/pull/4027#discussion_r1433373625
     private val jsOrientationHandler = JsOrientationHandler()
 
+    private var isSwipeUpNewChatEnabled: Boolean = false
+
+    private val swipeUpNewChatListener = object : BottomPullListener {
+        override fun canStartPull(): Boolean = isSwipeUpNewChatEnabled &&
+            omnibar.viewMode == DuckAI &&
+            !voiceActiveOnThisTab &&
+            !nativeInputStateProvider.stateForTab(tabId).value.isChatStreaming &&
+            // The frontend hides the input for screens that take over the chat.
+            binding.rootView.findViewById<View?>(R.id.inputModeRoot)?.isShown != false &&
+            webView?.url?.toUri()?.isDuckAiConversation(duckChat) == true
+
+        override fun onPull(distancePx: Int) {
+            binding.swipeUpNewChatIndicator.onPull(distancePx)
+        }
+
+        override fun onPullReleased(velocityPxPerSec: Float) {
+            val releasedOnUrl = webView?.url
+            binding.swipeUpNewChatIndicator.onRelease(velocityPxPerSec) {
+                if (!isAdded) return@onRelease
+                if (webView?.url == releasedOnUrl) {
+                    viewModel.openNewDuckChatFromSwipeUp()
+                } else {
+                    binding.swipeUpNewChatIndicator.reset()
+                }
+            }
+        }
+
+        override fun onPullCancelled() {
+            binding.swipeUpNewChatIndicator.springBack()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logcat { "onCreate called for tabId=$tabId" }
@@ -1216,6 +1257,7 @@ class BrowserTabFragment :
         viewModel.registerWebViewListener(webViewClient, webChromeClient)
         configureWebView()
         configureSwipeRefresh()
+        configureSwipeUpNewChat()
         configureAutoComplete()
         configureNewTab()
         createBrowserMenu()
@@ -2071,6 +2113,7 @@ class BrowserTabFragment :
     override fun onPause() {
         // With swiping tabs, a tab is paused when another one shows.
         removeContextualSheetIfWaitingForHide()
+        if (view != null) binding.swipeUpNewChatIndicator.reset()
         nativeInputManager.onTabVisibilityChanged(false)
         pdfDownloadTooltipPopup?.dismiss()
         pdfDownloadTooltipPopup = null
@@ -2090,6 +2133,7 @@ class BrowserTabFragment :
         binding.swipeRefreshContainer.removeCanChildScrollUpCallback()
         binding.autoCompleteSuggestionsList.removeOnScrollListener(autoCompleteKeyboardDismissScrollListener)
         webView?.removeEnableSwipeRefreshCallback()
+        webView?.removeBottomPullListener()
         webView?.stopNestedScroll()
         webView?.stopLoading()
         hidePdf()
@@ -2535,6 +2579,10 @@ class BrowserTabFragment :
         (activity as? CustomTabActivity)?.finish()
     }
 
+    private fun leaveTabAfterHandoff() {
+        if (tabDisplayedInCustomTabScreen) finishCustomTab() else viewModel.closeCurrentTab()
+    }
+
     private fun onBypassMaliciousWarning(
         url: Uri,
         feed: Feed,
@@ -2941,8 +2989,7 @@ class BrowserTabFragment :
             is Command.OpenAppLink -> {
                 val launched = openAppLink(it.appLink)
                 if (launched) {
-                    if (it.finishCustomTabOnLaunch) finishCustomTab()
-                    if (it.closeTabOnLaunch) viewModel.closeCurrentTab()
+                    if (it.leaveTabOnLaunch) leaveTabAfterHandoff()
                 }
             }
 
@@ -2955,9 +3002,8 @@ class BrowserTabFragment :
                     headers = it.headers,
                     showConfirmation = it.showConfirmation,
                     trustedCallerPackage = it.trustedCallerPackage,
-                    finishCustomTabOnTrustedCallerLaunch = it.finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly = it.trustedCallerOnly,
-                    closeTabOnTrustedCallerLaunch = it.closeTabOnTrustedCallerLaunch,
+                    leaveTabOnTrustedCallerLaunch = it.leaveTabOnTrustedCallerLaunch,
                 )
             }
 
@@ -3518,9 +3564,8 @@ class BrowserTabFragment :
         headers: Map<String, String> = emptyMap(),
         showConfirmation: Boolean = true,
         trustedCallerPackage: String? = null,
-        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
-        closeTabOnTrustedCallerLaunch: Boolean = false,
+        leaveTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         context?.let {
             val pm = it.packageManager
@@ -3594,10 +3639,9 @@ class BrowserTabFragment :
                     viewModel.linkOpenedInNewTab(),
                     showConfirmation,
                     trustedCallerPackage,
-                    finishCustomTabOnTrustedCallerLaunch,
                     trustedCallerOnly,
                     fallbackUrl,
-                    closeTabOnTrustedCallerLaunch,
+                    leaveTabOnTrustedCallerLaunch,
                 )
             }
         }
@@ -3612,10 +3656,9 @@ class BrowserTabFragment :
         isOpenedInNewTab: Boolean,
         showConfirmation: Boolean = true,
         trustedCallerPackage: String? = null,
-        finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         trustedCallerOnly: Boolean = false,
         fallbackUrl: String? = null,
-        closeTabOnTrustedCallerLaunch: Boolean = false,
+        leaveTabOnTrustedCallerLaunch: Boolean = false,
     ) {
         if (!isActiveCustomTab() && !isActiveTab && !isOpenedInNewTab) {
             logcat(VERBOSE) { "Will not launch an intent for an inactive tab" }
@@ -3636,7 +3679,7 @@ class BrowserTabFragment :
                 useFirstActivityFound = useFirstActivityFound,
                 showConfirmation = showConfirmation,
                 trustedCallerIntent = trustedCallerIntent,
-                finishCustomTabOnTrustedCallerLaunch = finishCustomTabOnTrustedCallerLaunch || closeTabOnTrustedCallerLaunch,
+                finishCustomTabOnTrustedCallerLaunch = leaveTabOnTrustedCallerLaunch,
             )
 
             val resolvedIntent = if (launch.useChooser) {
@@ -3651,9 +3694,7 @@ class BrowserTabFragment :
                 launchExternalAppDialog(context) { context.startActivity(resolvedIntent) }
             } else {
                 context.startActivity(resolvedIntent)
-                if (launch.finishCustomTab) {
-                    if (isActiveCustomTab()) finishCustomTab() else viewModel.closeCurrentTab()
-                }
+                if (launch.finishCustomTab) leaveTabAfterHandoff()
             }
         }.onFailure { exception ->
             logcat(ERROR) { "Failed to launch external app: ${exception.asLog()}" }
@@ -4346,6 +4387,7 @@ class BrowserTabFragment :
             it.setEnableSwipeRefreshCallback { enable ->
                 binding.swipeRefreshContainer?.isEnabled = enable
             }
+            it.setBottomPullListener(swipeUpNewChatListener)
 
             registerForContextMenu(it)
 
@@ -4787,6 +4829,13 @@ class BrowserTabFragment :
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach { voiceActiveOnThisTab = it }
             .launchIn(viewLifecycleOwner.lifecycleScope)
+    }
+
+    private fun configureSwipeUpNewChat() {
+        binding.swipeUpNewChatIndicator.content = binding.webViewContainer
+        viewLifecycleOwner.lifecycleScope.launch {
+            isSwipeUpNewChatEnabled = withContext(dispatchers.io()) { swipeUpNewChatFeature.self().isEnabled() }
+        }
     }
 
     @Suppress("NewApi") // This API and the behaviour described only apply to apps with targetSdkVersion ≥ TIRAMISU.
@@ -5256,6 +5305,7 @@ class BrowserTabFragment :
     private fun onTabHidden() {
         if (!isAdded) return
         removeContextualSheetIfWaitingForHide()
+        if (view != null) binding.swipeUpNewChatIndicator.reset()
         nativeInputManager.onTabVisibilityChanged(false)
         viewModel.onViewHidden()
         webViewClient.onTabBackgrounded()

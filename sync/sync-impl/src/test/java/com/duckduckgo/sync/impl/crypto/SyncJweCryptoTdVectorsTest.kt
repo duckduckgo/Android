@@ -274,6 +274,18 @@ class SyncJweCryptoTdVectorsTest {
         assertNotEquals("", segments[1])
     }
 
+    // ----- TD test6: 3party device name and type --------------------------------------------------
+
+    @Test
+    fun tdTest6_decryptFeProduced3partyDeviceNameAndType() {
+        val mek = crypto.hkdfSha256SingleBlock(secretBytes, saltBytes, "Main Key", 32)
+        val encryptedName = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoiM3BhcnR5In0..DEJLNnQw_F2048HD.L0uTWnvXt4CjsnAg6w.Ws7LZ14qhU7AcD7qqpcTqw"
+        val encryptedType = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIiwia2lkIjoiM3BhcnR5In0..DEJLNnQw_F2048HD.JFCbQXWZoIDC4g.8H3fvBS-hVrDr9GjC1439A"
+
+        assertEquals("Julia's Phone", String(crypto.jweDecryptSymmetric(encryptedName, mek), Charsets.UTF_8))
+        assertEquals("Android 18", String(crypto.jweDecryptSymmetric(encryptedType, mek), Charsets.UTF_8))
+    }
+
     // ----- helpers --------------------------------------------------------------------------------
 
     private fun base64UrlDecode(s: String): ByteArray = Base64.getUrlDecoder().decode(s)

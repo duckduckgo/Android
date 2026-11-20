@@ -60,4 +60,10 @@
     <string name="devSettingsDuckAiPromoCampaignRecordCleared">Promo record cleared</string>
     <string name="devSettingsDuckAiPromoCampaignStorageFailed">Couldn\'t read or write the promo record</string>
     <string name="devSettingsDuckAiPromoCampaignRecordCorruptedFailed">The promo record is corrupted. Clear it to recover</string>
+
+    <string name="devSettingsDuckAiClientToolsCapabilityTitle">Browser Tools</string>
+    <string name="devSettingsDuckAiClientToolsCapabilitySubtitle">Turn the browser tools flags on or off</string>
+    <string name="devSettingsDuckAiClientToolsTitle">Duck.ai Browser Tools</string>
+    <string name="devSettingsDuckAiClientToolsFlagsHeader">Flags</string>
+    <string name="devSettingsDuckAiClientToolsToolsHeader">Tools</string>
 </resources>

@@ -42,10 +42,17 @@ import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogAction.SYNCED
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.Instant
@@ -67,6 +74,11 @@ class RealSyncAuditLogLoaderTest {
         nameResolver = resolver,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
+
+    @Before
+    fun setup() = runTest {
+        whenever(resolver.resolve(any(), any())).thenReturn(emptyMap())
+    }
 
     @Test
     fun whenNoTokenThenFailsWithoutCallingServer() = runTest {
@@ -105,7 +117,7 @@ class RealSyncAuditLogLoaderTest {
     fun whenLogIsEmptyThenLoadedWithNoItems() = runTest {
         givenPage(decoded = emptyList())
 
-        assertEquals(SyncAuditLogLoadResult.Loaded(emptyList()), testee.loadLatest())
+        assertEquals(SyncAuditLogLoadResult.Loaded(emptyList(), SyncAuditLogPages(emptyList(), before = null)), testee.loadLatest())
     }
 
     @Test
@@ -122,16 +134,14 @@ class RealSyncAuditLogLoaderTest {
             ),
         )
 
-        val result = testee.loadLatest()
+        val result = testee.loadLatest() as SyncAuditLogLoadResult.Loaded
 
         assertEquals(
-            SyncAuditLogLoadResult.Loaded(
-                listOf(
-                    SyncAuditLogItem("e1", REMOVED, Instant.ofEpochSecond(30), "Laptop", DeviceType("desktop")),
-                    SyncAuditLogItem("e4", SYNCED, Instant.ofEpochSecond(10), "Phone", DeviceType()),
-                ),
+            listOf(
+                SyncAuditLogItem("e1", REMOVED, Instant.ofEpochSecond(30), "Laptop", DeviceType("desktop")),
+                SyncAuditLogItem("e4", SYNCED, Instant.ofEpochSecond(10), "Phone", DeviceType()),
             ),
-            result,
+            result.items,
         )
     }
 
@@ -139,25 +149,166 @@ class RealSyncAuditLogLoaderTest {
     fun whenNameIsMissingForAnEntryThenThatEntryIsHidden() = runTest {
         val login = decoded("e1", LOGIN, "d1", at = 10)
         givenPage(decoded = listOf(login))
-        whenever(resolver.resolve(any())).thenReturn(emptyMap())
+        whenever(resolver.resolve(any(), any())).thenReturn(emptyMap())
 
-        assertEquals(SyncAuditLogLoadResult.Loaded(emptyList()), testee.loadLatest())
+        assertEquals(emptyList<SyncAuditLogItem>(), (testee.loadLatest() as SyncAuditLogLoadResult.Loaded).items)
+    }
+
+    @Test
+    fun whenFirstPageHasMoreThenLoadedKeepsEntriesAndCursor() = runTest {
+        val login = decoded("e1", LOGIN, "d1", at = 10)
+        givenPage(decoded = listOf(login), before = "b1")
+        givenName(login)
+
+        val result = testee.loadLatest() as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(SyncAuditLogPages(listOf(login), before = "b1"), result.pages)
+        assertTrue(result.hasMore)
+    }
+
+    @Test
+    fun whenPageHasNoVisibleRowsThenOlderPagesLoadedUntilARow() = runTest {
+        val infoAdded = decoded("e3", DEVICE_INFO_ADDED, "d1", at = 30)
+        val skipped = Skipped("e2", AuditLogEntrySkipReason.UNKNOWN_TYPE)
+        val login = decoded("e1", LOGIN, "d1", at = 10)
+        givenPage(decoded = listOf(infoAdded), before = "b1")
+        givenOlderPage(cursor = "b1", decoded = listOf(skipped), before = "b2")
+        givenOlderPage(cursor = "b2", decoded = listOf(login), before = "b3")
+        givenName(login, newerEntries = listOf(infoAdded, skipped))
+
+        val result = testee.loadLatest() as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(listOf("e1"), result.items.map { it.entryId })
+        assertEquals(SyncAuditLogPages(listOf(infoAdded, skipped, login), before = "b3"), result.pages)
+    }
+
+    @Test
+    fun whenNoPageHasVisibleRowsThenLoadedEmptyWithNoMore() = runTest {
+        val infoAdded = decoded("e2", DEVICE_INFO_ADDED, "d1", at = 20)
+        givenPage(decoded = listOf(infoAdded), before = "b1")
+        givenOlderPage(cursor = "b1", decoded = emptyList(), before = null)
+
+        val result = testee.loadLatest() as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(emptyList<SyncAuditLogItem>(), result.items)
+        assertFalse(result.hasMore)
+    }
+
+    @Test
+    fun whenManyPagesHaveNoVisibleRowsThenStopsAtPageLimitWithMore() = runTest {
+        givenPage(decoded = listOf(decoded("p0", DEVICE_INFO_ADDED, "d1", at = 100)), before = "b1")
+        (1..RealSyncAuditLogLoader.MAX_PAGES_PER_LOAD).forEach { page ->
+            givenOlderPage(cursor = "b$page", decoded = listOf(decoded("p$page", DEVICE_INFO_ADDED, "d1", at = 100L - page)), before = "b${page + 1}")
+        }
+
+        val result = testee.loadLatest() as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(emptyList<SyncAuditLogItem>(), result.items)
+        assertEquals("b${RealSyncAuditLogLoader.MAX_PAGES_PER_LOAD}", result.pages.before)
+        verify(syncApi, times(RealSyncAuditLogLoader.MAX_PAGES_PER_LOAD - 1)).getAuditLogBefore(eq(TOKEN), any(), anyOrNull())
+    }
+
+    @Test
+    fun whenLoadOlderThenOnlyOlderRowsReturnedAndNamedWithNewerEntries() = runTest {
+        val newerLogin = decoded("e3", LOGIN, "d2", at = 30)
+        val infoAdded = decoded("e2", DEVICE_INFO_ADDED, "d1", at = 20)
+        val olderLogin = decoded("e1", LOGIN, "d1", at = 10)
+        givenToken()
+        givenOlderPage(cursor = "b1", decoded = listOf(olderLogin), before = null)
+        givenName(olderLogin, newerEntries = listOf(newerLogin, infoAdded))
+
+        val result = testee.loadOlder(loaded(listOf(newerLogin, infoAdded), before = "b1")) as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(listOf("e1"), result.items.map { it.entryId })
+        assertEquals(SyncAuditLogPages(listOf(newerLogin, infoAdded, olderLogin), before = null), result.pages)
+        assertFalse(result.hasMore)
+    }
+
+    @Test
+    fun whenOlderPageRepeatsALoadedEntryThenItIsDropped() = runTest {
+        val newerLogin = decoded("e2", LOGIN, "d2", at = 20)
+        val olderLogin = decoded("e1", LOGIN, "d1", at = 10)
+        givenToken()
+        givenOlderPage(cursor = "b1", decoded = listOf(newerLogin, olderLogin), before = null)
+        givenName(olderLogin, newerEntries = listOf(newerLogin))
+
+        val result = testee.loadOlder(loaded(listOf(newerLogin), before = "b1")) as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(listOf("e1"), result.items.map { it.entryId })
+        assertEquals(listOf(newerLogin, olderLogin), result.pages.entries)
+    }
+
+    @Test
+    fun whenLoadOlderFailsThenFails() = runTest {
+        givenToken()
+        whenever(syncApi.getAuditLogBefore(TOKEN, "b1")).thenReturn(AuditLogResult.RateLimited(418))
+
+        assertEquals(SyncAuditLogLoadResult.Failed, testee.loadOlder(loaded(emptyList(), before = "b1")))
+    }
+
+    @Test
+    fun whenLoadOlderHasNoKeyThenFails() = runTest {
+        givenToken()
+        givenOlderPage(
+            cursor = "b1",
+            decoded = listOf(Skipped("e1", AuditLogEntrySkipReason.KEY_NOT_FOUND)),
+            before = null,
+            keyUnavailableReason = AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED,
+        )
+
+        assertEquals(SyncAuditLogLoadResult.Failed, testee.loadOlder(loaded(emptyList(), before = "b1")))
+    }
+
+    @Test
+    fun whenNothingOlderThenLoadOlderDoesNotCallServer() = runTest {
+        givenToken()
+        val loaded = loaded(emptyList(), before = null)
+
+        assertEquals(loaded.copy(items = emptyList()), testee.loadOlder(loaded))
+        verifyNoInteractions(syncApi)
     }
 
     private fun givenToken() {
         whenever(syncStore.token).thenReturn(TOKEN)
     }
 
-    private fun givenPage(
+    private suspend fun givenPage(
         decoded: List<DecodedAuditLogEntry>,
+        before: String? = null,
         keyUnavailableReason: AccountInfoKeyUnavailableReason? = null,
     ) {
         givenToken()
-        val rawEntries = decoded.map { AuditLogEntry(id = it.id, rawVersion = "1", payload = "jwe-${it.id}") }
-        whenever(syncApi.getAuditLogLatest(TOKEN)).thenReturn(AuditLogResult.Success(AuditLogPage(rawEntries, after = "a", before = null)))
-        whenever(decoder.decode(rawEntries)).thenReturn(AuditLogDecodeResult(decoded, keyUnavailableReason))
-        whenever(resolver.resolve(decoded)).thenReturn(emptyMap())
+        val page = givenDecodedPage(decoded, before, keyUnavailableReason)
+        whenever(syncApi.getAuditLogLatest(TOKEN)).thenReturn(AuditLogResult.Success(page))
     }
+
+    private suspend fun givenOlderPage(
+        cursor: String,
+        decoded: List<DecodedAuditLogEntry>,
+        before: String?,
+        keyUnavailableReason: AccountInfoKeyUnavailableReason? = null,
+    ) {
+        val page = givenDecodedPage(decoded, before, keyUnavailableReason)
+        whenever(syncApi.getAuditLogBefore(TOKEN, cursor)).thenReturn(AuditLogResult.Success(page))
+    }
+
+    private suspend fun givenDecodedPage(
+        decoded: List<DecodedAuditLogEntry>,
+        before: String?,
+        keyUnavailableReason: AccountInfoKeyUnavailableReason?,
+    ): AuditLogPage {
+        val rawEntries = decoded.map { AuditLogEntry(id = it.id, rawVersion = "1", payload = "jwe-${it.id}") }
+        whenever(decoder.decode(rawEntries)).thenReturn(AuditLogDecodeResult(decoded, keyUnavailableReason))
+        return AuditLogPage(rawEntries, after = "a", before = before)
+    }
+
+    private suspend fun givenName(entry: Decoded, newerEntries: List<DecodedAuditLogEntry> = emptyList()) {
+        whenever(resolver.resolve(listOf(entry), newerEntries))
+            .thenReturn(mapOf(entry.id to ResolvedDeviceName("Name ${entry.id}", null, DeviceNameSource.INFO)))
+    }
+
+    private fun loaded(entries: List<DecodedAuditLogEntry>, before: String?) =
+        SyncAuditLogLoadResult.Loaded(items = listOf(), pages = SyncAuditLogPages(entries, before))
 
     private fun decoded(id: String, type: AuditLogEntryType, deviceId: String, at: Long) = Decoded(
         id = id,
@@ -166,6 +317,32 @@ class RealSyncAuditLogLoaderTest {
         device = DeviceV2(deviceId = deviceId),
         actor = null,
     )
+
+    @Test
+    fun whenEntriesPerPageGivenThenEveryPageRequestsIt() = runTest {
+        val login = decoded("e1", LOGIN, "d1", at = 10)
+        givenToken()
+        val page = givenDecodedPage(listOf(decoded("e2", DEVICE_INFO_ADDED, "d1", at = 20)), before = "b1", keyUnavailableReason = null)
+        whenever(syncApi.getAuditLogLatest(TOKEN, 5)).thenReturn(AuditLogResult.Success(page))
+        val older = givenDecodedPage(listOf(login), before = null, keyUnavailableReason = null)
+        whenever(syncApi.getAuditLogBefore(TOKEN, "b1", 5)).thenReturn(AuditLogResult.Success(older))
+
+        val result = testee.loadLatest(entriesPerPage = 5) as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(listOf("e2", "e1"), result.pages.entries.map { it.id })
+    }
+
+    @Test
+    fun whenLoadOlderWithEntriesPerPageThenRequestsIt() = runTest {
+        val login = decoded("e1", LOGIN, "d1", at = 10)
+        givenToken()
+        val older = givenDecodedPage(listOf(login), before = null, keyUnavailableReason = null)
+        whenever(syncApi.getAuditLogBefore(TOKEN, "b1", 5)).thenReturn(AuditLogResult.Success(older))
+
+        val result = testee.loadOlder(loaded(emptyList(), before = "b1"), entriesPerPage = 5) as SyncAuditLogLoadResult.Loaded
+
+        assertEquals(listOf(login), result.pages.entries)
+    }
 
     private companion object {
         const val TOKEN = "token"

@@ -40,6 +40,8 @@ class GoBackend @Inject constructor(
     private val appTrackerDetector: AppTrackerDetector,
     pixels: Lazy<NetworkProtectionPixels>,
 ) {
+    private val flowOwners = FlowOwners()
+
     init {
         try {
             logcat { "Loading wireguard-go library" }
@@ -89,14 +91,13 @@ class GoBackend @Inject constructor(
         @Suppress("ktlint:standard:comment-wrapping")
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return true
 
-        @Suppress("NAME_SHADOWING")
-        val uid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            getUidQ(protocol, saddr, sport, daddr, dport)
-        } else {
-            uid
-        }
-
-        return shouldAllowDomain(sni, uid)
+        val flow = FlowOwners.Flow(protocol, saddr, sport, daddr, dport)
+        return flowOwners.allow(
+            flow,
+            sni,
+            lookup = { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getUidQ(protocol, saddr, sport, daddr, dport) else uid },
+            judge = { owner -> shouldAllowDomain(sni, owner) },
+        )
     }
 
     // Called from native code

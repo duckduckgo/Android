@@ -48,7 +48,7 @@ interface SegmentSkip {
 
     fun modeFlow(): Flow<SegmentSkipMode>
 
-    suspend fun setMode(mode: SegmentSkipMode)
+    suspend fun setMode(mode: SegmentSkipMode): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -83,9 +83,7 @@ class RealSegmentSkip @Inject constructor(
 
     override fun modeFlow(): Flow<SegmentSkipMode> = userPreferences.modeFlow()
 
-    override suspend fun setMode(mode: SegmentSkipMode) {
-        userPreferences.setMode(mode)
-    }
+    override suspend fun setMode(mode: SegmentSkipMode): Boolean = userPreferences.setMode(mode)
 
     private fun isEnabled(): Boolean = segmentSkipFeature.mvpEnabled().isEnabled()
 

@@ -17,7 +17,7 @@
     "adBlocking_state_daily": {
         "description": "(Daily) Reports the client-side ad blocking state. Fired once daily on app foreground.",
         "owners": ["CrisBarreiro"],
-        "triggers": ["other"],
+        "triggers": ["startup"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
@@ -30,8 +30,72 @@
                 "key": "user_opted_in",
                 "type": "boolean",
                 "description": "Whether the user has explicitly opted in (turned the ad blocking setting on)"
+            },
+            {
+                "key": "segment_skip_status",
+                "type": "string",
+                "description": "Effective SegmentSkip mode: ask is Ask to Skip, skip is Always, and off is Never",
+                "enum": ["ask", "skip", "off"]
             }
         ]
+    },
+    "adBlocking_segmentSkip_settings_clicked": {
+        "description": "User opened SegmentSkip settings.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_segmentSkip_settings_updated": {
+        "description": "User changed SegmentSkip mode.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "segment_skip_status",
+                "type": "string",
+                "description": "Effective SegmentSkip mode: ask is Ask to Skip, skip is Always, and off is Never",
+                "enum": ["ask", "skip", "off"]
+            }
+        ]
+    },
+    "adBlocking_segmentSkip_prefixes_fetch_error": {
+        "description": "Fetching the prefix dataset failed.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_segmentSkip_prefixes_validation_error": {
+        "description": "Validating the prefix dataset failed.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Validation failure category",
+                "enum": ["decode_error", "checksum_mismatch", "unknown"]
+            }
+        ]
+    },
+    "adBlocking_segmentSkip_prefixes_updated": {
+        "description": "A prefix dataset revision was published.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "adBlocking_segmentSkip_prefixes_update_error": {
+        "description": "Updating the local prefix dataset failed.",
+        "owners": ["CrisBarreiro"],
+        "triggers": ["exception"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
     },
     "adBlocking_enabled_daily": {
         "description": "(Daily) User enabled YouTube ad blocking in settings.",

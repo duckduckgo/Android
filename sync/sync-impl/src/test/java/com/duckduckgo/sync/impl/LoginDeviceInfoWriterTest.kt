@@ -54,7 +54,6 @@ class LoginDeviceInfoWriterTest {
             deviceInfoMigrator = deviceInfoMigrator,
             dispatchers = coroutineTestRule.testDispatcherProvider,
         )
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(enable = true))
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(enable = true))
         whenever(accountInfoDdgWrapRepairer.repair(any(), any())).thenReturn(Result.Success(Unit))
         runBlocking { whenever(deviceInfoMigrator.ensureMigrated()).thenReturn(Result.Success(Unit)) }
@@ -98,16 +97,6 @@ class LoginDeviceInfoWriterTest {
         val result = writer.onLogin(listOf(accountInfoEntry(encryptedWith = CREDENTIAL_ID_3PARTY)))
 
         assertTrue(result is Result.Success)
-        verifyNoInteractions(accountInfoDdgWrapRepairer)
-        verify(deviceInfoMigrator, never()).ensureMigrated()
-    }
-
-    @Test
-    fun whenV2ConnectFlowDisabledThenNothingRuns() = runTest {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(enable = false))
-
-        writer.onLogin(listOf(accountInfoEntry(encryptedWith = CREDENTIAL_ID_3PARTY)))
-
         verifyNoInteractions(accountInfoDdgWrapRepairer)
         verify(deviceInfoMigrator, never()).ensureMigrated()
     }

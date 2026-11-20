@@ -562,9 +562,9 @@ probe_install() {
 # probe <host,host...> [mode] [timeout_ms]: one "RESULT run=.. host=.. mode=.. outcome=.." line per host.
 # Exit 1 when the run didn't finish, so a host without a result is never read as an outcome.
 cmd_probe() {
-  local usage="usage: verify.sh probe <host,host...> [single|window|split|late-sni] [timeout_ms]"
+  local usage="usage: verify.sh probe <host,host...> [single|window|split|late-sni|ip] [timeout_ms]"
   local hosts="${1:?$usage}" mode="${2:-single}" timeout="${3:-3000}" run="$RANDOM$RANDOM" lines="" wait_s n
-  case "$mode" in single|window|split|late-sni) ;; *) die "$usage" ;; esac
+  case "$mode" in single|window|split|late-sni|ip) ;; *) die "$usage" ;; esac
   probe_install
   a shell am start -S -W -n "$PROBE_PKG/.ProbeActivity" \
     --es hosts "$hosts" --es mode "$mode" --ei timeout "$timeout" --es run "$run" >/dev/null

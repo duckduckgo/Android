@@ -31,7 +31,6 @@ import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.onFailure
@@ -78,7 +77,6 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     @Assisted private val launchSource: SyncLaunchSource,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
-    private val syncFeature: SyncFeature,
     private val syncPixels: SyncPixels,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val switchedAccountDetector: SwitchedAccountDetector,
@@ -256,7 +254,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         if (codeSource is SyncCodeSource.Restored) {
             fireAutoRestoreFailurePixels(failure.code.toString(), failure.reason)
         }
-        if (failure.code == ALREADY_SIGNED_IN.code && syncFeature.seamlessAccountSwitching().isEnabled()) {
+        if (failure.code == ALREADY_SIGNED_IN.code) {
             syncPixels.fireAskUserToSwitchAccount()
             _viewState.update { it.copy(dialog = DialogType.SwitchAccount(syncCode)) }
         } else {

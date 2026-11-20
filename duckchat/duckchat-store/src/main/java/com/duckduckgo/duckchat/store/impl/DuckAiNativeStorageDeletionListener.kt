@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.savedsites.impl.sync
+package com.duckduckgo.duckchat.store.impl
 
-import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
-import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
+import com.duckduckgo.browsermode.api.BrowserMode
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "bookmarksLocalFieldValidation",
-)
-interface BookmarksSyncLocalValidationFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun self(): Toggle
+/** Called on the JavaBridge thread after the page deleted chats from native storage. */
+interface DuckAiNativeStorageDeletionListener {
+    fun onChatDeleted(chatId: String, browserMode: BrowserMode)
+    fun onAllChatsDeleted(browserMode: BrowserMode)
 }

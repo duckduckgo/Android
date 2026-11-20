@@ -23,6 +23,7 @@ import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.plugins.PluginPoint
@@ -44,6 +45,7 @@ import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.ensureActive
@@ -54,12 +56,13 @@ import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import javax.inject.Named
 
-// Backstop against unbounded growth, not a tuning parameter: observed depth on real pages is 0-1.
+// Per feature lane. Backstop against unbounded growth, not a tuning parameter: observed depth on real pages is 0-1.
 internal const val MAX_QUEUED_MESSAGES = 512
 
 @ContributesBinding(ActivityScope::class)
@@ -72,6 +75,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private val contentScopeScriptsFeature: ContentScopeScriptsFeature,
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : JsMessaging {
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
 
@@ -91,23 +95,52 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     private var registration: Registration? = null
 
     /**
-     * The producer/consumer handoff for inbound messages. [process] is the producer: it runs on the WebView JavaBridge
-     * thread and only enqueues. [ensureQueueConsumerRunning] starts the consumer, of which there is at most one, so that
-     * handlers keep seeing messages one at a time and in the order the page sent them. The consumer stops once the queue
-     * drains, which keeps it from outliving the WebView.
+     * The producer/consumer handoff for one feature's inbound messages. [process] is the producer: it runs on the WebView
+     * JavaBridge thread and only enqueues. [ensureQueueConsumerRunning] starts the lane's consumer, of which there is at
+     * most one, so that a handler keeps seeing its feature's messages one at a time and in the order the page sent them.
+     * Order is kept within a feature only. Handlers that forward to the JsMessageCallback hand off to coroutines, which
+     * never kept order across features, and native readers of a feature's state observe it rather than reacting to
+     * another feature's message. So features get separate lanes, and a slow handler or a pending url read only holds up
+     * its own feature. The consumer stops once the lane drains, which keeps it from outliving the WebView.
      *
      * Bounded because enqueueing removed the backpressure the synchronous JavaBridge call used to provide: the page's JS
      * thread no longer waits for a message to be handled, so nothing else limits how many can pile up behind a slow
      * handler.
      */
-    private val inboundQueue = LinkedBlockingQueue<QueuedMessage>(MAX_QUEUED_MESSAGES)
-    private val queueConsumerActive = AtomicBoolean(false)
+    private class Lane(
+        val reportedFeature: String,
+    ) {
+        val queue = LinkedBlockingQueue<QueuedMessage>(MAX_QUEUED_MESSAGES)
+        val consumerActive = AtomicBoolean(false)
 
-    /**
-     * One overflow episode reports once, rather than every message that arrives while the queue stays full. Reset when the
-     * consumer drains, so a later episode is still visible.
-     */
-    private val overflowReported = AtomicBoolean(false)
+        /**
+         * One overflow episode reports once, rather than every message that arrives while the lane stays full. Reset when
+         * the consumer drains, so a later episode is still visible.
+         */
+        val overflowReported = AtomicBoolean(false)
+
+        /**
+         * The message the consumer is working on, kept so an overflow can say whether the lane filled because the consumer
+         * was stuck on one message or because messages arrived faster than they could be handled.
+         */
+        @Volatile
+        var inFlight: InFlight? = null
+    }
+
+    // Keyed by registered feature only: feature names come from the page, so anything else shares one lane rather than
+    // letting the page create lanes without bound. addDebugFlag shares that lane too, whatever its feature: the callback
+    // appends every feature's flag to the same list, so those messages must stay one at a time across features.
+    private val lanes = ConcurrentHashMap<String, Lane>()
+
+    private class InFlight(
+        val stage: InFlightStage,
+        val startedAtMillis: Long,
+    )
+
+    private enum class InFlightStage(val paramValue: String) {
+        URL("url"),
+        HANDLER("handler"),
+    }
 
     /**
      * A message, the registration it arrived under, and — for domain restricted features only — the url of the document
@@ -166,52 +199,96 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     override val secret: String = coreContentScopeScripts.secret
     override val allowedDomains: List<String> = emptyList()
 
-    @JavascriptInterface
+    private val bridge = JavascriptBridge()
+
     override fun process(
         message: String,
         secret: String,
     ) {
-        if (optimizedProcessing) {
-            processOptimized(message, secret)
-        } else {
+        bridge.process(message, secret)
+    }
+
+    internal inner class JavascriptBridge {
+        @JavascriptInterface
+        fun process(
+            message: String,
+            secret: String,
+        ): Int {
+            if (optimizedProcessing) return processOptimized(message, secret)
+
             processLegacy(message, secret)
+            return NO_IMMEDIATE_ERROR
         }
     }
 
     private fun processOptimized(
         message: String,
         secret: String,
-    ) {
-        if (this.secret != secret) return
-        val jsMessage = parseJsMessage(message) ?: return
-        if (context != jsMessage.context) return
-        val registration = this.registration ?: return
+    ): Int {
+        if (this.secret != secret) return NO_IMMEDIATE_ERROR
+        val jsMessage = parseJsMessage(message) ?: return NO_IMMEDIATE_ERROR
+        if (context != jsMessage.context) return NO_IMMEDIATE_ERROR
+        val registration = this.registration ?: return NO_IMMEDIATE_ERROR
 
         val url =
             if (allowedDomains.isNotEmpty() || jsMessage.featureName in domainRestrictedFeatures) {
-                appCoroutineScope.async(dispatcherProvider.main()) {
+                appCoroutineScope.async(dispatcherProvider.main(), start = CoroutineStart.LAZY) {
                     runCatching { registration.webView.url }.getOrNull()
                 }
             } else {
                 null
             }
-        if (!inboundQueue.offer(QueuedMessage(registration, jsMessage, url))) {
+        val lane = laneFor(jsMessage)
+        if (!lane.queue.offer(QueuedMessage(registration, jsMessage, url))) {
             url?.cancel()
+            reportOverflow(lane)
             logcat(WARN) { "Inbound queue full, dropping ${jsMessage.featureName}.${jsMessage.method}" }
-            reportOverflow()
-            return
+            // The JavaScript transport rejects the pending request on the bridge return, without posting a main-thread reply.
+            return if (jsMessage.id == null) NO_IMMEDIATE_ERROR else QUEUE_FULL_ERROR_CODE
         }
-        ensureQueueConsumerRunning()
+        // Start at admission so the URL read samples the sending document without adding work for rejected messages.
+        url?.start()
+        ensureQueueConsumerRunning(lane)
+        return NO_IMMEDIATE_ERROR
+    }
+
+    private fun laneFor(jsMessage: JsMessage): Lane {
+        val key =
+            when {
+                jsMessage.method == ADD_DEBUG_FLAG_METHOD -> SHARED_LANE
+                jsMessage.featureName in handlersByFeatureAndMethod -> jsMessage.featureName
+                else -> SHARED_LANE
+            }
+        return lanes.computeIfAbsent(key) { Lane(toReportedFeature(it)) }
     }
 
     /**
-     * A drop leaves any page waiting on a reply to this message waiting forever, which the synchronous JavaBridge call
-     * could not do. Reported so the kill-switch decision doesn't depend on a logcat nobody is reading on a release build.
+     * Reported so the kill-switch decision doesn't depend on a logcat nobody is reading on a release build: a drop is
+     * something the synchronous JavaBridge call could not do.
      */
-    private fun reportOverflow() {
-        if (!overflowReported.compareAndSet(false, true)) return
-        pixel.fire(INBOUND_QUEUE_FULL, type = Daily())
+    private fun reportOverflow(lane: Lane) {
+        if (!lane.overflowReported.compareAndSet(false, true)) return
+        val current = lane.inFlight
+        val handlingTime = current?.let { handlingTimeBucket(currentTimeProvider.elapsedRealtime() - it.startedAtMillis) }
+        val parameters =
+            mapOf(
+                PARAM_FEATURE to lane.reportedFeature,
+                PARAM_HANDLING_STAGE to (current?.stage?.paramValue ?: NONE),
+                PARAM_HANDLING_TIME to (handlingTime ?: NONE),
+            )
+        pixel.fire(INBOUND_QUEUE_FULL, parameters = parameters, type = Daily())
     }
+
+    // Feature names come from the page, so anything outside the set registered in the pixel definition is collapsed.
+    private fun toReportedFeature(featureName: String): String = if (featureName in REPORTED_FEATURES) featureName else OTHER
+
+    private fun handlingTimeBucket(millis: Long): String =
+        when {
+            millis < 1_000 -> "under_1s"
+            millis < 10_000 -> "1s_to_10s"
+            millis < 60_000 -> "10s_to_60s"
+            else -> "over_60s"
+        }
 
     private fun parseJsMessage(message: String): JsMessage? =
         runCatching {
@@ -232,35 +309,42 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         }.onFailure { logcat(ERROR) { "Exception is ${it.asLog()}" } }
             .getOrNull()
 
-    private fun ensureQueueConsumerRunning() {
-        if (!queueConsumerActive.compareAndSet(false, true)) return
+    private fun ensureQueueConsumerRunning(lane: Lane) {
+        if (!lane.consumerActive.compareAndSet(false, true)) return
         appCoroutineScope.launch(dispatcherProvider.io()) {
             while (true) {
                 try {
                     while (true) {
                         ensureActive()
-                        val jsMessage = inboundQueue.poll() ?: break
+                        val queued = lane.queue.poll() ?: break
+                        val stage = if (queued.url == null) InFlightStage.HANDLER else InFlightStage.URL
+                        lane.inFlight = InFlight(stage, currentTimeProvider.elapsedRealtime())
                         try {
-                            handle(jsMessage)
+                            handle(queued, lane)
                         } catch (e: CancellationException) {
                             throw e
                         } catch (e: Exception) {
                             logcat(ERROR) { "Exception is ${e.asLog()}" }
+                        } finally {
+                            lane.inFlight = null
                         }
                     }
                 } finally {
-                    queueConsumerActive.set(false)
+                    lane.consumerActive.set(false)
                 }
-                if (inboundQueue.isEmpty()) {
-                    overflowReported.set(false)
+                if (lane.queue.isEmpty()) {
+                    lane.overflowReported.set(false)
                     return@launch
                 }
-                if (!queueConsumerActive.compareAndSet(false, true)) return@launch
+                if (!lane.consumerActive.compareAndSet(false, true)) return@launch
             }
         }
     }
 
-    private suspend fun handle(queued: QueuedMessage) {
+    private suspend fun handle(
+        queued: QueuedMessage,
+        lane: Lane,
+    ) {
         if (queued.registration !== this.registration) {
             queued.url?.cancel()
             return
@@ -268,7 +352,11 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         val jsMessage = queued.jsMessage
         val webView = queued.registration.webView
         val jsMessageCallback = queued.registration.jsMessageCallback
-        val host = queued.url?.await()?.toUri()?.host
+        val host = queued.url?.let { url ->
+            val resolvedHost = url.await()?.toUri()?.host
+            lane.inFlight = InFlight(InFlightStage.HANDLER, currentTimeProvider.elapsedRealtime())
+            resolvedHost
+        }
 
         if (allowedDomains.isNotEmpty() && !isUrlAllowed(allowedDomains, host)) return
 
@@ -277,7 +365,7 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
             nativeData.put("webViewId", System.identityHashCode(webView).toString())
             jsMessage.params.put("nativeData", nativeData)
         }
-        if (jsMessage.method == "addDebugFlag") {
+        if (jsMessage.method == ADD_DEBUG_FLAG_METHOD) {
             // If method is addDebugFlag, we want to handle it for all features
             jsMessageCallback.process(
                 featureName = jsMessage.featureName,
@@ -363,16 +451,18 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
         drainQueue()
         this.optimizedProcessing = contentScopeScriptsFeature.optimizeContentScopeMessaging().isEnabled()
         this.checkSenderHost = contentScopeScriptsFeature.bridgeOriginCheck().isEnabled()
-        webView.addJavascriptInterface(this, coreContentScopeScripts.javascriptInterface)
+        webView.addJavascriptInterface(bridge, coreContentScopeScripts.javascriptInterface)
 
         appCoroutineScope.launch(dispatcherProvider.io()) { domainRestrictedFeatures }
     }
 
     private fun drainQueue() {
-        val discarded = mutableListOf<QueuedMessage>()
-        inboundQueue.drainTo(discarded)
-        discarded.forEach { it.url?.cancel() }
-        overflowReported.set(false)
+        lanes.values.forEach { lane ->
+            val discarded = mutableListOf<QueuedMessage>()
+            lane.queue.drainTo(discarded)
+            discarded.forEach { it.url?.cancel() }
+            lane.overflowReported.set(false)
+        }
     }
 
     override fun sendSubscriptionEvent(subscriptionEventData: SubscriptionEventData) {
@@ -450,5 +540,34 @@ class ContentScopeScriptsJsMessaging @Inject constructor(
     companion object {
         private const val METHOD_NOT_FOUND_ERROR_CODE = -32601
         private const val METHOD_NOT_FOUND_ERROR_MESSAGE = "Method not found"
+
+        private const val NO_IMMEDIATE_ERROR = 0
+        internal const val QUEUE_FULL_ERROR_CODE = -32000
+
+        private const val SHARED_LANE = ""
+        private const val ADD_DEBUG_FLAG_METHOD = "addDebugFlag"
+
+        private const val PARAM_FEATURE = "feature"
+        private const val PARAM_HANDLING_STAGE = "handling_stage"
+        private const val PARAM_HANDLING_TIME = "handling_time"
+        private const val NONE = "none"
+        private const val OTHER = "other"
+
+        // Must match the feature enum of m_content_scope_scripts_inbound_queue_full.
+        private val REPORTED_FEATURES =
+            setOf(
+                "aiChat",
+                "breakageReporting",
+                "browserUiLock",
+                "duckAiNativeStorage",
+                "duckPlayer",
+                "internalFeedback",
+                "pageContext",
+                "serp",
+                "serpSettings",
+                "subscriptions",
+                "webCompat",
+                "webEvents",
+            )
     }
 }

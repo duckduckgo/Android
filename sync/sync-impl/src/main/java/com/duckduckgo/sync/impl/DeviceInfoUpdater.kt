@@ -82,7 +82,7 @@ class RealDeviceInfoUpdater @Inject constructor(
      * @return the server's device list as it stands after the update
      */
     private suspend fun setName(name: String, source: DeviceInfoUpdateSource?): Result<List<DeviceV2>> {
-        val includeDeviceInfo = syncFeature.canWriteDeviceInfo()
+        val includeDeviceInfo = syncFeature.canWriteUnifiedDeviceList().isEnabled()
 
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "UpdateDeviceInfo: not signed in")

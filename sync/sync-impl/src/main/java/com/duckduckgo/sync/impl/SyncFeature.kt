@@ -42,69 +42,8 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun level3AllowCreateAccount(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun gzipPatchRequests(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun seamlessAccountSwitching(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun exchangeKeysToSyncWithAnotherDevice(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun automaticallyUpdateSyncSettings(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun syncSetupBarcodeIsUrlBased(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canScanUrlBasedSyncSetupBarcodes(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canInterceptSyncSetupUrls(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canOverrideThemeSyncSetup(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSync(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useExpandableBarcodeConnectSyncLayout(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun syncAutoRestore(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun recoverDataEasilySetupScreen(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun sendSyncSetupWideEvent(): Toggle
-
-    /**
-     * Global switch for the v2 connect/exchange stack. When disabled, the device uses the
-     * v1 stack only — no v2 keys, no v2 channel, no scoped credentials.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canUseV2ConnectFlow(): Toggle
-
-    /**
-     * When enabled, this device displays a v2 QR code. No effect unless [canUseV2ConnectFlow]
-     * is also enabled.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun canShowV2ConnectCode(): Toggle
-
-    /**
-     * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
-     * always encoded as QR, so other formats only add noise (and false-positive decodes) to
-     * the scanner.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun restrictScannedBarcodesToQrTypes(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun preventStaleTokenLogout(): Toggle
 
     /**
      * Gates writing `device_info`
@@ -137,11 +76,3 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun loginNotification(): Toggle
 }
-
-/**
- * `device_info` is read only on the v2 device-list path, and the `account_info` key backing it must be wrapped for every credential on the
- * account, which needs the scoped credentials [SyncFeature.canUseV2ConnectFlow] governs. Writing it with v2 disabled would publish a blob
- * nobody on this device reads, off a key we can only wrap for `ddg`.
- */
-internal fun SyncFeature.canWriteDeviceInfo(): Boolean =
-    canUseV2ConnectFlow().isEnabled() && canWriteUnifiedDeviceList().isEnabled()

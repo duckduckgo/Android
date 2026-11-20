@@ -20,7 +20,6 @@ import android.net.Uri
 import androidx.annotation.VisibleForTesting
 import androidx.core.net.toUri
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
-import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
@@ -101,7 +100,6 @@ class AutoCompleteApi constructor(
     private val autoCompleteScorer: AutoCompleteScorer,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
     private val browserMode: BrowserMode,
-    private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -115,8 +113,6 @@ class AutoCompleteApi constructor(
 
     private val tabRepository: TabRepository
         get() = tabRepositoryProvider.forMode(browserMode)
-
-    private var isAutocompleteTabsFeatureEnabled: Boolean? = null
 
     private val localSuggestionsFirst: Boolean by lazy {
         isOmnibar && autocompleteSpeedFeature.localSuggestionsFirst().isEnabled()
@@ -423,23 +419,11 @@ class AutoCompleteApi constructor(
 
     private fun getAutocompleteSwitchToTabResults(query: String): Flow<List<RankedSuggestion<AutoCompleteSwitchToTabSuggestion>>> =
         runCatching {
-            if (autocompleteTabsEnabled) {
-                val repo = tabRepositoryProvider.forMode(browserMode)
-                combine(repo.flowTabs, repo.flowSelectedTab) { tabs, selectedTab ->
-                    rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
-                }.distinctUntilChanged()
-            } else {
-                flowOf(emptyList())
-            }
+            val repo = tabRepositoryProvider.forMode(browserMode)
+            combine(repo.flowTabs, repo.flowSelectedTab) { tabs, selectedTab ->
+                rankTabs(query, tabs.filter { it.tabId != selectedTab?.tabId })
+            }.distinctUntilChanged()
         }.getOrElse { flowOf(emptyList()) }
-
-    private val autocompleteTabsEnabled: Boolean by lazy {
-        isAutocompleteTabsFeatureEnabled ?: run {
-            val enabled = autocompleteTabsFeature.self().isEnabled()
-            isAutocompleteTabsFeatureEnabled = enabled
-            enabled
-        }
-    }
 
     private fun getAutoCompleteSearchResults(query: String) = flow {
         val searchSuggestionsList = mutableListOf<AutoCompleteSearchSuggestion>()

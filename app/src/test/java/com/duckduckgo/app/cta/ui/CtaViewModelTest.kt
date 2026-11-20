@@ -1555,7 +1555,7 @@ class CtaViewModelTest {
         testee.onCtaShown(cta)
 
         verify(mockDismissedCtaDao, never()).insert(any())
-        verify(mockPixel).fire(DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+        verify(mockPixel).enqueueFire(DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
         verifyNoMoreInteractions(mockPixel)
         verifyNoInteractions(mockOnboardingPixelSender)
         assertTrue(refreshHomeCta() is SyncAfterDeviceTransferBubbleCta)
@@ -1580,7 +1580,7 @@ class CtaViewModelTest {
 
         testee.onUserClickCtaOkButton(cta)
 
-        verify(mockPixel).fire(DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
+        verify(mockPixel).enqueueFire(DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
         verifyNoMoreInteractions(mockPixel)
         verifyNoInteractions(mockOnboardingPixelSender)
     }

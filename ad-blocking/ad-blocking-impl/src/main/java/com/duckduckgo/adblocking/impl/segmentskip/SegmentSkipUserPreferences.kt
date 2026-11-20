@@ -29,15 +29,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
+import java.io.IOException
 import javax.inject.Inject
 
-enum class SegmentSkipMode {
-    ALWAYS_ASK,
-    ALWAYS_SKIP,
-    OFF,
+enum class SegmentSkipMode(val pixelValue: String) {
+    ALWAYS_ASK("ask"),
+    ALWAYS_SKIP("skip"),
+    OFF("off"),
 }
 
 interface SegmentSkipUserPreferences {
@@ -49,7 +51,7 @@ interface SegmentSkipUserPreferences {
      */
     fun cachedMode(): SegmentSkipMode
 
-    suspend fun setMode(mode: SegmentSkipMode)
+    suspend fun setMode(mode: SegmentSkipMode): Boolean
 }
 
 @SingleIn(AppScope::class)
@@ -60,28 +62,42 @@ class RealSegmentSkipUserPreferences @Inject constructor(
     private val feature: SegmentSkipFeature,
 ) : SegmentSkipUserPreferences {
 
-    private val mode: StateFlow<SegmentSkipMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode())
+    private val mode: StateFlow<SegmentSkipMode> =
+        modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode(feature.mvpEnabled().isEnabled()))
 
     override fun modeFlow(): Flow<SegmentSkipMode> = combine(
         dataStore.data,
         feature.mvpEnabled().enabled(),
-        feature.softLaunchEnabled().enabled(),
-    ) { prefs, mvpEnabled, softLaunchEnabled ->
+    ) { prefs, mvpEnabled ->
         prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
-            ?: if (mvpEnabled && softLaunchEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+            ?: defaultMode(mvpEnabled)
     }
+        .catch { cause ->
+            if (cause !is IOException) throw cause
+            emit(SegmentSkipMode.OFF)
+        }
         .distinctUntilChanged()
 
     override fun cachedMode(): SegmentSkipMode = mode.value
 
-    override suspend fun setMode(mode: SegmentSkipMode) {
-        dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
+    override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+        var changed = false
+        dataStore.edit { prefs ->
+            val previous = prefs[KEY_MODE]?.let { stored ->
+                SegmentSkipMode.entries.firstOrNull {
+                    it.name == stored
+                }
+            } ?: defaultMode(feature.mvpEnabled().isEnabled())
+            changed = previous != mode
+            prefs[KEY_MODE] = mode.name
+        }
+        return changed
     }
 
-    private fun defaultMode(): SegmentSkipMode =
-        if (feature.mvpEnabled().isEnabled() && feature.softLaunchEnabled().isEnabled()) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+    private fun defaultMode(mvpEnabled: Boolean): SegmentSkipMode =
+        if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
 
     private companion object {
-        val KEY_MODE = stringPreferencesKey("sponsor_block_mode")
+        val KEY_MODE = stringPreferencesKey("segment_skip_mode")
     }
 }

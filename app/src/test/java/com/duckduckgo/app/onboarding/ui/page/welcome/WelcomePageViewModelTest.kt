@@ -1038,8 +1038,8 @@ class WelcomePageViewModelTest {
         testee.onEvent(NewUserOnboardingEvent.ContinueClicked)
         advanceUntilIdle()
 
-        verify(pixel).fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_SHOWN, type = Unique())
-        verify(pixel).fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
+        verify(pixel).enqueueFire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_SHOWN, type = Unique())
+        verify(pixel).enqueueFire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
         verifyNoMoreInteractions(pixel)
         verifyNoInteractions(mockShownPixels)
         verifyNoInteractions(mockAppInstallStore)

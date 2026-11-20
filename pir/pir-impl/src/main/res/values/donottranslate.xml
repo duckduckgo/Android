@@ -33,8 +33,8 @@
     <string name="pirFreemiumSettingStartScan">Start Free Scan</string>
     <string name="pirFreemiumSettingViewResults">View Scan Results</string>
 
-    <!-- Freemium PIR scan complete notification -->
-    <string name="pirFreemiumNotificationTitleComplete">Free Personal Information Scan</string>
+    <!-- Freemium PIR scan notifications -->
+    <string name="pirFreemiumNotificationTitle">Free Personal Information Scan</string>
     <string name="pirFreemiumNotificationMessageComplete">Your free personal info scan is now complete. Check out the results…</string>
 
     <!-- PIR subscription onboarding step -->
@@ -57,7 +57,7 @@
     <string name="pirOnboardingStepItem5Description">It can take a while for sites to update, but your personal dashboard makes it easy to keep tabs on progress of ongoing automated removals in real time and see where any manual follow ups may be needed.</string>
 
     <!-- PIR notification permission prompt -->
-    <string name="pirNotificationPermissionPromptTitle">Get Notified About Your Scan?</string>
+    <string name="pirNotificationPermissionPromptTitle">Get notified about your scan?</string>
     <string name="pirNotificationPermissionPromptMessage">Scans can take a while. If you allow notifications, we’ll let you know when your results are ready.</string>
     <string name="pirNotificationPermissionPromptSettingsMessage">Scans can take a while. If you turn on notifications in Settings, we’ll let you know when your results are ready.</string>
     <string name="pirNotificationPermissionPromptAllow">Allow Notifications</string>

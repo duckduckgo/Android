@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.sync.provider
+package com.duckduckgo.pagetranslation.impl
 
 import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
-@ContributesRemoteFeature(
-    scope = AppScope::class,
-    featureName = "credentialsLocalFieldValidation",
-)
-interface CredentialsSyncLocalValidationFeature {
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+@ContributesRemoteFeature(scope = AppScope::class, featureName = "pageTranslation")
+interface PageTranslationFeature {
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun self(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun translation(): Toggle
 }

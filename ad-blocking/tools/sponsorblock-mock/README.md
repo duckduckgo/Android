@@ -31,7 +31,7 @@ The mock serves the proposed prefix dataset API. It keeps revision history in me
 
 To test a sync requiring two diff requests, select **Set up two-request sync** under **Test scenarios**, then select **Force device to request revision**. The helper reads the device's saved dataset and creates two newer revisions so that one sync requires two requests. It replaces the mock's revision history; save or remove any draft changes first. Watch the phone requests and device storage to follow the sync.
 
-The web tool uses the device selected by `SERIAL` and the `com.duckduckgo.mobile.android.debug` application ID. Start the app and enable SponsorBlock before requesting a sync. Watch the server log for `/revision` and `/hashPrefix` requests. Mock builds also schedule periodic syncs approximately every 15 minutes; Android may delay them.
+The web tool uses the device selected by `SERIAL` and the `com.duckduckgo.mobile.android.debug` application ID. Start the app and enable SponsorBlock before requesting a sync. Watch the server log for `/revision` and `/hashPrefix` requests. Periodic syncs follow the app schedule; Android may delay them.
 
 After syncing, videos whose prefixes are in the dataset can request segments from the normal endpoint; other videos should not request segments. Restart the app before rechecking a video already looked up, because segment results are cached in the app process.
 

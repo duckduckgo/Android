@@ -78,7 +78,7 @@ class BackupRulesTest {
 
     @Test
     fun atbStoreIsIncluded() {
-        // Device migration detection falls back to a transferred ATB when the old phone never wrote the migration marker.
+        // Keeps the install's ATB and retention state continuous, so the new phone is not counted as a new install.
         assertTrue("sharedpref" to "com.duckduckgo.app.statistics.xml" in deviceTransferIncludes)
     }
 
@@ -90,6 +90,11 @@ class BackupRulesTest {
         )
 
         assertTrue("missing: ${vpnUserChoices - deviceTransferIncludes.toSet()}", deviceTransferIncludes.containsAll(vpnUserChoices))
+    }
+
+    @Test
+    fun userSettingsAreIncluded() {
+        assertTrue("missing: ${USER_SETTINGS - deviceTransferIncludes.toSet()}", deviceTransferIncludes.containsAll(USER_SETTINGS))
     }
 
     @Test
@@ -122,6 +127,19 @@ class BackupRulesTest {
             "Cloud backup must carry no data until device migration detection can tell a cloud restore from a device transfer"
 
         val ALL_DOMAINS = listOf("file", "database", "sharedpref", "external", "root")
+
+        // Stores holding choices the user made in Settings, which they expect to find on their new phone.
+        val USER_SETTINGS =
+            listOf(
+                "sharedpref" to "com.duckduckgo.app.accessibility.settings.xml",
+                "sharedpref" to "com.duckduckgo.history.xml",
+                "sharedpref" to "com.duckduckgo.autoconsent.store.settings.xml",
+                "sharedpref" to "com.duckduckgo.favicons.store.v1.xml",
+                "file" to "datastore/serp_settings.preferences_pb",
+                "file" to "datastore/ad_blocking.preferences_pb",
+                "file" to "datastore/bookmarks.preferences_pb",
+                "file" to "datastore/fire_clearing_preferences.preferences_pb",
+            )
 
         // Keystore-encrypted stores cannot be decrypted on another phone; the rest are per-device, per-install or telemetry state.
         val NON_TRANSFERABLE =

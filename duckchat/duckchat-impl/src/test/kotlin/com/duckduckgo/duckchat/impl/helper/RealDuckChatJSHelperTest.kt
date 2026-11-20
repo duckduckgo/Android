@@ -44,6 +44,13 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionGate
+import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
+import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPluginPoint
+import com.duckduckgo.duckchat.impl.clienttools.FakeDuckAiHostProvider
+import com.duckduckgo.duckchat.impl.clienttools.RealClientToolsExecutor
 import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -143,6 +150,7 @@ class RealDuckChatJSHelperTest {
     private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val chatStateStore = ChatStateStore()
     private val mockResponseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
+    private val mockAttentionTracker: DuckAiResponseAttentionTracker = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock {
         on { isDuckDuckGoQueryUrl(SERP_URL) } doReturn true
@@ -152,6 +160,16 @@ class RealDuckChatJSHelperTest {
     private val newChatHintsUsage: NewChatHintsUsage = mock()
 
     private val pdfPageContextResolver: PdfPageContextResolver = mock()
+
+    private val fakeClientTool = FakeClientTool(name = "listOpenTabs", enabled = false)
+    private val allowingPermissionGate: ClientToolPermissionGate = mock {
+        onBlocking { decide(any(), any()) } doReturn ClientToolPermissionDecision.ALLOWED
+    }
+    private val clientToolsExecutor = RealClientToolsExecutor(
+        tools = FakeClientToolPluginPoint(fakeClientTool),
+        permissionGate = allowingPermissionGate,
+        duckAiHostProvider = FakeDuckAiHostProvider(),
+    )
 
     private val testee = RealDuckChatJSHelper(
         pdfPageContextResolver = pdfPageContextResolver,
@@ -181,9 +199,11 @@ class RealDuckChatJSHelperTest {
         termsConsent = mockTermsConsent,
         chatStateStore = chatStateStore,
         responseWaitWideEvent = mockResponseWaitWideEvent,
+        attentionTracker = mockAttentionTracker,
         duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         tabSessions = tabSessions,
         newChatHintsUsage = newChatHintsUsage,
+        clientToolsExecutor = clientToolsExecutor,
     )
 
     init {
@@ -415,6 +435,75 @@ class RealDuckChatJSHelperTest {
         )
 
         assertTrue(result!!.params.getBoolean("supportsBonusOffer"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesFromDuckAiWithEnabledClientToolThenClientToolsAdvertised() = runTest {
+        fakeClientTool.enabled = true
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageUrl = "https://duck.ai/chat",
+        )
+
+        assertEquals(
+            """{"protocolVersion":1,"capabilities":[{"name":"listOpenTabs","version":1}]}""",
+            result!!.params.getJSONObject("clientTools").toString(),
+        )
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesFromDuckDuckGoWithEnabledClientToolThenClientToolsOmitted() = runTest {
+        fakeClientTool.enabled = true
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            pageUrl = "https://duckduckgo.com/?q=test&ia=chat",
+        )
+
+        assertFalse(result!!.params.has("clientTools"))
+    }
+
+    @Test
+    fun whenGetAIChatNativeConfigValuesInFireModeThenClientToolsOmitted() = runTest {
+        fakeClientTool.enabled = true
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            browserMode = BrowserMode.FIRE,
+            pageUrl = "https://duck.ai/chat",
+        )
+
+        assertFalse(result!!.params.has("clientTools"))
+    }
+
+    @Test
+    fun whenExecuteClientToolThenReplyIsSentWithMessageIdAndChatTab() = runTest {
+        fakeClientTool.enabled = true
+        val params = JSONObject("""{"callId":"c1","capability":{"name":"listOpenTabs","version":1},"input":{}}""")
+
+        val result = testee.processJsCallbackMessage(
+            "aiChat",
+            "executeClientTool",
+            "123",
+            params,
+            tabId = "tab-1",
+            pageUrl = "https://duck.ai/chat",
+        )
+
+        assertEquals("123", result!!.id)
+        assertEquals("executeClientTool", result.method)
+        assertEquals("""{"callId":"c1","ok":true,"value":{"echo":{}}}""", result.params.toString())
+        assertEquals("tab-1", fakeClientTool.calls.single().second.chatTabId)
     }
 
     @Test
@@ -2886,6 +2975,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockResponseWaitWideEvent).onResponseState("tab-1", "start_stream:restart_stream")
+        verify(mockAttentionTracker).onResponseState("tab-1", "start_stream:restart_stream")
     }
 
     @Test
@@ -2901,6 +2991,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verifyNoInteractions(mockResponseWaitWideEvent)
+        verifyNoInteractions(mockAttentionTracker)
     }
 
     @Test
@@ -2919,6 +3010,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockResponseWaitWideEvent).onNativePromptSubmitted("tab-1", BrowserMode.FIRE, "high", "WebSearch")
+        verify(mockAttentionTracker).onNativePromptSubmitted("tab-1", BrowserMode.FIRE)
     }
 
     @Test
@@ -2928,6 +3020,7 @@ class RealDuckChatJSHelperTest {
         testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext, tabId = "tab-1")
 
         verifyNoInteractions(mockResponseWaitWideEvent)
+        verifyNoInteractions(mockAttentionTracker)
     }
 
     @Test
