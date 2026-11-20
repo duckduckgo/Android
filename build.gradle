@@ -260,11 +260,12 @@ subprojects {
 
     if (project.name.endsWith('-impl')) {
         dependencyAnalysis {
-            abi {
-                exclusions {
-                    // -impl classes are public only because Kotlin defaults to public, not because other modules should use them.
-                    // The ABI only decides api vs implementation, so we drop it here and keep unused and transitive dependency checks.
-                    excludeClasses('.*')
+            issues {
+                // -impl classes are public only because Kotlin defaults to public, not because other modules should use them.
+                // We ignore api vs implementation advice here and keep unused and transitive dependency checks.
+                // We can't use abi { exclusions { } } for this, because the plugin keeps one ABI handler for the whole build.
+                onIncorrectConfiguration {
+                    severity('ignore')
                 }
             }
         }
