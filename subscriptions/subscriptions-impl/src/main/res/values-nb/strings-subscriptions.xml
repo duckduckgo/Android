@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Refusjonen din er under behandling.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Vi kunne ikke behandle forespørselen om å trekke deg fra abonnementet automatisk. Gå til <annotation type="withdrawal_help_link">denne siden</annotation> for å få avsluttet abonnementet.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Utløper</string>
+    <string name="subscriptionExpiringIconContentDescription">Abonnementet utløper</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Abonnementet ditt utløper %1$s.</string>
+    <string name="subscriptionKeepSubscription">Behold abonnementet</string>
+
 </resources>
