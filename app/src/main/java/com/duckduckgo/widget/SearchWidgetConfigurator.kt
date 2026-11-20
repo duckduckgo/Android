@@ -76,14 +76,16 @@ class SearchWidgetConfigurator @Inject constructor(
 
         val showDuckAi = !fromSearchOnlyWidget && duckAiEnabled
         withContext(dispatcherProvider.main()) {
-            remoteViews.setInt(
-                if (fromFavWidget) R.id.widgetSearchBarContainer else R.id.widgetContainer,
-                "setBackgroundResource",
-                resolveSearchBarBackground(
-                    widgetTheme = widgetTheme,
-                    isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled(),
-                ),
-            )
+            if (!fromSearchOnlyWidget) {
+                remoteViews.setInt(
+                    if (fromFavWidget) R.id.widgetSearchBarContainer else R.id.widgetContainer,
+                    "setBackgroundResource",
+                    resolveSearchBarBackground(
+                        widgetTheme = widgetTheme,
+                        isAddressBarRebrandEnabled = appBrandDesignUpdateToggles.addressBar().isEnabled(),
+                    ),
+                )
+            }
             remoteViews.setViewVisibility(R.id.voiceSearch, if (voiceSearchEnabled) View.VISIBLE else View.GONE)
             remoteViews.setViewVisibility(R.id.duckAi, if (showDuckAi) View.VISIBLE else View.GONE)
             remoteViews.setViewVisibility(R.id.separator, if (voiceSearchEnabled && showDuckAi) View.VISIBLE else View.GONE)
