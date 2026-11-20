@@ -29,6 +29,9 @@ sealed interface NewChatHintCommand {
     data class OpenDocuments(override val tabId: String, val mimeTypes: List<String>) : NewChatHintCommand
     data class OpenPhoto(override val tabId: String) : NewChatHintCommand
     data class CreateImage(override val tabId: String) : NewChatHintCommand
+
+    /** Picks [modelId] for the tab's new chat, then sends [then] once the pick is in the tab's state. */
+    data class PickModel(override val tabId: String, val modelId: String, val then: NewChatHintCommand) : NewChatHintCommand
 }
 
 @SingleIn(AppScope::class)

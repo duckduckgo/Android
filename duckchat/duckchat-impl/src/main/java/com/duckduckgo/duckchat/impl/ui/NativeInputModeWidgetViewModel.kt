@@ -63,6 +63,8 @@ import com.duckduckgo.duckchat.impl.models.newChatSelection
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -96,6 +98,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -144,6 +147,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val newChatHintsPixels: NewChatHintsPixels,
     private val newChatDetector: NewChatDetector,
     private val tabRepository: TabRepository,
+    private val newChatHintCommands: NewChatHintCommands,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -214,6 +218,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                     nativeInputStatePublisher.update(eventTabId) { it.copy(modelChangeMode = true) }
                 }
             }
+        }
+        viewModelScope.launch {
+            // Hints switch the model through this widget, the single writer of the tab's pick.
+            newChatHintCommands.commandsFor { activeTabId.value }
+                .filterIsInstance<NewChatHintCommand.PickModel>()
+                .collect { command ->
+                    nativeInputStatePublisher.update(command.tabId) { it.copy(newChatModelId = command.modelId) }
+                    // Launched: this collector is a subscriber of the same flow, so sending inline would wait on itself.
+                    viewModelScope.launch { newChatHintCommands.send(command.then) }
+                }
         }
     }
 

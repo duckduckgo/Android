@@ -25,9 +25,11 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.newChatSelection
 import com.duckduckgo.duckchat.impl.nativeinput.NewChat
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
@@ -61,6 +63,7 @@ class NewChatHintsViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val newChatDetector: NewChatDetector,
     private val pixels: NewChatHintsPixels,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     private val eligible: StateFlow<Boolean?> = eligibility.observeEligible(browserMode).stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -85,7 +88,7 @@ class NewChatHintsViewModel @Inject constructor(
             newChat,
         ) { selectedTab, input, models, isEligible, newChat ->
             val showHints = selectedTab?.tabId == tabId && isEligible && newChat.isGuaranteed && input.isDraftEmpty()
-            if (showHints) order.filter { capableModel(it, models) != null } else emptyList()
+            if (showHints) order.filter { capableModel(it, models, input) != null } else emptyList()
         }.distinctUntilChanged()
             .onEach { hints ->
                 if (hints.isEmpty()) return@onEach
@@ -110,24 +113,31 @@ class NewChatHintsViewModel @Inject constructor(
     private suspend fun sendCommand(hint: NewChatHint, tabId: String) {
         if (!canAct(tabId)) return
         val models = modelManager.modelState.value
-        val model = capableModel(hint, models) ?: return
-        if (model.id != models.selectedModelId) {
-            modelManager.selectModel(model)
-            // Selecting a model suspends; the tab, chat, eligibility or promo may have changed meanwhile.
-            if (!canAct(tabId)) return
-        }
+        val input = provider.stateForTab(tabId).value
+        val model = capableModel(hint, models, input) ?: return
         val command = when (hint) {
             NewChatHint.DOCUMENTS -> NewChatHintCommand.OpenDocuments(tabId, model.supportedFileTypes)
             NewChatHint.PHOTO -> NewChatHintCommand.OpenPhoto(tabId)
             NewChatHint.IMAGE_GENERATION -> NewChatHintCommand.CreateImage(tabId)
         }
-        commands.send(command)
+        if (model.id == models.newChatSelection(input).modelId) {
+            commands.send(command)
+        } else if (duckChatFeature.resetModelForNewChats().isEnabled()) {
+            // The widget writes the pick and only then sends the command, so the hint never opens on the old model.
+            commands.send(NewChatHintCommand.PickModel(tabId, model.id, then = command))
+        } else {
+            modelManager.selectModel(model)
+            // Selecting a model suspends; the tab, chat, eligibility or promo may have changed meanwhile.
+            if (!canAct(tabId)) return
+            commands.send(command)
+        }
     }
 
-    private fun capableModel(hint: NewChatHint, models: ModelState): AIChatModel? {
+    private fun capableModel(hint: NewChatHint, models: ModelState, input: NativeInputState): AIChatModel? {
         if (hint == NewChatHint.PHOTO && !duckChat.isImageUploadEnabled()) return null
         val capable = models.models.filter { it.isAccessible && hint.supportedBy(it) }
-        return capable.firstOrNull { it.id == models.selectedModelId } ?: capable.firstOrNull()
+        val current = models.newChatSelection(input).modelId
+        return capable.firstOrNull { it.id == current } ?: capable.firstOrNull()
     }
 
     private suspend fun canAct(tabId: String): Boolean =

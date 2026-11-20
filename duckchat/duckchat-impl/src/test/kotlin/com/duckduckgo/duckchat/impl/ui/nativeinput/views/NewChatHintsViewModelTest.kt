@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -46,6 +47,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -110,6 +113,7 @@ class NewChatHintsViewModelTest {
     private val chatStore: DuckAiChatStore = mock {
         onBlocking { getChatById(any()) } doAnswer { invocation -> chats.value.firstOrNull { it.chatId == invocation.getArgument(0) } }
     }
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val pixels = NewChatHintsPixels(duckChatPixels, mock(), coroutineRule.testDispatcherProvider)
     private fun viewModel(
         provider: NativeInputStateProvider = stateStore,
@@ -120,6 +124,7 @@ class NewChatHintsViewModelTest {
     ) = NewChatHintsViewModel(
         provider, modelManager, duckChat, commands, tabRepository, usage, eligibility, browserMode,
         NewChatDetector(provider, chatStateStore, voiceSessions, tabRepository, duckChat, chatStore, coroutineRule.testDispatcherProvider), pixels,
+        duckChatFeature,
     )
 
     @Before
@@ -280,6 +285,38 @@ class NewChatHintsViewModelTest {
         commands.commandsFor { "tab" }.test {
             viewModel().onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab")
             assertEquals("files", models.value.selectedModelId)
+            assertEquals(NewChatHintCommand.OpenDocuments("tab", listOf("application/pdf")), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndHintNeedsAnotherModelThenTabPicksItWithPickerAsFollowUp() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val unsupported = model().copy(id = "text", supportedFileTypes = emptyList())
+        val capable = model().copy(id = "files")
+        models.value = ModelState(models = listOf(unsupported, capable), selectedModelId = "text")
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab")
+            assertEquals(
+                NewChatHintCommand.PickModel("tab", "files", then = NewChatHintCommand.OpenDocuments("tab", listOf("application/pdf"))),
+                awaitItem(),
+            )
+            verify(modelManager, never()).selectModel(any())
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTabAlreadyPickedACapableModelThenHintUsesItWithoutSwitching() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val unsupported = model().copy(id = "text", supportedFileTypes = emptyList())
+        val capable = model().copy(id = "files")
+        models.value = ModelState(models = listOf(unsupported, capable), selectedModelId = "text")
+        stateStore.update("tab") { it.copy(newChatModelId = "files") }
+        commands.commandsFor { "tab" }.test {
+            viewModel().onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab")
             assertEquals(NewChatHintCommand.OpenDocuments("tab", listOf("application/pdf")), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }

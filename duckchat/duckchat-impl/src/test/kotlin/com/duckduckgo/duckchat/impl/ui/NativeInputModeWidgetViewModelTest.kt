@@ -63,6 +63,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
@@ -171,6 +173,7 @@ class NativeInputModeWidgetViewModelTest {
         chatStateStore,
     )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
+    private val newChatHintCommands = NewChatHintCommands()
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
 
     private val showSettingsFlow = MutableStateFlow(false)
@@ -282,6 +285,7 @@ class NativeInputModeWidgetViewModelTest {
             newChatHintsPixels = newChatHintsPixels,
             newChatDetector = newChatDetector,
             tabRepository = tabRepository,
+            newChatHintCommands = newChatHintCommands,
         )
     }
 
@@ -1704,6 +1708,25 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertEquals("default-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenHintPicksModelForActiveTabThenItBecomesThePickBeforeFollowUpIsSent() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        newChatHintCommands.commandsFor { "tab-A" }.test {
+            newChatHintCommands.send(NewChatHintCommand.PickModel("tab-A", "picked-model", then = NewChatHintCommand.OpenPhoto("tab-A")))
+            assertEquals(NewChatHintCommand.PickModel("tab-A", "picked-model", then = NewChatHintCommand.OpenPhoto("tab-A")), awaitItem())
+
+            val followUp = awaitItem()
+
+            assertEquals(NewChatHintCommand.OpenPhoto("tab-A"), followUp)
+            assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     @Test
