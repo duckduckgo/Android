@@ -18,6 +18,7 @@ package com.duckduckgo.agesignals.impl
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -143,7 +144,10 @@ internal class RealAgeSignalsStore @Inject constructor(
 @ContributesTo(AppScope::class)
 @BindingContainer
 internal object AgeSignalsStoreModule {
-    private val Context.ageSignalsDataStore: DataStore<Preferences> by preferencesDataStore(name = "age_signals")
+    private val Context.ageSignalsDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "age_signals",
+        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+    )
 
     @Provides
     @AgeSignals
