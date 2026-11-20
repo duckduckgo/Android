@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pagetranslation.impl
+package com.duckduckgo.pagetranslation.impl.manifest
 
 import android.content.Context
 import androidx.datastore.core.DataStore
@@ -24,6 +24,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -36,37 +37,49 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.ATOMIC_MOVE
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-import javax.inject.Inject
 
-private val Context.manifestPreferences by preferencesDataStore(name = "page_translation_manifest")
+private const val MANIFEST_PREFERENCES_NAME = "page_translation_manifest"
+
+private val Context.manifestPreferences by preferencesDataStore(name = MANIFEST_PREFERENCES_NAME)
 
 internal class ModelsManifestStore(
     private val directory: () -> File,
     private val preferences: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
 ) {
-    @Inject constructor(context: Context, dispatchers: DispatcherProvider) : this(
-        { context.filesDir.resolve("page-translation") },
+    constructor(
+        context: Context,
+        dispatchers: DispatcherProvider,
+    ) : this(
+        { context.filesDir.resolve(MANIFEST_DIRECTORY) },
         context.manifestPreferences,
         dispatchers,
     )
 
-    suspend fun manifest(): ModelsManifest? = withContext(dispatchers.io()) {
+    suspend fun readManifest(): ModelsManifest? = withContext(dispatchers.io()) {
         try {
-            val alternate = preferences.data.firstOrNull()?.get(ALTERNATE_FILE) ?: return@withContext null
-            parse(file(alternate).readText())
+            val isAlternateFile = preferences.data.firstOrNull()?.get(ALTERNATE_FILE) ?: return@withContext null
+
+            parse(getManifestFile(isAlternateFile).readText())
         } catch (_: IOException) {
             null
         }
     }
 
-    suspend fun etagForRequest(): String? = withContext(dispatchers.io()) {
-        if (manifest() != null) return@withContext preferences.data.firstOrNull()?.get(ETAG)
+    suspend fun getEtagForRequest(): String? = withContext(dispatchers.io()) {
+        if (readManifest() != null) {
+            return@withContext preferences.data.firstOrNull()?.get(ETAG)
+        }
+
         preferences.edit { prefs ->
-            prefs[ALTERNATE_FILE]?.let { Files.deleteIfExists(file(it).toPath()) }
+            prefs[ALTERNATE_FILE]?.let { isAlternateFile ->
+                Files.deleteIfExists(getManifestFile(isAlternateFile).toPath())
+            }
+
             prefs.remove(ALTERNATE_FILE)
             prefs.remove(ETAG)
         }
+
         null
     }
 
@@ -76,20 +89,30 @@ internal class ModelsManifestStore(
             return@withContext
         }
 
-        // Switching files and ETag in one preference edit keeps the previous pair usable if the write is interrupted.
+        // preserve the previous file and ETag if the update fails
         preferences.edit { prefs ->
-            val alternate = prefs[ALTERNATE_FILE] == false
-            val target = file(alternate).toPath()
+            val isAlternateFile = prefs[ALTERNATE_FILE] == false
+            val target = getManifestFile(isAlternateFile).toPath()
+            val temp = target.resolveSibling(TEMP_MANIFEST_FILE_NAME)
+
             Files.createDirectories(target.parent)
-            val temp = target.resolveSibling("models.tmp")
             Files.write(temp, body.toByteArray())
             Files.move(temp, target, ATOMIC_MOVE, REPLACE_EXISTING)
-            prefs[ALTERNATE_FILE] = alternate
-            if (etag == null) prefs.remove(ETAG) else prefs[ETAG] = etag
+
+            prefs[ALTERNATE_FILE] = isAlternateFile
+            if (etag == null) {
+                prefs.remove(ETAG)
+            } else {
+                prefs[ETAG] = etag
+            }
         }
     }
 
-    private fun file(alternate: Boolean) = directory().resolve(if (alternate) "models-alt.json" else "models.json")
+    private fun getManifestFile(isAlternateFile: Boolean): File {
+        val fileName = if (isAlternateFile) ALTERNATE_MANIFEST_FILE_NAME else MANIFEST_FILE_NAME
+
+        return directory().resolve(fileName)
+    }
 
     private fun parse(body: String): ModelsManifest? = try {
         adapter.fromJson(body)?.takeIf { it.schemaVersion <= SUPPORTED_SCHEMA_VERSION }
@@ -101,8 +124,21 @@ internal class ModelsManifestStore(
 
     private companion object {
         const val SUPPORTED_SCHEMA_VERSION = 1
-        val ALTERNATE_FILE = booleanPreferencesKey("alternate_file")
-        val ETAG = stringPreferencesKey("etag")
-        val adapter = Moshi.Builder().add(KotlinJsonAdapterFactory()).build().adapter(ModelsManifest::class.java)
+
+        const val MANIFEST_DIRECTORY = "page-translation"
+        const val MANIFEST_FILE_NAME = "models.json"
+        const val ALTERNATE_MANIFEST_FILE_NAME = "models-alt.json"
+        const val TEMP_MANIFEST_FILE_NAME = "models.tmp"
+
+        const val ALTERNATE_FILE_KEY = "alternate_file"
+        const val ETAG_KEY = "etag"
+
+        val ALTERNATE_FILE = booleanPreferencesKey(ALTERNATE_FILE_KEY)
+        val ETAG = stringPreferencesKey(ETAG_KEY)
+
+        val adapter: JsonAdapter<ModelsManifest> = Moshi.Builder()
+            .add(KotlinJsonAdapterFactory())
+            .build()
+            .adapter(ModelsManifest::class.java)
     }
 }
