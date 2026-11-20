@@ -21,6 +21,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.workDataOf
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -233,12 +234,60 @@ class SegmentSkipDatasetSyncTest {
         assertTrue(store.contains("00000001"))
     }
 
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun workerDelaysBothEnableAndRegularChecksAndCanBeCancelled() = runTest {
+        whenever(freshness.generation()).thenReturn(0L)
+        for (force in listOf(false, true)) {
+            val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context)
+                .setInputData(workDataOf(SegmentSkipDatasetWorker.FORCE_CHECK to force))
+                .build().also {
+                    it.sync = sync
+                    it.feature = feature
+                    it.dispatchers = coroutineRule.testDispatcherProvider
+                    it.freshness = freshness
+                }
+            val scheduler = coroutineRule.testScope.testScheduler
+            val before = service.revisionRequests
+            val cancelled = coroutineRule.testScope.launch { worker.doWork() }
+            scheduler.runCurrent()
+            assertEquals(before, service.revisionRequests)
+            cancelled.cancelAndJoin()
+            scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
+            scheduler.runCurrent()
+            assertEquals(before, service.revisionRequests)
+
+            val check = coroutineRule.testScope.launch { worker.doWork() }
+            scheduler.runCurrent()
+            assertEquals(before, service.revisionRequests)
+            scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
+            scheduler.runCurrent()
+            check.join()
+            assertEquals(before + 1, service.revisionRequests)
+        }
+    }
+
+    @Test fun consecutivePeriodicChecksRunEvenWhenPreviousCheckIsStillFresh() = runTest {
+        whenever(freshness.isStale(any())).thenReturn(false)
+        val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context)
+            .setInputData(workDataOf(SegmentSkipDatasetWorker.PERIODIC_CHECK to true))
+            .build().also {
+                it.sync = sync
+                it.feature = feature
+                it.dispatchers = coroutineRule.testDispatcherProvider
+                it.freshness = freshness
+            }
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(Result.success(), worker.doWork())
+        assertEquals(2, service.revisionRequests)
+    }
+
     @Test fun disabledWorkerDoesNotRequestRevision() = runTest {
         whenever(preferences.modeFlow()).thenReturn(flowOf(SegmentSkipMode.OFF))
         val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context).build().also {
             it.sync = sync
             it.feature = feature
             it.dispatchers = coroutineRule.testDispatcherProvider
+            it.freshness = freshness
         }
         assertEquals(Result.success(), worker.doWork())
         assertEquals(0, service.revisionRequests)
@@ -265,6 +314,7 @@ class SegmentSkipDatasetSyncTest {
             it.sync = sync
             it.feature = feature
             it.dispatchers = coroutineRule.testDispatcherProvider
+            it.freshness = freshness
         }
         assertEquals(Result.retry(), worker.doWork())
         service.failure = null

@@ -52,6 +52,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -67,6 +68,7 @@ import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
+import kotlin.random.Random
 
 @SingleIn(AppScope::class)
 class SegmentSkipDatasetSync @Inject constructor(
@@ -193,11 +195,16 @@ class SegmentSkipDatasetWorker(context: Context, parameters: WorkerParameters) :
 
     @Inject lateinit var dispatchers: DispatcherProvider
 
+    @Inject lateinit var freshness: SegmentSkipDatasetFreshness
+
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
         if (!feature.mvpEnabled().isEnabled()) return@withContext Result.success()
         try {
             val force = inputData.getBoolean(FORCE_CHECK, false)
-            sync.sync(staleOnly = !force, enableGeneration = if (force) inputData.getLong(ENABLE_GENERATION, 0) else null)
+            val periodic = inputData.getBoolean(PERIODIC_CHECK, false)
+            val generation = if (force) inputData.getLong(ENABLE_GENERATION, 0) else if (periodic) freshness.generation() else null
+            delay(Random.nextLong(1, TimeUnit.MINUTES.toMillis(5) + 1))
+            sync.sync(staleOnly = !force && !periodic, enableGeneration = generation)
             Result.success()
         } catch (e: UnsupportedSegmentSkipFormat) {
             Result.success()
@@ -209,6 +216,7 @@ class SegmentSkipDatasetWorker(context: Context, parameters: WorkerParameters) :
     }
 
     companion object {
+        const val PERIODIC_CHECK = "periodic_check"
         const val FORCE_CHECK = "force_check"
         const val ENABLE_GENERATION = "enable_generation"
     }
@@ -223,7 +231,7 @@ class SegmentSkipDatasetFreshness @Inject constructor(
         if (binary.revision() == 0L) return true
         val last = dataStore.data.firstOrNull()?.get(LAST_CHECK) ?: return true
         val now = clock.currentTimeMillis()
-        return last <= 0 || last > now || now - last >= TimeUnit.HOURS.toMillis(24)
+        return last <= 0 || last > now || now - last >= TimeUnit.HOURS.toMillis(1)
     }
 
     suspend fun generation(): Long = dataStore.data.firstOrNull()?.get(GENERATION) ?: 0
@@ -290,7 +298,8 @@ class SegmentSkipDatasetScheduler @Inject constructor(
     override fun onPrivacyConfigDownloaded() = Unit
 
     private fun schedulePeriodic() {
-        val request = PeriodicWorkRequestBuilder<SegmentSkipDatasetWorker>(24, TimeUnit.HOURS)
+        val request = PeriodicWorkRequestBuilder<SegmentSkipDatasetWorker>(1, TimeUnit.HOURS)
+            .setInputData(workDataOf(SegmentSkipDatasetWorker.PERIODIC_CHECK to true))
             .setConstraints(networkConstraints())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
             .build()
