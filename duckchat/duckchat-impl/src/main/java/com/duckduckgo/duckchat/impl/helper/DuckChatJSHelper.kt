@@ -254,7 +254,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 if (mode == Mode.FULL && tabId.isNotEmpty()) {
                     val status = data?.optString("status").orEmpty()
                     responseWaitWideEvent.onResponseState(tabId, status)
-                    attentionTracker.onResponseState(tabId, status)
+                    attentionTracker.onResponseState(tabId, status, browserMode)
                 }
                 data?.optJSONObject("attachments")?.let { attachments ->
                     val usage = AIChatAttachmentUsage(

@@ -30,6 +30,10 @@ class PendingResponseStatusTest {
         assertEquals(PendingResponseStatus.StartStream(isRestart = false), PendingResponseStatus.from("start_stream:new_prompt"))
         assertEquals(PendingResponseStatus.StartStream(isRestart = false), PendingResponseStatus.from("start_stream:auto_retry_last_prompt"))
         assertEquals(PendingResponseStatus.StartStream(isRestart = true), PendingResponseStatus.from("start_stream:restart_stream"))
+        assertEquals(
+            PendingResponseStatus.StartStream(isRestart = false, isReconnection = true),
+            PendingResponseStatus.from("start_stream:restart_stream_reconnection"),
+        )
         assertEquals(PendingResponseStatus.Ready, PendingResponseStatus.from("ready"))
         assertEquals(PendingResponseStatus.Error, PendingResponseStatus.from("error"))
         assertEquals(PendingResponseStatus.Blocked, PendingResponseStatus.from("blocked"))

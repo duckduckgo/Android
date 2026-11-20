@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.attention
 internal sealed interface PendingResponseStatus {
 
     /** Any `start_stream:` status. A restart is an edit, a regenerate, a model switch or a second opinion. */
-    data class StartStream(val isRestart: Boolean) : PendingResponseStatus
+    data class StartStream(val isRestart: Boolean, val isReconnection: Boolean = false) : PendingResponseStatus
 
     data object Loading : PendingResponseStatus
     data object Streaming : PendingResponseStatus
@@ -35,11 +35,12 @@ internal sealed interface PendingResponseStatus {
     companion object {
         private const val START_STREAM_PREFIX = "start_stream:"
         private const val RESTART_STREAM = "start_stream:restart_stream"
+        private const val RESTART_STREAM_RECONNECTION = "start_stream:restart_stream_reconnection"
 
         fun from(raw: String): PendingResponseStatus = when {
             raw == "loading" -> Loading
             raw == "streaming" -> Streaming
-            raw.startsWith(START_STREAM_PREFIX) -> StartStream(isRestart = raw == RESTART_STREAM)
+            raw.startsWith(START_STREAM_PREFIX) -> StartStream(isRestart = raw == RESTART_STREAM, isReconnection = raw == RESTART_STREAM_RECONNECTION)
             raw == "ready" -> Ready
             raw == "error" -> Error
             raw == "blocked" -> Blocked
