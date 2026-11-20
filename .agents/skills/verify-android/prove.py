@@ -294,17 +294,9 @@ def side_label(build):
     return f"this branch ({build.get('head', '?')[:10]}{' + uncommitted' if build.get('dirty') else ''})"
 
 
-def proof_origin(path):
-    """The proof's path in the repo and whether it is committed unchanged; pr-summary includes the source otherwise."""
+def repo_path(path):
     path = Path(path).resolve()
-    try:
-        rel = str(path.relative_to(REPO))
-    except ValueError:
-        return None, False
-    git = ["git", "-C", str(REPO)]
-    tracked = subprocess.run([*git, "ls-files", "--error-unmatch", rel], capture_output=True).returncode == 0
-    unchanged = subprocess.run([*git, "diff", "--quiet", "HEAD", "--", rel], capture_output=True).returncode == 0
-    return rel, tracked and unchanged
+    return str(path.relative_to(REPO)) if inside(path, REPO) else None
 
 
 def inside(path, root):
@@ -352,8 +344,7 @@ def run_details(m):
     return [f"Revision: {head}" + (f" + {rev['dirty_files']} uncommitted files" if rev.get("dirty_files") else ", clean"),
             f"Build: {build_label(m.get('build'))}", f"Device: {ev.device_name(m)}",
             f"Live services: {', '.join(m.get('live') or []) or 'none'}",
-            f"Proof: {proof.get('repo_path') or proof.get('name', 'proof') + '.py'}"
-            + (" (committed)" if proof.get("committed") else " (not committed; proof.py here is its source)"),
+            f"Proof: {proof.get('repo_path') or proof.get('name', 'proof') + '.py'} (proof.py here is its source)",
             f"Poster: {m['poster_source']}" if m.get("poster_source") else "Poster: none",
             f"Finished: {m.get('finished')}",
             "Rerun: " + " ; ".join(rerun_lines(None, m, proof.get("repo_path") or f"proofs/{proof.get('name')}.py"))]
@@ -417,11 +408,10 @@ def prove(path, attempt):
 
     checks = android.checks if android else []
     verdict = "ERROR" if error else "PASS" if checks and all(c["ok"] for c in checks) else "FAIL"
-    repo_path, committed = proof_origin(path)
     kept = lambda names: [f"{device_dir}/{n}" for n in names if folder and (folder / n).is_file()]
     m = {"verdict": verdict, "error": error,
          "proof": {"name": name, "path": str(Path(path).resolve()), "doc": (proof.__doc__ or "").strip() if proof else "",
-                   "repo_path": repo_path, "committed": committed,
+                   "repo_path": repo_path(path),
                    "source": Path(path).read_text() if Path(path).is_file() else ""},
          "device": serial, **props, "build": build, "revision": revision(), "checks": checks,
          "live": list(getattr(proof, "LIVE", [])) if proof else [],
@@ -717,7 +707,6 @@ def summarize(before, after, comparison=None):
     runs = [r for r in (before, after) if r]
     b, a = (before[0] if before else None), after[0]
     proof = a["proof"]
-    committed = proof.get("repo_path") if proof.get("committed") else None
     claim = (proof.get("doc") or "").split("\n\n")[0].replace("\n", " ").strip() or proof.get("name") or "proof"
     sentence = "; ".join(outcome(r) for r in (b, a) if r)
     device = ev.device_name(a) if a.get("model") else None
@@ -741,7 +730,7 @@ def summarize(before, after, comparison=None):
     outcome_line += (" Problems: " + "; ".join(problems) + ".") if problems else ""
     lines += [outcome_line, ""]
 
-    details = [f"proof `{committed}`" if committed else "proof written for this change (source below)",
+    details = ["proof written for this change (source below)",
                "builds " + (f"{build_public(b['build'])} → " if b else "") + build_public(a["build"])]
     details += [device] if device else []
     details += [f"live services: {', '.join(a.get('live') or []) or 'none'}"]
@@ -770,15 +759,15 @@ def summarize(before, after, comparison=None):
     for run in (r for r in (b, a) if r):
         for title, markdown in run.get("sections") or []:
             lines += ["", f"<details><summary>{title} ({column(run['build'])})</summary>", "", markdown, "", "</details>"]
-    if not committed and proof.get("source"):
+    if proof.get("source"):
         lines += ["", "<details><summary>Proof source</summary>", "", "```python", proof["source"].rstrip(), "```", "",
                   "</details>"]
     # proofs/ is where a proof finds steps.py, and .gitignore keeps it out of the repo there.
     saved = f"{SKILL.relative_to(REPO)}/proofs/{proof.get('name') or 'proof'}.py"
     lines += ["", "<details><summary>Rerun</summary>", "", "```",
-              *([] if committed else [f"# save the proof source above as {saved}"]),
+              f"# save the proof source above as {saved}",
               f"V={SKILL.relative_to(REPO)}/verify.sh", f"P={SKILL.relative_to(REPO)}/prove.py",
-              *rerun_lines(b, a, committed or saved), "```", "", "</details>"]
+              *rerun_lines(b, a, saved), "```", "", "</details>"]
     return public("\n".join(lines) + "\n")
 
 
@@ -823,10 +812,10 @@ def summary_fixtures(folder):
             "sha256": "75e3e4a9" * 8, "serial": "emulator-5580"}
     external = {"external": True, "apk": f"{home}/Downloads/app-internal-debug.apk", "sha256": "9c0ffee1" * 8,
                 "serial": "emulator-5580"}
-    committed = {"name": "tabs", "path": str(SKILL / "proofs" / "tabs.py"), "repo_path": ".agents/skills/verify-android/proofs/tabs.py",
-                 "committed": True, "doc": "The tab switcher lists one card per tab.\n\nRecipe: features/tabs.md.",
+    tabs = {"name": "tabs", "path": str(SKILL / "proofs" / "tabs.py"), "repo_path": ".agents/skills/verify-android/proofs/tabs.py",
+                 "doc": "The tab switcher lists one card per tab.\n\nRecipe: features/tabs.md.",
                  "source": "def run(android):\n    pass\n"}
-    scratch = {**committed, "name": "fix", "path": f"{home}/scratch/fix.py", "repo_path": None, "committed": False,
+    scratch = {**tabs, "name": "fix", "path": f"{home}/scratch/fix.py", "repo_path": None,
                "doc": "Closing a tab keeps the other tabs.", "source": "def run(android):\n    android.check('kept', True)\n"}
     dev = "sdk_gphone64_arm64"
 
@@ -846,18 +835,18 @@ def summary_fixtures(folder):
     checks = [("at the switcher", True, "TabSwitcherActivity"), ("card titled with the page", True, ""),
               ("tab count 2", True, "2")]
     compare_dir = folder / "20261117-100000-tabs-vs-base-ab12"
-    before = run(compare_dir / "before", "FAIL", base, committed, checks[:1] + [("card titled with the page", False, "")] + checks[2:])
-    after = run(compare_dir / "after", "PASS", branch, committed, checks)
+    before = run(compare_dir / "before", "FAIL", base, tabs, checks[:1] + [("card titled with the page", False, "")] + checks[2:])
+    after = run(compare_dir / "after", "PASS", branch, tabs, checks)
     (compare_dir / "compare.json").write_text(json.dumps({
-        "proof": {"name": "tabs", "doc": committed["doc"]}, "before": "before/proof.json", "after": "after/proof.json",
+        "proof": {"name": "tabs", "doc": tabs["doc"]}, "before": "before/proof.json", "after": "after/proof.json",
         "rows": check_rows(before, after), "before_after": "before-after.png", "problems": []}))
     run(folder / "error", "ERROR", branch, scratch, checks[:1], live=["duck.ai chat"],
         error=f"verify.sh tap id:close failed (1): not on screen in {REPO}\nscreen at the failure: {dev}/layout-at-failure.json",
         unverified=[{"what": "the undo snackbar", "why": "it hides before the layout can be read"}])
-    run(folder / "external", "FAIL", external, committed, [("tab count 2", False, "1")])
-    run(folder / "branch", "PASS", branch, committed, [("tab count 2", True, "2")])
+    run(folder / "external", "FAIL", external, tabs, [("tab count 2", False, "1")])
+    run(folder / "branch", "PASS", branch, tabs, [("tab count 2", True, "2")])
     served = "https://artifacts.go.duckduckgo.com/view/auto/076c07cc-9e60-42df-8edb-53a6896bf5a4/20261117-100000-tabs-ab12"
-    run(folder / "published", "PASS", branch, committed, checks, evidence_url=f"{served}/index.html")
+    run(folder / "published", "PASS", branch, tabs, checks, evidence_url=f"{served}/index.html")
     return compare_dir, served
 
 
@@ -926,7 +915,7 @@ def selftest(offline=False, evidence_dir=None):
                  "| | Before (base `origin/develop`) | After |", "| switcher | [<img src=\"before/sdk_gphone64_arm64/switcher.png\"",
                  "[▶ Watch video](after/sdk_gphone64_arm64/recording-1.mp4)", "before-after.png",
                  "**Outcome:** Fails on the base (1 of 3 checks); passes on this branch. Changed: card titled with the page: FAIL → pass.",
-                 "**Details:** `prove.py compare`", "[Full report](index.html)", "`.agents/skills/verify-android/proofs/tabs.py`",
+                 "**Details:** `prove.py compare`", "[Full report](index.html)", "save the proof source above as .agents/skills/verify-android/proofs/tabs.py",
                  "<details><summary>All checks", "$P compare", "API 34", "NOTE not published"),
                 leaks)),
             ("pr-summary of a published run links served thumbnails publish-pr can attach", *case(
@@ -935,7 +924,7 @@ def selftest(offline=False, evidence_dir=None):
                  f"({served}/sdk_gphone64_arm64/switcher.png)", f"[▶ Watch video]({served}/sdk_gphone64_arm64/recording-1.mp4)",
                  f"[Full report]({served}/index.html)", f"Key frames: [<img src=\"{served}/sdk_gphone64_arm64/key-frames.png\" width=\"200\" alt=\"This branch: key frames\">]"),
                 (*leaks, "NOTE not published"))),
-            ("pr-summary of an uncommitted proof that errored carries its source and no local paths", *case(
+            ("pr-summary of a proof that errored carries its source and no local paths", *case(
                 ["pr-summary", folder / "error" / "proof.json"], 0,
                 ("Couldn't run on this branch (verify.sh tap id:close failed (1): not on screen in <repo>)", "```python",
                  "save the proof source", "**Unverified:** the undo snackbar", "live services: duck.ai chat", "uncommitted changes"),

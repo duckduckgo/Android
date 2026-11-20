@@ -178,7 +178,7 @@ on the user's phone a notification can still appear in the video, so turn on Do 
 **Verified**, an evidence table (Before | After for a compare, else the run's own column) with a 200 px
 thumbnail per screenshot and the poster linking the video, `[▶ Watch video]` links, the key frames, then
 **Outcome**, **Details** with a `[Full report]` link to `index.html`, **Unverified**, and collapsed tables of
-every check, the proof source when it isn't committed unchanged, and the rerun commands. Published runs link
+every check, the proof source, and the rerun commands. Published runs link
 their served URLs; an unpublished one links local relative paths and says so on stderr, and auto's PR gate
 rejects those. It carries no local paths, logs or device serials, so it's safe for a public PR. A run that
 stopped at `doctor` never read the device or the build, so its summary leaves those out rather than guessing.
