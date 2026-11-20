@@ -35,13 +35,13 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Qualifier
 
-internal interface AgeSignalsScenarioStore {
+interface AgeSignalsScenarioStore {
     suspend fun scenario(): AgeSignalsScenario
     suspend fun setScenario(scenario: AgeSignalsScenario)
 }
 
 @ContributesBinding(AppScope::class)
-internal class RealAgeSignalsScenarioStore @Inject constructor(
+class RealAgeSignalsScenarioStore @Inject constructor(
     @AgeSignalsDev private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
 ) : AgeSignalsScenarioStore {
@@ -64,7 +64,7 @@ internal class RealAgeSignalsScenarioStore @Inject constructor(
 
 @ContributesTo(AppScope::class)
 @BindingContainer
-internal object AgeSignalsScenarioStoreModule {
+object AgeSignalsScenarioStoreModule {
     private val Context.ageSignalsDevDataStore: DataStore<Preferences> by preferencesDataStore(
         name = "age_signals_dev",
         corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
@@ -76,4 +76,4 @@ internal object AgeSignalsScenarioStoreModule {
 }
 
 @Qualifier
-internal annotation class AgeSignalsDev
+annotation class AgeSignalsDev

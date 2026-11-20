@@ -18,7 +18,7 @@ package com.duckduckgo.agesignals.impl
 
 import com.google.android.play.agesignals.model.AgeSignalsErrorCode
 
-internal sealed interface AgeSignalsOutcome {
+sealed interface AgeSignalsOutcome {
     data object NotApplicable : AgeSignalsOutcome
     data object NotShared : AgeSignalsOutcome
     data object VerificationRequired : AgeSignalsOutcome
@@ -27,9 +27,9 @@ internal sealed interface AgeSignalsOutcome {
     data class Failed(val step: Step, val error: AgeSignalsError) : AgeSignalsOutcome
 }
 
-internal enum class Step { APPLICABLE_FEATURES, REQUEST_ACCESS, CHECK_SIGNALS }
+enum class Step { APPLICABLE_FEATURES, REQUEST_ACCESS, CHECK_SIGNALS }
 
-internal enum class AgeSignalsError(val code: Int) {
+enum class AgeSignalsError(val code: Int) {
     API_NOT_AVAILABLE(AgeSignalsErrorCode.API_NOT_AVAILABLE),
     PLAY_STORE_NOT_FOUND(AgeSignalsErrorCode.PLAY_STORE_NOT_FOUND),
     NETWORK_ERROR(AgeSignalsErrorCode.NETWORK_ERROR),

@@ -37,7 +37,7 @@ internal data class FakeResponses(
     val failure: Pair<Step, AgeSignalsError>? = null,
 )
 
-internal enum class AgeSignalsScenario(@StringRes val title: Int, val fake: FakeResponses?) {
+enum class AgeSignalsScenario(@StringRes val title: Int, internal val fake: FakeResponses?) {
     REAL_PLAY(R.string.ageSignalsScenarioRealPlay, null),
     NOT_APPLICABLE(R.string.ageSignalsScenarioNotApplicable, FakeResponses(mandatorySharing = false)),
     NOT_SHARED(R.string.ageSignalsScenarioNotShared, FakeResponses(accessStatus = AgeSignalsStatus.NOT_SHARED)),

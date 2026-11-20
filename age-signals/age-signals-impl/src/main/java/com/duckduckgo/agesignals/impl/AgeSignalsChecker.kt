@@ -34,14 +34,14 @@ import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
-internal interface AgeSignalsChecker {
+interface AgeSignalsChecker {
     /** Runs the gated Play Age Signals flow and records its outcome. Concurrent calls run one after another. */
     suspend fun check(activity: Activity)
 }
 
 @ContributesBinding(AppScope::class)
 @SingleIn(AppScope::class)
-internal class RealAgeSignalsChecker @Inject constructor(
+class RealAgeSignalsChecker @Inject constructor(
     private val managerProvider: AgeSignalsManagerProvider,
     private val store: AgeSignalsStore,
 ) : AgeSignalsChecker {

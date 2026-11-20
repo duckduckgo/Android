@@ -42,13 +42,13 @@ import javax.inject.Inject
 class AgeSignalsDevSettingsActivity : DuckDuckGoActivity() {
 
     @Inject
-    internal lateinit var checker: AgeSignalsChecker
+    lateinit var checker: AgeSignalsChecker
 
     @Inject
-    internal lateinit var store: AgeSignalsStore
+    lateinit var store: AgeSignalsStore
 
     @Inject
-    internal lateinit var scenarioStore: AgeSignalsScenarioStore
+    lateinit var scenarioStore: AgeSignalsScenarioStore
 
     private val binding: ActivityAgeSignalsDevSettingsBinding by viewBinding()
 
@@ -103,6 +103,6 @@ class AgeSignalsDevSettingsActivity : DuckDuckGoActivity() {
         DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.MEDIUM).format(Date(millis))
 }
 
-internal data object AgeSignalsDevSettingsScreen : GlobalActivityStarter.ActivityParams {
+data object AgeSignalsDevSettingsScreen : GlobalActivityStarter.ActivityParams {
     private fun readResolve(): Any = AgeSignalsDevSettingsScreen
 }

@@ -28,7 +28,7 @@ import dev.zacsweers.metro.ElementsIntoSet
 import dev.zacsweers.metro.Provides
 import javax.inject.Inject
 
-internal class AgeSignalsInternalFeaturePlugin @Inject constructor(
+class AgeSignalsInternalFeaturePlugin @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
 ) : InternalFeaturePlugin {
     override fun internalFeatureTitle(): String = "Age Signals"
@@ -46,7 +46,7 @@ internal class AgeSignalsInternalFeaturePlugin @Inject constructor(
  */
 @ContributesTo(AppScope::class)
 @BindingContainer
-internal object AgeSignalsInternalFeaturePluginModule {
+object AgeSignalsInternalFeaturePluginModule {
     @Provides
     @ElementsIntoSet
     fun provideInternalFeaturePlugins(

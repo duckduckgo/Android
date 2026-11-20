@@ -25,12 +25,12 @@ import com.google.android.play.agesignals.AgeSignalsManagerFactory
 import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
-internal interface AgeSignalsManagerProvider {
+interface AgeSignalsManagerProvider {
     suspend fun get(): AgeSignalsManager
 }
 
 @ContributesBinding(AppScope::class)
-internal class RealAgeSignalsManagerProvider(
+class RealAgeSignalsManagerProvider internal constructor(
     private val context: Context,
     private val appBuildConfig: AppBuildConfig,
     private val scenarioStore: AgeSignalsScenarioStore,
