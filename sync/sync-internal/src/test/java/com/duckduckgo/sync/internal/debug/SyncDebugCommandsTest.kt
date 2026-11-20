@@ -85,7 +85,8 @@ class SyncDebugCommandsTest {
     fun whenStatusThenReportsSignInEnvironmentFlagsAndUnseenCount() = runTest {
         whenever(syncStore.isSignedIn()).thenReturn(true)
         whenever(auditLogCheckDebugControls.unseenCount()).thenReturn("Unseen logins: 2")
-        commands.run(SyncDebugCommands.SET_FLAGS, on = true)
+        commands.run(SyncDebugCommands.SET_FLAG, on = true, flag = "loginAuditLog")
+        commands.run(SyncDebugCommands.SET_FLAG, on = true, flag = "loginNotification")
 
         val result = commands.run(SyncDebugCommands.STATUS, on = true)
 
@@ -114,21 +115,36 @@ class SyncDebugCommandsTest {
     }
 
     @Test
-    fun whenSetFlagsOnThenBothAuditLogFlagsAreOn() = runTest {
-        commands.run(SyncDebugCommands.SET_FLAGS, on = true)
+    fun whenSetFlagOnThenOnlyThatFlagIsOn() = runTest {
+        val result = commands.run(SyncDebugCommands.SET_FLAG, on = true, flag = "loginAuditLog")
 
+        assertEquals("loginAuditLog=true", result)
         assertTrue(syncFeature.loginAuditLog().isEnabled())
-        assertTrue(syncFeature.loginNotification().isEnabled())
+        assertFalse(syncFeature.loginNotification().isEnabled())
     }
 
     @Test
-    fun whenSetFlagsOffThenBothAuditLogFlagsAreOff() = runTest {
-        commands.run(SyncDebugCommands.SET_FLAGS, on = true)
+    fun whenSetFlagOffThenThatFlagIsOff() = runTest {
+        commands.run(SyncDebugCommands.SET_FLAG, on = true, flag = "loginNotification")
 
-        commands.run(SyncDebugCommands.SET_FLAGS, on = false)
+        val result = commands.run(SyncDebugCommands.SET_FLAG, on = false, flag = "loginNotification")
 
-        assertFalse(syncFeature.loginAuditLog().isEnabled())
+        assertEquals("loginNotification=false", result)
         assertFalse(syncFeature.loginNotification().isEnabled())
+    }
+
+    @Test
+    fun whenSetFlagWithUnknownNameThenListsTheSyncFlags() = runTest {
+        val result = commands.run(SyncDebugCommands.SET_FLAG, on = true, flag = "nope")
+
+        assertTrue(result.startsWith("unknown flag \"nope\"; known: "))
+        assertTrue(result.contains("loginAuditLog"))
+        assertTrue(result.contains("loginNotification"))
+    }
+
+    @Test
+    fun whenSetFlagWithNoNameThenSaysItIsUnknown() = runTest {
+        assertTrue(commands.run(SyncDebugCommands.SET_FLAG, on = true).startsWith("unknown flag \"null\""))
     }
 
     @Test

@@ -52,15 +52,15 @@ class SyncDebugCommands @Inject constructor(
     private val syncStateRepository: SyncStateRepository,
 ) {
 
-    suspend fun run(command: String?, on: Boolean): String = when {
+    suspend fun run(command: String?, on: Boolean, flag: String? = null): String = when {
         command in STAGING_ONLY && !envDataStore.useSyncDevEnvironment -> "refused: $command only runs on staging; send $USE_STAGING first"
-        else -> runCommand(command, on)
+        else -> runCommand(command, on, flag)
     }
 
-    private suspend fun runCommand(command: String?, on: Boolean): String = when (command) {
+    private suspend fun runCommand(command: String?, on: Boolean, flag: String?): String = when (command) {
         STATUS -> status()
         USE_STAGING -> useStaging(on)
-        SET_FLAGS -> setFlags(on)
+        SET_FLAG -> setFlag(flag, on)
         SIMULATE_LOGIN -> otherDevicesDebugTool.simulateLogin()
         LOG_OUT_OTHERS -> logOutOthers()
         READ_LOG -> readLog()
@@ -82,14 +82,18 @@ class SyncDebugCommands @Inject constructor(
     }
 
     @SuppressLint("DenyListedApi")
-    private fun setFlags(on: Boolean): String {
-        listOf(syncFeature.loginAuditLog(), syncFeature.loginNotification()).forEach { toggle ->
-            val state = toggle.getRawStoredState()?.copy(enable = on, remoteEnableState = on)
-                ?: Toggle.State(enable = on, remoteEnableState = on)
-            toggle.setRawStoredState(state)
-        }
-        return "loginAuditLog=$on loginNotification=$on"
+    private fun setFlag(name: String?, on: Boolean): String {
+        val toggles = syncToggles()
+        val toggle = toggles[name] ?: return "unknown flag \"$name\"; known: ${toggles.keys.sorted().joinToString()}"
+        val state = toggle.getRawStoredState()?.copy(enable = on, remoteEnableState = on)
+            ?: Toggle.State(enable = on, remoteEnableState = on)
+        toggle.setRawStoredState(state)
+        return "$name=$on"
     }
+
+    private fun syncToggles(): Map<String, Toggle> = SyncFeature::class.java.methods
+        .filter { it.parameterCount == 0 && it.returnType == Toggle::class.java }
+        .associate { it.name to it.invoke(syncFeature) as Toggle }
 
     private fun logOutOthers(): String {
         val others = otherDevicesDebugTool.otherDevices()
@@ -128,7 +132,7 @@ class SyncDebugCommands @Inject constructor(
     companion object {
         const val STATUS = "status"
         const val USE_STAGING = "useStaging"
-        const val SET_FLAGS = "setFlags"
+        const val SET_FLAG = "setFlag"
         const val SIMULATE_LOGIN = "simulateLogin"
         const val LOG_OUT_OTHERS = "logOutOthers"
         const val READ_LOG = "readLog"
@@ -138,7 +142,7 @@ class SyncDebugCommands @Inject constructor(
         val COMMANDS = listOf(
             STATUS,
             USE_STAGING,
-            SET_FLAGS,
+            SET_FLAG,
             SIMULATE_LOGIN,
             LOG_OUT_OTHERS,
             READ_LOG,

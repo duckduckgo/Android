@@ -50,10 +50,11 @@ class SyncDebugBroadcastReceiver : BroadcastReceiver() {
         AndroidInjection.inject(this, context)
         val command = intent.getStringExtra(EXTRA_COMMAND)
         val on = intent.getBooleanExtra(EXTRA_ON, true)
+        val flag = intent.getStringExtra(EXTRA_FLAG)
         val pendingResult = goAsync()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             try {
-                logcat { "SyncDebugBroadcast: $command: ${commands.run(command, on)}" }
+                logcat { "SyncDebugBroadcast: $command: ${commands.run(command, on, flag)}" }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -68,5 +69,6 @@ class SyncDebugBroadcastReceiver : BroadcastReceiver() {
         const val ACTION = "com.duckduckgo.sync.internal.DEBUG"
         const val EXTRA_COMMAND = "command"
         const val EXTRA_ON = "on"
+        const val EXTRA_FLAG = "flag"
     }
 }
