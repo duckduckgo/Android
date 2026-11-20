@@ -406,11 +406,6 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.toChatIdOrNull
-import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionAnswer
-import com.duckduckgo.duckchat.impl.clienttools.GrantAccessSelection
-import com.duckduckgo.duckchat.impl.clienttools.GrantAccessSelections
-import com.duckduckgo.duckchat.impl.clienttools.PendingClientToolPermission
-import com.duckduckgo.duckchat.impl.clienttools.PublishingClientToolPermissionPrompt
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -590,7 +585,6 @@ class BrowserTabViewModel @Inject constructor(
     private val siteHttpErrorHandler: HttpCodeSiteErrorHandler,
     private val subscriptionsJSHelper: SubscriptionsJSHelper,
     private val duckChatJSHelper: DuckChatJSHelper,
-    private val clientToolPermissionPrompt: PublishingClientToolPermissionPrompt,
     private val tabManager: TabManager,
     private val addressDisplayFormatter: AddressDisplayFormatter,
     private val nonHttpAppLinkChecker: NonHttpAppLinkChecker,
@@ -687,9 +681,6 @@ class BrowserTabViewModel @Inject constructor(
     @VisibleForTesting
     internal var suppressDuckAiOnboardingCta = false
     private var duckAiOnboardingCtaUnblockJob: Job? = null
-    private var clientToolPermissionJob: Job? = null
-    private var shownClientToolPermission: PendingClientToolPermission? = null
-    private val clientToolPermissionSelections = GrantAccessSelections()
     val tabs: LiveData<List<TabEntity>> = tabRepository.liveTabs
     val liveSelectedTab: LiveData<TabEntity> = tabRepository.liveSelectedTab
     val command: SingleLiveEvent<Command> = SingleLiveEvent()
@@ -1060,7 +1051,6 @@ class BrowserTabViewModel @Inject constructor(
         site = siteLiveData.value
 
         observePendingVoiceSessionEnd(tabId)
-        observeClientToolPermissionPrompts(tabId)
 
         initialUrl?.let {
             // initialUrl is the previousUrl from previous session unless it's launched from an external app
@@ -1095,39 +1085,6 @@ class BrowserTabViewModel @Inject constructor(
                     _subscriptionEventDataChannel.send(event)
                 }
         }
-    }
-
-    /** Shows the Duck.ai tab's pending tool permission prompt while this tab is the selected one, and hides it otherwise. */
-    private fun observeClientToolPermissionPrompts(tabId: String) {
-        clientToolPermissionJob?.cancel()
-        clientToolPermissionJob = viewModelScope.launch {
-            combine(
-                clientToolPermissionPrompt.pendingFor(tabId, contextual = false),
-                tabRepository.flowSelectedTab.map { it?.tabId == tabId }.distinctUntilChanged(),
-            ) { pending, selected -> pending.takeIf { selected } }
-                .distinctUntilChanged()
-                .collect { showClientToolPermission(it) }
-        }
-    }
-
-    private fun showClientToolPermission(pending: PendingClientToolPermission?) {
-        if (pending === shownClientToolPermission) return
-        if (shownClientToolPermission != null) command.value = Command.DismissClientToolPermissionDialog
-        shownClientToolPermission = pending?.takeIf { it.isOpen }
-        shownClientToolPermission?.let { command.value = Command.ShowClientToolPermissionDialog(it.request) }
-    }
-
-    fun clientToolPermissionSelection(): GrantAccessSelection? =
-        shownClientToolPermission?.let { clientToolPermissionSelections.of(it) }
-
-    fun onClientToolPermissionToggled(toolName: String) {
-        val pending = shownClientToolPermission ?: return
-        clientToolPermissionSelections.update(pending) { it.toggle(toolName) }
-    }
-
-    fun onClientToolPermissionAnswered(answer: ClientToolPermissionAnswer) {
-        shownClientToolPermission?.answer(answer)
-        shownClientToolPermission = null
     }
 
     fun setIsCustomTab(isCustomTab: Boolean, clientPackage: String? = null, referrerPackage: String? = null) {

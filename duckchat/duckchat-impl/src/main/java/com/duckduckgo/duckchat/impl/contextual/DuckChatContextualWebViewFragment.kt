@@ -52,7 +52,6 @@ import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.dialog.ActionBottomSheetDialog
-import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
 import com.duckduckgo.common.ui.view.show
@@ -77,8 +76,7 @@ import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
-import com.duckduckgo.duckchat.impl.clienttools.BrowserToolsPermissionsDialog
-import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
+import com.duckduckgo.duckchat.impl.clienttools.RealDuckAiToolPermissionPrompts
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiWebviewBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -104,6 +102,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -147,6 +146,9 @@ class DuckChatContextualWebViewFragment :
 
     @Inject
     lateinit var duckChatJSHelper: DuckChatJSHelper
+
+    @Inject
+    lateinit var toolPermissionPrompts: RealDuckAiToolPermissionPrompts
 
     @Inject
     lateinit var subscriptionsJSHelper: SubscriptionsJSHelper
@@ -220,7 +222,6 @@ class DuckChatContextualWebViewFragment :
     private lateinit var backPressedCallback: OnBackPressedCallback
     internal val simpleWebview: WebView by lazy { binding.simpleWebview }
     private var chatsPopup: PopupMenu? = null
-    private var clientToolPermissionDialog: DaxAlertDialog? = null
 
     private val bottomSheetCallback =
         object : BottomSheetBehavior.BottomSheetCallback() {
@@ -256,6 +257,7 @@ class DuckChatContextualWebViewFragment :
                 )
             }
         }
+        toolPermissionPrompts.register(this, viewModel.viewState.map { it.tabId }, contextual = true)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -600,14 +602,6 @@ class DuckChatContextualWebViewFragment :
 
                     is DuckChatContextualWebViewViewModel.Command.ShowFireConfirmation -> {
                         showFireConfirmationDialog()
-                    }
-
-                    is DuckChatContextualWebViewViewModel.Command.ShowClientToolPermissionDialog -> {
-                        showClientToolPermissionDialog(command.request)
-                    }
-
-                    is DuckChatContextualWebViewViewModel.Command.DismissClientToolPermissionDialog -> {
-                        dismissClientToolPermissionDialog()
                     }
 
                     is DuckChatContextualWebViewViewModel.Command.ShowChatsPopup -> {
@@ -1034,28 +1028,11 @@ class DuckChatContextualWebViewFragment :
 
     override fun onDestroyView() {
         bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
-        dismissClientToolPermissionDialog()
         cancelPendingClientToolCalls()
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager?.flush()
         }
-    }
-
-    private fun showClientToolPermissionDialog(request: ClientToolPermissionRequest) {
-        dismissClientToolPermissionDialog()
-        clientToolPermissionDialog = BrowserToolsPermissionsDialog(
-            activity = requireActivity(),
-            request = request,
-            selection = viewModel::clientToolPermissionSelection,
-            onToggle = viewModel::onClientToolPermissionToggled,
-            onAnswer = viewModel::onClientToolPermissionAnswered,
-        ).also { it.show() }
-    }
-
-    private fun dismissClientToolPermissionDialog() {
-        clientToolPermissionDialog?.dismiss()
-        clientToolPermissionDialog = null
     }
 
     private fun cancelPendingClientToolCalls() {

@@ -343,6 +343,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
+import com.duckduckgo.duckchat.api.DuckAiToolPermissionPrompts
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
@@ -350,8 +351,6 @@ import com.duckduckgo.duckchat.api.DuckChatHistoryParams
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InteractionLock
-import com.duckduckgo.duckchat.impl.clienttools.BrowserToolsPermissionsDialog
-import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
 import com.duckduckgo.duckchat.impl.contextual.DuckChatContextualSharedViewModel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -612,6 +611,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
+
+    @Inject
+    lateinit var duckAiToolPermissionPrompts: DuckAiToolPermissionPrompts
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -1066,8 +1068,6 @@ class BrowserTabFragment :
 
     private var automaticFireproofDialog: DaxAlertDialog? = null
 
-    private var clientToolPermissionDialog: DaxAlertDialog? = null
-
     private var webShareRequest =
         registerForActivityResult(WebShareChooser()) {
             contentScopeScripts.onResponse(it)
@@ -1119,6 +1119,7 @@ class BrowserTabFragment :
             }
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
+        duckAiToolPermissionPrompts.register(this, tabId)
         externalCameraLauncher.registerForResult(this) {
             when (it) {
                 is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
@@ -3020,8 +3021,6 @@ class BrowserTabFragment :
 
             is Command.PrintLink -> launchPrint(it.documentName, it.mediaSize)
             is Command.ShowSitePermissionsDialog -> showSitePermissionsDialog(it.permissionsToRequest, it.request)
-            is Command.ShowClientToolPermissionDialog -> showClientToolPermissionDialog(it.request)
-            is Command.DismissClientToolPermissionDialog -> dismissClientToolPermissionDialog()
             is Command.ShowUserCredentialSavedOrUpdatedConfirmation ->
                 showAuthenticationSavedOrUpdatedSnackbar(
                     loginCredentials = it.credentials,
@@ -5350,7 +5349,6 @@ class BrowserTabFragment :
         dismissBrowserMenu()
         loginDetectionDialog?.dismiss()
         automaticFireproofDialog?.dismiss()
-        dismissClientToolPermissionDialog()
         privacyProSkippedOnboardingBottomSheet?.dismiss()
         browserAutofill.removeJsInterface()
         destroyWebView()
@@ -6711,22 +6709,6 @@ class BrowserTabFragment :
         val pdfFile = File(pdfPath).takeIf { it.exists() } ?: return null
         val displayName = state.currentPdfFileName ?: pdfFile.name
         return CachedPdfPrintDocumentAdapter(pdfFile, displayName, dispatchers)
-    }
-
-    private fun showClientToolPermissionDialog(request: ClientToolPermissionRequest) {
-        dismissClientToolPermissionDialog()
-        clientToolPermissionDialog = BrowserToolsPermissionsDialog(
-            activity = requireActivity(),
-            request = request,
-            selection = viewModel::clientToolPermissionSelection,
-            onToggle = viewModel::onClientToolPermissionToggled,
-            onAnswer = viewModel::onClientToolPermissionAnswered,
-        ).also { it.show() }
-    }
-
-    private fun dismissClientToolPermissionDialog() {
-        clientToolPermissionDialog?.dismiss()
-        clientToolPermissionDialog = null
     }
 
     private fun showSitePermissionsDialog(

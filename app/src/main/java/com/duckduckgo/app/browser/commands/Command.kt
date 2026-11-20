@@ -48,7 +48,6 @@ import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggesti
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
 import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
-import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
@@ -352,10 +351,6 @@ sealed class Command {
         val permissionsToRequest: SitePermissions,
         val request: PermissionRequest,
     ) : Command()
-
-    data class ShowClientToolPermissionDialog(val request: ClientToolPermissionRequest) : Command()
-
-    data object DismissClientToolPermissionDialog : Command()
 
     class ShowUserCredentialSavedOrUpdatedConfirmation(
         val credentials: LoginCredentials,

@@ -38,23 +38,3 @@ data class GrantAccessSelection(
         else -> copy(removed = removed + toolName)
     }
 }
-
-/** Remembers the selection of one pending prompt, so tools taken out stay out when its dialog is shown again. */
-class GrantAccessSelections {
-    private var current: Pair<PendingClientToolPermission, GrantAccessSelection>? = null
-
-    /** The selection for [pending], starting with every tool when it is a different prompt, or null when it asks for one tool. */
-    fun of(pending: PendingClientToolPermission): GrantAccessSelection? {
-        current?.takeIf { it.first === pending }?.let { return it.second }
-        val request = pending.request as? ClientToolPermissionRequest.GrantAccess ?: return null
-        return GrantAccessSelection(request).also { current = pending to it }
-    }
-
-    fun update(
-        pending: PendingClientToolPermission,
-        change: (GrantAccessSelection) -> GrantAccessSelection,
-    ) {
-        val selection = of(pending) ?: return
-        current = pending to change(selection)
-    }
-}

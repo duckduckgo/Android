@@ -76,12 +76,23 @@ sealed interface ClientToolPermissionAnswer {
     data object DontAllow : ClientToolPermissionAnswer
 }
 
-/** A prompt waiting for the user. Only the first [answer] counts, and answers after it is withdrawn are ignored. */
+/**
+ * A prompt waiting for the user. Only the first [answer] counts, and answers after it is withdrawn are ignored.
+ * It keeps the tools the user unchecked, so they stay out when its dialog is shown again.
+ */
 class PendingClientToolPermission(
     val request: ClientToolPermissionRequest,
     private val reply: CompletableDeferred<ClientToolPermissionAnswer>,
 ) {
     val isOpen: Boolean get() = !reply.isCompleted
+
+    /** Which tools a [ClientToolPermissionRequest.GrantAccess] prompt still asks for, or null when it asks for one tool to run. */
+    var selection: GrantAccessSelection? = (request as? ClientToolPermissionRequest.GrantAccess)?.let(::GrantAccessSelection)
+        private set
+
+    fun toggle(toolName: String) {
+        selection = selection?.toggle(toolName)
+    }
 
     fun answer(answer: ClientToolPermissionAnswer) {
         reply.complete(answer)

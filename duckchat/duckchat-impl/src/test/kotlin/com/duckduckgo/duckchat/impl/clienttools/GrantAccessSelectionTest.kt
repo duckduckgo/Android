@@ -104,23 +104,20 @@ class GrantAccessSelectionTest {
     private fun tool(name: String) = AskingTool(name, ClientToolPermissionMode.Ask(1, 2, 3, 4))
 }
 
-class GrantAccessSelectionsTest {
-
-    private val selections = GrantAccessSelections()
+class PendingClientToolPermissionSelectionTest {
 
     @Test
-    fun whenSamePromptShownAgainThenUncheckedToolsStayUnchecked() {
+    fun whenToolUncheckedThenThePromptKeepsItOut() {
         val prompt = pending("a", "b")
-        selections.update(prompt) { it.toggle("a") }
 
-        assertEquals(setOf("a"), selections.of(prompt)?.removed)
+        prompt.toggle("a")
+
+        assertEquals(setOf("a"), prompt.selection?.removed)
     }
 
     @Test
-    fun whenAnotherPromptArrivesThenItStartsWithEveryTool() {
-        selections.update(pending("a", "b")) { it.toggle("a") }
-
-        assertEquals(emptySet<String>(), selections.of(pending("a", "b"))?.removed)
+    fun whenPromptOpensThenItStartsWithEveryTool() {
+        assertEquals(emptySet<String>(), pending("a", "b").selection?.removed)
     }
 
     @Test
@@ -130,7 +127,9 @@ class GrantAccessSelectionsTest {
             CompletableDeferred(),
         )
 
-        assertNull(selections.of(runTool))
+        runTool.toggle("a")
+
+        assertNull(runTool.selection)
     }
 
     private fun pending(vararg names: String) = PendingClientToolPermission(

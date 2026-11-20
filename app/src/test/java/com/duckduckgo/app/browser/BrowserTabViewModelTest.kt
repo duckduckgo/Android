@@ -339,11 +339,6 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.impl.clienttools.AskingTool
-import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionAnswer
-import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionMode
-import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
-import com.duckduckgo.duckchat.impl.clienttools.PublishingClientToolPermissionPrompt
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -396,7 +391,6 @@ import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -764,7 +758,6 @@ class BrowserTabViewModelTest {
 
     private val selectedTab = TabEntity("TAB_ID", exampleUrl, position = 0, sourceTabId = "TAB_ID_SOURCE")
     private val flowSelectedTab = MutableStateFlow(selectedTab)
-    private val clientToolPermissionPrompt = PublishingClientToolPermissionPrompt()
     private val isFullSiteAddressEnabledFlow = MutableStateFlow(true)
 
     private val mockWebViewCompatWrapper: WebViewCompatWrapper = mock()
@@ -1085,7 +1078,6 @@ class BrowserTabViewModelTest {
                     mockPagesSettingPlugin,
                 ),
                 duckChatJSHelper = mockDuckChatJSHelper,
-                clientToolPermissionPrompt = clientToolPermissionPrompt,
                 refreshPixelSender = refreshPixelSender,
                 privacyProtectionTogglePlugin = protectionTogglePluginPoint,
                 showOnAppLaunchOptionHandler = mockShowOnAppLaunchHandler,
@@ -16983,75 +16975,4 @@ class BrowserTabViewModelTest {
 
         assertCommandIssued<Command.PageContextReceived> { assertEquals("markdown", pageContext) }
     }
-
-    @Test
-    fun whenToolPermissionPromptOpensForThisSelectedTabThenDialogIsShownAndTheAnswerGoesBack() = runTest {
-        flowSelectedTab.value = selectedTab.copy(tabId = "abc")
-        val request = toolPermissionRequest(chatTabId = "abc")
-        val reply = async { clientToolPermissionPrompt.request(request) }
-        advanceUntilIdle()
-
-        assertCommandIssued<Command.ShowClientToolPermissionDialog> { assertEquals(request, this.request) }
-        testee.onClientToolPermissionAnswered(ClientToolPermissionAnswer.DontAllow)
-        assertEquals(ClientToolPermissionAnswer.DontAllow, reply.await())
-    }
-
-    @Test
-    fun whenToolPermissionPromptBelongsToThisTabButAnotherTabIsSelectedThenItWaitsUntilThisTabIsSelected() = runTest {
-        val reply = async { clientToolPermissionPrompt.request(toolPermissionRequest(chatTabId = "abc")) }
-        advanceUntilIdle()
-        assertCommandNotIssued<Command.ShowClientToolPermissionDialog>()
-
-        flowSelectedTab.value = selectedTab.copy(tabId = "abc")
-        advanceUntilIdle()
-
-        assertCommandIssued<Command.ShowClientToolPermissionDialog>()
-        reply.cancel()
-    }
-
-    @Test
-    fun whenToolPermissionPromptBelongsToThisTabsContextualSheetThenTheTabDoesNotShowIt() = runTest {
-        flowSelectedTab.value = selectedTab.copy(tabId = "abc")
-        val reply = async { clientToolPermissionPrompt.request(toolPermissionRequest(chatTabId = "abc", contextual = true)) }
-        advanceUntilIdle()
-
-        assertCommandNotIssued<Command.ShowClientToolPermissionDialog>()
-        reply.cancel()
-    }
-
-    @Test
-    fun whenToolPermissionPromptIsWithdrawnThenDialogIsDismissed() = runTest {
-        flowSelectedTab.value = selectedTab.copy(tabId = "abc")
-        val reply = async { clientToolPermissionPrompt.request(toolPermissionRequest(chatTabId = "abc")) }
-        advanceUntilIdle()
-
-        reply.cancel()
-        advanceUntilIdle()
-
-        assertCommandIssued<Command.DismissClientToolPermissionDialog>()
-    }
-
-    @Test
-    fun whenToolIsUncheckedInTheDialogThenTheSelectionLeavesItOut() = runTest {
-        flowSelectedTab.value = selectedTab.copy(tabId = "abc")
-        val reply = async { clientToolPermissionPrompt.request(toolPermissionRequest(chatTabId = "abc", tools = listOf("a", "b"))) }
-        advanceUntilIdle()
-
-        testee.onClientToolPermissionToggled("b")
-
-        assertEquals(setOf("b"), testee.clientToolPermissionSelection()?.removed)
-        reply.cancel()
-    }
-
-    private fun toolPermissionRequest(
-        chatTabId: String,
-        contextual: Boolean = false,
-        tools: List<String> = listOf("listOpenTabs"),
-    ) = ClientToolPermissionRequest.GrantAccess(
-        chatTabId = chatTabId,
-        browserMode = BrowserMode.REGULAR,
-        tools = tools.map { AskingTool(it, ClientToolPermissionMode.Ask(1, 2, 3, 4)) },
-        toolsRemovable = true,
-        contextual = contextual,
-    )
 }
