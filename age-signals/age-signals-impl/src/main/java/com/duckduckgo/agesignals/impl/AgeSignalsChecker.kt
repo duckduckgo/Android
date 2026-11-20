@@ -42,9 +42,6 @@ import kotlin.time.Duration.Companion.seconds
 interface AgeSignalsChecker {
     /**
      * Runs the gated Play Age Signals flow and records its outcome. Concurrent calls run one after another.
-     *
-     * [currentActivity] is read only when the flow needs an Activity to request access. When it returns null, or an Activity
-     * that is finishing or destroyed, the run ends without recording anything.
      */
     suspend fun check(currentActivity: () -> Activity?)
 }
