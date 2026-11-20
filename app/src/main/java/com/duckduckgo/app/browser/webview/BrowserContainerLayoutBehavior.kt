@@ -88,6 +88,9 @@ class TopOmnibarBrowserContainerLayoutBehavior(
         val newMargin = if (dependency.top < 0) maxOf(0, visibleHeight - marginOffsetPx) else visibleHeight
         if (lp.bottomMargin != newMargin) {
             lp.bottomMargin = newMargin
+            // If the omnibar re-expands while the page can't scroll, no other layout pass follows,
+            // so without this the child keeps its collapsed height and its bottom is pushed off-screen.
+            child.requestLayout()
         }
     }
 }
