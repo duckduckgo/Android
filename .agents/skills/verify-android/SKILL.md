@@ -183,13 +183,14 @@ their served URLs; an unpublished one links local relative paths and says so on 
 rejects those. It carries no local paths, logs or device serials, so it's safe for a public PR. A run that
 stopped at `doctor` never read the device or the build, so its summary leaves those out rather than guessing.
 
-The PR body keeps the repo template's fields at the top, `Task/Issue URL:` first (the merge and Asana sync
-workflows read it), with `Evidence URL (if applicable):` set to the published `index.html` URL. The scenario
-goes under `## Verification` inside one `<details><summary>Checks</summary>` collapse, one scenario per proof.
-When auto writes the PR, the body goes through its `publish-pr.ts <body.md> --evidence-directory <auto evidence
-folder> -- create|edit ...` (`--upload-evidence` instead when there is a decision log): it turns the
-`<img src="https://artifacts.go.duckduckgo.com/...">` thumbnails into GitHub attachments, because github.com
-can't load images behind DuckDuckGo sign-in. Without auto, drag the images into the PR in the browser.
+When auto opens the PR, its body is the repo template's header fields (`Task/Issue URL:` first, then
+`Tech Design URL`, `API Proposals URL(s)` and `Evidence URL (if applicable):` set to the published `index.html`
+URL) followed by auto's own sections; auto writes `## Verification` from the attempt folder, so give it the
+folder and the `index.html` URL rather than `pr-summary` output (`.claude/docs/contributions.md`, PR body). It
+publishes through `publish-pr.ts <body.md> --evidence-directory <auto evidence folder> -- create|edit ...`,
+which turns `artifacts.go.duckduckgo.com` thumbnails into GitHub attachments, because github.com can't load
+images behind DuckDuckGo sign-in. Without auto, fill the template and paste `pr-summary` under its Description,
+and drag the images into the PR in the browser.
 
 ## Drive
 

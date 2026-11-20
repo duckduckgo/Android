@@ -26,6 +26,11 @@ Fill in the template sections as follows:
 - **Steps to test**: reviewer-facing steps per scenario; specific enough that someone unfamiliar with the code can follow them
 - **UI changes**: before/after screenshots or recordings; write `No UI changes` in both columns for pure logic/backend changes
 
+When auto opens or updates the PR, keep only the template's header fields at the top (`Task/Issue URL:` first,
+then `Tech Design URL`, `API Proposals URL(s)` and `Evidence URL`, filled or left blank) and let auto write the rest
+of the body in its own format. The merge and Asana sync workflows read `Task/Issue URL:`, and the API Proposal
+check reads its own field, so both still work.
+
 ## Tech Design and API Proposals
 
 When you first scope a change, judge whether it is cross-cutting (needs a tech design) or touches a `-api` public surface (needs an approved API Proposal), as described below. If either applies, tell the user up front so the document can be written and reviewed before implementation, not at PR time.
