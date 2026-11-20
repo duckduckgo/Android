@@ -65,23 +65,26 @@ class RealSegmentSkipUserPreferences @Inject constructor(
     override fun modeFlow(): Flow<SegmentSkipMode> = combine(
         dataStore.data,
         feature.mvpEnabled().enabled(),
-        feature.softLaunchEnabled().enabled(),
-    ) { prefs, mvpEnabled, softLaunchEnabled ->
-        prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
-            ?: if (mvpEnabled && softLaunchEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+    ) { prefs, mvpEnabled ->
+        (prefs[KEY_MODE] ?: prefs[LEGACY_KEY_MODE])?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
+            ?: if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
     }
         .distinctUntilChanged()
 
     override fun cachedMode(): SegmentSkipMode = mode.value
 
     override suspend fun setMode(mode: SegmentSkipMode) {
-        dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
+        dataStore.edit { prefs ->
+            prefs[KEY_MODE] = mode.name
+            prefs.remove(LEGACY_KEY_MODE)
+        }
     }
 
     private fun defaultMode(): SegmentSkipMode =
-        if (feature.mvpEnabled().isEnabled() && feature.softLaunchEnabled().isEnabled()) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+        if (feature.mvpEnabled().isEnabled()) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
 
     private companion object {
-        val KEY_MODE = stringPreferencesKey("sponsor_block_mode")
+        val KEY_MODE = stringPreferencesKey("segment_skip_mode")
+        val LEGACY_KEY_MODE = stringPreferencesKey("sponsor_block_mode")
     }
 }

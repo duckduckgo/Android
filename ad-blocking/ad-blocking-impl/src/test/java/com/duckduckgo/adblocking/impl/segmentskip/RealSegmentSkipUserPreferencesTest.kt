@@ -53,15 +53,25 @@ class RealSegmentSkipUserPreferencesTest {
     private val testee = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
 
     @Test
-    fun whenNothingStoredThenDefaultDependsOnBothFlags() = runTest {
+    fun whenNothingStoredThenDefaultDependsOnMvpFlag() = runTest {
         for (mvp in listOf(false, true)) {
             for (softLaunch in listOf(false, true)) {
                 feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = mvp))
                 feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = softLaunch))
-                val expected = if (mvp && softLaunch) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+                val expected = if (mvp) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
                 assertEquals(expected, testee.modeFlow().first())
             }
         }
+    }
+
+    @Test
+    fun whenMvpEnabledAndSoftLaunchDisabledThenInitialCacheAlwaysAsks() {
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = false))
+
+        val preferences = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
+
+        assertEquals(SegmentSkipMode.ALWAYS_ASK, preferences.cachedMode())
     }
 
     @Test
@@ -85,14 +95,27 @@ class RealSegmentSkipUserPreferencesTest {
 
     @Test
     fun whenExistingModeStoredThenItIsRestored() = runTest {
-        testDataStore.edit { it[stringPreferencesKey("sponsor_block_mode")] = "ALWAYS_SKIP" }
+        testDataStore.edit { it[stringPreferencesKey("segment_skip_mode")] = "ALWAYS_SKIP" }
 
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, testee.modeFlow().first())
     }
 
     @Test
+    fun whenLegacyModeStoredThenItIsPreservedAndReplacedOnWrite() = runTest {
+        val legacyKey = stringPreferencesKey("sponsor_block_mode")
+        val modeKey = stringPreferencesKey("segment_skip_mode")
+        testDataStore.edit { it[legacyKey] = "ALWAYS_SKIP" }
+
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, testee.modeFlow().first())
+        testee.setMode(SegmentSkipMode.OFF)
+        val preferences = testDataStore.data.first()
+        assertEquals("OFF", preferences[modeKey])
+        assertEquals(null, preferences[legacyKey])
+    }
+
+    @Test
     fun whenStoredValueIsUnknownThenModeIsOff() = runTest {
-        testDataStore.edit { it[stringPreferencesKey("sponsor_block_mode")] = "SOMETHING_ELSE" }
+        testDataStore.edit { it[stringPreferencesKey("segment_skip_mode")] = "SOMETHING_ELSE" }
 
         assertEquals(SegmentSkipMode.OFF, testee.modeFlow().first())
     }
