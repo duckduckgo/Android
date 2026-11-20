@@ -1473,7 +1473,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             }
         }
 
-    fun onTabSelectedFromSwitcher(tabId: String) {
+    fun requestNativeInputFocus(tabId: String) {
         supportFragmentManager.fragments
             .filterIsInstance<BrowserTabFragment>()
             .firstOrNull { it.tabId == tabId }

@@ -17,6 +17,8 @@
 package com.duckduckgo.app.browser.menu
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
+import androidx.core.net.toUri
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse
@@ -30,16 +32,19 @@ import com.duckduckgo.browser.ui.browsermenu.VpnMenuState
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
+@RunWith(AndroidJUnit4::class)
 class RealBrowserMenuViewStateFactoryTest {
 
     @get:Rule
@@ -56,6 +61,7 @@ class RealBrowserMenuViewStateFactoryTest {
     private val newDownloadState: NewDownloadState = mock()
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val duckChat: DuckChat = mock()
 
     private lateinit var testee: RealBrowserMenuViewStateFactory
 
@@ -63,7 +69,7 @@ class RealBrowserMenuViewStateFactoryTest {
     fun setup() {
         whenever(duckAiFeatureStateMock.showPopupMenuShortcut).thenReturn(popupMenuShortcutFlow)
         whenever(duckAiFeatureStateMock.showVoiceChatEntry).thenReturn(voiceChatEntryFlow)
-        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, newDownloadState, duckDuckGoUrlDetector, appBuildConfig)
+        testee = RealBrowserMenuViewStateFactory(duckAiFeatureStateMock, duckChat, newDownloadState, duckDuckGoUrlDetector, appBuildConfig)
     }
 
     @Test
@@ -124,6 +130,36 @@ class RealBrowserMenuViewStateFactoryTest {
         assertFalse(viewState.canPrintPage)
         assertTrue(viewState.showAutofill)
     }
+
+    @Test
+    fun `when creating menu on an empty duck ai chat then it is marked empty`() = runTest {
+        whenever(duckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
+
+        val result = createDuckAiMenu(siteUrl = "https://duck.ai/")
+
+        assertTrue(result.isEmptyChat)
+    }
+
+    @Test
+    fun `when creating menu on a duck ai conversation then it is not marked empty`() = runTest {
+        val url = "https://duck.ai/?chatID=conversation"
+        whenever(duckChat.isDuckChatUrl(url.toUri())).thenReturn(true)
+
+        val result = createDuckAiMenu(siteUrl = url)
+
+        assertFalse(result.isEmptyChat)
+    }
+
+    private fun createDuckAiMenu(siteUrl: String) = testee.create(
+        omnibarViewMode = ViewMode.DuckAI,
+        viewState = BrowserViewState(),
+        customTabsMode = false,
+        tabId = "",
+        title = null,
+        shortUrl = null,
+        omnibarText = null,
+        siteUrl = siteUrl,
+    ) as BrowserMenuViewState.DuckAi
 
     @Test
     fun `when creating menu in duck ai mode then vpn menu state is passed through`() = runTest {
