@@ -383,6 +383,20 @@ class SyncAuditLogViewModelTest {
         assertEquals(listOf(row(ITEM_1), row(ITEM_2)), testee.viewState.value.rows)
     }
 
+    @Test
+    fun whenLastSeenEntryIsOnAnOlderPageThenRowsAboveItOnThatPageAreHighlighted() = runTest {
+        stateStore.state = AuditLogCheckState(lastSeenEntryId = "e0")
+        val first = loaded(ITEM_1, before = "b1")
+        val testee = loadedViewModel(first)
+
+        testee.onNearListEnd()
+        loader.older.complete(
+            SyncAuditLogLoadResult.Loaded(listOf(ITEM_2), SyncAuditLogPages(first.pages.entries + entry("e1") + entry("e0"), before = null)),
+        )
+
+        assertEquals(listOf(row(ITEM_1, highlighted = true), row(ITEM_2, highlighted = true)), testee.viewState.value.rows)
+    }
+
     private fun viewModel(entriesPerPage: Int? = null) =
         SyncAuditLogViewModel(SyncAuditLogScreenParams(entriesPerPage), loader, timeProvider, stateStore)
 

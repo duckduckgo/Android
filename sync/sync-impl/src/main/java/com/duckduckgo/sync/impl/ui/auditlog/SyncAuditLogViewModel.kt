@@ -77,9 +77,13 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    private var lastLoad: SyncAuditLogLoadResult.Loaded? = null
+    private class Session(
+        val monitor: SyncAuditLogUnseenMonitor,
+        var lastLoad: SyncAuditLogLoadResult.Loaded,
+    )
+
+    private var session: Session? = null
     private var retryAllowed = false
-    private var unseen = SyncAuditLogUnseen()
 
     init {
         load()
@@ -102,43 +106,66 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     }
 
     private fun load() {
-        val previous = lastLoad
-        if (previous != null && !previous.hasMore) return
+        val current = session
+        if (current != null && !current.lastLoad.hasMore) return
 
         _viewState.update { it.copy(status = Status.LOADING) }
         viewModelScope.launch {
-            val result = if (previous == null) {
-                unseen = readUnseen()
-                loader.loadLatest(params.entriesPerPage)
-            } else {
-                loader.loadOlder(previous, params.entriesPerPage)
-            }
-            when (result) {
-                SyncAuditLogLoadResult.Failed -> {
-                    // A scroll during the failed load must not count: the retry needs a gesture made after the error shows.
-                    retryAllowed = false
-                    _viewState.update { it.copy(status = Status.FAILED) }
-                }
-                is SyncAuditLogLoadResult.Loaded -> {
-                    lastLoad = result
-                    if (previous == null) markSeen(newestEntryId = result.pages.entries.firstOrNull()?.id)
-                    val newRows = result.toRows()
-                    _viewState.update { it.copy(rows = it.rows + newRows, status = Status.IDLE, hasMore = result.hasMore) }
-                }
+            if (current == null) loadLatest() else loadOlder(current)
+        }
+    }
+
+    private suspend fun loadLatest() {
+        val monitor = readUnseenMonitor()
+        when (val result = loader.loadLatest(params.entriesPerPage)) {
+            SyncAuditLogLoadResult.Failed -> onLoadFailed()
+            is SyncAuditLogLoadResult.Loaded -> {
+                session = Session(monitor, result)
+                markSeen(monitor, newestEntryId = result.pages.entries.firstOrNull()?.id)
+                onLoaded(result, monitor.unseenIds(result.pages.entries, result.items))
             }
         }
     }
 
-    private suspend fun readUnseen(): SyncAuditLogUnseen {
+    private suspend fun loadOlder(session: Session) {
+        val previous = session.lastLoad
+        when (val result = loader.loadOlder(previous, params.entriesPerPage)) {
+            SyncAuditLogLoadResult.Failed -> onLoadFailed()
+            is SyncAuditLogLoadResult.Loaded -> {
+                session.lastLoad = result
+                val newEntries = result.pages.entries.drop(previous.pages.entries.size)
+                onLoaded(result, session.monitor.unseenIds(newEntries, result.items))
+            }
+        }
+    }
+
+    private fun onLoadFailed() {
+        // A scroll during the failed load must not count: the retry needs a gesture made after the error shows.
+        retryAllowed = false
+        _viewState.update { it.copy(status = Status.FAILED) }
+    }
+
+    private fun onLoaded(
+        result: SyncAuditLogLoadResult.Loaded,
+        unseenIds: Set<String>,
+    ) {
+        val newRows = result.toRows(unseenIds)
+        _viewState.update { it.copy(rows = it.rows + newRows, status = Status.IDLE, hasMore = result.hasMore) }
+    }
+
+    private suspend fun readUnseenMonitor(): SyncAuditLogUnseenMonitor {
         val state = stateStore.read()
-        return SyncAuditLogUnseen(state.pendingLogins.mapTo(HashSet()) { it.entryId }, state.lastSeenEntryId)
+        return SyncAuditLogUnseenMonitor(state.pendingLogins.mapTo(HashSet()) { it.entryId }, state.lastSeenEntryId)
     }
 
     // Only the logins read at open: a check that runs during the load can add one this screen does not show.
-    private suspend fun markSeen(newestEntryId: String?) {
+    private suspend fun markSeen(
+        monitor: SyncAuditLogUnseenMonitor,
+        newestEntryId: String?,
+    ) {
         stateStore.update { state ->
             val updated = state.copy(
-                pendingLogins = state.pendingLogins.filterNot { it.entryId in unseen.pendingLoginIds },
+                pendingLogins = state.pendingLogins.filterNot { it.entryId in monitor.pendingLoginIds },
                 lastSeenEntryId = newestEntryId ?: state.lastSeenEntryId,
             )
             updated.takeIf { it != state }
@@ -146,9 +173,8 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     }
 
     // Times are fixed when a page loads: the screen does not refresh while it is open.
-    private fun SyncAuditLogLoadResult.Loaded.toRows(): List<SyncAuditLogRow> {
+    private fun SyncAuditLogLoadResult.Loaded.toRows(unseenIds: Set<String>): List<SyncAuditLogRow> {
         val now = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
-        val unseenIds = unseen.unseenIds(this)
         endHighlightLater(unseenIds)
         return items.map { SyncAuditLogRow(it, RelativeTime.between(it.occurredAt, now), highlighted = it.entryId in unseenIds) }
     }
