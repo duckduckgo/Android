@@ -389,6 +389,32 @@ class ModelPickerViewModelTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndAccessibleModelTappedThenPickedForNewChatNotGlobally() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        stateFlow.value = ModelState(models = listOf(freeModel("default"), freeModel("new")), selectedModelId = "default")
+        val model = freeModel("new")
+
+        testee.modelChanges.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            assertEquals(PickerModelChange.PickNewChatModel("new"), awaitItem())
+            verify(modelManager, never()).selectModel(any())
+            verify(duckChatPixels).fireModelSelected(eq("new"), any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTabHasNewChatPickThenMenuTicksPick() = runTest {
+        stateFlow.value = ModelState(models = listOf(freeModel("default"), freeModel("new")), selectedModelId = "default")
+        nativeInputState.value = NativeInputState.zero().copy(newChatModelId = "new")
+        runCurrent()
+
+        assertEquals("new", testee.selectedModelIdForMenu())
+    }
+
+    @Test
     fun whenFreeUserTapsGatedPlusModelThenUpsellPixelFiredAndModelSelectedNotFired() = runTest {
         stateFlow.value = ModelState(userTier = UserTier.FREE, isSubscriptionEligible = true)
         val model = plusModel("p")

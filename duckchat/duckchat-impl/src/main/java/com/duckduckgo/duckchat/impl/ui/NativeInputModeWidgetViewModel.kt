@@ -56,8 +56,10 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.NewChatSelection
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.models.newChatSelection
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
@@ -271,6 +273,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         if (chat != null && ReasoningResolver.forChat(chat, modelManager.modelState.value) != null) {
             return chat.model
         }
+        // A chat started from a pick is sent with it even where the picker is off, as the contextual sheet's running chat is.
+        newChatSelection()?.let { return it.modelId }
         // Existing chat whose model is no longer in the list: fall through to global so submission
         // carries (global model, global effort). New chat with picker off: nothing to send.
         if (chat == null && !_modelPickerEnabled.value) return null
@@ -278,11 +282,35 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun getResolvedReasoningEffort(): String? {
-        val chat = validChat() ?: return modelManager.getResolvedReasoningEffort()
+        val chat = validChat()
+        if (chat == null) {
+            val selection = newChatSelection() ?: return modelManager.getResolvedReasoningEffort()
+            return selection.effort?.rawValue
+        }
         val resolution = ReasoningResolver.forChat(chat, modelManager.modelState.value)
             ?: return modelManager.getResolvedReasoningEffort()
         val mode = ReasoningResolver.resolveMode(persisted = resolution.mode, available = resolution.available)
         return ReasoningResolver.effortFor(mode, resolution.available)?.rawValue
+    }
+
+    // Null without a pick, which leaves the global selection, or while the tab shows a stored chat, whose model and effort are its own.
+    // A chat not stored yet is the one the pick started, so it keeps the pick until the tab leaves it.
+    private fun newChatSelection(): NewChatSelection? {
+        if (validChat() != null) return null
+        val state = currentInputState()
+            ?.takeIf { it.newChatModelId != null || it.newChatReasoningMode != null }
+            ?: return null
+        return modelManager.modelState.value.newChatSelection(state)
+    }
+
+    fun pickNewChatModel(modelId: String) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = modelId) }
+    }
+
+    fun pickNewChatReasoningMode(mode: String) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(newChatReasoningMode = mode) }
     }
 
     fun getSelectedTool(): String? {
@@ -484,7 +512,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun selectModelById(modelId: String) {
         val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
-        viewModelScope.launch { modelManager.selectModel(model) }
+        if (duckChatFeature.resetModelForNewChats().isEnabled()) {
+            pickNewChatModel(model.id)
+        } else {
+            viewModelScope.launch { modelManager.selectModel(model) }
+        }
     }
 
     fun hasActiveChat(): Boolean = currentInputState()?.chatId != null
@@ -688,7 +720,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             // Reset submitEnabled to true if we changed chats.
             // Always end the model-change window since it's per-visit.
             val submitEnabled = if (current.chatId != chatId) true else current.submitEnabled
-            current.copy(chatId = chatId, submitEnabled = submitEnabled, modelChangeMode = false)
+            // A pick lasts for the chat it started, so leaving that chat returns the tab's next new chat to the default.
+            val leavesChat = current.chatId != null && current.chatId != chatId
+            current.copy(
+                chatId = chatId,
+                submitEnabled = submitEnabled,
+                modelChangeMode = false,
+                newChatModelId = current.newChatModelId.takeUnless { leavesChat },
+                newChatReasoningMode = current.newChatReasoningMode.takeUnless { leavesChat },
+            )
         }
         currentChatJob?.cancel()
         currentChat.value = null

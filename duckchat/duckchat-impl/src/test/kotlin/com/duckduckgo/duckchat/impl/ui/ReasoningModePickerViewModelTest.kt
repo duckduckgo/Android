@@ -306,6 +306,46 @@ class ReasoningModePickerViewModelTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndAccessibleModeTappedThenPickedForNewChatNotGlobally() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+            ),
+        )
+        runCurrent()
+
+        testee.newChatModePicks.test {
+            testee.onModeTapped(ReasoningMode.REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            assertEquals(ReasoningMode.REASONING, awaitItem())
+            verify(modelManager, never()).selectReasoningMode(any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenTabHasNewChatPicksThenRowsAndDisplayedModeFollowThem() = runTest {
+        modelState.value = ModelState(
+            models = listOf(
+                aiModel("default", supported = listOf(ReasoningEffort.NONE)),
+                aiModel("picked", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+            ),
+            selectedModelId = "default",
+            selectedReasoningMode = ReasoningMode.FAST,
+            availableReasoningModes = listOf(AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE)),
+        )
+        nativeInputState.value = NativeInputState.zero().copy(newChatModelId = "picked", newChatReasoningMode = ReasoningMode.REASONING.rawValue)
+        runCurrent()
+
+        val state = testee.state.value
+        assertTrue(state.visible)
+        assertEquals(ReasoningMode.REASONING, state.displayedMode)
+    }
+
+    @Test
     fun whenAccessibleModeTappedThenReasoningEffortSelectedPixelFired() = runTest {
         modelState.value = ModelState(
             availableReasoningModes = listOf(

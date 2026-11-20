@@ -1952,6 +1952,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
         onChangeModelSubmitted?.invoke(modelId)
     }
 
+    override fun pickNewChatModel(modelId: String) {
+        viewModel.pickNewChatModel(modelId)
+    }
+
+    override fun pickNewChatReasoningMode(mode: String) {
+        viewModel.pickNewChatReasoningMode(mode)
+    }
+
     override fun requestCameraCapture(callback: ValueCallback<Array<Uri>>) {
         cameraCaptureCallback?.invoke(callback)
     }
