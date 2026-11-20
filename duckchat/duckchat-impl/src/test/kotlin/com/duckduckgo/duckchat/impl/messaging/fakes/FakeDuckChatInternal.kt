@@ -141,6 +141,8 @@ class FakeDuckChatInternal(
 
     override fun openDuckChatSettings() { }
 
+    override fun openBrowserAccessSettings() { }
+
     override fun closeDuckChat() { }
 
     override fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint) { }

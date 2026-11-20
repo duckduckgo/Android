@@ -247,6 +247,34 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenOpenAIChatSettingsWithBrowserPermissionsSectionThenOpenBrowserAccess() = runTest {
+        openAIChatSettings(JSONObject().put("section", "browserPermissions"))
+
+        verify(mockDuckChat).openBrowserAccessSettings()
+        verify(mockDuckChat, never()).openDuckChatSettings()
+    }
+
+    @Test
+    fun whenOpenAIChatSettingsWithoutSectionThenOpenSettings() = runTest {
+        openAIChatSettings(null)
+
+        verify(mockDuckChat).openDuckChatSettings()
+        verify(mockDuckChat, never()).openBrowserAccessSettings()
+    }
+
+    @Test
+    fun whenOpenAIChatSettingsWithUnknownSectionThenOpenSettings() = runTest {
+        openAIChatSettings(JSONObject().put("section", "somethingNew"))
+
+        verify(mockDuckChat).openDuckChatSettings()
+        verify(mockDuckChat, never()).openBrowserAccessSettings()
+    }
+
+    private suspend fun openAIChatSettings(data: JSONObject?) {
+        testee.processJsCallbackMessage("aiChat", "openAIChatSettings", null, data, pageContext = viewModel.updatedPageContext)
+    }
+
+    @Test
     fun whenGetAIChatNativeHandoffDataAndIdIsNullThenReturnNull() = runTest {
         val featureName = "aiChat"
         val method = "getAIChatNativeHandoffData"
