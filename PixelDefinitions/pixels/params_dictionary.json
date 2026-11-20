@@ -2,6 +2,12 @@
 // In your pixel definitions, you can reference these params by their key
 // See TEMPLATE.json for an example
 {
+    "deviceRamBucket": {
+        "key": "device_ram_bucket",
+        "type": "string",
+        "description": "Device memory capacity bucket (ActivityManager.MemoryInfo.totalMem). Absent if it could not be read.",
+        "enum": ["<1GB", "1GB", "2GB", "4GB", "6GB", "8GB", "12GB", "16GB+"]
+    },
     "appVersion": {
         "key": "appVersion",
         "type": "string",

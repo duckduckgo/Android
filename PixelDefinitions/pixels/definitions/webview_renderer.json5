@@ -1,0 +1,112 @@
+// WebView renderer process termination, reported from BrowserWebViewClient.onRenderProcessGone.
+// WebViews in the same profile share a renderer process, and Android notifies each WebView it served,
+// so the callbacks of one termination are collected and reported as a single pixel, unless the
+// renderProcessGonePixel remote feature is disabled.
+{
+    "m_web_view_renderer_gone_crash": {
+        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once per renderer termination, stored on the device until sent, so a death while the app was in the background is reported when the app is next opened. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
+        "owners": ["marcosholgado"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "app_state",
+                "description": "Whether any app activity was started when the renderer died, ignoring activity recreation. The death time is the one the system recorded when exit_reason matched a record, otherwise when the app was notified, which for an app frozen in the background can be after it reopens.",
+                "type": "string",
+                "enum": ["foreground", "background"]
+            },
+            {
+                "key": "affected_webviews",
+                "description": "Bucketed number of WebViews using the browser WebView client (browser tabs and the in-app WebView screen) that lost their page to this termination",
+                "type": "string",
+                "enum": ["1", "2-3", "4-5", "6-10", "11+"]
+            },
+            "deviceRamBucket",
+            {
+                "key": "time_in_background",
+                "description": "Bucketed time between the last app activity stopping and the renderer death (same death time as app_state), when app_state is background. never_opened means no activity had started since the app process launched.",
+                "type": "string",
+                "enum": ["<10s", "10s-1m", "1m-10m", "10m-1h", "1h+", "never_opened"]
+            },
+            {
+                "key": "exit_reason",
+                "description": "Reason the system recorded for the renderer process exit (ApplicationExitInfo REASON_*), from the one renderer record written after the previous notification and no later than this one, ignoring renderers torn down unused. other_system_kill is REASON_OTHER; unmapped is any reason without its own value. Some Android versions record low-memory kills as signaled. ambiguous means several renderer records qualified (for example Fire Mode or PIR renderers dying in the same window); not_found means none did. Absent below Android 11.",
+                "type": "string",
+                "enum": [
+                    "low_memory",
+                    "signaled",
+                    "crash",
+                    "crash_native",
+                    "excessive_resource_usage",
+                    "freezer",
+                    "dependency_died",
+                    "other_system_kill",
+                    "unknown",
+                    "unmapped",
+                    "ambiguous",
+                    "not_found"
+                ]
+            },
+            {
+                "key": "renderer_pss",
+                "description": "Bucketed last PSS the system sampled for the renderer before it exited, from the same exit record. The sample can be minutes old; unknown means the system never sampled it. Absent unless exit_reason matched a record.",
+                "type": "string",
+                "enum": ["unknown", "<100MB", "100-200MB", "200-400MB", "400-800MB", "800MB+"]
+            }
+        ]
+    },
+    "m_web_view_renderer_gone_killed": {
+        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once per renderer termination, stored on the device until sent, so a death while the app was in the background is reported when the app is next opened. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
+        "owners": ["marcosholgado"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "app_state",
+                "description": "Whether any app activity was started when the renderer died, ignoring activity recreation. The death time is the one the system recorded when exit_reason matched a record, otherwise when the app was notified, which for an app frozen in the background can be after it reopens.",
+                "type": "string",
+                "enum": ["foreground", "background"]
+            },
+            {
+                "key": "affected_webviews",
+                "description": "Bucketed number of WebViews using the browser WebView client (browser tabs and the in-app WebView screen) that lost their page to this termination",
+                "type": "string",
+                "enum": ["1", "2-3", "4-5", "6-10", "11+"]
+            },
+            "deviceRamBucket",
+            {
+                "key": "time_in_background",
+                "description": "Bucketed time between the last app activity stopping and the renderer death (same death time as app_state), when app_state is background. never_opened means no activity had started since the app process launched.",
+                "type": "string",
+                "enum": ["<10s", "10s-1m", "1m-10m", "10m-1h", "1h+", "never_opened"]
+            },
+            {
+                "key": "exit_reason",
+                "description": "Reason the system recorded for the renderer process exit (ApplicationExitInfo REASON_*), from the one renderer record written after the previous notification and no later than this one, ignoring renderers torn down unused. other_system_kill is REASON_OTHER; unmapped is any reason without its own value. Some Android versions record low-memory kills as signaled. ambiguous means several renderer records qualified (for example Fire Mode or PIR renderers dying in the same window); not_found means none did. Absent below Android 11.",
+                "type": "string",
+                "enum": [
+                    "low_memory",
+                    "signaled",
+                    "crash",
+                    "crash_native",
+                    "excessive_resource_usage",
+                    "freezer",
+                    "dependency_died",
+                    "other_system_kill",
+                    "unknown",
+                    "unmapped",
+                    "ambiguous",
+                    "not_found"
+                ]
+            },
+            {
+                "key": "renderer_pss",
+                "description": "Bucketed last PSS the system sampled for the renderer before it exited, from the same exit record. The sample can be minutes old; unknown means the system never sampled it. Absent unless exit_reason matched a record.",
+                "type": "string",
+                "enum": ["unknown", "<100MB", "100-200MB", "200-400MB", "400-800MB", "800MB+"]
+            }
+        ]
+    }
+}

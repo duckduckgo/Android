@@ -203,6 +203,7 @@ class BrowserWebViewClientTest {
     private val mockForceWebViewRecompositeFeature: ForceWebViewRecompositeFeature = mock()
     private val forceRecompositeEnabledFlow = MutableStateFlow(true)
     private val mockAppLinkFeature: AppLinkFeature = mock()
+    private val renderProcessGoneReporter: RenderProcessGoneReporter = mock()
     private val gesturedPostNavigationEnabledFlow = MutableStateFlow(true)
 
     @Before
@@ -273,6 +274,7 @@ class BrowserWebViewClientTest {
                     mockPageLoadTimeoutPixels,
                     pageLoadFeature,
                     mockAppLinkFeature,
+                    renderProcessGoneReporter,
                 )
             testee.webViewClientListener = listener
             whenever(webResourceRequest.url).thenReturn(Uri.EMPTY)
@@ -448,19 +450,19 @@ class BrowserWebViewClientTest {
     }
 
     @Test
-    fun whenRenderProcessGoneDueToCrashThenCrashDataStoreEntryIsIncremented() {
+    fun whenRenderProcessGoneDueToCrashThenReporterToldItCrashed() {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(true)
         testee.onRenderProcessGone(webView, detail)
-        verify(pixel).fire(WebViewPixelName.WEB_RENDERER_GONE_CRASH)
+        verify(renderProcessGoneReporter).onRenderProcessGone(didCrash = true)
     }
 
     @Test
-    fun whenRenderProcessGoneDueToNonCrashThenOtherDataStoreEntryIsIncremented() {
+    fun whenRenderProcessGoneDueToNonCrashThenReporterToldItWasKilled() {
         val detail: RenderProcessGoneDetail = mock()
         whenever(detail.didCrash()).thenReturn(false)
         testee.onRenderProcessGone(webView, detail)
-        verify(pixel).fire(WebViewPixelName.WEB_RENDERER_GONE_KILLED)
+        verify(renderProcessGoneReporter).onRenderProcessGone(didCrash = false)
     }
 
     @Test
