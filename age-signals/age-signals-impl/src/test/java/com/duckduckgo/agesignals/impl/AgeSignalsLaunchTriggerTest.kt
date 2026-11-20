@@ -26,8 +26,10 @@ import com.duckduckgo.agesignals.impl.AgeSignalsPixelName.CHECK_DAILY
 import com.duckduckgo.agesignals.impl.AgeSignalsPixelName.PROMPT_SHOWN_COUNT
 import com.duckduckgo.agesignals.impl.AgeSignalsPixelName.PROMPT_SHOWN_DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.PETAL
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.PETAL_RANDOMIZE
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -179,7 +181,7 @@ class AgeSignalsLaunchTriggerTest {
 
         trigger.onActivityResumed(mock<Activity>())
 
-        verifyCheckPixel(mapOf("result" to "success", "petal" to "randomize"), "m_age_signals_check_daily:success")
+        verifyCheckPixel(mapOf("result" to "success", PETAL to PETAL_RANDOMIZE), "m_age_signals_check_daily:success")
     }
 
     @Test
@@ -189,7 +191,7 @@ class AgeSignalsLaunchTriggerTest {
         trigger.onActivityResumed(mock<Activity>())
 
         verifyCheckPixel(
-            mapOf("result" to "failure", "error_code" to "timeout", "petal" to "randomize"),
+            mapOf("result" to "failure", "error_code" to "timeout", PETAL to PETAL_RANDOMIZE),
             "m_age_signals_check_daily:failure:timeout",
         )
     }
@@ -234,7 +236,7 @@ class AgeSignalsLaunchTriggerTest {
 
         trigger(realChecker).onActivityResumed(mock<Activity>())
 
-        verifyCheckPixel(mapOf("result" to "success", "petal" to "randomize"), "m_age_signals_check_daily:success")
+        verifyCheckPixel(mapOf("result" to "success", PETAL to PETAL_RANDOMIZE), "m_age_signals_check_daily:success")
     }
 
     @Test
@@ -243,8 +245,8 @@ class AgeSignalsLaunchTriggerTest {
 
         trigger.onActivityResumed(mock<AgeSharingConsentWrapperActivity>())
 
-        verify(pixel).fire(eq(PROMPT_SHOWN_COUNT), eq(mapOf("petal" to "randomize")), any(), eq(Count))
-        verify(pixel).fire(eq(PROMPT_SHOWN_DAILY), eq(mapOf("petal" to "randomize")), any(), eq(Daily()))
+        verify(pixel).fire(eq(PROMPT_SHOWN_COUNT), eq(mapOf(PETAL to PETAL_RANDOMIZE)), any(), eq(Count))
+        verify(pixel).fire(eq(PROMPT_SHOWN_DAILY), eq(mapOf(PETAL to PETAL_RANDOMIZE)), any(), eq(Daily()))
     }
 
     @Test

@@ -27,8 +27,10 @@ import com.duckduckgo.agesignals.impl.AgeSignalsPixelName.CHECK_DAILY
 import com.duckduckgo.agesignals.impl.AgeSignalsPixelName.PROMPT_SHOWN_COUNT
 import com.duckduckgo.agesignals.impl.AgeSignalsPixelName.PROMPT_SHOWN_DAILY
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.PETAL
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelValues.PETAL_RANDOMIZE
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -56,7 +58,7 @@ class AgeSignalsPixelsTest {
             verifyCountAndDaily(
                 CHECK_COUNT,
                 CHECK_DAILY,
-                mapOf("result" to "success", "petal" to "randomize"),
+                mapOf("result" to "success", PETAL to PETAL_RANDOMIZE),
                 "m_age_signals_check_daily:success",
             )
         }
@@ -91,7 +93,7 @@ class AgeSignalsPixelsTest {
                 verifyCountAndDaily(
                     CHECK_COUNT,
                     CHECK_DAILY,
-                    mapOf("result" to "failure", "error_code" to code, "petal" to "randomize"),
+                    mapOf("result" to "failure", "error_code" to code, PETAL to PETAL_RANDOMIZE),
                     "m_age_signals_check_daily:failure:$code",
                 )
             }
@@ -102,7 +104,7 @@ class AgeSignalsPixelsTest {
     fun whenThePromptIsShownThenThePromptPixelFiresWithoutData() {
         pixels.firePromptShown()
 
-        verifyCountAndDaily(PROMPT_SHOWN_COUNT, PROMPT_SHOWN_DAILY, mapOf("petal" to "randomize"), null)
+        verifyCountAndDaily(PROMPT_SHOWN_COUNT, PROMPT_SHOWN_DAILY, mapOf(PETAL to PETAL_RANDOMIZE), null)
     }
 
     @Test
