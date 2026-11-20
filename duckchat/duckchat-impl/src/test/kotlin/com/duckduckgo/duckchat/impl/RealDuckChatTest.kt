@@ -27,6 +27,7 @@ import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -163,7 +164,7 @@ class RealDuckChatTest {
         )
         coroutineRule.testScope.advanceUntilIdle()
 
-        whenever(mockBrowserNav.openDuckChat(any(), any(), any(), any(), any(), anyOrNull())).thenReturn(mockIntent)
+        whenever(mockBrowserNav.openDuckChat(any(), any(), anyOrNull(), any())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
     }
 
@@ -1996,7 +1997,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()))
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2012,7 +2013,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager).selectModel(capable)
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()))
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2028,7 +2029,7 @@ class RealDuckChatTest {
         coroutineRule.testScope.advanceUntilIdle()
 
         verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(false), any(), anyOrNull())
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.Open()))
         verify(mockContext).startActivity(mockIntent)
     }
 
