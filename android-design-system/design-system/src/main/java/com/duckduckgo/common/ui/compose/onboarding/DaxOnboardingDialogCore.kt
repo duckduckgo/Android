@@ -21,12 +21,8 @@ import android.content.Context
 import android.graphics.BlurMaskFilter
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector2D
-import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -45,27 +41,19 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.onFocusedBoundsChanged
-import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.movableContentOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
@@ -88,7 +76,6 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.onSizeChanged
@@ -123,13 +110,6 @@ import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTextStyle
 import com.duckduckgo.common.ui.compose.theme.LocalOnboardingColors
 import com.duckduckgo.common.ui.compose.theme.asTextStyle
 import com.duckduckgo.mobile.android.R
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.launch
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 import kotlin.time.Duration
@@ -158,7 +138,7 @@ internal fun dialogActionLayout(
 )
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 internal fun DaxOnboardingDialogCore(
     contentKey: String,
     title: AnnotatedString,
@@ -190,16 +170,37 @@ internal fun DaxOnboardingDialogCore(
     showScrollbar: Boolean = false,
 ) {
     val inInspectionMode = LocalInspectionMode.current
-    val compositionScope = rememberCoroutineScope()
-    val motionScale = compositionScope.coroutineContext[MotionDurationScale]?.scaleFactor ?: 1f
-    val intro = remember(contentKey) { DaxOnboardingDialogIntro(animate && motionScale != 0f && !inInspectionMode, entryDelay) }
-    val shell = remember { DaxOnboardingDialogShell(initiallyVisible = !intro.animate, tail = tail, tailExtended = tailExtended) }
-    val sampledAnimate = intro.animate
+    val holder = rememberDaxOnboardingDialogStateHolder(
+        contentKey = contentKey,
+        state = state,
+        animate = animate,
+        entryDelay = entryDelay,
+        tail = tail,
+        tailExtended = tailExtended,
+        boundsAnimationDuration = boundsAnimationDuration,
+    )
+    DaxOnboardingDialogEffects(
+        holder = holder,
+        contentKey = contentKey,
+        state = state,
+        animate = animate,
+        tail = tail,
+        tailExtended = tailExtended,
+        boundsAnimationDuration = boundsAnimationDuration,
+        hasHeader = headerImage != null,
+        hasTitle = title.text.isNotEmpty(),
+        onIntroFinished = onIntroFinished,
+    )
+    val intro = holder.intro
+    val contentSlot = remember(intro) {
+        movableContentOf<@Composable DaxOnboardingDialogContentScope.() -> Unit> { slot ->
+            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
+                val contentScope = remember(this, intro) { DaxOnboardingDialogContentScopeImpl(this, intro) }
+                contentScope.slot()
+            }
+        }
+    }
     val settled = intro.settled
-    val latestOnIntroFinished by rememberUpdatedState(onIntroFinished)
-    val latestTail by rememberUpdatedState(tail)
-    val latestTailExtended by rememberUpdatedState(tailExtended)
-    val latestHeaderImage by rememberUpdatedState(headerImage)
     val requestSkip = intro.requestSkip
     val latestAnimating by rememberUpdatedState(!settled)
     val latestRequestSkip by rememberUpdatedState(requestSkip)
@@ -219,132 +220,13 @@ internal fun DaxOnboardingDialogCore(
         }
     }
 
-    val cardSizeTracker = remember(contentKey) { CardSizeTracker() }
-    val replacingEnteredShell = remember(contentKey) { shell.entered }
-    val latestTitle by rememberUpdatedState(title)
-
-    DisposableEffect(state, contentKey) {
-        state.attach(requestSkip, !settled)
-        onDispose { state.detach(requestSkip) }
-    }
-    SideEffect { state.updateAnimating(requestSkip, !settled) }
-
-    LaunchedEffect(intro, intro.phase, intro.skipRequested) {
-        intro.runPhase(
-            shell = shell,
-            hasHeader = { latestHeaderImage != null },
-            morphEnteredShell = morphEnteredShell@{
-                if (replacingEnteredShell) {
-                    val sizes = snapshotFlow { cardSizeTracker.lastSize }.filterNotNull()
-                    if (cardSizeTracker.bounded) {
-                        // A host can raise the available height after the replacement is first measured, so the morph retargets.
-                        sizes.mapLatest { shell.cardSize.animateTo(it, boundsTween(boundsAnimationDuration)) }.firstOrNull()
-                    } else {
-                        sizes.firstOrNull()?.let { shell.cardSize.snapTo(it) }
-                    }
-                    cardSizeTracker.hasMeasured = true
-                }
-            },
-            settleShell = { shell.settle(latestTail, latestTailExtended, cardSizeTracker.lastSize) },
-            hasTitle = { latestTitle.text.isNotEmpty() },
-            onFinished = {
-                state.updateAnimating(requestSkip, false)
-                latestOnIntroFinished(contentKey)
-            },
-        )
-    }
-
-    val dismissOffsetPx = with(LocalDensity.current) { DaxOnboardingDialogDefaults.DismissOffset.roundToPx() }
-    fun updateCardSize(size: IntSize) {
-        cardSizeTracker.naturalSize = size
-        val maximum = state.availableHeightPx?.let { (it - dismissOffsetPx).coerceAtLeast(0) } ?: cardSizeTracker.maxHeight
-        val target = IntSize(size.width, size.height.coerceAtMost(maximum))
-        cardSizeTracker.lastSize = target
-        val awaitingMorph = replacingEnteredShell && sampledAnimate && !cardSizeTracker.hasMeasured && !intro.settled
-        if (awaitingMorph) return
-        compositionScope.launch {
-            if (cardSizeTracker.hasMeasured && intro.settled && animate && motionScale != 0f) {
-                if (!shell.cardSize.isRunning || shell.cardSize.targetValue.height != target.height) {
-                    shell.cardSize.animateTo(target, boundsTween(boundsAnimationDuration))
-                }
-            } else {
-                cardSizeTracker.hasMeasured = true
-                shell.cardSize.snapTo(target)
-            }
-        }
-    }
-    LaunchedEffect(cardSizeTracker, state.availableHeightPx) {
-        cardSizeTracker.naturalSize?.let { updateCardSize(it) }
-    }
-
-    val animateTailPosition = if (settled) animate else sampledAnimate
-    LaunchedEffect(contentKey, tail, animateTailPosition, motionScale) {
-        val target = tailPlacementFor(tail)
-        if (animateTailPosition && motionScale != 0f && shell.tailPlacement.value.toPlacement().present && target.present) {
-            val duration = DaxOnboardingDialogDefaults.TailPositionDuration.inWholeMilliseconds.toInt()
-            coroutineScope {
-                launch { shell.tailPlacement.animateTo(target.toOffset(), tween(duration, easing = FastOutSlowInEasing)) }
-                launch { shell.tailMirror.animateTo(target.mirrorFraction, tween(duration, easing = FastOutSlowInEasing)) }
-            }
-        } else {
-            shell.tailPlacement.snapTo(target.toOffset())
-            shell.tailMirror.snapTo(target.mirrorFraction)
-        }
-    }
-    // The tail is already at depth when content introduces itself; only a settled change animates.
-    LaunchedEffect(contentKey, tailExtended, animate, settled) {
-        val target = if (tailExtended) 1f else 0f
-        if (settled && animate && motionScale != 0f) {
-            shell.tailDepth.animateTo(
-                target,
-                tween(DaxOnboardingDialogDefaults.ContentFadeDuration.inWholeMilliseconds.toInt(), easing = FastOutSlowInEasing),
-            )
-        } else {
-            shell.tailDepth.snapTo(target)
-        }
-    }
-
-    val contentSlot = remember(intro) {
-        movableContentOf<@Composable DaxOnboardingDialogContentScope.() -> Unit> { slot ->
-            Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                val contentScope = remember(this, intro) { DaxOnboardingDialogContentScopeImpl(this, intro) }
-                contentScope.slot()
-            }
-        }
-    }
-    val scrollState = remember(contentKey) { ScrollState(0) }
     val context = LocalContext.current
     val scrollbar = remember(context, showScrollbar) { if (showScrollbar) PlatformScrollbar.from(context) else null }
-    val focusedContentRequester = remember(contentKey) { BringIntoViewRequester() }
-    var focusedChild by remember(contentKey) { mutableStateOf<LayoutCoordinates?>(null) }
-    var scrollingContent by remember(contentKey) { mutableStateOf<LayoutCoordinates?>(null) }
-    LaunchedEffect(contentKey, scrollState) {
-        snapshotFlow { Triple(scrollState.viewportSize, focusedChild, scrollingContent) }
-            .collectLatest { (viewportHeight, child, parent) ->
-                if (viewportHeight > 0 && child?.isAttached == true && parent?.isAttached == true) {
-                    focusedContentRequester.bringIntoView(parent.localBoundingBoxOf(child, clipBounds = false))
-                }
-            }
-    }
-    val tailAtRest = { !sampledAnimate && !intro.finished }
-    val renderedTailPlacement = { if (tailAtRest()) tailPlacementFor(tail).toOffset() else shell.tailPlacement.value }
-    val renderedTailDepth = { if (tailAtRest()) { if (tailExtended) 1f else 0f } else shell.tailDepth.value }
-    val renderedTailMirror = { if (tailAtRest()) tailPlacementFor(tail).mirrorFraction else shell.tailMirror.value }
-    val bubbleShape = {
-        DaxSpeechBubbleShape(
-            cornerRadius = DaxOnboardingDialogDefaults.CornerRadius,
-            tailPosition = tailPositionFor(tail, renderedTailPlacement()),
-            depth = renderedTailDepth(),
-            mirrorFraction = renderedTailMirror(),
-        )
-    }
-    val shellAlpha = { if (tailAtRest()) 1f else shell.cardAlpha.value }
     val colors = DaxOnboardingDialogDefaults.colors
     val rowHorizontalPadding = if (landscapeLayout) DaxOnboardingDialogDefaults.LandscapeHorizontalPadding else 0.dp
     val primaryCtaHorizontalPadding = if (landscapeLayout) 0.dp else DaxOnboardingDialogDefaults.ContentHorizontalPadding
     val textPadding = if (landscapeLayout) 0.dp else textHorizontalPadding
     val contentPadding = if (landscapeLayout) 0.dp else contentHorizontalPadding
-    val onboardingIconsPrimary = LocalOnboardingColors.current.iconsPrimary
     // Reads the phase at focus time, not `settled`: content may request focus as the intro settles, before recomposition.
     val contentGate = Modifier
         .focusProperties { if (intro.phase != IntroPhase.Settled) onEnter = { cancelFocusChange() } }
@@ -365,114 +247,78 @@ internal fun DaxOnboardingDialogCore(
     ) {
         Box(Modifier.fillMaxWidth()) {
             val cardModifier = Modifier
-                .groupAlphaWithOverflow(CardShadowOverflow, shellAlpha)
-                .bubbleStroke(bubbleShape, colors.stroke, DaxOnboardingDialogDefaults.StrokeWidth)
-                .shadowAndClip(bubbleShape, colors.shadow, elevation)
-                .bubbleFill(bubbleShape, colors.surface)
+                .groupAlphaWithOverflow(CardShadowOverflow, holder.shellAlpha)
+                .bubbleStroke(holder.bubbleShape, colors.stroke, DaxOnboardingDialogDefaults.StrokeWidth)
+                .shadowAndClip(holder.bubbleShape, colors.shadow, elevation)
+                .bubbleFill(holder.bubbleShape, colors.surface)
                 .then(
                     if (inInspectionMode) {
                         Modifier
                     } else {
                         Modifier.animatedCardSize(
-                            shell.cardSize,
-                            cardSizeTracker,
+                            holder.shell.cardSize,
+                            holder.cardSizeTracker,
                             { intro.settled },
-                            { replacingEnteredShell && sampledAnimate },
+                            holder.holdingForMorph,
                             { boundsAnimationDuration == Duration.ZERO },
                         )
                     },
                 )
-                .then(scrollbar?.let { Modifier.platformScrollbar(scrollState, it) } ?: Modifier)
-                .verticalScroll(scrollState, enabled = settled)
+                .then(scrollbar?.let { Modifier.platformScrollbar(holder.scrollState, it) } ?: Modifier)
+                .verticalScroll(holder.scrollState, enabled = settled)
 
             Box(modifier = cardModifier.fillMaxWidth()) {
                 key(contentKey) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .onFocusedBoundsChanged { focusedChild = it }
-                            .onGloballyPositioned { scrollingContent = it }
-                            .bringIntoViewRequester(focusedContentRequester)
-                            .onSizeChanged { size ->
-                                state.updateContentHeight(requestSkip, size.height)
-                                updateCardSize(size)
-                            }
+                            .onFocusedBoundsChanged { holder.focusedChild = it }
+                            .onGloballyPositioned { holder.scrollingContent = it }
+                            .bringIntoViewRequester(holder.focusedContentRequester)
+                            .onSizeChanged(holder::onContentSizeChanged)
                             .padding(
                                 top = topPadding,
                                 bottom = bottomPadding,
                             ),
                     ) {
-                        Layout(
-                            content = {
-                                Column {
-                                    DialogText(
-                                        intro = intro,
-                                        title = title,
-                                        titleStyle = titleStyle,
-                                        textAlign = textAlign,
-                                        headerImage = headerImage,
-                                        body = body,
-                                        titleBodySpacing = if (landscapeLayout) {
-                                            DaxOnboardingDialogDefaults.LandscapeTitleBodySpacing
-                                        } else {
-                                            titleBodySpacing
-                                        },
-                                        textHorizontalPadding = textPadding,
-                                        contentColor = colors.content,
-                                        contentGate = contentGate,
-                                    )
-                                }
-                                Column {
-                                    DialogActions(
-                                        intro = intro,
-                                        content = content,
-                                        contentSlot = contentSlot,
-                                        primaryCta = primaryCta,
-                                        landscape = landscapeLayout,
-                                        headerToActionsSpacing = headerToActionsSpacing,
-                                        contentHorizontalPadding = contentPadding,
-                                        primaryCtaHorizontalPadding = primaryCtaHorizontalPadding,
-                                        useNativeCtaInsets = useNativeCtaInsets,
-                                        contentGate = contentGate,
-                                    )
-                                }
-                            },
+                        DialogBodyLayout(
+                            landscape = landscapeLayout,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = rowHorizontalPadding),
-                        ) { measurables, constraints ->
-                            val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
-                            if (landscapeLayout) {
-                                val gap = DaxOnboardingDialogDefaults.LandscapeTextCtaSpacing.roundToPx()
-                                    .coerceAtMost(constraints.maxWidth)
-                                val actionsWidth = DaxOnboardingDialogDefaults.LandscapeCtaWidth.roundToPx()
-                                    .coerceAtMost(constraints.maxWidth - gap)
-                                val actions = measurables[1].measure(looseConstraints.copy(minWidth = actionsWidth, maxWidth = actionsWidth))
-                                val textWidth = if (constraints.hasBoundedWidth) constraints.maxWidth - actions.width - gap else 0
-                                val text = measurables[0].measure(
-                                    if (constraints.hasBoundedWidth) {
-                                        looseConstraints.copy(minWidth = textWidth, maxWidth = textWidth)
+                            text = {
+                                DialogText(
+                                    intro = intro,
+                                    title = title,
+                                    titleStyle = titleStyle,
+                                    textAlign = textAlign,
+                                    headerImage = headerImage,
+                                    body = body,
+                                    titleBodySpacing = if (landscapeLayout) {
+                                        DaxOnboardingDialogDefaults.LandscapeTitleBodySpacing
                                     } else {
-                                        looseConstraints
+                                        titleBodySpacing
                                     },
+                                    textHorizontalPadding = textPadding,
+                                    contentColor = colors.content,
+                                    contentGate = contentGate,
                                 )
-                                val height = maxOf(text.height, actions.height)
-                                layout(constraints.constrainWidth(text.width + gap + actions.width), constraints.constrainHeight(height)) {
-                                    text.placeRelative(0, (height - text.height) / 2)
-                                    actions.placeRelative(text.width + gap, (height - actions.height) / 2)
-                                }
-                            } else {
-                                val text = measurables[0].measure(looseConstraints)
-                                val actions = measurables[1].measure(looseConstraints.offset(vertical = -text.height))
-                                layout(
-                                    constraints.constrainWidth(maxOf(text.width, actions.width)),
-                                    constraints.constrainHeight(text.height + actions.height),
-                                ) {
-                                    text.placeRelative(0, 0)
-                                    actions.placeRelative(0, text.height)
-                                }
-                            }
-                        }
+                            },
+                            actions = {
+                                DialogActions(
+                                    intro = intro,
+                                    content = content,
+                                    contentSlot = contentSlot,
+                                    primaryCta = primaryCta,
+                                    landscape = landscapeLayout,
+                                    headerToActionsSpacing = headerToActionsSpacing,
+                                    contentHorizontalPadding = contentPadding,
+                                    primaryCtaHorizontalPadding = primaryCtaHorizontalPadding,
+                                    useNativeCtaInsets = useNativeCtaInsets,
+                                    contentGate = contentGate,
+                                )
+                            },
+                        )
 
                         if (tail != DaxOnboardingDialogTail.None) {
                             val tailBandHeight = with(LocalDensity.current) { onboardingTailBandHeightPx().toDp() }
@@ -483,32 +329,12 @@ internal fun DaxOnboardingDialogCore(
             }
 
             if (dismiss != null) {
-                DaxIconButton(
-                    onClick = dismiss.onDismiss,
-                    iconPainter = painterResource(R.drawable.ic_close_16),
-                    contentDescription = dismiss.contentDescription,
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .offset(x = DaxOnboardingDialogDefaults.DismissOffset, y = -DaxOnboardingDialogDefaults.DismissOffset)
-                        .size(DaxOnboardingDialogDefaults.DismissSize)
-                        .drawAlpha { if (tailAtRest()) 1f else shell.dismissAlpha.value }
-                        .clip(CircleShape)
-                        .background(colors.surface, CircleShape)
-                        .border(BorderStroke(DaxOnboardingDialogDefaults.StrokeWidth, colors.stroke), CircleShape),
-                    enabled = settled,
-                    iconSize = 16.dp,
-                    colors = DaxIconButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = onboardingIconsPrimary,
-                        disabledContainerColor = Color.Transparent,
-                        disabledContentColor = onboardingIconsPrimary,
-                    ),
-                )
+                DialogDismissButton(dismiss, holder.dismissAlpha, enabled = settled, modifier = Modifier.align(Alignment.TopEnd))
             }
         }
         AnimatedDaxOnboardingStepIndicator(
             step = step,
-            animate = animate && motionScale != 0f && !inInspectionMode,
+            animate = animate && holder.motionEnabled && !inInspectionMode,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(end = DaxOnboardingDialogDefaults.StepIndicatorEndInset)
@@ -517,9 +343,88 @@ internal fun DaxOnboardingDialogCore(
                     // ConstraintLayout rounds negative solved coordinates toward zero.
                     layout(placeable.width, 0) { placeable.place(0, (-placeable.height / 2 + .5f).toInt()) }
                 }
-                .graphicsLayer { alpha = shellAlpha() },
+                .graphicsLayer { alpha = holder.shellAlpha() },
         )
     }
+}
+
+@Composable
+private fun DialogBodyLayout(
+    landscape: Boolean,
+    text: @Composable () -> Unit,
+    actions: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Layout(
+        content = {
+            Column { text() }
+            Column { actions() }
+        },
+        modifier = modifier,
+    ) { measurables, constraints ->
+        val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+        if (landscape) {
+            val gap = DaxOnboardingDialogDefaults.LandscapeTextCtaSpacing.roundToPx()
+                .coerceAtMost(constraints.maxWidth)
+            val actionsWidth = DaxOnboardingDialogDefaults.LandscapeCtaWidth.roundToPx()
+                .coerceAtMost(constraints.maxWidth - gap)
+            val actions = measurables[1].measure(looseConstraints.copy(minWidth = actionsWidth, maxWidth = actionsWidth))
+            val textWidth = if (constraints.hasBoundedWidth) constraints.maxWidth - actions.width - gap else 0
+            val text = measurables[0].measure(
+                if (constraints.hasBoundedWidth) {
+                    looseConstraints.copy(minWidth = textWidth, maxWidth = textWidth)
+                } else {
+                    looseConstraints
+                },
+            )
+            val height = maxOf(text.height, actions.height)
+            layout(constraints.constrainWidth(text.width + gap + actions.width), constraints.constrainHeight(height)) {
+                text.placeRelative(0, (height - text.height) / 2)
+                actions.placeRelative(text.width + gap, (height - actions.height) / 2)
+            }
+        } else {
+            val text = measurables[0].measure(looseConstraints)
+            val actions = measurables[1].measure(looseConstraints.offset(vertical = -text.height))
+            layout(
+                constraints.constrainWidth(maxOf(text.width, actions.width)),
+                constraints.constrainHeight(text.height + actions.height),
+            ) {
+                text.placeRelative(0, 0)
+                actions.placeRelative(0, text.height)
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogDismissButton(
+    dismiss: DaxOnboardingDialogDismiss,
+    alpha: () -> Float,
+    enabled: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    val colors = DaxOnboardingDialogDefaults.colors
+    val onboardingIconsPrimary = LocalOnboardingColors.current.iconsPrimary
+    DaxIconButton(
+        onClick = dismiss.onDismiss,
+        iconPainter = painterResource(R.drawable.ic_close_16),
+        contentDescription = dismiss.contentDescription,
+        modifier = modifier
+            .offset(x = DaxOnboardingDialogDefaults.DismissOffset, y = -DaxOnboardingDialogDefaults.DismissOffset)
+            .size(DaxOnboardingDialogDefaults.DismissSize)
+            .drawAlpha(alpha)
+            .clip(CircleShape)
+            .background(colors.surface, CircleShape)
+            .border(BorderStroke(DaxOnboardingDialogDefaults.StrokeWidth, colors.stroke), CircleShape),
+        enabled = enabled,
+        iconSize = 16.dp,
+        colors = DaxIconButtonColors(
+            containerColor = Color.Transparent,
+            contentColor = onboardingIconsPrimary,
+            disabledContainerColor = Color.Transparent,
+            disabledContentColor = onboardingIconsPrimary,
+        ),
+    )
 }
 
 @Composable
@@ -721,33 +626,6 @@ internal fun tailPlacementFor(tail: DaxOnboardingDialogTail): DaxSpeechBubbleTai
 }
 
 internal fun DaxSpeechBubbleTailPlacement.toOffset(): Offset = Offset(edgeFraction, offsetDp)
-
-private fun Offset.toPlacement(): DaxSpeechBubbleTailPlacement = DaxSpeechBubbleTailPlacement(
-    edgeFraction = x,
-    offsetDp = y,
-    present = y > 0f,
-)
-
-private fun tailPositionFor(tail: DaxOnboardingDialogTail, placement: Offset): DaxSpeechBubbleTailPosition = when (tail) {
-    DaxOnboardingDialogTail.None -> DaxSpeechBubbleTailPosition.None
-    DaxOnboardingDialogTail.BottomStart,
-    DaxOnboardingDialogTail.BottomStartMirrored,
-    DaxOnboardingDialogTail.BottomStartWide,
-    DaxOnboardingDialogTail.BottomEnd,
-    -> DaxSpeechBubbleTailPosition.Interpolated(placement.x, placement.y)
-}
-
-private val BoundsAnimationEasing = Easing(AccelerateDecelerateInterpolator()::getInterpolation)
-
-private fun boundsTween(duration: Duration) = tween<IntSize>(duration.inWholeMilliseconds.toInt(), easing = BoundsAnimationEasing)
-
-private class CardSizeTracker {
-    var naturalSize: IntSize? = null
-    var lastSize by mutableStateOf<IntSize?>(null)
-    var hasMeasured = false
-    var maxHeight = Int.MAX_VALUE
-    val bounded: Boolean get() = maxHeight != Int.MAX_VALUE
-}
 
 private fun Modifier.shadowAndClip(shape: () -> Shape, color: Color, elevation: Dp): Modifier = then(
     if (elevation == 0.dp) {
