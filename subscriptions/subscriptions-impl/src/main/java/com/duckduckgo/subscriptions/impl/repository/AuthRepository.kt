@@ -82,6 +82,8 @@ interface AuthRepository {
         account: Account,
     ): Boolean
     suspend fun clearTokens()
+    suspend fun isTokenStoreAvailable(): Boolean
+    suspend fun hasRefreshTokenEntry(): Boolean
 }
 
 @BindingContainer
@@ -417,6 +419,14 @@ internal class RealAuthRepository constructor(
     override suspend fun clearTokens() = withContext(dispatcherProvider.io()) {
         subscriptionsDataStore.clearTokens()
         updateSerpPromoCookie()
+    }
+
+    override suspend fun isTokenStoreAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.isAvailable()
+    }
+
+    override suspend fun hasRefreshTokenEntry(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.hasRefreshTokenV2Entry()
     }
 }
 

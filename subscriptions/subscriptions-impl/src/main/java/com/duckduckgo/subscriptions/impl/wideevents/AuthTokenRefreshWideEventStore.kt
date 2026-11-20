@@ -21,7 +21,7 @@ import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
+import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
@@ -54,7 +54,7 @@ data class TokenRefreshHistory(
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAuthTokenRefreshWideEventStore @Inject constructor(
-    private val subscriptionsDataStore: SubscriptionsDataStore,
+    private val authRepository: AuthRepository,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val dispatcherProvider: DispatcherProvider,
 ) : AuthTokenRefreshWideEventStore {
@@ -93,13 +93,9 @@ class RealAuthTokenRefreshWideEventStore @Inject constructor(
         preferences.edit(commit = true) { clear() }
     }
 
-    override suspend fun isTokenStoreAvailable(): Boolean = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.isAvailable()
-    }
+    override suspend fun isTokenStoreAvailable(): Boolean = authRepository.isTokenStoreAvailable()
 
-    override suspend fun hasRefreshTokenEntry(): Boolean = withContext(dispatcherProvider.io()) {
-        subscriptionsDataStore.hasRefreshTokenV2Entry()
-    }
+    override suspend fun hasRefreshTokenEntry(): Boolean = authRepository.hasRefreshTokenEntry()
 
     private companion object {
         const val FILENAME = "com.duckduckgo.subscriptions.wideevents.auth_token_refresh"

@@ -46,6 +46,8 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYe
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
+import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
@@ -93,7 +95,12 @@ class AuthTokenRefreshWideEventTest {
     private val timeProvider: CurrentTimeProvider = mock()
     private val tokenDataStore = FakeSubscriptionsDataStore()
     private val store = RealAuthTokenRefreshWideEventStore(
-        subscriptionsDataStore = tokenDataStore,
+        authRepository = RealAuthRepository(
+            subscriptionsDataStore = tokenDataStore,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            serpPromo = FakeSerpPromo(),
+            subscriptionsFeature = lazy { subscriptionsFeature },
+        ),
         sharedPreferencesProvider = FakeSharedPreferencesProvider(),
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     )
