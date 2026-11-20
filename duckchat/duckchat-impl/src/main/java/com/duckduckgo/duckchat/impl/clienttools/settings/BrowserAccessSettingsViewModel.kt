@@ -139,6 +139,7 @@ class BrowserAccessSettingsViewModel @Inject constructor(
         val TOOL_ORDER = listOf(
             "listOpenTabs",
             "readTabContent",
+            "findInPage",
             "searchHistory",
             "searchBookmarks",
             "searchDownloads",

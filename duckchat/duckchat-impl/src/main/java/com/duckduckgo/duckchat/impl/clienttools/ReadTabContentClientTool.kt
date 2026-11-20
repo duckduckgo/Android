@@ -16,28 +16,17 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
-import com.duckduckgo.app.tabs.model.TabPageContextRepository
-import com.duckduckgo.app.tabs.model.TabRepository
-import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.R
 import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-/**
- * Reads the page context the browser cached for a tab when its page loaded, so background tabs can be read
- * without a live WebView. A tab with no cached context, or one cached for another address, is unavailable.
- */
 @ContributesIntoSet(AppScope::class)
 class ReadTabContentClientTool @Inject constructor(
     private val feature: AiChatBrowserToolsFeature,
-    // Lazy, as in RealNativeInputStateStore: TabDataRepository injects duckchat bindings itself.
-    private val tabRepositoryProvider: Lazy<BrowserModeDataProvider<TabRepository>>,
-    private val pageContextRepository: TabPageContextRepository,
-    private val duckChat: DuckChat,
+    private val cachedTabPages: CachedTabPages,
 ) : ClientTool {
 
     override val name: String = "readTabContent"
@@ -64,29 +53,19 @@ class ReadTabContentClientTool @Inject constructor(
         context: ClientToolCallContext,
     ): ClientToolResult {
         val request = parse(input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
-        val tabId = request.tabId ?: context.chatTabId
-        val tab = tabRepositoryProvider.value.forMode(context.browserMode).getTab(tabId)
-            ?: return ClientToolResult.Failure(ClientToolErrorCode.NOT_FOUND)
-        if (!duckChat.isToolVisible(tab)) return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
-
-        val url = ClientToolOutput.url(tab.url.orEmpty())
-        val pageContext = pageContextRepository.getPageContexts(listOf(tab.tabId))[tab.tabId]
-            ?.takeIf { ClientToolOutput.url(it.url) == url }
-            ?.let { runCatching { JSONObject(it.serializedPageContext) }.getOrNull() }
-            ?.takeIf { it.optBoolean(ATTACHABLE, true) }
-            ?: return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
-
-        val fullContent = pageContext.optString(CONTENT)
-        val content = ClientToolOutput.truncate(fullContent, MAX_CONTENT_LENGTH)
-        val fullContentLength = maxOf(pageContext.optInt(FULL_CONTENT_LENGTH, 0), fullContent.length)
+        val page = when (val lookup = cachedTabPages.find(request.tabId, context)) {
+            is CachedTabPages.Lookup.Failure -> return ClientToolResult.Failure(lookup.code)
+            is CachedTabPages.Lookup.Found -> lookup.page
+        }
+        val content = ClientToolOutput.truncate(page.content, MAX_CONTENT_LENGTH)
         return ClientToolResult.Success(
             JSONObject()
-                .put(TAB_ID, tab.tabId)
-                .put(TITLE, ClientToolOutput.title(pageContext.optString(TITLE).ifBlank { tab.title }))
-                .put(URL, url)
+                .put(TAB_ID, page.tabId)
+                .put(TITLE, page.title)
+                .put(URL, page.url)
                 .put(CONTENT, content)
-                .put(TRUNCATED, pageContext.optBoolean(TRUNCATED, false) || content.length < fullContent.length)
-                .put(FULL_CONTENT_LENGTH, fullContentLength)
+                .put(TRUNCATED, page.extractionTruncated || content.length < page.content.length)
+                .put(FULL_CONTENT_LENGTH, page.fullContentLength)
                 .put(ATTACHABLE, true)
                 // Reading a tab never attaches it to the chat.
                 .put(ATTACHED, false),

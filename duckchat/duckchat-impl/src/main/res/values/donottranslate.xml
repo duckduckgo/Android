@@ -85,6 +85,10 @@
     <string name="duckAiClientToolReadTabContentDescription">Read the text of a page you have open.</string>
     <string name="duckAiClientToolReadTabContentPromptTitle">Allow Duck.ai to read your open tabs?</string>
     <string name="duckAiClientToolReadTabContentPromptMessage">It will see the text of the pages it reads.</string>
+    <string name="duckAiClientToolFindInPageName">Find in Page</string>
+    <string name="duckAiClientToolFindInPageDescription">Find words or phrases in a page you have open.</string>
+    <string name="duckAiClientToolFindInPagePromptTitle">Allow Duck.ai to search the text of your open tabs?</string>
+    <string name="duckAiClientToolFindInPagePromptMessage">It will see each match and the text around it.</string>
     <string name="duckAiClientToolSearchHistoryName">Search History</string>
     <string name="duckAiClientToolSearchHistoryDescription">Search the pages you’ve visited.</string>
     <string name="duckAiClientToolSearchHistoryPromptTitle">Allow Duck.ai to search your history?</string>

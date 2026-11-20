@@ -17,9 +17,7 @@
 package com.duckduckgo.duckchat.impl.clienttools
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.app.tabs.model.CachedPageContext
 import com.duckduckgo.app.tabs.model.TabEntity
-import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
@@ -48,7 +46,7 @@ class ReadTabContentClientToolTest {
     private val pageContexts = FakeTabPageContextRepository()
     private val duckChat: DuckChat = mock()
 
-    private val testee = ReadTabContentClientTool(feature, lazy { tabRepositoryProvider }, pageContexts, duckChat)
+    private val testee = ReadTabContentClientTool(feature, CachedTabPages(lazy { tabRepositoryProvider }, pageContexts, duckChat))
 
     private val context = ClientToolCallContext(chatTabId = HOST_TAB, browserMode = BrowserMode.REGULAR, chatId = "chat-1", contextual = true)
 
@@ -179,22 +177,6 @@ class ReadTabContentClientToolTest {
         .put("attachable", attachable)
 
     private fun success(result: ClientToolResult): JSONObject = (result as ClientToolResult.Success).value
-
-    private class FakeTabPageContextRepository : TabPageContextRepository {
-        private val stored = mutableMapOf<String, CachedPageContext>()
-
-        override suspend fun storePageContext(
-            tabId: String,
-            url: String,
-            serializedPageContext: String,
-        ) {
-            stored[tabId] = CachedPageContext(tabId, url, serializedPageContext, collectedAt = 0)
-        }
-
-        override suspend fun getPageContexts(tabIds: List<String>): Map<String, CachedPageContext> = stored.filterKeys { it in tabIds }
-
-        override suspend fun deleteAll() = stored.clear()
-    }
 
     private companion object {
         const val HOST_TAB = "host"
