@@ -21,6 +21,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
+import com.duckduckgo.contentscopescripts.impl.messaging.ContentScopeScriptsJsMessaging.Companion.QUEUE_FULL_ERROR_CODE
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -95,6 +96,30 @@ class RealContentScopeScripts @Inject constructor(
     override val secret: String = getSecret()
     override val javascriptInterface: String = getSecret()
     override val callbackName: String = getSecret()
+
+    private val scriptJavascriptInterface = getSecret()
+
+    // The bundled transport captures and deletes its global interface, and already rejects a pending request if send throws.
+    private val bridgeAdapterScript = """
+        "use strict";
+        (() => {
+            const name = "$javascriptInterface";
+            if (!Object.prototype.hasOwnProperty.call(globalThis, name)) return;
+            const bridge = globalThis[name];
+            const process = bridge.process.bind(bridge);
+            delete globalThis[name];
+            Object.defineProperty(globalThis, "$scriptJavascriptInterface", {
+                configurable: true,
+                value: {
+                    process(message, secret) {
+                        if (process(message, secret) === $QUEUE_FULL_ERROR_CODE) {
+                            throw new Error("Too many pending messages");
+                        }
+                    },
+                },
+            });
+        })();
+    """.trimIndent()
 
     private val cachedMessagingParameters: String =
         "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
@@ -230,7 +255,7 @@ class RealContentScopeScripts @Inject constructor(
 
     private fun getCallbackKeyValuePair() = "\"messageCallback\":\"$callbackName\""
 
-    private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$javascriptInterface\""
+    private fun getInterfaceKeyValuePair() = "\"javascriptInterface\":\"$scriptJavascriptInterface\""
 
     private fun getLegacyPluginParameters(): PluginParameters {
         var config = ""
@@ -324,23 +349,25 @@ class RealContentScopeScripts @Inject constructor(
             assembleContentScopeJS(contentScopeJS)
         } else {
             val messagingParameters = "${getSecretKeyValuePair()},${getCallbackKeyValuePair()},${getInterfaceKeyValuePair()}"
-            contentScopeJS
+            val script = contentScopeJS
                 .replace(CONTENT_SCOPE, cachedContentScopeJson)
                 .replace(USER_UNPROTECTED_DOMAINS, cachedUserUnprotectedDomainsJson)
                 .replace(USER_PREFERENCES, cachedUserPreferencesJson)
                 .replace(MESSAGING_PARAMETERS, messagingParameters)
+            "$bridgeAdapterScript\n$script"
         }
     }
 
     private fun assembleContentScopeJS(template: String): String {
         val segments = cachedTemplateSegments ?: splitTemplate(template).also { cachedTemplateSegments = it }
         val builder = StringBuilder(
-            template.length +
+            bridgeAdapterScript.length + 1 + template.length +
                 cachedContentScopeJson.length +
                 cachedUserUnprotectedDomainsJson.length +
                 cachedUserPreferencesJson.length +
                 cachedMessagingParameters.length,
         )
+        builder.append(bridgeAdapterScript).append('\n')
         segments.forEach { segment ->
             when (segment) {
                 is TemplateSegment.Literal -> builder.append(segment.text)

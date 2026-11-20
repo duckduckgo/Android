@@ -26,3 +26,15 @@ fun Uri.toChatIdOrNull(duckChat: DuckChat): String? {
     if (!duckChat.isDuckChatUrl(this)) return null
     return getQueryParameter("chatID")?.takeIf { it.isNotBlank() }
 }
+
+/**
+ * True when this Duck.ai URL shows a conversation: one of the user's chats or a chat shared with them.
+ */
+fun Uri.isDuckAiConversation(duckChat: DuckChat): Boolean {
+    if (toChatIdOrNull(duckChat) != null) return true
+    if (!duckChat.isDuckChatUrl(this)) return false
+    val segments = pathSegments
+    return segments.size == 2 && segments[0] == SHARE_PATH && segments[1].isNotBlank()
+}
+
+private const val SHARE_PATH = "share"

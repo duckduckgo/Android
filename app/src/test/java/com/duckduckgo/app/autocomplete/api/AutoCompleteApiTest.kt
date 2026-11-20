@@ -22,7 +22,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
-import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.impl.AutoCompletePixelNames
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
@@ -46,7 +45,6 @@ import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.history.api.HistoryEntry.VisitedPage
 import com.duckduckgo.history.api.HistoryEntry.VisitedSERP
@@ -101,12 +99,6 @@ class AutoCompleteApiTest {
     private lateinit var mockTabRepositoryProvider: BrowserModeDataProvider<TabRepository>
 
     @Mock
-    private lateinit var mockAutocompleteTabsFeature: AutocompleteTabsFeature
-
-    @Mock
-    private lateinit var mockToggle: Toggle
-
-    @Mock
     private lateinit var mockDuckChat: DuckChat
 
     @Mock
@@ -138,8 +130,6 @@ class AutoCompleteApiTest {
         runTest {
             whenever(mockDeviceAppLookup.query(any())).thenReturn(emptyList())
         }
-        whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockToggle)
-        whenever(mockToggle.isEnabled()).thenReturn(true)
         whenever(mockDuckChat.isEnabled()).thenReturn(false)
         testee = createTestee()
     }
@@ -2339,7 +2329,6 @@ class AutoCompleteApiTest {
             RealAutoCompleteScorer(),
             mockTabRepositoryProvider,
             BrowserMode.REGULAR,
-            mockAutocompleteTabsFeature,
             fakeAutocompleteSpeedFeature,
             mockDuckChat,
             mockHistory,

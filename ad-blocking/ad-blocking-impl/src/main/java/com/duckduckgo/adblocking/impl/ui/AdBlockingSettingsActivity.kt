@@ -28,7 +28,7 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.browser.api.ui.BrowserScreens
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
@@ -82,7 +82,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         binding.duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
-        binding.sponsorBlockModeEntry.setClickListener { viewModel.onSponsorBlockModeClicked() }
+        binding.segmentSkipModeEntry.setClickListener { viewModel.onSegmentSkipModeClicked() }
 
         configureEdgeToEdgeInsets()
         observeViewModel()
@@ -112,9 +112,9 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                 else -> getString(R.string.duck_player_mode_always_ask)
             },
         )
-        binding.sponsorBlockModeEntry.isVisible = state.sponsorBlockMode != null
-        binding.sponsorBlockDescription.isVisible = state.sponsorBlockMode != null
-        state.sponsorBlockMode?.let { binding.sponsorBlockModeEntry.setSecondaryText(getString(it.labelRes())) }
+        binding.segmentSkipModeEntry.isVisible = state.segmentSkipMode != null
+        binding.segmentSkipDescription.isVisible = state.segmentSkipMode != null
+        state.segmentSkipMode?.let { binding.segmentSkipModeEntry.setSecondaryText(getString(it.labelRes())) }
         if (state.isContingencyMode) {
             binding.adBlockingDescription.gone()
             binding.contingencyModeItem.show()
@@ -167,32 +167,32 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                         this,
                         DuckPlayerSettingsNoParams,
                     )
-                    is AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog -> showSponsorBlockModeDialog(command.mode)
+                    is AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog -> showSegmentSkipModeDialog(command.mode)
                 }
             }
             .launchIn(lifecycleScope)
     }
 
-    private fun showSponsorBlockModeDialog(currentMode: SponsorBlockMode) {
-        val modes = SponsorBlockMode.entries
+    private fun showSegmentSkipModeDialog(currentMode: SegmentSkipMode) {
+        val modes = listOf(SegmentSkipMode.ALWAYS_SKIP, SegmentSkipMode.ALWAYS_ASK, SegmentSkipMode.OFF)
         RadioListAlertDialogBuilder(this)
-            .setTitle(getString(R.string.sponsor_block_settings_title))
+            .setTitle(getString(R.string.segment_skip_settings_title))
             .setOptions(modes.map { it.labelRes() }, modes.indexOf(currentMode) + 1)
             .setPositiveButton(CommonR.string.dialogSave)
             .setNegativeButton(CommonR.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        viewModel.onSponsorBlockModeSelected(modes[selectedItem - 1])
+                        viewModel.onSegmentSkipModeSelected(modes[selectedItem - 1])
                     }
                 },
             )
             .show()
     }
 
-    private fun SponsorBlockMode.labelRes(): Int = when (this) {
-        SponsorBlockMode.ALWAYS_ASK -> R.string.sponsor_block_mode_always_ask
-        SponsorBlockMode.ALWAYS_SKIP -> R.string.sponsor_block_mode_always_skip
-        SponsorBlockMode.OFF -> R.string.sponsor_block_mode_off
+    private fun SegmentSkipMode.labelRes(): Int = when (this) {
+        SegmentSkipMode.ALWAYS_ASK -> R.string.segment_skip_mode_always_ask
+        SegmentSkipMode.ALWAYS_SKIP -> R.string.segment_skip_mode_always_skip
+        SegmentSkipMode.OFF -> R.string.segment_skip_mode_off
     }
 }

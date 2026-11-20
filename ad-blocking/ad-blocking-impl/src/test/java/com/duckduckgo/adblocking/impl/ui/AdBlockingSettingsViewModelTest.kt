@@ -31,11 +31,11 @@ import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlock
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockConfig
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockSegment
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkip
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipConfig
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipFeature
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipSegment
 import com.duckduckgo.adblocking.impl.store.RealAdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -54,6 +54,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -76,14 +78,14 @@ class AdBlockingSettingsViewModelTest {
     private val pixel: Pixel = mock()
     private val duckPlayer: DuckPlayer = mock()
     private val duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider = mock()
-    private val sponsorBlockFeature = FeatureToggles.Builder()
+    private val segmentSkipFeature = FeatureToggles.Builder()
         .store(FakeToggleStore())
         .appVersionProvider { Int.MAX_VALUE }
         .featureName("sponsorBlock")
         .ioDispatcher(coroutineRule.testDispatcher)
         .build()
-        .create(SponsorBlockFeature::class.java)
-    private val sponsorBlock = FakeSponsorBlock()
+        .create(SegmentSkipFeature::class.java)
+    private val segmentSkip = FakeSegmentSkip()
 
     private fun createViewModel(
         duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
@@ -99,14 +101,14 @@ class AdBlockingSettingsViewModelTest {
             pixel,
             duckPlayer,
             duckPlayerSettingsPlacementProvider,
-            sponsorBlockFeature,
-            sponsorBlock,
+            segmentSkipFeature,
+            segmentSkip,
         )
     }
 
-    private fun setSponsorBlockEnabled(enabled: Boolean) {
-        sponsorBlockFeature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
-        sponsorBlockFeature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+    private fun setSegmentSkipEnabled(enabled: Boolean) {
+        segmentSkipFeature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
+        segmentSkipFeature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = enabled))
     }
 
     private fun setToggles(contingency: Boolean) {
@@ -299,55 +301,95 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenSponsorBlockDisabledThenHidesSponsorBlockMode() = runTest {
+    fun whenSegmentSkipDisabledThenHidesSegmentSkipMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setSponsorBlockEnabled(false)
+        setSegmentSkipEnabled(false)
 
         createViewModel().viewState.test {
-            assertNull(expectMostRecentItem().sponsorBlockMode)
+            assertNull(expectMostRecentItem().segmentSkipMode)
         }
     }
 
     @Test
-    fun whenSponsorBlockEnabledThenShowsStoredSponsorBlockMode() = runTest {
+    fun whenSegmentSkipEnabledThenShowsStoredSegmentSkipMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        setSponsorBlockEnabled(true)
-        sponsorBlock.mode.value = SponsorBlockMode.ALWAYS_SKIP
+        setSegmentSkipEnabled(true)
+        segmentSkip.mode.value = SegmentSkipMode.ALWAYS_SKIP
 
         createViewModel().viewState.test {
-            assertEquals(SponsorBlockMode.ALWAYS_SKIP, expectMostRecentItem().sponsorBlockMode)
+            assertEquals(SegmentSkipMode.ALWAYS_SKIP, expectMostRecentItem().segmentSkipMode)
         }
     }
 
     @Test
-    fun whenSponsorBlockModeClickedThenShowsDialogWithCurrentMode() = runTest {
+    fun whenSegmentSkipModeClickedThenShowsDialogWithCurrentMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
-        sponsorBlock.mode.value = SponsorBlockMode.OFF
+        segmentSkip.mode.value = SegmentSkipMode.OFF
         val viewModel = createViewModel()
 
         viewModel.commands.test {
-            viewModel.onSponsorBlockModeClicked()
-            assertEquals(AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog(SponsorBlockMode.OFF), awaitItem())
+            viewModel.onSegmentSkipModeClicked()
+            assertEquals(AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog(SegmentSkipMode.OFF), awaitItem())
         }
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_DAILY, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
     }
 
     @Test
-    fun whenSponsorBlockModeSelectedThenStoresIt() = runTest {
+    fun whenSegmentSkipModeSelectedThenStoresIt() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
 
-        createViewModel().onSponsorBlockModeSelected(SponsorBlockMode.ALWAYS_SKIP)
+        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP)
 
-        assertEquals(SponsorBlockMode.ALWAYS_SKIP, sponsorBlock.mode.value)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
+        val parameters = mapOf("segment_skip_status" to "skip")
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_DAILY, parameters = parameters, type = Pixel.PixelType.Daily())
+        verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = parameters)
     }
 
-    private class FakeSponsorBlock : SponsorBlock {
-        val mode = MutableStateFlow(SponsorBlockMode.ALWAYS_ASK)
+    @Test
+    fun whenModeIsReselectedThenNoUpdatedPixelFires() = runTest {
+        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_ASK)
+        verify(pixel, never()).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = mapOf("segment_skip_status" to "ask"))
+    }
 
-        override fun config(): SponsorBlockConfig = throw UnsupportedOperationException()
-        override suspend fun getSegments(videoId: String): List<SponsorBlockSegment> = throw UnsupportedOperationException()
-        override fun modeFlow(): Flow<SponsorBlockMode> = mode
-        override suspend fun setMode(mode: SponsorBlockMode) {
+    @Test
+    fun whenRowIsClickedTwiceThenBothClicksAreCounted() = runTest {
+        val viewModel = createViewModel()
+        viewModel.onSegmentSkipModeClicked()
+        viewModel.onSegmentSkipModeClicked()
+        verify(pixel, times(2)).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
+        verify(pixel, never()).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = mapOf("segment_skip_status" to "ask"))
+    }
+
+    @Test
+    fun whenSaveFailsThenNoUpdatedPixelFires() = runTest {
+        segmentSkip.failSave = true
+        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP)
+        assertEquals(SegmentSkipMode.ALWAYS_ASK, segmentSkip.mode.value)
+        verify(pixel, never()).fire(
+            AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT,
+            parameters = mapOf("segment_skip_status" to "skip"),
+        )
+        verify(pixel, never()).fire(
+            AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_DAILY,
+            parameters = mapOf("segment_skip_status" to "skip"),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    private class FakeSegmentSkip : SegmentSkip {
+        val mode = MutableStateFlow(SegmentSkipMode.ALWAYS_ASK)
+        var failSave = false
+
+        override fun config(): SegmentSkipConfig = throw UnsupportedOperationException()
+        override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> = throw UnsupportedOperationException()
+        override fun modeFlow(): Flow<SegmentSkipMode> = mode
+        override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+            if (failSave) throw java.io.IOException()
+            val changed = this.mode.value != mode
             this.mode.value = mode
+            return changed
         }
     }
 }

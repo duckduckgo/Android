@@ -21,8 +21,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.statistics.AtbInitializerListener
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.devicemigration.impl.DeviceMigrationMarkerStore.Companion.KEY_DEFAULT_BROWSER
@@ -71,17 +69,15 @@ private data class Detection(val migrated: Boolean, val sourceIsNewInstall: Bool
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, binding = binding<DeviceMigration>())
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
-@ContributesIntoSet(AppScope::class, binding = binding<AtbInitializerListener>())
 class RealDeviceMigration @Inject constructor(
     private val markerStore: DeviceMigrationMarkerStore,
     private val installTimeComparison: InstallTimeComparison,
     private val deviceMigrationFeature: DeviceMigrationFeature,
-    private val statisticsDataStore: StatisticsDataStore,
     private val deviceSyncState: Lazy<DeviceSyncState>, // break any possible DI dependency cycle
     private val defaultBrowserDetector: Lazy<DefaultBrowserDetector>, // break any possible DI dependency cycle
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-) : DeviceMigration, MainProcessLifecycleObserver, AtbInitializerListener {
+) : DeviceMigration, MainProcessLifecycleObserver {
 
     // Detection must run once per process, before anything overwrites the transferred marker.
     private val detection: Detection by lazy(LazyThreadSafetyMode.SYNCHRONIZED) { detect() }
@@ -172,17 +168,11 @@ class RealDeviceMigration @Inject constructor(
         transferred.edit().putBoolean(KEY_DEFAULT_BROWSER, isDefaultBrowser).commit()
     }
 
-    // Detection treats an ATB on a fresh package as transferred data, so it must run before this install's first ATB is saved.
-    override suspend fun beforeAtbInit() {
-        detection
-    }
-
-    override fun beforeAtbInitTimeoutMillis(): Long = ATB_INIT_TIMEOUT_MS
-
     /**
-     * An old phone that never opened a version writing the transferred marker still hands over its data. Until this install's
-     * first detection, an ATB on a package never updated since install can only have come from that transfer: cloud backup is
-     * excluded, and the first ATB of this install is saved only after [beforeAtbInit] has run.
+     * Only the migration's own signals count: the marker the old phone writes when the app starts, and the restore that
+     * [DeviceMigrationBackupAgent] records on this phone. The agent sends nothing until the app has started on the old phone,
+     * so a transfer that brings data also brings at least one of them. Other data on a fresh install, such as an ATB, is not
+     * evidence of a transfer.
      */
     private fun detect(): Detection {
         val local = markerStore.local
@@ -197,12 +187,8 @@ class RealDeviceMigration @Inject constructor(
             return recordMigrated(source = transferred.getBoolean(KEY_IS_NEW_INSTALL, true))
         }
 
-        // Set by DeviceMigrationBackupAgent on this phone; unlike the heuristic below, it survives an app update before first open.
+        // Set by DeviceMigrationBackupAgent on this phone, so it does not depend on the old phone's stamp being written before the backup.
         if (local.getBoolean(KEY_RESTORED_FROM_BACKUP, false)) {
-            return recordMigrated(source = false)
-        }
-
-        if (installTimeComparison.isUnupdatedSinceFirstInstall() && statisticsDataStore.hasInstallationStatistics) {
             return recordMigrated(source = false)
         }
 
@@ -231,8 +217,6 @@ class RealDeviceMigration @Inject constructor(
     }
 
     private companion object {
-        const val ATB_INIT_TIMEOUT_MS = 1_000L
-
         // Kept apart from the detection keys that share the local file.
         const val DONE_ON_THIS_INSTALL_PREFIX = "doneOnThisInstall."
     }

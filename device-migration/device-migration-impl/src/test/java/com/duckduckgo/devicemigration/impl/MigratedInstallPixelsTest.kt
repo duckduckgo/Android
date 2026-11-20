@@ -21,7 +21,6 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.common.utils.CurrentTimeProvider
@@ -70,7 +69,6 @@ class MigratedInstallPixelsTest {
     private val deviceSyncState: DeviceSyncState = mock {
         on { isUserSignedInOnDevice() } doAnswer { signedInToSync }
     }
-    private val statisticsDataStore: StatisticsDataStore = mock()
     private var now = 1_000_000_000_000L
     private val timeProvider = object : CurrentTimeProvider {
         override fun elapsedRealtime() = 0L
@@ -88,7 +86,6 @@ class MigratedInstallPixelsTest {
                 override fun isUnupdatedSinceFirstInstall() = true
             },
             deviceMigrationFeature = feature,
-            statisticsDataStore = statisticsDataStore,
             deviceSyncState = lazyOf(deviceSyncState),
             defaultBrowserDetector = lazyOf(defaultBrowserDetector),
             dispatchers = coroutineRule.testDispatcherProvider,

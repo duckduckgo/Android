@@ -64,7 +64,6 @@ import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
-import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
@@ -676,7 +675,6 @@ class BrowserTabViewModelTest {
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val fakeCustomTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
     private val fakeAppLinkFeature = FakeFeatureToggleFactory.create(AppLinkFeature::class.java)
-    private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
@@ -843,7 +841,6 @@ class BrowserTabViewModelTest {
                     mockAutoCompleteScorer,
                     tabRepositoryProvider,
                     BrowserMode.REGULAR,
-                    mockAutocompleteTabsFeature,
                     fakeAutocompleteSpeedFeature,
                     mockDuckChat,
                     mockHistory,
@@ -885,8 +882,6 @@ class BrowserTabViewModelTest {
             val mockFeatureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
             whenever(mockFeatureToggle.isEnabled()).thenReturn(false)
             whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockFeatureToggle)
-            whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
-            whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
@@ -14763,6 +14758,41 @@ class BrowserTabViewModelTest {
         testee.openNewDuckChatFromChatMenu()
 
         assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
+    fun whenOnlySharedConversationExistsThenCreateNewChat() = runTest {
+        val url = "https://duck.ai/share/shared-id"
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("shared", url = url)))
+        whenever(mockDuckChat.isDuckChatUrl(url.toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromChatMenu()
+
+        assertCommandNotIssued<Command.SwitchToTab>()
+        assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpThenOpensNewTabWithEmptyChat() = runTest {
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
+        }
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpAndCurrentChatIsEmptyThenNothingHappens() = runTest {
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("abc", url = "https://duck.ai/")))
+        whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandNotIssued<Command.OpenInNewTab>()
+        assertCommandNotIssued<Command.SwitchToTab>()
     }
 
     @Test

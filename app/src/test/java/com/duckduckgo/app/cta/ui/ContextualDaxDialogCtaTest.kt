@@ -104,7 +104,7 @@ class ContextualDaxDialogCtaTest {
         val constructor = FragmentBrowserTabBinding::class.java.declaredConstructors.single().apply {
             isAccessible = true
         }
-        val constructorArgs = arrayOfNulls<Any>(21).apply {
+        val constructorArgs = arrayOfNulls<Any>(constructor.parameterCount).apply {
             this[0] = root
             this[11] = brandDesignBinding
             this[15] = root

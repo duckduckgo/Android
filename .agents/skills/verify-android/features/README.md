@@ -59,13 +59,58 @@ has a recipe; the subscription VPN is a different feature.
 
 ## Proofs
 
-`../prove.py ../proofs/<name>.py` replays a recipe as checks: it refuses to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. Each run writes a fresh attempt folder with the video, screenshots, `report.md`, `index.html` and the PR images (SKILL.md, Evidence and report). A proof is throwaway, written to verify one PR and never committed; `pr-summary` carries its source into the PR. Shared paths are in `proofs/steps.py`, which is committed. The video is split into segments of 160 s, because screenrecord stops at 170 s. After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step and a stale build are ERROR, a proof with no checks (or only `unverified` items) isn't a pass, pixels logged before `mark()` aren't counted, and, with no device (`selftest --offline` runs only these), that `pr-summary` is auto's scenario format and carries no local path, an evidence dir inside the checkout is refused, and an attempt folder gets its key frames, poster, `report.md` in scenario order and a self-contained `index.html`.
+A proof is a short Python file that drives a recipe and records checks; `../prove.py <proof>` runs it, refuses
+to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from
+logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. Each run writes a fresh attempt folder with
+the video, screenshots, `report.md`, `index.html` and the PR images (SKILL.md, Evidence and report). The video is
+split into segments of 160 s, because screenrecord stops at 170 s.
+
+No proofs are committed. An agent writes one for each change from the feature maps in `../proofs/`, where Git
+ignores everything but `steps.py`, the shared paths a proof imports. Add a path to `steps.py` when a second
+recipe needs it.
+
+The proof is linked from the PR with `../prove.py pr-summary` (SKILL.md, Prove). It can be as specific as the
+change needs (a long journey, a live service, a one-off edge case) because CI never runs it. When a proof keeps its value after the change ships,
+ask the agent to turn it into a Maestro flow under `.maestro/` and commit that instead
+(`.claude/rules/maestro-ui-tests.md`). If that flow should block a release, promote it through the
+[Release AOR](https://app.asana.com/1/137249556945/project/1211760946270935/list/1211768268642986).
+
+After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step
+and a stale build are ERROR, a proof with no checks (or only `unverified` items) isn't a pass, pixels logged
+before `mark()` aren't counted, and, with no device (`selftest --offline` runs only these), that `pr-summary` is
+auto's scenario format and carries no local path, an evidence dir inside the checkout is refused, and an attempt
+folder gets its key frames, poster, `report.md` in scenario order and a self-contained `index.html`.
 
 ## Adding a feature
 
-1. Find the user entry points in code: the screen's `@ContributeToActivityStarter` params, and every `globalActivityStarter.start(..., <Params>)` call site.
-2. Drive it once on a fresh run: reach the starting point through the Common paths, then walk every entry point with `$V ui` and `$V text` on each screen (and `$V web eval` inside pages) to collect real selectors. Never copy selectors from code or Maestro flows without seeing them in `android layout`.
-3. Create `<feature>.md` here: an H1, one paragraph of user-visible behaviour, then exactly these H2s: `Sub-features` (short ids, one line each), `How to get to it (user POV)` (every entry point), `Driving it with verify.sh` (commands and the observable end state per entry point), `Gotchas` (ending with which sub-features have been driven and when).
-4. Add a row to the table above and remove the area from the "without a recipe" list.
-5. Write a proof from the recipe in `../proofs/` (one `check` per observable end state, `steps.py` for the shared paths) and run it with `../prove.py` until it passes; fix the recipe where it drifted. Don't commit the proof: the recipe is what stays.
+Feature maps are written by the people who know the area best, by asking an agent to map the feature and then
+reviewing what it drove. How to prompt for a map, review it, read its evidence and keep it current is in
+[How to contribute to verify-android](https://app.asana.com/1/137249556945/project/1174433894299346/task/1220697369265141).
+A map is a recipe for reaching and driving a feature and what proves it works; it never tests a specific change.
 
+### What a feature map holds
+
+`<feature>.md` here, with an H1, one paragraph of user-visible behaviour, then exactly these H2s:
+
+- `Sub-features`: short ids, one line each, naming the observable result (`apptp-enabled` the tracker screen with
+  the switch on and a `tun` interface up).
+- `How to get to it (user POV)`: every entry point a user has, not only the shortest.
+- `Driving it with verify.sh`: the commands for each entry point and the observable end state that proves it.
+- `Gotchas`: what tripped the agent up (timing, dialogs some devices show, state that survives `reset`), ending
+  with which sub-features have been driven and when.
+
+[app-tracking-protection.md](app-tracking-protection.md) is the worked example, added in
+[#10591](https://github.com/duckduckgo/Android/pull/10591): it covers onboarding and the VPN consent dialog, the
+per-app switches, the dev settings, and blocking a tracker in another app through the probe app (`$V probe`).
+
+### Creating one
+
+1. Find the entry points in code: the screen's `@ContributeToActivityStarter` params and every
+   `globalActivityStarter.start(..., <Params>)` call site.
+2. Drive each one on an emulator this run booted, collecting selectors from `$V ui` and `$V text` (and
+   `$V web eval` in pages). Selectors copied from code or Maestro flows without being seen in `android layout`
+   don't count.
+3. Write `<feature>.md`, add a row to the Features table above, remove the area from "Without a recipe yet", and
+   add a Common path if the feature has a new starting point.
+4. Prove the map once by driving every sub-feature with a throwaway proof in `../proofs/`, and hand
+   the evidence and the `pr-summary` output to the person who asked. The proof isn't committed (see Proofs).

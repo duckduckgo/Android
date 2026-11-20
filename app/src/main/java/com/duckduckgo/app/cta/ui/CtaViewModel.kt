@@ -229,7 +229,7 @@ class CtaViewModel @Inject constructor(
                 brokenSitePrompt.ctaShown()
             }
             if (cta is SyncAfterDeviceTransferBubbleCta) {
-                pixel.fire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+                pixel.enqueueFire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
             }
             if (cta is DaxSubscriptionBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
@@ -290,7 +290,7 @@ class CtaViewModel @Inject constructor(
             pixel.fire(it, cta.pixelOkParameters())
         }
         if (cta is SyncAfterDeviceTransferBubbleCta) {
-            pixel.fire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
+            pixel.enqueueFire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
         }
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()

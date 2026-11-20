@@ -65,6 +65,7 @@ import com.duckduckgo.sync.impl.AccountErrorCodes.LOGIN_FAILED
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
+import com.duckduckgo.sync.impl.crypto.RealSyncJweCrypto
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -77,6 +78,7 @@ import com.duckduckgo.sync.store.SyncStore
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -88,6 +90,8 @@ import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argThat
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.check
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
@@ -146,6 +150,7 @@ class AppSyncAccountRepositoryTest {
             deviceInfoUpdater = deviceInfoUpdater,
             connectedDevicesRepository = connectedDevicesRepository,
             remoteDeviceLogout = RealRemoteDeviceLogout(syncStore, syncApi, syncPixels),
+            deviceFieldEncryptor = RealDeviceFieldEncryptor(syncStore, syncJweCrypto, nativeLib),
         )
         runBlocking { whenever(connectedDevicesRepository.latestConnectedDeviceCount()).thenAnswer { connectedDevicesCount } }
         (syncRepo as AppSyncAccountRepository).upgradeRetryDelayMillis = 0L // keep retry-path tests instant
@@ -1355,6 +1360,47 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun whenJoinAccountFromThirdPartyThenThirdPartyLoginNameAndTypeDecryptWithThirdPartyKey() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        val realCrypto = RealSyncJweCrypto()
+        whenever(syncJweCrypto.hkdfSha256SingleBlock(any(), any(), any(), any())).thenAnswer {
+            realCrypto.hkdfSha256SingleBlock(it.getArgument(0), it.getArgument(1), it.getArgument(2), it.getArgument(3))
+        }
+        whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), anyOrNull())).thenAnswer {
+            realCrypto.jweEncryptSymmetric(it.getArgument(0), it.getArgument(1), it.getArgument(2))
+        }
+        whenever(syncJweCrypto.jweDecryptSymmetric(any(), any())).thenAnswer {
+            realCrypto.jweDecryptSymmetric(it.getArgument(0), it.getArgument(1))
+        }
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        val nameCaptor = argumentCaptor<String>()
+        val typeCaptor = argumentCaptor<String>()
+        verify(syncApi).login(eq(userId), any(), eq(deviceId), nameCaptor.capture(), typeCaptor.capture(), eq("ai_chats"))
+        val readerStore: SyncStore = mock()
+        whenever(readerStore.scopedPassword).thenReturn(ScopedPassword(base64UrlStringToStandardBase64(thirdPartySecret)))
+        whenever(readerStore.userId).thenReturn(userId)
+        val decrypted = RealDeviceFieldDecryptor(readerStore, syncJweCrypto, nativeLib).decrypt(
+            DeviceV2(deviceId = deviceId, deviceName = nameCaptor.firstValue, deviceType = typeCaptor.firstValue, credentialId = "3party"),
+        )
+        assertEquals(Success(DecryptedDevice(deviceId, deviceName, deviceFactor)), decrypted)
+        assertEquals("3party", jweHeader(nameCaptor.firstValue).getString("kid"))
+        assertEquals("3party", jweHeader(typeCaptor.firstValue).getString("kid"))
+    }
+
+    @Test
+    fun whenJoinAccountFromThirdPartyThenThirdPartyKeysAreDerivedOnce() = runTest {
+        val pastedCode = prepareForJoinAccountFromThirdPartyRecoveryCode()
+        val secretBytes = java.util.Base64.getUrlDecoder().decode(thirdPartySecret)
+
+        syncRepo.joinAccountFromThirdPartyRecoveryCode(pastedCode)
+
+        verify(syncJweCrypto, times(1)).hkdfSha256SingleBlock(argThat { contentEquals(secretBytes) }, any(), eq("Main Key"), any())
+        verify(syncJweCrypto, times(1)).hkdfSha256SingleBlock(argThat { contentEquals(secretBytes) }, any(), eq("Password"), any())
+    }
+
+    @Test
     fun whenV2ThirdPartyCodeParsedAsAuthCodeThenNotTreatedAsRecovery() {
         val v2ThirdPartyJson =
             """{"recovery":{"user_id":"$userId","secret":"rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o","cid":"3party","v":"2.0"}}"""
@@ -1363,6 +1409,11 @@ class AppSyncAccountRepositoryTest {
 
         assertTrue(type is SyncAuthCode.Unknown)
     }
+
+    private val thirdPartySecret = "rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o"
+
+    private fun jweHeader(jweCompact: String): JSONObject =
+        JSONObject(String(java.util.Base64.getUrlDecoder().decode(jweCompact.substringBefore('.')), Charsets.UTF_8))
 
     private val step7aLoginUnauthorized = Error(code = API_CODE.INVALID_LOGIN_CREDENTIALS.code, reason = "invalid credentials")
     private val step7aLoginServerError = Error(code = 500, reason = "server error")
@@ -1388,7 +1439,7 @@ class AppSyncAccountRepositoryTest {
         whenever(syncDeviceIds.deviceType()).thenReturn(deviceType)
 
         val recoveryJson =
-            """{"recovery":{"user_id":"$userId","secret":"rUzlGqLLlbonAC_zIeh1nrCmuDsDAn6UooUUDz-6x3o","cid":"$cid","v":"$version"}}"""
+            """{"recovery":{"user_id":"$userId","secret":"$thirdPartySecret","cid":"$cid","v":"$version"}}"""
         val pastedCode = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(recoveryJson.toByteArray(Charsets.UTF_8))
 
         whenever(nativeLib.encryptData(anyString(), anyString())).thenReturn(EncryptResult(0, "encrypted"))

@@ -17,7 +17,6 @@
 package com.duckduckgo.app.autocomplete.api
 
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
-import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
@@ -42,7 +41,6 @@ class AutoCompleteFactoryImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
-    private val autocompleteTabsFeature: AutocompleteTabsFeature,
     private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
@@ -65,7 +63,6 @@ class AutoCompleteFactoryImpl @Inject constructor(
             autoCompleteScorer = autoCompleteScorer,
             tabRepositoryProvider = tabRepositoryProvider,
             browserMode = browserMode,
-            autocompleteTabsFeature = autocompleteTabsFeature,
             autocompleteSpeedFeature = autocompleteSpeedFeature,
             duckChat = duckChat,
             history = history,

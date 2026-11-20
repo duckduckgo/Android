@@ -26,4 +26,4 @@ interface BrowserUiLockContentScopePrivacyFeature
 interface DetectorPerfContentScopePrivacyFeature
 
 @ContentScopePrivacyFeature(featureName = "sponsorBlock")
-interface SponsorBlockContentScopePrivacyFeature
+interface SegmentSkipContentScopePrivacyFeature

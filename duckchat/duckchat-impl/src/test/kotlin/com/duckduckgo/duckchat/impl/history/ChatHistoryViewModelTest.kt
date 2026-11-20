@@ -552,6 +552,15 @@ class ChatHistoryViewModelTest {
     }
 
     @Test
+    fun `onNewChatRequested with only a shared conversation opens a new chat`() = runTest {
+        whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "shared", url = "https://duck.ai/share/abc")))
+
+        viewModel.onNewChatRequested()
+
+        assertEquals(1, duckChat.openDuckChatCalls)
+    }
+
+    @Test
     fun `onNewChatRequested in fire mode opens a new chat even when a regular empty chat exists`() = runTest {
         whenever(tabRepository.getTabs()).thenReturn(listOf(TabEntity(tabId = "empty", url = "https://duck.ai/")))
 

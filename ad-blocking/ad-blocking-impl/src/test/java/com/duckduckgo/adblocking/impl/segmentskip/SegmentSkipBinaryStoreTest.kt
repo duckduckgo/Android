@@ -1,0 +1,320 @@
+/*
+ * Copyright (c) 2026 DuckDuckGo
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.duckduckgo.adblocking.impl.segmentskip
+
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
+import com.duckduckgo.common.utils.DispatcherProvider
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runTest
+import org.junit.After
+import org.junit.Assert.*
+import org.junit.Test
+import org.junit.runner.RunWith
+import java.io.ByteArrayInputStream
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.security.MessageDigest
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import kotlin.concurrent.thread
+import kotlin.coroutines.CoroutineContext
+
+@RunWith(AndroidJUnit4::class)
+class SegmentSkipBinaryStoreTest {
+    private val context = ApplicationProvider.getApplicationContext<Context>()
+    private val file = File(context.filesDir, "sponsor-prefixes.bin")
+    private val store = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+
+    @After fun clean() {
+        file.delete()
+        File(context.filesDir, "sponsor-next.tmp").delete()
+    }
+
+    @Test fun loadsSavedSnapshotOnlyOnFirstAccess() = runBlocking {
+        clean()
+        val fresh = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        file.writeBytes(full(1, listOf(1)))
+        assertEquals(1L, fresh.revision())
+        assertTrue(fresh.contains("00000001"))
+    }
+
+    @Test fun missingOrInvalidSavedSnapshotStartsAtRevisionZero() = runBlocking {
+        clean()
+        val missing = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        assertEquals(0L, missing.revision())
+        assertFalse(missing.contains("00000001"))
+        file.writeBytes(byteArrayOf(1, 2, 3))
+        val invalid = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        assertEquals(0L, invalid.revision())
+        assertFalse(invalid.contains("00000001"))
+    }
+
+    @Test fun concurrentFirstAccessLoadsSnapshotOnce() = runTest {
+        clean()
+        file.writeBytes(full(1, listOf(1)))
+        var ioRequests = 0
+        val io = StandardTestDispatcher(testScheduler)
+        val dispatchers = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher {
+                ioRequests++
+                return io
+            }
+        }
+        val fresh = SegmentSkipBinaryStore(context, dispatchers)
+        val first = async(start = CoroutineStart.UNDISPATCHED) { fresh.revision() }
+        val second = async(start = CoroutineStart.UNDISPATCHED) { fresh.contains("00000001") }
+        assertFalse(first.isCompleted)
+        assertFalse(second.isCompleted)
+        advanceUntilIdle()
+        assertEquals(1L, first.await())
+        assertTrue(second.await())
+        assertTrue(fresh.contains("00000001"))
+        assertEquals(1, ioRequests)
+    }
+
+    @Test fun cancelledFirstLoadCanBeRetried() = runTest {
+        clean()
+        file.writeBytes(full(1, listOf(1)))
+        val io = StandardTestDispatcher(testScheduler)
+        val dispatchers = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher = io
+        }
+        val fresh = SegmentSkipBinaryStore(context, dispatchers)
+        val job = launch(start = CoroutineStart.UNDISPATCHED) { fresh.revision() }
+        assertFalse(job.isCompleted)
+        job.cancel()
+        advanceUntilIdle()
+        assertTrue(job.isCancelled)
+        val retry = async { fresh.revision() }
+        advanceUntilIdle()
+        assertEquals(1L, retry.await())
+        assertTrue(fresh.contains("00000001"))
+    }
+
+    @Test fun fullDiffAndInvalidUpdates() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(0x0a130329, 0x0a13c480)).inputStream())
+        assertTrue(store.contains("0a130329"))
+        store.apply(1, diff(2, listOf(0xcb1ad2a7), listOf(0x0a13c480), listOf(0x0a130329, 0xcb1ad2a7)).inputStream())
+        assertEquals(2L, store.revision())
+        assertFalse(store.contains("0a13c480"))
+        assertTrue(store.contains("cb1ad2a7"))
+        val invalid = full(3, listOf(1)).apply { this[lastIndex] = (this[lastIndex].toInt() xor 1).toByte() }
+        try {
+            store.apply(2, invalid.inputStream())
+            fail("Expected invalid checksum")
+        } catch (_: InvalidSegmentSkipFile) { }
+        assertEquals(2L, store.revision())
+        assertTrue(store.contains("cb1ad2a7"))
+        val badDiff = diff(3, listOf(5), listOf(5), listOf(0x0a130329, 0xcb1ad2a7))
+        try {
+            store.apply(2, badDiff.inputStream())
+            fail("Expected overlapping lists to fail")
+        } catch (_: InvalidSegmentSkipFile) { }
+        assertEquals(2L, store.revision())
+    }
+
+    @Test fun acceptsUnsignedRevisionsAcrossSignedIntBoundary() = runBlocking {
+        clean()
+        store.apply(0, full(0x80000000L, listOf(1)).inputStream())
+        assertEquals(0x80000000L, store.revision())
+        store.apply(0x80000000L, diff(0xffffffffL, listOf(2), emptyList(), listOf(1, 2)).inputStream())
+        assertEquals(0xffffffffL, SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).revision())
+        assertTrue(store.contains("00000002"))
+    }
+
+    @Test fun rejectsInvalidHeadersOffsetsAndVersions() = runBlocking {
+        clean()
+        val valid = full(1, listOf(1, 2))
+        val malformed = listOf(
+            valid.copyOf(20),
+            valid.copyOf().apply { this[0] = 0 },
+            valid.copyOf().apply { this[6] = 1 },
+            valid.copyOf().apply { this[28] = 1 },
+            valid.copyOf().apply {
+                this[lastIndex] = this[lastIndex - 2]
+                this[lastIndex - 1] = this[lastIndex - 3]
+            },
+        )
+        for (response in malformed) {
+            try {
+                store.apply(0, response.inputStream())
+                fail("Expected invalid file")
+            } catch (_: InvalidSegmentSkipFile) { }
+            assertEquals(0L, store.revision())
+        }
+        try {
+            store.apply(0, valid.copyOf().apply { this[4] = 2 }.inputStream())
+            fail("Expected unsupported version")
+        } catch (_: UnsupportedSegmentSkipFormat) { }
+        assertEquals(0L, store.revision())
+    }
+
+    @Test fun interruptedDownloadKeepsSavedFileAcrossRestart() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        val interrupted = object : InputStream() {
+            private var reads = 0
+            override fun read(): Int = if (reads++ < 10) 0 else throw IOException("interrupted")
+        }
+        try {
+            store.apply(1, interrupted)
+            fail("Expected interrupted download")
+        } catch (_: IOException) { }
+        assertEquals(1L, store.revision())
+        File(context.filesDir, "sponsor-next.tmp").writeBytes(full(2, listOf(2)))
+        val restarted = SegmentSkipBinaryStore(context, DefaultDispatcherProvider())
+        assertEquals(1L, restarted.revision())
+        assertTrue(restarted.contains("00000001"))
+        assertFalse(File(context.filesDir, "sponsor-download.tmp").exists())
+    }
+
+    @Test fun lookupsUseOldFileUntilPublication() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        val dispatcher = PausingDispatcher()
+        val writer = launch(dispatcher, start = CoroutineStart.UNDISPATCHED) {
+            store.apply(1, diff(2, listOf(2), listOf(1), listOf(2)).inputStream())
+        }
+        assertFalse(writer.isCompleted)
+        dispatcher.runNext()
+        assertFalse(writer.isCompleted)
+        assertEquals(1L, store.revision())
+        assertTrue(store.contains("00000001"))
+        assertFalse(store.contains("00000002"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
+        dispatcher.runQueued()
+        writer.join()
+        assertEquals(2L, store.revision())
+        assertFalse(store.contains("00000001"))
+        assertTrue(store.contains("00000002"))
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000002"))
+    }
+
+    @Test fun cancelledValidationAndMergeKeepPreviousFile() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        suspend fun cancelDuringUpdate(response: ByteArray) {
+            val dispatcher = PausingDispatcher()
+            val job = launch(dispatcher, start = CoroutineStart.UNDISPATCHED) {
+                store.apply(1, response.inputStream())
+            }
+            assertFalse(job.isCompleted)
+            job.cancel()
+            dispatcher.runQueued()
+            job.join()
+            assertTrue(job.isCancelled)
+            assertEquals(1L, store.revision())
+            assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
+            assertFalse(File(context.filesDir, "sponsor-download.tmp").exists())
+            assertFalse(File(context.filesDir, "sponsor-next.tmp").exists())
+            assertFalse(File(context.filesDir, "sponsor-suffix.tmp").exists())
+        }
+        cancelDuringUpdate(full(2, listOf(2)))
+        cancelDuringUpdate(diff(2, listOf(2), emptyList(), listOf(1, 2)))
+    }
+
+    @Test fun staleConcurrentUpdateIsIgnored() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        store.apply(1, full(2, listOf(2)).inputStream())
+        store.apply(1, full(2, listOf(3)).inputStream())
+        assertEquals(2L, store.revision())
+        assertTrue(store.contains("00000002"))
+    }
+
+    @Test fun cancellationBeforePublicationLeavesOldFile() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        val dispatcher = PausingDispatcher()
+        val job = launch(dispatcher, start = CoroutineStart.UNDISPATCHED) {
+            store.apply(1, full(2, listOf(2)).inputStream())
+        }
+        assertFalse(job.isCompleted)
+        dispatcher.runNext()
+        assertFalse(job.isCompleted)
+        job.cancel()
+        dispatcher.runQueued()
+        job.join()
+        assertTrue(job.isCancelled)
+        assertEquals(1L, store.revision())
+        assertTrue(SegmentSkipBinaryStore(context, DefaultDispatcherProvider()).contains("00000001"))
+    }
+
+    @Test fun lookupsContinueWhileUpdateIsBeingDownloaded() = runBlocking {
+        clean()
+        store.apply(0, full(1, listOf(1)).inputStream())
+        val started = CountDownLatch(1)
+        val resume = CountDownLatch(1)
+        val input = object : ByteArrayInputStream(full(2, listOf(2))) {
+            override fun read(b: ByteArray, off: Int, len: Int): Int {
+                started.countDown()
+                check(resume.await(5, TimeUnit.SECONDS))
+                return super.read(b, off, len)
+            }
+        }
+        val writer = thread { runBlocking { store.apply(1, input) } }
+        assertTrue(started.await(5, TimeUnit.SECONDS))
+        try {
+            assertTrue(store.contains("00000001"))
+            assertEquals(1L, store.revision())
+        } finally {
+            resume.countDown()
+            writer.join(5000)
+        }
+        assertEquals(2L, store.revision())
+        assertTrue(store.contains("00000002"))
+    }
+}
+
+private class PausingDispatcher : CoroutineDispatcher() {
+    private val tasks = ArrayDeque<Runnable>()
+    override fun dispatch(context: CoroutineContext, block: Runnable) { tasks.addLast(block) }
+    fun runNext() { tasks.removeFirst().run() }
+    fun runQueued() { while (tasks.isNotEmpty()) runNext() }
+}
+
+internal fun full(revision: Long, values: List<Long>): ByteArray {
+    val sorted = values.sorted()
+    val body = ByteBuffer.allocate(65537 * 4 + sorted.size * 2).order(ByteOrder.LITTLE_ENDIAN)
+    for (bucket in 0..65536) body.putInt(sorted.count { (it ushr 16) < bucket })
+    sorted.forEach { body.putShort(it.toShort()) }
+    val checksum = MessageDigest.getInstance("SHA-256").digest(body.array()).copyOf(4)
+    return header(0, revision, checksum, sorted.size, 0, 0) + body.array()
+}
+
+internal fun diff(revision: Long, inserts: List<Long>, deletes: List<Long>, result: List<Long>): ByteArray {
+    val checksum = full(revision, result).copyOfRange(12, 16)
+    val body = ByteBuffer.allocate(4 * (inserts.size + deletes.size)).order(ByteOrder.LITTLE_ENDIAN)
+    (inserts + deletes).forEach { body.putInt(it.toInt()) }
+    return header(1, revision, checksum, result.size, inserts.size, deletes.size) + body.array()
+}
+
+private fun header(type: Byte, revision: Long, checksum: ByteArray, count: Int, inserts: Int, deletes: Int): ByteArray =
+    ByteBuffer.allocate(28).order(ByteOrder.LITTLE_ENDIAN).put("SBPL".toByteArray()).put(1).put(type).putShort(0)
+        .putInt(revision.toInt()).put(checksum).putInt(count).putInt(inserts).putInt(deletes).array()

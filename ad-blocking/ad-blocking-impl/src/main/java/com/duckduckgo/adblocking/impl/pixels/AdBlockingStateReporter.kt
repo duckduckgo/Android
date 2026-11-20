@@ -20,6 +20,9 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_STATE_DAILY
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkip
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipFeature
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -42,18 +45,24 @@ import javax.inject.Inject
 class AdBlockingStateReporter @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
     private val pixel: Pixel,
+    private val segmentSkip: SegmentSkip,
+    private val segmentSkipFeature: SegmentSkipFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
 ) : MainProcessLifecycleObserver {
 
     override fun onResume(owner: LifecycleOwner) {
         appScope.launch {
-            val (isActive, userState) = combine(
+            val (isActive, userState, mode) = combine(
                 statusChecker.observeCanInject(),
                 statusChecker.observeState(),
-            ) { isActive, userState -> isActive to userState }.firstOrNull() ?: return@launch
+                combine(segmentSkip.modeFlow(), segmentSkipFeature.mvpEnabled().enabled()) { mode, enabled ->
+                    if (enabled) mode else SegmentSkipMode.OFF
+                },
+            ) { isActive, userState, mode -> Triple(isActive, userState, mode) }.firstOrNull() ?: return@launch
             pixel.fire(
                 AD_BLOCKING_STATE_DAILY,
                 parameters = mapOf(
+                    "segment_skip_status" to mode.pixelValue,
                     PARAM_IS_ENABLED to isActive.toString(),
                     PARAM_USER_OPTED_IN to (userState is AdBlockingState.Enabled.WithPixelConsent).toString(),
                 ),
