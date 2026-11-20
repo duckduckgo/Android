@@ -19,7 +19,9 @@ needs is reached through the UI, the way a user gets there.
 Prerequisites: the `android` CLI (`~/.local/bin/android`), JDK 21 at `/opt/homebrew/opt/openjdk@21` (override
 with `JAVA_HOME_21`), the Android SDK, `node` 22+, `jq`, `python3`, `local.properties` with `sdk.dir`, and
 submodules (`git submodule update --init --recursive`). The fallback AVD needs
-`system-images;android-34;google_apis_playstore;arm64-v8a`.
+`system-images;android-34;google_apis_playstore;arm64-v8a`. The PR images are drawn by `Compose.java` with that
+same JDK, so they need nothing more; `ffmpeg` (`brew install ffmpeg`) is optional and makes the poster the video's
+last frame instead of the last screenshot.
 
 ## Choose the device
 
@@ -90,20 +92,21 @@ the app goes into the recipe.
 
 ```bash
 P=.agents/skills/verify-android/prove.py
-$P .agents/skills/verify-android/proofs/<name>.py           # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
+$P [--evidence-dir <dir>] .agents/skills/verify-android/proofs/<name>.py   # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
 $V build --base origin/develop                     # the "before" build (git fetch first for the latest)
-$P compare .agents/skills/verify-android/proofs/<name>.py   # runs it on the base build, then on this checkout's
-$P pr-summary [<before>] <after>                   # Markdown for the PR, from runs' proof-<name>.json (or the evidence folder)
+$P compare [--evidence-dir <dir>] .agents/skills/verify-android/proofs/<name>.py   # base build, then this checkout's
+$P publish <attempt or compare folder> [--into <dir>]   # uploads a copy to a fresh auto evidence folder; prints the Evidence URL
+$P pr-summary <attempt or compare folder>          # the PR's Verification scenario (or <before> <after> folders)
 $P selftest                                        # after changing prove.py: the harness still tells pass from fail
-$P selftest --offline                              # only the cases that need no device (pr-summary)
+$P selftest --offline                              # only the cases that need no device
 ```
 
 A run refuses to start unless `doctor` passes, stops with ERROR at the first step that can't be done
-(so a broken path never reads as failed checks), and needs at least one check to pass. Each run writes
-`proof-<name>.md`, `.json` and its video (in 160 s segments) to the evidence folder, and appends every
-`verify.sh` command, with the `adb` and `android` calls it made and their exit codes, to `ui.log`. When a
-step fails it also saves `layout-at-failure.json` (the element tree) and `at-failure.png`; the error names
-them.
+(so a broken path never reads as failed checks), and needs at least one check to pass. Each run writes its
+own attempt folder (see Evidence and report): the video (in 160 s segments), every screenshot the proof took,
+and a `ui.log` of every `verify.sh` command with the `adb` and `android` calls it made and their exit codes.
+When a step fails it also saves `layout-at-failure.json` (the element tree) and `at-failure.png`; the error
+names them.
 
 The `android` handle a proof gets:
 
@@ -113,20 +116,81 @@ The `android` handle a proof gets:
 - **Report:** `note(text)`, `section(title, markdown)`, and `unverified(what, why)` for something the proof couldn't check: listed in the report and `pr-summary`, never a pass and never a fail (a proof with only those is FAIL, as with no checks).
 - A module-level `LIVE = ["Duck.ai chat"]` names the live services the proof depends on; the report and `pr-summary` list them.
 
-`pr-summary` prints Markdown for a PR's verification section: a verdict line, the device and builds
-(commit, base or branch or external APK), live services, the checks that changed between the runs, every
-check result in a collapsed `<details>`, the proof's source when it isn't committed unchanged, and the
-commands to rerun it. It carries no local paths, logs, screenshots or device serials, so it's safe for
-a public PR. Given one run with a `-base` run of the same proof beside it (as `compare` leaves them), it
-summarises both. A run that stopped at `doctor` never read the device or the build, so its summary leaves
-those lines out rather than guessing them.
-
 `build --base <ref>` builds the ref in `build/verify/base-worktree`, a worktree this skill owns and moves
 between base commits, and keeps the APK per commit, so the same base is built once. `compare` installs
-it, runs the proof, installs this checkout's build and runs it again (base runs' files are labelled
-`-base`, external APK runs' `-external`), then writes `compare-<name>.md` with every check side by side. The strongest evidence for a
-fix is FAIL before and PASS after; for a refactor or a removal, PASS on both is the expectation, so say
-which one you expect. Its exit code is the after run's.
+it, runs the proof, installs this checkout's build and runs it again, each run in its own attempt folder
+(`before/` and `after/`) inside one compare folder. The strongest evidence for a fix is FAIL before and PASS
+after; for a refactor or a removal, PASS on both is the expectation, so say which one you expect. Its exit
+code is the after run's.
+
+## Evidence and report
+
+Each run writes a fresh attempt folder, `<evidence dir>/<stamp>-<proof name>-<id>/`, and never reuses one:
+
+```
+<stamp>-<name>-<id>/
+  proof.py  proof.json  report.md  index.html
+  <device model>/            recording-1.mp4 (more segments after 160 s), the proof's screenshots (each with the
+                             .layout.json and .json that `shot` writes), ui.log, key-frames.png, poster.png,
+                             and on an error layout-at-failure.json and at-failure.png
+```
+
+`compare` writes `<stamp>-<name>-vs-base-<id>/` holding `before/` and `after/` (each an attempt folder as above)
+and its own `compare.json`, `report.md`, `index.html` and `before-after.png`. Every link in these files is
+relative to the folder, so it works wherever the whole folder is copied or published.
+
+**Where evidence goes.** Without a flag, attempt folders go in `build/verify/evidence/`. `--evidence-dir <dir>`
+puts them in any directory outside the checkout (use the one auto's `new-evidence.ts` printed, so `publish`
+uploads in place), and `--decision-log <decisions.tsv>` puts them in `proofs/` beside auto's decision log, so the
+log can link them. Either one inside the checkout is refused: evidence there could be committed.
+
+**`report.md`** is one verification scenario, in the order a PR presents it: **Verified** (the proof's
+docstring, whose first line is the title and the claim a reviewer reads), **Evidence** (relative links per
+device: video, key frames, poster, screenshots, logs), **Outcome** (every check with its result and detail,
+the error, problems, notes), **Details** (revision and uncommitted file count, build, device model and API,
+live services, the proof, where the poster came from, the rerun command), then **Unverified**. Report to the
+user from it.
+
+**Images.** `key-frames.png` is the proof's screenshots side by side in the order taken, each captioned with
+its name; `poster.png` is the video's last frame with a play badge (the last screenshot without `ffmpeg`);
+`before-after.png` pairs the base run's screenshots above this checkout's by name, with "not taken" where one
+side has none. An image that can't be drawn (no JDK, an unreadable frame) is listed under Problems in the
+report and `pr-summary` and never changes the verdict: the checks are the proof, the images only show it.
+
+**`index.html`** is the entry page a reviewer opens: the claim and verdict, the video playing inline with its
+poster, the key frames and screenshots, the checks with failures first, problems, unverified items, and the
+details. For a compare it shows both runs side by side, `before-after.png`, and the checks with the changed
+ones first. It loads nothing from elsewhere and runs no script. The artifacts viewer renders `report.md`
+without `<video>`, so link `index.html` when a video matters.
+
+**Publishing it in a PR.** `publish` needs auto installed and signed in to its store (`upload-evidence.ts
+--check` from auto's show-me-your-work scripts says `ready`). auto uploads a whole evidence folder, so
+`publish` copies the attempt or compare folder into a fresh one from `new-evidence.ts` and uploads that: only
+the run you pass ever leaves the machine. `--into <auto evidence folder>` copies it into that folder instead
+(the one auto opened for this change), and everything already in it goes up too. It records each
+`index.html`'s served URL as `evidence_url` in `proof.json` and `compare.json` (in the copy and the original),
+uploads, and prints the URLs, ending with `Evidence URL:`. The store never replaces a file, so publish a folder
+once and rerun the proof for new evidence. The URLs need DuckDuckGo sign-in and point at internal storage only.
+Look at a run's screenshots and video before publishing it. `shot` collapses the notification shade first, but
+on the user's phone a notification can still appear in the video, so turn on Do Not Disturb there.
+
+`pr-summary <attempt or compare folder>` then prints the scenario in auto's PR format: `### <claim>`,
+**Verified**, an evidence table (Before | After for a compare, else the run's own column) with a 200 px
+thumbnail per screenshot and the poster linking the video, `[▶ Watch video]` links, the key frames, then
+**Outcome**, **Details** with a `[Full report]` link to `index.html`, **Unverified**, and collapsed tables of
+every check, the proof source, and the rerun commands. Published runs link
+their served URLs; an unpublished one links local relative paths and says so on stderr, and auto's PR gate
+rejects those. It carries no local paths, logs or device serials, so it's safe for a public PR. A run that
+stopped at `doctor` never read the device or the build, so its summary leaves those out rather than guessing.
+
+When auto opens the PR, its body is the repo template's header fields (`Task/Issue URL:` first, then
+`Tech Design URL`, `API Proposals URL(s)` and `Evidence URL (if applicable):` set to the published `index.html`
+URL) followed by auto's own sections; auto writes `## Verification` from the attempt folder, so give it the
+folder and the `index.html` URL rather than `pr-summary` output (`.claude/docs/contributions.md`, PR body). It
+publishes through `publish-pr.ts <body.md> --evidence-directory <auto evidence folder> -- create|edit ...`,
+which turns `artifacts.go.duckduckgo.com` thumbnails into GitHub attachments, because github.com can't load
+images behind DuckDuckGo sign-in. Without auto, fill the template and paste `pr-summary` under its Description,
+and drag the images into the PR in the browser.
 
 ## Drive
 
@@ -178,10 +242,11 @@ $V tap id:trailingSwitch --index 3
 $V checked trailingSwitch 2          # "Start-up tracing" must stay false
 ```
 
-## Evidence
+## Evidence by hand
 
-Each feature recipe is one video plus screenshots of its key states, all in
-`build/verify/evidence/<run-id>/<device>/` (`doctor` prints it):
+Driving a recipe by hand, each feature is one video plus screenshots of its key states, all in
+`build/verify/evidence/<run-id>/<device>/` (`doctor` prints it). A proof's captures go to its attempt folder
+instead (Evidence and report).
 
 ```bash
 $V record start search-url.mp4   # screenrecord, before the first step under test; stops by itself at 170 s
@@ -199,7 +264,7 @@ Proof standards:
 - Capture the action and the resulting state: a shot before the step that matters and one after.
 - Verify side effects through a second view (the tab switcher after opening a tab, the New Tab Page after changing a setting).
 - Look at every PNG you cite; for web content pair it with a `web eval` read of the same state.
-- Report the commit from `doctor` with the evidence path. For a PR, paste the output of `$P pr-summary`, not paths or screenshots. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
+- Report the commit from `doctor` with the evidence path. For a PR, `$P publish` the attempt or compare folder and paste `$P pr-summary` of it, as Publishing it in a PR says, not paths or local screenshots. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
 - Use synthetic data only and keep captures on this machine.
 
 ## Cleanup
@@ -210,8 +275,8 @@ $V cleanup
 
 Undoes only what the run did: stops recordings (keeping the videos), removes the adb forwards it created,
 stops emulators it booted, and deletes `build/verify/state`. The user's phone and emulators they started
-keep running, with the verified build still installed. Evidence stays in `build/verify/evidence/` and
-builds in `build/verify/builds/` until you delete them. Never `adb emu kill` or `pkill` devices the run
+keep running, with the verified build still installed. Evidence stays in `build/verify/evidence/` (and in any
+`--evidence-dir`) and builds in `build/verify/builds/` until you delete them. Never `adb emu kill` or `pkill` devices the run
 did not boot. Run `$V cleanup` after a failed run too, before retrying.
 
 ## Gotchas
