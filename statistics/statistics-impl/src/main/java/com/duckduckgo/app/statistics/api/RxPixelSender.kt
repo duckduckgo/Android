@@ -67,7 +67,6 @@ class RxPixelSender @Inject constructor(
     private val deviceInfo: DeviceInfo,
     private val statisticsLibraryConfig: StatisticsLibraryConfig,
     private val pixelFiredRepository: PixelFiredRepository,
-    private val pixelSenderFeature: Lazy<PixelSenderFeature>,
     private val pixelRequiringAtbPlugins: PluginPoint<PixelRequiringAtbPlugin>,
     private val concurrencyLimitFeature: Lazy<PixelConcurrencyLimitFeature>,
     private val deviceMigration: Lazy<DeviceMigration>, // break any possible DI dependency cycle
@@ -277,10 +276,7 @@ class RxPixelSender @Inject constructor(
         pixelRequiringAtbPlugins.getPlugins().flatMap { it.names() }.toSet()
     }
 
-    private fun shouldSendAtb(pixelName: String): Boolean {
-        if (!pixelSenderFeature.value.self().isEnabled()) return true
-        return pixelsRequiringAtb.any { pixelName.startsWith(it) }
-    }
+    private fun shouldSendAtb(pixelName: String): Boolean = pixelsRequiringAtb.any { pixelName.startsWith(it) }
 
     private fun getDeviceFactor() = deviceInfo.formFactor().description
 

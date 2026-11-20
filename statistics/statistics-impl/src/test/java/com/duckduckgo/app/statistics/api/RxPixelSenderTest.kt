@@ -101,9 +101,9 @@ class RxPixelSenderTest {
     private lateinit var testee: RxPixelSender
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val pixelFiredRepository = FakePixelFiredRepository()
-    private val pixelSenderFeature = FakeFeatureToggleFactory.create(PixelSenderFeature::class.java)
     private val concurrencyLimitFeature = FakeFeatureToggleFactory.create(PixelConcurrencyLimitFeature::class.java)
     private val deviceMigration = FakeDeviceMigration()
+
     private var pixelsRequiringAtb: List<String> = emptyList()
     private var pixelsRequiringAtbSecondPlugin: List<String> = emptyList()
     private val pixelRequiringAtbPlugins = object : PluginPoint<PixelRequiringAtbPlugin> {
@@ -121,8 +121,6 @@ class RxPixelSenderTest {
             .build()
         pendingPixelDao = db.pixelDao()
 
-        // Disabled by default so existing tests exercise the legacy (ATB-always) path.
-        pixelSenderFeature.self().setRawStoredState(State(enable = false))
         concurrencyLimitFeature.self().setRawStoredState(State(enable = false))
 
         testee = createTestee(pendingPixelDao)
@@ -137,7 +135,6 @@ class RxPixelSenderTest {
             override fun shouldFirePixelsAsDev() = true
         },
         pixelFiredRepository,
-        lazy { pixelSenderFeature },
         pixelRequiringAtbPlugins,
         lazy { concurrencyLimitFeature },
         lazy { deviceMigration },
@@ -149,8 +146,9 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenPixelFiredThenPixelServiceCalledWithCorrectAtbAndVariant() {
-        givenPixelApiSucceeds()
+    fun whenOptedInPixelFiredThenPixelServiceCalledWithCorrectAtbAndVariant() {
+        pixelsRequiringAtb = listOf(TEST.pixelName)
+        givenFireWithAtbSucceeds()
         givenAtbVariant(Atb("atb"))
         givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -163,18 +161,19 @@ class RxPixelSenderTest {
 
     @Test
     fun whenPixelFiredTabletFormFactorThenPixelServiceCalledWithTabletParameter() {
-        givenApiSendPixelSucceeds()
+        givenFireWithoutAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.TABLET)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
-        verify(api).fire(eq("test"), eq("tablet"), eq(""), any(), any(), any())
+        verify(api).fireWithoutAtb(eq("test"), eq("tablet"), any(), any(), any())
     }
 
     @Test
-    fun whenPixelFiredWithNoAtbThenPixelServiceCalledWithCorrectPixelNameAndNoAtb() {
-        givenApiSendPixelSucceeds()
+    fun whenOptedInPixelFiredWithNoStoredAtbThenPixelServiceCalledWithEmptyAtb() {
+        pixelsRequiringAtb = listOf(TEST.pixelName)
+        givenFireWithAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
@@ -185,9 +184,7 @@ class RxPixelSenderTest {
 
     @Test
     fun whenPixelFiredWithAdditionalParametersThenPixelServiceCalledWithDefaultAndAdditionalParameters() {
-        givenPixelApiSucceeds()
-        givenAtbVariant(Atb("atb"))
-        givenVariant("variant")
+        givenFireWithoutAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
@@ -196,14 +193,12 @@ class RxPixelSenderTest {
         testee.sendPixel(TEST.pixelName, params, emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
-        verify(api).fire("test", "phone", "atbvariant", expectedParams, emptyMap())
+        verify(api).fireWithoutAtb("test", "phone", expectedParams, emptyMap())
     }
 
     @Test
     fun whenPixelFiredWithoutAdditionalParametersThenPixelServiceCalledWithOnlyDefaultParameters() {
-        givenPixelApiSucceeds()
-        givenAtbVariant(Atb("atb"))
-        givenVariant("variant")
+        givenFireWithoutAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         givenAppVersion("1.0.0")
 
@@ -211,7 +206,7 @@ class RxPixelSenderTest {
             .test().assertValue(PIXEL_SENT)
 
         val expectedParams = mapOf("appVersion" to "1.0.0")
-        verify(api).fire("test", "phone", "atbvariant", expectedParams, emptyMap())
+        verify(api).fireWithoutAtb("test", "phone", expectedParams, emptyMap())
     }
 
     @Test
@@ -265,7 +260,7 @@ class RxPixelSenderTest {
 
     @Test
     fun whenAppForegroundedThenPixelSent() {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         val pixelEntity = PixelEntity(
             pixelName = "test",
             atb = "atbvariant",
@@ -277,10 +272,9 @@ class RxPixelSenderTest {
 
         testee.onStart(mockLifecycleOwner)
 
-        verify(api).fire(
+        verify(api).fireWithoutAtb(
             pixelEntity.pixelName,
             "phone",
-            pixelEntity.atb,
             pixelEntity.additionalQueryParams,
             pixelEntity.encodedQueryParams,
         )
@@ -288,20 +282,20 @@ class RxPixelSenderTest {
 
     @Test
     fun whenMigratedInstallForegroundedThenPreviousPhoneQueueDroppedUnsent() {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         deviceMigration.migrated = true
         pendingPixelDao.insert(queuedPixel())
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onStart(mockLifecycleOwner)
 
-        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+        verify(api, never()).fireWithoutAtb(any(), any(), any(), any(), any())
         assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
     }
 
     @Test
     fun whenMigratedInstallForegroundedAgainThenQueueNotDroppedTwice() {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         deviceMigration.migrated = true
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         testee.onStart(mockLifecycleOwner)
@@ -311,12 +305,12 @@ class RxPixelSenderTest {
 
         testee.onStart(mockLifecycleOwner)
 
-        verify(api).fire(ownPixel.pixelName, "phone", ownPixel.atb, ownPixel.additionalQueryParams, ownPixel.encodedQueryParams)
+        verify(api).fireWithoutAtb(ownPixel.pixelName, "phone", ownPixel.additionalQueryParams, ownPixel.encodedQueryParams)
     }
 
     @Test
     fun whenMigratedInstallEnqueuesBeforeForegroundThenOnlyPreviousPhoneQueueDropped() {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         deviceMigration.migrated = true
         pendingPixelDao.insert(queuedPixel().copy(pixelName = "previous_phone"))
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -325,8 +319,8 @@ class RxPixelSenderTest {
             .assertValue(EnqueuePixelResult.PIXEL_ENQUEUED)
         testee.onStart(mockLifecycleOwner)
 
-        verify(api, never()).fire(eq("previous_phone"), any(), any(), any(), any(), any())
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api, never()).fireWithoutAtb(eq("previous_phone"), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
     }
 
     @Test
@@ -341,20 +335,20 @@ class RxPixelSenderTest {
 
     @Test
     fun whenNotMigratedInstallForegroundedThenQueueSentAndNotCheckedAgain() {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         val pixelEntity = queuedPixel()
         pendingPixelDao.insert(pixelEntity)
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.onStart(mockLifecycleOwner)
 
-        verify(api).fire(pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
+        verify(api).fireWithoutAtb(pixelEntity.pixelName, "phone", pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
         assertTrue(deviceMigration.done.isNotEmpty())
     }
 
     @Test
     fun whenAppForegroundedAndPixelSentThenPixelRemoved() {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         val pixelEntity = PixelEntity(
             pixelName = "test",
             atb = "atbvariant",
@@ -372,7 +366,7 @@ class RxPixelSenderTest {
 
     @Test
     fun whenAppForegroundedAndSendPixelFailsThenPixelNotRemoved() {
-        givenPixelApiFails()
+        givenFireWithoutAtbFails()
         val pixelEntity = PixelEntity(
             pixelName = "test",
             atb = "atbvariant",
@@ -391,7 +385,7 @@ class RxPixelSenderTest {
 
     @Test
     fun whenAppForegroundedWithMultiplePixelsEnqueuedThenSendAllPixels() {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         val pixelEntity = PixelEntity(
             pixelName = "test",
             atb = "atbvariant",
@@ -403,10 +397,9 @@ class RxPixelSenderTest {
 
         testee.onStart(mockLifecycleOwner)
 
-        verify(api, times(5)).fire(
+        verify(api, times(5)).fireWithoutAtb(
             pixelEntity.pixelName,
             "phone",
-            pixelEntity.atb,
             pixelEntity.additionalQueryParams,
             pixelEntity.encodedQueryParams,
         )
@@ -421,7 +414,7 @@ class RxPixelSenderTest {
 
         first.assertValue(PIXEL_SENT)
         second.assertValue(PIXEL_IGNORED)
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
     }
 
     @Test
@@ -464,25 +457,25 @@ class RxPixelSenderTest {
 
     @Test
     fun whenDailyPixelIsFiredThenPixelNameIsStored() = runTest {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
             .test().assertValue(PIXEL_SENT)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertTrue(TEST.pixelName in pixelFiredRepository.dailyPixelsFiredToday)
     }
 
     @Test
     fun whenDailyPixelFireFailsThenPixelNameIsNotStored() = runTest {
-        givenPixelApiFails()
+        givenFireWithoutAtbFails()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
             .test().assertError(RuntimeException::class.java)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertFalse(TEST.pixelName in pixelFiredRepository.dailyPixelsFiredToday)
     }
 
@@ -499,25 +492,25 @@ class RxPixelSenderTest {
 
     @Test
     fun whenDailyPixelIsFiredThenTagIsStored() = runTest {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
             .test().assertValue(PIXEL_SENT)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertTrue("tag" in pixelFiredRepository.dailyPixelsFiredToday)
     }
 
     @Test
     fun whenDailyPixelFireFailsThenTagIsNotStored() = runTest {
-        givenPixelApiFails()
+        givenFireWithoutAtbFails()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily("tag"))
             .test().assertError(RuntimeException::class.java)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertFalse("tag" in pixelFiredRepository.dailyPixelsFiredToday)
     }
 
@@ -534,25 +527,25 @@ class RxPixelSenderTest {
 
     @Test
     fun whenUniquePixelIsFiredThenPixelNameIsStored() = runTest {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique())
             .test().assertValue(PIXEL_SENT)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertTrue(TEST.pixelName in pixelFiredRepository.uniquePixelsFired)
     }
 
     @Test
     fun whenUniquePixelFireFailsThenPixelNameIsNotStored() = runTest {
-        givenPixelApiFails()
+        givenFireWithoutAtbFails()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique())
             .test().assertError(RuntimeException::class.java)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertFalse(TEST.pixelName in pixelFiredRepository.uniquePixelsFired)
     }
 
@@ -569,25 +562,25 @@ class RxPixelSenderTest {
 
     @Test
     fun whenUniquePixelIsFiredThenTagIsStored() = runTest {
-        givenPixelApiSucceeds()
+        givenFireWithoutAtbSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique("tag"))
             .test().assertValue(PIXEL_SENT)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertTrue("tag" in pixelFiredRepository.uniquePixelsFired)
     }
 
     @Test
     fun whenUniquePixelFireFailsThenTagIsNotStored() = runTest {
-        givenPixelApiFails()
+        givenFireWithoutAtbFails()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Unique("tag"))
             .test().assertError(RuntimeException::class.java)
 
-        verify(api).fire(eq(TEST.pixelName), any(), any(), any(), any(), any())
+        verify(api).fireWithoutAtb(eq(TEST.pixelName), any(), any(), any(), any())
         assertFalse("tag" in pixelFiredRepository.uniquePixelsFired)
     }
 
@@ -699,9 +692,7 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenAtbOptInEnabledAndPixelNotOptedInThenFiredWithoutAtb() {
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
-        pixelsRequiringAtb = emptyList()
+    fun whenPixelNotOptedInThenFiredWithoutAtb() {
         givenFireWithoutAtbSucceeds()
         givenAtbVariant(Atb("atb"))
         givenVariant("variant")
@@ -715,10 +706,9 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenAtbOptInEnabledAndPixelOptedInThenFiredWithAtb() {
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+    fun whenPixelOptedInThenFiredWithAtb() {
         pixelsRequiringAtb = listOf("test")
-        givenApiSendPixelSucceeds()
+        givenFireWithAtbSucceeds()
         givenAtbVariant(Atb("atb"))
         givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -731,24 +721,7 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenAtbOptInDisabledThenAlwaysFiredWithAtb() {
-        pixelSenderFeature.self().setRawStoredState(State(enable = false))
-        pixelsRequiringAtb = emptyList()
-        givenApiSendPixelSucceeds()
-        givenAtbVariant(Atb("atb"))
-        givenVariant("variant")
-        givenFormFactor(DeviceInfo.FormFactor.PHONE)
-
-        testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
-            .test().assertValue(PIXEL_SENT)
-
-        verify(api).fire(eq("test"), eq("phone"), eq("atbvariant"), any(), any(), any())
-    }
-
-    @Test
-    fun whenAtbOptInEnabledAndEnqueuedPixelNotOptedInThenSentWithoutAtb() {
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
-        pixelsRequiringAtb = emptyList()
+    fun whenEnqueuedPixelNotOptedInThenSentWithoutAtb() {
         givenFireWithoutAtbSucceeds()
         givenAtbVariant(Atb("atb"))
         givenVariant("variant")
@@ -762,10 +735,9 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenAtbOptInEnabledAndEnqueuedPixelOptedInThenSentWithAtb() {
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
+    fun whenEnqueuedPixelOptedInThenSentWithAtb() {
         pixelsRequiringAtb = listOf("test")
-        givenApiSendPixelSucceeds()
+        givenFireWithAtbSucceeds()
         givenAtbVariant(Atb("atb"))
         givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -779,11 +751,10 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenAtbOptInEnabledAndPixelNameStartsWithOptedInPrefixThenFiredWithAtb() {
+    fun whenPixelNameStartsWithOptedInPrefixThenFiredWithAtb() {
         // The opt-in list holds prefixes: a longer pixel name that starts with the prefix must still match.
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
         pixelsRequiringAtb = listOf("m_anr")
-        givenApiSendPixelSucceeds()
+        givenFireWithAtbSucceeds()
         givenAtbVariant(Atb("atb"))
         givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -796,9 +767,8 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenAtbOptInEnabledAndPixelNameOnlyContainsPrefixThenFiredWithoutAtb() {
+    fun whenPixelNameOnlyContainsPrefixThenFiredWithoutAtb() {
         // Matching is startsWith, not contains: a prefix appearing mid-name must not opt the pixel in.
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
         pixelsRequiringAtb = listOf("anr")
         givenFireWithoutAtbSucceeds()
         givenAtbVariant(Atb("atb"))
@@ -813,12 +783,11 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenAtbOptInEnabledAndPixelOptedInBySecondPluginThenFiredWithAtb() {
+    fun whenPixelOptedInBySecondPluginThenFiredWithAtb() {
         // The opt-in decision must span every contributed plugin, not just the first.
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
         pixelsRequiringAtb = listOf("other")
         pixelsRequiringAtbSecondPlugin = listOf("test")
-        givenApiSendPixelSucceeds()
+        givenFireWithAtbSucceeds()
         givenAtbVariant(Atb("atb"))
         givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
@@ -841,24 +810,25 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenConcurrencyLimitEnabledThenPixelSentWithFireAsync() {
+    fun whenConcurrencyLimitEnabledAndPixelOptedInThenFiredAsyncWithAtb() {
         concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
-        givenAsyncPixelApiSucceeds()
+        pixelsRequiringAtb = listOf(TEST.pixelName)
+        wheneverBlocking { api.fireAsync(any(), any(), any(), any(), any(), anyOrNull()) }.thenReturn(Unit)
+        givenAtbVariant(Atb("atb"))
+        givenVariant("variant")
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
             .test().assertValue(PIXEL_SENT)
 
-        verifyBlocking(api) { fireAsync(eq(TEST.pixelName), eq("phone"), any(), any(), any(), any()) }
+        verifyBlocking(api) { fireAsync(eq(TEST.pixelName), eq("phone"), eq("atbvariant"), any(), any(), any()) }
         verify(api, never()).fire(any(), any(), any(), any(), any(), any())
     }
 
     @Test
-    fun whenConcurrencyLimitEnabledAndAtbOptInEnabledAndPixelNotOptedInThenFiredWithoutAtb() {
+    fun whenConcurrencyLimitEnabledAndPixelNotOptedInThenFiredWithoutAtb() {
         concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
-        pixelSenderFeature.self().setRawStoredState(State(enable = true))
-        pixelsRequiringAtb = emptyList()
-        wheneverBlocking { api.fireWithoutAtbAsync(any(), any(), any(), any(), any()) }.thenReturn(Unit)
+        givenFireWithoutAtbAsyncSucceeds()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Count)
@@ -871,7 +841,7 @@ class RxPixelSenderTest {
     @Test
     fun whenConcurrencyLimitEnabledAndDailyPixelFireFailsThenPixelNameIsNotStored() {
         concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
-        givenAsyncPixelApiFails()
+        givenFireWithoutAtbAsyncFails()
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
 
         testee.sendPixel(TEST.pixelName, emptyMap(), emptyMap(), Daily())
@@ -881,9 +851,9 @@ class RxPixelSenderTest {
     }
 
     @Test
-    fun whenConcurrencyLimitEnabledAndAppForegroundedThenQueuedPixelSentWithFireAsyncAndRemoved() {
+    fun whenConcurrencyLimitEnabledAndAppForegroundedThenQueuedPixelSentAsyncAndRemoved() {
         concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
-        givenAsyncPixelApiSucceeds()
+        givenFireWithoutAtbAsyncSucceeds()
         val pixelEntity = PixelEntity(
             pixelName = "test",
             atb = "atbvariant",
@@ -896,16 +866,16 @@ class RxPixelSenderTest {
         testee.onStart(mockLifecycleOwner)
 
         verifyBlocking(api) {
-            fireAsync(pixelEntity.pixelName, "phone", pixelEntity.atb, pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
+            fireWithoutAtbAsync(pixelEntity.pixelName, "phone", pixelEntity.additionalQueryParams, pixelEntity.encodedQueryParams)
         }
-        verify(api, never()).fire(any(), any(), any(), any(), any(), any())
+        verify(api, never()).fireWithoutAtb(any(), any(), any(), any(), any())
         assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
     }
 
     @Test
     fun whenConcurrencyLimitEnabledAndQueuedPixelSendFailsThenPixelNotRemoved() {
         concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
-        givenAsyncPixelApiFails()
+        givenFireWithoutAtbAsyncFails()
         val pixelEntity = PixelEntity(
             pixelName = "test",
             atb = "atbvariant",
@@ -924,7 +894,7 @@ class RxPixelSenderTest {
     fun whenConcurrencyLimitEnabledAndMultiplePixelsQueuedThenEachSentOnceAndQueueEmptied() {
         concurrencyLimitFeature.self().setRawStoredState(State(enable = true))
         // The send must actually suspend; with an instant mock a non-blocking drain would not get cancelled by switchMap.
-        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.doSuspendableAnswer { delay(10) }
+        wheneverBlocking { api.fireWithoutAtbAsync(any(), any(), any(), any(), anyOrNull()) }.doSuspendableAnswer { delay(10) }
         val pixelNames = listOf("first", "second", "third")
         pixelNames.forEach { name ->
             pendingPixelDao.insert(
@@ -941,7 +911,7 @@ class RxPixelSenderTest {
         testee.onStart(mockLifecycleOwner)
 
         pixelNames.forEach { name ->
-            verifyBlocking(api, times(1)) { fireAsync(eq(name), any(), any(), any(), any(), any()) }
+            verifyBlocking(api, times(1)) { fireWithoutAtbAsync(eq(name), any(), any(), any(), any()) }
         }
         assertTrue(pendingPixelDao.pixels().test().assertNoErrors().values().last().isEmpty())
     }
@@ -959,7 +929,7 @@ class RxPixelSenderTest {
         val testee = createTestee(asyncPixelDao)
         val sendStarted = CountDownLatch(1)
         val sendCancelled = CountDownLatch(1)
-        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.doSuspendableAnswer {
+        wheneverBlocking { api.fireWithoutAtbAsync(any(), any(), any(), any(), anyOrNull()) }.doSuspendableAnswer {
             sendStarted.countDown()
             try {
                 awaitCancellation()
@@ -991,12 +961,12 @@ class RxPixelSenderTest {
         }
     }
 
-    private fun givenAsyncPixelApiSucceeds() {
-        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.thenReturn(Unit)
+    private fun givenFireWithoutAtbAsyncSucceeds() {
+        wheneverBlocking { api.fireWithoutAtbAsync(any(), any(), any(), any(), anyOrNull()) }.thenReturn(Unit)
     }
 
-    private fun givenAsyncPixelApiFails() {
-        wheneverBlocking { api.fireAsync(any(), any(), any(), anyOrNull(), any(), any()) }.thenAnswer { throw TimeoutException() }
+    private fun givenFireWithoutAtbAsyncFails() {
+        wheneverBlocking { api.fireWithoutAtbAsync(any(), any(), any(), any(), anyOrNull()) }.thenAnswer { throw TimeoutException() }
     }
 
     private fun <T : Any> raceDailyPixelOperations(
@@ -1007,7 +977,7 @@ class RxPixelSenderTest {
         givenFormFactor(DeviceInfo.FormFactor.PHONE)
         val enteredFirstSend = CountDownLatch(1)
         val releaseFirstSend = CountDownLatch(1)
-        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(
+        whenever(api.fireWithoutAtb(any(), any(), any(), any(), anyOrNull())).thenReturn(
             Completable.fromAction {
                 enteredFirstSend.countDown()
                 check(releaseFirstSend.await(10, SECONDS))
@@ -1044,12 +1014,8 @@ class RxPixelSenderTest {
         whenever(mockDeviceInfo.appVersion).thenReturn(appVersion)
     }
 
-    private fun givenApiSendPixelSucceeds() {
-        whenever(api.fire(any(), any(), any(), any(), any(), any())).thenReturn(Completable.complete())
-    }
-
-    private fun givenFireWithoutAtbSucceeds() {
-        whenever(api.fireWithoutAtb(any(), any(), any(), any(), any())).thenReturn(Completable.complete())
+    private fun givenFireWithAtbSucceeds() {
+        whenever(api.fire(any(), any(), any(), any(), any(), anyOrNull())).thenReturn(Completable.complete())
     }
 
     private fun givenVariant(variantKey: String) {
@@ -1064,12 +1030,12 @@ class RxPixelSenderTest {
         whenever(mockDeviceInfo.formFactor()).thenReturn(formFactor)
     }
 
-    private fun givenPixelApiSucceeds() {
-        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.complete())
+    private fun givenFireWithoutAtbSucceeds() {
+        whenever(api.fireWithoutAtb(any(), any(), any(), any(), anyOrNull())).thenReturn(Completable.complete())
     }
 
-    private fun givenPixelApiFails() {
-        whenever(api.fire(any(), any(), any(), anyOrNull(), any(), any())).thenReturn(Completable.error(TimeoutException()))
+    private fun givenFireWithoutAtbFails() {
+        whenever(api.fireWithoutAtb(any(), any(), any(), any(), anyOrNull())).thenReturn(Completable.error(TimeoutException()))
     }
 
     private fun queuedPixel() = PixelEntity(
