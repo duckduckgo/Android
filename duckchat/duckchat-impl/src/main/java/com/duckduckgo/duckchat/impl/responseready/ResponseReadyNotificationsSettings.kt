@@ -23,18 +23,22 @@ import kotlin.time.Duration.Companion.seconds
 data class ResponseReadyNotificationsSettings(
     val pollInterval: Duration,
     val timeout: Duration,
+    val errorSettle: Duration,
 )
 
 private const val POLL_INTERVAL_KEY = "pollIntervalSeconds"
 private const val DEFAULT_POLL_INTERVAL_SECONDS = 4
 private const val TIMEOUT_KEY = "timeoutSeconds"
 private const val DEFAULT_TIMEOUT_SECONDS = 180
+private const val ERROR_SETTLE_KEY = "errorSettleSeconds"
+private const val DEFAULT_ERROR_SETTLE_SECONDS = 5
 
 internal fun DuckChatFeature.responseReadySettings(): ResponseReadyNotificationsSettings {
     val settings = responseReadyNotifications().getSettings()
     return ResponseReadyNotificationsSettings(
         pollInterval = readSeconds(settings, POLL_INTERVAL_KEY, DEFAULT_POLL_INTERVAL_SECONDS),
         timeout = readSeconds(settings, TIMEOUT_KEY, DEFAULT_TIMEOUT_SECONDS),
+        errorSettle = readSeconds(settings, ERROR_SETTLE_KEY, DEFAULT_ERROR_SETTLE_SECONDS),
     )
 }
 

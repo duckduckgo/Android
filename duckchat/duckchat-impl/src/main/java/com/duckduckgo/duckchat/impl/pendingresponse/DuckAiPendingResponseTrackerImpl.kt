@@ -241,6 +241,7 @@ class DuckAiPendingResponseTrackerImpl @Inject constructor(
             }
             status.isTerminal -> response.done = true
         }
+        response.wait?.statuses?.trySend(status)
     }
 
     private suspend fun startPageInitiatedResponse(
@@ -269,7 +270,7 @@ class DuckAiPendingResponseTrackerImpl @Inject constructor(
         val chatId = response.chatId
         val settings = duckChatFeature.value.responseReadySettings()
         wait.job = coroutineScope.launch(dispatchers.io()) {
-            val result = readyMonitor.await(tabId, chatId, settings) { foundChatId ->
+            val result = readyMonitor.await(tabId, chatId, wait.statuses, settings) { foundChatId ->
                 channel.send(Action.ChatIdFound(response, wait, chatId = foundChatId))
             }
             channel.send(Action.WaitFinished(response, wait, result))
@@ -390,7 +391,9 @@ class DuckAiPendingResponseTrackerImpl @Inject constructor(
         }
     }
 
+    /** A running wait, and the page statuses it reads while the user is away. */
     private class Wait {
+        val statuses = Channel<PendingResponseStatus>(capacity = Channel.UNLIMITED)
         lateinit var job: Job
     }
 

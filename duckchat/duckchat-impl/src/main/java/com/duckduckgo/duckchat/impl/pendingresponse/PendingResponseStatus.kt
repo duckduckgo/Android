@@ -16,7 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.pendingresponse
 
-internal sealed interface PendingResponseStatus {
+sealed interface PendingResponseStatus {
 
     /** Any `start_stream:` status. A restart is an edit, a regenerate, a model switch or a second opinion. */
     data class StartStream(val isRestart: Boolean, val isReconnection: Boolean = false) : PendingResponseStatus
