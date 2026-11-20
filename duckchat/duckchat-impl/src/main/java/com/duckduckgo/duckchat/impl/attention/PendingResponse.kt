@@ -37,9 +37,9 @@ internal open class PendingResponse(
     var tabId = tabId
         private set
 
-    /** Null for a new chat until it comes on screen with an ID. */
+    /** Null for a new chat until it comes on screen with an ID, or a subclass learns it another way. */
     var chatId = chatId
-        private set
+        protected set
 
     var onScreen = false
         private set
@@ -97,3 +97,7 @@ internal fun <T : PendingResponse> Iterable<T>.clearedBy(type: ClearableData, du
     }
     else -> emptyList()
 }
+
+/** Returns the responses whose chat the page deleted. A null [chatId] means every chat in [browserMode]. */
+internal fun <T : PendingResponse> Iterable<T>.deletedBy(chatId: String?, browserMode: BrowserMode): List<T> =
+    filter { it.browserMode == browserMode && (chatId == null || it.chatId == chatId) }
