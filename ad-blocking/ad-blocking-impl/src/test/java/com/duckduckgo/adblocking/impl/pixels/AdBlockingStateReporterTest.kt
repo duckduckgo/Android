@@ -20,8 +20,13 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_STATE_DAILY
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkip
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipFeature
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import org.junit.Rule
@@ -40,7 +45,49 @@ class AdBlockingStateReporterTest {
     private val pixel: Pixel = mock()
     private val owner: LifecycleOwner = mock()
 
-    private val reporter = AdBlockingStateReporter(statusChecker, pixel, coroutineRule.testScope)
+    private val segmentSkip: SegmentSkip = mock()
+    private val feature = FakeFeatureToggleFactory.create(SegmentSkipFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
+    private val reporter = AdBlockingStateReporter(statusChecker, pixel, segmentSkip, feature, coroutineRule.testScope)
+
+    @org.junit.Before
+    fun setup() {
+        feature.self().setRawStoredState(Toggle.State(remoteEnableState = true))
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        whenever(segmentSkip.modeFlow()).thenReturn(flowOf(SegmentSkipMode.OFF))
+    }
+
+    @Test
+    fun whenGateClosedThenSavedSkipIsReportedOff() {
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = false))
+        whenever(segmentSkip.modeFlow()).thenReturn(flowOf(SegmentSkipMode.ALWAYS_SKIP))
+        whenever(statusChecker.observeCanInject()).thenReturn(flowOf(true))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+
+        reporter.onResume(owner)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel).fire(
+            AD_BLOCKING_STATE_DAILY,
+            parameters = mapOf("segment_skip_status" to "off", "is_enabled" to "true", "user_opted_in" to "false"),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenGateOpenThenSavedSkipIsReported() {
+        whenever(segmentSkip.modeFlow()).thenReturn(flowOf(SegmentSkipMode.ALWAYS_SKIP))
+        whenever(statusChecker.observeCanInject()).thenReturn(flowOf(true))
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+
+        reporter.onResume(owner)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(pixel).fire(
+            AD_BLOCKING_STATE_DAILY,
+            parameters = mapOf("segment_skip_status" to "skip", "is_enabled" to "true", "user_opted_in" to "false"),
+            type = Pixel.PixelType.Daily(),
+        )
+    }
 
     @Test
     fun whenCanInjectAndEnabledWithPixelConsentThenBothParamsTrue() {
@@ -48,10 +95,11 @@ class AdBlockingStateReporterTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         reporter.onResume(owner)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "true", "user_opted_in" to "true"),
+            parameters = mapOf("segment_skip_status" to "off", "is_enabled" to "true", "user_opted_in" to "true"),
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -62,10 +110,11 @@ class AdBlockingStateReporterTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
 
         reporter.onResume(owner)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "true", "user_opted_in" to "false"),
+            parameters = mapOf("segment_skip_status" to "off", "is_enabled" to "true", "user_opted_in" to "false"),
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -76,10 +125,11 @@ class AdBlockingStateReporterTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithoutPixelConsent))
 
         reporter.onResume(owner)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "true", "user_opted_in" to "false"),
+            parameters = mapOf("segment_skip_status" to "off", "is_enabled" to "true", "user_opted_in" to "false"),
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -90,10 +140,11 @@ class AdBlockingStateReporterTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.WithPixelConsent))
 
         reporter.onResume(owner)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "false", "user_opted_in" to "true"),
+            parameters = mapOf("segment_skip_status" to "off", "is_enabled" to "false", "user_opted_in" to "true"),
             type = Pixel.PixelType.Daily(),
         )
     }
@@ -104,10 +155,11 @@ class AdBlockingStateReporterTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Disabled.Permanent))
 
         reporter.onResume(owner)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(pixel).fire(
             AD_BLOCKING_STATE_DAILY,
-            parameters = mapOf("is_enabled" to "false", "user_opted_in" to "false"),
+            parameters = mapOf("segment_skip_status" to "off", "is_enabled" to "false", "user_opted_in" to "false"),
             type = Pixel.PixelType.Daily(),
         )
     }
