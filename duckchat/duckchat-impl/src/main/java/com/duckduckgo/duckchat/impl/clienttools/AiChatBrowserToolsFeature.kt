@@ -52,6 +52,9 @@ interface AiChatBrowserToolsFeature {
     fun searchDownloads(): Toggle
 
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun readTabContent(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun searchHistory(): Toggle
 
     /** Advertises the `requestAccess` capability, which asks for several tools in one prompt. */

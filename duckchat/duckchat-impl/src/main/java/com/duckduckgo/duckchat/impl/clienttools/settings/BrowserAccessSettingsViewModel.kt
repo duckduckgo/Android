@@ -131,6 +131,7 @@ class BrowserAccessSettingsViewModel @Inject constructor(
     private companion object {
         val TOOL_ORDER = listOf(
             "listOpenTabs",
+            "readTabContent",
             "searchHistory",
             "searchBookmarks",
             "searchDownloads",
