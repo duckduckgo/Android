@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pagetranslation.impl
+package com.duckduckgo.pagetranslation.impl.manifest
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
@@ -40,36 +40,50 @@ class ModelsManifestStoreTest {
     val temporaryFolder = TemporaryFolder()
 
     private val preferences = PreferenceDataStoreFactory.create(scope = coroutineRule.testScope) {
-        temporaryFolder.root.resolve("manifest.preferences_pb")
+        temporaryFolder.root.resolve(MANIFEST_PREFERENCES_FILE_NAME)
     }
 
     @Test
-    fun manifestIsNullBeforeFirstWrite() = runTest {
-        assertNull(store(preferences).manifest())
+    fun returnNullBeforeFirstWrite() = runTest {
+        assertNull(createStore(preferences).readManifest())
     }
 
     @Test
-    fun failedPreferenceCommitLeavesPreviousFileAndETagReadable() = runTest {
-        store(preferences).replaceIfSupported("""{"schemaVersion":1,"baseUrl":"first","models":{}}""", "\"old\"")
+    fun keepPreviousFileAndETagReadableWhenPreferenceCommitFails() = runTest {
+        createStore(preferences).replaceIfSupported(ORIGINAL_MANIFEST, ORIGINAL_ETAG)
+
         val failingPreferences = object : DataStore<Preferences> by preferences {
             override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences {
                 return preferences.updateData { current ->
                     transform(current)
-                    throw IOException("Failed to commit preferences")
+                    throw IOException(COMMIT_FAILURE_MESSAGE)
                 }
             }
         }
 
         try {
-            store(failingPreferences).replaceIfSupported("""{"schemaVersion":1,"baseUrl":"second","models":{}}""", "\"new\"")
-            fail("Expected a failed write")
+            createStore(failingPreferences).replaceIfSupported(UPDATED_MANIFEST, UPDATED_ETAG)
+            fail(EXPECTED_FAILURE_MESSAGE)
         } catch (_: IOException) {
-            val reopened = store(preferences)
-            assertEquals("first", reopened.manifest()!!.baseUrl)
-            assertEquals("\"old\"", reopened.etagForRequest())
+            val reopened = createStore(preferences)
+
+            assertEquals(ORIGINAL_BASE_URL, reopened.readManifest()!!.baseUrl)
+            assertEquals(ORIGINAL_ETAG, reopened.getEtagForRequest())
         }
     }
 
-    private fun store(dataStore: DataStore<Preferences>) =
-        ModelsManifestStore({ temporaryFolder.root.resolve("page-translation") }, dataStore, coroutineRule.testDispatcherProvider)
+    private fun createStore(dataStore: DataStore<Preferences>) =
+        ModelsManifestStore({ temporaryFolder.root.resolve(MANIFEST_DIRECTORY_NAME) }, dataStore, coroutineRule.testDispatcherProvider)
+
+    private companion object {
+        const val MANIFEST_PREFERENCES_FILE_NAME = "manifest.preferences_pb"
+        const val MANIFEST_DIRECTORY_NAME = "page-translation"
+        const val ORIGINAL_MANIFEST = """{"schemaVersion":1,"baseUrl":"first","models":{}}"""
+        const val UPDATED_MANIFEST = """{"schemaVersion":1,"baseUrl":"second","models":{}}"""
+        const val ORIGINAL_BASE_URL = "first"
+        const val ORIGINAL_ETAG = "\"old\""
+        const val UPDATED_ETAG = "\"new\""
+        const val COMMIT_FAILURE_MESSAGE = "Failed to commit preferences"
+        const val EXPECTED_FAILURE_MESSAGE = "Expected a failed write"
+    }
 }
