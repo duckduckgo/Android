@@ -4,7 +4,7 @@
 // renderProcessGonePixel remote feature is disabled.
 {
     "m_web_view_renderer_gone_crash": {
-        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once per renderer termination. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
+        "description": "The WebView renderer process crashed (RenderProcessGoneDetail.didCrash() is true). Fires once per renderer termination, stored on the device until sent, so a death while the app was in the background is reported when the app is next opened. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
         "owners": ["marcosholgado"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],
@@ -57,7 +57,7 @@
         ]
     },
     "m_web_view_renderer_gone_killed": {
-        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once per renderer termination. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
+        "description": "The system killed the WebView renderer process without it crashing (RenderProcessGoneDetail.didCrash() is false), usually to reclaim memory. Fires once per renderer termination, stored on the device until sent, so a death while the app was in the background is reported when the app is next opened. With the renderProcessGonePixel remote feature disabled, and in versions before the parameters existed, it fires once for each WebView the renderer served, without parameters.",
         "owners": ["marcosholgado"],
         "triggers": ["exception"],
         "suffixes": ["form_factor"],

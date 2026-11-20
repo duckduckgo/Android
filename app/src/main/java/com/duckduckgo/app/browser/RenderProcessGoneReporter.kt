@@ -119,7 +119,9 @@ class RealRenderProcessGoneReporter @Inject constructor(
                 null -> Unit
             }
         }
-        pixel.fire(pixelName(death.didCrash), params)
+        // Stored before sending, because memory sweeps often kill the app right after its renderer, and a direct send is lost
+        // when the process dies or the device is offline before the request completes.
+        pixel.enqueueFire(pixelName(death.didCrash), params)
     }
 
     /** Null when the app was open at [timeMillis], otherwise how long it had been closed. */

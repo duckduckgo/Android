@@ -36,9 +36,9 @@ import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.time.LocalDateTime
@@ -76,15 +76,24 @@ class RealRenderProcessGoneReporterTest {
         repeat(6) { testee.onRenderProcessGone(didCrash = false) }
         runNextMainMessage()
 
-        verify(pixel, times(1)).fire(eq(WEB_RENDERER_GONE_KILLED), any(), any(), any())
+        verify(pixel, times(1)).enqueueFire(eq(WEB_RENDERER_GONE_KILLED), any(), any(), any())
         assertEquals("6-10", firedParams().single()["affected_webviews"])
+    }
+
+    @Test
+    fun whenRendererDiesThenPixelIsStoredUntilSent() {
+        testee.onRenderProcessGone(didCrash = false)
+        runNextMainMessage()
+
+        verify(pixel).enqueueFire(eq(WEB_RENDERER_GONE_KILLED), any(), any(), any())
+        verifyNoMoreInteractions(pixel)
     }
 
     @Test
     fun whenCallbacksAreStillBeingDeliveredThenNoPixelYet() {
         testee.onRenderProcessGone(didCrash = false)
 
-        verify(pixel, never()).fire(any<Pixel.PixelName>(), any(), any(), any())
+        verifyNoInteractions(pixel)
     }
 
     @Test
@@ -92,7 +101,7 @@ class RealRenderProcessGoneReporterTest {
         testee.onRenderProcessGone(didCrash = true)
         runNextMainMessage()
 
-        verify(pixel).fire(eq(WEB_RENDERER_GONE_CRASH), any(), any(), any())
+        verify(pixel).enqueueFire(eq(WEB_RENDERER_GONE_CRASH), any(), any(), any())
     }
 
     @Test
@@ -103,8 +112,8 @@ class RealRenderProcessGoneReporterTest {
         testee.onRenderProcessGone(didCrash = false)
         runNextMainMessage()
 
-        verify(pixel).fire(eq(WEB_RENDERER_GONE_CRASH), any(), any(), any())
-        verify(pixel).fire(eq(WEB_RENDERER_GONE_KILLED), any(), any(), any())
+        verify(pixel).enqueueFire(eq(WEB_RENDERER_GONE_CRASH), any(), any(), any())
+        verify(pixel).enqueueFire(eq(WEB_RENDERER_GONE_KILLED), any(), any(), any())
         assertEquals(listOf("1", "2-3"), firedParams().map { it["affected_webviews"] })
     }
 
@@ -312,7 +321,7 @@ class RealRenderProcessGoneReporterTest {
 
     private fun firedParams(): List<Map<String, String>> {
         val captor = argumentCaptor<Map<String, String>>()
-        verify(pixel, atLeastOnce()).fire(any<Pixel.PixelName>(), captor.capture(), any(), any())
+        verify(pixel, atLeastOnce()).enqueueFire(any<Pixel.PixelName>(), captor.capture(), any(), any())
         return captor.allValues
     }
 
