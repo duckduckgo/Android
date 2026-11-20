@@ -30,6 +30,7 @@ import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.RadioListOption
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.launch
@@ -50,11 +51,18 @@ class AgeSignalsDevSettingsActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var scenarioStore: AgeSignalsScenarioStore
 
+    @Inject
+    lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
+
     private val binding: ActivityAgeSignalsDevSettingsBinding by viewBinding()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.root)
+        edgeToEdgeHandler.applyStatusBarInsets(binding.includeToolbar.appBarLayout)
+        edgeToEdgeHandler.applyScrollableNavigationBarInsets(binding.contentScrollView)
         setupToolbar(binding.includeToolbar.toolbar)
 
         binding.scenario.setClickListener { lifecycleScope.launch { showScenarioPicker() } }
