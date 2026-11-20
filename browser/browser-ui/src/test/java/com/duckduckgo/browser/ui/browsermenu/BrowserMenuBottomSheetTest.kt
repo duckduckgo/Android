@@ -439,6 +439,25 @@ class BrowserMenuBottomSheetTest {
     }
 
     @Test
+    fun whenRenderDuckAiMenuOnEmptyChatThenNewChatIsDimmedButClickable() {
+        dialog.placeDuckAiSection(atTop = true)
+
+        dialog.render(BrowserMenuViewState.DuckAi(showDuckAiSection = true, isEmptyChat = true))
+
+        assertEquals(0.4f, dialog.duckAiNewChatMenuItem.alpha)
+        assertTrue(dialog.duckAiNewChatMenuItem.isEnabled)
+    }
+
+    @Test
+    fun whenRenderDuckAiMenuOnConversationThenNewChatIsNotDimmed() {
+        dialog.placeDuckAiSection(atTop = true)
+
+        dialog.render(BrowserMenuViewState.DuckAi(showDuckAiSection = true, isEmptyChat = false))
+
+        assertEquals(1f, dialog.duckAiNewChatMenuItem.alpha)
+    }
+
+    @Test
     fun whenRenderDuckAiMenuWithShortcutsDisabledThenOnlyChatSettingsVisibleInSection() {
         dialog.placeDuckAiSection(atTop = true)
 

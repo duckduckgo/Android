@@ -315,6 +315,7 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.isImmersiveModeEnabled
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
+import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -884,7 +885,7 @@ class BrowserTabFragment :
             if (result.resultCode == RESULT_OK) {
                 // Handle any result data if needed
                 result.data?.let { intent ->
-                    intent.getStringExtra(TabSwitcherActivity.EXTRA_KEY_SELECTED_TAB_ID)?.let { browserActivity?.onTabSelectedFromSwitcher(it) }
+                    intent.getStringExtra(TabSwitcherActivity.EXTRA_KEY_SELECTED_TAB_ID)?.let { browserActivity?.requestNativeInputFocus(it) }
                     intent.extras?.let { extras ->
                         val deletedTabIds = extras.getStringArrayList(TabSwitcherActivity.EXTRA_KEY_DELETED_TAB_IDS)
                         if (!deletedTabIds.isNullOrEmpty()) {
@@ -3150,6 +3151,11 @@ class BrowserTabFragment :
                 browserActivity?.openExistingTab(it.tabId)
             }
 
+            is Command.FocusEmptyDuckAiChat -> {
+                if (it.tabId != tabId) browserActivity?.openExistingTab(it.tabId)
+                browserActivity?.requestNativeInputFocus(it.tabId)
+            }
+
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
 
             is Command.LaunchPopupMenu -> {
@@ -4082,6 +4088,10 @@ class BrowserTabFragment :
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)
                         .isVisible = nativeSidebarEnabled
+                    // Dimmed rather than disabled: on an empty chat, tapping still focuses its input.
+                    chatMenuPopup.contentView
+                        .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)
+                        .setEnabledOpacity(!viewModel.isOnEmptyDuckAiChat())
                     setChatMenuItemText(
                         com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat,
                         if (plusMenuUpdateEnabled) {

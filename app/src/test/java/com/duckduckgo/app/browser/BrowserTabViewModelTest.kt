@@ -14715,7 +14715,7 @@ class BrowserTabViewModelTest {
 
         testee.openNewDuckChatFromChatMenu()
 
-        assertCommandIssued<Command.SwitchToTab> { assertEquals("empty", tabId) }
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("empty", tabId) }
         verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
         verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
         verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
@@ -14729,11 +14729,11 @@ class BrowserTabViewModelTest {
 
         testee.openNewDuckChat(ViewMode.Browser("https://example.com"))
 
-        assertCommandIssued<Command.SwitchToTab> { assertEquals("empty", tabId) }
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("empty", tabId) }
     }
 
     @Test
-    fun whenCurrentChatIsEmptyThenPreferItToAnotherEmptyChat() = runTest {
+    fun whenCurrentChatIsEmptyThenFocusItInsteadOfAnotherEmptyChat() = runTest {
         whenever(mockTabRepository.getTabs()).thenReturn(
             listOf(TabEntity("other", url = "https://duck.ai/"), TabEntity("abc", url = "https://duck.ai/")),
         )
@@ -14744,7 +14744,7 @@ class BrowserTabViewModelTest {
         verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
         verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
         assertCommandNotIssued<Command.OpenInNewTab>()
-        assertCommandNotIssued<Command.SwitchToTab>()
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("abc", tabId) }
     }
 
     @Test
@@ -14768,7 +14768,7 @@ class BrowserTabViewModelTest {
 
         testee.openNewDuckChatFromChatMenu()
 
-        assertCommandNotIssued<Command.SwitchToTab>()
+        assertCommandNotIssued<Command.FocusEmptyDuckAiChat>()
         assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
     }
 
@@ -14785,14 +14785,14 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenNewChatRequestedBySwipingUpAndCurrentChatIsEmptyThenNothingHappens() = runTest {
+    fun whenNewChatRequestedBySwipingUpAndCurrentChatIsEmptyThenItIsFocused() = runTest {
         whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("abc", url = "https://duck.ai/")))
         whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
 
         testee.openNewDuckChatFromSwipeUp()
 
         assertCommandNotIssued<Command.OpenInNewTab>()
-        assertCommandNotIssued<Command.SwitchToTab>()
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("abc", tabId) }
     }
 
     @Test

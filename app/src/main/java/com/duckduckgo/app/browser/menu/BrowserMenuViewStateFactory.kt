@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser.menu
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.browser.SSLErrorType.NONE
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
+import com.duckduckgo.app.browser.duckchat.isEmptyDuckAiChat
 import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.viewstate.BrowserViewState
 import com.duckduckgo.app.browser.viewstate.HighlightableButton
@@ -29,6 +30,7 @@ import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.api.DuckChat
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
@@ -51,6 +53,7 @@ interface BrowserMenuViewStateFactory {
 @SingleIn(AppScope::class)
 class RealBrowserMenuViewStateFactory @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChat: DuckChat,
     private val newDownloadState: NewDownloadState,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val appBuildConfig: AppBuildConfig,
@@ -71,7 +74,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         } else {
             when (omnibarViewMode) {
                 Omnibar.ViewMode.NewTab -> createNewTabPageViewState(viewState)
-                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState, title, tabId)
+                Omnibar.ViewMode.DuckAI -> createDuckAiViewState(viewState, title, tabId, siteUrl)
                 Omnibar.ViewMode.Error -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.SSLWarning -> createNewTabPageViewState(viewState)
                 Omnibar.ViewMode.MaliciousSiteWarning -> createNewTabPageViewState(viewState)
@@ -121,6 +124,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
         browserViewState: BrowserViewState,
         title: String?,
         tabId: String,
+        siteUrl: String?,
     ): BrowserMenuViewState.DuckAi {
         return BrowserMenuViewState.DuckAi(
             canPrintPage = browserViewState.canPrintPage,
@@ -131,6 +135,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
             vpnMenuState = browserViewState.vpnMenuState,
             pageContextHeader = PageContextHeaderState.DuckAi(title = title, tabId = tabId),
+            isEmptyChat = duckChat.isEmptyDuckAiChat(siteUrl),
         )
     }
 
