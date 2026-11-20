@@ -98,8 +98,7 @@ interface WideEventClient {
      * If [timeout] elapses before [intervalEnd], [flowFinish] or [flowAbort], the flow auto-finishes with
      * [FlowStatus.Unknown] and is sent. Explicit finish/abort cancels any pending timeouts.
      *
-     * The measured duration is bucketed according to [buckets]. The recorded duration is rounded down to
-     * the nearest bucket. Values below the smallest bucket are recorded as 0. A null value disables
+     * The measured duration is bucketed according to [buckets] and [rounding]. A null [buckets] disables
      * bucketing and records the raw duration.
      *
      * @param wideEventId ID of the wide event.
@@ -107,12 +106,14 @@ interface WideEventClient {
      * @param timeout Optional duration for auto-finish.
      * @param buckets Bucket boundaries for the measured duration, or null to disable bucketing.
      *   Defaults to [DEFAULT_INTERVAL_BUCKETS].
+     * @param rounding Which bucket boundary is recorded. Ignored when [buckets] is null.
      */
     suspend fun intervalStart(
         wideEventId: Long,
         key: String,
         timeout: Duration? = null,
         buckets: Set<Duration>? = DEFAULT_INTERVAL_BUCKETS,
+        rounding: BucketRounding = BucketRounding.RoundDown,
     ): Result<Unit>
 
     /**
@@ -171,6 +172,23 @@ data class WideEventDefinition(
             val INITIAL = Version(minor = 0, patch = 0)
         }
     }
+}
+
+/**
+ * How an interval's duration is mapped to a bucket boundary. A duration equal to a boundary records that
+ * boundary. A negative duration, e.g. after a clock change, records -1 in both modes.
+ */
+enum class BucketRounding {
+    /**
+     * The largest boundary not greater than the duration. Durations shorter than the smallest boundary record 0.
+     */
+    RoundDown,
+
+    /**
+     * The smallest boundary not less than the duration. Durations longer than the largest boundary record the
+     * largest boundary.
+     */
+    RoundUp,
 }
 
 /** Represents the final outcome status of a wide event. */

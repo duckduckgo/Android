@@ -96,6 +96,7 @@ fun WideEventEntity.WideEventInterval.mapToRepositoryWideEventInterval(): WideEv
         startedAt = startedAt,
         timeout = timeout,
         buckets = buckets,
+        rounding = rounding.mapToRepositoryBucketRounding(),
     )
 
 fun WideEventRepository.WideEventInterval.mapToDbWideEventInterval(): WideEventEntity.WideEventInterval =
@@ -104,4 +105,17 @@ fun WideEventRepository.WideEventInterval.mapToDbWideEventInterval(): WideEventE
         startedAt = startedAt,
         timeout = timeout,
         buckets = buckets,
+        rounding = rounding.mapToDbBucketRounding(),
     )
+
+fun WideEventEntity.BucketRounding.mapToRepositoryBucketRounding(): WideEventRepository.BucketRounding =
+    when (this) {
+        WideEventEntity.BucketRounding.ROUND_DOWN -> WideEventRepository.BucketRounding.ROUND_DOWN
+        WideEventEntity.BucketRounding.ROUND_UP -> WideEventRepository.BucketRounding.ROUND_UP
+    }
+
+fun WideEventRepository.BucketRounding.mapToDbBucketRounding(): WideEventEntity.BucketRounding =
+    when (this) {
+        WideEventRepository.BucketRounding.ROUND_DOWN -> WideEventEntity.BucketRounding.ROUND_DOWN
+        WideEventRepository.BucketRounding.ROUND_UP -> WideEventEntity.BucketRounding.ROUND_UP
+    }

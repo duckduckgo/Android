@@ -147,6 +147,7 @@ class WideEventRepositoryImpl @Inject constructor(
         name: String,
         timeout: Duration?,
         buckets: List<Duration>?,
+        rounding: WideEventRepository.BucketRounding,
     ) {
         if (buckets != null) {
             require(buckets.none { it.isNegative }) {
@@ -168,6 +169,7 @@ class WideEventRepositoryImpl @Inject constructor(
                     startedAt = timeProvider.getCurrentTime(),
                     timeout = timeout,
                     buckets = sortedBuckets,
+                    rounding = rounding.mapToDbBucketRounding(),
                 )
 
             event.copy(activeIntervals = event.activeIntervals + interval)
@@ -194,7 +196,10 @@ class WideEventRepositoryImpl @Inject constructor(
                 duration.isNegative -> NEGATIVE_INTERVAL_BUCKET_VALUE
                 intervalBuckets == null -> duration.toMillis().toString()
                 else -> {
-                    val matched = intervalBuckets.lastOrNull { it <= duration }
+                    val matched = when (interval.rounding) {
+                        WideEventEntity.BucketRounding.ROUND_DOWN -> intervalBuckets.lastOrNull { it <= duration }
+                        WideEventEntity.BucketRounding.ROUND_UP -> intervalBuckets.firstOrNull { it >= duration } ?: intervalBuckets.lastOrNull()
+                    }
                     (matched?.toMillis() ?: 0L).toString()
                 }
             }

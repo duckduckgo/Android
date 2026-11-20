@@ -80,6 +80,7 @@ class BadUrlErrorPageWideEventTest {
                 any(),
                 anyOrNull(),
                 any(),
+                any(),
             ),
         ).thenReturn(Result.success(Unit))
         whenever(
@@ -122,6 +123,7 @@ class BadUrlErrorPageWideEventTest {
             eq(FLOW_ID),
             eq("error_page_duration_ms_bucketed"),
             anyOrNull(),
+            any(),
             any(),
         )
     }
@@ -412,6 +414,7 @@ class BadUrlErrorPageWideEventTest {
             any(),
             any(),
             anyOrNull(),
+            any(),
             any(),
         )
     }
