@@ -21,9 +21,11 @@ import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.pagetranslation.impl.translatekit.TranslateKitLoader
 import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
+@Suppress("unused")
 @ContributesIntoSet(AppScope::class)
 class PageTranslationJsInjectorPlugin @Inject constructor(
     private val translateKitLoader: TranslateKitLoader,

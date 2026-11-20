@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pagetranslation.impl
+package com.duckduckgo.pagetranslation.impl.translatekit
 
 import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.translatekit.TranslateKit
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -33,15 +34,17 @@ import javax.inject.Inject
 
 interface TranslateKitLibrary {
     fun init()
+
     fun isInitialized(): Boolean
 }
 
-@Suppress("DenyListedApi")
+@Suppress("DenyListedApi", "unused")
 @ContributesBinding(AppScope::class)
 class RealTranslateKitLibrary @Inject constructor(
     private val context: Context,
 ) : TranslateKitLibrary {
     override fun init() = TranslateKit.init(context)
+
     override fun isInitialized(): Boolean = TranslateKit.isInitialized()
 }
 
@@ -52,12 +55,14 @@ class TranslateKitLoader @Inject constructor(
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) {
-    private val loadStarted = AtomicBoolean(false)
+    private val isLoadingStarted = AtomicBoolean(false)
 
     fun loadIfNeeded() {
-        if (loadStarted.get()) return
+        if (isLoadingStarted.get()) return
+
         appScope.launch(dispatchers.io()) {
-            if (!feature.translation().isEnabled() || !loadStarted.compareAndSet(false, true)) return@launch
+            if (!feature.translation().isEnabled() || !isLoadingStarted.compareAndSet(false, true)) return@launch
+
             try {
                 library.init()
             } catch (e: Exception) {
