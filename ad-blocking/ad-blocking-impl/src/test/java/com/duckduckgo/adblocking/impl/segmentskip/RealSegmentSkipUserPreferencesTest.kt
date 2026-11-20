@@ -132,6 +132,16 @@ class RealSegmentSkipUserPreferencesTest {
     }
 
     @Test
+    fun whenSavingDefaultThenChangeReflectsMvpFlag() = runTest {
+        for (mvp in listOf(false, true)) {
+            testDataStore.edit { it.clear() }
+            feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = mvp))
+            val default = if (mvp) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+            assertEquals(false, testee.setMode(default))
+        }
+    }
+
+    @Test
     fun whenDefaultIsSavedThenLaterDefaultChangeDoesNotReplaceIt() = runTest {
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
         feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
