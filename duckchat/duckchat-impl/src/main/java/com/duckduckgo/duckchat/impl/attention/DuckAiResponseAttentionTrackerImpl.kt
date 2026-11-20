@@ -16,14 +16,19 @@
 
 package com.duckduckgo.duckchat.impl.attention
 
+import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.FireMode
+import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.RealDuckChat
 import com.duckduckgo.duckchat.impl.attention.PendingResponse.ScreenChange
 import com.duckduckgo.duckchat.impl.attention.ResponseAttentionEvent.LeftWhileGenerating
 import com.duckduckgo.duckchat.impl.attention.ResponseAttentionEvent.Returned
@@ -59,6 +64,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
     private val duckChat: DuckChat,
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
+    @param:FireMode private val fireTabRepository: Lazy<TabRepository>,
     dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
 ) : DuckAiResponseAttentionTracker,
@@ -106,6 +112,17 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
 
     fun onDuckAiPageVisible(tabId: String, url: String) {
         channel.trySend(Action.ChatVisibility(ChatVisibilityEvent.DuckAiPageVisible(tabId, url)))
+        // The page reports [onNativePromptSubmitted] for an address-bar prompt only once it has loaded,
+        // which can be too late to start the service after the user leaves.
+        // If the prompt is in the URL, we treat it as submitted right away and start tracking the response.
+        if (isPromptHandoverWithQuery(url)) {
+            channel.trySend(Action.PromptHandoverVisible(tabId))
+        }
+    }
+
+    private fun isPromptHandoverWithQuery(url: String): Boolean {
+        val uri = url.toUri()
+        return RealDuckChat.isPromptHandoverUrl(uri) && !uri.getQueryParameter(QUERY).isNullOrBlank()
     }
 
     fun onSelectedTabChanged(tabId: String?, url: String?) {
@@ -142,6 +159,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         when (action) {
             is Action.ChatVisibility -> reconcileOnScreen()
             is Action.NativePromptSubmitted -> startResponse(action.tabId, action.browserMode)
+            is Action.PromptHandoverVisible -> startResponse(action.tabId, browserModeOf(action.tabId))
             is Action.ResponseState -> applyResponseState(action.tabId, action.status)
             is Action.StopTapped -> responses.firstOrNull { it.isOnScreenIn(action.tabId) }?.done = true
             is Action.ClearChats -> action.types.forEach { abort(responses.clearedBy(it, duckChat)) }
@@ -160,7 +178,13 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         }
     }
 
+    private suspend fun browserModeOf(tabId: String): BrowserMode =
+        if (fireTabRepository.value.getTab(tabId) != null) BrowserMode.FIRE else BrowserMode.REGULAR
+
     private suspend fun startResponse(tabId: String, browserMode: BrowserMode) {
+        // An address-bar prompt is reported on each page load and again when the page picks it up. This deduplicates them.
+        if (responses.any { it.tabId == tabId && !it.done && !it.chatSwitchedAway && it.awaitingFirstProgressStatus }) return
+
         // The tab's on-screen response is never away, so no listener is watching it.
         responses.removeAll { it.isOnScreenIn(tabId) }
         val response = AttentionPendingResponse(id = nextId++, tabId = tabId, browserMode = browserMode)
@@ -232,6 +256,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
 
     private sealed class Action {
         data class NativePromptSubmitted(val tabId: String, val browserMode: BrowserMode) : Action()
+        data class PromptHandoverVisible(val tabId: String) : Action()
         data class ResponseState(val tabId: String, val status: String) : Action()
         data class StopTapped(val tabId: String) : Action()
         data class ChatVisibility(val event: ChatVisibilityEvent) : Action()
