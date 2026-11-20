@@ -256,19 +256,19 @@ class SyncDebugCommandsTest {
     }
 
     @Test
-    fun whenAgeLastSyncWithNoAttemptThenStoresNothing() = runTest {
+    fun whenExpireSyncDebounceWithNoAttemptThenStoresNothing() = runTest {
         whenever(syncStateRepository.current()).thenReturn(null)
 
-        assertEquals("no sync attempt stored", commands.run(SyncDebugCommands.AGE_LAST_SYNC, on = true))
+        assertEquals("no sync attempt stored", commands.run(SyncDebugCommands.EXPIRE_SYNC_DEBOUNCE, on = true))
         verify(syncStateRepository, never()).store(any())
     }
 
     @Test
-    fun whenAgeLastSyncThenSameAttemptMovesPastTheDebouncePeriod() = runTest {
+    fun whenExpireSyncDebounceThenSameAttemptMovesPastTheDebouncePeriod() = runTest {
         val last = SyncAttempt(id = 7, state = SyncAttemptState.SUCCESS, meta = "meta")
         whenever(syncStateRepository.current()).thenReturn(last)
 
-        commands.run(SyncDebugCommands.AGE_LAST_SYNC, on = true)
+        commands.run(SyncDebugCommands.EXPIRE_SYNC_DEBOUNCE, on = true)
 
         val stored = argumentCaptor<SyncAttempt>()
         verify(syncStateRepository).store(stored.capture())

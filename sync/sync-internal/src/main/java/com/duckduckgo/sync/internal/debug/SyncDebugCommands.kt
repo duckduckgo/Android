@@ -66,7 +66,7 @@ class SyncDebugCommands @Inject constructor(
         READ_LOG -> readLog()
         DELETE_ACCOUNT -> deleteAccount()
         RUN_BACKGROUND_SYNC -> runBackgroundSync()
-        AGE_LAST_SYNC -> ageLastSync()
+        EXPIRE_SYNC_DEBOUNCE -> expireSyncDebounce()
         else -> "unknown command \"$command\"; known: ${COMMANDS.joinToString()}"
     }
 
@@ -118,11 +118,11 @@ class SyncDebugCommands @Inject constructor(
         return "enqueued SyncBackgroundWorker"
     }
 
-    private fun ageLastSync(): String {
+    private fun expireSyncDebounce(): String {
         val last = syncStateRepository.current() ?: return "no sync attempt stored"
         val aged = OffsetDateTime.now(ZoneOffset.UTC).minusMinutes(RealSyncScheduler.DEBOUNCE_PERIOD_IN_MINUTES + 1L)
         syncStateRepository.store(last.copy(timestamp = DatabaseDateFormatter.iso8601(aged)))
-        return "last sync (${last.state}) moved to ${DatabaseDateFormatter.iso8601(aged)}"
+        return "debounce expired: last sync (${last.state}) moved to ${DatabaseDateFormatter.iso8601(aged)}"
     }
 
     companion object {
@@ -134,7 +134,7 @@ class SyncDebugCommands @Inject constructor(
         const val READ_LOG = "readLog"
         const val DELETE_ACCOUNT = "deleteAccount"
         const val RUN_BACKGROUND_SYNC = "runBackgroundSync"
-        const val AGE_LAST_SYNC = "ageLastSync"
+        const val EXPIRE_SYNC_DEBOUNCE = "expireSyncDebounce"
         val COMMANDS = listOf(
             STATUS,
             USE_STAGING,
@@ -144,7 +144,7 @@ class SyncDebugCommands @Inject constructor(
             READ_LOG,
             DELETE_ACCOUNT,
             RUN_BACKGROUND_SYNC,
-            AGE_LAST_SYNC,
+            EXPIRE_SYNC_DEBOUNCE,
         )
         val STAGING_ONLY = setOf(SIMULATE_LOGIN, LOG_OUT_OTHERS, DELETE_ACCOUNT)
         const val NOT_SIGNED_IN = "Not signed in"
