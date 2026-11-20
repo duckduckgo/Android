@@ -58,6 +58,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
+import org.robolectric.shadows.ShadowLog
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -93,6 +94,16 @@ class SegmentSkipDatasetSyncTest {
     }
 
     @After fun clean() { file.delete() }
+
+    @Test fun revisionCheckLogsOnlyForMockBuild() = runTest {
+        ShadowLog.clear()
+        sync.sync()
+        val messages = ShadowLog.getLogsForTag("SegmentSkipMock").map { it.msg }
+        assertEquals(
+            if (BuildConfig.SPONSOR_BLOCK_MOCK) listOf("revision check started", "revision check completed") else emptyList<String>(),
+            messages,
+        )
+    }
 
     @Test fun binaryRequestUsesHashPrefixEndpoint() {
         val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").build().create(SegmentSkipDatasetService::class.java)

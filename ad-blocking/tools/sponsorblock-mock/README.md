@@ -20,6 +20,10 @@ The mock serves the proposed prefix dataset API. It keeps revision history in me
 
 3. Open the [SponsorBlock mock server](http://127.0.0.1:8765/) on your computer.
 
+## Inspect scheduling logs
+
+With the mock-enabled build, run `adb logcat -s SegmentSkipMock:D '*:S'`. The logs show scheduling and cancellation requests, WorkManager's observed states for each unique work name, worker start and result, periodic jitter start and completion, and revision check start, completion, or skip reason. WorkManager state is observed asynchronously and can omit short-lived transitions. Its lists can include historical terminal work; a state does not identify a particular request. A scheduling request does not prove work ran. A cancellation request does not prove work was cancelled, and jitter completion does not measure its duration. The server request log and device storage show the corresponding network and dataset effects.
+
 ## Use the web tool
 
 1. **Edit the draft:** paste a YouTube video URL or ID and select **Add video**. Use **Remove** to remove a prefix. The draft and current dataset display hash prefixes.

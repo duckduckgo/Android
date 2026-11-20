@@ -17,6 +17,7 @@
 package com.duckduckgo.adblocking.impl.segmentskip
 
 import android.content.Context
+import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -34,6 +35,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames
+import com.duckduckgo.adblocking.impl.BuildConfig
 import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
@@ -57,6 +59,7 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -83,9 +86,19 @@ class SegmentSkipDatasetSync @Inject constructor(
     private val syncMutex = Mutex()
 
     suspend fun sync(staleOnly: Boolean = false, enableGeneration: Long? = null) = syncMutex.withLock {
-        if (!feature.mvpEnabled().isEnabled() || preferences.modeFlow().firstOrNull().let { it == null || it == SegmentSkipMode.OFF }) return@withLock
-        if (staleOnly && !freshness.isStale(binary)) return@withLock
-        if (enableGeneration != null && freshness.generation() != enableGeneration) return@withLock
+        if (!feature.mvpEnabled().isEnabled() || preferences.modeFlow().firstOrNull().let { it == null || it == SegmentSkipMode.OFF }) {
+            mockLog("check skipped: disabled")
+            return@withLock
+        }
+        if (staleOnly && !freshness.isStale(binary)) {
+            mockLog("check skipped: fresh")
+            return@withLock
+        }
+        if (enableGeneration != null && freshness.generation() != enableGeneration) {
+            mockLog("check skipped: superseded")
+            return@withLock
+        }
+        mockLog("revision check started")
         val latest = try {
             requireNotNull(service.revision().revision).also { require(it in 0..0xffffffffL) }
         } catch (e: CancellationException) {
@@ -106,6 +119,7 @@ class SegmentSkipDatasetSync @Inject constructor(
         }
         currentCoroutineContext().ensureActive()
         freshness.recordSuccess()
+        mockLog("revision check completed")
     }
 
     private suspend fun download(revision: Long, expected: Long, requireFull: Boolean = false) = coroutineScope {
@@ -198,19 +212,31 @@ class SegmentSkipDatasetWorker(context: Context, parameters: WorkerParameters) :
     @Inject lateinit var freshness: SegmentSkipDatasetFreshness
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        if (!feature.mvpEnabled().isEnabled()) return@withContext Result.success()
+        if (!feature.mvpEnabled().isEnabled()) {
+            mockLog("worker skipped: disabled")
+            return@withContext Result.success()
+        }
         try {
             val force = inputData.getBoolean(FORCE_CHECK, false)
             val periodic = inputData.getBoolean(PERIODIC_CHECK, false)
             val generation = if (force) inputData.getLong(ENABLE_GENERATION, 0) else if (periodic) freshness.generation() else null
-            if (periodic) delay(Random.nextLong(1, TimeUnit.MINUTES.toMillis(5) + 1))
+            mockLog("worker started: ${if (periodic) "periodic" else if (force) "forced" else "catch-up"}")
+            if (periodic) {
+                mockLog("periodic jitter started")
+                delay(Random.nextLong(1, TimeUnit.MINUTES.toMillis(5) + 1))
+                mockLog("periodic jitter completed")
+            }
             sync.sync(staleOnly = !force && !periodic, enableGeneration = generation)
+            mockLog("worker result: success")
             Result.success()
         } catch (e: UnsupportedSegmentSkipFormat) {
+            mockLog("worker result: unsupported format")
             Result.success()
         } catch (e: CancellationException) {
+            mockLog("worker cancelled")
             throw e
         } catch (e: Exception) {
+            mockLog("worker result: retry")
             Result.retry()
         }
     }
@@ -263,6 +289,16 @@ class SegmentSkipDatasetScheduler @Inject constructor(
     private val schedulingMutex = Mutex()
 
     override fun onCreate(owner: LifecycleOwner) {
+        if (BuildConfig.SPONSOR_BLOCK_MOCK) {
+            listOf(WORK_NAME, ENABLE_WORK_NAME, CATCH_UP_WORK_NAME).forEach { name ->
+                scope.launch {
+                    workManager.getWorkInfosForUniqueWorkFlow(name)
+                        .map { infos -> infos.map { it.state }.toSet() }
+                        .distinctUntilChanged()
+                        .collect { states -> mockLog("work $name: ${if (states.isEmpty()) "NONE" else states.sortedBy { it.name }.joinToString()}") }
+                }
+            }
+        }
         scope.launch {
             var previous: Boolean? = null
             combine(preferences.modeFlow(), feature.mvpEnabled().enabled()) { mode, enabled ->
@@ -303,6 +339,7 @@ class SegmentSkipDatasetScheduler @Inject constructor(
             .setConstraints(networkConstraints())
             .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 1, TimeUnit.MINUTES)
             .build()
+        mockLog("schedule requested: periodic")
         workManager.enqueueUniquePeriodicWork(WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
     }
 
@@ -317,10 +354,12 @@ class SegmentSkipDatasetScheduler @Inject constructor(
                 ),
             )
             .build()
+        mockLog("schedule requested: ${if (force) "forced" else "catch-up"}")
         workManager.enqueueUniqueWork(if (force) ENABLE_WORK_NAME else CATCH_UP_WORK_NAME, ExistingWorkPolicy.KEEP, request)
     }
 
     private fun cancelWork() {
+        mockLog("cancellation requested")
         workManager.cancelUniqueWork(WORK_NAME)
         workManager.cancelUniqueWork(ENABLE_WORK_NAME)
         workManager.cancelUniqueWork(CATCH_UP_WORK_NAME)
@@ -333,4 +372,8 @@ class SegmentSkipDatasetScheduler @Inject constructor(
         private const val ENABLE_WORK_NAME = "sponsor_dataset_enable"
         private const val CATCH_UP_WORK_NAME = "sponsor_dataset_catch_up"
     }
+}
+
+private fun mockLog(message: String) {
+    if (BuildConfig.SPONSOR_BLOCK_MOCK) Log.d("SegmentSkipMock", message)
 }

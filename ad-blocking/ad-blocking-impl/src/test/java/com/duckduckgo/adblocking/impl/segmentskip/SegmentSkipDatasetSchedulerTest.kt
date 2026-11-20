@@ -27,6 +27,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -58,6 +59,7 @@ class SegmentSkipDatasetSchedulerTest {
     private lateinit var scheduler: SegmentSkipDatasetScheduler
 
     @Before fun setup() {
+        whenever(workManager.getWorkInfosForUniqueWorkFlow(any())).thenReturn(flowOf(emptyList()))
         whenever(feature.mvpEnabled()).thenReturn(toggle)
         whenever(toggle.isEnabled()).thenReturn(true)
         whenever(toggle.enabled()).thenReturn(enabled)

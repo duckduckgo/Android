@@ -28,9 +28,11 @@ android {
     buildTypes {
         debug {
             def mockServer = providers.gradleProperty('sponsorBlockMock').map { it == 'true' }.getOrElse(false)
+            buildConfigField 'boolean', 'SPONSOR_BLOCK_MOCK', mockServer.toString()
             buildConfigField 'String', 'SPONSOR_BLOCK_BASE_URL', mockServer ? '"http://127.0.0.1:8765/sponsorblock/v1"' : '"https://protection.duckduckgo.com/api/protection/segments/v1/android"'
         }
         release {
+            buildConfigField 'boolean', 'SPONSOR_BLOCK_MOCK', 'false'
             buildConfigField 'String', 'SPONSOR_BLOCK_BASE_URL', '"https://protection.duckduckgo.com/api/protection/segments/v1/android"'
         }
     }
