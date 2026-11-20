@@ -125,8 +125,12 @@ class RealClientToolsExecutor @Inject constructor(
         }
         val names = RequestAccess.parseCapabilities(request.input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
         val chatId = context.chatId ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
-        val enabledTools = tools.getPlugins().filter { it.isEnabled() }.associateBy { it.name }
-        return when (val decision = permissionGate.requestAccess(names.mapNotNull { enabledTools[it] }, chatId, context)) {
+        val toolsByName = tools.getPlugins().associateBy { it.name }
+        if (names.any { toolsByName[it]?.permissionMode is ClientToolPermissionMode.AskEveryTime }) {
+            return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
+        }
+        val servable = names.mapNotNull { name -> toolsByName[name]?.takeIf { it.isEnabled() } }
+        return when (val decision = permissionGate.requestAccess(servable, chatId, context)) {
             is ClientToolAccessDecision.Granted -> {
                 val access = JSONObject()
                 names.forEach { access.put(it, (decision.access[it] ?: ClientToolAccessLevel.NOT_GRANTED).wireName) }

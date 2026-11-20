@@ -986,27 +986,20 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenRequestAccessNamesAskEveryTimeToolThenItIsNeitherAskedNorGranted() = runTest {
+    fun whenRequestAccessNamesAskEveryTimeToolThenInvalidArgumentsWithoutPrompt() = runTest {
         enableRequestAccess()
 
-        val reply = async { requestAccess("onceTool", "askTool") }
-        runCurrent()
-        assertEquals(listOf(AskingTool("askTool", ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
-        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
-        assertAccess(reply.await(), "onceTool" to "notGranted", "askTool" to "chat")
-
-        val again = async { executeOnceTool() }
-        runCurrent()
-        assertTrue(prompt.current.request is ClientToolPermissionRequest.RunToolOnce)
-        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
-        again.await()
+        assertFailure("invalid_arguments", requestAccess("onceTool", "askTool"))
+        assertTrue(prompt.prompts.isEmpty())
+        assertFalse(chatGrants.isGranted(CHAT_ID, "askTool"))
     }
 
     @Test
-    fun whenRequestAccessNamesOnlyAskEveryTimeToolThenNothingIsGrantedWithoutPrompt() = runTest {
+    fun whenRequestAccessNamesDisabledAskEveryTimeToolThenInvalidArguments() = runTest {
         enableRequestAccess()
+        onceTool.enabled = false
 
-        assertAccess(requestAccess("onceTool"), "onceTool" to "notGranted")
+        assertFailure("invalid_arguments", requestAccess("onceTool"))
         assertTrue(prompt.prompts.isEmpty())
     }
 

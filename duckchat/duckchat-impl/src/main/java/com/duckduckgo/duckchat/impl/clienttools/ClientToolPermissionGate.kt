@@ -40,7 +40,7 @@ interface ClientToolPermissionGate {
 
     /**
      * Asks once for every tool in [tools] the user has not allowed yet, and grants the ones they allow for [chatId].
-     * Never runs a tool.
+     * Never runs a tool, and never asks for an [ClientToolPermissionMode.AskEveryTime] tool.
      */
     suspend fun requestAccess(
         tools: List<ClientTool>,
