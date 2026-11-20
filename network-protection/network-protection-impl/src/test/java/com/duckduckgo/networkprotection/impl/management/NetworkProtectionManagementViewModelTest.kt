@@ -73,8 +73,10 @@ import com.duckduckgo.networkprotection.store.NetPGeoswitchingRepository.UserPre
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.wireguard.config.Config
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -91,6 +93,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.BufferedReader
 import java.io.StringReader
+import java.util.concurrent.TimeUnit
 
 class NetworkProtectionManagementViewModelTest {
     @get:Rule
@@ -165,6 +168,7 @@ class NetworkProtectionManagementViewModelTest {
         runTest {
             whenever(vpnStateMonitor.isAlwaysOnEnabled()).thenReturn(false)
             whenever(vpnStateMonitor.vpnLastDisabledByAndroid()).thenReturn(false)
+            whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(flowOf(VpnState(state = DISABLED)))
         }
 
         testee = NetworkProtectionManagementViewModel(
@@ -267,6 +271,41 @@ class NetworkProtectionManagementViewModelTest {
             val intent = Intent()
             testee.onRequiredPermissionNotGranted(intent, 1000)
             assertEquals(RequestVPNPermission(intent), this.awaitItem())
+        }
+    }
+
+    @Test
+    fun whenOnStartVpnAndServiceIsSlowToAcknowledgeThenViewStateDoesNotFallBackToDisconnected() = runTest {
+        val vpnState = MutableStateFlow(VpnState(state = DISABLED))
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(vpnState)
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
+
+        testee.viewState().test {
+            assertEquals(Disconnected, awaitItem().connectionState)
+
+            testee.onStartVpn()
+            advanceTimeBy(TimeUnit.SECONDS.toMillis(2))
+            expectNoEvents()
+
+            vpnState.value = VpnState(state = ENABLING)
+            assertEquals(Connecting, awaitItem().connectionState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnStartVpnAndServiceNeverAcknowledgesThenViewStateReEmitsDisconnected() = runTest {
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(MutableStateFlow(VpnState(state = DISABLED)))
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
+
+        testee.viewState().test {
+            assertEquals(Disconnected, awaitItem().connectionState)
+
+            testee.onStartVpn()
+            advanceTimeBy(TimeUnit.SECONDS.toMillis(10))
+
+            assertEquals(Disconnected, awaitItem().connectionState)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

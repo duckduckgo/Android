@@ -83,6 +83,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -352,8 +353,18 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             vpnEnableWideEvent.onStartVpn()
             networkProtectionState.start()
             networkProtectionRepository.enabledTimeInMillis = -1L
-            forceUpdateRunningState()
             tryShowAlwaysOnPromotion()
+            resetToggleIfStartNotAcknowledged()
+        }
+    }
+
+    private suspend fun resetToggleIfStartNotAcknowledged() {
+        // A cold VPN process can take well over a second to write ENABLING; until then the last stored state is the stale DISABLED
+        val acknowledged = withTimeoutOrNull(START_ACK_TIMEOUT_MILLIS) {
+            vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN).firstOrNull { it.state == ENABLING || it.state == ENABLED }
+        }
+        if (acknowledged == null) {
+            refreshVpnRunningState.emit(System.currentTimeMillis())
         }
     }
 
@@ -494,5 +505,9 @@ class NetworkProtectionManagementViewModel @Inject constructor(
         ShowRevoked,
         ShowAlwaysOnLockdownEnabled,
         None,
+    }
+
+    private companion object {
+        private val START_ACK_TIMEOUT_MILLIS = TimeUnit.SECONDS.toMillis(5)
     }
 }
