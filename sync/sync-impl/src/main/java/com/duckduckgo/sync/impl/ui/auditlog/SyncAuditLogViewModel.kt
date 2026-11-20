@@ -19,25 +19,30 @@ package com.duckduckgo.sync.impl.ui.auditlog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
+import kotlin.time.Duration.Companion.seconds
 
 data class SyncAuditLogRow(
     val item: SyncAuditLogItem,
     val time: RelativeTime,
+    val highlighted: Boolean = false,
 )
 
 class SyncAuditLogViewModel @AssistedInject constructor(
     @Assisted private val params: SyncAuditLogScreenParams,
     private val loader: SyncAuditLogLoader,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val stateStore: AuditLogCheckStateStore,
 ) : ViewModel() {
 
     data class ViewState(
@@ -72,7 +77,12 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
 
-    private var lastLoad: SyncAuditLogLoadResult.Loaded? = null
+    private class Session(
+        val monitor: SyncAuditLogUnseenMonitor,
+        var lastLoad: SyncAuditLogLoadResult.Loaded,
+    )
+
+    private var session: Session? = null
     private var retryAllowed = false
 
     init {
@@ -96,39 +106,95 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     }
 
     private fun load() {
-        val previous = lastLoad
-        if (previous != null && !previous.hasMore) return
+        val current = session
+        if (current != null && !current.lastLoad.hasMore) return
 
         _viewState.update { it.copy(status = Status.LOADING) }
         viewModelScope.launch {
-            val result = if (previous == null) {
-                loader.loadLatest(params.entriesPerPage)
-            } else {
-                loader.loadOlder(previous, params.entriesPerPage)
-            }
-            when (result) {
-                SyncAuditLogLoadResult.Failed -> {
-                    // A scroll during the failed load must not count: the retry needs a gesture made after the error shows.
-                    retryAllowed = false
-                    _viewState.update { it.copy(status = Status.FAILED) }
-                }
-                is SyncAuditLogLoadResult.Loaded -> {
-                    lastLoad = result
-                    val newRows = result.items.toRows()
-                    _viewState.update { it.copy(rows = it.rows + newRows, status = Status.IDLE, hasMore = result.hasMore) }
-                }
+            if (current == null) loadLatest() else loadOlder(current)
+        }
+    }
+
+    private suspend fun loadLatest() {
+        val monitor = readUnseenMonitor()
+        when (val result = loader.loadLatest(params.entriesPerPage)) {
+            SyncAuditLogLoadResult.Failed -> onLoadFailed()
+            is SyncAuditLogLoadResult.Loaded -> {
+                session = Session(monitor, result)
+                markSeen(monitor, newestEntryId = result.pages.entries.firstOrNull()?.id)
+                onLoaded(result, monitor.unseenIds(result.pages.entries, result.items))
             }
         }
     }
 
+    private suspend fun loadOlder(session: Session) {
+        val previous = session.lastLoad
+        when (val result = loader.loadOlder(previous, params.entriesPerPage)) {
+            SyncAuditLogLoadResult.Failed -> onLoadFailed()
+            is SyncAuditLogLoadResult.Loaded -> {
+                session.lastLoad = result
+                val newEntries = result.pages.entries.drop(previous.pages.entries.size)
+                onLoaded(result, session.monitor.unseenIds(newEntries, result.items))
+            }
+        }
+    }
+
+    private fun onLoadFailed() {
+        // A scroll during the failed load must not count: the retry needs a gesture made after the error shows.
+        retryAllowed = false
+        _viewState.update { it.copy(status = Status.FAILED) }
+    }
+
+    private fun onLoaded(
+        result: SyncAuditLogLoadResult.Loaded,
+        unseenIds: Set<String>,
+    ) {
+        val newRows = result.toRows(unseenIds)
+        _viewState.update { it.copy(rows = it.rows + newRows, status = Status.IDLE, hasMore = result.hasMore) }
+    }
+
+    private suspend fun readUnseenMonitor(): SyncAuditLogUnseenMonitor {
+        val state = stateStore.read()
+        return SyncAuditLogUnseenMonitor(state.pendingLogins.mapTo(HashSet()) { it.entryId }, state.lastSeenEntryId)
+    }
+
+    // Only the logins read at open: a check that runs during the load can add one this screen does not show.
+    private suspend fun markSeen(
+        monitor: SyncAuditLogUnseenMonitor,
+        newestEntryId: String?,
+    ) {
+        stateStore.update { state ->
+            val updated = state.copy(
+                pendingLogins = state.pendingLogins.filterNot { it.entryId in monitor.pendingLoginIds },
+                lastSeenEntryId = newestEntryId ?: state.lastSeenEntryId,
+            )
+            updated.takeIf { it != state }
+        }
+    }
+
     // Times are fixed when a page loads: the screen does not refresh while it is open.
-    private fun List<SyncAuditLogItem>.toRows(): List<SyncAuditLogRow> {
+    private fun SyncAuditLogLoadResult.Loaded.toRows(unseenIds: Set<String>): List<SyncAuditLogRow> {
         val now = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
-        return map { SyncAuditLogRow(it, RelativeTime.between(it.occurredAt, now)) }
+        endHighlightLater(unseenIds)
+        return items.map { SyncAuditLogRow(it, RelativeTime.between(it.occurredAt, now), highlighted = it.entryId in unseenIds) }
+    }
+
+    private fun endHighlightLater(ids: Set<String>) {
+        if (ids.isEmpty()) return
+        viewModelScope.launch {
+            delay(HIGHLIGHT_DURATION)
+            _viewState.update { state ->
+                state.copy(rows = state.rows.map { if (it.item.entryId in ids) it.copy(highlighted = false) else it })
+            }
+        }
     }
 
     @AssistedFactory
     interface Factory {
         fun create(params: SyncAuditLogScreenParams): SyncAuditLogViewModel
+    }
+
+    private companion object {
+        val HIGHLIGHT_DURATION = 3.seconds
     }
 }

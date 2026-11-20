@@ -26,6 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogEntryBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogErrorBinding
@@ -37,6 +38,7 @@ import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.Header
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.LoadMoreFailed
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.LoadingMore
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Footer
+import com.duckduckgo.mobile.android.R as CommonR
 
 sealed interface SyncAuditLogListItem {
     data object Header : SyncAuditLogListItem
@@ -108,6 +110,7 @@ private class EntryViewHolder(private val binding: ItemSyncAuditLogEntryBinding)
             setPrimaryText(context.getString(R.string.syncAuditLogRowTitle, row.time.format(context.resources), context.getString(action)))
             setSecondaryText(row.item.deviceName)
             setLeadingIconDrawable(icon(row.item))
+            if (row.highlighted) setBackgroundColor(context.getColorFromAttr(CommonR.attr.daxColorAccentAltPrimary)) else background = null
         }
     }
 
