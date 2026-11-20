@@ -95,6 +95,22 @@
                 android:layout_marginStart="10dp"
                 android:text="Open Device Activity screen" />
 
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/openSyncAuditLogSmallPagesButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="Open Device Activity: 5 per page" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="Same screen, but reads 5 entries per page instead of 100. Use it to test loading more on scroll with only a few entries: the server rate limits logins, so 100+ entries are hard to make."
+                app:textType="secondary"
+                app:typography="caption" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/serverLogResultTextView"
                 android:layout_width="match_parent"

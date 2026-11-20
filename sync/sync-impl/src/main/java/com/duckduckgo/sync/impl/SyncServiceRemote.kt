@@ -96,6 +96,7 @@ interface SyncApi {
     fun getAuditLogBefore(
         token: String,
         cursor: String,
+        limit: Int? = null,
     ): AuditLogResult
 
     /**
@@ -333,7 +334,8 @@ class SyncServiceRemote @Inject constructor(
     override fun getAuditLogBefore(
         token: String,
         cursor: String,
-    ): AuditLogResult = fetchAuditLog(token, after = null, before = cursor, limit = null)
+        limit: Int?,
+    ): AuditLogResult = fetchAuditLog(token, after = null, before = cursor, limit = limit)
 
     private fun fetchAuditLog(
         token: String,

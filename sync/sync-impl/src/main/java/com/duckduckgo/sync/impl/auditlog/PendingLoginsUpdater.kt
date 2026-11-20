@@ -105,7 +105,7 @@ class RealPendingLoginsUpdater @Inject constructor(
         )
     }
 
-    private fun newLogins(
+    private suspend fun newLogins(
         newestFirst: List<DecodedAuditLogEntry>,
         oldestFirst: List<Decoded>,
         ownDeviceId: String,

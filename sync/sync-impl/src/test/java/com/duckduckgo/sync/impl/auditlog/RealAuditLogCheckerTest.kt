@@ -72,7 +72,7 @@ class RealAuditLogCheckerTest {
         stateStore = stateStore,
         entryDecoder = decoder,
         pendingLoginsUpdater = RealPendingLoginsUpdater(
-            RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor),
+            RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, coroutineTestRule.testDispatcherProvider),
             deviceInfoDecryptor,
             coroutineTestRule.testDispatcherProvider,
         ),
@@ -464,7 +464,7 @@ class RealAuditLogCheckerTest {
             byId[entry.id] = entry
         }
 
-        override fun decode(entries: List<AuditLogEntry>): AuditLogDecodeResult {
+        override suspend fun decode(entries: List<AuditLogEntry>): AuditLogDecodeResult {
             val reason = keyUnavailableReason
             val decoded = entries.map { if (reason != null) Skipped(it.id, AuditLogEntrySkipReason.KEY_NOT_FOUND) else byId.getValue(it.id) }
             return AuditLogDecodeResult(decoded, reason)
