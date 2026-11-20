@@ -388,9 +388,9 @@ dependencies {
     implementation project(":onboarding-impl")
     implementation project(':page-translation-api')
     implementation project(':page-translation-impl')
-    // temporary inclusion to ensure blockstore integration
-    implementation project(':persistent-storage-api')
-    implementation project(':persistent-storage-api')
+    implementation(project(':persistent-storage-api')) {
+        because 'temporary inclusion to ensure blockstore integration'
+    }
     implementation project(":pir-api")
     implementation project(":pir-impl")
     implementation project(':privacy-config-api')
@@ -459,25 +459,19 @@ dependencies {
     implementation project(":widget-api")
     implementation project(':windows-api')
     implementation project(':windows-impl')
-    // Browser
     implementation "androidx.browser:browser:_"
-    // Widgets
     implementation "androidx.core:core-remoteviews:_"
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"
-    // PDF Viewer
     implementation "androidx.pdf:pdf-viewer-fragment:_"
     implementation "androidx.work:work-multiprocess:_"
-    // Lottie
     implementation "com.airbnb.android:lottie:_"
     implementation "com.duckduckgo.urlpredictor:url-predictor-android:_"
     implementation "com.facebook.shimmer:shimmer:_"
-    // Glide
     implementation "com.github.bumptech.glide:glide:_"
     implementation "com.github.bumptech.glide:okhttp3-integration:_"
     implementation("com.google.guava:guava:_")
     implementation "com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:_"
-    // RxRelay
     implementation "com.jakewharton.rxrelay2:rxrelay:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-kotlin:_"
@@ -488,32 +482,27 @@ dependencies {
     implementation "io.reactivex.rxjava2:rxandroid:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
     implementation 'nl.dionsegijn:konfetti:1.2.5'
-    // Required by LevelDB
-    implementation("org.iq80.snappy:snappy:_")
-    // HTML
+    implementation("org.iq80.snappy:snappy:_") {
+        because 'LevelDB declares Snappy as optional, so it is not added transitively'
+    }
     implementation 'org.jsoup:jsoup:_'
     implementation AndroidX.activity.compose
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
-    // Android KTX
     implementation AndroidX.core.ktx
     implementation AndroidX.core.splashscreen
     implementation AndroidX.fragment.ktx
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.lifecycle.process
-    // ViewModel and LiveData
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.recyclerView
-    // Room
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    // Security crypto
     implementation AndroidX.security.crypto
     implementation AndroidX.swipeRefreshLayout
     implementation AndroidX.webkit
-    // WorkManager
     implementation AndroidX.work.runtimeKtx
     implementation AndroidX.work.rxJava2
     implementation Google.android.material
@@ -552,8 +541,9 @@ dependencies {
     internalImplementation project(':traces-api')
     internalImplementation project(':traces-impl')
     internalImplementation project(':vpn-internal')
-    // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
-    internalImplementation AndroidX.tracing
+    internalImplementation(AndroidX.tracing) {
+        because 'it backs the internal-flavor PageLoadTracer; other flavors bind a no-op instead'
+    }
 
     playImplementation project(':credential-exchange-impl')
     playImplementation project(':persistent-storage-impl')
@@ -573,8 +563,8 @@ dependencies {
     testImplementation AndroidX.work.testing
     testImplementation CashApp.turbine
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation Square.okHttp3.mockWebServer
@@ -598,14 +588,12 @@ dependencies {
     androidTestImplementation AndroidX.work.testing
     androidTestImplementation CashApp.turbine
     androidTestImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     androidTestImplementation Square.okHttp3.mockWebServer
 
-    // Testing dependencies
-    androidTestUtil AndroidX.test.orchestrator
     androidTestUtil AndroidX.test.orchestrator
 
     baselineProfile project(':macrobenchmark')
