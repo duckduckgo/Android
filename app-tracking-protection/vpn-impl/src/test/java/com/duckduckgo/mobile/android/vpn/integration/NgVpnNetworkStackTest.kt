@@ -23,6 +23,7 @@ import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
+import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
@@ -76,6 +77,11 @@ class NgVpnNetworkStackTest {
             coroutineRule.testDispatcherProvider,
             fakeDnsProvider,
         )
+    }
+
+    @Test
+    fun whenAppTpTunnelRunsThenItDoesNotRouteThisAppsTraffic() {
+        assertFalse(ngVpnNetworkStack.routesOwnTraffic)
     }
 
     @Test
@@ -285,6 +291,45 @@ class NgVpnNetworkStackTest {
             ),
             config.addresses,
         )
+    }
+
+    @Test
+    fun whenNetworkNotAllowedAndPrivateDnsConfiguredThenNeedsNetworkWithoutResolvingPrivateDns() = runTest {
+        whenever(appBuildConfig.model).thenReturn("")
+        fakeDnsProvider.privateDnsConfigured = true
+        fakeDnsProvider.mutablePrivateDns.add(InetAddress.getLocalHost())
+        whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
+
+        val configResult = ngVpnNetworkStack.onPrepareVpn(networkAllowed = false)
+
+        assertTrue(configResult.exceptionOrNull() is VpnNetworkStack.NeedsNetworkException)
+        assertEquals(0, fakeDnsProvider.privateDnsLookups)
+    }
+
+    @Test
+    fun whenNetworkNotAllowedAndPrivateDnsNotConfiguredThenReturnConfig() = runTest {
+        whenever(appBuildConfig.model).thenReturn("")
+        whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf("com.example.excluded"))
+
+        val config = ngVpnNetworkStack.onPrepareVpn(networkAllowed = false).getOrThrow()
+
+        assertEquals(1500, config.mtu)
+        assertTrue(config.dns.isEmpty())
+        assertEquals(setOf("com.example.excluded"), config.appExclusionList)
+    }
+
+    @Test
+    fun whenNetworkAllowedAndPrivateDnsConfiguredThenResolvePrivateDnsAndConfigureEmptyDns() = runTest {
+        whenever(appBuildConfig.model).thenReturn("moto g play")
+        fakeDnsProvider.privateDnsConfigured = true
+        fakeDnsProvider.mutablePrivateDns.add(InetAddress.getLocalHost())
+        fakeDnsProvider.mutableSystemDns.add(InetAddress.getLocalHost())
+        whenever(trackingProtectionAppsRepository.getExclusionAppsList()).thenReturn(listOf())
+
+        val config = ngVpnNetworkStack.onPrepareVpn(networkAllowed = true).getOrThrow()
+
+        assertTrue(config.dns.isEmpty())
+        assertEquals(1, fakeDnsProvider.privateDnsLookups)
     }
 
     @Test

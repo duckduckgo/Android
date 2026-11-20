@@ -359,11 +359,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             null
         }
 
-        // This app's traffic still goes through the current tunnel, so the in-place prepare runs without the network: a
-        // call into a dead tunnel would hang. A stack that needs the network is prepared behind the null-route tunnel.
+        // When the current tunnel carries this app's traffic, the in-place prepare runs without the network: a call into
+        // a dead tunnel would hang. Then a stack that needs the network is prepared behind the null-route tunnel.
         val inPlacePrepareResult = handover?.let {
             vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
-            it.next.onPrepareVpn(networkAllowed = false)
+            it.next.onPrepareVpn(networkAllowed = it.nextMayUseNetwork)
         }
         if (inPlacePrepareResult?.exceptionOrNull() is VpnNetworkStack.NeedsNetworkException) {
             logcat { "VPN log: in-place prepare needs the network, falling back to the null-route tunnel" }

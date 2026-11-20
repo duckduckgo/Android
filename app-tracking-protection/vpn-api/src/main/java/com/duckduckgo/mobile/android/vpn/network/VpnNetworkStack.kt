@@ -26,6 +26,15 @@ interface VpnNetworkStack {
     val name: String
 
     /**
+     * `true` when this stack's tunnel carries this app's own traffic. While such a tunnel runs, a network call made by
+     * this app goes through it and hangs if the tunnel is dead, so an in-place restart prepares the next stack with
+     * `networkAllowed = false`. A tunnel that excludes this app leaves its traffic on the underlying network. Defaults to
+     * `true`, so a stack that does not declare it costs an unneeded fallback rather than a hang.
+     */
+    val routesOwnTraffic: Boolean
+        get() = true
+
+    /**
      *
      * @return `true` if the networking layer is successfully created, `false` otherwise
      */
@@ -34,10 +43,11 @@ interface VpnNetworkStack {
     /**
      * Called before the vpn tunnel is created and before the vpn is started.
      *
-     * @param networkAllowed `false` when this app's network calls must not be made, e.g. during an in-place restart,
-     * where the running tunnel routes this app and a call into a dead tunnel hangs. A stack that cannot prepare without
-     * the network then fails fast with [NeedsNetworkException], and the caller prepares it again with the network
-     * allowed once this app's traffic no longer goes through the running tunnel.
+     * @param networkAllowed `false` when this app's network calls must not be made: during an in-place restart from a
+     * stack whose tunnel [routesOwnTraffic], a call into that tunnel hangs if it is dead. It is about the running tunnel,
+     * not this stack's own, so every stack honors it. A stack that cannot prepare without the network then fails fast
+     * with [NeedsNetworkException], and the caller prepares it again with the network allowed once this app's traffic
+     * no longer goes through the running tunnel.
      *
      * @return VpnTunnelConfig that will be used to configures the VPN's tunnel.
      *
