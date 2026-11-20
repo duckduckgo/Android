@@ -21,6 +21,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -38,7 +39,7 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesTo
 import dev.zacsweers.metro.Provides
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Qualifier
@@ -108,7 +109,7 @@ internal class RealAgeSignalsStore @Inject constructor(
 
     override suspend fun lastPromptShownAt(): Long? = read()[PROMPT_SHOWN_AT]
 
-    private suspend fun read(): Preferences = withContext(dispatchers.io()) { store.data.first() }
+    private suspend fun read(): Preferences = withContext(dispatchers.io()) { store.data.firstOrNull() ?: emptyPreferences() }
 
     private fun MutablePreferences.setOutcome(name: String, at: Long) {
         this[OUTCOME] = name
