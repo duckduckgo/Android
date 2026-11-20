@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
+import com.duckduckgo.duckchat.impl.models.newChatSelection
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
@@ -90,6 +91,8 @@ class ReasoningModePickerViewModel @Inject constructor(
     // Named distinctly from the [PickerSurface] param on [onModeTapped] to avoid shadowing.
     private var pixelSurface: DuckChatPixelSurface = DuckChatPixelSurface.ADDRESS_BAR
 
+    private var nativeState: NativeInputState? = null
+
     init {
         viewModelScope.launch {
             // collectLatest: cancel in-flight lookup on chatId flip to avoid stale currentChat.
@@ -101,11 +104,14 @@ class ReasoningModePickerViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch {
-            nativeInputStateProvider.state.collect { pixelSurface = DuckChatPixelSurface.from(it.inputContext) }
+            nativeInputStateProvider.state.collect {
+                nativeState = it
+                pixelSurface = DuckChatPixelSurface.from(it.inputContext)
+            }
         }
     }
 
-    /** Existing chat: rows derive from the chat's model. Otherwise: from the global selection. */
+    /** Existing chat: rows derive from the chat's model. Otherwise: from the tab's new-chat selection. */
     val state: StateFlow<ReasoningModePickerState> = combine(
         modelManager.modelState,
         nativeInputStateProvider.state,
@@ -128,8 +134,9 @@ class ReasoningModePickerViewModel @Inject constructor(
         if (nativeState.chatId != null && chatResolution == null) {
             return ReasoningModePickerState(visible = false, sections = emptyList(), displayedMode = null)
         }
-        val available = chatResolution?.available ?: modelState.availableReasoningModes
-        val persistedMode = chatResolution?.mode ?: modelState.selectedReasoningMode
+        val newChat = modelState.newChatSelection(nativeState)
+        val available = chatResolution?.available ?: newChat.available
+        val persistedMode = chatResolution?.mode ?: newChat.mode
         val displayedMode = ReasoningResolver.resolveMode(persistedMode, available)
         val visible = available.size > 1 && available.any { it.isAccessible }
         val sections = buildSections(available, displayedMode, modelState)
@@ -158,6 +165,11 @@ class ReasoningModePickerViewModel @Inject constructor(
     private val command = Channel<UpsellCommand>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     val commands: Flow<UpsellCommand> = command.receiveAsFlow()
 
+    private val newChatModePickChannel = Channel<ReasoningMode>(capacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
+    /** Modes picked for the tab's next new chat; the view hands them to the host. */
+    val newChatModePicks: Flow<ReasoningMode> = newChatModePickChannel.receiveAsFlow()
+
     fun onPickerShown(surface: PickerSurface) {
         duckChatPixels.fireReasoningEffortPickerShown(surface.origin)
         state.value.sections.firstNotNullOfOrNull { it.gatedHeader }?.let { header ->
@@ -176,7 +188,9 @@ class ReasoningModePickerViewModel @Inject constructor(
         val modelState = modelManager.modelState.value
         val chat = currentChat.value
         val chatResolution = chat?.let { ReasoningResolver.forChat(it, modelState) }
-        val available = chatResolution?.available ?: modelState.availableReasoningModes
+        val available = chatResolution?.available
+            ?: nativeState?.let { modelState.newChatSelection(it).available }
+            ?: modelState.availableReasoningModes
 
         val match = available.firstOrNull { it.mode == mode }
         if (match == null) {
@@ -191,6 +205,8 @@ class ReasoningModePickerViewModel @Inject constructor(
             }
             if (chatResolution != null) {
                 viewModelScope.launch { modelManager.setChatScopedReasoningMode(mode) }
+            } else if (duckChatFeature.resetModelForNewChats().isEnabled()) {
+                newChatModePickChannel.trySend(mode)
             } else {
                 viewModelScope.launch { modelManager.selectReasoningMode(mode) }
             }

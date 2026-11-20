@@ -56,11 +56,15 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.NewChatSelection
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.models.newChatSelection
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -94,6 +98,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -142,6 +147,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val newChatHintsPixels: NewChatHintsPixels,
     private val newChatDetector: NewChatDetector,
     private val tabRepository: TabRepository,
+    private val newChatHintCommands: NewChatHintCommands,
 ) : ViewModel() {
 
     // The first prompt is the one that accepts the terms, so while they are pending the keyboard must not submit:
@@ -213,6 +219,16 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 }
             }
         }
+        viewModelScope.launch {
+            // Hints switch the model through this widget, the single writer of the tab's pick.
+            newChatHintCommands.commandsFor { activeTabId.value }
+                .filterIsInstance<NewChatHintCommand.PickModel>()
+                .collect { command ->
+                    nativeInputStatePublisher.update(command.tabId) { it.copy(newChatModelId = command.modelId) }
+                    // Launched: this collector is a subscriber of the same flow, so sending inline would wait on itself.
+                    viewModelScope.launch { newChatHintCommands.send(command.then) }
+                }
+        }
     }
 
     /**
@@ -271,6 +287,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         if (chat != null && ReasoningResolver.forChat(chat, modelManager.modelState.value) != null) {
             return chat.model
         }
+        // A chat started from a pick is sent with it even where the picker is off, as the contextual sheet's running chat is.
+        newChatSelection()?.let { return it.modelId }
         // Existing chat whose model is no longer in the list: fall through to global so submission
         // carries (global model, global effort). New chat with picker off: nothing to send.
         if (chat == null && !_modelPickerEnabled.value) return null
@@ -278,11 +296,35 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun getResolvedReasoningEffort(): String? {
-        val chat = validChat() ?: return modelManager.getResolvedReasoningEffort()
+        val chat = validChat()
+        if (chat == null) {
+            val selection = newChatSelection() ?: return modelManager.getResolvedReasoningEffort()
+            return selection.effort?.rawValue
+        }
         val resolution = ReasoningResolver.forChat(chat, modelManager.modelState.value)
             ?: return modelManager.getResolvedReasoningEffort()
         val mode = ReasoningResolver.resolveMode(persisted = resolution.mode, available = resolution.available)
         return ReasoningResolver.effortFor(mode, resolution.available)?.rawValue
+    }
+
+    // Null without a pick, which leaves the global selection, or while the tab shows a stored chat, whose model and effort are its own.
+    // A chat not stored yet is the one the pick started, so it keeps the pick until the tab leaves it.
+    private fun newChatSelection(): NewChatSelection? {
+        if (validChat() != null) return null
+        val state = currentInputState()
+            ?.takeIf { it.newChatModelId != null || it.newChatReasoningMode != null }
+            ?: return null
+        return modelManager.modelState.value.newChatSelection(state)
+    }
+
+    fun pickNewChatModel(modelId: String) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = modelId) }
+    }
+
+    fun pickNewChatReasoningMode(mode: String) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(newChatReasoningMode = mode) }
     }
 
     fun getSelectedTool(): String? {
@@ -484,7 +526,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun selectModelById(modelId: String) {
         val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
-        viewModelScope.launch { modelManager.selectModel(model) }
+        if (duckChatFeature.resetModelForNewChats().isEnabled()) {
+            pickNewChatModel(model.id)
+        } else {
+            viewModelScope.launch { modelManager.selectModel(model) }
+        }
     }
 
     fun hasActiveChat(): Boolean = currentInputState()?.chatId != null
@@ -688,7 +734,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             // Reset submitEnabled to true if we changed chats.
             // Always end the model-change window since it's per-visit.
             val submitEnabled = if (current.chatId != chatId) true else current.submitEnabled
-            current.copy(chatId = chatId, submitEnabled = submitEnabled, modelChangeMode = false)
+            // A pick lasts for the chat it started, so leaving that chat returns the tab's next new chat to the default.
+            val leavesChat = current.chatId != null && current.chatId != chatId
+            current.copy(
+                chatId = chatId,
+                submitEnabled = submitEnabled,
+                modelChangeMode = false,
+                newChatModelId = current.newChatModelId.takeUnless { leavesChat },
+                newChatReasoningMode = current.newChatReasoningMode.takeUnless { leavesChat },
+            )
         }
         currentChatJob?.cancel()
         currentChat.value = null
@@ -718,9 +772,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             null
         }
         // An "open Duck.ai for image generation" launch preselects image generation on the new tab.
-        // The image-capable model was already selected when the launch was requested.
+        // The image-capable model was already selected, or held for this chat, when the launch was requested.
         if (isDuckAiMode && forceImageGeneration) {
             nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+        }
+        // Only a tab on a new chat can be the one a launch opened.
+        if (isDuckAiMode && nativeInputStateProvider.stateForTab(tabId).value.chatId == null) {
+            modelManager.consumeLaunchedNewChatModel()?.let { modelId ->
+                nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = modelId, newChatReasoningMode = null) }
+            }
         }
     }
 

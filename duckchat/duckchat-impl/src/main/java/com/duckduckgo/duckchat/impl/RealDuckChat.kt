@@ -739,7 +739,7 @@ class RealDuckChat @Inject constructor(
         val imageCapableModel = state.models.firstOrNull {
             it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
         } ?: return false
-        duckAiModelManager.selectModel(imageCapableModel)
+        duckAiModelManager.selectModelForLaunchedNewChat(imageCapableModel)
         return true
     }
 

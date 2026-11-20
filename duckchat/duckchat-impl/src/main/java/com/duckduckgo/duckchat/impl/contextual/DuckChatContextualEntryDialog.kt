@@ -273,8 +273,14 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureQuickAction() {
         binding.entryPromptQuickAction.setOnClickListener {
             if (viewModel.viewState.value.attachedContext == null) return@setOnClickListener
-            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(summarizePromptResource()), null, null, null, null, null))
+            viewModel.onSummarizeSubmitted(promptWithComposerSelection(getString(summarizePromptResource())))
         }
+    }
+
+    // Prompts sent around the composer still start on the model and reasoning picked in it.
+    private fun promptWithComposerSelection(prompt: String): NativeInputPrompt {
+        val widget = binding.entryNativeInputCard.widget
+        return NativeInputPrompt(prompt, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), null, null, null)
     }
 
     private fun configureWindowInsets() {
@@ -299,7 +305,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun configureSuggestions() {
         binding.entrySuggestionsView.onSuggestionSelected = { suggestion ->
-            viewModel.onSuggestionSubmitted(NativeInputPrompt(suggestion.prompt, null, null, null, null, null))
+            viewModel.onSuggestionSubmitted(promptWithComposerSelection(suggestion.prompt))
         }
 
         binding.entrySuggestionsView.onContentChanged = { updateQuickActionVisibility() }
@@ -367,7 +373,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     ) {
         if (query.isBlank()) return
         if (isDuckAiResult) {
-            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null), voice = true)
+            viewModel.onPromptSubmitted(promptWithComposerSelection(query), voice = true)
         } else {
             startActivity(browserNav.openInNewTab(requireContext(), query))
             dismiss()

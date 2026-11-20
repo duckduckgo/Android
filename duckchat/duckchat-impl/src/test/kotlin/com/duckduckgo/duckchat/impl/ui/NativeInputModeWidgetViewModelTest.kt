@@ -57,11 +57,14 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
+import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
+import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
@@ -170,6 +173,7 @@ class NativeInputModeWidgetViewModelTest {
         chatStateStore,
     )
     private val nativeInputStatePublisher: NativeInputStatePublisher = realNativeInputStateStore
+    private val newChatHintCommands = NewChatHintCommands()
     private val nativeInputStateProvider: NativeInputStateProvider = realNativeInputStateStore
 
     private val showSettingsFlow = MutableStateFlow(false)
@@ -281,6 +285,7 @@ class NativeInputModeWidgetViewModelTest {
             newChatHintsPixels = newChatHintsPixels,
             newChatDetector = newChatDetector,
             tabRepository = tabRepository,
+            newChatHintCommands = newChatHintCommands,
         )
     }
 
@@ -1565,6 +1570,216 @@ class NativeInputModeWidgetViewModelTest {
 
         verify(modelManager).setChatScopedReasoningMode(null)
     }
+
+    // region new-chat picks
+
+    private fun givenNewChatModels() {
+        whenever(modelManager.getSelectedModelId()).thenReturn("default-model")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("none")
+        modelStateFlow.value = ModelState(
+            models = listOf(
+                aiModel(id = "default-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+                aiModel(id = "picked-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+            ),
+            selectedModelId = "default-model",
+            selectedReasoningMode = ReasoningMode.FAST,
+            availableReasoningModes = ReasoningResolver.availableModes(listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+        )
+    }
+
+    @Test
+    fun whenNewChatModelPickedThenSubmissionUsesPickWithDefaultMode() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.pickNewChatModel("picked-model")
+
+        assertEquals("picked-model", viewModel.getSelectedModelId())
+        assertEquals("none", viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenNewChatReasoningModePickedThenSubmissionUsesPickedEffort() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING.rawValue)
+
+        assertEquals("default-model", viewModel.getSelectedModelId())
+        assertEquals("low", viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenNewChatPickIsForAnotherTabThenSubmissionUsesDefault() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("picked-model")
+
+        viewModel.configure(tabId = "tab-B", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals("default-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenChatStartedFromPickIsNotStoredYetThenFollowUpsUsePickWithPickerOff() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING.rawValue)
+
+        viewModel.onPromptSubmitted()
+        viewModel.setActiveChatId("chat-1")
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+
+        assertEquals("picked-model", viewModel.getSelectedModelId())
+        assertEquals("low", viewModel.getResolvedReasoningEffort())
+    }
+
+    @Test
+    fun whenTabLeavesChatStartedFromPickThenPickCleared() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING.rawValue)
+        viewModel.onPromptSubmitted()
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        viewModel.setActiveChatId(null)
+        advanceUntilIdle()
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertNull(state.newChatModelId)
+        assertNull(state.newChatReasoningMode)
+        assertEquals("default-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenNoPickAndPickerOffInUnstoredChatThenNoModelSent() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.setActiveChatId("chat-1")
+        viewModel.setModelPickerEnabled(false)
+        advanceUntilIdle()
+
+        assertNull(viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenPromptSubmittedInExistingChatThenPickKept() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        viewModel.onPromptSubmitted()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+    }
+
+    @Test
+    fun whenTabAttachedToChatWithGoneModelThenPickIgnored() = runTest {
+        givenNewChatModels()
+        whenever(duckAiChatStore.getChatById("chat-1")).thenReturn(
+            DuckAiChat(chatId = "chat-1", title = "t", model = "missing-model", lastEdit = "now", pinned = false),
+        )
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.setActiveChatId("chat-1")
+        advanceUntilIdle()
+
+        assertEquals("default-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenDuckAiConfiguredWithLaunchedModelThenItBecomesThePick() = runTest {
+        givenNewChatModels()
+        whenever(modelManager.consumeLaunchedNewChatModel()).thenReturn("picked-model")
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+    }
+
+    @Test
+    fun whenBrowserConfiguredThenLaunchedModelNotTaken() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        verify(modelManager, never()).consumeLaunchedNewChatModel()
+    }
+
+    @Test
+    fun whenTabOnExistingChatConfiguredThenLaunchedModelNotTaken() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        nativeInputStatePublisher.update("tab-A") { it.copy(chatId = "chat-1") }
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        verify(modelManager, never()).consumeLaunchedNewChatModel()
+    }
+
+    @Test
+    fun whenHintPicksModelForActiveTabThenItBecomesThePickBeforeFollowUpIsSent() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        newChatHintCommands.commandsFor { "tab-A" }.test {
+            newChatHintCommands.send(NewChatHintCommand.PickModel("tab-A", "picked-model", then = NewChatHintCommand.OpenPhoto("tab-A")))
+            assertEquals(NewChatHintCommand.PickModel("tab-A", "picked-model", then = NewChatHintCommand.OpenPhoto("tab-A")), awaitItem())
+
+            val followUp = awaitItem()
+
+            assertEquals(NewChatHintCommand.OpenPhoto("tab-A"), followUp)
+            assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndModelSelectedByIdThenPickedForTabNotGlobally() = runTest {
+        givenNewChatModels()
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.selectModelById("picked-model")
+        advanceUntilIdle()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        verify(modelManager, never()).selectModel(any())
+    }
+
+    // endregion
 
     private fun aiModel(id: String, supported: List<ReasoningEffort>): AIChatModel = AIChatModel(
         id = id,

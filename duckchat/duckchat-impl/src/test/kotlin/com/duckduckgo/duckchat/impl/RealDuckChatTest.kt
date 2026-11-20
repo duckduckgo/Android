@@ -2011,7 +2011,7 @@ class RealDuckChatTest {
         testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(mockDuckAiModelManager).selectModel(capable)
+        verify(mockDuckAiModelManager).selectModelForLaunchedNewChat(capable)
         verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(true), any(), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }

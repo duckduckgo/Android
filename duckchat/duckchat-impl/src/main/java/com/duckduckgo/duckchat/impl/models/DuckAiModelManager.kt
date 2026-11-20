@@ -44,6 +44,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 data class ModelState(
@@ -83,6 +84,16 @@ interface DuckAiModelManager {
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
 
+    /**
+     * Starts the next new chat a launch opens (e.g. the subscription onboarding) on [model]. When new chats reset to
+     * the default, [model] is held for that chat only and `true` is returned; otherwise it is selected as
+     * [selectModel] does and `false` is returned.
+     */
+    suspend fun selectModelForLaunchedNewChat(model: AIChatModel): Boolean
+
+    /** Takes the model held by [selectModelForLaunchedNewChat], if any; only the first caller gets it. */
+    fun consumeLaunchedNewChatModel(): String?
+
     fun getSelectedModelId(): String?
 
     fun getResolvedReasoningEffort(): String?
@@ -112,6 +123,8 @@ class RealDuckAiModelManager @Inject constructor(
     // consistent view of the previous state.
     private val stateMutex = Mutex()
 
+    private val launchedNewChatModelId = AtomicReference<String?>(null)
+
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
             try {
@@ -121,7 +134,13 @@ class RealDuckAiModelManager @Inject constructor(
                 logcat { "Duck.ai Model Manager: failed to clear pinned default model: ${e.message}" }
             }
             try {
-                stateMutex.withLock { restoreCachedSelection() }
+                // With new chats reset to the default, the last pick must not show, nor be left to the page, before the first fetch lands.
+                if (resetsNewChats()) {
+                    val defaultModelId = DEFAULT_MODEL_IDS[resolveUserTier()]
+                    stateMutex.withLock { seedDefaultSelection(defaultModelId) }
+                } else {
+                    stateMutex.withLock { restoreCachedSelection() }
+                }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
             }
@@ -178,6 +197,11 @@ class RealDuckAiModelManager @Inject constructor(
         )
     }
 
+    private fun seedDefaultSelection(defaultModelId: String?) {
+        if (_modelState.value.selectedModelId != null) return
+        _modelState.value = _modelState.value.copy(selectedModelId = defaultModelId, selectedReasoningMode = DEFAULT_REASONING_MODE)
+    }
+
     override suspend fun fetchModels() {
         subscriptionChangeObserver.start()
         withContext(dispatcherProvider.io()) {
@@ -207,7 +231,7 @@ class RealDuckAiModelManager @Inject constructor(
                 stateMutex.withLock {
                     // Selection is resolved before sorting so the derived default keeps following
                     // endpoint order, and only the picker's display order changes.
-                    val selectedModelId = resolveSelection(models)
+                    val selectedModelId = resolveSelection(models, userTier)
                     val displayModels = models.sortLabelledFirst()
                     val selectedModel = models.find { it.id == selectedModelId }
                     val available = ReasoningResolver.availableModes(
@@ -215,7 +239,7 @@ class RealDuckAiModelManager @Inject constructor(
                         effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
                         isEligible = isSubscriptionEligible,
                     )
-                    val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+                    val nextReasoningMode = validateAndPersistReasoningMode(lastUsedReasoningMode(), available)
 
                     _modelState.value = _modelState.value.copy(
                         models = displayModels,
@@ -266,15 +290,15 @@ class RealDuckAiModelManager @Inject constructor(
      * pick the user never made. A persisted provider is kept even when nothing matches, since the
      * provider may return to the response later.
      */
-    private suspend fun resolveSelection(models: List<AIChatModel>): String? {
-        val persistedId = dataStore.getSelectedModel()?.id
+    private suspend fun resolveSelection(models: List<AIChatModel>, userTier: UserTier): String? {
+        val persistedId = lastUsedModelId(userTier)
         if (persistedId != null) {
             val persisted = models.find { it.id == persistedId }
             if (persisted != null && persisted.isAccessible) return persistedId
-            dataStore.setSelectedModel(null)
+            saveLastUsed { setSelectedModel(null) }
         }
 
-        val persistedProvider = ModelProvider.fromNameOrNull(dataStore.getSelectedProvider())
+        val persistedProvider = lastUsedProvider()
         if (persistedProvider != null) {
             val model = models.firstOrNull { it.provider == persistedProvider && it.isAccessible }
             if (model != null) return model.id
@@ -286,11 +310,38 @@ class RealDuckAiModelManager @Inject constructor(
     private companion object {
         const val MAX_LABEL_LENGTH = 40
         const val PINNED_DEFAULT_MODEL_ID = "gpt-5.4-mini"
+
+        // Hardcoded until the models endpoint reports a default per tier.
+        val DEFAULT_MODEL_IDS = mapOf(
+            UserTier.FREE to "gpt-6-luna",
+            UserTier.PLUS to "gpt-5.6-terra",
+            UserTier.PRO to "gpt-5.6-terra",
+        )
+        val DEFAULT_REASONING_MODE = ReasoningMode.FAST
+    }
+
+    private fun resetsNewChats(): Boolean = duckChatFeature.value.resetModelForNewChats().isEnabled()
+
+    // While new chats reset to the default, the tier default stands in for the last used pick. The saved
+    // pick is only read around, never cleared, so turning the flag off restores it.
+    private suspend fun lastUsedModelId(userTier: UserTier): String? =
+        if (resetsNewChats()) DEFAULT_MODEL_IDS[userTier] else dataStore.getSelectedModel()?.id
+
+    private suspend fun lastUsedProvider(): ModelProvider? =
+        if (resetsNewChats()) null else ModelProvider.fromNameOrNull(dataStore.getSelectedProvider())
+
+    private fun lastUsedReasoningMode(): ReasoningMode? =
+        if (resetsNewChats()) DEFAULT_REASONING_MODE else _modelState.value.selectedReasoningMode
+
+    private suspend fun saveLastUsed(write: suspend DuckChatDataStore.() -> Unit) {
+        if (!resetsNewChats()) dataStore.write()
     }
 
     override suspend fun selectModel(model: AIChatModel) {
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
+                // While new chats reset to the default, picks belong to a tab's next new chat, not to the global selection.
+                if (resetsNewChats()) return@withLock
                 dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
                 dataStore.setSelectedProvider(null)
                 publishSelection(modelId = model.id, model = model)
@@ -302,11 +353,12 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun selectProvider(provider: ModelProvider) {
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
+                if (resetsNewChats()) return@withLock
                 dataStore.setSelectedModel(null)
                 dataStore.setSelectedProvider(provider.name)
 
                 val models = _modelState.value.models
-                val selectedModelId = resolveSelection(models)
+                val selectedModelId = resolveSelection(models, _modelState.value.userTier)
                 publishSelection(modelId = selectedModelId, model = models.find { it.id == selectedModelId })
                 logcat { "Duck.ai Model Manager: selected provider ${provider.name}, resolved model $selectedModelId" }
             }
@@ -326,7 +378,7 @@ class RealDuckAiModelManager @Inject constructor(
             effortAccess = model?.reasoningEffortAccess.orEmpty(),
             isEligible = _modelState.value.isSubscriptionEligible,
         )
-        val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+        val nextReasoningMode = validateAndPersistReasoningMode(lastUsedReasoningMode(), available)
         _modelState.value = _modelState.value.copy(
             selectedModelId = modelId,
             selectedModelShortName = model?.shortName,
@@ -340,6 +392,7 @@ class RealDuckAiModelManager @Inject constructor(
             stateMutex.withLock {
                 val match = _modelState.value.availableReasoningModes.firstOrNull { it.mode == mode }
                 if (match == null || !match.isAccessible) return@withLock
+                if (resetsNewChats()) return@withLock
                 dataStore.setSelectedReasoningMode(mode.rawValue)
                 _modelState.value = _modelState.value.copy(selectedReasoningMode = mode)
                 logcat { "Duck.ai Model Manager: selected reasoning mode ${mode.rawValue}" }
@@ -352,6 +405,18 @@ class RealDuckAiModelManager @Inject constructor(
             _modelState.value = _modelState.value.copy(chatScopedReasoningMode = mode)
         }
     }
+
+    override suspend fun selectModelForLaunchedNewChat(model: AIChatModel): Boolean {
+        val resets = withContext(dispatcherProvider.io()) { resetsNewChats() }
+        if (!resets) {
+            selectModel(model)
+            return false
+        }
+        launchedNewChatModelId.set(model.id)
+        return true
+    }
+
+    override fun consumeLaunchedNewChatModel(): String? = launchedNewChatModelId.getAndSet(null)
 
     override fun getSelectedModelId(): String? = _modelState.value.selectedModelId
 
@@ -368,7 +433,7 @@ class RealDuckAiModelManager @Inject constructor(
         if (match != null && match.isAccessible) return persisted
         val next = available.firstOrNull { it.isAccessible }?.mode
         if (next != persisted) {
-            dataStore.setSelectedReasoningMode(next?.rawValue)
+            saveLastUsed { setSelectedReasoningMode(next?.rawValue) }
         }
         return next
     }

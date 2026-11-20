@@ -95,6 +95,28 @@ class EffectiveModelProviderTest {
     }
 
     @Test
+    fun whenTabHasNoChatAndANewChatPickThenPickIsEffective() = runTest {
+        publish(NativeInputState.zero().copy(newChatModelId = "chat-model"))
+
+        assertEquals("chat-model", testee.resolvedModelId())
+    }
+
+    @Test
+    fun whenTabChatIsNotStoredYetThenNewChatPickIsEffective() = runTest {
+        publish(NativeInputState.zero().copy(chatId = "chat-1", newChatModelId = "chat-model"))
+
+        assertEquals("chat-model", testee.resolvedModelId())
+    }
+
+    @Test
+    fun whenTabHasAChatThenNewChatPickIsIgnored() = runTest {
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "model-we-lost-access-to")
+        publish(NativeInputState.zero().copy(chatId = "chat-1", newChatModelId = "chat-model"))
+
+        assertEquals("global-model", testee.resolvedModelId())
+    }
+
+    @Test
     fun whenActiveChatHasModelThenChatModelIsEffective() = runTest {
         chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1"))

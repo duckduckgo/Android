@@ -88,6 +88,12 @@ interface NativeInputHost {
     /** The user picked a model during the FE model-change recovery flow. */
     fun changeModelSubmitted(modelId: String)
 
+    /** The user picked a model for this tab's next new chat. */
+    fun pickNewChatModel(modelId: String)
+
+    /** The user picked a reasoning mode (its raw value) for this tab's next new chat. */
+    fun pickNewChatReasoningMode(mode: String)
+
     /** Ask the host to run the camera capture flow; the activity owns the result plumbing. */
     fun requestCameraCapture(callback: ValueCallback<Array<Uri>>)
 

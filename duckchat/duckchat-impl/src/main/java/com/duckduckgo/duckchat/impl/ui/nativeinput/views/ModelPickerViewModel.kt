@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.impl.models.ModelLabel
 import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.models.newChatSelection
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -66,6 +67,9 @@ data class ModelSection(
 /** Emitted when the user picks a model during the FE recovery model-change flow. */
 sealed class PickerModelChange {
     data class ChangeModel(val modelId: String) : PickerModelChange()
+
+    /** Emitted when the user picks a model for the tab's next new chat. */
+    data class PickNewChatModel(val modelId: String) : PickerModelChange()
 }
 
 @ContributesViewModel(ViewScope::class)
@@ -92,6 +96,9 @@ class ModelPickerViewModel @Inject constructor(
     // currentChat, which can still be resolving when the user picks.
     private var publishedChatId: String? = null
 
+    // The tab's pending new-chat pick; null while the tab is attached to a chat.
+    private var newChatModelId: String? = null
+
     // The pixel surface for the active tab, tracked from the published input context.
     // Named distinctly from the [PickerSurface] param on [onModelTapped] to avoid shadowing.
     private var pixelSurface: DuckChatPixelSurface = DuckChatPixelSurface.ADDRESS_BAR
@@ -115,6 +122,7 @@ class ModelPickerViewModel @Inject constructor(
             nativeInputStateProvider.state.collect { state ->
                 modelChangeMode = state.modelChangeMode
                 publishedChatId = state.chatId
+                newChatModelId = state.newChatModelId.takeIf { state.chatId == null }
                 pixelSurface = DuckChatPixelSurface.from(state.inputContext)
                 if (!state.modelChangeMode) {
                     recoverySelectedModelId.value = null
@@ -175,8 +183,11 @@ class ModelPickerViewModel @Inject constructor(
         recoverySelectedModelId.value?.let { return it }
         val chat = currentChat.value
         if (modelChangeMode && chat != null) return chat.model
-        return modelManager.modelState.value.selectedModelId
+        return newChatModelIdOrDefault()
     }
+
+    private fun newChatModelIdOrDefault(): String? =
+        modelManager.modelState.value.newChatSelection(pickedModelId = newChatModelId, pickedReasoningMode = null).modelId
 
     var menuShowing = false
 
@@ -228,6 +239,11 @@ class ModelPickerViewModel @Inject constructor(
                 recoverySelectedModelId.value = model.id
                 effectiveModelProvider.onRecoveryModelPicked(chatId = publishedChatId, modelId = model.id)
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
+            } else if (duckChatFeature.resetModelForNewChats().isEnabled()) {
+                if (model.id != newChatModelIdOrDefault()) {
+                    duckChatPixels.fireModelSelected(model.id, pixelSurface)
+                }
+                modelChangeChannel.trySend(PickerModelChange.PickNewChatModel(model.id))
             } else {
                 if (model.id != modelManager.getSelectedModelId()) {
                     duckChatPixels.fireModelSelected(model.id, pixelSurface)

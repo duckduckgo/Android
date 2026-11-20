@@ -124,13 +124,13 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     /** A suggested prompt was picked; suggestions are page-specific, so attach the context before submit. */
     fun onSuggestionSubmitted(prompt: NativeInputPrompt) {
         if (_viewState.value.attachedContext == null && !hasTextSelections()) latestValidPageContext?.let { attach(it) }
-        fireUnifiedInputPromptSubmitted()
+        fireUnifiedInputPromptSubmitted(prompt)
         inputOutcomeTracker.suggestedPrompt()
         submit(prompt, carriesTermsConsent = false)
     }
 
     fun onSummarizeSubmitted(prompt: NativeInputPrompt) {
-        fireUnifiedInputPromptSubmitted()
+        fireUnifiedInputPromptSubmitted(prompt)
         inputOutcomeTracker.suggestedPrompt()
         submit(prompt, carriesTermsConsent = false)
     }
@@ -139,11 +139,11 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         submit(prompt, voice = voice)
     }
 
-    private fun fireUnifiedInputPromptSubmitted() {
+    private fun fireUnifiedInputPromptSubmitted(prompt: NativeInputPrompt) {
         duckChatPixels.firePromptSubmitted(
             selectedTool = "none",
-            modelId = modelManager.getSelectedModelId(),
-            reasoningEffort = modelManager.getResolvedReasoningEffort(),
+            modelId = prompt.modelId ?: modelManager.getSelectedModelId(),
+            reasoningEffort = prompt.reasoningEffort ?: modelManager.getResolvedReasoningEffort(),
             hasImageAttachment = false,
             hasFileAttachment = false,
             hasText = true,

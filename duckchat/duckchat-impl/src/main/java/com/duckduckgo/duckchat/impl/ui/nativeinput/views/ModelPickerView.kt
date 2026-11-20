@@ -197,6 +197,7 @@ class ModelPickerView @JvmOverloads constructor(
                         host?.changeModelSubmitted(change.modelId)
                         dismissPopup()
                     }
+                    is PickerModelChange.PickNewChatModel -> host?.pickNewChatModel(change.modelId)
                 }
             }
             .launchIn(scope)

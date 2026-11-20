@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.nativeinput
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.newChatSelection
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import dev.zacsweers.metro.ContributesBinding
@@ -81,6 +82,7 @@ class RealEffectiveModelProvider @Inject constructor(
         val modelChangeMode: Boolean,
         val chatModel: String?,
         val resolved: Boolean,
+        val newChatModelId: String? = null,
     )
 
     // Keyed by chat: two tabs can sit in a model-change window at once, and each keeps its own pick.
@@ -92,13 +94,17 @@ class RealEffectiveModelProvider @Inject constructor(
         .onStart { emit(null) }
 
     private val activeChat: Flow<ActiveChat> = combine(
-        nativeInputStateProvider.state.map { it.chatId to it.modelChangeMode }.distinctUntilChanged(),
+        nativeInputStateProvider.state.map { Triple(it.chatId, it.modelChangeMode, it.newChatModelId) }.distinctUntilChanged(),
         chats,
-    ) { (chatId, modelChangeMode), chats ->
+    ) { (chatId, modelChangeMode, newChatModelId), chats ->
         when {
-            chatId == null -> ActiveChat(null, modelChangeMode, null, resolved = true)
+            chatId == null -> ActiveChat(null, modelChangeMode, null, resolved = true, newChatModelId = newChatModelId)
             chats == null -> ActiveChat(chatId, modelChangeMode, null, resolved = false)
-            else -> ActiveChat(chatId, modelChangeMode, chats.firstOrNull { it.chatId == chatId }?.model, resolved = true)
+            else -> {
+                val stored = chats.firstOrNull { it.chatId == chatId }
+                // A chat not stored yet is the one the tab's pick started.
+                ActiveChat(chatId, modelChangeMode, stored?.model, resolved = true, newChatModelId = newChatModelId.takeIf { stored == null })
+            }
         }
     }
 
@@ -114,7 +120,8 @@ class RealEffectiveModelProvider @Inject constructor(
             ?.takeIf { it in modelIds }
         EffectiveModel.Resolved(
             chatId = chat.chatId,
-            modelId = recovered ?: chat.chatModel?.takeIf { it in modelIds } ?: modelState.selectedModelId,
+            modelId = recovered ?: chat.chatModel?.takeIf { it in modelIds }
+                ?: modelState.newChatSelection(pickedModelId = chat.newChatModelId, pickedReasoningMode = null).modelId,
         )
     }.distinctUntilChanged()
 
