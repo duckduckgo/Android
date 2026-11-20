@@ -333,4 +333,12 @@ interface DuckChatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun newChatHints(): Toggle
+
+    /**
+     * @return `true` when new Duck.ai chats start on the tier's default model and reasoning mode instead of
+     * the last-used one, and a pick made for a new chat applies only to that tab until the chat is sent.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun resetModelForNewChats(): Toggle
 }
