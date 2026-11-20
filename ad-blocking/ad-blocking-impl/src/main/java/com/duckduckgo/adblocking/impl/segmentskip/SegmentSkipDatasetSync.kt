@@ -203,7 +203,7 @@ class SegmentSkipDatasetWorker(context: Context, parameters: WorkerParameters) :
             val force = inputData.getBoolean(FORCE_CHECK, false)
             val periodic = inputData.getBoolean(PERIODIC_CHECK, false)
             val generation = if (force) inputData.getLong(ENABLE_GENERATION, 0) else if (periodic) freshness.generation() else null
-            delay(Random.nextLong(1, TimeUnit.MINUTES.toMillis(5) + 1))
+            if (periodic) delay(Random.nextLong(1, TimeUnit.MINUTES.toMillis(5) + 1))
             sync.sync(staleOnly = !force && !periodic, enableGeneration = generation)
             Result.success()
         } catch (e: UnsupportedSegmentSkipFormat) {

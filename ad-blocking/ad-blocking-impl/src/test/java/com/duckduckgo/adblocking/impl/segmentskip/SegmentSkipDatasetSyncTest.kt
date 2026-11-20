@@ -235,7 +235,7 @@ class SegmentSkipDatasetSyncTest {
     }
 
     @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
-    @Test fun workerDelaysBothEnableAndRegularChecksAndCanBeCancelled() = runTest {
+    @Test fun oneTimeChecksRequestRevisionImmediately() = runTest {
         whenever(freshness.generation()).thenReturn(0L)
         for (force in listOf(false, true)) {
             val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context)
@@ -246,24 +246,40 @@ class SegmentSkipDatasetSyncTest {
                     it.dispatchers = coroutineRule.testDispatcherProvider
                     it.freshness = freshness
                 }
-            val scheduler = coroutineRule.testScope.testScheduler
             val before = service.revisionRequests
-            val cancelled = coroutineRule.testScope.launch { worker.doWork() }
-            scheduler.runCurrent()
-            assertEquals(before, service.revisionRequests)
-            cancelled.cancelAndJoin()
-            scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
-            scheduler.runCurrent()
-            assertEquals(before, service.revisionRequests)
-
             val check = coroutineRule.testScope.launch { worker.doWork() }
-            scheduler.runCurrent()
-            assertEquals(before, service.revisionRequests)
-            scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
-            scheduler.runCurrent()
-            check.join()
+            coroutineRule.testScope.testScheduler.runCurrent()
             assertEquals(before + 1, service.revisionRequests)
+            check.join()
         }
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun periodicCheckWaitsAndCanBeCancelled() = runTest {
+        val worker = TestListenableWorkerBuilder<SegmentSkipDatasetWorker>(context)
+            .setInputData(workDataOf(SegmentSkipDatasetWorker.PERIODIC_CHECK to true))
+            .build().also {
+                it.sync = sync
+                it.feature = feature
+                it.dispatchers = coroutineRule.testDispatcherProvider
+                it.freshness = freshness
+            }
+        val scheduler = coroutineRule.testScope.testScheduler
+        val cancelled = coroutineRule.testScope.launch { worker.doWork() }
+        scheduler.runCurrent()
+        assertEquals(0, service.revisionRequests)
+        cancelled.cancelAndJoin()
+        scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
+        scheduler.runCurrent()
+        assertEquals(0, service.revisionRequests)
+
+        val check = coroutineRule.testScope.launch { worker.doWork() }
+        scheduler.runCurrent()
+        assertEquals(0, service.revisionRequests)
+        scheduler.advanceTimeBy(TimeUnit.MINUTES.toMillis(5) + 1)
+        scheduler.runCurrent()
+        check.join()
+        assertEquals(1, service.revisionRequests)
     }
 
     @Test fun consecutivePeriodicChecksRunEvenWhenPreviousCheckIsStillFresh() = runTest {
