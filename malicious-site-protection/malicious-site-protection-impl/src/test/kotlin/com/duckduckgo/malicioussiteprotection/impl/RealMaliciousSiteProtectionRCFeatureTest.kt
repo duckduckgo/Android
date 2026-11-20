@@ -8,6 +8,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor.PLAY
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -31,6 +32,26 @@ class RealMaliciousSiteProtectionRCFeatureTest {
         isMainProcess = true,
         appCoroutineScope = coroutinesTestRule.testScope,
     )
+
+    @Test
+    fun `when remote settings are absent hash prefix frequency defaults to 480 minutes`() {
+        fakeMaliciousSiteProtectionFeature.self().setRawStoredState(State(enable = true))
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertEquals(480L, testee.getHashPrefixUpdateFrequency())
+    }
+
+    @Test
+    fun `when remote settings supply hash prefix frequency it overrides the fallback`() {
+        fakeMaliciousSiteProtectionFeature.self().setRawStoredState(
+            State(enable = true, settings = """{"hashPrefixUpdateFrequency": 20, "filterSetUpdateFrequency": 720}"""),
+        )
+
+        testee.onPrivacyConfigDownloaded()
+
+        assertEquals(20L, testee.getHashPrefixUpdateFrequency())
+    }
 
     @Test
     fun `when RC is enabled but flavor is fdroid then return false`() {
