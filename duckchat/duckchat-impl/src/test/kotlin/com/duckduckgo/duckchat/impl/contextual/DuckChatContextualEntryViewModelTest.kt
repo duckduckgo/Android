@@ -71,6 +71,7 @@ class DuckChatContextualEntryViewModelTest {
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
     private val samplePrompt = NativeInputPrompt("hi", "model-1", "high", "tool-1", null, null)
+    private val promptWithoutSelection = NativeInputPrompt("hi", null, null, null, null, null)
 
     @Test
     fun whenValidPageContextReceivedThenAttached() {
@@ -186,13 +187,39 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
-    fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+    fun whenSuggestionSubmittedWithComposerSelectionThenPixelReportsIt() = runTest {
         viewModel.start("tab-1")
         whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
         whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
 
         viewModel.commands.test {
             viewModel.onSuggestionSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "model-1",
+            reasoningEffort = "high",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab-1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+    }
+
+    @Test
+    fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+        viewModel.start("tab-1")
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        viewModel.commands.test {
+            viewModel.onSuggestionSubmitted(promptWithoutSelection)
             assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
         }
 
@@ -219,7 +246,7 @@ class DuckChatContextualEntryViewModelTest {
         whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
 
         viewModel.commands.test {
-            viewModel.onSummarizeSubmitted(samplePrompt)
+            viewModel.onSummarizeSubmitted(promptWithoutSelection)
             assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
         }
 
