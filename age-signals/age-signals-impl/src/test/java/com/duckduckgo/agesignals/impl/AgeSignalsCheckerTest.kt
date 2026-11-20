@@ -123,8 +123,9 @@ class AgeSignalsCheckerTest {
             resetStore()
             val manager = provider.use(RecordingManager(scenario.fake!!.toFakeManager()))
 
-            checker.check { activity }
+            val returned = checker.check { activity }
 
+            assertEquals("$scenario returned", expected.outcome, returned)
             assertEquals("$scenario calls", expected.calls, manager.calls)
             when (val outcome = expected.outcome) {
                 is Failed -> {
@@ -173,8 +174,9 @@ class AgeSignalsCheckerTest {
     fun whenNoActivityIsAvailableToRequestAccessThenNothingIsRecordedAndAccessIsNotRequested() = runTest {
         val manager = provider.use(RecordingManager(SHARED.fake!!.toFakeManager()))
 
-        checker.check { null }
+        val returned = checker.check { null }
 
+        assertNull(returned)
         assertEquals(FEATURES_ONLY, manager.calls)
         assertNull(store.lastOutcome())
         assertNull(store.lastFailure())
@@ -324,6 +326,8 @@ class AgeSignalsCheckerTest {
         fun <T : AgeSignalsManager> use(manager: T): T = manager.also { this.manager = it }
 
         override suspend fun get(): AgeSignalsManager = manager!!
+
+        override suspend fun isFakeScenarioActive(): Boolean = false
     }
 
     private class FakeTimeProvider : CurrentTimeProvider {

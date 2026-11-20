@@ -1,0 +1,32 @@
+// Play Age Signals API pixels: health of the automatic check that runs once per app launch
+{
+    "m_age_signals_check": {
+        "description": "Fires when the automatic Play Age Signals check that runs once per app launch ends with a recorded result. Reports only whether the check succeeded or failed, and the error code on failure. It never says which result Play returned. Not sent when the check is run from the internal dev screen or against a simulated result.",
+        "owners": ["cmonfortep"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "petal",
+            {
+                "key": "result",
+                "type": "string",
+                "description": "Whether the check completed (success) or ended with an error (failure)",
+                "enum": ["success", "failure"]
+            },
+            {
+                "key": "error_code",
+                "type": "string",
+                "description": "Sent only when result is failure. The Play Age Signals error code, 'timeout' when a Play call took longer than 60 seconds, or 'unknown' for a code the app does not recognize",
+                "enum": ["-1", "-2", "-3", "-4", "-5", "-6", "-7", "-8", "-9", "-10", "-11", "-100", "timeout", "unknown"]
+            }
+        ]
+    },
+    "m_age_signals_prompt_shown": {
+        "description": "Fires when Google Play's age-sharing consent screen opens inside the app. The app only calls the step that can open this screen after Play reports that age sharing is mandatory for the user, so this pixel implies the user is in a region where Play requires it. Carries no other data.",
+        "owners": ["cmonfortep"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "petal"]
+    }
+}
