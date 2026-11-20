@@ -22,6 +22,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -45,6 +46,34 @@ class VpnNetworkStackHandoverTest {
         val handover = VpnNetworkStackHandover(current = current, next = next)
 
         assertFalse(handover.isSameStack)
+    }
+
+    @Test
+    fun whenNetPRestartsInPlaceThenNextMayNotUseNetwork() {
+        val netp = stack(routesOwnTraffic = true)
+
+        assertFalse(VpnNetworkStackHandover(current = netp, next = netp).nextMayUseNetwork)
+    }
+
+    @Test
+    fun whenSwitchingFromNetPToAppTpThenNextMayNotUseNetwork() {
+        val handover = VpnNetworkStackHandover(current = stack(routesOwnTraffic = true), next = stack(routesOwnTraffic = false))
+
+        assertFalse(handover.nextMayUseNetwork)
+    }
+
+    @Test
+    fun whenSwitchingFromAppTpToNetPThenNextMayUseNetwork() {
+        val handover = VpnNetworkStackHandover(current = stack(routesOwnTraffic = false), next = stack(routesOwnTraffic = true))
+
+        assertTrue(handover.nextMayUseNetwork)
+    }
+
+    @Test
+    fun whenAppTpRestartsInPlaceThenNextMayUseNetwork() {
+        val appTp = stack(routesOwnTraffic = false)
+
+        assertTrue(VpnNetworkStackHandover(current = appTp, next = appTp).nextMayUseNetwork)
     }
 
     @Test
@@ -104,20 +133,6 @@ class VpnNetworkStackHandoverTest {
     }
 
     @Test
-    fun whenNextNeedsNetworkToPrepareThenDoesNotSupportInPlaceRestart() {
-        whenever(next.needsNetworkToPrepare).thenReturn(true)
-
-        assertFalse(VpnNetworkStackHandover.supportsInPlaceRestart(next))
-    }
-
-    @Test
-    fun whenNextDoesNotNeedNetworkToPrepareThenSupportsInPlaceRestart() {
-        whenever(next.needsNetworkToPrepare).thenReturn(false)
-
-        assertTrue(VpnNetworkStackHandover.supportsInPlaceRestart(next))
-    }
-
-    @Test
     fun whenSameStackThenAbortDoesNothing() {
         val handover = VpnNetworkStackHandover(current = current, next = current)
 
@@ -125,5 +140,9 @@ class VpnNetworkStackHandoverTest {
 
         verify(current, never()).onDestroyVpn()
         verify(current, never()).onStopVpn(any())
+    }
+
+    private fun stack(routesOwnTraffic: Boolean): VpnNetworkStack = mock {
+        on { this.routesOwnTraffic } doReturn routesOwnTraffic
     }
 }

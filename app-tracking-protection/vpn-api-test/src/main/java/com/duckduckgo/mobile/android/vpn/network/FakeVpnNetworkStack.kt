@@ -24,7 +24,7 @@ class FakeVpnNetworkStack(override val name: String) : VpnNetworkStack {
         return Result.success(Unit)
     }
 
-    override suspend fun onPrepareVpn(): Result<VpnNetworkStack.VpnTunnelConfig> {
+    override suspend fun onPrepareVpn(networkAllowed: Boolean): Result<VpnNetworkStack.VpnTunnelConfig> {
         return Result.success(
             VpnNetworkStack.VpnTunnelConfig(
                 mtu = 1500,

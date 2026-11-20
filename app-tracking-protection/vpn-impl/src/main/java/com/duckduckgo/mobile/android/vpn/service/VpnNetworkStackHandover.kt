@@ -37,6 +37,10 @@ internal class VpnNetworkStackHandover(
     val isSameStack: Boolean
         get() = current === next
 
+    /** Whether [next] may use the network while it prepares, which this app can do only when [current]'s tunnel does not carry its traffic. */
+    val nextMayUseNetwork: Boolean
+        get() = !current.routesOwnTraffic
+
     /** Stops and tears down [current], recreating it when it is also the stack the restart brings up. */
     fun switch() {
         current.onStopVpn(VpnStopReason.RESTART).onFailure {
@@ -55,14 +59,5 @@ internal class VpnNetworkStackHandover(
         if (!isSameStack) {
             next.onDestroyVpn()
         }
-    }
-
-    companion object {
-        /**
-         * Whether [next] can be brought up by an in-place restart, whatever the restartInPlace toggle says. In place,
-         * [next] is prepared while the current tunnel is up, so a stack that needs the network to prepare can have its
-         * calls routed into that tunnel and hang when it is unhealthy.
-         */
-        fun supportsInPlaceRestart(next: VpnNetworkStack): Boolean = !next.needsNetworkToPrepare
     }
 }

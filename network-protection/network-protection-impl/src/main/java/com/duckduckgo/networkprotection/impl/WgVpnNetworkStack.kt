@@ -27,9 +27,11 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.NetPNetworkGate
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
 import com.duckduckgo.networkprotection.impl.configuration.computeBlockMalwareDnsOrSame
+import com.duckduckgo.networkprotection.impl.configuration.isCausedByBlockedNetwork
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
 import com.duckduckgo.networkprotection.impl.portprobing.PortProbingCoordinator
 import com.duckduckgo.networkprotection.impl.portprobing.currentEndpointPort
@@ -40,10 +42,13 @@ import com.wireguard.config.Config
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @ContributesIntoSet(
     scope = VpnScope::class,
@@ -63,59 +68,72 @@ class WgVpnNetworkStack @Inject constructor(
     private val netPSettingsLocalConfig: NetPSettingsLocalConfig,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
     private val portProbingCoordinator: Lazy<PortProbingCoordinator>,
+    private val networkGate: NetPNetworkGate,
 ) : VpnNetworkStack {
     private var wgConfig: Config? = null
 
-    override val name: String = NetPVpnFeature.NETP_VPN.featureName
+    // Overlapping restarts can prepare concurrently, and a network-allowed prepare that overlaps a blocked one
+    // would fail at the process-wide NetPNetworkGate
+    private val prepareMutex = Mutex()
 
-    // Registration with the controller is not excluded from the NetP tunnel, so it would go through the running tunnel
-    override val needsNetworkToPrepare: Boolean = true
+    override val name: String = NetPVpnFeature.NETP_VPN.featureName
 
     override fun onCreateVpn(): Result<Unit> = Result.success(Unit)
 
-    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
-        return try {
+    override suspend fun onPrepareVpn(networkAllowed: Boolean): Result<VpnTunnelConfig> = prepareMutex.withLock {
+        // A prepare that needs the network runs again with the network allowed, and only that one counts as an attempt
+        if (networkAllowed) netpPixels.value.reportEnableAttempt()
+
+        val result = runCatching {
+            if (networkAllowed) prepareTunnelConfig() else networkGate.withNetworkBlocked { prepareTunnelConfig() }
+        }
+        result.exceptionOrNull()?.let { if (it is CancellationException) throw it }
+        if (!networkAllowed) {
+            if (result.exceptionOrNull()?.isCausedByBlockedNetwork() == true) {
+                logcat { "onPrepareVpn needs the network" }
+                return@withLock Result.failure(VpnNetworkStack.NeedsNetworkException())
+            }
             netpPixels.value.reportEnableAttempt()
+        }
 
-            wgConfig = wgTunnelLazy.value.createAndSetWgConfig()
-                .onFailure { netpPixels.value.reportErrorInRegistration() }
-                .getOrThrow()
-            logcat { "Wireguard configuration:\n$wgConfig" }
-
-            wgConfig = if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
-                probeAndSelectPort(wgConfig!!)
-            } else {
-                withServerDefaultPort(wgConfig!!)
-            }
-            wgTunnelConfigLazy.value.setTunnelActivePort(wgConfig!!.currentEndpointPort())
-
-            val privateDns = dnsProvider.getPrivateDns()
-            val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled() && vpnRemoteFeatures.allowDnsBlockMalware().isEnabled()) {
-                // if the user has configured "block malware" we calculate the malware DNS from the DDG default DNS(s)
-                wgConfig!!.`interface`.dnsServers.map { it.computeBlockMalwareDnsOrSame() }.toSet()
-            } else {
-                wgConfig!!.`interface`.dnsServers
-            }
-            Result.success(
-                VpnTunnelConfig(
-                    mtu = wgConfig?.`interface`?.mtu ?: 1280,
-                    addresses = wgConfig!!.`interface`.addresses.associate { Pair(it.address, it.mask) },
-                    // when Android private DNS are set, we return DO NOT configure any DNS.
-                    // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
-                    // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
-                    dns = if (privateDns.isEmpty()) dns else emptySet(),
-                    customDns = if (privateDns.isEmpty()) netPDefaultConfigProvider.fallbackDns() else emptySet(),
-                    routes = wgConfig!!.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
-                    appExclusionList = wgConfig!!.`interface`.excludedApplications,
-                ),
-            ).also { logcat { "Returning VPN configuration: ${it.getOrNull()}" } }
-        } catch (e: Throwable) {
+        result.onFailure { e ->
             logcat(ERROR) { "onPrepareVpn failed due to ${e.asLog()}" }
             crashLogger.logCrash(Crash("vpn_on_prepare_error", e))
-            Result.failure(e)
-        }.onFailure {
             netpPixels.value.reportEnableAttemptFailure()
         }
+    }
+
+    private suspend fun prepareTunnelConfig(): VpnTunnelConfig {
+        wgConfig = wgTunnelLazy.value.createAndSetWgConfig()
+            .onFailure { if (!it.isCausedByBlockedNetwork()) netpPixels.value.reportErrorInRegistration() }
+            .getOrThrow()
+        logcat { "Wireguard configuration:\n$wgConfig" }
+
+        wgConfig = if (vpnRemoteFeatures.endpointPortFallback().isEnabled()) {
+            probeAndSelectPort(wgConfig!!)
+        } else {
+            withServerDefaultPort(wgConfig!!)
+        }
+        wgTunnelConfigLazy.value.setTunnelActivePort(wgConfig!!.currentEndpointPort())
+
+        val privateDnsConfigured = dnsProvider.isPrivateDnsConfigured()
+        val dns = if (netPSettingsLocalConfig.blockMalware().isEnabled() && vpnRemoteFeatures.allowDnsBlockMalware().isEnabled()) {
+            // if the user has configured "block malware" we calculate the malware DNS from the DDG default DNS(s)
+            wgConfig!!.`interface`.dnsServers.map { it.computeBlockMalwareDnsOrSame() }.toSet()
+        } else {
+            wgConfig!!.`interface`.dnsServers
+        }
+        return VpnTunnelConfig(
+            mtu = wgConfig?.`interface`?.mtu ?: 1280,
+            addresses = wgConfig!!.`interface`.addresses.associate { Pair(it.address, it.mask) },
+            // when Android private DNS are set, we return DO NOT configure any DNS.
+            // why? no use intercepting encrypted DNS traffic, plus we can't configure any DNS that doesn't support DoT, otherwise Android
+            // will enforce DoT and will stop passing any DNS traffic, resulting in no DNS resolution == connectivity is killed
+            dns = if (privateDnsConfigured) emptySet() else dns,
+            customDns = if (privateDnsConfigured) emptySet() else netPDefaultConfigProvider.fallbackDns(),
+            routes = wgConfig!!.`interface`.routes.associate { it.address.hostAddress!! to it.mask },
+            appExclusionList = wgConfig!!.`interface`.excludedApplications,
+        ).also { logcat { "Returning VPN configuration: $it" } }
     }
 
     private suspend fun probeAndSelectPort(config: Config): Config = runCatching {

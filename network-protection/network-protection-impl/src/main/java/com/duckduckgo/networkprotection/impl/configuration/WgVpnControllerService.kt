@@ -47,8 +47,11 @@ object WgVpnControllerServiceModule {
     fun provideInternalCustomHttpClient(
         @Named("api") okHttpClient: OkHttpClient,
         dns: Dns,
+        networkGate: NetPNetworkGate,
     ): OkHttpClient {
         return okHttpClient.newBuilder()
+            // First, so a blocked call fails before it connects, looks up the host or fetches an auth token
+            .apply { interceptors().add(0, networkGate.interceptor) }
             .dns(dns)
             .build()
     }

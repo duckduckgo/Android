@@ -18,18 +18,22 @@ package com.duckduckgo.networkprotection.impl.config
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.VpnScope
+import com.duckduckgo.networkprotection.impl.CurrentTimeProvider
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
+import com.duckduckgo.networkprotection.impl.configuration.NetPNetworkGate
 import com.duckduckgo.networkprotection.impl.configuration.VPNExcludedDomainsFallback
 import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListRepository
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.Dns
 import java.net.Inet4Address
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface NetPDefaultConfigProvider {
@@ -43,6 +47,7 @@ interface NetPDefaultConfigProvider {
 }
 
 @ContributesBinding(VpnScope::class)
+@SingleIn(VpnScope::class)
 class RealNetPDefaultConfigProvider @Inject constructor(
     private val netPExclusionListRepository: NetPExclusionListRepository,
     private val dispatcherProvider: DispatcherProvider,
@@ -50,9 +55,19 @@ class RealNetPDefaultConfigProvider @Inject constructor(
     private val systemAppsExclusionRepository: SystemAppsExclusionRepository,
     private val netpVpnSettingsDataStore: NetpVpnSettingsDataStore,
     private val vpnRemoteFeatures: VpnRemoteFeatures,
-    private val dns: Dns,
+    dns: Dns,
+    networkGate: NetPNetworkGate,
     private val excludedDomainsFallback: VPNExcludedDomainsFallback,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) : NetPDefaultConfigProvider {
+    private val dns = networkGate.gate(dns)
+
+    // An in-place restart prepares with NetP's network calls blocked and takes the slower null-route path when it needs
+    // one, so the excluded hosts are reused across restarts. They expire so that a changed host IP, or a hardcoded
+    // fallback IP cached after a failed lookup, is resolved again.
+    @Volatile
+    private var resolvedHosts: ResolvedHosts? = null
+
     override suspend fun exclusionList(): Set<String> {
         return mutableSetOf<String>().apply {
             addAll(netPExclusionListRepository.getExcludedAppPackages())
@@ -65,12 +80,7 @@ class RealNetPDefaultConfigProvider @Inject constructor(
 
         return@withContext if (netPSettingsLocalConfig.vpnExcludeLocalNetworkRoutes().isEnabled()) {
             val routes = if (isLocalDnsEnabled) {
-                // get the all excluded IPs from excluded domains
-                val excludedDomainIps = excludedDomainsFallback.getFallback().keys.map {
-                    dns.lookup(it)
-                }.flatten().filterIsInstance<Inet4Address>()
-                    .mapNotNull { it.hostAddress }
-                    .associateWith { 32 }
+                val excludedDomainIps = excludedDomainIps()
 
                 val excludedRanges = WgVpnRoutes.vpnDefaultExcludedRoutes + excludedDomainIps
                 logcat { "Generating VPN routes dynamically, excluded ranges: $excludedRanges" }
@@ -86,12 +96,7 @@ class RealNetPDefaultConfigProvider @Inject constructor(
             }
         } else {
             val routes = if (isLocalDnsEnabled) {
-                // get the all excluded IPs from excluded domains
-                val excludedDomainIps = excludedDomainsFallback.getFallback().keys.map {
-                    dns.lookup(it)
-                }.flatten().filterIsInstance<Inet4Address>()
-                    .mapNotNull { it.hostAddress }
-                    .associateWith { 32 }
+                val excludedDomainIps = excludedDomainIps()
 
                 val excludedRanges = WgVpnRoutes.vpnExcludedSpecialRoutes + excludedDomainIps
                 logcat { "Generating VPN routes dynamically, excluded ranges: $excludedRanges" }
@@ -109,11 +114,35 @@ class RealNetPDefaultConfigProvider @Inject constructor(
         }
     }
 
+    private fun excludedDomainIps(): Map<String, Int> {
+        freshExcludedDomainIps()?.let { return it }
+
+        val resolvedAtMillis = currentTimeProvider.getTimeInMillis()
+        return excludedDomainsFallback.getFallback().keys.map {
+            dns.lookup(it)
+        }.flatten().filterIsInstance<Inet4Address>()
+            .mapNotNull { it.hostAddress }
+            .associateWith { 32 }
+            .also { resolvedHosts = ResolvedHosts(it, resolvedAtMillis) }
+    }
+
+    private fun freshExcludedDomainIps(): Map<String, Int>? {
+        val hosts = resolvedHosts ?: return null
+        val ageMillis = currentTimeProvider.getTimeInMillis() - hosts.resolvedAtMillis
+        return hosts.ips.takeIf { ageMillis in 0 until RESOLVED_HOSTS_TTL_MILLIS }
+    }
+
     override fun fallbackDns(): Set<InetAddress> {
         return netpVpnSettingsDataStore.customDns?.run {
             runCatching {
                 InetAddress.getAllByName(this).toSet()
             }.getOrDefault(emptySet())
         } ?: emptySet()
+    }
+
+    private class ResolvedHosts(val ips: Map<String, Int>, val resolvedAtMillis: Long)
+
+    private companion object {
+        val RESOLVED_HOSTS_TTL_MILLIS = TimeUnit.HOURS.toMillis(1)
     }
 }

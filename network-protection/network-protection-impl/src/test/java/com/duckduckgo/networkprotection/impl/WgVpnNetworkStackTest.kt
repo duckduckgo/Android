@@ -25,6 +25,7 @@ import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.RESTART
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.networkprotection.impl.config.NetPDefaultConfigProvider
+import com.duckduckgo.networkprotection.impl.configuration.NetPNetworkGate
 import com.duckduckgo.networkprotection.impl.configuration.ServerDetails
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnel
 import com.duckduckgo.networkprotection.impl.configuration.WgTunnelConfig
@@ -38,6 +39,7 @@ import com.duckduckgo.networkprotection.impl.store.NetworkProtectionRepository
 import com.duckduckgo.networkprotection.impl.store.RealNetworkProtectionRepository
 import com.duckduckgo.networkprotection.store.RealNetworkProtectionPrefs
 import com.wireguard.config.Config
+import com.wireguard.crypto.KeyPair
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
@@ -96,7 +98,7 @@ class WgVpnNetworkStackTest {
         Address = 10.237.97.63/32
         DNS = 1.2.3.4
         MTU = 1280
-        PrivateKey = yD1fKxCG/HFbxOy4YfR6zG86YQ1nOswlsv8n7uypb14=
+        PrivateKey = ${KeyPair().privateKey.toBase64()}
 
         [Peer]
         AllowedIPs = 0.0.0.0/0
@@ -137,6 +139,7 @@ class WgVpnNetworkStackTest {
             netPSettingsLocalConfig,
             vpnRemoteFeatures,
             lazy { portProbingCoordinator },
+            NetPNetworkGate(),
         )
     }
 
@@ -229,14 +232,15 @@ class WgVpnNetworkStackTest {
     }
 
     @Test
-    fun whenOnPrepareVpnAndPrivateDnsConfiguredThenReturnEmptyDnsList() = runTest {
+    fun whenOnPrepareVpnAndPrivateDnsConfiguredThenReturnNoDns() = runTest {
         whenever(wgTunnel.createAndSetWgConfig()).thenReturn(wgConfig.success())
-        privateDnsProvider.mutablePrivateDns.add(InetAddress.getByName("1.1.1.1"))
+        // The server name is set but not resolvable, as when the running tunnel is dead
+        privateDnsProvider.privateDnsConfigured = true
 
         val actual = wgVpnNetworkStack.onPrepareVpn().getOrThrow()
 
-        assertNotNull(actual)
-        assertEquals(0, actual.dns.size)
+        assertEquals(emptySet<InetAddress>(), actual.dns)
+        assertEquals(emptySet<InetAddress>(), actual.customDns)
         verify(netpPixels).reportEnableAttempt()
         verifyNoMoreInteractions(netpPixels)
     }

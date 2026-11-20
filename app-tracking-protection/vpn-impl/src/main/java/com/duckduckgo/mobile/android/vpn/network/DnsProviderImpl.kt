@@ -43,4 +43,8 @@ class DnsProviderImpl @Inject constructor(
             context.getPrivateDnsServerName()?.let { InetAddress.getAllByName(it).toList() } ?: emptyList()
         }.getOrDefault(emptyList())
     }
+
+    override fun isPrivateDnsConfigured(): Boolean {
+        return runCatching { context.getPrivateDnsServerName() != null }.getOrDefault(false)
+    }
 }

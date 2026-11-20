@@ -26,13 +26,13 @@ interface VpnNetworkStack {
     val name: String
 
     /**
-     * `true` when [onPrepareVpn] makes network calls from this app, e.g. to register with a backend.
-     *
-     * While a tunnel that routes this app is up, those calls go through it. The VPN service then prepares this stack
-     * behind its null-route tunnel, which excludes this app, instead of restarting in place.
+     * `true` when this stack's tunnel carries this app's own traffic. While such a tunnel runs, a network call made by
+     * this app goes through it and hangs if the tunnel is dead, so an in-place restart prepares the next stack with
+     * `networkAllowed = false`. A tunnel that excludes this app leaves its traffic on the underlying network. Defaults to
+     * `true`, so a stack that does not declare it costs an unneeded fallback rather than a hang.
      */
-    val needsNetworkToPrepare: Boolean
-        get() = false
+    val routesOwnTraffic: Boolean
+        get() = true
 
     /**
      *
@@ -43,11 +43,17 @@ interface VpnNetworkStack {
     /**
      * Called before the vpn tunnel is created and before the vpn is started.
      *
+     * @param networkAllowed `false` when this app's network calls must not be made: during an in-place restart from a
+     * stack whose tunnel [routesOwnTraffic], a call into that tunnel hangs if it is dead. It is about the running tunnel,
+     * not this stack's own, so every stack honors it. A stack that cannot prepare without the network then fails fast
+     * with [NeedsNetworkException], and the caller prepares it again with the network allowed once this app's traffic
+     * no longer goes through the running tunnel.
+     *
      * @return VpnTunnelConfig that will be used to configures the VPN's tunnel.
      *
      * The signature of this method is [suspend] to allow for asynchronous operations when creating the [VpnTunnelConfig].
      */
-    suspend fun onPrepareVpn(): Result<VpnTunnelConfig>
+    suspend fun onPrepareVpn(networkAllowed: Boolean = true): Result<VpnTunnelConfig>
 
     /**
      * Called before the VPN is started
@@ -93,6 +99,13 @@ interface VpnNetworkStack {
         val appExclusionList: Set<String>,
     )
 
+    /**
+     * The failure [onPrepareVpn] returns when it is called with `networkAllowed = false` and cannot prepare without
+     * making a network call. It is not an error: the stack must leave no state behind that a successful prepare would
+     * not, so the caller can prepare it again with the network allowed.
+     */
+    class NeedsNetworkException : Exception("The network stack needs the network to prepare")
+
     companion object EmptyVpnNetworkStack : VpnNetworkStack {
         override val name = "empty"
 
@@ -100,7 +113,7 @@ interface VpnNetworkStack {
             return Result.failure(Exception("EmptyVpnNetworkStack"))
         }
 
-        override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
+        override suspend fun onPrepareVpn(networkAllowed: Boolean): Result<VpnTunnelConfig> {
             return Result.failure(Exception("EmptyVpnNetworkStack"))
         }
 

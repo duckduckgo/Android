@@ -78,6 +78,9 @@ class NgVpnNetworkStack @Inject constructor(
 
     override val name: String = AppTpVpnFeature.APPTP_VPN.featureName
 
+    // App Tracking Protection's tunnel excludes this app
+    override val routesOwnTraffic: Boolean = false
+
     override fun onCreateVpn(): Result<Unit> {
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
 
@@ -95,7 +98,13 @@ class NgVpnNetworkStack @Inject constructor(
         return Result.success(Unit)
     }
 
-    override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
+    override suspend fun onPrepareVpn(networkAllowed: Boolean): Result<VpnTunnelConfig> {
+        // Strict Private DNS needs its server name resolved to decide the tunnel DNS
+        if (!networkAllowed && dnsProvider.isPrivateDnsConfigured()) {
+            logcat { "onPrepareVpn needs the network to resolve Private DNS" }
+            return Result.failure(VpnNetworkStack.NeedsNetworkException())
+        }
+
         fun getDns(): Set<InetAddress> {
             val privateDns = dnsProvider.getPrivateDns()
             if (privateDns.isNotEmpty()) {
