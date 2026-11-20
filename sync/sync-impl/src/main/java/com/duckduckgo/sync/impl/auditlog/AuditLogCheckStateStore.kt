@@ -89,7 +89,7 @@ class RealAuditLogCheckStateStore @Inject constructor(
 ) : AuditLogCheckStateStore {
 
     private val mutex = Mutex()
-    private val writeCount = MutableStateFlow(0L)
+    private val changes = MutableStateFlow(0L)
 
     override suspend fun read(): AuditLogCheckState = withContext(dispatchers.io()) {
         mutex.withLock { readState() }
@@ -107,11 +107,11 @@ class RealAuditLogCheckStateStore @Inject constructor(
             syncStore.auditLogPending = encode(updated.pendingLogins)
             syncStore.auditLogCursor = updated.cursor
             if (updated.lastSeenEntryId != current.lastSeenEntryId) syncStore.auditLogLastSeenEntryId = updated.lastSeenEntryId
-            writeCount.value++
+            changes.value++
         }
     }
 
-    override fun pendingLogins(): Flow<List<PendingLogin>> = writeCount
+    override fun pendingLogins(): Flow<List<PendingLogin>> = changes
         .map { read().pendingLogins }
         .distinctUntilChanged()
 
