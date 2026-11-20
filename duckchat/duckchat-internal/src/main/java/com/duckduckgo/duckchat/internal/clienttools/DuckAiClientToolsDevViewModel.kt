@@ -57,6 +57,7 @@ class DuckAiClientToolsDevViewModel @Inject constructor(
         SEARCH_DOWNLOADS("searchDownloads", FlagGroup.TOOLS, { it.searchDownloads() }),
         READ_TAB_CONTENT("readTabContent", FlagGroup.TOOLS, { it.readTabContent() }),
         SEARCH_HISTORY("searchHistory", FlagGroup.TOOLS, { it.searchHistory() }),
+        FIND_IN_PAGE("findInPage", FlagGroup.TOOLS, { it.findInPage() }),
     }
 
     data class FlagRow(
