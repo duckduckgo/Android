@@ -14,44 +14,54 @@
   ~ limitations under the License.
   -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/widgetContainer"
-    style="@style/Widget.DuckDuckGo.SearchWidgetSearchBarContainer"
-    android:background="@drawable/search_widget_background_daynight"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    tools:ignore="DeprecatedWidgetInXml, InvalidColorAttribute">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:ignore="DeprecatedWidgetInXml, InvalidColorAttribute, UselessParent">
 
-    <ImageView
-        android:id="@+id/logo"
-        style="@style/Widget.DuckDuckGo.SearchWidgetDDGLogo"
+    <LinearLayout
+        android:id="@+id/widgetContainer"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
         android:layout_gravity="center_vertical"
-        android:src="@drawable/ic_ddg_logo"
-        tools:ignore="ContentDescription" />
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:background="@drawable/search_only_widget_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/searchInputBox"
-        style="@style/Widget.DuckDuckGo.SearchWidgetInputBox"
-        android:layout_width="0dp"
-        android:layout_weight="1"
-        android:ellipsize="end"
-        android:text="@string/searchWidgetTextHint"
-        android:textColor="@color/searchWidgetSearchBarHintColor"
-        tools:ignore="ContentDescription" />
+        <ImageView
+            android:id="@+id/logo"
+            style="@style/Widget.DuckDuckGo.SearchWidgetDDGLogo"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_ddg_logo"
+            tools:ignore="ContentDescription" />
 
-    <ImageView
-        android:id="@+id/voiceSearch"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_microphone_widget_daynight"
-        android:visibility="gone"
-        tools:ignore="ContentDescription" />
+        <TextView
+            android:id="@+id/searchInputBox"
+            style="@style/Widget.DuckDuckGo.SearchWidgetInputBox"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:text="@string/searchWidgetTextHint"
+            android:textColor="@color/searchWidgetSearchBarHintColor"
+            tools:ignore="ContentDescription" />
 
-    <ImageView
-        android:id="@+id/search"
-        style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
-        android:src="@drawable/ic_find_search_24_daynight"
-        android:visibility="visible"
-        tools:ignore="ContentDescription" />
+        <ImageView
+            android:id="@+id/voiceSearch"
+            style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+            android:src="@drawable/ic_microphone_widget_daynight"
+            android:visibility="gone"
+            tools:ignore="ContentDescription" />
 
-</LinearLayout>
+        <ImageView
+            android:id="@+id/search"
+            style="@style/Widget.DuckDuckGo.SearchWidgetSearchIcon"
+            android:src="@drawable/ic_find_search_24_daynight"
+            android:visibility="visible"
+            tools:ignore="ContentDescription" />
+
+    </LinearLayout>
+
+</FrameLayout>
