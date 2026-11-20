@@ -302,14 +302,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 
     private suspend fun startVpn(isAlwaysOnTriggered: Boolean = false) = withContext(serviceDispatcher) {
-        suspend fun updateNetworkStackUponRestart(next: VpnNetworkStack) {
+        suspend fun updateNetworkStackUponRestart() {
             logcat { "VPN log: updating the networking stack" }
             logcat { "VPN log: CURRENT network ${vpnNetworkStack.name}" }
             // stop the current networking stack
             vpnNetworkStack.onStopVpn(VpnStopReason.RESTART)
             vpnNetworkStack.onDestroyVpn()
-            // maybe we have changed the networking stack
-            vpnNetworkStack = next
+            // maybe we have changed the networking stack. Read it again: the main process registers VPN features in multiprocess
+            // prefs right before restarting, and this process may only see that write by now
+            vpnNetworkStack = vpnNetworkStackProvider.provideNetworkStack()
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
@@ -324,7 +325,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
-        // Resolved once so the in-place decision, the null tunnel's exclusions, the wide event and the stack switch all see the same stack
+        // Resolved once so the in-place decision, the null tunnel's exclusions, the wide event and the handover all see the same stack
         val restartNetworkStack = if (restarting) vpnNetworkStackProvider.provideNetworkStack() else null
         val restartInPlace = restartNetworkStack != null && appTpRemoteFeatures.restartInPlace().isEnabled() &&
             VpnNetworkStackHandover.supportsInPlaceRestart(restartNetworkStack)
@@ -394,7 +395,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             if (restarting) {
                 logcat { "VPN log: restarting the tunnel" }
                 vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_SWITCH)
-                updateNetworkStackUponRestart(restartNetworkStack!!)
+                updateNetworkStackUponRestart()
                 vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
             }
             activeTun = nullTun
