@@ -26,7 +26,6 @@ import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
-import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class ListOpenTabsClientTool @Inject constructor(
@@ -43,7 +42,6 @@ class ListOpenTabsClientTool @Inject constructor(
         promptTitle = R.string.duckAiClientToolListOpenTabsPromptTitle,
         promptMessage = R.string.duckAiClientToolListOpenTabsPromptMessage,
         name = R.string.duckAiClientToolListOpenTabsName,
-        icon = CommonR.drawable.ic_tabs_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.listOpenTabs().isEnabled()

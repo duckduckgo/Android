@@ -133,7 +133,7 @@ class RealDuckAiToolPermissionPromptsTest {
     ) = ClientToolPermissionRequest.GrantAccess(
         chatTabId = chatTabId,
         browserMode = BrowserMode.REGULAR,
-        tools = listOf(AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(1, 2, 3, 4))),
+        tools = listOf(AskingTool("listOpenTabs", ClientToolPermissionMode.Ask(1, 2, 3))),
         toolsRemovable = true,
         contextual = contextual,
     )

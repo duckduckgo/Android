@@ -17,117 +17,77 @@
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
 
     <LinearLayout
+        style="@style/Widget.DuckDuckGo.Dialog.Content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingTop="@dimen/keyline_5"
-        android:paddingBottom="@dimen/dialogContentPaddingBottom">
+        android:orientation="vertical">
 
-        <FrameLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal">
-
-            <ImageView
-                android:id="@+id/browserToolsPermissionsPictogram"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:importantForAccessibility="no"
-                app:srcCompat="@drawable/ddg_app_question_96" />
-
-            <!-- Sits in the corner of the 96dp pictogram, where its own badge would be. -->
-            <ImageView
-                android:id="@+id/browserToolsPermissionsBadge"
-                android:layout_width="28dp"
-                android:layout_height="28dp"
-                android:layout_marginStart="60dp"
-                android:layout_marginTop="54dp"
-                android:background="@drawable/background_browser_tools_permissions_badge"
-                android:importantForAccessibility="no"
-                android:padding="6dp"
-                android:visibility="gone"
-                app:tint="?attr/daxColorAccentContentPrimary" />
-        </FrameLayout>
+        <ImageView
+            android:layout_width="@dimen/dialogImageSize"
+            android:layout_height="@dimen/dialogImageSize"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/background_dialog_icon_circular"
+            android:importantForAccessibility="no"
+            android:padding="@dimen/rebrandDialogIconInset"
+            app:srcCompat="@drawable/ic_ddg_logo" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/browserToolsPermissionsTitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/keyline_5"
             android:layout_marginTop="@dimen/keyline_4"
+            android:text="@string/duckAiClientToolRequestAccessPromptTitle"
             app:textType="primary"
             app:typography="h2" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/browserToolsPermissionsMessage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/keyline_5"
             android:layout_marginTop="@dimen/keyline_2"
+            android:text="@string/duckAiClientToolRequestAccessPromptMessage"
             app:textType="secondary"
             app:typography="body1" />
 
-        <LinearLayout
-            android:id="@+id/browserToolsPermissionsToolsSection"
+        <!-- Capped so only the list scrolls; the outer scroll is for screens too short for the rest. -->
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_marginTop="@dimen/keyline_2">
 
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:layout_width="match_parent"
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/browserToolsPermissionsToolsScroll"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_4"
-                app:defaultPadding="false" />
+                android:scrollbars="vertical"
+                app:layout_constrainedHeight="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_max="@dimen/duckAiBrowserToolsPermissionsListMaxHeight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Capped so only the list scrolls; the outer scroll is for screens too short for the rest. -->
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <androidx.core.widget.NestedScrollView
-                    android:id="@+id/browserToolsPermissionsToolsScroll"
-                    android:layout_width="0dp"
+                <LinearLayout
+                    android:id="@+id/browserToolsPermissionsTools"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fadeScrollbars="false"
-                    android:scrollbars="vertical"
-                    app:layout_constrainedHeight="true"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHeight_max="@dimen/duckAiBrowserToolsPermissionsListMaxHeight"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-
-                    <LinearLayout
-                        android:id="@+id/browserToolsPermissionsTools"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:paddingVertical="@dimen/keyline_2" />
-                </androidx.core.widget.NestedScrollView>
-            </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:defaultPadding="false" />
-        </LinearLayout>
-
-        <com.duckduckgo.common.ui.view.button.DaxButtonGhost
-            android:id="@+id/browserToolsPermissionsDontAllow"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/keyline_5"
-            android:layout_marginTop="@dimen/keyline_5"
-            android:text="@string/duckAiClientToolPromptDontAllow" />
+                    android:orientation="vertical" />
+            </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
             android:id="@+id/browserToolsPermissionsAllow"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/keyline_5"
+            android:layout_marginTop="@dimen/keyline_5"
             android:text="@string/duckAiClientToolPromptAllowInChat" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/browserToolsPermissionsDontAllow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/duckAiClientToolPromptDontAllow" />
 
     </LinearLayout>
 

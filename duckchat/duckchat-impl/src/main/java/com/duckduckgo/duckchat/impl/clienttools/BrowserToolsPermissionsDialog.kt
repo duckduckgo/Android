@@ -22,8 +22,7 @@ import android.content.res.Configuration
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
-import androidx.appcompat.app.AppCompatDialog
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -31,26 +30,26 @@ import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogBrowserToolsPermissionsBinding
 import com.duckduckgo.duckchat.impl.databinding.ItemClientToolGrantAccessBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.duckduckgo.mobile.android.R as CommonR
 
 /**
- * Asks the user about [request]. One tool gets its own copy under a pictogram badged with its icon.
- * Several tools are listed, each with a checkbox, in a height capped list that scrolls on its own.
+ * Asks the user for several [tools] at once. Matches the design system's rebrand stacked dialog, which has no room
+ * for a list: each tool gets a checkbox, in a height capped list that scrolls on its own.
  * The whole dialog scrolls only on screens too short for the header and buttons, such as a phone in landscape.
- * Looks like the design system's rebrand stacked dialog, which has no room for the badge or the list.
  *
  * [selection] is read on every render, so the checkboxes follow what [onToggle] stored.
  * [onAnswer] gets one answer per user action; [dismiss] closes the dialog without one.
  */
 class BrowserToolsPermissionsDialog(
     private val activity: Activity,
-    private val request: ClientToolPermissionRequest,
+    private val tools: List<AskingTool>,
     private val selection: () -> GrantAccessSelection?,
     private val onToggle: (toolName: String) -> Unit,
     private val onAnswer: (ClientToolPermissionAnswer) -> Unit,
 ) : DaxAlertDialog {
 
-    private var dialog: AppCompatDialog? = null
+    private var dialog: AlertDialog? = null
     private var binding: DialogBrowserToolsPermissionsBinding? = null
     private var rows: List<Pair<AskingTool, ItemClientToolGrantAccessBinding>> = emptyList()
 
@@ -65,28 +64,9 @@ class BrowserToolsPermissionsDialog(
 
     override fun build(): DaxAlertDialog {
         val binding = DialogBrowserToolsPermissionsBinding.inflate(LayoutInflater.from(activity)).also { binding = it }
-        val tools = when (request) {
-            is ClientToolPermissionRequest.RunTool -> listOf(request.tool)
-            is ClientToolPermissionRequest.GrantAccess -> request.tools
-        }
-        when (val tool = tools.singleOrNull()) {
-            null -> {
-                binding.browserToolsPermissionsTitle.setText(R.string.duckAiClientToolRequestAccessPromptTitle)
-                binding.browserToolsPermissionsMessage.setText(R.string.duckAiClientToolRequestAccessPromptMessage)
-            }
-            else -> {
-                binding.browserToolsPermissionsPictogram.setImageResource(R.drawable.ddg_app_96)
-                binding.browserToolsPermissionsBadge.setImageResource(tool.copy.icon)
-                binding.browserToolsPermissionsBadge.isVisible = true
-                binding.browserToolsPermissionsTitle.setText(tool.copy.promptTitle)
-                binding.browserToolsPermissionsMessage.setText(tool.copy.promptMessage)
-                binding.browserToolsPermissionsToolsSection.isVisible = false
-            }
-        }
-        rows = tools.takeIf { it.size > 1 }.orEmpty().map { tool ->
+        rows = tools.map { tool ->
             val row = ItemClientToolGrantAccessBinding.inflate(LayoutInflater.from(activity), binding.browserToolsPermissionsTools, true)
             val toolName = activity.getString(tool.copy.name)
-            row.grantAccessToolIcon.setImageResource(tool.copy.icon)
             row.grantAccessToolName.text = toolName
             row.grantAccessToolDescription.text = activity.getString(tool.copy.promptMessage)
             row.grantAccessToolCheckbox.contentDescription = toolName
@@ -97,14 +77,14 @@ class BrowserToolsPermissionsDialog(
         }
         binding.browserToolsPermissionsDontAllow.setOnClickListener { answer(ClientToolPermissionAnswer.DontAllow) }
 
-        dialog = AppCompatDialog(activity).apply {
-            supportRequestWindowFeature(Window.FEATURE_NO_TITLE)
-            setContentView(binding.root)
+        dialog = MaterialAlertDialogBuilder(activity, CommonR.style.Widget_DuckDuckGo_Dialog_Rebrand)
+            .setView(binding.root)
             // Only the buttons answer, as on desktop and iOS: Back and taps outside do nothing.
-            setCancelable(false)
-            setOnDismissListener { activity.unregisterComponentCallbacks(resizeOnRotation) }
-            window?.setBackgroundDrawableResource(R.drawable.background_browser_tools_permissions_dialog)
-        }
+            .setCancelable(false)
+            .setOnDismissListener { activity.unregisterComponentCallbacks(resizeOnRotation) }
+            .setBackgroundInsetStart(0)
+            .setBackgroundInsetEnd(0)
+            .create()
         render()
         return this
     }

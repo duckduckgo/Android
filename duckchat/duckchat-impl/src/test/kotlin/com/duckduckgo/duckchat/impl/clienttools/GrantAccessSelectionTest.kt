@@ -101,7 +101,7 @@ class GrantAccessSelectionTest {
         vararg names: String,
     ) = GrantAccessSelection(names.map { tool(it) }, removable)
 
-    private fun tool(name: String) = AskingTool(name, ClientToolPermissionMode.Ask(1, 2, 3, 4))
+    private fun tool(name: String) = AskingTool(name, ClientToolPermissionMode.Ask(1, 2, 3))
 }
 
 class PendingClientToolPermissionSelectionTest {
@@ -123,7 +123,7 @@ class PendingClientToolPermissionSelectionTest {
     @Test
     fun whenPromptAsksForOneToolToRunThenThereIsNoSelection() {
         val runTool = PendingClientToolPermission(
-            ClientToolPermissionRequest.RunTool("tab", BrowserMode.REGULAR, AskingTool("a", ClientToolPermissionMode.Ask(1, 2, 3, 4))),
+            ClientToolPermissionRequest.RunTool("tab", BrowserMode.REGULAR, AskingTool("a", ClientToolPermissionMode.Ask(1, 2, 3))),
             CompletableDeferred(),
         )
 
@@ -136,7 +136,7 @@ class PendingClientToolPermissionSelectionTest {
         ClientToolPermissionRequest.GrantAccess(
             "tab",
             BrowserMode.REGULAR,
-            names.map { AskingTool(it, ClientToolPermissionMode.Ask(1, 2, 3, 4)) },
+            names.map { AskingTool(it, ClientToolPermissionMode.Ask(1, 2, 3)) },
             toolsRemovable = true,
         ),
         CompletableDeferred(),
