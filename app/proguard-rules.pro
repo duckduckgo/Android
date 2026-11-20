@@ -20,8 +20,6 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--dontoptimize
-
 # disable obfuscation
 -dontobfuscate
 
@@ -32,9 +30,10 @@
 -dontwarn java.beans.ConstructorProperties
 -dontwarn java.beans.Transient
 
-# required for Moshi (keeps Kotlin's generated default-value constructors)
+# required for Moshi (keeps generated default-value constructors and reflectively-set fields)
 -keepclassmembers class com.duckduckgo.** {
     <init>(...);
+    <fields>;
 }
 
 # required for reflective injection (used by AndroidInjector)
@@ -47,6 +46,9 @@
     public static *** inflate(...);
     public static *** bind(android.view.View);
 }
+
+# required for org.json (Android uses its own copy at runtime, so optimizing the bundled one causes NoSuchMethodError)
+-keep class org.json.** { *; }
 
 # required for jjwt
 -keep class io.jsonwebtoken.** { *; }
