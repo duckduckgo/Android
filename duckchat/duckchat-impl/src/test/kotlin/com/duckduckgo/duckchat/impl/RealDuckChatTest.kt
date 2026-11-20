@@ -41,10 +41,7 @@ import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
-import com.duckduckgo.duckchat.impl.models.ModelState
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
@@ -59,6 +56,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
@@ -81,8 +79,10 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.never
+import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -166,6 +166,51 @@ class RealDuckChatTest {
 
         whenever(mockBrowserNav.openDuckChat(any(), any(), anyOrNull(), any())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
+    }
+
+    @Test
+    fun reproPlacedWidgetUpdateDuringColdStartLeavesEveryTargetUnwired() = runTest {
+        val readSetting = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        mockDuckChatFeatureRepository.stub {
+            onBlocking { isDuckChatUserEnabled() }.doSuspendableAnswer { readSetting.await() }
+        }
+        val cold = RealDuckChat(
+            mockDuckChatFeatureRepository,
+            mockAddressBarPickerAttributionRepository,
+            duckChatFeature,
+            moshi,
+            dispatcherProvider,
+            mockGlobalActivityStarter,
+            mockContext,
+            true,
+            coroutineRule.testScope,
+            lazy { mockDuckChatPixels },
+            imageUploadFeature,
+            mockBrowserNav,
+            mockDeviceSyncState,
+            cookiesManager,
+            mockDuckAiHostProvider,
+            mockAppBuildConfig,
+            mockVoiceSessionStateManager,
+            chatSuggestionsStore,
+            mockDuckAiTabSessionRepository,
+            mockDuckAiModelManager,
+            lazy { entryWideEvent },
+        )
+        val views = mock<android.widget.RemoteViews>()
+        val renderer = com.duckduckgo.duckchat.impl.widget.DuckAiWidgetConfigurator(
+            duckChatFeature,
+            mockDuckChatFeatureRepository,
+            mock(),
+            dispatcherProvider,
+        )
+        val render = async { renderer.populateRemoteViews(mockContext, views) }
+        readSetting.complete(true)
+        render.await()
+        coroutineRule.testScope.advanceUntilIdle()
+        org.junit.Assert.assertTrue("Duck.ai is now enabled", cold.isEnabled())
+        val count = org.mockito.Mockito.mockingDetails(views).invocations.count { it.method.name == "setOnClickPendingIntent" }
+        org.junit.Assert.assertEquals("installed widget targets after settings load", 4, count)
     }
 
     @Test
@@ -1472,6 +1517,24 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when native input disabled and get voice duck chat url then url contains only voice mode param`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals("https://duck.ai/chat?mode=voice-mode&duckai=5", testee.getVoiceDuckChatUrl())
+    }
+
+    @Test
+    fun `when native input enabled and get voice duck chat url then url also contains native input param`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+
+        assertEquals("https://duck.ai/chat?mode=voice-mode&native-input=true&duckai=5", testee.getVoiceDuckChatUrl())
+    }
+
+    @Test
     fun `when native input enabled and build chat url then url contains both chatID and native input param`() = runTest {
         duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
         testee.onPrivacyConfigDownloaded()
@@ -1988,64 +2051,25 @@ class RealDuckChatTest {
 
     @Test
     fun whenOpenDuckChatImageGenerationAndCurrentModelSupportsItThenModelNotSwitchedAndOpensWithImageGenerationForced() = runTest {
-        val current = aiModel("m1", tools = listOf(Tool.IMAGE_GENERATION))
-        whenever(mockDuckAiModelManager.modelState).thenReturn(
-            MutableStateFlow(ModelState(models = listOf(current), selectedModelId = "m1")),
-        )
+        whenever(mockDuckAiModelManager.ensureImageCapableModelSelected()).thenReturn(true)
 
         testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(mockDuckAiModelManager, never()).selectModel(any())
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()))
-        verify(mockContext).startActivity(mockIntent)
-    }
-
-    @Test
-    fun whenOpenDuckChatImageGenerationAndCurrentModelUnsupportedThenSwitchesToCapableModelAndForcesImageGeneration() = runTest {
-        val current = aiModel("m1")
-        val capable = aiModel("m2", tools = listOf(Tool.IMAGE_GENERATION))
-        whenever(mockDuckAiModelManager.modelState).thenReturn(
-            MutableStateFlow(ModelState(models = listOf(current, capable), selectedModelId = "m1")),
-        )
-
-        testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
-        coroutineRule.testScope.advanceUntilIdle()
-
-        verify(mockDuckAiModelManager).selectModel(capable)
         verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()))
         verify(mockContext).startActivity(mockIntent)
     }
 
     @Test
     fun whenOpenDuckChatImageGenerationAndNoAccessibleImageCapableModelThenDoesNotForceImageGenerationButStillOpens() = runTest {
-        val current = aiModel("m1")
-        val inaccessible = aiModel("m2", isAccessible = false, tools = listOf(Tool.IMAGE_GENERATION))
-        whenever(mockDuckAiModelManager.modelState).thenReturn(
-            MutableStateFlow(ModelState(models = listOf(current, inaccessible), selectedModelId = "m1")),
-        )
+        whenever(mockDuckAiModelManager.ensureImageCapableModelSelected()).thenReturn(false)
 
         testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(mockDuckAiModelManager, never()).selectModel(any())
         verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.Open()))
         verify(mockContext).startActivity(mockIntent)
     }
-
-    private fun aiModel(
-        id: String,
-        isAccessible: Boolean = true,
-        tools: List<Tool> = emptyList(),
-    ) = AIChatModel(
-        id = id,
-        name = id,
-        displayName = id,
-        shortName = id,
-        accessTier = emptyList(),
-        isAccessible = isAccessible,
-        supportedTools = tools,
-    )
 
     private suspend fun enableChatHistoryFlags() {
         duckChatFeature.self().setRawStoredState(State(enable = true))

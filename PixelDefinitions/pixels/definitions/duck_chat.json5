@@ -2188,6 +2188,20 @@
             }
         ]
     },
+    "m_aichat_widget_added": {
+        "description": "Triggered when the Duck.ai home-screen widget is added",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_widget_deleted": {
+        "description": "Triggered when the Duck.ai home-screen widget is removed",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "aichat_new_chat_hints_cap_reached": {
         "description": "The user has ignored New Chat hints in enough New Chats that the hints stop showing. Once per install, the first time the cap is reached.",
         "owners": ["karlenDimla"],

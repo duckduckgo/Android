@@ -31,6 +31,7 @@ class BrowserLaunchSourceTest {
             SystemSearchExternal,
             FavoritesWidget,
             SearchWidgetDuckAi,
+            DuckAiWidget,
             AppShortcutNewTab,
             AppShortcutBookmarks,
             AppShortcutDuckAi,

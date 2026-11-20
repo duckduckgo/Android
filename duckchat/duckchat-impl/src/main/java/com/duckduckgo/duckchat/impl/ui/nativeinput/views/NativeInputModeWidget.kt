@@ -1556,6 +1556,16 @@ class NativeInputModeWidget @JvmOverloads constructor(
             viewModel.configure(tabId, isDuckAiMode, isBottom, launch)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
+            if (shouldLaunchCameraCapture(isDuckAiMode, launch, viewModel.supportsImageUpload())) launchCameraCapture()
+        }
+    }
+
+    // Same sink the attach menu's "Take photo" feeds, reached through the ViewModel the attachment plugin shares,
+    // so the launch needs no attachment view to exist yet.
+    private fun launchCameraCapture() {
+        requestCameraCapture { uris ->
+            val images = uris?.toList().orEmpty()
+            if (images.isNotEmpty()) attachmentViewModel?.onImagesPicked(images, AttachmentViewModel.ImageSource.CAMERA)
         }
     }
 
@@ -2141,6 +2151,12 @@ internal fun hasPendingAdoptedAttachments(
     pendingImages: List<SubmittedImage>,
     pendingFiles: List<SubmittedFile>,
 ): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
+
+internal fun shouldLaunchCameraCapture(
+    isDuckAiMode: Boolean,
+    launch: DuckChatLaunch,
+    supportsImageUpload: Boolean,
+): Boolean = isDuckAiMode && launch is DuckChatLaunch.CameraCapture && supportsImageUpload
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on
