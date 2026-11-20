@@ -27,7 +27,7 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
@@ -73,15 +73,15 @@ class DuckAiResponseReadyMonitorImpl @Inject constructor(
         settings: ResponseReadyNotificationsSettings,
         onChatIdFound: suspend (String) -> Unit,
     ): Boolean {
-        val chatId = knownChatId ?: awaitChatIdInTabUrl(tabId).also { onChatIdFound(it) }
+        val chatId = knownChatId ?: awaitChatIdInTabUrl(tabId)?.also { onChatIdFound(it) } ?: return false
         val storedResponseId = awaitPendingResponseId(chatId, settings.pollInterval)
         return awaitStoredResponse(storedResponseId, settings.pollInterval)
     }
 
-    private suspend fun awaitChatIdInTabUrl(tabId: String): String =
+    private suspend fun awaitChatIdInTabUrl(tabId: String): String? =
         tabRepository.flowTabs
             .mapNotNull { tabs -> tabs.firstOrNull { it.tabId == tabId && !it.deletable }?.url?.toUri()?.toChatIdOrNull(duckChat) }
-            .first()
+            .firstOrNull()
 
     /** The page can save the chat after the user left, so the saved chat is read again until it shows the pending response ID. */
     private suspend fun awaitPendingResponseId(chatId: String, pollInterval: Duration): String {
