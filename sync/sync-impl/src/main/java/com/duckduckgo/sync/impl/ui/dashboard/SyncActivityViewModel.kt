@@ -189,21 +189,20 @@ class SyncActivityViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun observeNewDeviceBanner() {
-        // Sign-out wipes the pending list without telling the store's flow, so subscribe again each time the account state changes.
+        // Sign-out clears the pending logins without the store's flow emitting, so start again on each sign-in and sign-out.
         newDeviceBannerJob += syncStateMonitor.syncState()
             .map { it != OFF }
-            .onStart { emit(true) }
             .distinctUntilChanged()
-            .flatMapLatest {
-                if (syncAccountRepository.isSignedIn() && loginAuditLogFeature.isNotificationEnabled()) {
-                    auditLogStateStore.pendingLogins().map { NewDeviceBanner.from(it) }
-                } else {
-                    flowOf(null)
-                }
-            }
+            .flatMapLatest { newDeviceBannerUpdates() }
             .onEach { newDeviceBanner.value = it }
             .flowOn(dispatchers.io())
             .launchIn(viewModelScope)
+    }
+
+    private suspend fun newDeviceBannerUpdates(): Flow<NewDeviceBanner?> {
+        val canShow = syncAccountRepository.isSignedIn() && loginAuditLogFeature.isNotificationEnabled()
+        if (!canShow) return flowOf(null)
+        return auditLogStateStore.pendingLogins().map { NewDeviceBanner.from(it) }
     }
 
     private fun schedulePeriodicRefresh() {
