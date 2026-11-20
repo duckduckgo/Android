@@ -41,6 +41,7 @@ plugins {
     id 'com.diffplug.spotless' apply false
     id 'com.squareup.sort-dependencies' apply false
     id 'androidx.baselineprofile' apply false
+    id 'com.autonomousapps.dependency-analysis'
 }
 
 // Proprietary DuckSans font swap. See https://app.asana.com/1/137249556945/project/1207908166761516/task/1213686706814504
@@ -250,6 +251,35 @@ subprojects {
         }
         dependencies {
             implementation "javax.inject:javax.inject:_"
+        }
+    }
+}
+
+subprojects {
+    apply plugin: 'com.autonomousapps.dependency-analysis'
+
+    if (project.name.endsWith('-impl')) {
+        dependencyAnalysis {
+            issues {
+                // -impl classes are public only because Kotlin defaults to public, not because other modules should use them.
+                // We ignore api vs implementation advice here and keep unused and transitive dependency checks.
+                // We can't use abi { exclusions { } } for this, because the plugin keeps one ABI handler for the whole build.
+                onIncorrectConfiguration {
+                    severity('ignore')
+                }
+            }
+        }
+    }
+}
+
+dependencyAnalysis {
+    issues {
+        all {
+            onAny {
+                // We report only issues between our own modules. The plugin fully matches this regex against a dependency's identifier and GAV:
+                // project paths always start with ':' (e.g. ':sync-api'), while external libraries start with their group (e.g. 'com.squareup.okio:okio').
+                excludeRegex('[^:].*')
+            }
         }
     }
 }
