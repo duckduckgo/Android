@@ -69,7 +69,7 @@ class AgeSignalsDevSettingsActivity : DuckDuckGoActivity() {
         binding.runNow.setOnClickListener {
             lifecycleScope.launch {
                 binding.runNow.isEnabled = false
-                checker.check(this@AgeSignalsDevSettingsActivity)
+                checker.check { this@AgeSignalsDevSettingsActivity }
                 render()
                 binding.runNow.isEnabled = true
             }

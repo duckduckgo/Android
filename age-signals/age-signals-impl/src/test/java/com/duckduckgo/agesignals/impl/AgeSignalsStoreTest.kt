@@ -133,6 +133,14 @@ class AgeSignalsStoreTest {
         }
     }
 
+    @Test
+    fun whenEveryErrorIsRecordedThenItReadsBackUnchanged() = runTest {
+        AgeSignalsError.entries.forEach { error ->
+            store.record(Failed(Step.REQUEST_ACCESS, error))
+            assertEquals(error, store.lastFailure()?.error)
+        }
+    }
+
     private class FakeTimeProvider : CurrentTimeProvider {
         var now: Long = 0
         override fun currentTimeMillis(): Long = now

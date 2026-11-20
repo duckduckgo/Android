@@ -43,4 +43,5 @@ enum class AgeSignalsError(val code: Int) {
     DEVICE_NOT_SUPPORTED(AgeSignalsErrorCode.DEVICE_NOT_SUPPORTED),
     INTERNAL_ERROR(AgeSignalsErrorCode.INTERNAL_ERROR),
     UNKNOWN(Int.MIN_VALUE),
+    TIMEOUT(Int.MIN_VALUE + 1),
 }

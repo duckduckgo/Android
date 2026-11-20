@@ -47,6 +47,7 @@ import com.duckduckgo.agesignals.impl.Step.REQUEST_ACCESS
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.TaskCompletionSource
 import com.google.android.gms.tasks.Tasks
 import com.google.android.play.agesignals.AgeSignalsAccessRequest
 import com.google.android.play.agesignals.AgeSignalsAccessResult
@@ -55,14 +56,18 @@ import com.google.android.play.agesignals.AgeSignalsRequest
 import com.google.android.play.agesignals.AgeSignalsResult
 import com.google.android.play.agesignals.ApplicableAgeFeaturesRequest
 import com.google.android.play.agesignals.ApplicableAgeFeaturesResult
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import java.io.File
 import java.time.LocalDateTime
@@ -118,7 +123,7 @@ class AgeSignalsCheckerTest {
             resetStore()
             val manager = provider.use(RecordingManager(scenario.fake!!.toFakeManager()))
 
-            checker.check(activity)
+            checker.check { activity }
 
             assertEquals("$scenario calls", expected.calls, manager.calls)
             when (val outcome = expected.outcome) {
@@ -138,7 +143,7 @@ class AgeSignalsCheckerTest {
     fun whenSharingIsNotMandatoryThenAccessIsNeverRequested() = runTest {
         val manager = provider.use(RecordingManager(NOT_APPLICABLE.fake!!.toFakeManager()))
 
-        checker.check(activity)
+        checker.check { activity }
 
         assertEquals(FEATURES_ONLY, manager.calls)
         assertEquals(NotApplicable, store.lastOutcome()?.outcome)
@@ -149,7 +154,7 @@ class AgeSignalsCheckerTest {
         listOf(NOT_SHARED, VERIFICATION_REQUIRED, UNKNOWN_STATUS).forEach { scenario ->
             val manager = provider.use(RecordingManager(scenario.fake!!.toFakeManager()))
 
-            checker.check(activity)
+            checker.check { activity }
 
             assertEquals("$scenario", UP_TO_ACCESS, manager.calls)
         }
@@ -159,9 +164,92 @@ class AgeSignalsCheckerTest {
     fun whenAccessIsRequestedThenTheRequestCarriesTheActivity() = runTest {
         val manager = provider.use(RecordingManager(SHARED.fake!!.toFakeManager()))
 
-        checker.check(activity)
+        checker.check { activity }
 
         assertSame(activity, manager.accessRequestActivity)
+    }
+
+    @Test
+    fun whenNoActivityIsAvailableToRequestAccessThenNothingIsRecordedAndAccessIsNotRequested() = runTest {
+        val manager = provider.use(RecordingManager(SHARED.fake!!.toFakeManager()))
+
+        checker.check { null }
+
+        assertEquals(FEATURES_ONLY, manager.calls)
+        assertNull(store.lastOutcome())
+        assertNull(store.lastFailure())
+    }
+
+    @Test
+    fun whenTheActivityIsFinishingOrDestroyedThenNothingIsRecordedAndAccessIsNotRequested() = runTest {
+        val finishing: Activity = mock { on { isFinishing } doReturn true }
+        val destroyed: Activity = mock { on { isDestroyed } doReturn true }
+
+        listOf(finishing, destroyed).forEach { activity ->
+            val manager = provider.use(RecordingManager(SHARED.fake!!.toFakeManager()))
+
+            checker.check { activity }
+
+            assertEquals(FEATURES_ONLY, manager.calls)
+            assertNull(store.lastOutcome())
+            assertNull(store.lastFailure())
+        }
+    }
+
+    @Test
+    fun whenTheActivityIsReadThenItIsReadOnlyOnceSharingIsKnownToBeMandatory() = runTest {
+        var reads = 0
+        provider.use(RecordingManager(NOT_APPLICABLE.fake!!.toFakeManager()))
+        checker.check { activity.also { reads++ } }
+        assertEquals(0, reads)
+
+        provider.use(RecordingManager(SHARED.fake!!.toFakeManager()))
+        checker.check { activity.also { reads++ } }
+        assertEquals(1, reads)
+    }
+
+    @Test
+    fun whenAPlayCallNeverAnswersThenTheRunRecordsATimeoutAtThatStep() = runTest {
+        Step.entries.forEach { step ->
+            resetStore()
+            provider.use(HangingManager(step, SHARED.fake!!.toFakeManager()))
+
+            checker.check { activity }
+
+            assertEquals("$step", LastFailure(step, AgeSignalsError.TIMEOUT, 1_000), store.lastFailure())
+            assertNull("$step", store.lastOutcome())
+        }
+    }
+
+    @Test
+    fun whenAPlayCallTimesOutThenALaterCheckStillRuns() = runTest {
+        provider.use(HangingManager(APPLICABLE_FEATURES, SHARED.fake!!.toFakeManager()))
+        checker.check { activity }
+
+        provider.use(RecordingManager(NOT_APPLICABLE.fake!!.toFakeManager()))
+        checker.check { activity }
+
+        assertEquals(NotApplicable, store.lastOutcome()?.outcome)
+    }
+
+    @Test
+    fun whenTwoChecksRunConcurrentlyThenTheSecondStartsAfterTheFirstEnds() = runTest {
+        val manager = provider.use(PendingFeaturesManager())
+
+        val first = launch { checker.check { activity } }
+        val second = launch { checker.check { activity } }
+        runCurrent()
+        assertEquals(1, manager.pending.size)
+
+        manager.pending[0].setResult(NOT_MANDATORY)
+        runCurrent()
+        assertTrue(first.isCompleted)
+        assertEquals(2, manager.pending.size)
+
+        manager.pending[1].setResult(NOT_MANDATORY)
+        runCurrent()
+        assertTrue(second.isCompleted)
+        assertEquals(NotApplicable, store.lastOutcome()?.outcome)
     }
 
     @Test(expected = IllegalStateException::class)
@@ -174,7 +262,7 @@ class AgeSignalsCheckerTest {
         )
 
         try {
-            checker.check(activity)
+            checker.check { activity }
         } finally {
             assertNull(store.lastOutcome())
             assertNull(store.lastFailure())
@@ -206,6 +294,30 @@ class AgeSignalsCheckerTest {
         }
     }
 
+    private class HangingManager(private val hangAt: Step, private val delegate: AgeSignalsManager) : AgeSignalsManager {
+        override fun getApplicableAgeFeatures(request: ApplicableAgeFeaturesRequest): Task<ApplicableAgeFeaturesResult> =
+            if (hangAt == APPLICABLE_FEATURES) {
+                TaskCompletionSource<ApplicableAgeFeaturesResult>().task
+            } else {
+                delegate.getApplicableAgeFeatures(
+                    request,
+                )
+            }
+
+        override fun requestAgeSignalsAccess(request: AgeSignalsAccessRequest): Task<AgeSignalsAccessResult> =
+            if (hangAt == REQUEST_ACCESS) TaskCompletionSource<AgeSignalsAccessResult>().task else delegate.requestAgeSignalsAccess(request)
+
+        override fun checkAgeSignals(request: AgeSignalsRequest): Task<AgeSignalsResult> =
+            if (hangAt == CHECK_SIGNALS) TaskCompletionSource<AgeSignalsResult>().task else delegate.checkAgeSignals(request)
+    }
+
+    private class PendingFeaturesManager : AgeSignalsManager by NOT_APPLICABLE.fake!!.toFakeManager() {
+        val pending = mutableListOf<TaskCompletionSource<ApplicableAgeFeaturesResult>>()
+
+        override fun getApplicableAgeFeatures(request: ApplicableAgeFeaturesRequest): Task<ApplicableAgeFeaturesResult> =
+            TaskCompletionSource<ApplicableAgeFeaturesResult>().also { pending += it }.task
+    }
+
     private class FakeManagerProvider : AgeSignalsManagerProvider {
         private var manager: AgeSignalsManager? = null
 
@@ -224,5 +336,6 @@ class AgeSignalsCheckerTest {
         val FEATURES_ONLY = listOf(Call.GET_APPLICABLE_FEATURES)
         val UP_TO_ACCESS = listOf(Call.GET_APPLICABLE_FEATURES, Call.REQUEST_ACCESS)
         val ALL_CALLS = listOf(Call.GET_APPLICABLE_FEATURES, Call.REQUEST_ACCESS, Call.CHECK_SIGNALS)
+        val NOT_MANDATORY: ApplicableAgeFeaturesResult = ApplicableAgeFeaturesResult.builder().setFeatures(emptySet()).build()
     }
 }
