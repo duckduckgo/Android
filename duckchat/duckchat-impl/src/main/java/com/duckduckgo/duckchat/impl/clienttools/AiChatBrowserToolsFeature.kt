@@ -51,6 +51,15 @@ interface AiChatBrowserToolsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun searchDownloads(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun readTabContent(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun searchHistory(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun findInPage(): Toggle
+
     /** Advertises the `requestAccess` capability, which asks for several tools in one prompt. */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun requestAccess(): Toggle

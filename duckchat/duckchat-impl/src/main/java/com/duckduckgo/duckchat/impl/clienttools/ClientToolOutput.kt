@@ -16,6 +16,12 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
+
 /**
  * Fits tool values to the v1 contract limits. Duck.ai rejects a value over any limit, which ends the answer.
  * Lengths are UTF-16 units, so a cut value never exceeds the contract's code point limit.
@@ -24,7 +30,15 @@ object ClientToolOutput {
     const val MAX_TITLE_LENGTH = 256
     const val MAX_URL_LENGTH = 1280
 
+    private val UTC_TIMESTAMP: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneOffset.UTC)
+
     fun title(title: String?): String = truncate(title.orEmpty(), MAX_TITLE_LENGTH)
+
+    /** ISO-8601 UTC ending in Z, as the contract requires; offsets such as +02:00 are rejected. */
+    fun timestamp(instant: Instant): String = UTC_TIMESTAMP.format(instant)
+
+    /** Browser databases store times as device-local time without an offset. */
+    fun instantOf(deviceLocal: LocalDateTime): Instant = deviceLocal.atZone(ZoneId.systemDefault()).toInstant()
 
     /** Drops user info, query and fragment, which can carry credentials or one-time links. */
     fun url(url: String): String = truncate(withoutUserInfo(withoutQueryOrFragment(url)), MAX_URL_LENGTH)

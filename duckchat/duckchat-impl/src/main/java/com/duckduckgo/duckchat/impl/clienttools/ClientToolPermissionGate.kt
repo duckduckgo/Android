@@ -40,7 +40,7 @@ interface ClientToolPermissionGate {
 
     /**
      * Asks once for every tool in [tools] the user has not allowed yet, and grants the ones they allow for [chatId].
-     * Never runs a tool.
+     * Never runs a tool, and never asks for an [ClientToolPermissionMode.AskEveryTime] tool.
      */
     suspend fun requestAccess(
         tools: List<ClientTool>,
@@ -58,9 +58,27 @@ enum class ClientToolPermissionDecision {
     CANCELLED,
 }
 
+/** How a `requestAccess` reply reports each requested tool. */
+enum class ClientToolAccessLevel(val wireName: String) {
+    /** Allowed without asking. */
+    DEFAULT("default"),
+
+    /** Always Allow in settings. */
+    ALWAYS("always"),
+
+    /** Allowed for this chat, in this prompt or earlier. */
+    CHAT("chat"),
+
+    /** Never Allow in settings, so it was left out of the prompt. */
+    NEVER("never"),
+
+    /** Removed from the prompt, or can't be served now. Nothing is remembered. */
+    NOT_GRANTED("notGranted"),
+}
+
 sealed interface ClientToolAccessDecision {
-    /** The requested tools the chat may now use, in the order they were requested. */
-    data class Granted(val toolNames: List<String>) : ClientToolAccessDecision
+    /** Each requested tool's level, in the order they were requested. */
+    data class Granted(val access: Map<String, ClientToolAccessLevel>) : ClientToolAccessDecision
 
     data object Denied : ClientToolAccessDecision
 
@@ -78,7 +96,7 @@ class RealClientToolPermissionGate @Inject constructor(
 ) : ClientToolPermissionGate {
 
     private sealed interface Standing {
-        data object Allowed : Standing
+        data class Allowed(val level: ClientToolAccessLevel) : Standing
 
         data object Denied : Standing
 
@@ -96,14 +114,14 @@ class RealClientToolPermissionGate @Inject constructor(
         promptDetail: String?,
     ): ClientToolPermissionDecision {
         when (standing(tool, context)) {
-            Standing.Allowed -> return ClientToolPermissionDecision.ALLOWED
+            is Standing.Allowed -> return ClientToolPermissionDecision.ALLOWED
             Standing.Denied -> return ClientToolPermissionDecision.DENIED
             is Standing.NeedsPrompt, is Standing.NeedsPromptEveryTime -> Unit
         }
         // Re-checked once the lock is ours: the prompt this call queued behind may have settled it.
         return awaitTurn(context.chatTabId, ClientToolPermissionDecision.CANCELLED) {
             when (val now = standing(tool, context)) {
-                Standing.Allowed -> ClientToolPermissionDecision.ALLOWED
+                is Standing.Allowed -> ClientToolPermissionDecision.ALLOWED
                 Standing.Denied -> ClientToolPermissionDecision.DENIED
                 is Standing.NeedsPrompt -> ask(now.tool, context)
                 is Standing.NeedsPromptEveryTime -> askOnce(now.copy, promptDetail.orEmpty(), context)
@@ -117,10 +135,10 @@ class RealClientToolPermissionGate @Inject constructor(
         context: ClientToolCallContext,
     ): ClientToolAccessDecision {
         val accessContext = context.copy(chatId = chatId)
-        if (tools.none { standing(it, accessContext) is Standing.NeedsPrompt }) return grantedNow(tools, accessContext)
+        if (tools.none { standing(it, accessContext) is Standing.NeedsPrompt }) return accessNow(tools, accessContext)
         return awaitTurn(context.chatTabId, ClientToolAccessDecision.Cancelled) {
             val toAsk = tools.mapNotNull { (standing(it, accessContext) as? Standing.NeedsPrompt)?.tool }
-            if (toAsk.isEmpty()) return@awaitTurn grantedNow(tools, accessContext)
+            if (toAsk.isEmpty()) return@awaitTurn accessNow(tools, accessContext)
             val request = ClientToolPermissionRequest.GrantAccess(
                 context.chatTabId,
                 context.browserMode,
@@ -131,7 +149,7 @@ class RealClientToolPermissionGate @Inject constructor(
             when (val answer = prompt.request(request)) {
                 is ClientToolPermissionAnswer.AllowForChat -> {
                     chatGrants.grant(chatId, toAsk.map { it.name } - answer.removedTools)
-                    grantedNow(tools, accessContext)
+                    accessNow(tools, accessContext)
                 }
                 ClientToolPermissionAnswer.AllowOnce, ClientToolPermissionAnswer.DontAllow -> ClientToolAccessDecision.Denied
             }
@@ -154,22 +172,32 @@ class RealClientToolPermissionGate @Inject constructor(
                 if (stored == ClientToolPermission.NEVER_ALLOW) Standing.Denied else Standing.NeedsPromptEveryTime(mode)
             ClientToolPermissionMode.Auto -> when (stored) {
                 ClientToolPermission.NEVER_ALLOW -> Standing.Denied
-                ClientToolPermission.ALWAYS_ALLOW, null -> Standing.Allowed
+                ClientToolPermission.ALWAYS_ALLOW -> Standing.Allowed(ClientToolAccessLevel.ALWAYS)
+                null -> Standing.Allowed(ClientToolAccessLevel.DEFAULT)
             }
             is ClientToolPermissionMode.Ask -> when {
-                stored == ClientToolPermission.ALWAYS_ALLOW -> Standing.Allowed
+                stored == ClientToolPermission.ALWAYS_ALLOW -> Standing.Allowed(ClientToolAccessLevel.ALWAYS)
                 stored == ClientToolPermission.NEVER_ALLOW -> Standing.Denied
-                skipsPromptForDevelopment() -> Standing.Allowed
-                context.chatId != null && chatGrants.isGranted(context.chatId, tool.name) -> Standing.Allowed
+                skipsPromptForDevelopment() -> Standing.Allowed(ClientToolAccessLevel.DEFAULT)
+                context.chatId != null && chatGrants.isGranted(context.chatId, tool.name) -> Standing.Allowed(ClientToolAccessLevel.CHAT)
                 else -> Standing.NeedsPrompt(AskingTool(tool.name, mode))
             }
         }
     }
 
-    private suspend fun grantedNow(
+    private suspend fun accessNow(
         tools: List<ClientTool>,
         context: ClientToolCallContext,
-    ): ClientToolAccessDecision = ClientToolAccessDecision.Granted(tools.filter { standing(it, context) == Standing.Allowed }.map { it.name })
+    ): ClientToolAccessDecision = ClientToolAccessDecision.Granted(
+        tools.associate { tool ->
+            val level = when (val standing = standing(tool, context)) {
+                is Standing.Allowed -> standing.level
+                Standing.Denied -> ClientToolAccessLevel.NEVER
+                is Standing.NeedsPrompt, is Standing.NeedsPromptEveryTime -> ClientToolAccessLevel.NOT_GRANTED
+            }
+            tool.name to level
+        },
+    )
 
     private fun skipsPromptForDevelopment(): Boolean =
         appBuildConfig.isInternalBuild() && browserToolsFeature.devSkipPermissionPrompt().isEnabled()

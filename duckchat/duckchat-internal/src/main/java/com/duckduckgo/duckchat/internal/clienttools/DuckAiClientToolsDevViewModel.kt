@@ -55,6 +55,9 @@ class DuckAiClientToolsDevViewModel @Inject constructor(
         CLOSE_TABS("closeTabs", FlagGroup.TOOLS, { it.closeTabs() }),
         SEARCH_BOOKMARKS("searchBookmarks", FlagGroup.TOOLS, { it.searchBookmarks() }),
         SEARCH_DOWNLOADS("searchDownloads", FlagGroup.TOOLS, { it.searchDownloads() }),
+        READ_TAB_CONTENT("readTabContent", FlagGroup.TOOLS, { it.readTabContent() }),
+        SEARCH_HISTORY("searchHistory", FlagGroup.TOOLS, { it.searchHistory() }),
+        FIND_IN_PAGE("findInPage", FlagGroup.TOOLS, { it.findInPage() }),
     }
 
     data class FlagRow(

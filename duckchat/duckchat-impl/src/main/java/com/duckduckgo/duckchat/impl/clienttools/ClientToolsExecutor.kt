@@ -119,9 +119,17 @@ class RealClientToolsExecutor @Inject constructor(
         }
         val names = RequestAccess.parseCapabilities(request.input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
         val chatId = context.chatId ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
-        val enabledTools = tools.getPlugins().filter { it.isEnabled() }.associateBy { it.name }
-        return when (val decision = permissionGate.requestAccess(names.mapNotNull { enabledTools[it] }, chatId, context)) {
-            is ClientToolAccessDecision.Granted -> ClientToolResult.Success(JSONObject().put(GRANTED, JSONArray(decision.toolNames)))
+        val toolsByName = tools.getPlugins().associateBy { it.name }
+        if (names.any { toolsByName[it]?.permissionMode is ClientToolPermissionMode.AskEveryTime }) {
+            return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
+        }
+        val servable = names.mapNotNull { name -> toolsByName[name]?.takeIf { it.isEnabled() } }
+        return when (val decision = permissionGate.requestAccess(servable, chatId, context)) {
+            is ClientToolAccessDecision.Granted -> {
+                val access = JSONObject()
+                names.forEach { access.put(it, (decision.access[it] ?: ClientToolAccessLevel.NOT_GRANTED).wireName) }
+                ClientToolResult.Success(JSONObject().put(ACCESS, access))
+            }
             ClientToolAccessDecision.Denied -> ClientToolResult.Failure(ClientToolErrorCode.DENIED)
             ClientToolAccessDecision.Cancelled -> ClientToolResult.Failure(ClientToolErrorCode.CANCELLED)
         }
@@ -212,7 +220,7 @@ class RealClientToolsExecutor @Inject constructor(
         const val VALUE = "value"
         const val ERROR = "error"
         const val CODE = "code"
-        const val GRANTED = "granted"
+        const val ACCESS = "access"
         const val CHAT_ID_QUERY = "chatID"
     }
 }

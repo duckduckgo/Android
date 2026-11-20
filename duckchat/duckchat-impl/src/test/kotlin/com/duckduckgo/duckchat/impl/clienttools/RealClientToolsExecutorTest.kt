@@ -641,12 +641,13 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenRequestAccessAsksForTwelveUnknownToolsThenNothingIsGranted() = runTest {
+    fun whenRequestAccessAsksForTwelveUnknownToolsThenNoneIsGranted() = runTest {
         enableRequestAccess()
+        val names = (1..12).map { "t$it" }
 
-        val reply = requestAccess(*(1..12).map { "t$it" }.toTypedArray())
+        val reply = requestAccess(*names.toTypedArray())
 
-        assertGranted(reply)
+        assertAccess(reply, *names.map { it to "notGranted" }.toTypedArray())
         assertTrue(prompt.prompts.isEmpty())
     }
 
@@ -673,20 +674,20 @@ class RealClientToolsExecutorTest {
 
         val reply = requestAccess("askTool", "autoTool", "otherAskTool")
 
-        assertGranted(reply, "askTool", "autoTool", "otherAskTool")
+        assertAccess(reply, "askTool" to "chat", "autoTool" to "default", "otherAskTool" to "always")
         assertTrue(prompt.prompts.isEmpty())
         assertTrue(askTool.calls.isEmpty() && autoTool.calls.isEmpty() && otherAskTool.calls.isEmpty())
     }
 
     @Test
-    fun whenRequestAccessNamesNeverAllowedUnknownOrDisabledToolsThenTheyAreLeftOut() = runTest {
+    fun whenRequestAccessNamesNeverAllowedUnknownOrDisabledToolsThenTheyAreNotAsked() = runTest {
         enableRequestAccess()
         store.choices["askTool"] = ClientToolPermission.NEVER_ALLOW
         otherAskTool.enabled = false
 
         val reply = requestAccess("askTool", "missing", "otherAskTool", "autoTool")
 
-        assertGranted(reply, "autoTool")
+        assertAccess(reply, "askTool" to "never", "missing" to "notGranted", "otherAskTool" to "notGranted", "autoTool" to "default")
         assertTrue(prompt.prompts.isEmpty())
     }
 
@@ -707,7 +708,7 @@ class RealClientToolsExecutorTest {
             prompt.current.request,
         )
         prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
-        assertGranted(reply.await(), "otherAskTool", "autoTool", "askTool")
+        assertAccess(reply.await(), "otherAskTool" to "chat", "autoTool" to "default", "askTool" to "chat")
         assertTrue(askTool.calls.isEmpty() && otherAskTool.calls.isEmpty())
         assertTrue(store.choices.isEmpty())
 
@@ -729,7 +730,7 @@ class RealClientToolsExecutorTest {
         }
         runCurrent()
         prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
-        assertGranted(reply.await(), "askTool")
+        assertAccess(reply.await(), "askTool" to "chat")
 
         assertEquals(true, executeAskTool(chatId = PAGE_CHAT_ID).getBoolean("ok"))
         assertEquals(1, prompt.prompts.size)
@@ -819,7 +820,7 @@ class RealClientToolsExecutorTest {
         assertEquals(true, toolCall.await().getBoolean("ok"))
         assertEquals(listOf(AskingTool("otherAskTool", OTHER_ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
         prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
-        assertGranted(access.await(), "askTool", "otherAskTool")
+        assertAccess(access.await(), "askTool" to "chat", "otherAskTool" to "chat")
         assertEquals(1, prompt.maxOpenAtOnce)
     }
 
@@ -846,7 +847,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
         prompt.current.answer(ClientToolPermissionAnswer.AllowForChat(removedTools = setOf("otherAskTool")))
 
-        assertGranted(reply.await(), "autoTool", "askTool")
+        assertAccess(reply.await(), "otherAskTool" to "notGranted", "autoTool" to "default", "askTool" to "chat")
         assertTrue(chatGrants.isGranted(CHAT_ID, "askTool"))
         assertFalse(chatGrants.isGranted(CHAT_ID, "otherAskTool"))
         assertTrue(store.choices.isEmpty())
@@ -864,7 +865,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
         assertEquals(listOf(AskingTool("otherAskTool", OTHER_ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
         prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
-        assertGranted(again.await(), "askTool", "otherAskTool")
+        assertAccess(again.await(), "askTool" to "chat", "otherAskTool" to "chat")
     }
 
     @Test
@@ -939,27 +940,20 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenRequestAccessNamesAskEveryTimeToolThenItIsNeitherAskedNorGranted() = runTest {
+    fun whenRequestAccessNamesAskEveryTimeToolThenInvalidArgumentsWithoutPrompt() = runTest {
         enableRequestAccess()
 
-        val reply = async { requestAccess("onceTool", "askTool") }
-        runCurrent()
-        assertEquals(listOf(AskingTool("askTool", ASK_MODE)), (prompt.current.request as ClientToolPermissionRequest.GrantAccess).tools)
-        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
-        assertGranted(reply.await(), "askTool")
-
-        val again = async { executeOnceTool() }
-        runCurrent()
-        assertTrue(prompt.current.request is ClientToolPermissionRequest.RunToolOnce)
-        prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
-        again.await()
+        assertFailure("invalid_arguments", requestAccess("onceTool", "askTool"))
+        assertTrue(prompt.prompts.isEmpty())
+        assertFalse(chatGrants.isGranted(CHAT_ID, "askTool"))
     }
 
     @Test
-    fun whenRequestAccessNamesOnlyAskEveryTimeToolThenNothingIsGrantedWithoutPrompt() = runTest {
+    fun whenRequestAccessNamesDisabledAskEveryTimeToolThenInvalidArguments() = runTest {
         enableRequestAccess()
+        onceTool.enabled = false
 
-        assertGranted(requestAccess("onceTool"))
+        assertFailure("invalid_arguments", requestAccess("onceTool"))
         assertTrue(prompt.prompts.isEmpty())
     }
 
@@ -1005,12 +999,12 @@ class RealClientToolsExecutorTest {
         return params
     }
 
-    private fun assertGranted(
+    private fun assertAccess(
         reply: JSONObject,
-        vararg names: String,
+        vararg levels: Pair<String, String>,
     ) {
-        val granted = names.joinToString(",") { "\"$it\"" }
-        assertEquals("""{"callId":"call-1","ok":true,"value":{"granted":[$granted]}}""", reply.toString())
+        val access = levels.joinToString(",") { (name, level) -> "\"$name\":\"$level\"" }
+        assertEquals("""{"callId":"call-1","ok":true,"value":{"access":{$access}}}""", reply.toString())
     }
 
     private fun assertFailure(
