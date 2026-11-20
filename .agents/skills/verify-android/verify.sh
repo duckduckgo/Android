@@ -60,7 +60,9 @@ serial() {
   esac
 }
 
+# prove.py points VERIFY_EVIDENCE_DIR at its attempt folder, so a proof's captures never mix with another run's.
 evidence_dir() {
+  if [[ -n "${VERIFY_EVIDENCE_DIR:-}" ]]; then mkdir -p "$VERIFY_EVIDENCE_DIR"; echo "$VERIFY_EVIDENCE_DIR"; return; fi
   local s; s="$(serial)"
   local d="$EVIDENCE_ROOT/$(run_id)/$(label "$s" | tr -c 'A-Za-z0-9._-\n' '_')"
   mkdir -p "$d"; echo "$d"

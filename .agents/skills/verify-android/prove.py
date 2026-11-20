@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
 """Runs a proof against the app on the selected device and gives a verdict.
 
-  prove.py proofs/<name>.py
-  prove.py compare proofs/<name>.py   runs it on the base build (verify.sh build --base <ref>), then on this
-                                      checkout's build, and lines up the checks: before and after
-  prove.py pr-summary [<before>] <after>
-                               Markdown for a PR's verification section from runs' proof-<name>.json files (or
-                               the evidence folder); safe for a public PR: no local paths, logs or screenshots
-  prove.py publish <proof-<name>.json | evidence folder> [--into <auto evidence folder>]
-                               copies one run (and its base run, after compare) into an auto evidence folder (a
-                               new one, or the one auto opened for this change), records each report's served URL
-                               in its proof-<name>.json, uploads it, and prints the URLs: the one to put in the PR
-                               template's Evidence URL field
-  prove.py selftest [--offline]
+  prove.py [--evidence-dir <dir> | --decision-log <decisions.tsv>] proofs/<name>.py
+  prove.py compare [--evidence-dir <dir> | --decision-log <decisions.tsv>] proofs/<name>.py
+                               runs it on the base build (verify.sh build --base <ref>), then on this checkout's
+                               build, and lines up the checks and key frames: before and after
+  prove.py pr-summary <attempt folder | compare folder | proof.json> [<after>]
+                               the PR's Verification scenario, in auto's format; safe for a public PR: no local paths
+                               or logs, and evidence links are served URLs once the run is published
+  prove.py publish <attempt folder | compare folder> [--into <auto evidence folder>]
+                               uploads the folder to auto's evidence store (copying it into an auto evidence folder
+                               first when it isn't in one), records the served URLs and prints the index.html URL:
+                               the one for the PR template's Evidence URL field
+  prove.py selftest [--offline] [--evidence-dir <dir>]
                                checks the harness itself (run it after changing prove.py); see tests/.
                                --offline runs only the cases that need no device
 
@@ -21,7 +21,9 @@ checks with android.check(). Exit 0 PASS (at least one check, all passed), 1 FAI
 2 ERROR (setup, a driving step or the installed build went wrong). An error is never a pass, and the run
 stops at the first one instead of failing every check after it.
 
-Evidence (video, screenshots, proof-<name>.json and .md, ui.log) goes to verify.sh's evidence folder for the run.
+Each run writes a fresh attempt folder, <evidence dir>/<stamp>-<name>-<id>/, and never reuses one: proof.py,
+proof.json, report.md, index.html, and per device the video, screenshots, ui.log, key-frames.png and poster.png.
+Without --evidence-dir or --decision-log the attempt folders go in build/verify/evidence/.
 """
 import datetime
 import importlib.util
@@ -29,19 +31,26 @@ import json
 import os
 import re
 import shutil
+import struct
 import subprocess
 import sys
 import tempfile
 import threading
 import time
 import traceback
+import uuid
+import zlib
 from pathlib import Path
+from urllib.parse import quote
+
+import evidence as ev
 
 SKILL = Path(__file__).resolve().parent
 REPO = Path(subprocess.run(["git", "-C", str(SKILL), "rev-parse", "--show-toplevel"],
                            capture_output=True, text=True, check=True).stdout.strip())
 V = str(SKILL / "verify.sh")
 STATE = REPO / "build" / "verify" / "state"
+DEFAULT_EVIDENCE = REPO / "build" / "verify" / "evidence"
 PIXEL_LINE = re.compile(r"Pixel (?:sent|enqueued): (?:\S+ )?(\S+) with params")
 
 
@@ -66,11 +75,10 @@ def verify(*args, check=True):
 
 
 class Android:
-    def __init__(self, serial, evidence, prefix=""):
-        # prefix keeps a base run's screenshots apart from the after run's in the same evidence folder
-        self.serial, self.evidence, self.prefix = serial, evidence, prefix
+    def __init__(self, serial, evidence):
+        self.serial, self.evidence = serial, evidence
         self.checks, self.notes, self.sections, self._mark = [], [], [], None
-        self.unverified_items, self.failure_files = [], []
+        self.unverified_items, self.failure_files, self.shots = [], [], []
 
     # Driving: a step that fails raises Error, because nothing after it would mean anything.
     def tap(self, selector, index=None):
@@ -95,7 +103,8 @@ class Android:
         verify("reset")
 
     def shot(self, name):
-        verify("shot", f"{self.prefix}{name}.png")
+        verify("shot", f"{name}.png")
+        self.shots.append(f"{name}.png")
 
     # Reading: these return what they saw, so a proof can check it and report the actual value.
     def where(self):
@@ -211,11 +220,11 @@ class Android:
             return
         layout = verify("layout", check=False)
         if layout.returncode == 0:
-            name = f"{self.prefix}layout-at-failure.json"
-            (self.evidence / name).write_text(layout.stdout)
-            self.failure_files.append(name)
-        if verify("shot", f"{self.prefix}at-failure.png", check=False).returncode == 0:
-            self.failure_files.append(f"{self.prefix}at-failure.png")
+            (self.evidence / "layout-at-failure.json").write_text(layout.stdout)
+            self.failure_files.append("layout-at-failure.json")
+        if verify("shot", "at-failure.png", check=False).returncode == 0:
+            self.failure_files.append("at-failure.png")
+            self.shots.append("at-failure.png")
 
     def _adb(self, *args):
         # Logcat carries raw bytes from other apps; decode leniently so one bad byte isn't an error.
@@ -237,7 +246,7 @@ class Recording:
         self._thread.start()
 
     def _start(self):
-        video = f"proof-{self.name}-{len(self.videos) + 1}.mp4"
+        video = f"recording-{len(self.videos) + 1}.mp4"
         verify("record", "start", video)
         self.videos.append(video)
 
@@ -264,34 +273,14 @@ def load(path):
 
 
 def build_label(build):
+    if not build:
+        return "build not read: the run stopped before doctor passed"
     if build.get("external"):
         return f"external APK {build.get('sha256', '?')[:16]}, not built from this source"
     label = f"build {build.get('sha256', '?')[:16]} of {build.get('head', '?')[:10]}"
     if build.get("base"):
         return f"base {label} ({build['base']})"
     return label + (" + uncommitted changes" if build.get("dirty") else "")
-
-
-def report(m):
-    lines = [f"# {m['proof']['name']}", "", m["proof"]["doc"], "",
-             f"**{m['verdict']}**" + (f": {m['error'].splitlines()[0]}" if m["error"] else ""), "",
-             f"Device {m['device']} ({m.get('model') or '?'}, API {m.get('api') or '?'}), {build_label(m['build'])}", "",
-             f"Live services: {', '.join(m.get('live') or []) or 'none'}", "",
-             "| Check | Result | Detail |", "|---|---|---|"]
-    lines += [f"| {c['check']} | {'pass' if c['ok'] else 'FAIL'} | {c['detail']} |" for c in m["checks"]]
-    if m.get("unverified"):
-        lines += ["", "Not verified:", *[f"- {u['what']}: {u['why']}" for u in m["unverified"]]]
-    # Relative links resolve beside the report, locally and in auto's evidence viewer once published.
-    if m["videos"]:
-        lines += ["", "Video, in order: " + ", ".join(f"[{v}]({v})" for v in m["videos"])]
-    shots = [f for f in m.get("files") or [] if f.endswith(".png")]
-    if shots:
-        lines += ["", "## Screenshots", "", *[line for f in shots for line in (f"![{f}]({f})", "")]]
-    if m["notes"]:
-        lines += ["", "Notes:", *[f"- {n}" for n in m["notes"]]]
-    for title, body in m["sections"]:
-        lines += ["", f"## {title}", "", body]
-    return "\n".join(lines) + "\n"
 
 
 def proof_origin(path):
@@ -307,39 +296,97 @@ def proof_origin(path):
     return rel, tracked and unchanged
 
 
-def prove(path):
-    """Runs one proof; returns its manifest, whose "exit" is 0 PASS, 1 FAIL or 2 ERROR."""
-    name = label = Path(path).stem
+def inside(path, root):
+    path, root = Path(path).resolve(), Path(root).resolve()
+    return path == root or root in path.parents
+
+
+def evidence_root(evidence_dir=None, decision_log=None):
+    """Where attempt folders go: --evidence-dir, proofs/ beside auto's decision log, or build/verify/evidence."""
+    if evidence_dir and decision_log:
+        raise Error("pass --evidence-dir or --decision-log, not both")
+    if evidence_dir:
+        root, what = Path(evidence_dir).expanduser().resolve(), "--evidence-dir"
+    elif decision_log:
+        log = Path(decision_log).expanduser().resolve()
+        if not log.is_file() or log.suffix != ".tsv":
+            raise Error(f"--decision-log must be an existing decisions .tsv file: {decision_log}")
+        root, what = log.parent / "proofs", "the decision log"
+    else:
+        return DEFAULT_EVIDENCE
+    if inside(root, REPO):
+        # Untracked evidence there could be committed, and would make every build look stale.
+        raise Error(f"keep {what} outside this checkout: evidence written there would land in the repo")
+    return root
+
+
+def new_attempt(root, stem):
+    root.mkdir(parents=True, exist_ok=True)
+    folder = root / f"{datetime.datetime.now():%Y%m%d-%H%M%S}-{stem}-{uuid.uuid4().hex[:4]}"
+    folder.mkdir()  # never exist_ok: two attempts never share a folder
+    return folder
+
+
+def revision():
+    git = ["git", "-C", str(REPO)]
+    head = subprocess.run([*git, "rev-parse", "HEAD"], capture_output=True, text=True).stdout.strip()
+    dirty = subprocess.run([*git, "status", "--porcelain"], capture_output=True, text=True).stdout.splitlines()
+    return {"head": head, "dirty_files": len(dirty)}
+
+
+def run_details(m):
+    rev = m.get("revision") or {}
+    head = f"`{rev['head'][:10]}`" if rev.get("head") else "unknown"
+    proof = m["proof"]
+    return [f"Revision: {head}" + (f" + {rev['dirty_files']} uncommitted files" if rev.get("dirty_files") else ", clean"),
+            f"Build: {build_label(m.get('build'))}", f"Device: {ev.device_name(m)}",
+            f"Live services: {', '.join(m.get('live') or []) or 'none'}",
+            f"Proof: {proof.get('repo_path') or proof.get('name', 'proof') + '.py'}"
+            + (" (committed)" if proof.get("committed") else " (not committed; proof.py here is its source)"),
+            f"Poster: {m['poster_source']}" if m.get("poster_source") else "Poster: none",
+            f"Finished: {m.get('finished')}",
+            "Rerun: " + " ; ".join(rerun_lines(None, m, proof.get("repo_path") or f"proofs/{proof.get('name')}.py"))]
+
+
+def write_run(attempt, m):
+    attempt = Path(attempt)
+    (attempt / "proof.json").write_text(json.dumps({**m, "sections": [list(s) for s in m.get("sections") or []]}, indent=2) + "\n")
+    (attempt / "report.md").write_text(ev.report_md(m, run_details(m)))
+    (attempt / "index.html").write_text(ev.index_html(m, run_details(m)))
+
+
+def prove(path, attempt):
+    """Runs one proof into its attempt folder; returns its manifest, whose "exit" is 0 PASS, 1 FAIL or 2 ERROR."""
+    name = Path(path).stem
+    attempt = Path(attempt)
     devices = STATE / "devices"
     selected = devices.read_text().split() if devices.exists() else []
     serial = os.environ.get("VERIFY_SERIAL") or (selected[0] if selected else None)
-    error, evidence, build, proof, android, videos, props = None, None, {}, None, None, [], {}
-    existing, ui_header = {}, None
+    error, build, proof, android, videos, props, device_dir, folder = None, {}, None, None, [], {}, None, None
+    if Path(path).is_file():
+        shutil.copy2(path, attempt / "proof.py")
+    # verify.sh shot and record write here instead of the shared run folder.
+    os.environ["VERIFY_EVIDENCE_DIR"] = str(attempt)
     try:
         if not serial:
             raise Error("no device selected: run verify.sh use <serial>")
         os.environ["VERIFY_SERIAL"] = serial
         # The gate: the app on the device must be verify.sh's build of the current source.
         doctor = verify("doctor", check=False)
-        evidence = Path(re.search(r"evidence -> (\S+)", doctor.stdout).group(1)) if "evidence ->" in doctor.stdout else None
         if doctor.returncode != 0:
             raise Error("verify.sh doctor failed: " + "; ".join(l[5:] for l in doctor.stdout.splitlines() if l.startswith("FAIL")))
         build = json.loads((STATE / "dev" / serial / "installed.json").read_text())
-        # A base or external build gets its own file names, so a run on this checkout's build doesn't overwrite it.
-        side = "base" if build.get("base") else "external" if build.get("external") else ""
-        label = f"{name}-{side}" if side else name
         proof = load(path)
-        android = Android(serial, evidence, f"{side}-" if side else "")
+        android = Android(serial, None)
         for prop, key in (("ro.product.model", "model"), ("ro.build.version.sdk", "api")):
             props[key] = android._adb("shell", "getprop", prop).strip()
-        if evidence:
-            evidence.mkdir(parents=True, exist_ok=True)
-            # The folder holds every run until verify.sh cleanup, so a run's own files are what changed during it.
-            existing = {f.name: f.stat().st_mtime_ns for f in evidence.iterdir() if f.is_file()}
-            os.environ["VERIFY_UI_LOG"] = str(evidence / "ui.log")
-            ui_header = f"== {label} {datetime.datetime.now().isoformat(timespec='seconds')}"
-            ui_log(ui_header)
-        recording = Recording(label)
+        # Named after the model, not the serial: the folder name reaches published URLs.
+        device_dir = re.sub(r"[^A-Za-z0-9._-]+", "_", props.get("model") or "").strip("_") or "device"
+        folder = android.evidence = attempt / device_dir
+        folder.mkdir()
+        os.environ["VERIFY_EVIDENCE_DIR"] = str(folder)
+        os.environ["VERIFY_UI_LOG"] = str(folder / "ui.log")
+        recording = Recording(name)
         try:
             proof.run(android)
         except Exception:
@@ -353,32 +400,35 @@ def prove(path):
         error = "the proof raised:\n" + traceback.format_exc()
     finally:
         os.environ.pop("VERIFY_UI_LOG", None)
+        os.environ.pop("VERIFY_EVIDENCE_DIR", None)
     if error and android and android.failure_files:
-        error += f"\nscreen at the failure: {', '.join(android.failure_files)}; commands run: ui.log"
+        error += f"\nscreen at the failure: {', '.join(f'{device_dir}/{f}' for f in android.failure_files)}; commands run: {device_dir}/ui.log"
 
     checks = android.checks if android else []
     verdict = "ERROR" if error else "PASS" if checks and all(c["ok"] for c in checks) else "FAIL"
     repo_path, committed = proof_origin(path)
+    kept = lambda names: [f"{device_dir}/{n}" for n in names if folder and (folder / n).is_file()]
     m = {"verdict": verdict, "error": error,
          "proof": {"name": name, "path": str(Path(path).resolve()), "doc": (proof.__doc__ or "").strip() if proof else "",
                    "repo_path": repo_path, "committed": committed,
                    "source": Path(path).read_text() if Path(path).is_file() else ""},
-         "device": serial, **props, "build": build, "checks": checks,
+         "device": serial, **props, "build": build, "revision": revision(), "checks": checks,
          "live": list(getattr(proof, "LIVE", [])) if proof else [],
          "unverified": android.unverified_items if android else [],
-         "videos": videos, "notes": android.notes if android else [], "sections": android.sections if android else [],
-         "finished": datetime.datetime.now().isoformat(timespec="seconds"), "ui_log": ui_header,
-         "exit": {"PASS": 0, "FAIL": 1}.get(verdict, 2), "evidence": str(evidence) if evidence else None}
-    if evidence:
-        evidence.mkdir(parents=True, exist_ok=True)
-        own = {f"proof-{label}.json", f"proof-{label}.md"}
-        m["files"] = sorted(own | {f.name for f in evidence.iterdir() if f.is_file() and f.name != "ui.log"
-                                   and existing.get(f.name) != f.stat().st_mtime_ns})
-        (evidence / f"proof-{label}.json").write_text(json.dumps({**m, "sections": [list(s) for s in m["sections"]]}, indent=2) + "\n")
-        (evidence / f"proof-{label}.md").write_text(report(m))
+         "notes": android.notes if android else [], "sections": android.sections if android else [],
+         "attempt": str(attempt), "device_dir": device_dir if folder else None,
+         "videos": kept(videos), "shots": kept(dict.fromkeys(android.shots if android else [])),
+         "logs": kept(["ui.log", "layout-at-failure.json"]),
+         "problems": [f"{v} missing: screenrecord saved nothing" for v in videos if not (folder / v).is_file()],
+         "finished": datetime.datetime.now().isoformat(timespec="seconds"),
+         "exit": {"PASS": 0, "FAIL": 1}.get(verdict, 2)}
+    ev.draw_run(attempt, m)
+    write_run(attempt, m)
     passed = sum(c["ok"] for c in checks)
+    drawn = ", ".join(Path(p).name for p in m["images"].values())
     print(f"VERDICT {verdict}  checks {passed}/{len(checks)}" + (f"\nERROR {error}" if error else "")
-          + (f"\nevidence {evidence}" if evidence else ""))
+          + (f"\ndrew {drawn}" if drawn else "") + "".join(f"\nPROBLEM {p}" for p in m["problems"])
+          + f"\nevidence {attempt}  (report.md, index.html)")
     return m
 
 
@@ -391,9 +441,19 @@ def paired(checks):
     return out
 
 
-def compare(path):
-    """Before and after: the proof on the base build, then on this checkout's build. Exit is the after run's."""
+def check_rows(before, after):
+    """(check, before, after) per check, each "pass", "FAIL" or "-", in the after run's order."""
+    b, a = paired(before["checks"]), paired(after["checks"])
+    keys = list(a) + [k for k in b if k not in a]
+    mark = lambda c: "-" if c is None else "pass" if c["ok"] else "FAIL"
+    return [(k[0] if k[1] == 1 else f"{k[0]} ({k[1]})", mark(b.get(k)), mark(a.get(k))) for k in keys]
+
+
+def compare(path, root):
+    """Before and after: the proof on the base build, then on this checkout's build, each in its own attempt folder
+    under one compare folder. Exit is the after run's."""
     name = Path(path).stem
+    folder = new_attempt(root, f"{name}-vs-base")
     runs = {}
     for side, args in (("before", ["--base"]), ("after", [])):
         installed = verify("install", *args, check=False)
@@ -401,14 +461,11 @@ def compare(path):
             print(f"ERROR installing the {side} build: {(installed.stderr or installed.stdout).strip()}")
             return 2
         print(f"== {side}: {installed.stdout.strip()}", flush=True)
-        runs[side] = prove(path)
+        (folder / side).mkdir()
+        runs[side] = prove(path, folder / side)
     before, after = runs["before"], runs["after"]
 
-    b, a = paired(before["checks"]), paired(after["checks"])
-    keys = list(a) + [k for k in b if k not in a]
-    mark = lambda c: "-" if c is None else "pass" if c["ok"] else "FAIL"
-    rows = [(k[0], mark(b.get(k)), mark(a.get(k))) for k in keys]
-    changed = [r for r in rows if r[1] != r[2]]
+    rows = check_rows(before, after)
     if after["verdict"] == "PASS" and before["verdict"] != "PASS":
         meaning = "fails before and passes after: the change makes the proof's claim true"
     elif after["verdict"] == "PASS":
@@ -416,38 +473,24 @@ def compare(path):
                    "the change fixes")
     else:
         meaning = f"the after run is {after['verdict']}: the change doesn't hold up"
-    lines = [f"# {name}: before and after", "", after["proof"]["doc"], "",
-             f"**{before['verdict']} before, {after['verdict']} after**: {meaning}.", "",
-             f"Before: {build_label(before['build'])}. After: {build_label(after['build'])}. Device {after['device']}.", "",
-             "| Check | Before | After |", "|---|---|---|", *[f"| {n} | {x} | {y} |" for n, x, y in rows]]
-    for side in (before, after):
-        if side["error"]:
-            lines += ["", f"{'Before' if side is before else 'After'} stopped with an error: {side['error'].splitlines()[0]}"]
-    if after["evidence"]:
-        Path(after["evidence"], f"compare-{name}.md").write_text("\n".join(lines) + "\n")
+    labels = (f"Before: {build_label(before['build'])}", f"After: {build_label(after['build'])}")
+    image, problem = ev.draw_before_after(folder, before, after, labels)
+    c = {"proof": {"name": name, "doc": after["proof"]["doc"]}, "before": "before/proof.json", "after": "after/proof.json",
+         "verdicts": [before["verdict"], after["verdict"]], "meaning": meaning, "rows": rows, "labels": labels,
+         "before_after": image, "problems": [problem] if problem else [], "exit": after["exit"]}
+    details = [*labels, f"Device: {ev.device_name(after)}", run_details(after)[0], run_details(after)[3],
+               "Rerun: " + " ; ".join(rerun_lines(before, after, after["proof"].get("repo_path") or f"proofs/{name}.py"))]
+    (folder / "compare.json").write_text(json.dumps(c, indent=2) + "\n")
+    (folder / "report.md").write_text(ev.compare_report_md(c, before, after, details))
+    (folder / "index.html").write_text(ev.compare_index_html(c, before, after, details))
 
     print(f"\nCOMPARE {before['verdict']} before, {after['verdict']} after: {meaning}")
-    for n, x, y in changed:
-        print(f"  {x:>4} -> {y:<4}  {n}")
-    if after["evidence"]:
-        print(f"report {Path(after['evidence'], f'compare-{name}.md')}")
+    for n, x, y in rows:
+        if x != y:
+            print(f"  {x:>4} -> {y:<4}  {n}")
+    print(f"evidence {folder}  (report.md, index.html" + (f", {image})" if image else ")")
+          + (f"\nPROBLEM {problem}" if problem else ""))
     return after["exit"]
-
-
-# --- pr-summary: the repo is public, so the Markdown carries only what the runs' JSON records about the proof,
-# builds, device and checks. Never a path, log, screenshot or user name.
-
-def load_run(arg):
-    """A run's proof-<name>.json, given the file or an evidence folder holding one proof's run on this checkout."""
-    path = Path(arg)
-    if path.is_dir():
-        found = sorted(f for f in path.glob("proof-*.json") if not f.stem.endswith(("-base", "-external")))
-        if len(found) != 1:
-            raise Error(f"{arg} holds {len(found)} runs on this checkout's build; pass the run's proof-<name>.json")
-        path = found[0]
-    if not path.is_file():
-        raise Error(f"no run at {arg}: pass a proof-<name>.json or the evidence folder holding it")
-    return json.loads(path.read_text()), path
 
 
 def public(text):
@@ -470,19 +513,13 @@ def build_public(build):
     return "this branch" + (f" ({detail})" if detail else "")
 
 
-def headline(error):
-    lines = [l.strip() for l in (error or "error").splitlines() if l.strip()] or ["error"]
-    # A proof that raised carries a traceback, whose last line is the exception itself.
-    return lines[-1] if lines[0].startswith("the proof raised") else lines[0]
-
-
 def outcome(run):
     where = {"Base": "the base", "External APK": "the external APK"}.get(column(run["build"]), "this branch")
     bad = [c for c in run["checks"] if not c["ok"]]
     if run["verdict"] == "PASS":
         return f"passes on {where}"
     if run["verdict"] == "ERROR":
-        return f"couldn't run on {where} ({headline(run['error'])})"
+        return f"couldn't run on {where} ({ev.headline(run['error'])})"
     if not run["checks"]:
         return f"fails on {where} (no checks ran)"
     return f"fails on {where} ({len(bad)} of {len(run['checks'])} checks)"
@@ -530,102 +567,192 @@ def node(script, *args):
         raise Error(f"{script.name} failed: {detail}")
     return p.stdout.strip().splitlines()[-1]
 
-def ui_log_sections(text, headers):
-    """The parts of a shared ui.log that belong to the given runs: each starts at its "== <label> <time>" line."""
-    keep, out = False, []
-    for line in text.splitlines(keepends=True):
-        if line.startswith("== "):
-            keep = line.rstrip("\n") in headers
-        if keep:
-            out.append(line)
-    return "".join(out)
+
+def auto_root():
+    home = Path(os.environ.get("DDG_AUTO_HOME") or Path.home() / ".auto")
+    return Path(os.environ.get("DDG_AUTO_AUDIT_ROOT") or home / "evidence").resolve()
+
 
 def publish(arg, into=None):
-    """Copies one run (with its base run and compare report, when compare left them) into an auto evidence folder,
-    records each report's served URL in the run's proof-<name>.json (here and in the copy), uploads the auto folder,
+    """Uploads an attempt or compare folder to auto's evidence store, copying it into an auto evidence folder first
+    when it isn't in one, records each index.html's served URL as evidence_url in its JSON (here and in the copy),
     and prints the URLs."""
     try:
-        after, path = load_run(arg)
-        src = path.parent
-        base = path.with_name(f"{path.stem}-base.json")
-        runs = [(after, path)] + ([(json.loads(base.read_text()), base)] if base.is_file() else [])
-        compared = src / f"compare-{after['proof']['name']}.md"
+        src = Path(arg).resolve()
+        src = src.parent if src.is_file() else src
+        # A side of a comparison is published with the comparison, so its links keep working.
+        if src.name in ("before", "after") and (src.parent / "compare.json").is_file():
+            src = src.parent
+        compared = (src / "compare.json").is_file()
+        if not compared and not (src / "proof.json").is_file():
+            raise Error(f"no run at {arg}: pass an attempt folder (proof.json) or a compare folder (compare.json)")
         scripts = auto_evidence_scripts()
         os.umask(0o022)  # the store serves what it uploads; keep files readable
-        root = Path(into).resolve() if into else Path(node(scripts / "new-evidence.ts"))
-        dest = root / "verify-android" / f"{src.parent.name}-{src.name}-{path.stem.removeprefix('proof-')}"
-        if dest.exists():
-            raise Error(f"{dest} exists: the store never replaces a file, so publish a run once")
-        dest.mkdir(parents=True)
-        # Runs from before files were recorded fall back to their own report, data and videos.
-        names = {n for m, p in runs for n in (m.get("files") or [p.name, p.with_suffix(".md").name, *m.get("videos", [])])}
-        names |= {compared.name} if base.is_file() and compared.is_file() else set()
-        for n in sorted(names):
-            if (src / n).is_file():
-                shutil.copy2(src / n, dest / n)
-        if (src / "ui.log").is_file():
-            (dest / "ui.log").write_text(ui_log_sections((src / "ui.log").read_text(), {m.get("ui_log") for m, _ in runs}))
+        root = auto_root()
+        target = Path(into).resolve() if into else None if inside(src, root) else Path(node(scripts / "new-evidence.ts"))
+        dest = src
+        if target and not inside(src, target):
+            dest = target / src.name
+            if dest.exists():
+                raise Error(f"{dest} exists: the store never replaces a file, so publish a run once")
+            shutil.copytree(src, dest)
+        if not inside(dest, root) or dest == root:
+            raise Error(f"{dest} isn't in auto's evidence store ({root}): pass --into an evidence folder from new-evidence.ts")
         urls = {}
-        for m, p in runs:
-            report_md = dest / p.with_suffix(".md").name
-            urls[p.name] = node(scripts / "evidence-url.ts", report_md if report_md.is_file() else dest / p.name)
-            for copy in (dest / p.name, p):
+        for rel in (["compare.json", "before/proof.json", "after/proof.json"] if compared else ["proof.json"]):
+            url = node(scripts / "evidence-url.ts", (dest / rel).parent / "index.html")
+            urls[str(Path(rel).parent / "index.html").removeprefix("./")] = url
+            for copy in {dest / rel, src / rel}:
                 data = json.loads(copy.read_text())
-                data["evidence_url"] = urls[p.name]
+                data["evidence_url"] = url
                 copy.write_text(json.dumps(data, indent=2) + "\n")
-        if (dest / compared.name).is_file():
-            urls[compared.name] = node(scripts / "evidence-url.ts", dest / compared.name)
-        uploaded = json.loads(node(scripts / "upload-evidence.ts", "--directory", root))
+        uploaded = json.loads(node(scripts / "upload-evidence.ts", "--directory", root / dest.relative_to(root).parts[0]))
         if uploaded.get("failed"):
-            raise Error(f"{uploaded['failed']} files failed to upload; rerun publish with --into {root}")
+            raise Error(f"{uploaded['failed']} files failed to upload; rerun publish on {dest}")
     except Error as e:
         print(f"ERROR {e}", file=sys.stderr)
         return 2
     for name, url in urls.items():
         print(f"{name}  {url}")
+    print(f"Evidence URL: {urls['index.html']}")
     return 0
 
-def summarize(before, after):
-    proof = after["proof"]
-    committed = proof.get("repo_path") if proof.get("committed") else None
-    claim = (proof.get("doc") or "").split("\n\n")[0].replace("\n", " ")
-    sentence = "; ".join(outcome(r) for r in (before, after) if r)
-    # A run that stopped at doctor never read the device or the build, so those lines are left out, not guessed.
-    device = ", ".join(x for x in (after.get("model"), f"API {after['api']}" if after.get("api") else "") if x)
-    lines = [f"**{sentence[0].upper()}{sentence[1:]}.**", "",
-             "- Proof: " + (f"`{committed}`" if committed else "written for this change (source below)") + (f": {claim}" if claim else "")]
-    lines += [f"- Device: {device}"] if device else []
-    lines += ["- Builds: " + (f"{build_public(before['build'])} → " if before else "") + build_public(after["build"]),
-              f"- Live services: {', '.join(after.get('live') or []) or 'none'}"]
-    lines += [f"- Evidence: {after['evidence_url']}"] if after.get("evidence_url") else []
-    if before:
-        differs = [k for k in ("model", "api") if before.get(k) != after.get(k)]
-        differs += ["proof source"] if before["proof"].get("source") != proof.get("source") else []
-        if differs:
-            lines.append(f"- Not like for like: the runs differ in {', '.join(differs)}")
-    lines += [f"- Not verified: {u['what']} ({u['why']})" for u in after.get("unverified") or []]
 
-    if before:
-        b, a = paired(before["checks"]), paired(after["checks"])
-        keys = list(a) + [k for k in b if k not in a]
-        label = lambda k: k[0] if k[1] == 1 else f"{k[0]} ({k[1]})"
-        header = [f"| Check | {column(before['build'])} | {column(after['build'])} |", "|---|---|---|"]
-        rows = {k: f"| {label(k)} | {cell(b.get(k))} | {cell(a.get(k))} |" for k in keys}
-        changed = [k for k in keys if cell(b.get(k)).split(" ")[0] != cell(a.get(k)).split(" ")[0]]
-        lines += ["", *header, *([rows[k] for k in changed] or [f"| all {len(keys)} checks | same result | same result |"])]
-        lines += ["", "<details><summary>All checks</summary>", "", *header, *rows.values(), "", "</details>"]
+# --- pr-summary: the repo is public, so the Markdown carries only what the runs' JSON records about the proof,
+# builds, device and checks, and links to evidence: served URLs once published. Never a path, log or user name.
+
+def read_run(arg):
+    path = Path(arg)
+    path = path / "proof.json" if path.is_dir() else path
+    if not path.is_file() or path.name == "compare.json":
+        raise Error(f"no run at {arg}: pass an attempt folder or its proof.json, or a compare folder")
+    return json.loads(path.read_text()), path.parent
+
+
+def load_runs(args):
+    """(before, after, comparison): each run is (manifest, the prefix its unpublished links take); comparison is the
+    compare folder's compare.json, or None."""
+    first = Path(args[0])
+    folder = first if first.is_dir() else first.parent if first.name == "compare.json" else None
+    if len(args) == 1 and folder and (folder / "compare.json").is_file():
+        c = json.loads((folder / "compare.json").read_text())
+        return (read_run(folder / "before")[0], "before/"), (read_run(folder / "after")[0], "after/"), c
+    runs = [read_run(a) for a in args]
+    if len(runs) == 1:
+        return None, (runs[0][0], ""), None
+    (b, b_dir), (a, a_dir) = runs
+    return (b, f"{b_dir.name}/"), (a, f"{a_dir.name}/"), None
+
+
+def href(run, rel):
+    """A file of a run: its served URL when published (siblings of the served index.html), else a relative path."""
+    m, prefix = run
+    if m.get("evidence_url"):
+        return m["evidence_url"].rsplit("/", 1)[0] + "/" + quote(rel)
+    return quote(prefix + rel)
+
+
+def thumb(src, alt, target=None):
+    # auto's publish-pr finds exactly this form and swaps the src for a GitHub attachment.
+    alt = re.sub(r"[`\"<>]", "", alt)
+    return f"[<img src=\"{src}\" width=\"200\" alt=\"{alt}\">]({target or src})"
+
+
+def heading(run, compared):
+    build = run[0]["build"]
+    if build.get("base"):
+        return f"Before (base `{build['base']}`)"
+    return {"External APK": "External APK"}.get(column(build), "After" if compared else "This branch")
+
+
+def evidence_table(runs, compared, comparison):
+    lines, ms = [], [m for m, _ in runs]
+    names = ev.shot_names(*ms)
+    labels = [heading(r, compared) for r in runs]
+    if names or any(m.get("videos") for m in ms):
+        lines += ["| | " + " | ".join(labels) + " |", "|---" * (len(runs) + 1) + "|"]
+        for n in names[:6]:
+            cells = [thumb(href(r, ev.shot_path(r[0], n)), f"{label}: {n}") if ev.shot_path(r[0], n) else "not taken"
+                     for r, label in zip(runs, labels)]
+            lines.append(f"| {n} | " + " | ".join(cells) + " |")
+        if any(m.get("videos") for m in ms):
+            cells = []
+            for r, label in zip(runs, labels):
+                video, poster = (r[0].get("videos") or [None])[0], (r[0].get("images") or {}).get("poster")
+                cells.append("no video" if not video else thumb(href(r, poster), f"{label}: video", href(r, video))
+                             if poster else f"[▶ Watch video]({href(r, video)})")
+            lines.append("| video | " + " | ".join(cells) + " |")
+        lines.append("")
+    watch = [f"{label}: [▶ Watch video]({href(r, r[0]['videos'][0])})"
+             + "".join(f" ([part {i}]({href(r, v)}))" for i, v in enumerate(r[0]["videos"][1:], 2))
+             for r, label in zip(runs, labels) if r[0].get("videos")]
+    lines += [" · ".join(watch), ""] if watch else []
+    more = [f"{len(names) - 6} more screenshots in the full report"] if len(names) > 6 else []
+    if comparison and comparison.get("before_after"):
+        url = (comparison["evidence_url"].rsplit("/", 1)[0] + "/" if comparison.get("evidence_url") else "") + comparison["before_after"]
+        lines += [f"Key frames paired by name: [before-after.png]({url})" + "".join(f"; {x}" for x in more) + ".", ""]
     else:
-        bad = [c for c in after["checks"] if not c["ok"]]
-        if bad:
-            lines += ["", "| Check | Result |", "|---|---|", *[f"| {c['check']} | {cell(c)} |" for c in bad]]
-        elif after["verdict"] == "PASS":
-            lines += ["", f"All {len(after['checks'])} checks passed."]
-        elif not after["checks"]:
-            lines += ["", "No checks ran."]
-        lines += ["", "<details><summary>All checks</summary>", "", "| Check | Result |", "|---|---|",
-                  *[f"| {c['check']} | {cell(c)} |" for c in after["checks"]], "", "</details>"]
+        frames = [f"[{label}]({href(r, r[0]['images']['key_frames'])})" for r, label in zip(runs, labels)
+                  if (r[0].get("images") or {}).get("key_frames")]
+        if frames or more:
+            lines += ["; ".join(([f"Key frames: {', '.join(frames)}"] if frames else []) + more) + ".", ""]
+    return lines
 
-    for run in (r for r in (before, after) if r):
+
+def summarize(before, after, comparison=None):
+    runs = [r for r in (before, after) if r]
+    b, a = (before[0] if before else None), after[0]
+    proof = a["proof"]
+    committed = proof.get("repo_path") if proof.get("committed") else None
+    claim = (proof.get("doc") or "").split("\n\n")[0].replace("\n", " ").strip() or proof.get("name") or "proof"
+    sentence = "; ".join(outcome(r) for r in (b, a) if r)
+    device = ev.device_name(a) if a.get("model") else None
+    on = f"{a['model']} (API {a.get('api') or '?'})" if a.get("model") else None
+    compared = bool(b and b["build"].get("base"))
+    how = f" Driven through the app's UI on a {on}" + (", on the base build and on this branch" if compared else "") + "." if device else ""
+    lines = [f"### {ev.claim(a)}", "", f"**Verified:** {claim}{how}", "", *evidence_table(runs, compared, comparison)]
+
+    outcome_line = f"**Outcome:** {sentence[0].upper()}{sentence[1:]}."
+    if b:
+        changed = [(n, x, y) for n, x, y in check_rows(b, a) if x != y]
+        outcome_line += (" Changed: " + "; ".join(f"{n}: {x} → {y}" for n, x, y in changed[:5]) + "."
+                         if changed else f" All {len(check_rows(b, a))} checks give the same result on both.")
+    else:
+        bad = [c for c in a["checks"] if not c["ok"]]
+        outcome_line += (" Failed: " + "; ".join(c["check"] + (f" ({c['detail']})" if c["detail"] else "") for c in bad[:5]) + "."
+                         if bad else " The one check passed." if len(a["checks"]) == 1
+                         else f" All {len(a['checks'])} checks passed." if a["checks"] else " No checks ran.")
+    problems = [p for m in (b, a) if m for p in m.get("problems") or []] + ((comparison or {}).get("problems") or [])
+    outcome_line += (" Problems: " + "; ".join(problems) + ".") if problems else ""
+    lines += [outcome_line, ""]
+
+    details = [f"proof `{committed}`" if committed else "proof written for this change (source below)",
+               "builds " + (f"{build_public(b['build'])} → " if b else "") + build_public(a["build"])]
+    details += [device] if device else []
+    details += [f"live services: {', '.join(a.get('live') or []) or 'none'}"]
+    if b:
+        differs = [k for k in ("model", "api") if b.get(k) != a.get(k)]
+        differs += ["proof source"] if b["proof"].get("source") != proof.get("source") else []
+        details += [f"not like for like: the runs differ in {', '.join(differs)}"] if differs else []
+    if comparison:
+        report = (comparison["evidence_url"] if comparison.get("evidence_url") else "index.html")
+    else:
+        report = href(after, "index.html")
+    lines += [f"**Details:** `prove.py{' compare' if comparison else ''}`, " + ", ".join(details) + f". [Full report]({report})", ""]
+    if a.get("unverified"):
+        lines += ["**Unverified:** " + "; ".join(f"{u['what']} ({u['why']})" for u in a["unverified"]) + ".", ""]
+
+    if b:
+        header = [f"| Check | {column(b['build'])} | {column(a['build'])} |", "|---|---|---|"]
+        bp, ap = paired(b["checks"]), paired(a["checks"])
+        keys = list(ap) + [k for k in bp if k not in ap]
+        label = lambda k: k[0] if k[1] == 1 else f"{k[0]} ({k[1]})"
+        lines += ["<details><summary>All checks</summary>", "", *header,
+                  *[f"| {label(k)} | {cell(bp.get(k))} | {cell(ap.get(k))} |" for k in keys], "", "</details>"]
+    else:
+        lines += ["<details><summary>All checks</summary>", "", "| Check | Result |", "|---|---|",
+                  *[f"| {c['check']} | {cell(c)} |" for c in a["checks"]], "", "</details>"]
+    for run in (r for r in (b, a) if r):
         for title, markdown in run.get("sections") or []:
             lines += ["", f"<details><summary>{title} ({column(run['build'])})</summary>", "", markdown, "", "</details>"]
     if not committed and proof.get("source"):
@@ -636,30 +763,44 @@ def summarize(before, after):
     lines += ["", "<details><summary>Rerun</summary>", "", "```",
               *([] if committed else [f"# save the proof source above as {saved}"]),
               f"V={SKILL.relative_to(REPO)}/verify.sh", f"P={SKILL.relative_to(REPO)}/prove.py",
-              *rerun_lines(before, after, committed or saved), "```", "", "</details>"]
+              *rerun_lines(b, a, committed or saved), "```", "", "</details>"]
     return public("\n".join(lines) + "\n")
 
 
 def pr_summary(*args):
-    """Prints the summary of one run, or of a before and an after run. With one run and a -base run of the same proof
-    beside it (as compare leaves them), that is the before."""
+    """Prints the Verification scenario for a compare folder, one run, or a before and an after run."""
     try:
-        runs = [load_run(a) for a in args]
+        before, after, comparison = load_runs(args)
     except Error as e:
         print(f"ERROR {e}", file=sys.stderr)
         return 2
-    if len(runs) == 2:
-        before, after = runs[0][0], runs[1][0]
-    else:
-        after, path = runs[0]
-        base = path.with_name(f"{path.stem}-base.json")
-        before = json.loads(base.read_text()) if base.is_file() and not after["build"].get("base") else None
-    print(summarize(before, after), end="")
+    print(summarize(before, after, comparison), end="")
+    published = [r[0].get("evidence_url") for r in (before, after) if r] + ([comparison.get("evidence_url")] if comparison else [])
+    if not all(published):
+        print("NOTE not published: evidence links are local relative paths, which a PR can't open; "
+              "run prove.py publish on the folder, then pr-summary again", file=sys.stderr)
     return 0
 
 
+# --- selftest
+
+def tiny_png(path, rgb, width=54, height=120):
+    """A solid PNG with the standard library only, so the offline cases need no image tool."""
+    raw = b"".join(b"\x00" + bytes(rgb) * width for _ in range(height))
+    chunk = lambda kind, data: (struct.pack(">I", len(data)) + kind + data
+                                + struct.pack(">I", zlib.crc32(kind + data) & 0xffffffff))
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0))
+                     + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+
+
+def png_size(path):
+    data = Path(path).read_bytes()[:24]
+    return struct.unpack(">II", data[16:24]) if data[:8] == b"\x89PNG\r\n\x1a\n" else (0, 0)
+
+
 def summary_fixtures(folder):
-    """Runs as prove() writes them, with this machine's paths in every field that has one, for the offline cases."""
+    """Attempt folders as prove() and compare() write them, with this machine's paths in every field that has one."""
     home, apk = str(Path.home()), str(REPO / "build" / "verify" / "builds")
     branch = {"head": "4f2a9c1e7b3d5a6f", "dirty": True, "fingerprint": "f" * 64, "apk": f"{apk}/4f2a9c1e.apk",
               "sha256": "4f2a9c1e" * 8, "serial": "emulator-5580"}
@@ -672,33 +813,80 @@ def summary_fixtures(folder):
                  "source": "def run(android):\n    pass\n"}
     scratch = {**committed, "name": "fix", "path": f"{home}/scratch/fix.py", "repo_path": None, "committed": False,
                "doc": "Closing a tab keeps the other tabs.", "source": "def run(android):\n    android.check('kept', True)\n"}
+    dev = "sdk_gphone64_arm64"
 
-    def run(verdict, build, proof, checks, **extra):
-        return {"verdict": verdict, "error": None, "proof": proof, "device": "emulator-5580", "model": "sdk_gphone64_arm64",
-                "api": "34", "build": build, "checks": [{"check": c, "ok": ok, "detail": d} for c, ok, d in checks],
-                "live": [], "unverified": [], "videos": ["proof-tabs-1.mp4"], "notes": [f"saved in {home}"],
-                "sections": [], "finished": "2026-11-17T10:00:00", "exit": {"PASS": 0, "FAIL": 1}.get(verdict, 2),
-                "evidence": f"{REPO}/build/verify/evidence/20261117-100000/emulator", **extra}
+    def run(attempt, verdict, build, proof, checks, shots=("before-switcher", "switcher"), **extra):
+        m = {"verdict": verdict, "error": None, "proof": proof, "device": "emulator-5580", "model": dev,
+             "api": "34", "build": build, "revision": {"head": build.get("head", "0" * 10), "dirty_files": 2},
+             "checks": [{"check": c, "ok": ok, "detail": d} for c, ok, d in checks],
+             "live": [], "unverified": [], "notes": [f"saved in {home}"], "sections": [], "attempt": str(attempt),
+             "device_dir": dev, "videos": [f"{dev}/recording-1.mp4"], "shots": [f"{dev}/{s}.png" for s in shots],
+             "logs": [f"{dev}/ui.log"], "problems": [], "images": {"key_frames": f"{dev}/key-frames.png", "poster": f"{dev}/poster.png"},
+             "poster_source": "the video's last frame", "finished": "2026-11-17T10:00:00",
+             "exit": {"PASS": 0, "FAIL": 1}.get(verdict, 2), **extra}
+        attempt.mkdir(parents=True)
+        (attempt / "proof.json").write_text(json.dumps(m))
+        return m
 
     checks = [("at the switcher", True, "TabSwitcherActivity"), ("card titled with the page", True, ""),
               ("tab count 2", True, "2")]
-    compare_dir = folder / "compare"
-    compare_dir.mkdir()
-    (compare_dir / "proof-tabs-base.json").write_text(json.dumps(run(
-        "FAIL", base, committed, checks[:1] + [("card titled with the page", False, "")] + checks[2:])))
-    (compare_dir / "proof-tabs.json").write_text(json.dumps(run("PASS", branch, committed, checks)))
-    (folder / "error.json").write_text(json.dumps(run(
-        "ERROR", branch, scratch, checks[:1], live=["duck.ai chat"],
-        error=f"verify.sh tap id:close failed (1): not on screen in {REPO}\nscreen at the failure: layout-at-failure.json",
-        unverified=[{"what": "the undo snackbar", "why": "it hides before the layout can be read"}])))
-    (folder / "external.json").write_text(json.dumps(run("FAIL", external, committed, [("tab count 2", False, "1")])))
-    (folder / "branch.json").write_text(json.dumps(run("PASS", branch, committed, [("tab count 2", True, "2")])))
-    return compare_dir
+    compare_dir = folder / "20261117-100000-tabs-vs-base-ab12"
+    before = run(compare_dir / "before", "FAIL", base, committed, checks[:1] + [("card titled with the page", False, "")] + checks[2:])
+    after = run(compare_dir / "after", "PASS", branch, committed, checks)
+    (compare_dir / "compare.json").write_text(json.dumps({
+        "proof": {"name": "tabs", "doc": committed["doc"]}, "before": "before/proof.json", "after": "after/proof.json",
+        "rows": check_rows(before, after), "before_after": "before-after.png", "problems": []}))
+    run(folder / "error", "ERROR", branch, scratch, checks[:1], live=["duck.ai chat"],
+        error=f"verify.sh tap id:close failed (1): not on screen in {REPO}\nscreen at the failure: {dev}/layout-at-failure.json",
+        unverified=[{"what": "the undo snackbar", "why": "it hides before the layout can be read"}])
+    run(folder / "external", "FAIL", external, committed, [("tab count 2", False, "1")])
+    run(folder / "branch", "PASS", branch, committed, [("tab count 2", True, "2")])
+    served = "https://artifacts.go.duckduckgo.com/view/auto/076c07cc-9e60-42df-8edb-53a6896bf5a4/20261117-100000-tabs-ab12"
+    run(folder / "published", "PASS", branch, committed, checks, evidence_url=f"{served}/index.html")
+    return compare_dir, served
 
 
-def selftest(offline=False):
-    """Runs the tests/ proofs and a stale build, and checks each verdict, after the pr-summary cases, which need no
-    device. Exit 0 when all behave."""
+def selftest_evidence(folder):
+    """Draws a run's images and writes its pages from fixture captures: the offline half of what prove() leaves."""
+    problems = []
+    attempt = folder / "drawn"
+    for i, name in enumerate(("before-tap", "after-tap")):
+        tiny_png(attempt / "dev" / f"{name}.png", (40 * i, 120, 200))
+    (attempt / "dev" / "recording-1.mp4").write_bytes(b"not a video")
+    m = {"verdict": "FAIL", "error": None, "proof": {"name": "drawn", "doc": "A tap shows the next screen."},
+         "model": "Pixel 7", "api": "36", "build": {}, "checks": [{"check": "ok", "ok": True, "detail": ""},
+                                                                  {"check": "bad", "ok": False, "detail": "x"}],
+         "unverified": [], "notes": [], "sections": [], "device_dir": "dev", "videos": ["dev/recording-1.mp4"],
+         "shots": ["dev/before-tap.png", "dev/after-tap.png"], "logs": [], "problems": []}
+    ev.draw_run(attempt, m)
+    width, height = png_size(attempt / "dev" / ev.KEY_FRAMES)
+    if not (width > 2 * 54 and height > ev.HEIGHT):
+        problems.append(f"key-frames.png is {width}x{height}, not two labelled frames ({m['problems']})")
+    if png_size(attempt / "dev" / ev.POSTER)[1] != ev.HEIGHT:
+        problems.append(f"poster.png wasn't drawn from the last screenshot ({m['problems']})")
+    write_run(attempt, m)
+    report = (attempt / "report.md").read_text()
+    order = [report.find(h) for h in ("## Verified", "## Evidence", "## Outcome", "## Details", "## Unverified")]
+    if -1 in order or order != sorted(order):
+        problems.append(f"report.md sections out of order: {order}")
+    page = (attempt / "index.html").read_text()
+    if "<video controls" not in page or page.find(">bad<") > page.find(">ok<"):
+        problems.append("index.html lacks the video, or doesn't list failed checks first")
+    if re.search(r"(src|href)=\"(https?:)?//", page):
+        problems.append("index.html loads something from elsewhere")
+    other = folder / "other"
+    tiny_png(other / "after" / "dev" / "after-tap.png", (0, 0, 0))
+    (other / "before").mkdir()
+    shutil.copytree(attempt / "dev", other / "before" / "dev")
+    image, problem = ev.draw_before_after(other, m, {**m, "shots": ["dev/after-tap.png"]}, ("Before", "After"))
+    if not image or png_size(other / ev.BEFORE_AFTER)[1] < 2 * ev.HEIGHT:
+        problems.append(f"before-after.png wasn't drawn as two rows: {problem}")
+    return problems
+
+
+def selftest(offline=False, evidence_dir=None):
+    """Runs the offline cases (pr-summary, evidence folders, images and pages), then the tests/ proofs and a stale build,
+    and checks each verdict. Exit 0 when all behave."""
     tests = SKILL / "tests"
     stale = REPO / "verify-selftest-stale.txt"
 
@@ -714,65 +902,116 @@ def selftest(offline=False):
     results = []
     with tempfile.TemporaryDirectory() as tmp:
         folder = Path(tmp)
-        compare_dir = summary_fixtures(folder)
-        leaks = (str(REPO), str(Path.home()), tmp, os.environ.get("USER", ""), "Downloads", "emulator-5580", "evidence")
+        compare_dir, served = summary_fixtures(folder)
+        leaks = (str(REPO), str(Path.home()), tmp, os.environ.get("USER", ""), "Downloads", "emulator-5580")
         results += [
-            ("pr-summary pairs a compare's runs and shows what changed", *case(
+            ("pr-summary of a compare folder is one auto scenario with Before | After", *case(
                 ["pr-summary", compare_dir], 0,
-                ("**Fails on the base (1 of 3 checks); passes on this branch.**", "| card titled with the page | FAIL | pass |",
-                 "`.agents/skills/verify-android/proofs/tabs.py`", "<details><summary>All checks", "$P compare", "API 34"),
+                ("### The tab switcher lists one card per tab.", "**Verified:** The tab switcher lists one card per tab.",
+                 "| | Before (base `origin/develop`) | After |", "| switcher | [<img src=\"before/sdk_gphone64_arm64/switcher.png\"",
+                 "[▶ Watch video](after/sdk_gphone64_arm64/recording-1.mp4)", "before-after.png",
+                 "**Outcome:** Fails on the base (1 of 3 checks); passes on this branch. Changed: card titled with the page: FAIL → pass.",
+                 "**Details:** `prove.py compare`", "[Full report](index.html)", "`.agents/skills/verify-android/proofs/tabs.py`",
+                 "<details><summary>All checks", "$P compare", "API 34", "NOTE not published"),
                 leaks)),
+            ("pr-summary of a published run links served thumbnails publish-pr can attach", *case(
+                ["pr-summary", folder / "published"], 0,
+                (f"[<img src=\"{served}/sdk_gphone64_arm64/switcher.png\" width=\"200\" alt=\"This branch: switcher\">]"
+                 f"({served}/sdk_gphone64_arm64/switcher.png)", f"[▶ Watch video]({served}/sdk_gphone64_arm64/recording-1.mp4)",
+                 f"[Full report]({served}/index.html)", f"Key frames: [This branch]({served}/sdk_gphone64_arm64/key-frames.png)"),
+                (*leaks, "NOTE not published"))),
             ("pr-summary of an uncommitted proof that errored carries its source and no local paths", *case(
-                ["pr-summary", folder / "error.json"], 0,
-                ("Couldn't run on this branch (verify.sh tap id:close failed (1): not on screen in <repo>)", "```python", "save the proof source", "Not verified: the undo snackbar",
-                 "Live services: duck.ai chat", "uncommitted changes"),
+                ["pr-summary", folder / "error" / "proof.json"], 0,
+                ("Couldn't run on this branch (verify.sh tap id:close failed (1): not on screen in <repo>)", "```python",
+                 "save the proof source", "**Unverified:** the undo snackbar", "live services: duck.ai chat", "uncommitted changes"),
                 (*leaks, "layout-at-failure"))),
             ("pr-summary marks an external APK", *case(
-                ["pr-summary", folder / "external.json", folder / "branch.json"], 0,
-                ("Fails on the external APK", "an external APK (sha256 `9c0ffee19c0f`)", "$V install --apk"), leaks)),
+                ["pr-summary", folder / "external", folder / "branch"], 0,
+                ("Fails on the external APK", "an external APK (sha256 `9c0ffee19c0f`)", "$V install --apk", "| | External APK | This branch |"),
+                leaks)),
             ("pr-summary refuses a folder without a run", *case(["pr-summary", folder / "nothing"], 2, ("ERROR",))),
+            ("an evidence dir inside the checkout is refused before anything runs", *case(
+                ["--evidence-dir", REPO / "build" / "verify-selftest", tests / "harness.py"], 2, ("outside this checkout",), ("VERDICT",))),
+            ("a decision log must be an existing .tsv", *case(
+                ["compare", "--decision-log", folder / "decisions.md", tests / "harness.py"], 2, ("--decision-log",), ("VERDICT",))),
         ]
-    if not offline:
-        cases = [
-            ("harness checks pass, and an unverified item doesn't fail them", "harness.py", 0, ("VERDICT PASS", "UNVERIFIED"), ()),
-            ("a wrong expectation is FAIL", "must_fail.py", 1, ("FAIL pixel m_verify_never_fired fired", "FAIL a log line that was never written"), ()),
-            ("a broken step is ERROR, stops the run and saves the screen", "must_error.py", 2,
-             ("VERDICT ERROR", "layout-at-failure.json"), ("never reached",)),
-            ("a proof with no checks isn't a pass", "no_checks.py", 1, ("VERDICT FAIL",), ()),
-            ("an unverified item is never a pass", "only_unverified.py", 1, ("VERDICT FAIL",), ()),
-        ]
-        for name, proof, code, say, not_say in cases:
-            results.append((name, *case([tests / proof], code, say, not_say)))
-        # A source change after the build makes the installed app stale: the run must refuse to start.
-        try:
-            stale.write_text("verify selftest: makes the installed build stale; deleted when the selftest ends\n")
-            results.append(("a stale build is ERROR before anything runs",
-                            *case([tests / "harness.py"], 2, ("stale build",), ("PASS",))))
-        finally:
-            stale.unlink(missing_ok=True)
+        drawn = selftest_evidence(folder)
+        results.append(("an attempt gets key frames, a poster, report.md in scenario order and a self-contained index.html",
+                        drawn, "; ".join(drawn)))
+        if not offline:
+            root = Path(evidence_dir).resolve() if evidence_dir else folder / "attempts"
+            cases = [
+                ("harness checks pass, an unverified item doesn't fail them, and the run is filmed", "harness.py", 0,
+                 ("VERDICT PASS", "UNVERIFIED", "drew poster.png", "report.md, index.html"), ("PROBLEM",)),
+                ("a wrong expectation is FAIL", "must_fail.py", 1, ("FAIL pixel m_verify_never_fired fired", "FAIL a log line that was never written"), ()),
+                ("a broken step is ERROR, stops the run and saves the screen as a key frame", "must_error.py", 2,
+                 ("VERDICT ERROR", "layout-at-failure.json", "drew key-frames.png"), ("never reached",)),
+                ("a proof with no checks isn't a pass", "no_checks.py", 1, ("VERDICT FAIL",), ()),
+                ("an unverified item is never a pass", "only_unverified.py", 1, ("VERDICT FAIL",), ()),
+            ]
+            for name, proof, code, say, not_say in cases:
+                results.append((name, *case(["--evidence-dir", root, tests / proof], code, say, not_say)))
+            attempts = [d for d in root.iterdir() if d.is_dir()] if root.is_dir() else []
+            results.append(("every run wrote its own attempt folder",
+                            [] if len(attempts) >= len(cases) else [f"{len(attempts)} attempt folders for {len(cases)} runs"], ""))
+            # A source change after the build makes the installed app stale: the run must refuse to start.
+            try:
+                stale.write_text("verify selftest: makes the installed build stale; deleted when the selftest ends\n")
+                results.append(("a stale build is ERROR before anything runs",
+                                *case(["--evidence-dir", root, tests / "harness.py"], 2, ("stale build",), ("PASS",))))
+            finally:
+                stale.unlink(missing_ok=True)
 
-    for name, problems, out in results:
-        print(f"{'ok  ' if not problems else 'BAD '} {name}" + (f": {'; '.join(problems)}" if problems else ""))
-        if problems:
-            print("     " + "\n     ".join(out.strip().splitlines()[-6:]))
+        for name, problems, out in results:
+            print(f"{'ok  ' if not problems else 'BAD '} {name}" + (f": {'; '.join(problems)}" if problems else ""))
+            if problems:
+                print("     " + "\n     ".join(out.strip().splitlines()[-6:]))
     bad = sum(1 for _, problems, _ in results if problems)
     print(f"SELFTEST {'PASS' if not bad else 'FAIL'}  {len(results) - bad}/{len(results)} cases behaved"
           + ("  (offline: device cases skipped)" if offline else ""))
     return 1 if bad else 0
 
 
+def parse(args, flags):
+    """Positional arguments and the given --flags (each taking a value, or None for a switch); None on a bad flag."""
+    opts, pos, it = {}, [], iter(args)
+    for a in it:
+        if a in flags:
+            opts[a] = True if flags[a] is None else next(it, None)
+            if opts[a] is None:
+                return None, None
+        elif a.startswith("-"):
+            return None, None
+        else:
+            pos.append(a)
+    return opts, pos
+
+
+def main(args):
+    where = {"--evidence-dir": "", "--decision-log": ""}
+    command = args[0] if args and args[0] in ("compare", "pr-summary", "publish", "selftest") else None
+    opts, pos = parse(args[1:] if command else args, {
+        "compare": where, None: where, "pr-summary": {}, "publish": {"--into": ""},
+        "selftest": {"--offline": None, "--evidence-dir": ""}}[command])
+    if opts is None:
+        return __doc__
+    if command == "pr-summary" and len(pos) in (1, 2):
+        return pr_summary(*pos)
+    if command == "publish" and len(pos) == 1:
+        return publish(pos[0], opts.get("--into"))
+    if command == "selftest" and not pos:
+        return selftest(offline=bool(opts.get("--offline")), evidence_dir=opts.get("--evidence-dir"))
+    if command in ("compare", None) and len(pos) == 1:
+        try:
+            root = evidence_root(opts.get("--evidence-dir"), opts.get("--decision-log"))
+            return compare(pos[0], root) if command else prove(pos[0], new_attempt(root, Path(pos[0]).stem))["exit"]
+        except Error as e:
+            print(f"ERROR {e}")
+            return 2
+    return __doc__
+
+
 if __name__ == "__main__":
     # Proofs import Error from here; let them share this module's class instead of loading a second copy.
     sys.modules.setdefault("prove", sys.modules[__name__])
-    args = sys.argv[1:]
-    if args[:1] == ["pr-summary"] and len(args) in (2, 3):
-        sys.exit(pr_summary(*args[1:]))
-    if args[:1] == ["publish"] and len(args) in (2, 4) and (len(args) == 2 or args[2] == "--into"):
-        sys.exit(publish(args[1], args[3] if len(args) == 4 else None))
-    if args[:1] == ["compare"] and len(args) == 2:
-        sys.exit(compare(args[1]))
-    if args[:1] == ["selftest"] and args[1:] in ([], ["--offline"]):
-        sys.exit(selftest(offline=args[1:] == ["--offline"]))
-    if len(args) == 1 and not args[0].startswith("-") and args[0] not in ("pr-summary", "compare", "publish"):
-        sys.exit(prove(args[0])["exit"])
-    sys.exit(__doc__)
+    sys.exit(main(sys.argv[1:]))
