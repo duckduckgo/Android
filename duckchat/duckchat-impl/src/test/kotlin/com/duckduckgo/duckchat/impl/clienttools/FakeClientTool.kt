@@ -31,6 +31,7 @@ class FakeClientTool(
     var enabled: Boolean = true,
     var validInput: (JSONObject) -> Boolean = { true },
     var result: suspend (JSONObject) -> ClientToolResult = { ClientToolResult.Success(JSONObject().put("echo", it)) },
+    var detail: suspend (JSONObject) -> ClientToolPromptDetail? = { null },
 ) : ClientTool {
     val calls = mutableListOf<Pair<JSONObject, ClientToolCallContext>>()
 
@@ -45,6 +46,11 @@ class FakeClientTool(
         calls += input to context
         return result(input)
     }
+
+    override suspend fun promptDetail(
+        input: JSONObject,
+        context: ClientToolCallContext,
+    ): ClientToolPromptDetail? = detail(input)
 }
 
 class FakeClientToolPluginPoint(vararg tools: ClientTool) : PluginPoint<ClientTool> {

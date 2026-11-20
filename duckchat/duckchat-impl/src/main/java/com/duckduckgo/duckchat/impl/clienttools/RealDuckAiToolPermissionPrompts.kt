@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.clienttools
 
 import android.app.Activity
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.app.tabs.model.TabRepository
@@ -110,18 +111,26 @@ class RealDuckAiToolPermissionPrompts @Inject constructor(
         activity: Activity,
         pending: PendingClientToolPermission,
     ): DaxAlertDialog {
-        val tools = when (val request = pending.request) {
-            is ClientToolPermissionRequest.RunTool -> listOf(request.tool)
-            is ClientToolPermissionRequest.GrantAccess -> request.tools
-        }
-        val dialog = tools.singleOrNull()?.let { singleToolDialog(activity, it, pending) }
-            ?: BrowserToolsPermissionsDialog(
+        val dialog = when (val request = pending.request) {
+            is ClientToolPermissionRequest.RunTool -> singleToolDialog(activity, request.tool, pending)
+            is ClientToolPermissionRequest.GrantAccess ->
+                request.tools.singleOrNull()?.let { singleToolDialog(activity, it, pending) }
+                    ?: BrowserToolsPermissionsDialog(
+                        activity = activity,
+                        tools = request.tools,
+                        selection = { pending.selection },
+                        onToggle = pending::toggle,
+                        onAnswer = pending::answer,
+                    )
+            is ClientToolPermissionRequest.RunToolOnce -> stackedDialog(
                 activity = activity,
-                tools = tools,
-                selection = { pending.selection },
-                onToggle = pending::toggle,
-                onAnswer = pending::answer,
+                title = activity.getText(request.copy.promptTitle),
+                message = activity.getString(request.copy.promptMessage, request.detail),
+                allowText = R.string.duckAiClientToolPromptAllowOnce,
+                onAllow = { pending.answer(ClientToolPermissionAnswer.AllowOnce) },
+                onDontAllow = { pending.answer(ClientToolPermissionAnswer.DontAllow) },
             )
+        }
         return dialog.also { it.show() }
     }
 
@@ -129,22 +138,36 @@ class RealDuckAiToolPermissionPrompts @Inject constructor(
         activity: Activity,
         tool: AskingTool,
         pending: PendingClientToolPermission,
+    ): DaxAlertDialog = stackedDialog(
+        activity = activity,
+        title = activity.getText(tool.copy.promptTitle),
+        message = activity.getText(tool.copy.promptMessage),
+        allowText = R.string.duckAiClientToolPromptAllowInChat,
+        onAllow = { pending.answer(ClientToolPermissionAnswer.AllowForChat()) },
+        onDontAllow = { pending.answer(ClientToolPermissionAnswer.DontAllow) },
+    )
+
+    private fun stackedDialog(
+        activity: Activity,
+        title: CharSequence,
+        message: CharSequence,
+        @StringRes allowText: Int,
+        onAllow: () -> Unit,
+        onDontAllow: () -> Unit,
     ): DaxAlertDialog = StackedAlertDialogBuilder(activity)
         .setRebrandUpdate(true)
         .setHeaderImageResource(CommonR.drawable.ic_ddg_logo)
-        .setTitle(tool.copy.promptTitle)
-        .setMessage(tool.copy.promptMessage)
+        .setTitle(title)
+        .setMessage(message)
         .setStackedButtons(
             listOf(
-                StackedButton(R.string.duckAiClientToolPromptAllowInChat, PRIMARY),
+                StackedButton(allowText, PRIMARY),
                 StackedButton(R.string.duckAiClientToolPromptDontAllow, SECONDARY),
             ),
         )
         .addEventListener(
             object : StackedAlertDialogBuilder.EventListener() {
-                override fun onButtonClicked(position: Int) = pending.answer(
-                    if (position == ALLOW_BUTTON) ClientToolPermissionAnswer.AllowForChat() else ClientToolPermissionAnswer.DontAllow,
-                )
+                override fun onButtonClicked(position: Int) = if (position == ALLOW_BUTTON) onAllow() else onDontAllow()
             },
         )
 
