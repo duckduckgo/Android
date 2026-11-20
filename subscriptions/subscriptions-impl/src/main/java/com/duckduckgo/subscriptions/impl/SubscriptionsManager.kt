@@ -47,6 +47,7 @@ import com.duckduckgo.subscriptions.impl.auth.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.AuthClient
 import com.duckduckgo.subscriptions.impl.auth.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenManager
 import com.duckduckgo.subscriptions.impl.auth.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth.PkceGenerator
@@ -919,7 +920,8 @@ class RealSubscriptionsManager @Inject constructor(
             throw TokenStoreException("Refresh token could not be read")
         }
         tokenRefreshWideEvent.onTokenRead()
-        var backendAcceptedRefreshToken = true
+        var spentRefreshToken: RefreshToken? = refreshToken
+        var recoveredWithBackup = false
 
         /*
             Get jwks before refreshing the token, just in case getting jwks fails. We don't want to end up in a situation where
@@ -938,7 +940,7 @@ class RealSubscriptionsManager @Inject constructor(
                 onRefreshTokenInvalid = tokenRefreshWideEvent::onRefreshTokenValidationFailed,
             ).also { tokenRefreshWideEvent.onTokensValidated() }
         } catch (e: HttpException) {
-            backendAcceptedRefreshToken = false
+            spentRefreshToken = null
             val parsedError = parseError(e)
                 ?.also { tokenRefreshWideEvent.onBackendErrorResponse(backendErrorResponse = it.error, backendErrorCode = it.errorCode) }
             val backendErrorResponse = parsedError?.error
@@ -958,43 +960,13 @@ class RealSubscriptionsManager @Inject constructor(
                 pixelSender.reportAuthV2InvalidRefreshTokenDetected()
                 val account = checkNotNull(authRepository.getAccount()) { "Missing account info when refreshing access token" }
 
-                when (val storeLoginResult = storeLogin(account.externalId)) {
-                    is StoreLoginResult.Success -> {
-                        tokenRefreshWideEvent.onPlayLoginSuccess()
-                        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
-                        storeLoginResult.tokens
-                    }
-
-                    StoreLoginResult.Failure.AccountExternalIdMismatch,
-                    StoreLoginResult.Failure.AuthenticationError,
-                    StoreLoginResult.Failure.NoActivePurchase,
-                    -> {
-                        tokenRefreshWideEvent.onPlayLoginFailure(
-                            signedOut = true,
-                            refreshException = e,
-                            loginError = storeLoginResult.javaClass.simpleName,
-                        )
-                        pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
-                        signOut(invalidateTokens = false)
-                        throw e
-                    }
-
-                    is StoreLoginResult.Failure.TokenValidationFailed,
-                    is StoreLoginResult.Failure.PurchaseInfoNotAvailable,
-                    is StoreLoginResult.Failure.UnknownError,
-                    -> {
-                        val loginError = when (storeLoginResult) {
-                            is StoreLoginResult.Failure.PurchaseInfoNotAvailable ->
-                                "${storeLoginResult.javaClass.simpleName} - ${storeLoginResult.cause}"
-                            else -> storeLoginResult.javaClass.simpleName
-                        }
-                        tokenRefreshWideEvent.onPlayLoginFailure(
-                            signedOut = false,
-                            refreshException = e,
-                            loginError = loginError,
-                        )
-                        throw e
-                    }
+                val backupRecovery = recoverWithBackupToken(accountExternalId = account.externalId, refreshException = e)
+                if (backupRecovery != null) {
+                    spentRefreshToken = backupRecovery.spentBackupRefreshToken
+                    recoveredWithBackup = true
+                    backupRecovery.tokens
+                } else {
+                    recoverWithStoreLogin(accountExternalId = account.externalId, refreshException = e)
                 }
             } else {
                 throw e
@@ -1002,16 +974,72 @@ class RealSubscriptionsManager @Inject constructor(
         }
 
         try {
-            saveTokens(newTokens)
+            saveTokens(tokens = newTokens, deleteBackup = recoveredWithBackup)
         } catch (e: TokenStoreException) {
             tokenRefreshWideEvent.onTokenSaveFailed()
             throw e
         }
         tokenRefreshWideEvent.onTokensSaved()
-        if (backendAcceptedRefreshToken) {
-            backupTokenManager.mintIfNeeded(spentRefreshToken = refreshToken, accountExternalId = newTokens.accessTokenClaims.accountExternalId)
+        if (spentRefreshToken != null) {
+            backupTokenManager.mintIfNeeded(spentRefreshToken = spentRefreshToken, accountExternalId = newTokens.accessTokenClaims.accountExternalId)
         }
         return AccessToken(newTokens.accessToken, newTokens.accessTokenClaims.expiresAt)
+    }
+
+    private suspend fun recoverWithBackupToken(
+        accountExternalId: String,
+        refreshException: HttpException,
+    ): BackupRecoveryResult.Recovered? {
+        val result = backupTokenManager.recover(accountExternalId)
+        tokenRefreshWideEvent.onBackupRecovery(result)
+        if (result is BackupRecoveryResult.Failure.NetworkError) throw refreshException
+        if (result !is BackupRecoveryResult.Recovered) return null
+        pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+        return result
+    }
+
+    private suspend fun recoverWithStoreLogin(
+        accountExternalId: String,
+        refreshException: HttpException,
+    ): ValidatedTokenPair {
+        return when (val storeLoginResult = storeLogin(accountExternalId)) {
+            is StoreLoginResult.Success -> {
+                tokenRefreshWideEvent.onPlayLoginSuccess()
+                pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
+                storeLoginResult.tokens
+            }
+
+            StoreLoginResult.Failure.AccountExternalIdMismatch,
+            StoreLoginResult.Failure.AuthenticationError,
+            StoreLoginResult.Failure.NoActivePurchase,
+            -> {
+                tokenRefreshWideEvent.onPlayLoginFailure(
+                    signedOut = true,
+                    refreshException = refreshException,
+                    loginError = storeLoginResult.javaClass.simpleName,
+                )
+                pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
+                signOut(invalidateTokens = false)
+                throw refreshException
+            }
+
+            is StoreLoginResult.Failure.TokenValidationFailed,
+            is StoreLoginResult.Failure.PurchaseInfoNotAvailable,
+            is StoreLoginResult.Failure.UnknownError,
+            -> {
+                val loginError = when (storeLoginResult) {
+                    is StoreLoginResult.Failure.PurchaseInfoNotAvailable ->
+                        "${storeLoginResult.javaClass.simpleName} - ${storeLoginResult.cause}"
+                    else -> storeLoginResult.javaClass.simpleName
+                }
+                tokenRefreshWideEvent.onPlayLoginFailure(
+                    signedOut = false,
+                    refreshException = refreshException,
+                    loginError = loginError,
+                )
+                throw refreshException
+            }
+        }
     }
 
     override suspend fun refreshSubscriptionData() {
@@ -1109,7 +1137,10 @@ class RealSubscriptionsManager @Inject constructor(
         )
     }
 
-    private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
+    private suspend fun saveTokens(
+        tokens: ValidatedTokenPair,
+        deleteBackup: Boolean = false,
+    ) = with(tokens) {
         try {
             backupTokenManager.deleteIfAccountChanged(newAccountExternalId = accessTokenClaims.accountExternalId)
             val saved = try {
@@ -1118,6 +1149,7 @@ class RealSubscriptionsManager @Inject constructor(
                     refreshToken = RefreshToken(refreshToken, refreshTokenClaims.expiresAt),
                     entitlements = accessTokenClaims.entitlements,
                     account = Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId),
+                    deleteBackupRefreshToken = deleteBackup,
                 )
             } catch (e: Exception) {
                 throw TokenStoreException("Token pair write failed", e)

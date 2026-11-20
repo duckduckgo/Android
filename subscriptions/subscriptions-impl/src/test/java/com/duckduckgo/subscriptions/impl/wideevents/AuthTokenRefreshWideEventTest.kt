@@ -30,7 +30,11 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.ValidatedTokenPair
+import com.duckduckgo.subscriptions.impl.auth.AccessTokenClaims
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult
 import com.duckduckgo.subscriptions.impl.auth.BackupTokenState
+import com.duckduckgo.subscriptions.impl.auth.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.ClaimsParseError
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Expired
@@ -48,6 +52,7 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import kotlinx.coroutines.TimeoutCancellationException
@@ -187,7 +192,7 @@ class AuthTokenRefreshWideEventTest {
                 "last_refresh_process" to "unknown",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 4)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 5)),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
@@ -525,6 +530,66 @@ class AuthTokenRefreshWideEventTest {
             success = false,
             metadata = mapOf("backend_error_response" to "backend-err", "backend_error_code" to "7"),
         )
+    }
+
+    @Test
+    fun `onBackupRecovery reports a recovery through the backup token`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(15L))
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onBackupRecovery(recoveredWithBackup())
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 15L,
+            stepName = "backup_recovery",
+            success = true,
+            metadata = mapOf(
+                "backup_recovery_result" to "recovered",
+                "recovery_strategy" to "backup_token",
+                "recovery_outcome" to "recovered",
+            ),
+        )
+    }
+
+    @Test
+    fun `onBackupRecovery reports a network error as a deferred backup recovery`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(15L))
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onBackupRecovery(BackupRecoveryResult.Failure.NetworkError)
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 15L,
+            stepName = "backup_recovery",
+            success = false,
+            metadata = mapOf(
+                "backup_recovery_result" to "network_error",
+                "recovery_strategy" to "backup_token",
+                "recovery_outcome" to "deferred",
+                "signed_out" to "false",
+            ),
+        )
+    }
+
+    @Test
+    fun `onBackupRecovery leaves strategy and outcome to the Play login when the backup did not decide`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(15L))
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
+
+        listOf(BackupRecoveryResult.Failure.Rejected to "rejected", BackupRecoveryResult.Failure.NotAvailable to "not_available")
+            .forEach { (result, expected) ->
+                authWideEvent.onBackupRecovery(result)
+
+                verify(wideEventClient).flowStep(
+                    wideEventId = 15L,
+                    stepName = "backup_recovery",
+                    success = false,
+                    metadata = mapOf("backup_recovery_result" to expected),
+                )
+            }
     }
 
     @Test
@@ -1005,5 +1070,32 @@ class AuthTokenRefreshWideEventTest {
 
     private companion object {
         val NOW: Instant = Instant.parse("2026-10-28T12:00:00Z")
+    }
+
+    private fun recoveredWithBackup(): BackupRecoveryResult.Recovered {
+        val accessTokenClaims = AccessTokenClaims(
+            expiresAt = Instant.ofEpochMilli(2_000L),
+            accountExternalId = "1234",
+            email = null,
+            entitlements = emptyList(),
+        )
+        val refreshTokenClaims = RefreshTokenClaims(
+            expiresAt = Instant.ofEpochMilli(3_000L),
+            accountExternalId = "1234",
+        )
+        val tokens = ValidatedTokenPair(
+            accessToken = "recovered access token",
+            accessTokenClaims = accessTokenClaims,
+            refreshToken = "recovered refresh token",
+            refreshTokenClaims = refreshTokenClaims,
+        )
+        val spentBackupRefreshToken = RefreshToken(
+            jwt = "backup refresh token",
+            expiresAt = Instant.ofEpochMilli(1_000L),
+        )
+        return BackupRecoveryResult.Recovered(
+            tokens = tokens,
+            spentBackupRefreshToken = spentBackupRefreshToken,
+        )
     }
 }

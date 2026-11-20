@@ -641,4 +641,55 @@ class RealAuthRepositoryTest {
 
         assertTrue(authRepository.hasRefreshTokenEntry())
     }
+
+    @Test
+    fun whenTokensAreSavedWithBackupDeletionThenBackupIsGoneWithTheNewPair() = runTest {
+        givenStoredBackup()
+
+        saveNewTokens(deleteBackupRefreshToken = true)
+
+        assertEquals("new refresh", authStore.refreshTokenV2)
+        assertNull(authRepository.getBackupRefreshToken())
+    }
+
+    @Test
+    fun whenTokensAreSavedWithoutBackupDeletionThenBackupIsKept() = runTest {
+        givenStoredBackup()
+
+        saveNewTokens(deleteBackupRefreshToken = false)
+
+        assertEquals("backup", authRepository.getBackupRefreshToken()?.jwt)
+    }
+
+    private suspend fun saveNewTokens(deleteBackupRefreshToken: Boolean) {
+        val accessToken = AccessToken(
+            jwt = "new access",
+            expiresAt = Instant.ofEpochMilli(5_000L),
+        )
+        val refreshToken = RefreshToken(
+            jwt = "new refresh",
+            expiresAt = Instant.ofEpochMilli(6_000L),
+        )
+        val account = Account(
+            email = null,
+            externalId = "1234",
+        )
+        authRepository.saveTokensV2(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            entitlements = emptyList(),
+            account = account,
+            deleteBackupRefreshToken = deleteBackupRefreshToken,
+        )
+    }
+
+    private suspend fun givenStoredBackup() {
+        val backup = BackupRefreshToken(
+            jwt = "backup",
+            expiresAt = Instant.ofEpochMilli(9_000L),
+            accountExternalId = "1234",
+            issuedAt = Instant.ofEpochMilli(1_000L),
+        )
+        authRepository.saveBackupRefreshToken(backup)
+    }
 }
