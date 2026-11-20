@@ -99,11 +99,11 @@ class RealRendererExitInfoProvider @Inject constructor(
     // The system can update a record's reason and timestamp after writing it, so the pid identifies it.
     private val usedPids = LinkedHashSet<Int>()
 
-    override val isSupported: Boolean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+    override val isSupported: Boolean = Build.VERSION.SDK_INT >= 30
 
     @Synchronized
     override fun findRendererExit(callbackTimeMillis: Long): RendererExitLookup {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return RendererExitLookup.NotFound
+        if (Build.VERSION.SDK_INT < 30) return RendererExitLookup.NotFound
         val activityManager = context.getSystemService(ActivityManager::class.java) ?: return RendererExitLookup.NotFound
         // The renderer is an isolated process of the WebView provider, but the system files its exit under this app.
         val records = runCatching { activityManager.getHistoricalProcessExitReasons(null, 0, MAX_RECORDS) }
