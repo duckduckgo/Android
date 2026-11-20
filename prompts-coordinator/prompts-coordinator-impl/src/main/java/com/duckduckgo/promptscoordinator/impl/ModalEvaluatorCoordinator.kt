@@ -62,7 +62,8 @@ import javax.inject.Inject
 @SingleIn(AppScope::class)
 class ModalEvaluatorCoordinator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
-    private val modalEvaluatorPluginPoint: PluginPoint<ModalEvaluator>,
+    // Evaluators and their dependencies are only needed when a pass runs, so they are not built on the main thread at app start.
+    private val modalEvaluatorPluginPoint: Lazy<PluginPoint<ModalEvaluator>>,
     private val completionStore: ModalEvaluatorCompletionStore,
     private val promptsCoordinator: PromptsCoordinator,
     private val dispatchers: DispatcherProvider,
@@ -111,7 +112,7 @@ class ModalEvaluatorCoordinator @Inject constructor(
         // Everything past the claim runs inside the try: evaluators are plugin code from other teams,
         // and a throw anywhere here would otherwise strand the surface for the rest of the process.
         try {
-            val evaluators = modalEvaluatorPluginPoint.getPlugins()
+            val evaluators = modalEvaluatorPluginPoint.value.getPlugins()
                 .filter { it.trigger == trigger }
                 .sortedBy { it.priority }
             logcat { "ModalEvaluatorCoordinator: Found ${evaluators.size} evaluators for trigger $trigger" }

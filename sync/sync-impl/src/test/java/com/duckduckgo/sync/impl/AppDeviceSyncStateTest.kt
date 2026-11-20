@@ -26,7 +26,7 @@ internal class AppDeviceSyncStateTest {
 
     private val syncFeatureToggle: SyncFeatureToggle = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
-    private val appDeviceSyncState = AppDeviceSyncState(syncFeatureToggle, syncAccountRepository)
+    private val appDeviceSyncState = AppDeviceSyncState(syncFeatureToggle, lazy { syncAccountRepository })
 
     @Test
     fun whenUserSignedInThenDeviceSyncEnabled() {
