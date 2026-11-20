@@ -58,7 +58,7 @@ class RealMaliciousSiteProtectionRCFeature @Inject constructor(
     private var shouldStripWWWPrefix = false
     private var enableCaching = false
 
-    private var hashPrefixUpdateFrequency = 20L
+    private var hashPrefixUpdateFrequency = 480L
     private var filterSetUpdateFrequency = 720L
 
     init {

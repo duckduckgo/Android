@@ -14,6 +14,9 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.M
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.PHISHING
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
+import com.duckduckgo.malicioussiteprotection.impl.data.db.MaliciousSiteDao
+import com.duckduckgo.malicioussiteprotection.impl.data.db.RevisionEntity
+import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -37,6 +40,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val maliciousSiteRepository: MaliciousSiteRepository = mock()
+    private val dao: MaliciousSiteDao = mock()
     private val dispatcherProvider = coroutineRule.testDispatcherProvider
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionRCFeature = mock()
     private val worker = TestListenableWorkerBuilder<MaliciousSiteProtectionFiltersUpdateWorker>(context = context)
@@ -55,6 +59,8 @@ class MaliciousSiteProtectionFiltersUpdateWorkerTest {
 
     @Before
     fun setup() {
+        worker.maliciousSiteDao = dao
+        scamWorker.maliciousSiteDao = dao
         worker.maliciousSiteRepository = maliciousSiteRepository
         scamWorker.maliciousSiteRepository = maliciousSiteRepository
         worker.dispatcherProvider = dispatcherProvider
@@ -62,6 +68,40 @@ class MaliciousSiteProtectionFiltersUpdateWorkerTest {
         worker.maliciousSiteProtectionFeature = maliciousSiteProtectionFeature
         scamWorker.maliciousSiteProtectionFeature = maliciousSiteProtectionFeature
         whenever(maliciousSiteProtectionFeature.canUpdateDatasets()).thenReturn(true)
+    }
+
+    @Test
+    fun bootstrapLoadsOnlyFeedsWithoutStoredRevision() = runTest {
+        val bootstrap = TestListenableWorkerBuilder<MaliciousSiteProtectionFiltersUpdateWorker>(context = context)
+            .setInputData(Data.Builder().putStringArray("type", arrayOf(PHISHING.name, MALWARE.name)).putBoolean("bootstrap", true).build())
+            .build()
+        bootstrap.maliciousSiteRepository = maliciousSiteRepository
+        bootstrap.maliciousSiteDao = dao
+        bootstrap.dispatcherProvider = dispatcherProvider
+        bootstrap.maliciousSiteProtectionFeature = maliciousSiteProtectionFeature
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(dao.getLatestRevision(PHISHING.name, Type.FILTER_SET.name)).thenReturn(mock<RevisionEntity>())
+
+        bootstrap.doWork()
+
+        verify(maliciousSiteRepository).loadFilters(MALWARE)
+    }
+
+    @Test
+    fun bootstrapSkipsNetworkWhenAllFeedsArePopulated() = runTest {
+        val bootstrap = TestListenableWorkerBuilder<MaliciousSiteProtectionFiltersUpdateWorker>(context = context)
+            .setInputData(Data.Builder().putStringArray("type", arrayOf(PHISHING.name, MALWARE.name)).putBoolean("bootstrap", true).build())
+            .build()
+        bootstrap.maliciousSiteRepository = maliciousSiteRepository
+        bootstrap.maliciousSiteDao = dao
+        bootstrap.dispatcherProvider = dispatcherProvider
+        bootstrap.maliciousSiteProtectionFeature = maliciousSiteProtectionFeature
+        whenever(maliciousSiteProtectionFeature.isFeatureEnabled()).thenReturn(true)
+        whenever(dao.getLatestRevision(PHISHING.name, Type.FILTER_SET.name)).thenReturn(mock<RevisionEntity>())
+        whenever(dao.getLatestRevision(MALWARE.name, Type.FILTER_SET.name)).thenReturn(mock<RevisionEntity>())
+
+        assertEquals(success(), bootstrap.doWork())
+        verify(maliciousSiteRepository, never()).loadFilters(any())
     }
 
     @Test
@@ -121,7 +161,8 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
 
     private val workManager: WorkManager = mock()
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionRCFeature = mock()
-    private val scheduler = MaliciousSiteProtectionFiltersUpdateWorkerScheduler(workManager, maliciousSiteProtectionFeature)
+    private val schedule: ProtectionUpdateSchedule = mock()
+    private val scheduler = MaliciousSiteProtectionFiltersUpdateWorkerScheduler(workManager, maliciousSiteProtectionFeature, schedule)
 
     @Test
     fun onPrivacyConfigDownloadedWithFeatureOnAndScamOff_schedulesPhishingAndMalwareWorkerAndCancelsScamWorker() {
@@ -136,7 +177,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
 
         val workRequestCaptor = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(
-            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG"),
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG_v2"),
             eq(ExistingPeriodicWorkPolicy.UPDATE),
             workRequestCaptor.capture(),
         )
@@ -145,7 +186,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
             eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG"),
         )
         verify(workManager, never()).enqueueUniquePeriodicWork(
-            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG"),
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG_v2"),
             any(),
             any(),
         )
@@ -170,7 +211,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
 
         val workRequestCaptor = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(
-            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG"),
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG_v2"),
             eq(ExistingPeriodicWorkPolicy.UPDATE),
             workRequestCaptor.capture(),
         )
@@ -187,7 +228,7 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
 
         val scamWorkRequestCaptor = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(
-            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG"),
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG_v2"),
             eq(ExistingPeriodicWorkPolicy.UPDATE),
             scamWorkRequestCaptor.capture(),
         )
@@ -213,6 +254,8 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
 
         scheduler.onPrivacyConfigDownloaded()
 
+        verify(schedule).clear("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG")
+        verify(schedule).clear("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG")
         verify(workManager).cancelUniqueWork(
             eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG"),
         )
@@ -220,12 +263,12 @@ class MaliciousSiteProtectionFiltersUpdateWorkerSchedulerTest {
             eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG"),
         )
         verify(workManager, never()).enqueueUniquePeriodicWork(
-            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG"),
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_TAG_v2"),
             any(),
             any(),
         )
         verify(workManager, never()).enqueueUniquePeriodicWork(
-            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG"),
+            eq("MALICIOUS_SITE_PROTECTION_FILTERS_UPDATE_WORKER_SCAM_TAG_v2"),
             any(),
             any(),
         )

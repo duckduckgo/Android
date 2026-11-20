@@ -82,6 +82,8 @@ class RealMaliciousSiteRepository @Inject constructor(
 ) : MaliciousSiteRepository {
 
     private val writeMutex = Mutex()
+    private val hashPrefixUpdateMutex = Mutex()
+    private val filterUpdateMutex = Mutex()
 
     override suspend fun getFeedForHashPrefix(hashPrefix: String): Feed? {
         return withContext(dispatcherProvider.io()) {
@@ -171,14 +173,17 @@ class RealMaliciousSiteRepository @Inject constructor(
         loadData: suspend (revisions: List<RevisionEntity>, networkRevision: Int) -> Unit,
     ): Result<Unit> {
         return withContext(dispatcherProvider.io()) {
-            val networkRevision = maliciousSiteService.getRevision().revision
-            val localRevisions = writeMutex.withLock { getLocalRevisions(type) }
+            val updateMutex = if (type == HASH_PREFIXES) hashPrefixUpdateMutex else filterUpdateMutex
+            updateMutex.withLock {
+                val networkRevision = maliciousSiteService.getRevision().revision
+                val localRevisions = writeMutex.withLock { getLocalRevisions(type) }
 
-            try {
-                loadData(localRevisions, networkRevision)
-                Result.success(Unit)
-            } catch (e: Exception) {
-                Result.failure(e)
+                try {
+                    loadData(localRevisions, networkRevision)
+                    Result.success(Unit)
+                } catch (e: Exception) {
+                    Result.failure(e)
+                }
             }
         }
     }
