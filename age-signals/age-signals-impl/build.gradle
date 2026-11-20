@@ -17,6 +17,7 @@
 plugins {
     id 'com.android.library'
     id 'dev.zacsweers.metro'
+    id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
@@ -26,8 +27,19 @@ android {
 }
 
 dependencies {
+    ksp project(':codegen-ksp')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
     implementation project(path: ':common-utils')
+    implementation project(path: ':design-system')
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':internal-features-api')
+    implementation project(path: ':navigation-api')
+
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
+    implementation Google.android.material
+    implementation "com.squareup.logcat:logcat:_"
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.playServices
@@ -36,6 +48,7 @@ dependencies {
     implementation "com.google.android.play:age-signals:_"
 
     testImplementation Testing.junit4
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
     testImplementation (KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"

@@ -118,6 +118,14 @@ class AgeSignalsStoreTest {
     }
 
     @Test
+    fun whenStoredFailureStepNameIsUnknownThenThereIsNoLastFailure() = runTest {
+        store.record(Failed(Step.CHECK_SIGNALS, AgeSignalsError.APP_NOT_OWNED))
+        dataStore.edit { it[stringPreferencesKey("failureStep")] = "SOMETHING_NEW" }
+
+        assertNull(store.lastFailure())
+    }
+
+    @Test
     fun whenEveryOutcomeIsRecordedThenItReadsBackUnchanged() = runTest {
         listOf(NotApplicable, AgeSignalsOutcome.NotShared, VerificationRequired, Shared, UnknownStatus).forEach { outcome ->
             store.record(outcome)

@@ -18,6 +18,7 @@ package com.duckduckgo.agesignals.impl
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
@@ -44,11 +45,11 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Qualifier
 
-internal data class LastOutcome(val outcome: AgeSignalsOutcome, val outcomeAt: Long)
+data class LastOutcome(val outcome: AgeSignalsOutcome, val outcomeAt: Long)
 
-internal data class LastFailure(val step: Step, val error: AgeSignalsError, val failureAt: Long)
+data class LastFailure(val step: Step, val error: AgeSignalsError, val failureAt: Long)
 
-internal interface AgeSignalsStore {
+interface AgeSignalsStore {
     /** A [Failed] outcome goes to [lastFailure] and leaves [lastOutcome] untouched. */
     suspend fun record(outcome: AgeSignalsOutcome)
     suspend fun recordPromptShown()
@@ -59,7 +60,7 @@ internal interface AgeSignalsStore {
 
 @ContributesBinding(AppScope::class)
 @SingleIn(AppScope::class)
-internal class RealAgeSignalsStore @Inject constructor(
+class RealAgeSignalsStore @Inject constructor(
     @AgeSignals private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
     private val timeProvider: CurrentTimeProvider,
@@ -142,8 +143,11 @@ internal class RealAgeSignalsStore @Inject constructor(
 
 @ContributesTo(AppScope::class)
 @BindingContainer
-internal object AgeSignalsStoreModule {
-    private val Context.ageSignalsDataStore: DataStore<Preferences> by preferencesDataStore(name = "age_signals")
+object AgeSignalsStoreModule {
+    private val Context.ageSignalsDataStore: DataStore<Preferences> by preferencesDataStore(
+        name = "age_signals",
+        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+    )
 
     @Provides
     @AgeSignals
@@ -151,4 +155,4 @@ internal object AgeSignalsStoreModule {
 }
 
 @Qualifier
-internal annotation class AgeSignals
+annotation class AgeSignals

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<resources>
+    <string name="ageSignalsDevTitle">Age Signals</string>
+    <string name="ageSignalsDevLastOutcome">Last outcome</string>
+    <string name="ageSignalsDevLastFailure">Last failure</string>
+    <string name="ageSignalsDevLastPrompt">Last prompt shown</string>
+    <string name="ageSignalsDevNever">Never</string>
+    <string name="ageSignalsDevScenario">Scenario</string>
+    <string name="ageSignalsDevSelect">Select</string>
+    <string name="ageSignalsDevCancel">Cancel</string>
+    <string name="ageSignalsDevRunNow">Run now</string>
+
+    <string name="ageSignalsScenarioRealPlay">Real Play</string>
+    <string name="ageSignalsScenarioNotApplicable">Not applicable</string>
+    <string name="ageSignalsScenarioNotShared">Not shared</string>
+    <string name="ageSignalsScenarioVerificationRequired">Verification required</string>
+    <string name="ageSignalsScenarioShared">Shared</string>
+    <string name="ageSignalsScenarioUnknownStatus">Unknown status</string>
+    <string name="ageSignalsScenarioAppNotOwnedAtFeatures">Failure -9 at APPLICABLE_FEATURES</string>
+    <string name="ageSignalsScenarioNetworkErrorAtFeatures">Failure -3 at APPLICABLE_FEATURES</string>
+    <string name="ageSignalsScenarioInternalErrorAtFeatures">Failure -100 at APPLICABLE_FEATURES</string>
+    <string name="ageSignalsScenarioAppNotOwnedAtAccess">Failure -9 at REQUEST_ACCESS</string>
+    <string name="ageSignalsScenarioNetworkErrorAtAccess">Failure -3 at REQUEST_ACCESS</string>
+    <string name="ageSignalsScenarioInternalErrorAtAccess">Failure -100 at REQUEST_ACCESS</string>
+    <string name="ageSignalsScenarioAppNotOwnedAtCheck">Failure -9 at CHECK_SIGNALS</string>
+    <string name="ageSignalsScenarioNetworkErrorAtCheck">Failure -3 at CHECK_SIGNALS</string>
+    <string name="ageSignalsScenarioInternalErrorAtCheck">Failure -100 at CHECK_SIGNALS</string>
+</resources>

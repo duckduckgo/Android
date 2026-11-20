@@ -21,9 +21,11 @@ import com.duckduckgo.agesignals.impl.AgeSignalsOutcome.NotShared
 import com.duckduckgo.agesignals.impl.AgeSignalsOutcome.Shared
 import com.duckduckgo.agesignals.impl.AgeSignalsOutcome.UnknownStatus
 import com.duckduckgo.agesignals.impl.AgeSignalsOutcome.VerificationRequired
+import com.google.android.gms.common.api.Status
 import com.google.android.play.agesignals.AgeSignalsAccessResult
 import com.google.android.play.agesignals.AgeSignalsException
 import com.google.android.play.agesignals.ApplicableAgeFeaturesResult
+import com.google.android.play.agesignals.model.AgeSignalsErrorCode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -103,6 +105,14 @@ class AgeSignalsParserTest {
         assertEquals(
             Failed(Step.CHECK_SIGNALS, AgeSignalsError.UNKNOWN),
             AgeSignalsParser.parseFailure(Step.CHECK_SIGNALS, AgeSignalsException(-12345)),
+        )
+    }
+
+    @Test
+    fun whenExceptionHasNoErrorCodeThenFailureCarriesUnknown() {
+        assertEquals(
+            Failed(Step.APPLICABLE_FEATURES, AgeSignalsError.UNKNOWN),
+            AgeSignalsParser.parseFailure(Step.APPLICABLE_FEATURES, AgeSignalsException(Status(AgeSignalsErrorCode.NO_ERROR))),
         )
     }
 
