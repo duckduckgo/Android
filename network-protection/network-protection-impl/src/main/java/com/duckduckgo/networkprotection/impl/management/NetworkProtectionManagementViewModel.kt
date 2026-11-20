@@ -353,8 +353,13 @@ class NetworkProtectionManagementViewModel @Inject constructor(
             vpnEnableWideEvent.onStartVpn()
             networkProtectionState.start()
             networkProtectionRepository.enabledTimeInMillis = -1L
-            tryShowAlwaysOnPromotion()
-            resetToggleIfStartNotAcknowledged()
+            if (vpnRemoteFeatures.waitForStartAcknowledgement().isEnabled()) {
+                tryShowAlwaysOnPromotion()
+                resetToggleIfStartNotAcknowledged()
+            } else {
+                forceUpdateRunningState()
+                tryShowAlwaysOnPromotion()
+            }
         }
     }
 

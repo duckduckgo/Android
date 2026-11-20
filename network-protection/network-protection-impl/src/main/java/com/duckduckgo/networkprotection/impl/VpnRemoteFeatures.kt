@@ -61,6 +61,9 @@ interface VpnRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun endpointPortFallback(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun waitForStartAcknowledgement(): Toggle // kill switch
 }
 
 @ContributesBinding(AppScope::class)
