@@ -278,6 +278,36 @@ class SyncSavedSitesRepositoryTest {
     }
 
     @Test
+    fun whenFolderHasBlankChildRelationThenFolderDiffExcludesIt() = runTest {
+        val entities = BookmarkTestUtils.givenSomeBookmarks(2)
+        savedSitesEntitiesDao.insertList(entities)
+        savedSitesRelationsDao.insert(Relation(folderId = folder.id, entityId = ""))
+        savedSitesRelationsDao.insertList(BookmarkTestUtils.givenFolderWithContent(folder.id, entities))
+
+        val folderChildren = repository.getFolderDiff(folder.id)
+
+        Assert.assertEquals(entities.map { it.entityId }, folderChildren.current)
+        Assert.assertEquals(entities.map { it.entityId }, folderChildren.insert)
+        Assert.assertEquals(emptyList<String>(), folderChildren.remove)
+    }
+
+    @Test
+    fun whenFolderHasBlankChildRelationAndMetadataPresentThenFolderDiffExcludesIt() = runTest {
+        val entities = BookmarkTestUtils.givenSomeBookmarks(2)
+        savedSitesEntitiesDao.insertList(entities)
+        savedSitesRelationsDao.insert(Relation(folderId = folder.id, entityId = ""))
+        savedSitesRelationsDao.insertList(BookmarkTestUtils.givenFolderWithContent(folder.id, entities))
+        val childrenJSON = stringListAdapter.toJson(entities.map { it.entityId })
+        savedSitesMetadataDao.addOrUpdate(SavedSitesSyncMetadataEntity(folder.id, childrenJSON, "[]"))
+
+        val folderChildren = repository.getFolderDiff(folder.id)
+
+        Assert.assertEquals(entities.map { it.entityId }, folderChildren.current)
+        Assert.assertEquals(emptyList<String>(), folderChildren.insert)
+        Assert.assertEquals(emptyList<String>(), folderChildren.remove)
+    }
+
+    @Test
     fun whenFolderIsReplacedThenChildrenAreUpdated() {
         val bookmarks = BookmarkTestUtils.givenSomeBookmarks(10)
         savedSitesEntitiesDao.insertList(bookmarks)
