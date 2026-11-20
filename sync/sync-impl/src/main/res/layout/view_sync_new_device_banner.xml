@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/newDeviceBanner"
+    style="@style/Widget.DuckDuckGo.MessageCta"
+    android:layout_marginBottom="@dimen/keyline_2"
+    android:clipChildren="false"
+    android:visibility="gone"
+    tools:visibility="visible">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clipToPadding="?attr/daxMessageCtaClipToPadding"
+        android:paddingHorizontal="@dimen/keyline_4"
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_2">
+
+        <ImageView
+            android:id="@+id/newDeviceBannerClose"
+            android:layout_width="?attr/daxMessageCtaCloseButtonSize"
+            android:layout_height="?attr/daxMessageCtaCloseButtonSize"
+            android:layout_marginTop="-10dp"
+            android:layout_marginEnd="-10dp"
+            android:background="?attr/daxMessageCtaCloseButtonBackground"
+            android:contentDescription="@string/closeButtonContentDescription"
+            android:scaleType="center"
+            android:src="@drawable/ic_close_24"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/newDeviceBannerTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="@dimen/keyline_2"
+            app:layout_constraintEnd_toStartOf="@id/newDeviceBannerClose"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:typography="h3"
+            tools:text="New synced devices" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/newDeviceBannerBody"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginEnd="@dimen/keyline_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/newDeviceBannerTitle"
+            app:textType="secondary"
+            app:typography="body2"
+            tools:text="This phone has synced with Laptop, Tablet and Desktop." />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/newDeviceBannerReview"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:text="@string/syncNewDeviceBannerReview"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/newDeviceBannerBody" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

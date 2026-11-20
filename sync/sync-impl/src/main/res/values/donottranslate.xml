@@ -26,6 +26,17 @@
     <string name="syncAuditLogSynced">Synced</string>
     <string name="syncAuditLogRemoved">Removed</string>
     <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity. First placeholder is how long ago it happened, for example 3 days ago. Second placeholder is Synced or Removed">%1$s · %2$s</string>
+    <plurals name="syncNewDeviceBannerTitle" instruction="Title of a message in Sync settings. The number is how many new devices synced with this account. Do not show the number">
+        <item quantity="one">New synced device</item>
+        <item quantity="other">New synced devices</item>
+    </plurals>
+    <string name="syncNewDeviceBannerBody" instruction="Message in Sync settings. Placeholder is one device name, or a list of device names">This phone has synced with %1$s.</string>
+    <string name="syncNewDeviceBannerLastName" instruction="Joins the last device name to a list. First placeholder is the earlier device names, separated by commas. Second placeholder is the last device name">%1$s and %2$s</string>
+    <plurals name="syncNewDeviceBannerMore" instruction="Ends a list of device names. Placeholder 1 is the device names, separated by commas. Placeholder 2 is how many more devices synced">
+        <item quantity="one">%1$s and %2$d more</item>
+        <item quantity="other">%1$s and %2$d more</item>
+    </plurals>
+    <string name="syncNewDeviceBannerReview">Review Activity</string>
     <string name="syncAuditLogJustNow">Just now</string>
     <plurals name="syncAuditLogMinutesAgo" instruction="Placeholder is the number of minutes since a device was synced or removed">
         <item quantity="one">%1$d minute ago</item>

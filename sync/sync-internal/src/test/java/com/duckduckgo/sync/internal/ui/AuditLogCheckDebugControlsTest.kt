@@ -23,6 +23,8 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogChecker
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.store.SyncStore
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -167,6 +169,8 @@ class AuditLogCheckDebugControlsTest {
         override suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?) {
             transform(state)?.let { state = it }
         }
+
+        override fun pendingLogins(): Flow<List<PendingLogin>> = flowOf(state.pendingLogins)
     }
 
     private class FakeChecker : AuditLogChecker {
