@@ -363,13 +363,10 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenSaveFailsThenNoUpdatedPixelFires() {
-        org.junit.Assert.assertThrows(IllegalStateException::class.java) {
-            runTest {
-                segmentSkip.failSave = true
-                createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP)
-            }
-        }
+    fun whenSaveFailsThenNoUpdatedPixelFires() = runTest {
+        segmentSkip.failSave = true
+        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP)
+        assertEquals(SegmentSkipMode.ALWAYS_ASK, segmentSkip.mode.value)
         verify(pixel, never()).fire(
             AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT,
             parameters = mapOf("segment_skip_status" to "skip"),
@@ -389,7 +386,7 @@ class AdBlockingSettingsViewModelTest {
         override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> = throw UnsupportedOperationException()
         override fun modeFlow(): Flow<SegmentSkipMode> = mode
         override suspend fun setMode(mode: SegmentSkipMode): Boolean {
-            check(!failSave)
+            if (failSave) throw java.io.IOException()
             val changed = this.mode.value != mode
             this.mode.value = mode
             return changed

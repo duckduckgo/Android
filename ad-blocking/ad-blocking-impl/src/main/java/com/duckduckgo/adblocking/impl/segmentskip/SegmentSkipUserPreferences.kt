@@ -26,12 +26,15 @@ import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.stateIn
+import java.io.IOException
 import javax.inject.Inject
 
 enum class SegmentSkipMode(val pixelValue: String) {
@@ -70,6 +73,12 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
             ?: defaultMode(mvpEnabled)
     }
+        .retryWhen { cause, _ ->
+            if (cause !is IOException) throw cause
+            emit(SegmentSkipMode.OFF)
+            delay(1_000)
+            true
+        }
         .distinctUntilChanged()
 
     override fun cachedMode(): SegmentSkipMode = mode.value
@@ -77,7 +86,11 @@ class RealSegmentSkipUserPreferences @Inject constructor(
     override suspend fun setMode(mode: SegmentSkipMode): Boolean {
         var changed = false
         dataStore.edit { prefs ->
-            val previous = prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } } ?: defaultMode()
+            val previous = prefs[KEY_MODE]?.let { stored ->
+                SegmentSkipMode.entries.firstOrNull {
+                    it.name == stored
+                }
+            } ?: defaultMode(feature.mvpEnabled().isEnabled())
             changed = previous != mode
             prefs[KEY_MODE] = mode.name
         }

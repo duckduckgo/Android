@@ -57,6 +57,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -174,7 +175,12 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     fun onSegmentSkipModeSelected(mode: SegmentSkipMode) {
         viewModelScope.launch {
-            if (segmentSkip.setMode(mode)) {
+            val changed = try {
+                segmentSkip.setMode(mode)
+            } catch (e: IOException) {
+                return@launch
+            }
+            if (changed) {
                 val parameters = mapOf("segment_skip_status" to mode.pixelValue)
                 pixel.fire(SEGMENT_SKIP_SETTINGS_UPDATED_DAILY, parameters = parameters, type = Pixel.PixelType.Daily())
                 pixel.fire(SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = parameters)
