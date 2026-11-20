@@ -174,7 +174,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
     }
 
     private fun showSegmentSkipModeDialog(currentMode: SegmentSkipMode) {
-        val modes = SegmentSkipMode.entries
+        val modes = listOf(SegmentSkipMode.ALWAYS_SKIP, SegmentSkipMode.ALWAYS_ASK, SegmentSkipMode.OFF)
         RadioListAlertDialogBuilder(this)
             .setTitle(getString(R.string.segment_skip_settings_title))
             .setOptions(modes.map { it.labelRes() }, modes.indexOf(currentMode) + 1)
