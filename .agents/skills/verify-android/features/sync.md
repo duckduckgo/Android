@@ -38,13 +38,14 @@ Sync's setup has no user path (staging, feature flags, a second device, deleting
 adb -s <serial> shell am broadcast -a com.duckduckgo.sync.internal.DEBUG -p com.duckduckgo.mobile.android.debug -f 32 --es id <id> --es command <command> [--es flag <name>] [--ez on true|false]
 ```
 
-`-f 32` (`FLAG_INCLUDE_STOPPED_PACKAGES`) is needed: without it Android drops the broadcast, with no error, when the app was just installed or force-stopped. `--ez on` defaults to true. Each broadcast logs exactly one line with the tag `SyncDebugBroadcast`: `SyncDebugBroadcast: <id>: <command>: <result>`. Send a new `id` each time and poll `adb logcat -d -s SyncDebugBroadcast` for `SyncDebugBroadcast: <id>: ` (up to 30 s; each command times out after 30 s). `simulateLogin`, `logOutOthers` and `deleteAccount` refuse to run until `useStaging` is on.
+`-f 32` (`FLAG_INCLUDE_STOPPED_PACKAGES`) is needed: without it Android drops the broadcast, with no error, when the app was just installed or force-stopped. `--ez on` defaults to true. Each broadcast logs exactly one line with the tag `SyncDebugBroadcast`: `SyncDebugBroadcast: <id>: <command>: <result>`. Send a new `id` each time and poll `adb logcat -d -s SyncDebugBroadcast` for `SyncDebugBroadcast: <id>: ` (up to 30 s; each command times out after 30 s). `createAccount`, `simulateLogin`, `logOutOthers` and `deleteAccount` refuse to run until `useStaging` is on. `scripts/sync-debug-broadcast-check.sh` checks every command in one run; read it for each command's exact result.
 
 | Command | Does | Result |
 |---|---|---|
 | `status` | Reads the state | `signedIn=… environment=… loginAuditLog=… loginNotification=… Unseen logins: N` |
 | `useStaging` (`on`) | Points Sync at staging or production. If signed in and the server changes, logs out first | `environment=https://sync-staging.duckduckgo.com`, or `logged out; environment=…` |
 | `setFlag` (`flag`, `on`) | Sets one `SyncFeature` flag by name, for example `loginAuditLog` | `loginAuditLog=true` |
+| `createAccount` | Creates a new account, like Sync Dev Settings' "Create account" (setup only; when turning Sync on is under test, use the UI) | `account created` |
 | `simulateLogin` | Logs in a real extra device, "Fake device HH:mm:ss", with no phone behind it | `Logged in "Fake device …" (<id>) and set its name.` |
 | `logOutOthers` | Logs out every other device | `Logged out "…"` per device, or `no other devices` |
 | `readLog` | Reads and decrypts the newest server entries (the server's default page) | `N entries: N decoded, 0 skipped. …` then the entries |
