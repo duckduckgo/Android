@@ -28,6 +28,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class SearchBookmarksClientTool @Inject constructor(
@@ -42,6 +43,13 @@ class SearchBookmarksClientTool @Inject constructor(
         promptTitle = R.string.duckAiClientToolSearchBookmarksPromptTitle,
         promptMessage = R.string.duckAiClientToolSearchBookmarksPromptMessage,
         name = R.string.duckAiClientToolSearchBookmarksName,
+    )
+
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.SEE,
+        name = R.string.duckAiClientToolSearchBookmarksName,
+        description = R.string.duckAiClientToolSearchBookmarksDescription,
+        icon = CommonR.drawable.ic_bookmarks_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.searchBookmarks().isEnabled()

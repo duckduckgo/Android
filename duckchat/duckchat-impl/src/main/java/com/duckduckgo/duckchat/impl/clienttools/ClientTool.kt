@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
@@ -27,6 +28,9 @@ interface ClientTool {
     val name: String
     val version: Int
     val permissionMode: ClientToolPermissionMode
+
+    /** How the Browser Access settings screen lists this tool. */
+    val settingsListing: ClientToolSettingsListing
 
     fun isEnabled(): Boolean
 
@@ -45,6 +49,21 @@ interface ClientTool {
         input: JSONObject,
         context: ClientToolCallContext,
     ): ClientToolPromptDetail? = null
+}
+
+data class ClientToolSettingsListing(
+    val section: ClientToolSettingsSection,
+    @StringRes val name: Int,
+    @StringRes val description: Int,
+    @DrawableRes val icon: Int,
+)
+
+enum class ClientToolSettingsSection {
+    /** Tools that let Duck.ai read browser data. */
+    SEE,
+
+    /** Tools that let Duck.ai change something in the browser. */
+    DO,
 }
 
 sealed interface ClientToolPromptDetail {

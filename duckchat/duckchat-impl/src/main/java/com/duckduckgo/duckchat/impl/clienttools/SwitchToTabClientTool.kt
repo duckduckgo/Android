@@ -20,10 +20,12 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.contextual.ContextualSheetCloseRequests
 import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class SwitchToTabClientTool @Inject constructor(
@@ -37,6 +39,13 @@ class SwitchToTabClientTool @Inject constructor(
     override val name: String = "switchToTab"
     override val version: Int = 1
     override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Auto
+
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.DO,
+        name = R.string.duckAiClientToolSwitchToTabName,
+        description = R.string.duckAiClientToolSwitchToTabDescription,
+        icon = CommonR.drawable.ic_tab_24,
+    )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.switchToTab().isEnabled()
 
