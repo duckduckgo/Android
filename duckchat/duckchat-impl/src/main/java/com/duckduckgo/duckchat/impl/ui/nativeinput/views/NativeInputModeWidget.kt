@@ -58,6 +58,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -205,8 +206,8 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
-    fun bindTextSelections(tabId: String, textSelection: String?)
     fun getTextSelectionsJson(): JSONArray?
+    fun addAttachments(tabId: String, attachments: List<Attachment>)
 
     /**
      * Binds a reactive source of the active chat id for this tab.
@@ -388,8 +389,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var askAboutPageAction: (() -> Unit)? = null
     private var pageContextRemovedAction: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
-    private var pendingTextSelectionsTabId: String? = null
-    private var pendingTextSelection: String? = null
+    private var pendingAttachmentsTabId: String? = null
+    private var pendingAttachments: List<Attachment> = emptyList()
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached, when the attachment ViewModel cannot be resolved yet, so the values are held here and
@@ -1489,16 +1490,18 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getPageContext(): PageContextAttachment? = attachmentViewModel?.getPageContext()
 
-    override fun bindTextSelections(tabId: String, textSelection: String?) {
-        pendingTextSelectionsTabId = tabId
-        pendingTextSelection = textSelection
-        attachmentViewModel?.let { vm ->
-            vm.bindTextSelections(tabId, textSelection)
-            pendingTextSelection = null
-        }
-    }
-
     override fun getTextSelectionsJson(): JSONArray? = attachmentViewModel?.getTextSelectionsJson()
+
+    override fun addAttachments(tabId: String, attachments: List<Attachment>) {
+        val viewModel = attachmentViewModel
+        if (viewModel == null) {
+            pendingAttachmentsTabId = tabId
+            pendingAttachments = attachments
+            return
+        }
+        pendingAttachments = emptyList()
+        viewModel.addAttachments(tabId, attachments)
+    }
 
     override fun setContextualAttachmentActions(
         onAskAboutPage: () -> Unit,
@@ -1563,6 +1566,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         isContextualWidget = true
         doOnAttach {
             viewModel.configureContextual(tabId)
+            attachmentViewModel?.bindTextSelections(tabId)
             publishGatingSnapshot()
             selectChatTab()
         }
@@ -1620,7 +1624,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyPendingAttachmentState() {
         val viewModel = attachmentViewModel ?: return
         pendingPageContext?.let { viewModel.setPageContext(it) }
-        pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection) }
+        pendingAttachmentsTabId?.let { if (pendingAttachments.isNotEmpty()) addAttachments(it, pendingAttachments) }
         if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
             viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
         }

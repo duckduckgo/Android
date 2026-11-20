@@ -235,6 +235,11 @@ interface DuckChatInternal : DuckChat {
     val editPromptRequests: Flow<EditPromptRequest>
 
     /**
+     * Returns whether "Ask Duck.ai" should be shown in the system share sheet.
+     */
+    val showShareSheetAction: StateFlow<Boolean>
+
+    /**
      * Returns whether image upload is enabled or not.
      */
     fun isImageUploadEnabled(): Boolean
@@ -487,6 +492,7 @@ class RealDuckChat @Inject constructor(
     private val _showVoiceChatEntry = MutableStateFlow(false)
     private val _showContextualMode = MutableStateFlow(false)
     private val _showTextSelectionAction = MutableStateFlow(false)
+    private val _showShareSheetAction = MutableStateFlow(false)
     private val _allowDuckAiAsDigitalAssistant = MutableStateFlow(false)
     private val _displayedMode = MutableStateFlow(InputMode.SEARCH)
     private val _inputQuery = MutableStateFlow("")
@@ -691,6 +697,8 @@ class RealDuckChat @Inject constructor(
     override val showContextualMode: StateFlow<Boolean> = _showContextualMode.asStateFlow()
 
     override val showTextSelectionAction: StateFlow<Boolean> = _showTextSelectionAction.asStateFlow()
+
+    override val showShareSheetAction: StateFlow<Boolean> = _showShareSheetAction.asStateFlow()
 
     override val allowDuckAiAsDigitalAssistant: StateFlow<Boolean> = _allowDuckAiAsDigitalAssistant.asStateFlow()
 
@@ -1123,6 +1131,13 @@ class RealDuckChat @Inject constructor(
                 isContextualModeEnabled &&
                     isContextualNativeInputEnabled &&
                     duckChatFeature.duckAiTextSelectionAction().isEnabled(),
+            )
+
+            _showShareSheetAction.emit(
+                isDuckChatFeatureEnabled &&
+                    isDuckChatUserEnabled &&
+                    isNativeChatInputEnabled &&
+                    duckChatFeature.duckAiShareSheetAction().isEnabled(),
             )
 
             isAutomaticContextAttachmentEnabled = isContextualModeEnabled &&

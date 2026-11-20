@@ -169,6 +169,8 @@ class FakeDuckChatInternal(
 
     override val editPromptRequests: Flow<EditPromptRequest> = _editPromptRequests.asSharedFlow()
 
+    override val showShareSheetAction: StateFlow<Boolean> = MutableStateFlow(false)
+
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false

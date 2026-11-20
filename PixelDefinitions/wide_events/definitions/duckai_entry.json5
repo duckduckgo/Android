@@ -46,6 +46,7 @@
                             "recent_chat_tab_switcher",
                             "recent_chat_contextual",
                             "chat_suggestion_input",
+                            "share_sheet",
                             "tab_swipe",
                             "app_open"
                         ]

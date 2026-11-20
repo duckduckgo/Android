@@ -1573,6 +1573,42 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when share sheet action enabled, then showShareSheetAction emits true`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiShareSheetAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertTrue(testee.showShareSheetAction.value)
+    }
+
+    @Test
+    fun `when native chat input disabled, then showShareSheetAction emits false`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = false))
+        duckChatFeature.duckAiShareSheetAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showShareSheetAction.value)
+    }
+
+    @Test
+    fun `when share sheet action disabled, then showShareSheetAction emits false`() = runTest {
+        duckChatFeature.duckAiShareSheetAction().setRawStoredState(State(enable = false))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showShareSheetAction.value)
+    }
+
+    @Test
+    fun `when duck chat user disabled, then showShareSheetAction emits false`() = runTest {
+        whenever(mockDuckChatFeatureRepository.isDuckChatUserEnabled()).thenReturn(false)
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        duckChatFeature.duckAiShareSheetAction().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+
+        assertFalse(testee.showShareSheetAction.value)
+    }
+
+    @Test
     fun `when contextual mode enabled, isDuckChatContextualModeEnabled returns true`() = runTest {
         duckChatFeature.contextualMode().setRawStoredState(State(enable = true))
         duckChatFeature.contextualModeKillSwitch().setRawStoredState(State(enable = true))
