@@ -35,6 +35,11 @@ dependencies {
     implementation project(path: ':app-build-config-api')
     implementation project(path: ':internal-features-api')
     implementation project(path: ':navigation-api')
+    implementation project(path: ':browser-api')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':experiments-api')
+    implementation Square.moshi
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout
@@ -50,6 +55,7 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation (KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
