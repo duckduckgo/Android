@@ -71,6 +71,10 @@ interface AppTpRemoteFeatures {
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun restartWideEvent(): Toggle
 
+    // Keeps excluded apps out of the null-route tunnel a restart puts up, so Android doesn't close their connections
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun keepExclusionsInNullTunnel(): Toggle // kill switch
+
     @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment001(): Toggle
 
