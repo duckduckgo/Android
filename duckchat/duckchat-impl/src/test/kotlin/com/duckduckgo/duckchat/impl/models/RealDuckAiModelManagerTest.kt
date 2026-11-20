@@ -1825,4 +1825,108 @@ class RealDuckAiModelManagerTest {
             }
         }
     }
+
+    @Test
+    fun whenResetModelForNewChatsAndFreeTierThenFreeDefaultAndFastSelected() = runTest {
+        givenResetModelForNewChats()
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("claude-haiku-4-5", "Haiku 4.5"))
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn("reasoning")
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        givenResetModels()
+
+        testee = createManager()
+        testee.fetchModels()
+
+        val state = testee.modelState.value
+        assertEquals("gpt-6-luna", state.selectedModelId)
+        assertEquals(ReasoningMode.FAST, state.selectedReasoningMode)
+        assertEquals("none", testee.getResolvedReasoningEffort())
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        verify(dataStore, never()).setSelectedReasoningMode(anyOrNull())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndPlusTierThenPaidDefaultSelected() = runTest {
+        givenResetModelForNewChats()
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
+        givenResetModels()
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt-5.6-terra", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndDefaultNotAccessibleThenFirstAccessibleSelected() = runTest {
+        givenResetModelForNewChats()
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt-5.6-terra", accessTier = listOf("plus", "pro"), entityHasAccess = false),
+                    remoteModel("claude-haiku-4-5", accessTier = listOf("free", "plus", "pro"), supportedReasoningEffort = listOf("low")),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("claude-haiku-4-5", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.selectedReasoningMode)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsThenGlobalPicksIgnored() = runTest {
+        givenResetModelForNewChats()
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        givenResetModels()
+        testee = createManager()
+        testee.fetchModels()
+        val haiku = testee.modelState.value.models.first { it.id == "claude-haiku-4-5" }
+
+        testee.selectModel(haiku)
+        testee.selectProvider(ModelProvider.ANTHROPIC)
+        testee.selectReasoningMode(ReasoningMode.REASONING)
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        verify(dataStore, never()).setSelectedProvider(anyOrNull())
+        verify(dataStore, never()).setSelectedReasoningMode(anyOrNull())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsThenTierDefaultInsteadOfCachedSelectionBeforeFirstFetch() = runTest {
+        givenResetModelForNewChats()
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("claude-haiku-4-5", "Haiku"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+
+        testee = createManager()
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+    }
+
+    private fun givenResetModelForNewChats() {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+    }
+
+    private suspend fun givenResetModels() {
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("claude-haiku-4-5", accessTier = listOf("free", "plus", "pro"), supportedReasoningEffort = listOf("none", "low")),
+                    remoteModel("gpt-6-luna", accessTier = listOf("free", "plus", "pro"), supportedReasoningEffort = listOf("none", "low")),
+                    remoteModel("gpt-5.6-terra", accessTier = listOf("plus", "pro"), supportedReasoningEffort = listOf("none", "low")),
+                ),
+            ),
+        )
+    }
 }
