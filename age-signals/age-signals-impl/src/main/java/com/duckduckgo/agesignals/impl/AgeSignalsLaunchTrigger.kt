@@ -37,6 +37,8 @@ class AgeSignalsLaunchTrigger @Inject constructor(
     private val feature: AgeSignalsFeature,
     private val checker: AgeSignalsChecker,
     private val store: AgeSignalsStore,
+    private val managerProvider: AgeSignalsManagerProvider,
+    private val pixels: AgeSignalsPixels,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : ActivityLifecycleCallbacks {
@@ -50,12 +52,17 @@ class AgeSignalsLaunchTrigger @Inject constructor(
         resumedActivity = WeakReference(activity)
 
         if (activity.javaClass.name == CONSENT_ACTIVITY) {
-            appCoroutineScope.launch { store.recordPromptShown() }
+            appCoroutineScope.launch {
+                store.recordPromptShown()
+                if (!managerProvider.isFakeScenarioActive()) pixels.firePromptShown()
+            }
         }
 
         if (launched.compareAndSet(false, true)) {
             appCoroutineScope.launch(dispatchers.io()) {
-                if (feature.self().isEnabled()) checker.check { resumedActivity.get() }
+                if (!feature.self().isEnabled()) return@launch
+                val outcome = checker.check { resumedActivity.get() } ?: return@launch
+                if (!managerProvider.isFakeScenarioActive()) pixels.fireCheck(outcome)
             }
         }
     }

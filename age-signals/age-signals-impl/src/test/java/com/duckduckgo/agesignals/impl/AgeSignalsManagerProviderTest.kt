@@ -22,6 +22,7 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.google.android.play.agesignals.AgeSignalsManager
 import com.google.android.play.agesignals.testing.FakeAgeSignalsManager
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -59,6 +60,27 @@ class AgeSignalsManagerProviderTest {
         val manager = provider(BuildFlavor.INTERNAL).get()
 
         assertSame(playManager, manager)
+    }
+
+    @Test
+    fun whenInternalBuildHasAStoredFakeScenarioThenAFakeScenarioIsActive() = runTest {
+        scenarioStore.setScenario(AgeSignalsScenario.VERIFICATION_REQUIRED)
+
+        assertTrue(provider(BuildFlavor.INTERNAL).isFakeScenarioActive())
+    }
+
+    @Test
+    fun whenInternalBuildSelectsRealPlayThenNoFakeScenarioIsActive() = runTest {
+        scenarioStore.setScenario(AgeSignalsScenario.REAL_PLAY)
+
+        assertFalse(provider(BuildFlavor.INTERNAL).isFakeScenarioActive())
+    }
+
+    @Test
+    fun whenPlayBuildHasAStoredFakeScenarioThenNoFakeScenarioIsActive() = runTest {
+        scenarioStore.setScenario(AgeSignalsScenario.SHARED)
+
+        assertFalse(provider(BuildFlavor.PLAY).isFakeScenarioActive())
     }
 
     private fun provider(flavor: BuildFlavor): RealAgeSignalsManagerProvider {

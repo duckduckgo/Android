@@ -36,6 +36,7 @@ dependencies {
     implementation project(path: ':internal-features-api')
     implementation project(path: ':navigation-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':statistics-api')
 
     implementation AndroidX.appCompat
     implementation AndroidX.constraintLayout

@@ -42,8 +42,10 @@ import kotlin.time.Duration.Companion.seconds
 interface AgeSignalsChecker {
     /**
      * Runs the gated Play Age Signals flow and records its outcome. Concurrent calls run one after another.
+     *
+     * @return the outcome this run recorded, or null when it recorded nothing.
      */
-    suspend fun check(currentActivity: () -> Activity?)
+    suspend fun check(currentActivity: () -> Activity?): AgeSignalsOutcome?
 }
 
 @ContributesBinding(AppScope::class)
@@ -55,16 +57,15 @@ class RealAgeSignalsChecker @Inject constructor(
 
     private val mutex = Mutex()
 
-    override suspend fun check(currentActivity: () -> Activity?) {
-        mutex.withLock {
-            val outcome = runFlow(managerProvider.get(), currentActivity)
-            if (outcome == null) {
-                logcat(VERBOSE) { "Age signals: no live Activity to request access, nothing recorded" }
-                return
-            }
+    override suspend fun check(currentActivity: () -> Activity?): AgeSignalsOutcome? = mutex.withLock {
+        val outcome = runFlow(managerProvider.get(), currentActivity)
+        if (outcome == null) {
+            logcat(VERBOSE) { "Age signals: no live Activity to request access, nothing recorded" }
+        } else {
             logcat(VERBOSE) { "Age signals outcome: $outcome" }
             store.record(outcome)
         }
+        outcome
     }
 
     private suspend fun runFlow(manager: AgeSignalsManager, currentActivity: () -> Activity?): AgeSignalsOutcome? {

@@ -27,6 +27,7 @@ import javax.inject.Inject
 
 interface AgeSignalsManagerProvider {
     suspend fun get(): AgeSignalsManager
+    suspend fun isFakeScenarioActive(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -44,10 +45,10 @@ class RealAgeSignalsManagerProvider internal constructor(
         scenarioStore: AgeSignalsScenarioStore,
     ) : this(context, appBuildConfig, scenarioStore, AgeSignalsManagerFactory::create)
 
-    override suspend fun get(): AgeSignalsManager {
-        if (appBuildConfig.flavor == BuildFlavor.INTERNAL) {
-            scenarioStore.scenario().fake?.let { return it.toFakeManager() }
-        }
-        return createPlayManager(context)
-    }
+    override suspend fun get(): AgeSignalsManager = fakeResponses()?.toFakeManager() ?: createPlayManager(context)
+
+    override suspend fun isFakeScenarioActive(): Boolean = fakeResponses() != null
+
+    private suspend fun fakeResponses(): FakeResponses? =
+        if (appBuildConfig.flavor == BuildFlavor.INTERNAL) scenarioStore.scenario().fake else null
 }
