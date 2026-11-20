@@ -18,8 +18,9 @@ package com.duckduckgo.duckchat.impl.attention
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.duckchat.api.DuckChat
@@ -32,7 +33,6 @@ import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -43,7 +43,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -59,8 +58,7 @@ class DuckAiResponseAttentionTrackerImplTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckChatFeatureRepository: DuckChatFeatureRepository = mock()
     private val listener = RecordingListener()
-    private val currentMode = MutableStateFlow(BrowserMode.REGULAR)
-    private val browserModeStateHolder: BrowserModeStateHolder = mock { on { currentMode } doReturn currentMode }
+    private val fireTabRepository: TabRepository = mock()
 
     private lateinit var testee: DuckAiResponseAttentionTrackerImpl
 
@@ -82,7 +80,7 @@ class DuckAiResponseAttentionTrackerImplTest {
         duckChat = duckChat,
         duckChatFeature = lazy { duckChatFeature },
         duckChatFeatureRepository = duckChatFeatureRepository,
-        browserModeStateHolder = browserModeStateHolder,
+        fireTabRepository = lazy { fireTabRepository },
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
     ).also {
@@ -484,8 +482,8 @@ class DuckAiResponseAttentionTrackerImplTest {
     }
 
     @Test
-    fun `when an address bar prompt page loads in fire mode then events carry FIRE`() {
-        currentMode.value = BrowserMode.FIRE
+    fun `when an address bar prompt page loads in a fire tab then events carry FIRE`() = runTest {
+        whenever(fireTabRepository.getTab("t1")).thenReturn(TabEntity(tabId = "t1"))
         testee.onDuckAiPageVisible(tabId = "t1", url = HANDOVER_URL)
         testee.onClose()
         idle()

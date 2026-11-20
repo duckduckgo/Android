@@ -18,9 +18,10 @@ package com.duckduckgo.duckchat.impl.attention
 
 import androidx.core.net.toUri
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.browsermode.api.BrowserModeStateHolder
+import com.duckduckgo.browsermode.api.FireMode
 import com.duckduckgo.common.utils.AppUrl.ParamKey.QUERY
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
@@ -63,7 +64,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
     private val duckChat: DuckChat,
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val duckChatFeatureRepository: DuckChatFeatureRepository,
-    private val browserModeStateHolder: BrowserModeStateHolder,
+    @param:FireMode private val fireTabRepository: Lazy<TabRepository>,
     dispatchers: DispatcherProvider,
     @AppCoroutineScope appCoroutineScope: CoroutineScope,
 ) : DuckAiResponseAttentionTracker,
@@ -115,7 +116,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         // which can be too late to start the service after the user leaves.
         // If the prompt is in the URL, we treat it as submitted right away and start tracking the response.
         if (isPromptHandoverWithQuery(url)) {
-            channel.trySend(Action.NativePromptSubmitted(tabId, browserModeStateHolder.currentMode.value))
+            channel.trySend(Action.PromptHandoverVisible(tabId))
         }
     }
 
@@ -158,6 +159,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
         when (action) {
             is Action.ChatVisibility -> reconcileOnScreen()
             is Action.NativePromptSubmitted -> startResponse(action.tabId, action.browserMode)
+            is Action.PromptHandoverVisible -> startResponse(action.tabId, browserModeOf(action.tabId))
             is Action.ResponseState -> applyResponseState(action.tabId, action.status)
             is Action.StopTapped -> responses.firstOrNull { it.isOnScreenIn(action.tabId) }?.done = true
             is Action.ClearChats -> action.types.forEach { abort(responses.clearedBy(it, duckChat)) }
@@ -175,6 +177,9 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
             if (response.away) emit(TrackingAborted(response.snapshot()))
         }
     }
+
+    private suspend fun browserModeOf(tabId: String): BrowserMode =
+        if (fireTabRepository.value.getTab(tabId) != null) BrowserMode.FIRE else BrowserMode.REGULAR
 
     private suspend fun startResponse(tabId: String, browserMode: BrowserMode) {
         // An address-bar prompt is reported on each page load and again when the page picks it up. This deduplicates them.
@@ -251,6 +256,7 @@ class DuckAiResponseAttentionTrackerImpl @Inject constructor(
 
     private sealed class Action {
         data class NativePromptSubmitted(val tabId: String, val browserMode: BrowserMode) : Action()
+        data class PromptHandoverVisible(val tabId: String) : Action()
         data class ResponseState(val tabId: String, val status: String) : Action()
         data class StopTapped(val tabId: String) : Action()
         data class ChatVisibility(val event: ChatVisibilityEvent) : Action()
