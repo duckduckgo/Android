@@ -101,19 +101,6 @@ class RealSegmentSkipUserPreferencesTest {
     }
 
     @Test
-    fun whenLegacyModeStoredThenItIsPreservedAndReplacedOnWrite() = runTest {
-        val legacyKey = stringPreferencesKey("sponsor_block_mode")
-        val modeKey = stringPreferencesKey("segment_skip_mode")
-        testDataStore.edit { it[legacyKey] = "ALWAYS_SKIP" }
-
-        assertEquals(SegmentSkipMode.ALWAYS_SKIP, testee.modeFlow().first())
-        testee.setMode(SegmentSkipMode.OFF)
-        val preferences = testDataStore.data.first()
-        assertEquals("OFF", preferences[modeKey])
-        assertEquals(null, preferences[legacyKey])
-    }
-
-    @Test
     fun whenStoredValueIsUnknownThenModeIsOff() = runTest {
         testDataStore.edit { it[stringPreferencesKey("segment_skip_mode")] = "SOMETHING_ELSE" }
 

@@ -66,7 +66,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         dataStore.data,
         feature.mvpEnabled().enabled(),
     ) { prefs, mvpEnabled ->
-        (prefs[KEY_MODE] ?: prefs[LEGACY_KEY_MODE])?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
+        prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
             ?: if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
     }
         .distinctUntilChanged()
@@ -74,10 +74,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
     override fun cachedMode(): SegmentSkipMode = mode.value
 
     override suspend fun setMode(mode: SegmentSkipMode) {
-        dataStore.edit { prefs ->
-            prefs[KEY_MODE] = mode.name
-            prefs.remove(LEGACY_KEY_MODE)
-        }
+        dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
     }
 
     private fun defaultMode(): SegmentSkipMode =
@@ -85,6 +82,5 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     private companion object {
         val KEY_MODE = stringPreferencesKey("segment_skip_mode")
-        val LEGACY_KEY_MODE = stringPreferencesKey("sponsor_block_mode")
     }
 }
