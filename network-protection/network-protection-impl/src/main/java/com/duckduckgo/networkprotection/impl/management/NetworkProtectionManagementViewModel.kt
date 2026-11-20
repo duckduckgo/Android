@@ -359,9 +359,10 @@ class NetworkProtectionManagementViewModel @Inject constructor(
     }
 
     private suspend fun resetToggleIfStartNotAcknowledged() {
-        // A cold VPN process can take well over a second to write ENABLING; until then the last stored state is the stale DISABLED
+        // A cold VPN process can take well over a second to write ENABLING; until then the last stored state is the stale DISABLED.
+        // The first emission is a snapshot taken on subscribe, which can already read ENABLED before the service has written anything.
         val acknowledged = withTimeoutOrNull(START_ACK_TIMEOUT_MILLIS) {
-            vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN).firstOrNull { it.state == ENABLING || it.state == ENABLED }
+            vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN).drop(1).firstOrNull { it.state == ENABLING || it.state == ENABLED }
         }
         if (acknowledged == null) {
             refreshVpnRunningState.emit(System.currentTimeMillis())

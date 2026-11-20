@@ -310,6 +310,26 @@ class NetworkProtectionManagementViewModelTest {
     }
 
     @Test
+    fun whenOnStartVpnAndOnlyTheInitialSnapshotReportsEnabledThenViewStateReEmitsDisconnected() = runTest {
+        // The first value of getStateFlow is a snapshot taken on subscribe, not a state the service wrote
+        whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
+            MutableStateFlow(VpnState(state = DISABLED)),
+            MutableStateFlow(VpnState(state = ENABLED)),
+        )
+        whenever(netPGeoswitchingRepository.getUserPreferredLocation()).thenReturn(UserPreferredLocation())
+
+        testee.viewState().test {
+            assertEquals(Disconnected, awaitItem().connectionState)
+
+            testee.onStartVpn()
+            advanceTimeBy(TimeUnit.SECONDS.toMillis(10))
+
+            assertEquals(Disconnected, awaitItem().connectionState)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenVpnStateIsEnablingThenViewStateEmitsConnecting() = runTest {
         whenever(vpnStateMonitor.getStateFlow(NetPVpnFeature.NETP_VPN)).thenReturn(
             flowOf(
