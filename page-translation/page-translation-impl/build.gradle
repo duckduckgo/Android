@@ -32,4 +32,19 @@ dependencies {
     implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':page-translation-api')
+    implementation project(':browser-api')
+    implementation project(':common-utils')
+
+    implementation KotlinX.coroutines.core
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.duckduckgo.translatekit:translate-kit-android:_"
+
+    testImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation Testing.junit4
 }
