@@ -69,6 +69,7 @@ class SyncDebugCommands @Inject constructor(
         STATUS -> status()
         USE_STAGING -> useStaging(on)
         SET_FLAG -> setFlag(flag, on)
+        CREATE_ACCOUNT -> createAccount()
         SIMULATE_LOGIN -> otherDevicesDebugTool.simulateLogin()
         LOG_OUT_OTHERS -> logOutOthers()
         READ_LOG -> readLog()
@@ -113,6 +114,11 @@ class SyncDebugCommands @Inject constructor(
         .filter { it.parameterCount == 0 && it.returnType == Toggle::class.java }
         .associate { it.name to it.invoke(syncFeature) as Toggle }
 
+    private fun createAccount(): String = when (val result = syncAccountRepository.createAccount()) {
+        is Result.Success -> "account created"
+        is Result.Error -> "${ERROR}create failed: ${result.reason} (code ${result.code})"
+    }
+
     private fun logOutOthers(): String {
         val others = otherDevicesDebugTool.otherDevices()
         others.error?.let { return it }
@@ -151,6 +157,7 @@ class SyncDebugCommands @Inject constructor(
         const val STATUS = "status"
         const val USE_STAGING = "useStaging"
         const val SET_FLAG = "setFlag"
+        const val CREATE_ACCOUNT = "createAccount"
         const val SIMULATE_LOGIN = "simulateLogin"
         const val LOG_OUT_OTHERS = "logOutOthers"
         const val READ_LOG = "readLog"
@@ -161,6 +168,7 @@ class SyncDebugCommands @Inject constructor(
             STATUS,
             USE_STAGING,
             SET_FLAG,
+            CREATE_ACCOUNT,
             SIMULATE_LOGIN,
             LOG_OUT_OTHERS,
             READ_LOG,
@@ -168,7 +176,7 @@ class SyncDebugCommands @Inject constructor(
             RUN_BACKGROUND_SYNC,
             EXPIRE_SYNC_DEBOUNCE,
         )
-        val STAGING_ONLY = setOf(SIMULATE_LOGIN, LOG_OUT_OTHERS, DELETE_ACCOUNT)
+        val STAGING_ONLY = setOf(CREATE_ACCOUNT, SIMULATE_LOGIN, LOG_OUT_OTHERS, DELETE_ACCOUNT)
         const val NOT_SIGNED_IN = "Not signed in"
         const val ERROR = "error: "
 

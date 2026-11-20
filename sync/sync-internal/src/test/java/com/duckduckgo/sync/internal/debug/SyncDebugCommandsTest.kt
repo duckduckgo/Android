@@ -315,8 +315,28 @@ class SyncDebugCommandsTest {
             )
         }
         verify(syncAccountRepository, never()).deleteAccount()
+        verify(syncAccountRepository, never()).createAccount()
         verify(otherDevicesDebugTool, never()).simulateLogin()
         verify(otherDevicesDebugTool, never()).otherDevices()
+    }
+
+    @Test
+    fun whenCreateAccountOnStagingSucceedsThenSaysCreated() = runTest {
+        envDataStore.useSyncDevEnvironment = true
+        whenever(syncAccountRepository.createAccount()).thenReturn(Result.Success(true))
+
+        assertEquals("account created", commands.run(SyncDebugCommands.CREATE_ACCOUNT, on = true))
+    }
+
+    @Test
+    fun whenCreateAccountFailsThenReturnsAnErrorWithReasonAndCode() = runTest {
+        envDataStore.useSyncDevEnvironment = true
+        whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(code = 51, reason = "Already signed in"))
+
+        assertEquals(
+            "error: create failed: Already signed in (code 51)",
+            commands.run(SyncDebugCommands.CREATE_ACCOUNT, on = true),
+        )
     }
 
     @Test
