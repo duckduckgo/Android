@@ -36,6 +36,10 @@ dependencies {
     implementation project(':common-utils')
 
     implementation KotlinX.coroutines.core
+    implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.dataStore.preferences
+    implementation Square.okHttp3.okHttp
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.duckduckgo.translatekit:translate-kit-android:_"
 
@@ -46,5 +50,9 @@ dependencies {
     }
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation Square.okHttp3.mockWebServer
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
     testImplementation Testing.junit4
 }
