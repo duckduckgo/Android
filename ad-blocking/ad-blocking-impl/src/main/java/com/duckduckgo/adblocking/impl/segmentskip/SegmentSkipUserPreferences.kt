@@ -26,13 +26,12 @@ import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.stateIn
 import java.io.IOException
 import javax.inject.Inject
@@ -73,11 +72,9 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
             ?: defaultMode(mvpEnabled)
     }
-        .retryWhen { cause, _ ->
+        .catch { cause ->
             if (cause !is IOException) throw cause
             emit(SegmentSkipMode.OFF)
-            delay(1_000)
-            true
         }
         .distinctUntilChanged()
 

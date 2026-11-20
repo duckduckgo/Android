@@ -60,7 +60,7 @@ class RealSegmentSkipUserPreferencesTest {
     private val testee = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
 
     @Test
-    fun whenReadFailsThenModeIsOffAndRecoversOnRetry() {
+    fun whenReadFailsThenModeIsOffAndNewCollectionCanRecover() = runTest {
         val failingStore: DataStore<Preferences> = mock()
         var attempts = 0
         whenever(failingStore.data).thenReturn(
@@ -77,10 +77,10 @@ class RealSegmentSkipUserPreferencesTest {
         val preferences = RealSegmentSkipUserPreferences(failingStore, coroutineRule.testScope, testFeature)
 
         assertEquals(SegmentSkipMode.OFF, preferences.cachedMode())
-        coroutineRule.testScope.testScheduler.advanceTimeBy(1_001)
-        coroutineRule.testScope.testScheduler.runCurrent()
+        assertEquals(1, attempts)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, preferences.modeFlow().first())
         assertEquals(2, attempts)
-        assertEquals(SegmentSkipMode.ALWAYS_SKIP, preferences.cachedMode())
+        assertEquals(SegmentSkipMode.OFF, preferences.cachedMode())
     }
 
     @Test
