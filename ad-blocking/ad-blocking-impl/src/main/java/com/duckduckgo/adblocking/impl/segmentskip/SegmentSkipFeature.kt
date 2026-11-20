@@ -23,7 +23,7 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
-    featureName = "segmentSkip",
+    featureName = "sponsorBlock",
 )
 interface SegmentSkipFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)

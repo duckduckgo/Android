@@ -79,7 +79,7 @@ class AdBlockingSettingsViewModelTest {
     private val segmentSkipFeature = FeatureToggles.Builder()
         .store(FakeToggleStore())
         .appVersionProvider { Int.MAX_VALUE }
-        .featureName("segmentSkip")
+        .featureName("sponsorBlock")
         .ioDispatcher(coroutineRule.testDispatcher)
         .build()
         .create(SegmentSkipFeature::class.java)
