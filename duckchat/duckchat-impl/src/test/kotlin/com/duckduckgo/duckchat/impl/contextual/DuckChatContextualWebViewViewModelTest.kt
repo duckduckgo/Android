@@ -25,7 +25,6 @@ import com.duckduckgo.duckchat.api.DuckAiTermsConsent
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.PageContextTrigger
 import com.duckduckgo.duckchat.impl.DuckChatInternal
-import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.helper.NativeAction
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
@@ -40,7 +39,6 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRe
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.SelectionTerminalReason
-import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -87,9 +85,7 @@ class DuckChatContextualWebViewViewModelTest {
     private val entryWideEvent: DuckAiEntryWideEvent = mock()
     private val pdfPageContextResolver: PdfPageContextResolver = mock()
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
-    private val duckChatFeature: DuckChatFeature = mock()
     private val termsConsent: DuckAiTermsConsent = mock()
-    private val contextualFireButtonToggle: Toggle = mock()
     private val modelManager: com.duckduckgo.duckchat.impl.models.DuckAiModelManager = mock()
     private val chatHistoryRepository: ChatHistoryRepository = mock()
     private val contextualEntryPromptStore: ContextualEntryPromptStore = mock()
@@ -111,8 +107,6 @@ class DuckChatContextualWebViewViewModelTest {
 
     @Before
     fun setup() {
-        whenever(duckChatFeature.contextualFireButton()).thenReturn(contextualFireButtonToggle)
-        whenever(contextualFireButtonToggle.isEnabled()).thenReturn(false)
         whenever(chatHistoryRepository.observeChats()).thenReturn(recentChatsFlow)
         whenever(promoCampaignJSHelper.promoRecordEvents).thenReturn(promoRecordEvents)
         whenever(duckChatInternal.isAutomaticContextAttachmentEnabled()).thenReturn(true)
@@ -960,7 +954,6 @@ class DuckChatContextualWebViewViewModelTest {
         timeProvider = timeProvider,
         duckChatPixels = duckChatPixels,
         selectionJourney = selectionJourney,
-        duckChatFeature = duckChatFeature,
         modelManager = modelManager,
         chatHistoryRepository = chatHistoryRepository,
         contextualEntryPromptStore = contextualEntryPromptStore,
