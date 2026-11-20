@@ -34,6 +34,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
@@ -71,6 +72,42 @@ class DeviceFieldEncryptorTest {
         val result = encryptor.encrypt("My Phone", "phone")
 
         assertEquals(Success(EncryptedDeviceFields(name = "enc-My Phone", type = "enc-phone")), result)
+    }
+
+    @Test
+    fun whenThirdPartyThenNameAndTypeCarryThirdPartyKid() {
+        whenever(syncStore.credentialId).thenReturn("3party")
+        whenever(syncStore.scopedPassword).thenReturn(ScopedPassword(spBase64))
+        whenever(syncStore.userId).thenReturn(userId)
+        whenever(syncJweCrypto.hkdfSha256SingleBlock(any(), any(), eq("Main Key"), eq(32))).thenReturn(ByteArray(32))
+        whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), anyOrNull())).thenReturn("enc")
+
+        encryptor.encrypt("My Phone", "phone")
+
+        verify(syncJweCrypto, times(2)).jweEncryptSymmetric(any(), any(), eq("3party"))
+    }
+
+    @Test
+    fun whenEncryptThirdPartyWithMainKeyThenUsesThatKeyWithoutReadingStore() {
+        val mainKey = ByteArray(32) { 7 }
+        whenever(syncJweCrypto.jweEncryptSymmetric(any(), eq(mainKey), eq("3party"))).thenAnswer {
+            "enc-" + String(it.getArgument(0), Charsets.UTF_8)
+        }
+
+        val result = encryptor.encryptThirdParty("My Phone", "phone", mainKey)
+
+        assertEquals(Success(EncryptedDeviceFields(name = "enc-My Phone", type = "enc-phone")), result)
+        verify(syncJweCrypto, never()).hkdfSha256SingleBlock(any(), any(), any(), any())
+        verify(syncStore, never()).scopedPassword
+    }
+
+    @Test
+    fun whenEncryptThirdPartyWithMainKeyThrowsThenError() {
+        whenever(syncJweCrypto.jweEncryptSymmetric(any(), any(), anyOrNull())).thenThrow(RuntimeException("boom"))
+
+        val result = encryptor.encryptThirdParty("My Phone", "phone", ByteArray(32))
+
+        assertTrue(result is Error)
     }
 
     @Test

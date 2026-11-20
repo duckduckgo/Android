@@ -181,6 +181,7 @@ class AppSyncAccountRepository @Inject constructor(
     private val deviceInfoUpdater: DeviceInfoUpdater,
     private val connectedDevicesRepository: ConnectedDevicesRepository,
     private val remoteDeviceLogout: RemoteDeviceLogout,
+    private val deviceFieldEncryptor: DeviceFieldEncryptor,
 ) : SyncAccountRepository {
 
     // Bounded backoff for the 3party→ddg upgrade network calls.
@@ -464,6 +465,25 @@ class AppSyncAccountRepository @Inject constructor(
 
     override fun refreshThirdPartyCredential(): Result<Boolean> = thirdPartyCredentialManager.refresh()
 
+    private class ThirdPartySecretKeys(
+        val standardBase64Secret: String,
+        val mainKey: ByteArray,
+        val hashedPassword: String,
+    )
+
+    private fun deriveThirdPartySecretKeys(parsed: ThirdPartyRecoveryCode): Result<ThirdPartySecretKeys> {
+        // SP travels in the recovery code as base64url; nativeLib + hkdfDerive* helpers expect standard base64.
+        val standardBase64Secret = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
+            .getOrElse { return Error(reason = "failed to decode SP: ${it.message}") }
+        val hkdfSalt = parsed.userId.toByteArray(Charsets.UTF_8)
+        val mainKey = kotlin.runCatching {
+            syncJweCrypto.hkdfDeriveBytes(standardBase64Secret, hkdfSalt, HKDF_INFO_MAIN_ENCRYPTION_KEY, MAIN_ENCRYPTION_KEY_LENGTH_BYTES)
+        }.getOrElse { return Error(reason = "failed to derive SP MEK: ${it.message}") }
+        val hashedPassword = kotlin.runCatching { syncJweCrypto.hkdfDeriveBase64Url(standardBase64Secret, hkdfSalt, "Password", 32) }
+            .getOrElse { return Error(reason = "failed to derive 3party hashed_password: ${it.message}") }
+        return Success(ThirdPartySecretKeys(standardBase64Secret, mainKey, hashedPassword))
+    }
+
     /**
      * Bundle produced by [buildThirdPartyUpgradePackage] and consumed by the upgrade POST +
      * SyncStore commit step. Keeps the locally-generated DDG account material together with the
@@ -496,17 +516,10 @@ class AppSyncAccountRepository @Inject constructor(
      */
     private fun buildThirdPartyUpgradePackage(
         parsed: ThirdPartyRecoveryCode,
+        thirdPartyKeys: ThirdPartySecretKeys,
         keysFromLogin: List<ProtectedKeyEntry>,
     ): Result<ThirdPartyUpgradePackage> {
-        // SP travels in the recovery code as base64url; nativeLib + hkdfDerive* helpers expect
-        // standard base64. Compute once at the boundary, reuse for all derivations.
-        val spStandardB64 = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
-            .getOrElse { return Error(reason = "Upgrade: failed to decode SP") }
         val hkdfSalt = parsed.userId.toByteArray(Charsets.UTF_8)
-
-        // SP-derived MEK: used to decrypt FE-written (JWE) keys we received from /sync/login.
-        val spMek = kotlin.runCatching { syncJweCrypto.hkdfDeriveBytes(spStandardB64, hkdfSalt, "Main Key", 32) }
-            .getOrElse { return Error(reason = "Upgrade: failed to derive SP MEK") }
 
         // Fresh DDG credential generated locally. nativeLib.generateAccountKeys returns a tuple
         // where `primaryKey` is the new account's MP (the seed for all spec-side derivations) and
@@ -543,7 +556,7 @@ class AppSyncAccountRepository @Inject constructor(
                 if (srcKey.encryptedWith != CREDENTIAL_ID_3PARTY) {
                     error("Upgrade: cannot re-wrap key kid=${srcKey.kid} encrypted_with=${srcKey.encryptedWith}; expected 3party")
                 }
-                val rawPrivateKeyBytes = syncJweCrypto.jweDecryptSymmetric(srcKey.encryptedPrivateKey, spMek)
+                val rawPrivateKeyBytes = syncJweCrypto.jweDecryptSymmetric(srcKey.encryptedPrivateKey, thirdPartyKeys.mainKey)
                 val encryptedResult = nativeLib.encryptData(rawPrivateKeyBytes, newDdgKeys.secretKey).also {
                     it.checkResult("Upgrade: libsodium encryption of re-wrapped key kid=${srcKey.kid} failed")
                 }
@@ -566,18 +579,12 @@ class AppSyncAccountRepository @Inject constructor(
         }
         val rewrappedKeysList = rewrappedKeys.map { it.getOrThrow() }
 
-        // hashedPassword (re-auth against the existing 3party credential) — same HKDF derivation
-        // we used at /sync/login. Per Sync API docs, the POST /access-credentials/{id} body carries
-        // hashed_password as a re-auth of ANY existing credential, allowing the server to decrypt
-        // the e2ee_id and accept the new credential atomically.
-        val hashedPasswordForReauth = kotlin.runCatching { syncJweCrypto.hkdfDeriveBase64Url(spStandardB64, hkdfSalt, "Password", 32) }
-            .getOrElse { return Error(reason = "Upgrade: failed to derive 3party hashed_password: ${it.message}") }
-
         // credentialHashedPassword for the new DDG credential — libsodium/Argon2, the same derivation
         // performCreateAccount uses for standard signup. Keeping every ddg credential libsodium-hashed
         // means the standard performLogin path works for both signup-created and upgrade-created
         val request = CreateAccessCredentialRequest(
-            hashedPassword = hashedPasswordForReauth,
+            // Re-auth against the existing 3party credential: the server needs it to decrypt the e2ee_id and accept the new credential.
+            hashedPassword = thirdPartyKeys.hashedPassword,
             credentialHashedPassword = newDdgKeys.passwordHash,
             protectedEncryptionKey = newDdgKeys.protectedSecretKey,
             encrypted3partyCredential = encryptedThreePartyCredential,
@@ -598,6 +605,10 @@ class AppSyncAccountRepository @Inject constructor(
 
         val parsed = parseThirdPartyRecoveryCode(pastedCode)
             ?: return Error(reason = "JoinFrom3party: code is not a valid 3party recovery code")
+        val thirdPartyKeys = when (val keys = deriveThirdPartySecretKeys(parsed)) {
+            is Error -> return keys.copy(reason = "JoinFrom3party: ${keys.reason}")
+            is Success -> keys.data
+        }
 
         // Saved before the 3party login so a retry after a transient failure logs in with the same id and replaces this device's record.
         val deviceId = syncDeviceIds.deviceId()
@@ -605,12 +616,12 @@ class AppSyncAccountRepository @Inject constructor(
         val deviceName = syncDeviceIds.deviceName()
 
         // Step 2 — authenticate against the 3party credential.
-        val loginResponse = when (val loginResult = performThirdPartyLogin(parsed, deviceId)) {
+        val loginResponse = when (val loginResult = performThirdPartyLogin(parsed.userId, thirdPartyKeys, deviceId)) {
             is Error -> return loginResult.copy(reason = "JoinFrom3party: ${loginResult.reason}")
             is Success -> loginResult.data
         }
 
-        return when (val upgrade = upgradeThirdPartyAccount(parsed, loginResponse, deviceId, deviceName)) {
+        return when (val upgrade = upgradeThirdPartyAccount(parsed, thirdPartyKeys, loginResponse, deviceId, deviceName)) {
             is ThirdPartyUpgrade.Upgraded -> Success(true)
             is ThirdPartyUpgrade.TransientFailure -> upgrade.error
             is ThirdPartyUpgrade.Aborted -> {
@@ -633,6 +644,7 @@ class AppSyncAccountRepository @Inject constructor(
 
     private suspend fun upgradeThirdPartyAccount(
         parsed: ThirdPartyRecoveryCode,
+        thirdPartyKeys: ThirdPartySecretKeys,
         loginResponse: LoginResponse,
         deviceId: String,
         deviceName: String,
@@ -662,7 +674,7 @@ class AppSyncAccountRepository @Inject constructor(
         logcat { "Sync-ScopedToken: 3party /sync/login OK, ${keysFromLogin.size} key(s) to re-wrap" }
 
         // Steps 3 + 4 + 5 — build the upgrade payload locally.
-        val upgradePackage = when (val pkg = buildThirdPartyUpgradePackage(parsed, keysFromLogin)) {
+        val upgradePackage = when (val pkg = buildThirdPartyUpgradePackage(parsed, thirdPartyKeys, keysFromLogin)) {
             is Error -> return ThirdPartyUpgrade.Aborted(pkg.copy(reason = "JoinFrom3party: ${pkg.reason}"))
             is Success -> pkg.data
         }
@@ -720,9 +732,7 @@ class AppSyncAccountRepository @Inject constructor(
         // credential's encrypted_3party_credential, but we have the SP in hand from the pasted
         // recovery code. Writing it locally guarantees scopedPassword is populated independent
         // of the server response shape.
-        kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
-            .onSuccess { syncStore.scopedPassword = ScopedPassword(it) }
-            .onFailure { logcat(ERROR) { "Sync-ScopedToken: failed to write local SP after upgrade: ${it.message}" } }
+        syncStore.scopedPassword = ScopedPassword(thirdPartyKeys.standardBase64Secret)
 
         logcat { "Sync-ScopedToken: 3party→ddg upgrade complete; account joined as ddg" }
         return ThirdPartyUpgrade.Upgraded
@@ -921,44 +931,34 @@ class AppSyncAccountRepository @Inject constructor(
      *                     (Encryption Algorithms TD, Asana 1214802412121967, §"Hashed password derivation")
      *   scope           = "ai_chats" — the canonical scope for 3party-restricted credentials
      *   device_name,
-     *   device_type     = libsodium-encrypted with SP-as-key (mirrors the existing ddg pattern;
-     *                     server treats these as opaque blobs)
+     *   device_type     = JWE (alg=dir, enc=A256GCM, kid="3party") with the SP main key, so other
+     *                     clients can read them (Encryption Algorithms TD, test6)
      *
      * Response carries token + keys[] for downstream re-wrap. NO protected_encryption_key —
      * 3party credentials don't carry one (Sync API docs, POST /sync/login Notes).
      */
     private fun performThirdPartyLogin(
-        parsed: ThirdPartyRecoveryCode,
+        userId: String,
+        thirdPartyKeys: ThirdPartySecretKeys,
         deviceId: String,
     ): Result<LoginResponse> {
-        // SP travels in the recovery code as base64url; nativeLib + hkdfDerive* helpers expect
-        // standard base64 input. Convert at the boundary.
-        val spStandardB64 = kotlin.runCatching { base64UrlStringToStandardBase64(parsed.secret) }
-            .getOrElse { return Error(reason = "3party login: failed to decode SP: ${it.message}") }
-
-        val hkdfSalt = parsed.userId.toByteArray(Charsets.UTF_8)
-        val hashedPassword = kotlin.runCatching { syncJweCrypto.hkdfDeriveBase64Url(spStandardB64, hkdfSalt, "Password", 32) }
-            .getOrElse { return Error(reason = "3party login: failed to derive hashed_password: ${it.message}") }
-
-        val deviceName = syncDeviceIds.deviceName()
-        val deviceType = syncDeviceIds.deviceType()
-        val encryptedDeviceName = kotlin.runCatching {
-            nativeLib.encryptData(deviceName, spStandardB64).also {
-                it.checkResult("3party login: encrypting device name failed")
-            }.encryptedData
-        }.getOrElse { return it.asErrorResult() }
-        val encryptedDeviceType = kotlin.runCatching {
-            nativeLib.encryptData(deviceType.deviceFactor, spStandardB64).also {
-                it.checkResult("3party login: encrypting device type failed")
-            }.encryptedData
-        }.getOrElse { return it.asErrorResult() }
+        val encryptedFields = when (
+            val fields = deviceFieldEncryptor.encryptThirdParty(
+                name = syncDeviceIds.deviceName(),
+                type = syncDeviceIds.deviceType().deviceFactor,
+                mainEncryptionKey = thirdPartyKeys.mainKey,
+            )
+        ) {
+            is Error -> return fields.copy(reason = "3party login: ${fields.reason}")
+            is Success -> fields.data
+        }
 
         return syncApi.login(
-            userID = parsed.userId,
-            hashedPassword = hashedPassword,
+            userID = userId,
+            hashedPassword = thirdPartyKeys.hashedPassword,
             deviceId = deviceId,
-            deviceName = encryptedDeviceName,
-            deviceType = encryptedDeviceType,
+            deviceName = encryptedFields.name,
+            deviceType = encryptedFields.type,
             scope = SYNC_SCOPE_AI_CHATS,
         )
     }
