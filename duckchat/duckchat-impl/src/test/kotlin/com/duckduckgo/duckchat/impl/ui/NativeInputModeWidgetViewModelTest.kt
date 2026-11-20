@@ -1711,6 +1711,41 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenDuckAiConfiguredWithLaunchedModelThenItBecomesThePick() = runTest {
+        givenNewChatModels()
+        whenever(modelManager.consumeLaunchedNewChatModel()).thenReturn("picked-model")
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+    }
+
+    @Test
+    fun whenBrowserConfiguredThenLaunchedModelNotTaken() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        verify(modelManager, never()).consumeLaunchedNewChatModel()
+    }
+
+    @Test
+    fun whenTabOnExistingChatConfiguredThenLaunchedModelNotTaken() = runTest {
+        givenNewChatModels()
+        val viewModel = createViewModel()
+        nativeInputStatePublisher.update("tab-A") { it.copy(chatId = "chat-1") }
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        verify(modelManager, never()).consumeLaunchedNewChatModel()
+    }
+
+    @Test
     fun whenHintPicksModelForActiveTabThenItBecomesThePickBeforeFollowUpIsSent() = runTest {
         givenNewChatModels()
         val viewModel = createViewModel()

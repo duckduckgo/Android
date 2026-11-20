@@ -772,9 +772,15 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             null
         }
         // An "open Duck.ai for image generation" launch preselects image generation on the new tab.
-        // The image-capable model was already selected when the launch was requested.
+        // The image-capable model was already selected, or held for this chat, when the launch was requested.
         if (isDuckAiMode && forceImageGeneration) {
             nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+        }
+        // Only a tab on a new chat can be the one a launch opened.
+        if (isDuckAiMode && nativeInputStateProvider.stateForTab(tabId).value.chatId == null) {
+            modelManager.consumeLaunchedNewChatModel()?.let { modelId ->
+                nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = modelId, newChatReasoningMode = null) }
+            }
         }
     }
 

@@ -1500,6 +1500,8 @@ private class FakeDuckAiModelManager : DuckAiModelManager {
     override suspend fun selectProvider(provider: ModelProvider) = Unit
     override suspend fun selectReasoningMode(mode: ReasoningMode) = Unit
     override suspend fun setChatScopedReasoningMode(mode: ReasoningMode?) = Unit
+    override suspend fun selectModelForLaunchedNewChat(model: AIChatModel): Boolean = false
+    override fun consumeLaunchedNewChatModel(): String? = null
     override fun getSelectedModelId(): String? = null
     override fun getResolvedReasoningEffort(): String? = null
 }

@@ -44,6 +44,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import logcat.logcat
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 data class ModelState(
@@ -83,6 +84,16 @@ interface DuckAiModelManager {
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
 
+    /**
+     * Starts the next new chat a launch opens (e.g. the subscription onboarding) on [model]. When new chats reset to
+     * the default, [model] is held for that chat only and `true` is returned; otherwise it is selected as
+     * [selectModel] does and `false` is returned.
+     */
+    suspend fun selectModelForLaunchedNewChat(model: AIChatModel): Boolean
+
+    /** Takes the model held by [selectModelForLaunchedNewChat], if any; only the first caller gets it. */
+    fun consumeLaunchedNewChatModel(): String?
+
     fun getSelectedModelId(): String?
 
     fun getResolvedReasoningEffort(): String?
@@ -111,6 +122,8 @@ class RealDuckAiModelManager @Inject constructor(
     // with availableReasoningModes. This mutex serializes those operations so each one sees a
     // consistent view of the previous state.
     private val stateMutex = Mutex()
+
+    private val launchedNewChatModelId = AtomicReference<String?>(null)
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -392,6 +405,18 @@ class RealDuckAiModelManager @Inject constructor(
             _modelState.value = _modelState.value.copy(chatScopedReasoningMode = mode)
         }
     }
+
+    override suspend fun selectModelForLaunchedNewChat(model: AIChatModel): Boolean {
+        val resets = withContext(dispatcherProvider.io()) { resetsNewChats() }
+        if (!resets) {
+            selectModel(model)
+            return false
+        }
+        launchedNewChatModelId.set(model.id)
+        return true
+    }
+
+    override fun consumeLaunchedNewChatModel(): String? = launchedNewChatModelId.getAndSet(null)
 
     override fun getSelectedModelId(): String? = _modelState.value.selectedModelId
 

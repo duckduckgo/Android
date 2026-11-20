@@ -22,8 +22,8 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint.SUBSCRIPTION_ONBOARDING
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -46,7 +46,7 @@ import javax.inject.Inject
 @ContributesViewModel(FragmentScope::class)
 class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
     private val controller: SubscriptionOnboardingController,
-    private val duckChat: DuckChat,
+    private val duckChat: DuckChatInternal,
     private val duckAiModelManager: DuckAiModelManager,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
@@ -78,10 +78,10 @@ class SubscriptionOnboardingDuckAiViewModel @Inject constructor(
         val selectedId = viewState.value.selectedModelId ?: return
         viewModelScope.launch {
             duckAiModelManager.modelState.value.models.firstOrNull { it.id == selectedId }?.let {
-                duckAiModelManager.selectModel(it)
+                duckAiModelManager.selectModelForLaunchedNewChat(it)
             }
             val duckAi = duckChat
-            controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED) { duckAi.openDuckChat(SUBSCRIPTION_ONBOARDING) }
+            controller.onStepFinished(DUCK_AI_STEP_ID, COMPLETED) { duckAi.openNewDuckChatSession(SUBSCRIPTION_ONBOARDING) }
         }
     }
 

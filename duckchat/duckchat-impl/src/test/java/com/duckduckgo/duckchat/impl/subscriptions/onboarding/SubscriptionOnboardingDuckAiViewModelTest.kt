@@ -18,8 +18,8 @@ package com.duckduckgo.duckchat.impl.subscriptions.onboarding
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint.SUBSCRIPTION_ONBOARDING
+import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
@@ -37,6 +37,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -49,8 +50,10 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val controller: SubscriptionOnboardingController = mock()
-    private val duckChat: DuckChat = mock()
-    private val modelManager: DuckAiModelManager = mock()
+    private val duckChat: DuckChatInternal = mock()
+    private val modelManager: DuckAiModelManager = mock {
+        onBlocking { selectModelForLaunchedNewChat(any()) } doReturn false
+    }
 
     @Test
     fun whenModelsLoadedThenPaidModelsFirstAndFirstIsPreselected() = runTest {
@@ -172,19 +175,19 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     }
 
     @Test
-    fun whenStartClickedThenSelectedModelPersistedAndStepCompletedWithHandoff() = runTest {
+    fun whenStartClickedThenSelectedModelHandedToLaunchedChatAndStepCompletedWithHandoff() = runTest {
         val plus = model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus"))
         val testee = createViewModel(models = listOf(plus))
 
         testee.onStartClicked()
 
-        verify(modelManager).selectModel(plus)
+        verify(modelManager).selectModelForLaunchedNewChat(plus)
         verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), any())
         verifyNoInteractions(duckChat)
     }
 
     @Test
-    fun whenStartClickedThenHandoffOpensDuckChatFromSubscriptionOnboarding() = runTest {
+    fun whenStartClickedThenHandoffOpensNewDuckChatSessionFromSubscriptionOnboarding() = runTest {
         val plus = model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus"))
         val testee = createViewModel(models = listOf(plus))
 
@@ -194,7 +197,7 @@ class SubscriptionOnboardingDuckAiViewModelTest {
         verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), handoff.capture())
         handoff.firstValue.invoke()
 
-        verify(duckChat).openDuckChat(SUBSCRIPTION_ONBOARDING)
+        verify(duckChat).openNewDuckChatSession(SUBSCRIPTION_ONBOARDING)
     }
 
     private fun createViewModel(

@@ -1903,6 +1903,23 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsThenLaunchedModelHeldOnceForNextNewChat() = runTest {
+        givenResetModelForNewChats()
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        givenResetModels()
+        testee = createManager()
+        testee.fetchModels()
+        val haiku = testee.modelState.value.models.first { it.id == "claude-haiku-4-5" }
+
+        assertTrue(testee.selectModelForLaunchedNewChat(haiku))
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals("claude-haiku-4-5", testee.consumeLaunchedNewChatModel())
+        assertNull(testee.consumeLaunchedNewChatModel())
+    }
+
+    @Test
     fun whenResetModelForNewChatsThenTierDefaultInsteadOfCachedSelectionBeforeFirstFetch() = runTest {
         givenResetModelForNewChats()
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("claude-haiku-4-5", "Haiku"))
@@ -1912,6 +1929,22 @@ class RealDuckAiModelManagerTest {
 
         assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
         assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+    }
+
+    @Test
+    fun whenNotResettingModelForNewChatsThenLaunchedModelSelectedGlobally() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        givenResetModels()
+        testee = createManager()
+        testee.fetchModels()
+        val haiku = testee.modelState.value.models.first { it.id == "claude-haiku-4-5" }
+
+        assertFalse(testee.selectModelForLaunchedNewChat(haiku))
+
+        assertEquals("claude-haiku-4-5", testee.modelState.value.selectedModelId)
+        assertNull(testee.consumeLaunchedNewChatModel())
+        verify(dataStore).setSelectedModel(SelectedModel("claude-haiku-4-5", "claude-haiku-4-5"))
     }
 
     private fun givenResetModelForNewChats() {
