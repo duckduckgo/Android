@@ -612,4 +612,23 @@ class RealAuthRepositoryTest {
         assertNull(authStore.externalId)
         assertNull(serpPromo.cookie)
     }
+
+    @Test
+    fun whenTokenStoreIsUnavailableThenIsTokenStoreAvailableIsFalse() = runTest {
+        assertTrue(authRepository.isTokenStoreAvailable())
+
+        authStore.available = false
+
+        assertFalse(authRepository.isTokenStoreAvailable())
+    }
+
+    @Test
+    fun whenRefreshTokenIsStoredButUnreadableThenHasRefreshTokenEntryIsTrue() = runTest {
+        authStore.refreshTokenV2 = null
+        assertFalse(authRepository.hasRefreshTokenEntry())
+
+        authStore.simulateUnreadableRefreshToken = true
+
+        assertTrue(authRepository.hasRefreshTokenEntry())
+    }
 }
