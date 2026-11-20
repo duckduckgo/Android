@@ -50,6 +50,8 @@ class DuckAiClientToolsDevViewModelTest {
             listOf(
                 FlagRow(BrowserToolsFlag.BROWSER_TOOLS, enabled = false),
                 FlagRow(BrowserToolsFlag.SKIP_PERMISSION_PROMPT, enabled = false),
+                FlagRow(BrowserToolsFlag.REQUEST_ACCESS, enabled = false),
+                FlagRow(BrowserToolsFlag.REQUEST_ACCESS_REMOVE_TOOLS, enabled = false),
                 FlagRow(BrowserToolsFlag.LIST_OPEN_TABS, enabled = true),
             ),
             viewModel.viewState.value.flags,

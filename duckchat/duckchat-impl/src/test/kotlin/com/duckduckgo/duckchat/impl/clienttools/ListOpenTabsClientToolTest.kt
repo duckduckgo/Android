@@ -62,7 +62,7 @@ class ListOpenTabsClientToolTest {
         tabReadability = WebUrlTabReadability(),
     )
 
-    private val regular = ClientToolCallContext(chatTabId = "chat", browserMode = BrowserMode.REGULAR)
+    private val regular = ClientToolCallContext(chatTabId = "chat", browserMode = BrowserMode.REGULAR, chatId = "chat-1")
 
     @Test
     fun whenOnlyParentFlagEnabledThenToolIsDisabled() {

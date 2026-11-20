@@ -48,4 +48,13 @@
     <!-- Foreground service notification shown while a response the user left is generating -->
     <string name="duckAiRespondingNotificationTitle">Duck.ai is responding…</string>
     <string name="duckAiRespondingNotificationChannelName">Duck.ai responses in progress</string>
+
+    <!-- Duck.ai client tool permission prompt -->
+    <string name="duckAiClientToolPromptAllowInChat">Allow in This Chat</string>
+    <string name="duckAiClientToolPromptDontAllow">Don’t Allow</string>
+    <string name="duckAiClientToolRequestAccessPromptTitle">Allow Duck.ai to do the following:</string>
+    <string name="duckAiClientToolRequestAccessPromptMessage">Duck.ai can take these actions without asking again in this chat.</string>
+    <string name="duckAiClientToolListOpenTabsName">Open Tabs</string>
+    <string name="duckAiClientToolListOpenTabsPromptTitle">Allow Duck.ai to see your open tabs?</string>
+    <string name="duckAiClientToolListOpenTabsPromptMessage">It will see the title and address of each open tab.</string>
 </resources>

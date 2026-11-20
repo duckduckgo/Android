@@ -15,4 +15,5 @@
   -->
 
 <resources>
+    <dimen name="duckAiBrowserToolsPermissionsListMaxHeight">120dp</dimen>
 </resources>

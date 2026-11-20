@@ -344,6 +344,7 @@ import com.duckduckgo.downloads.api.FileDownloader
 import com.duckduckgo.downloads.api.FileDownloader.PendingFileDownload
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckAiTermsConsent
+import com.duckduckgo.duckchat.api.DuckAiToolPermissionPrompts
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatContextual
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
@@ -613,6 +614,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var sitePermissionsDialogLauncher: SitePermissionsDialogLauncher
+
+    @Inject
+    lateinit var duckAiToolPermissionPrompts: DuckAiToolPermissionPrompts
 
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
@@ -1156,6 +1160,7 @@ class BrowserTabFragment :
             }
         }
         sitePermissionsDialogLauncher.registerPermissionLauncher(this)
+        duckAiToolPermissionPrompts.register(this, tabId)
         externalCameraLauncher.registerForResult(this) {
             when (it) {
                 is MediaCaptured -> pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(it.file)))
