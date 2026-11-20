@@ -58,6 +58,11 @@
                 "enum": ["-1", "0", "1", "4", "24", "72", "168", "720"]
             },
             {
+                "key": "feature.data.ext.backup_token_state",
+                "description": "State of the backup refresh token when the refresh started. 'none' means no backup is stored, 'ok' a backup the app can use, 'stale' a usable backup older than 14 days that is due for renewal, 'expired' a backup past its expiry, 'other_account' a backup that belongs to a different account, 'flag_off' that the backup feature is disabled. Only the main process reads the backup, so the field is absent in every other process. It is also absent in the main process when the token store could not be read, which process_name tells apart.",
+                "enum": ["none", "ok", "stale", "expired", "other_account", "flag_off"]
+            },
+            {
                 "key": "feature.data.ext.netp_is_enabled",
                 "description": "Whether the VPN was enabled when the refresh started. Empty string if the value could not be read.",
                 "type": "string",

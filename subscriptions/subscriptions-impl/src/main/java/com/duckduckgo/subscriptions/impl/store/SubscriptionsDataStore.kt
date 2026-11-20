@@ -54,6 +54,11 @@ interface SubscriptionsDataStore {
     // Pending Plans (stored as JSON array string)
     var pendingPlans: String?
 
+    val backupRefreshToken: String?
+    val backupRefreshTokenExpiresAt: Instant?
+    val backupRefreshTokenExternalId: String?
+    val backupRefreshTokenIssuedAt: Instant?
+
     fun canUseEncryption(): Boolean
 
     fun isAvailable(): Boolean
@@ -71,6 +76,15 @@ interface SubscriptionsDataStore {
     ): Boolean
 
     fun clearTokens(): Boolean
+
+    fun saveBackupRefreshToken(
+        refreshToken: String,
+        expiresAt: Instant,
+        externalId: String,
+        issuedAt: Instant,
+    ): Boolean
+
+    fun clearBackupRefreshToken(): Boolean
 }
 
 /**
@@ -273,6 +287,23 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override val backupRefreshToken: String?
+        get() = encryptedPreferences?.getString(KEY_BACKUP_REFRESH_TOKEN, null)
+
+    override val backupRefreshTokenExpiresAt: Instant?
+        get() = encryptedPreferences?.getInstant(KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT)
+
+    override val backupRefreshTokenExternalId: String?
+        get() = encryptedPreferences?.getString(KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID, null)
+
+    override val backupRefreshTokenIssuedAt: Instant?
+        get() = encryptedPreferences?.getInstant(KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT)
+
+    private fun SharedPreferences.getInstant(key: String): Instant? {
+        val epochMillis = getLong(key, NOT_SET)
+        return if (epochMillis == NOT_SET) null else Instant.ofEpochMilli(epochMillis)
+    }
+
     override fun canUseEncryption(): Boolean {
         encryptedPreferences?.edit(commit = true) { putBoolean("test", true) }
         return encryptedPreferences?.getBoolean("test", false) == true
@@ -315,10 +346,38 @@ internal class SubscriptionsEncryptedDataStore(
             .remove(KEY_AUTH_TOKEN)
             .remove(KEY_EMAIL)
             .remove(KEY_EXTERNAL_ID)
+            .removeBackupRefreshToken()
             .commit()
     }
 
+    override fun saveBackupRefreshToken(
+        refreshToken: String,
+        expiresAt: Instant,
+        externalId: String,
+        issuedAt: Instant,
+    ): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor
+            .putString(KEY_BACKUP_REFRESH_TOKEN, refreshToken)
+            .putLong(KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT, expiresAt.toEpochMilli())
+            .putString(KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID, externalId)
+            .putLong(KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT, issuedAt.toEpochMilli())
+            .commit()
+    }
+
+    override fun clearBackupRefreshToken(): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor.removeBackupRefreshToken().commit()
+    }
+
+    private fun SharedPreferences.Editor.removeBackupRefreshToken(): SharedPreferences.Editor =
+        remove(KEY_BACKUP_REFRESH_TOKEN)
+            .remove(KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT)
+            .remove(KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID)
+            .remove(KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT)
+
     companion object {
+        private const val NOT_SET = 0L
         const val FILENAME = "com.duckduckgo.subscriptions.store"
         const val KEY_ACCESS_TOKEN_V2 = "KEY_ACCESS_TOKEN_V2"
         const val KEY_ACCESS_TOKEN_V2_EXPIRES_AT = "KEY_ACCESS_TOKEN_V2_EXPIRES_AT"
@@ -341,5 +400,9 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_SUBSCRIPTION_ENTITLEMENTS = "KEY_SUBSCRIPTION_ENTITLEMENTS"
         const val KEY_FREE_TRIAL_ACTIVE = "KEY_FREE_TRIAL_ACTIVE"
         const val KEY_PENDING_PLANS = "KEY_PENDING_PLANS"
+        const val KEY_BACKUP_REFRESH_TOKEN = "KEY_BACKUP_REFRESH_TOKEN"
+        const val KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT = "KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT"
+        const val KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID = "KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID"
+        const val KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT = "KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT"
     }
 }

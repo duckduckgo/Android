@@ -30,6 +30,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.auth.BackupTokenState
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.ClaimsParseError
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Expired
@@ -131,9 +132,14 @@ class AuthTokenRefreshWideEventTest {
         subscriptionStatus: SubscriptionStatus = SubscriptionStatus.UNKNOWN,
         subscriptionPlatform: String? = "google",
         refreshHistory: TokenRefreshHistory = TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null),
+        backupTokenState: BackupTokenState? = null,
     ) {
         givenStoredRefreshHistory(refreshHistory)
-        authWideEvent.onStart(subscriptionStatus = subscriptionStatus, subscriptionPlatform = subscriptionPlatform)
+        authWideEvent.onStart(
+            subscriptionStatus = subscriptionStatus,
+            subscriptionPlatform = subscriptionPlatform,
+            backupTokenState = backupTokenState,
+        )
     }
 
     private suspend fun givenStoredRefreshHistory(refreshHistory: TokenRefreshHistory) {
@@ -148,7 +154,11 @@ class AuthTokenRefreshWideEventTest {
 
     private suspend fun startFlowWithId(wideEventId: Long) {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(wideEventId))
-        authWideEvent.onStart(subscriptionStatus = SubscriptionStatus.UNKNOWN, subscriptionPlatform = "google")
+        authWideEvent.onStart(
+            subscriptionStatus = SubscriptionStatus.UNKNOWN,
+            subscriptionPlatform = "google",
+            backupTokenState = null,
+        )
     }
 
     @Test
@@ -177,7 +187,7 @@ class AuthTokenRefreshWideEventTest {
                 "last_refresh_process" to "unknown",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 3)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 4)),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
@@ -682,6 +692,26 @@ class AuthTokenRefreshWideEventTest {
                 verify(wideEventClient).flowStart(any(), anyOrNull(), argThat { this["last_refresh_process"] == expected }, any(), any(), any())
                 clearInvocations(wideEventClient)
             }
+    }
+
+    @Test
+    fun `onStart reports the backup token state`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        startFlow(backupTokenState = BackupTokenState.OTHER_ACCOUNT)
+
+        verify(wideEventClient).flowStart(any(), anyOrNull(), argThat { this["backup_token_state"] == "other_account" }, any(), any(), any())
+    }
+
+    @Test
+    fun `onStart leaves the backup token state out when there is none to report`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        startFlow(backupTokenState = null)
+
+        verify(wideEventClient).flowStart(any(), anyOrNull(), argThat { "backup_token_state" !in this }, any(), any(), any())
     }
 
     @Test

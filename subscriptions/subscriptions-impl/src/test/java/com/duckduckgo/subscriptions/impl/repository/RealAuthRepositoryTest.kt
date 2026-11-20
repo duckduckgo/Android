@@ -602,8 +602,18 @@ class RealAuthRepositoryTest {
         authStore.externalId = "externalId"
         serpPromo.injectCookie("access")
 
+        authRepository.saveBackupRefreshToken(
+            BackupRefreshToken(
+                jwt = "backup",
+                expiresAt = Instant.ofEpochMilli(9_000L),
+                accountExternalId = "1234",
+                issuedAt = Instant.ofEpochMilli(1_000L),
+            ),
+        )
+
         authRepository.clearTokens()
 
+        assertNull(authRepository.getBackupRefreshToken())
         assertNull(authStore.accessTokenV2)
         assertNull(authStore.refreshTokenV2)
         assertNull(authStore.accessToken)

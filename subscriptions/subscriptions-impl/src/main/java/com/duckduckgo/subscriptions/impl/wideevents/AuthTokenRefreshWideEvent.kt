@@ -28,6 +28,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
+import com.duckduckgo.subscriptions.impl.auth.BackupTokenState
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.ClaimsParseError
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Expired
@@ -63,6 +64,7 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onStart(
         subscriptionStatus: SubscriptionStatus,
         subscriptionPlatform: String?,
+        backupTokenState: BackupTokenState?,
     )
 
     suspend fun onCrossProcessLockAcquired(result: Result<Closeable>)
@@ -115,6 +117,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
     override suspend fun onStart(
         subscriptionStatus: SubscriptionStatus,
         subscriptionPlatform: String?,
+        backupTokenState: BackupTokenState?,
     ) {
         if (!isFeatureEnabled()) return
 
@@ -138,8 +141,8 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_CONSECUTIVE_FAILURES to refreshHistory.failureStreak.toFailureStreakBucket().toString(),
                     KEY_TIME_SINCE_LAST_SUCCESS to refreshHistory.lastSuccessAt.toHoursSinceBucket(timeProvider.currentTimeMillis()).toString(),
                     KEY_LAST_REFRESH_PROCESS to refreshHistory.lastSuccessProcess.toProcessParamValue(),
-                ),
-                definition = WideEventDefinition(version = Version(minor = 1, patch = 3)),
+                ) + listOfNotNull(backupTokenState?.let { KEY_BACKUP_TOKEN_STATE to it.paramValue }),
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 4)),
             )
             .getOrNull()
             ?.also { wideEventId ->
@@ -420,6 +423,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_CONSECUTIVE_FAILURES = "consecutive_failures_bucket"
         const val KEY_TIME_SINCE_LAST_SUCCESS = "time_since_last_success_h_bucketed"
         const val KEY_LAST_REFRESH_PROCESS = "last_refresh_process"
+        const val KEY_BACKUP_TOKEN_STATE = "backup_token_state"
         const val KEY_STORE_ERROR = "store_error"
         const val KEY_RECOVERY_STRATEGY = "recovery_strategy"
         const val KEY_RECOVERY_OUTCOME = "recovery_outcome"

@@ -94,6 +94,39 @@ class FakeSubscriptionsDataStore(
         authToken = null
         email = null
         externalId = null
+        clearBackupRefreshToken()
+        return true
+    }
+
+    override var backupRefreshToken: String? = null
+        private set
+    override var backupRefreshTokenExpiresAt: Instant? = null
+        private set
+    override var backupRefreshTokenExternalId: String? = null
+        private set
+    override var backupRefreshTokenIssuedAt: Instant? = null
+        private set
+
+    override fun saveBackupRefreshToken(
+        refreshToken: String,
+        expiresAt: Instant,
+        externalId: String,
+        issuedAt: Instant,
+    ): Boolean {
+        if (!available) return false
+        backupRefreshToken = refreshToken
+        backupRefreshTokenExpiresAt = expiresAt
+        backupRefreshTokenExternalId = externalId
+        backupRefreshTokenIssuedAt = issuedAt
+        return true
+    }
+
+    override fun clearBackupRefreshToken(): Boolean {
+        if (!available) return false
+        backupRefreshToken = null
+        backupRefreshTokenExpiresAt = null
+        backupRefreshTokenExternalId = null
+        backupRefreshTokenIssuedAt = null
         return true
     }
 }
