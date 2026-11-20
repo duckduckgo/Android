@@ -23,53 +23,46 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(":new-tab-page-api")
-    implementation project(':browser-api')
-    implementation project(':duckchat-api')
-    implementation project(':browser-mode-api')
-    implementation project(':common-utils')
-    implementation project(':saved-sites-api')
-    implementation project(':navigation-api')
-    implementation project(':design-system')
-    implementation project(':data-store-api')
-    implementation project(':statistics-api')
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-    implementation AndroidX.recyclerView
-
-    // Shimmer
-    implementation "com.facebook.shimmer:shimmer:_"
-
-    // ViewModel and LiveData
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
-
-    // Room
-    implementation AndroidX.room.runtime
-
-    implementation project(path: ':codegen-annotations')
-    implementation project(path: ':di')
-    ksp AndroidX.room.compiler
     api AndroidX.dataStore.preferences
 
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.core.ktx
+    implementation project(':browser-api')
+    implementation project(':browser-mode-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':data-store-api')
+    implementation project(':design-system')
+    implementation project(path: ':di')
+    implementation project(':duckchat-api')
+    implementation project(':navigation-api')
+    implementation project(":new-tab-page-api")
+    implementation project(':saved-sites-api')
+    implementation project(':statistics-api')
+    implementation "com.facebook.shimmer:shimmer:_"
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.recyclerView
+    implementation AndroidX.room.runtime
+    implementation Google.android.material
+    implementation KotlinX.coroutines.android
 
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
     testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 android {

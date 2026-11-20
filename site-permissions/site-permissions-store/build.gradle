@@ -46,12 +46,14 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':feature-toggles-api')
     implementation AndroidX.room.runtime
-    ksp AndroidX.room.compiler
+
     compileOnly "javax.inject:javax.inject:_"
 
     testImplementation project(path: ':common-test')
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.room.testing
+
+    ksp AndroidX.room.compiler
 }

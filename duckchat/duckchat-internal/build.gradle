@@ -35,41 +35,41 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(path: ':codegen-annotations')
     implementation project(path: ':browser-api')
     implementation project(path: ':browser-mode-api')
-    implementation project(path: ':internal-features-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':content-scope-scripts-api')
+    implementation project(path: ':content-scope-scripts-impl')
+    implementation project(path: ':data-store-api')
+    implementation project(path: ':design-system')
+    implementation project(path: ':di')
     implementation project(path: ':duckchat-api')
     implementation project(path: ':duckchat-impl')
     implementation project(path: ':duckchat-store')
+    implementation project(path: ':internal-features-api')
     implementation project(path: ':test-seeder-api')
-    implementation project(path: ':content-scope-scripts-api')
-    implementation project(path: ':content-scope-scripts-impl')
-    implementation project(path: ':di')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':data-store-api')
-    implementation project(path: ':design-system')
-
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.core.ktx
-    implementation AndroidX.appCompat
-    implementation AndroidX.activity.compose
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation Google.android.material
-    implementation "org.nanohttpd:nanohttpd:2.3.1"
     implementation "com.squareup.logcat:logcat:_"
+    implementation "org.nanohttpd:nanohttpd:2.3.1"
+    implementation AndroidX.activity.compose
+    implementation AndroidX.appCompat
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
+    implementation Google.android.material
+    implementation KotlinX.coroutines.android
 
-    testImplementation Testing.junit4
-    testImplementation Testing.robolectric
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation "androidx.test.ext:junit-ktx:_"
     testImplementation project(path: ':common-test')
-    testImplementation CashApp.turbine
     testImplementation project(path: ':data-store-test')
     testImplementation project(path: ':feature-toggles-test')
+    testImplementation "androidx.test.ext:junit-ktx:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation CashApp.turbine
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }

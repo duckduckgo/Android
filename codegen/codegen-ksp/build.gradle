@@ -18,19 +18,20 @@ kotlin {
 dependencies {
     implementation project(path: ':codegen-annotations')
     implementation project(':feature-toggles-api')
+    implementation "com.google.auto.service:auto-service-annotations:1.1.0"
     implementation "com.google.devtools.ksp:symbol-processing-api:_"
     implementation "com.squareup:kotlinpoet:1.11.0"
     implementation "com.squareup:kotlinpoet-ksp:1.11.0"
 
-    implementation "com.google.auto.service:auto-service-annotations:1.1.0"
-    ksp "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
-
-    testImplementation Testing.junit4
-    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
+    testImplementation "com.google.devtools.ksp:symbol-processing-api:_"
     testImplementation "dev.zacsweers.kctfork:core:0.14.0"
     testImplementation "dev.zacsweers.kctfork:ksp:0.14.0"
-    testImplementation "com.google.devtools.ksp:symbol-processing-api:_"
     testImplementation "dev.zacsweers.metro:runtime:_"
     testImplementation "javax.inject:javax.inject:_"
+    testImplementation 'org.junit.vintage:junit-vintage-engine:_'
+    testImplementation Testing.junit4
+
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:_'
+
+    ksp "dev.zacsweers.autoservice:auto-service-ksp:1.1.0"
 }

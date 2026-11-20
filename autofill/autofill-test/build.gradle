@@ -22,9 +22,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(path: ':autofill-api')
-
-    implementation KotlinX.coroutines.core
     implementation AndroidX.appCompat
+    implementation KotlinX.coroutines.core
 }
 
 

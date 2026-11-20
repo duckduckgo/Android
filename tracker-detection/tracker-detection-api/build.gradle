@@ -22,8 +22,9 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     api project(':feature-toggles-api')
-    implementation AndroidX.annotation
+
     implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation AndroidX.annotation
 }
 
 android {

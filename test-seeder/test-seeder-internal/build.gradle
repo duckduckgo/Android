@@ -27,19 +27,18 @@ android {
 }
 
 dependencies {
-    implementation project(':test-seeder-api')
-
-    ksp project(path: ':codegen-ksp')
     implementation project(path: ':codegen-annotations')
-    implementation project(':di')
     implementation project(path: ':common-utils')
-
+    implementation project(':di')
+    implementation project(':test-seeder-api')
     implementation KotlinX.coroutines.core
 
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+
+    ksp project(path: ':codegen-ksp')
 }

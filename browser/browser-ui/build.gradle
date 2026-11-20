@@ -39,46 +39,39 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-
-    implementation project(path: ':common-utils')
-    implementation project(path: ':di')
-    implementation project(path: ':codegen-annotations')
     implementation project(path: ':app-build-config-api')
-    implementation project(':internal-features-api')
     implementation project(':browser-api')
     implementation project(':browser-mode-api')
-    implementation project(':navigation-api')
-    implementation project(':duckchat-api')
-    implementation project(':new-tab-page-api')
-    implementation project(':statistics-api')
-    implementation project(':settings-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
     implementation project(':design-system')
+    implementation project(path: ':di')
+    implementation project(':duckchat-api')
+    implementation project(':internal-features-api')
+    implementation project(':navigation-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':settings-api')
+    implementation project(':statistics-api')
+    implementation "androidx.core:core-ktx:_"
     implementation "androidx.datastore:datastore-preferences:_"
-
+    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
+    implementation "com.airbnb.android:lottie:_"
+    implementation "com.github.bumptech.glide:glide:_"
     implementation AndroidX.appCompat
-    implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.splashscreen
-    implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
-
-    implementation "androidx.core:core-ktx:_"
-    implementation "androidx.localbroadcastmanager:localbroadcastmanager:_"
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:_"
-
-    // Image loading
-    implementation "com.github.bumptech.glide:glide:_"
-
-    // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation project(':feature-toggles-test')
+    implementation AndroidX.recyclerView
+    implementation Google.android.material
     implementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
-    testImplementation 'app.cash.turbine:turbine:_'
-    testImplementation Testing.robolectric
+
     testImplementation project(path: ':common-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }

@@ -31,8 +31,8 @@ kotlin {
 }
 
 dependencies {
+    implementation "org.json:json:_"
     implementation Square.moshi
     implementation Square.okio
-    implementation "org.json:json:_"
 }
 

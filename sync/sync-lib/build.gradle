@@ -14,14 +14,13 @@ android {
 }
 
 dependencies {
-    implementation "com.squareup.logcat:logcat:_"
-    implementation Square.okio
     implementation project(':library-loader-api')
     implementation "com.duckduckgo.synccrypto:sync-crypto-android:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation Square.okio
 
-    // Testing dependencies
-    androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
 }
 
 fulladleModuleConfig {
