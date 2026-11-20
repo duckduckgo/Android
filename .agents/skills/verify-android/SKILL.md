@@ -95,7 +95,7 @@ P=.agents/skills/verify-android/prove.py
 $P [--evidence-dir <dir>] .agents/skills/verify-android/proofs/<name>.py   # exit 0 PASS, 1 FAIL (a check failed), 2 ERROR
 $V build --base origin/develop                     # the "before" build (git fetch first for the latest)
 $P compare [--evidence-dir <dir>] .agents/skills/verify-android/proofs/<name>.py   # base build, then this checkout's
-$P publish <attempt or compare folder> [--into <dir>]   # uploads it to auto's evidence store; prints the Evidence URL
+$P publish <attempt or compare folder> [--into <dir>]   # uploads a copy to a fresh auto evidence folder; prints the Evidence URL
 $P pr-summary <attempt or compare folder>          # the PR's Verification scenario (or <before> <after> folders)
 $P selftest                                        # after changing prove.py: the harness still tells pass from fail
 $P selftest --offline                              # only the cases that need no device
@@ -164,15 +164,15 @@ ones first. It loads nothing from elsewhere and runs no script. The artifacts vi
 without `<video>`, so link `index.html` when a video matters.
 
 **Publishing it in a PR.** `publish` needs auto installed and signed in to its store (`upload-evidence.ts
---check` from auto's show-me-your-work scripts says `ready`). Given an attempt or compare folder already in
-auto's evidence store, it uploads it there; otherwise it copies the folder into `--into <auto evidence
-folder>` or a new one from `new-evidence.ts`. It records each `index.html`'s served URL as `evidence_url` in
-`proof.json` and `compare.json` (in the copy and the original), uploads, and prints the URLs, ending with
-`Evidence URL:`. The store never replaces a file, so publish a folder once and rerun the proof for new
-evidence. The URLs need DuckDuckGo sign-in and point at internal storage only. auto uploads a whole evidence
-folder, so every attempt in it goes up with the one you publish: look at an attempt's screenshots before
-publishing, and run proofs you won't show (a run that caught the user's notifications, say) into another
-`--evidence-dir`.
+--check` from auto's show-me-your-work scripts says `ready`). auto uploads a whole evidence folder, so
+`publish` copies the attempt or compare folder into a fresh one from `new-evidence.ts` and uploads that: only
+the run you pass ever leaves the machine. `--into <auto evidence folder>` copies it into that folder instead
+(the one auto opened for this change), and everything already in it goes up too. It records each
+`index.html`'s served URL as `evidence_url` in `proof.json` and `compare.json` (in the copy and the original),
+uploads, and prints the URLs, ending with `Evidence URL:`. The store never replaces a file, so publish a folder
+once and rerun the proof for new evidence. The URLs need DuckDuckGo sign-in and point at internal storage only.
+Look at a run's screenshots and video before publishing it. `shot` collapses the notification shade first, but
+on the user's phone a notification can still appear in the video, so turn on Do Not Disturb there.
 
 `pr-summary <attempt or compare folder>` then prints the scenario in auto's PR format: `### <claim>`,
 **Verified**, an evidence table (Before | After for a compare, else the run's own column) with a 200 px

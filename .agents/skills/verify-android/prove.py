@@ -600,9 +600,11 @@ def publish(arg, into=None):
         scripts = auto_evidence_scripts()
         os.umask(0o022)  # the store serves what it uploads; keep files readable
         root = auto_root()
-        target = Path(into).resolve() if into else None if inside(src, root) else Path(node(scripts / "new-evidence.ts"))
+        # upload-evidence uploads a whole evidence folder, so without --into each publish gets a fresh one: only the
+        # run passed here ever leaves the machine, never another attempt that sits beside it.
+        target = Path(into).resolve() if into else Path(node(scripts / "new-evidence.ts"))
         dest = src
-        if target and not inside(src, target):
+        if not inside(src, target):
             dest = target / src.name
             if dest.exists():
                 raise Error(f"{dest} exists: the store never replaces a file, so publish a run once")
