@@ -60,14 +60,15 @@ class RealSegmentSkipUserPreferences @Inject constructor(
     private val feature: SegmentSkipFeature,
 ) : SegmentSkipUserPreferences {
 
-    private val mode: StateFlow<SegmentSkipMode> = modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode())
+    private val mode: StateFlow<SegmentSkipMode> =
+        modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode(feature.mvpEnabled().isEnabled()))
 
     override fun modeFlow(): Flow<SegmentSkipMode> = combine(
         dataStore.data,
         feature.mvpEnabled().enabled(),
     ) { prefs, mvpEnabled ->
         prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
-            ?: if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+            ?: defaultMode(mvpEnabled)
     }
         .distinctUntilChanged()
 
@@ -77,8 +78,8 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
     }
 
-    private fun defaultMode(): SegmentSkipMode =
-        if (feature.mvpEnabled().isEnabled()) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
+    private fun defaultMode(mvpEnabled: Boolean): SegmentSkipMode =
+        if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
 
     private companion object {
         val KEY_MODE = stringPreferencesKey("segment_skip_mode")
