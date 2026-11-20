@@ -573,6 +573,7 @@ dependencies {
     }
 
     implementation AndroidX.appCompat
+    internalImplementation "androidx.compose.animation:animation-graphics"
     implementation AndroidX.activity.compose
     implementation Google.android.material
     implementation AndroidX.constraintLayout
@@ -644,6 +645,7 @@ dependencies {
 
     // Lottie
     implementation "com.airbnb.android:lottie:_"
+    internalImplementation "com.airbnb.android:lottie-compose:_"
 
     // Security crypto
     implementation AndroidX.security.crypto
