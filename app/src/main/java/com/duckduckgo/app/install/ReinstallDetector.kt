@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.install
 
+import android.content.Context
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.edit
@@ -51,6 +52,7 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.abs
 
 interface ReinstallDetector {
     /**
@@ -72,6 +74,7 @@ object InstallSeenPersistentStorageKey : PersistentStorageKey(
 @ContributesBinding(AppScope::class, binding = binding<ReinstallDetector>())
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealReinstallDetector @Inject constructor(
+    private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val persistentStorage: PersistentStorage,
@@ -223,10 +226,50 @@ class RealReinstallDetector @Inject constructor(
     // The answer is saved before the folder is created. If only the folder were written, the next launch would find it and
     // answer "reinstall" for a new install; if only the answer is saved, a later reinstall goes undetected, which is the lesser harm.
     private fun detectAndSaveWithDownloadsFolder(): CheckOutcome {
-        val ddgDirectoryExists = getDownloadsDirectory().list()?.asList().orEmpty().contains(DDG_DOWNLOADS_DIRECTORY)
+        val downloadsDirectory = getDownloadsDirectory()
+        val ddgDirectoryExists = downloadsDirectory.list()?.asList().orEmpty().contains(DDG_DOWNLOADS_DIRECTORY)
         val saved = saveAppReinstallValue(ddgDirectoryExists)
         if (!ddgDirectoryExists && saved) createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
+        if (ddgDirectoryExists) runCatching { reportFolderAge(File(downloadsDirectory, DDG_DOWNLOADS_DIRECTORY)) }
         return CheckOutcome(ddgDirectoryExists, saved)
+    }
+
+    // Some stores (Galaxy Store is one we have seen) launch the app out of sight while installing it and then wipe its data, but the
+    // folder that launch created survives and makes the first real launch look like a reinstall. The folder age shows how often.
+    private fun reportFolderAge(directory: File) {
+        val modifiedAt = directory.lastModified()
+        val installedAt = context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
+        if (modifiedAt == 0L || installedAt == 0L) return
+
+        val distanceFromInstallMs = abs(modifiedAt - installedAt)
+        val age = when {
+            distanceFromInstallMs <= 10_000L -> ReinstallFolderAge.UP_TO_10_SECONDS
+            distanceFromInstallMs <= 2 * 60_000L -> ReinstallFolderAge.UP_TO_2_MINUTES
+            distanceFromInstallMs <= 10 * 60_000L -> ReinstallFolderAge.UP_TO_10_MINUTES
+            else -> ReinstallFolderAge.OVER_10_MINUTES
+        }
+        logcat(INFO) { "Reinstall check: folder changed ${(modifiedAt - installedAt) / 1000}s from install time" }
+        pixel.fire(
+            ReinstallDetectorPixelName.FOLDER_AGE,
+            parameters = mapOf(PARAM_AGE to age.value, PARAM_INSTALLER to installer().value),
+            type = Unique(),
+        )
+    }
+
+    private fun installer(): ReinstallFolderInstaller = when (runCatching { installerPackageName() }.getOrNull()) {
+        GALAXY_STORE_PACKAGE -> ReinstallFolderInstaller.GALAXY_STORE
+        PLAY_STORE_PACKAGE -> ReinstallFolderInstaller.PLAY_STORE
+        else -> ReinstallFolderInstaller.OTHER
+    }
+
+    private fun installerPackageName(): String? {
+        val packageManager = context.packageManager
+        return if (Build.VERSION.SDK_INT >= 30) {
+            packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getInstallerPackageName(context.packageName)
+        }
     }
 
     private fun getDownloadsDirectory(): File {
@@ -262,7 +305,11 @@ class RealReinstallDetector @Inject constructor(
         private const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
         private const val PARAM_RESULT = "result"
         private const val PARAM_DURATION = "duration"
+        private const val PARAM_AGE = "age"
+        private const val PARAM_INSTALLER = "installer"
         private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
+        private const val GALAXY_STORE_PACKAGE = "com.sec.android.app.samsungapps"
+        private const val PLAY_STORE_PACKAGE = "com.android.vending"
 
         // Nothing else bounds this step: the pre-ATB time limit can't stop it, so a stuck Play services call would hold back the ATB
         private const val BLOCK_STORE_TIME_LIMIT_MS = 10_000L
