@@ -80,7 +80,7 @@ class SegmentSkipDatasetSchedulerTest {
         assertEquals(NetworkType.CONNECTED, request.firstValue.workSpec.constraints.requiredNetworkType)
         val periodic = argumentCaptor<PeriodicWorkRequest>()
         verify(workManager).enqueueUniquePeriodicWork(eq("sponsor_dataset"), eq(ExistingPeriodicWorkPolicy.UPDATE), periodic.capture())
-        assertEquals(TimeUnit.HOURS.toMillis(24), periodic.firstValue.workSpec.intervalDuration)
+        assertEquals(TimeUnit.HOURS.toMillis(1), periodic.firstValue.workSpec.intervalDuration)
         assertEquals(NetworkType.CONNECTED, periodic.firstValue.workSpec.constraints.requiredNetworkType)
         assertEquals(BackoffPolicy.EXPONENTIAL, periodic.firstValue.workSpec.backoffPolicy)
         assertEquals(TimeUnit.MINUTES.toMillis(1), periodic.firstValue.workSpec.backoffDelayDuration)
