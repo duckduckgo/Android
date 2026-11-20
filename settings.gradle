@@ -13,6 +13,10 @@ plugins {
 
 rootProject.name = "androidRoot"
 
+refreshVersions {
+    extraArtifactVersionKeyRules(file("refreshVersions-extra-rules.txt"))
+}
+
 def isCI = System.getenv('CI') != null
 
 develocity {

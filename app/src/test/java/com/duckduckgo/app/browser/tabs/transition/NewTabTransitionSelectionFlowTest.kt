@@ -259,6 +259,7 @@ class NewTabTransitionSelectionFlowTest {
             mock(),
             BrowserMode.REGULAR,
             mock(),
+            mock(),
         )
     }
 
