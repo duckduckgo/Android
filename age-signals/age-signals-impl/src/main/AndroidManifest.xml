@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application>
+        <activity
+            android:name="com.duckduckgo.agesignals.impl.dev.AgeSignalsDevSettingsActivity"
+            android:exported="false"
+            android:label="@string/ageSignalsDevTitle" />
+    </application>
+
+</manifest>
