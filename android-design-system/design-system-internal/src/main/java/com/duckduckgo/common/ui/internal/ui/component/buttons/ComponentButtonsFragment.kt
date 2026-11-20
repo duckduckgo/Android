@@ -24,12 +24,15 @@ import android.view.ViewGroup
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import com.duckduckgo.common.ui.compose.button.DaxBrandButton
+import com.duckduckgo.common.ui.compose.button.DaxBrandButtonTypography
 import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
@@ -40,7 +43,6 @@ import com.duckduckgo.common.ui.compose.button.DaxIconButton
 import com.duckduckgo.common.ui.compose.button.DaxIconButtonDefaults
 import com.duckduckgo.common.ui.compose.button.DaxPrimaryButton
 import com.duckduckgo.common.ui.compose.button.DaxSecondaryButton
-import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.databinding.ComponentButtonsBinding
 import com.duckduckgo.common.ui.internal.ui.appComponentsViewModel
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
@@ -48,6 +50,7 @@ import com.duckduckgo.mobile.android.R
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import com.duckduckgo.common.ui.DuckDuckGoTheme as AppTheme
+import com.duckduckgo.common.ui.internal.R as InternalR
 
 @SuppressLint("NoFragment", "DenyListedApi") // we don't use DI here
 class ComponentButtonsFragment : Fragment() {
@@ -112,7 +115,7 @@ class ComponentButtonsFragment : Fragment() {
     ) {
         // Brand
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_brand,
+            id = InternalR.id.compose_button_brand,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -140,14 +143,19 @@ class ComponentButtonsFragment : Fragment() {
                 DaxBrandButton(
                     text = "Brand DuckSans",
                     onClick = {},
-                    textStyle = DuckDuckGoTheme.typography.onboardingButton,
+                    typography = DaxBrandButtonTypography.DuckSans,
+                )
+                DaxBrandButton(
+                    text = "Brand with a label that wraps",
+                    onClick = {},
+                    modifier = Modifier.width(160.dp),
                 )
             }
         }
 
         // Primary
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_primary,
+            id = InternalR.id.compose_button_primary,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -172,12 +180,17 @@ class ComponentButtonsFragment : Fragment() {
                     leadingIconPainter = painterResource(R.drawable.ic_device_desktop_16),
                 )
                 DaxPrimaryButton(text = "Primary Disabled", onClick = {}, enabled = false)
+                DaxPrimaryButton(
+                    text = "Primary with a label that wraps",
+                    onClick = {},
+                    modifier = Modifier.width(160.dp),
+                )
             }
         }
 
         // Secondary
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_secondary,
+            id = InternalR.id.compose_button_secondary,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -207,7 +220,7 @@ class ComponentButtonsFragment : Fragment() {
 
         // Destructive Primary
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_destructive_primary,
+            id = InternalR.id.compose_button_destructive_primary,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -237,7 +250,7 @@ class ComponentButtonsFragment : Fragment() {
 
         // Ghost
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_ghost,
+            id = InternalR.id.compose_button_ghost,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -267,7 +280,7 @@ class ComponentButtonsFragment : Fragment() {
 
         // Destructive Ghost Secondary
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_destructive_ghost_secondary,
+            id = InternalR.id.compose_button_destructive_ghost_secondary,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -297,7 +310,7 @@ class ComponentButtonsFragment : Fragment() {
 
         // Destructive Ghost
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_destructive_ghost,
+            id = InternalR.id.compose_button_destructive_ghost,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -327,7 +340,7 @@ class ComponentButtonsFragment : Fragment() {
 
         // Ghost Alt
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_button_ghost_alt,
+            id = InternalR.id.compose_button_ghost_alt,
             isDarkTheme = isDarkTheme,
         ) {
             Column(
@@ -357,7 +370,7 @@ class ComponentButtonsFragment : Fragment() {
 
         // Icon Button
         view.setupThemedComposeView(
-            id = com.duckduckgo.common.ui.internal.R.id.compose_icon_button,
+            id = InternalR.id.compose_icon_button,
             isDarkTheme = isDarkTheme,
         ) {
             Row(
