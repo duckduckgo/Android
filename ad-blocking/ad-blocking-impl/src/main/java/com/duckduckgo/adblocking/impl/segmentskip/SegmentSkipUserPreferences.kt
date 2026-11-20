@@ -29,15 +29,17 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
+import java.io.IOException
 import javax.inject.Inject
 
-enum class SegmentSkipMode {
-    ALWAYS_ASK,
-    ALWAYS_SKIP,
-    OFF,
+enum class SegmentSkipMode(val pixelValue: String) {
+    ALWAYS_ASK("ask"),
+    ALWAYS_SKIP("skip"),
+    OFF("off"),
 }
 
 interface SegmentSkipUserPreferences {
@@ -49,7 +51,7 @@ interface SegmentSkipUserPreferences {
      */
     fun cachedMode(): SegmentSkipMode
 
-    suspend fun setMode(mode: SegmentSkipMode)
+    suspend fun setMode(mode: SegmentSkipMode): Boolean
 }
 
 @SingleIn(AppScope::class)
@@ -70,12 +72,26 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         prefs[KEY_MODE]?.let { stored -> SegmentSkipMode.entries.firstOrNull { it.name == stored } }
             ?: defaultMode(mvpEnabled)
     }
+        .catch { cause ->
+            if (cause !is IOException) throw cause
+            emit(SegmentSkipMode.OFF)
+        }
         .distinctUntilChanged()
 
     override fun cachedMode(): SegmentSkipMode = mode.value
 
-    override suspend fun setMode(mode: SegmentSkipMode) {
-        dataStore.edit { prefs -> prefs[KEY_MODE] = mode.name }
+    override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+        var changed = false
+        dataStore.edit { prefs ->
+            val previous = prefs[KEY_MODE]?.let { stored ->
+                SegmentSkipMode.entries.firstOrNull {
+                    it.name == stored
+                }
+            } ?: defaultMode(feature.mvpEnabled().isEnabled())
+            changed = previous != mode
+            prefs[KEY_MODE] = mode.name
+        }
+        return changed
     }
 
     private fun defaultMode(mvpEnabled: Boolean): SegmentSkipMode =

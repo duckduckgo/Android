@@ -60,6 +60,9 @@ interface SyncStore {
     /** JSON list of logins by other devices that the user has not seen yet. Its format belongs to the caller. */
     var auditLogPending: String?
 
+    /** Id of the newest audit log entry loaded the last time Device Activity opened with no error. */
+    var auditLogLastSeenEntryId: String?
+
     /**
      * Emits [connectedDevicesCount] now and again whenever it changes.
      */
@@ -250,6 +253,14 @@ constructor(
             }
         }
 
+    override var auditLogLastSeenEntryId: String?
+        get() = encryptedPreferences?.getString(KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID) else putString(KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID, value)
+            }
+        }
+
     override fun connectedDevicesCountFlow(): Flow<Int> {
         val flow = callbackFlow {
             val preferences = encryptedPreferences
@@ -327,5 +338,6 @@ constructor(
         private const val KEY_CONNECTED_DEVICES_COUNT = "KEY_CONNECTED_DEVICES_COUNT"
         private const val KEY_AUDIT_LOG_CURSOR = "KEY_AUDIT_LOG_CURSOR"
         private const val KEY_AUDIT_LOG_PENDING = "KEY_AUDIT_LOG_PENDING"
+        private const val KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID = "KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID"
     }
 }

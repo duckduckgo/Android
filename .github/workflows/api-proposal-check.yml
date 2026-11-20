@@ -96,8 +96,9 @@ jobs:
             let section = '';
             if (label) {
               section = noComments.slice(label.index + label[0].length);
-              const heading = section.search(/\n\s*###/); // stop at the next PR-body heading
-              if (heading !== -1) section = section.slice(0, heading);
+              // Stop at the next heading or the next field label (Evidence URL follows it).
+              const next = section.search(/\n\s*(###|[A-Za-z][^\n:]*URL[^\n:]*:)/);
+              if (next !== -1) section = section.slice(0, next);
             }
             const hasLink = /https?:\/\/\S+/i.test(section);
             const hasNone = /\b(none|n\/?a)\b/i.test(section);

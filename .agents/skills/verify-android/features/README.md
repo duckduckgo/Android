@@ -36,7 +36,7 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 ## Proof and skip reporting
 
 - Every recipe runs inside `$V record start <feature-id>.mp4` / `$V record stop`, so each feature has a video.
-- Shot before and after the step under test (`$V shot <name>.png`), plus the `assert` or `web eval` results, all in the same run id.
+- Shot before and after the step under test (`$V shot <name>.png`), plus the `assert` or `web eval` results, all in the same run id (a proof records and shoots into its own attempt folder).
 - A mutation is proved through a second view (tab switcher, bookmarks list), not the screen that made it.
 - Report every entry point in a file as verified, failed (command and exit code) or not attempted. Do not report one as verified because another worked.
 
@@ -61,8 +61,9 @@ has a recipe; the subscription VPN is a different feature.
 
 A proof is a short Python file that drives a recipe and records checks; `../prove.py <proof>` runs it, refuses
 to start unless `verify.sh doctor` passes, stops at the first driving step that fails, can check pixels from
-logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. The video is split into segments of 160 s,
-because screenrecord stops at 170 s.
+logcat after `android.mark()`, and exits 0 PASS, 1 FAIL or 2 ERROR. Each run writes a fresh attempt folder with
+the video, screenshots, `report.md`, `index.html` and the PR images (SKILL.md, Evidence and report). The video is
+split into segments of 160 s, because screenrecord stops at 170 s.
 
 No proofs are committed. An agent writes one for each change from the feature maps in `../proofs/`, where Git
 ignores everything but `steps.py`, the shared paths a proof imports. Add a path to `steps.py` when a second
@@ -76,8 +77,9 @@ ask the agent to turn it into a Maestro flow under `.maestro/` and commit that i
 
 After changing `prove.py`, run `../prove.py selftest`: it checks that a wrong expectation is FAIL, a broken step
 and a stale build are ERROR, a proof with no checks (or only `unverified` items) isn't a pass, pixels logged
-before `mark()` aren't counted, and `pr-summary` carries no local path (`selftest --offline` runs only that part,
-with no device).
+before `mark()` aren't counted, and, with no device (`selftest --offline` runs only these), that `pr-summary` is
+auto's scenario format and carries no local path, an evidence dir inside the checkout is refused, and an attempt
+folder gets its key frames, poster, `report.md` in scenario order and a self-contained `index.html`.
 
 ## Adding a feature
 

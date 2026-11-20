@@ -44,7 +44,9 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auditlog.RealLoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
@@ -58,6 +60,7 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTu
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchDeviceActivity
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
@@ -114,6 +117,7 @@ class SyncActivityViewModelTest {
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
     private val syncAutoRestoreManager: SyncAutoRestoreManager = mock()
     private val syncAutoRestore: SyncAutoRestore = mock()
+    private val fakeSyncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
 
@@ -138,6 +142,7 @@ class SyncActivityViewModelTest {
             syncAutoRestoreManager = syncAutoRestoreManager,
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
+            loginAuditLogFeature = RealLoginAuditLogFeature(fakeSyncFeature, coroutineTestRule.testDispatcherProvider),
         )
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
@@ -1262,6 +1267,48 @@ class SyncActivityViewModelTest {
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.ShowDeviceUnsupported::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedInAndAuditLogEnabledThenShowDeviceActivity() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+
+        testee.viewState().test {
+            assertTrue(expectMostRecentItem().showDeviceActivity)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedInAndAuditLogDisabledThenHideDeviceActivity() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().showDeviceActivity)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutAndAuditLogEnabledThenHideDeviceActivity() = runViewModelTest {
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().showDeviceActivity)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeviceActivityClickedThenLaunchDeviceActivity() = runViewModelTest {
+        testee.onDeviceActivityClicked()
+
+        testee.commands().test {
+            assertEquals(LaunchDeviceActivity, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -21,6 +21,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.preferencesOf
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
@@ -28,12 +29,18 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
+import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 class RealSegmentSkipUserPreferencesTest {
@@ -51,6 +58,30 @@ class RealSegmentSkipUserPreferencesTest {
 
     private val feature = FakeFeatureToggleFactory.create(SegmentSkipFeature::class.java)
     private val testee = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
+
+    @Test
+    fun whenReadFailsThenModeIsOffAndNewCollectionCanRecover() = runTest {
+        val failingStore: DataStore<Preferences> = mock()
+        var attempts = 0
+        whenever(failingStore.data).thenReturn(
+            flow {
+                if (attempts++ == 0) throw IOException()
+                emit(preferencesOf(stringPreferencesKey("segment_skip_mode") to "ALWAYS_SKIP"))
+            },
+        )
+        val testFeature: SegmentSkipFeature = mock()
+        val toggle: Toggle = mock()
+        whenever(testFeature.mvpEnabled()).thenReturn(toggle)
+        whenever(toggle.isEnabled()).thenReturn(true)
+        whenever(toggle.enabled()).thenReturn(flowOf(true))
+        val preferences = RealSegmentSkipUserPreferences(failingStore, coroutineRule.testScope, testFeature)
+
+        assertEquals(SegmentSkipMode.OFF, preferences.cachedMode())
+        assertEquals(1, attempts)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, preferences.modeFlow().first())
+        assertEquals(2, attempts)
+        assertEquals(SegmentSkipMode.OFF, preferences.cachedMode())
+    }
 
     @Test
     fun whenNothingStoredThenDefaultDependsOnMvpFlag() = runTest {
@@ -91,6 +122,22 @@ class RealSegmentSkipUserPreferencesTest {
         assertEquals(SegmentSkipMode.OFF, testee.modeFlow().first())
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(SegmentSkipMode.OFF, testee.cachedMode())
+    }
+
+    @Test
+    fun whenConcurrentSavesSelectSameModeThenOnlyOneChangesIt() = runTest {
+        val first = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
+        val second = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
+        assertEquals(listOf(false, true), listOf(first.await(), second.await()).sorted())
+    }
+
+    @Test
+    fun whenDefaultIsSavedThenLaterDefaultChangeDoesNotReplaceIt() = runTest {
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        assertEquals(false, testee.setMode(SegmentSkipMode.ALWAYS_ASK))
+        feature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = false))
+        assertEquals(SegmentSkipMode.ALWAYS_ASK, testee.modeFlow().first())
     }
 
     @Test

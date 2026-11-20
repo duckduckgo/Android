@@ -223,13 +223,24 @@ class SyncSharedPrefsStoreTest {
     }
 
     @Test
+    fun whenAuditLogLastSeenEntryIdStoredThenValueUpdatedInPrefsStore() {
+        assertNull(store.auditLogLastSeenEntryId)
+        store.auditLogLastSeenEntryId = "e1"
+        assertEquals("e1", store.auditLogLastSeenEntryId)
+        store.auditLogLastSeenEntryId = null
+        assertNull(store.auditLogLastSeenEntryId)
+    }
+
+    @Test
     fun whenClearAllThenAuditLogStateCleared() {
         store.auditLogCursor = "cursor"
         store.auditLogPending = "[]"
+        store.auditLogLastSeenEntryId = "e1"
 
         store.clearAll()
 
         assertNull(store.auditLogCursor)
         assertNull(store.auditLogPending)
+        assertNull(store.auditLogLastSeenEntryId)
     }
 }
