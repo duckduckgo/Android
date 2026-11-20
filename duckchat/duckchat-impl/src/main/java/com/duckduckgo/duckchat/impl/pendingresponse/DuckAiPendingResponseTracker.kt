@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.attention
+package com.duckduckgo.duckchat.impl.pendingresponse
 
 import com.duckduckgo.browsermode.api.BrowserMode
 
@@ -22,7 +22,7 @@ import com.duckduckgo.browsermode.api.BrowserMode
  * Tracks which Duck.ai responses are still generating and whether the user is looking at them, awaits the ones the user left,
  * and keeps the app alive while any of them is generating or awaited. Tracking is in memory only, so it ends with the process.
  */
-interface DuckAiResponseAttentionTracker {
+interface DuckAiPendingResponseTracker {
     fun onNativePromptSubmitted(tabId: String, browserMode: BrowserMode)
     fun onResponseState(tabId: String, status: String, browserMode: BrowserMode)
     fun onStopTapped(tabId: String)

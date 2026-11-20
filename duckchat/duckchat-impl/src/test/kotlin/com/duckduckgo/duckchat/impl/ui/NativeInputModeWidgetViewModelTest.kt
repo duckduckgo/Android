@@ -47,7 +47,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
-import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
@@ -65,6 +64,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsPixels
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.pendingresponse.DuckAiPendingResponseTracker
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -159,7 +159,7 @@ class NativeInputModeWidgetViewModelTest {
     }
     private val chatStateStore = ChatStateStore()
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
-    private val attentionTracker: DuckAiResponseAttentionTracker = mock()
+    private val pendingResponseTracker: DuckAiPendingResponseTracker = mock()
     private val newChatHintsUsage: NewChatHintsUsage = mock()
     private val newChatHintsPixels: NewChatHintsPixels = mock()
     private val newChatDetector: NewChatDetector = mock { on { observe(any()) } doReturn emptyFlow() }
@@ -276,7 +276,7 @@ class NativeInputModeWidgetViewModelTest {
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
             chatStateStore = chatStateStore,
             responseWaitWideEvent = responseWaitWideEvent,
-            attentionTracker = attentionTracker,
+            pendingResponseTracker = pendingResponseTracker,
             newChatHintsUsage = newChatHintsUsage,
             newChatHintsPixels = newChatHintsPixels,
             newChatDetector = newChatDetector,
@@ -2076,7 +2076,7 @@ class NativeInputModeWidgetViewModelTest {
         )
 
         verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", BrowserMode.FIRE, "medium", Tool.IMAGE_GENERATION.rawValue)
-        verify(attentionTracker).onNativePromptSubmitted("tab-A", BrowserMode.FIRE)
+        verify(pendingResponseTracker).onNativePromptSubmitted("tab-A", BrowserMode.FIRE)
     }
 
     @Test
@@ -2094,7 +2094,7 @@ class NativeInputModeWidgetViewModelTest {
         )
 
         verifyNoInteractions(responseWaitWideEvent)
-        verifyNoInteractions(attentionTracker)
+        verifyNoInteractions(pendingResponseTracker)
     }
 
     @Test
@@ -2113,7 +2113,7 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.fireStopGenerationTapped()
 
         verifyNoInteractions(responseWaitWideEvent)
-        verifyNoInteractions(attentionTracker)
+        verifyNoInteractions(pendingResponseTracker)
     }
 
     @Test
@@ -2125,7 +2125,7 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.fireStopGenerationTapped()
 
         verify(responseWaitWideEvent).onStopTapped("tab-A")
-        verify(attentionTracker).onStopTapped("tab-A")
+        verify(pendingResponseTracker).onStopTapped("tab-A")
     }
 
     @Test
