@@ -551,4 +551,84 @@ class RealAuthRepositoryTest {
 
         assertNull(subscription!!.planCountry)
     }
+
+    @Test
+    fun whenSaveTokensV2SucceedsThenTokensEntitlementsAndAccountAreStoredAndSerpCookieIsInjected() = runTest {
+        val saved = authRepository.saveTokensV2(
+            accessToken = AccessToken("access", Instant.ofEpochMilli(1_000L)),
+            refreshToken = RefreshToken("refresh", Instant.ofEpochMilli(2_000L)),
+            entitlements = listOf(Entitlement(name = "subscriber", product = "Network Protection")),
+            account = Account(email = "email@duck.com", externalId = "externalId"),
+        )
+
+        assertTrue(saved)
+        assertEquals("access", authStore.accessTokenV2)
+        assertEquals(Instant.ofEpochMilli(1_000L), authStore.accessTokenV2ExpiresAt)
+        assertEquals("refresh", authStore.refreshTokenV2)
+        assertEquals(Instant.ofEpochMilli(2_000L), authStore.refreshTokenV2ExpiresAt)
+        assertEquals(listOf(Entitlement(name = "subscriber", product = "Network Protection")), authRepository.getEntitlements())
+        assertEquals(Account(email = "email@duck.com", externalId = "externalId"), authRepository.getAccount())
+        assertEquals("access", serpPromo.cookie)
+    }
+
+    @Test
+    fun whenSaveTokensV2CommitFailsThenNothingChanges() = runTest {
+        authStore.accessTokenV2 = "old access"
+        authStore.refreshTokenV2 = "old refresh"
+        authStore.externalId = "old externalId"
+        authStore.simulateTokenCommitFailure = true
+
+        val saved = authRepository.saveTokensV2(
+            accessToken = AccessToken("access", Instant.ofEpochMilli(1_000L)),
+            refreshToken = RefreshToken("refresh", Instant.ofEpochMilli(2_000L)),
+            entitlements = emptyList(),
+            account = Account(email = null, externalId = "externalId"),
+        )
+
+        assertFalse(saved)
+        assertEquals("old access", authStore.accessTokenV2)
+        assertEquals("old refresh", authStore.refreshTokenV2)
+        assertEquals("old externalId", authStore.externalId)
+        assertNull(serpPromo.cookie)
+    }
+
+    @Test
+    fun whenClearTokensThenTokensAndAccountAreGoneAndSerpCookieIsCleared() = runTest {
+        authStore.accessTokenV2 = "access"
+        authStore.refreshTokenV2 = "refresh"
+        authStore.accessToken = "legacy access"
+        authStore.authToken = "legacy auth"
+        authStore.email = "email@duck.com"
+        authStore.externalId = "externalId"
+        serpPromo.injectCookie("access")
+
+        authRepository.clearTokens()
+
+        assertNull(authStore.accessTokenV2)
+        assertNull(authStore.refreshTokenV2)
+        assertNull(authStore.accessToken)
+        assertNull(authStore.authToken)
+        assertNull(authStore.email)
+        assertNull(authStore.externalId)
+        assertNull(serpPromo.cookie)
+    }
+
+    @Test
+    fun whenTokenStoreIsUnavailableThenIsTokenStoreAvailableIsFalse() = runTest {
+        assertTrue(authRepository.isTokenStoreAvailable())
+
+        authStore.available = false
+
+        assertFalse(authRepository.isTokenStoreAvailable())
+    }
+
+    @Test
+    fun whenRefreshTokenIsStoredButUnreadableThenHasRefreshTokenEntryIsTrue() = runTest {
+        authStore.refreshTokenV2 = null
+        assertFalse(authRepository.hasRefreshTokenEntry())
+
+        authStore.simulateUnreadableRefreshToken = true
+
+        assertTrue(authRepository.hasRefreshTokenEntry())
+    }
 }

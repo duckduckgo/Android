@@ -23,6 +23,8 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.app.statistics.wideevents.WideEventDefinition.Version
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
@@ -43,18 +45,29 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Missi
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
+import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
+import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
+import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withTimeout
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.*
+import retrofit2.HttpException
+import retrofit2.Response
 import java.io.Closeable
+import java.io.IOException
+import java.time.Instant
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.hours
@@ -75,20 +88,67 @@ class AuthTokenRefreshWideEventTest {
             .create(SubscriptionsFeature::class.java)
             .apply { sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(true)) }
 
+    private var verifiedInstall = true
+    private val isVerifiedPlayStoreInstall = object : IsVerifiedPlayStoreInstall {
+        override fun invoke(): Boolean = verifiedInstall
+    }
+    private val timeProvider: CurrentTimeProvider = mock()
+    private val tokenDataStore = FakeSubscriptionsDataStore()
+    private val store = RealAuthTokenRefreshWideEventStore(
+        authRepository = RealAuthRepository(
+            subscriptionsDataStore = tokenDataStore,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+            serpPromo = FakeSerpPromo(),
+            subscriptionsFeature = lazy { subscriptionsFeature },
+        ),
+        sharedPreferencesProvider = FakeSharedPreferencesProvider(),
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
+    )
+
     private lateinit var authWideEvent: AuthTokenRefreshWideEventImpl
 
     @Before
     fun setup() = runBlocking {
         whenever(networkProtectionState.isEnabled()).thenReturn(false)
         whenever(networkProtectionState.isRunning()).thenReturn(false)
+        whenever(timeProvider.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
 
-        authWideEvent = AuthTokenRefreshWideEventImpl(
-            wideEventClient = wideEventClient,
-            subscriptionsFeature = lazy { subscriptionsFeature },
-            dispatchers = coroutineRule.testDispatcherProvider,
-            networkProtectionState = lazy { networkProtectionState },
-            processName = "main",
-        )
+        authWideEvent = createWideEvent(store = store)
+    }
+
+    private fun createWideEvent(store: AuthTokenRefreshWideEventStore) = AuthTokenRefreshWideEventImpl(
+        wideEventClient = wideEventClient,
+        subscriptionsFeature = lazy { subscriptionsFeature },
+        dispatchers = coroutineRule.testDispatcherProvider,
+        networkProtectionState = lazy { networkProtectionState },
+        isVerifiedPlayStoreInstall = lazy { isVerifiedPlayStoreInstall },
+        timeProvider = timeProvider,
+        store = store,
+        processName = "main",
+    )
+
+    private suspend fun startFlow(
+        subscriptionStatus: SubscriptionStatus = SubscriptionStatus.UNKNOWN,
+        subscriptionPlatform: String? = "google",
+        refreshHistory: TokenRefreshHistory = TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null),
+    ) {
+        givenStoredRefreshHistory(refreshHistory)
+        authWideEvent.onStart(subscriptionStatus = subscriptionStatus, subscriptionPlatform = subscriptionPlatform)
+    }
+
+    private suspend fun givenStoredRefreshHistory(refreshHistory: TokenRefreshHistory) {
+        store.clearRefreshHistory()
+        refreshHistory.lastSuccessAt?.let { store.recordRefreshSuccess(at = it, processName = refreshHistory.lastSuccessProcess.orEmpty()) }
+        givenFailureStreak(refreshHistory.failureStreak)
+    }
+
+    private suspend fun givenFailureStreak(failureStreak: Int) {
+        repeat(failureStreak) { store.recordRefreshFailure() }
+    }
+
+    private suspend fun startFlowWithId(wideEventId: Long) {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(wideEventId))
+        authWideEvent.onStart(subscriptionStatus = SubscriptionStatus.UNKNOWN, subscriptionPlatform = "google")
     }
 
     @Test
@@ -96,19 +156,28 @@ class AuthTokenRefreshWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(123L))
 
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(
+            subscriptionStatus = SubscriptionStatus.UNKNOWN,
+            subscriptionPlatform = "google",
+            refreshHistory = TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null),
+        )
 
         verify(wideEventClient).flowStart(
             name = "auth-token-refresh",
             flowEntryPoint = null,
             metadata = mapOf(
                 "subscription_status" to SubscriptionStatus.UNKNOWN.statusName,
+                "subscription_platform" to "google",
                 "netp_is_enabled" to "false",
                 "netp_is_running" to "false",
                 "process_name" to "main",
+                "verified_install" to "true",
+                "consecutive_failures_bucket" to "0",
+                "time_since_last_success_h_bucketed" to "-1",
+                "last_refresh_process" to "unknown",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 2)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 3)),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
@@ -125,12 +194,12 @@ class AuthTokenRefreshWideEventTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
-        authWideEvent.onStart(SubscriptionStatus.WAITING)
+        startFlow(subscriptionStatus = SubscriptionStatus.WAITING)
 
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(2L))
 
-        authWideEvent.onStart(SubscriptionStatus.AUTO_RENEWABLE)
+        startFlow(subscriptionStatus = SubscriptionStatus.AUTO_RENEWABLE)
 
         verify(wideEventClient).intervalEnd(1L, "total_duration_ms_bucketed")
         verify(wideEventClient).flowFinish(1L, FlowStatus.Unknown, emptyMap())
@@ -140,7 +209,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onCrossProcessLockAcquired ends lock wait interval and sends successful step with outcome`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(21L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onCrossProcessLockAcquired(Result.success(Closeable {}))
 
@@ -152,7 +221,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onCrossProcessLockAcquired with fallback timeout outcome sends failed step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(23L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onCrossProcessLockAcquired(Result.failure(timeoutCancellationException()))
 
@@ -163,7 +232,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onCrossProcessLockAcquired with fallback error outcome sends failed step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(24L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onCrossProcessLockAcquired(Result.failure(RuntimeException()))
 
@@ -174,7 +243,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onTokenRead sends step and starts jwks interval`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(10L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onTokenRead()
 
@@ -186,7 +255,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onJwksFetched ends jwks interval and starts tokens interval`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(11L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onJwksFetched()
 
@@ -199,7 +268,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onTokensFetched ends tokens interval and sends step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(12L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onTokensFetched()
 
@@ -211,7 +280,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onTokensValidated sends validation step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(13L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onTokensValidated()
 
@@ -222,7 +291,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onAccessTokenValidationFailed sends failed validation step for access token`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(25L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onAccessTokenValidationFailed(InvalidSignature)
 
@@ -241,7 +310,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onRefreshTokenValidationFailed sends failed validation step for refresh token`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(26L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onRefreshTokenValidationFailed(KeyNotFound)
 
@@ -375,7 +444,7 @@ class AuthTokenRefreshWideEventTest {
         reset(wideEventClient)
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(27L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         block()
 
@@ -388,7 +457,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onBackendErrorResponse sends token_request failure with metadata`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(14L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onBackendErrorResponse(backendErrorResponse = "backend-err", backendErrorCode = 3)
 
@@ -404,7 +473,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onBackendErrorResponse without error code sends only error`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(14L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onBackendErrorResponse(backendErrorResponse = "backend-err", backendErrorCode = null)
 
@@ -420,7 +489,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onBackendErrorResponse without error sends only error code`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(14L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onBackendErrorResponse(backendErrorResponse = null, backendErrorCode = 0)
 
@@ -436,7 +505,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onBackendErrorResponse sends error code outside known range as is`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(14L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onBackendErrorResponse(backendErrorResponse = "backend-err", backendErrorCode = 7)
 
@@ -452,18 +521,23 @@ class AuthTokenRefreshWideEventTest {
     fun `onPlayLoginSuccess sends step`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(15L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onPlayLoginSuccess()
 
-        verify(wideEventClient).flowStep(15L, "play_login", true, emptyMap())
+        verify(wideEventClient).flowStep(
+            wideEventId = 15L,
+            stepName = "play_login",
+            success = true,
+            metadata = mapOf("recovery_strategy" to "play_login", "recovery_outcome" to "recovered"),
+        )
     }
 
     @Test
     fun `onPlayLoginFailure sends failure step, finishes flow and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(16L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         val ex = IllegalStateException("boom")
         authWideEvent.onPlayLoginFailure(signedOut = true, refreshException = ex, loginError = "sign-in-required")
@@ -472,7 +546,11 @@ class AuthTokenRefreshWideEventTest {
             wideEventId = 16L,
             stepName = "play_login",
             success = false,
-            metadata = mapOf("play_login_error" to "sign-in-required"),
+            metadata = mapOf(
+                "play_login_error" to "sign-in-required",
+                "recovery_strategy" to "play_login",
+                "recovery_outcome" to "signed_out",
+            ),
         )
         verify(wideEventClient).intervalEnd(16L, "total_duration_ms_bucketed")
         verify(wideEventClient).flowFinish(16L, FlowStatus.Failure("IllegalStateException"), mapOf("signed_out" to "true"))
@@ -488,7 +566,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onPlayLoginFailure without signing the user out logs signedOut as false`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(20L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = IllegalStateException("boom"), loginError = "UnknownError")
 
@@ -496,7 +574,11 @@ class AuthTokenRefreshWideEventTest {
             wideEventId = 20L,
             stepName = "play_login",
             success = false,
-            metadata = mapOf("play_login_error" to "UnknownError"),
+            metadata = mapOf(
+                "play_login_error" to "UnknownError",
+                "recovery_strategy" to "play_login",
+                "recovery_outcome" to "deferred",
+            ),
         )
         verify(wideEventClient).flowFinish(20L, FlowStatus.Failure("IllegalStateException"), mapOf("signed_out" to "false"))
     }
@@ -505,7 +587,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onUnknownAccountError cancels flow and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(17L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onUnknownAccountError()
 
@@ -521,7 +603,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onSkipped aborts flow and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(21L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onSkipped()
 
@@ -538,7 +620,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onSuccess finishes with Success and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(18L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onSuccess()
 
@@ -554,7 +636,7 @@ class AuthTokenRefreshWideEventTest {
     fun `onFailure finishes with Failure and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(19L))
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         authWideEvent.onFailure(IllegalArgumentException("nope"))
 
@@ -569,14 +651,329 @@ class AuthTokenRefreshWideEventTest {
         e
     }
 
+    @Test
+    fun `onStart maps the subscription platform to a bounded value`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        listOf("google" to "google", "stripe" to "stripe", "apple" to "apple", "ios" to "apple", "web" to "unknown", null to "unknown")
+            .forEach { (platform, expected) ->
+                startFlow(subscriptionPlatform = platform)
+                verify(wideEventClient).flowStart(
+                    any(),
+                    anyOrNull(),
+                    argThat { this["subscription_platform"] == expected },
+                    any(),
+                    any(),
+                    any(),
+                )
+                clearInvocations(wideEventClient)
+            }
+    }
+
+    @Test
+    fun `onStart maps the last refreshing process to a bounded value`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        listOf("main" to "main", ":vpn" to ":vpn", ":pir" to ":pir", "ERROR" to "unknown", null to "unknown")
+            .forEach { (process, expected) ->
+                startFlow(refreshHistory = TokenRefreshHistory(failureStreak = 0, lastSuccessAt = NOW, lastSuccessProcess = process))
+                verify(wideEventClient).flowStart(any(), anyOrNull(), argThat { this["last_refresh_process"] == expected }, any(), any(), any())
+                clearInvocations(wideEventClient)
+            }
+    }
+
+    @Test
+    fun `onStart reports an unverified install`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+        verifiedInstall = false
+
+        startFlow()
+
+        verify(wideEventClient).flowStart(any(), anyOrNull(), argThat { this["verified_install"] == "false" }, any(), any(), any())
+    }
+
+    @Test
+    fun `onStart buckets the failure streak downwards`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        listOf(0 to "0", 1 to "1", 2 to "2", 4 to "3", 7 to "5", 19 to "10", 49 to "20", 50 to "50", 500 to "50")
+            .forEach { (streak, expected) ->
+                startFlow(refreshHistory = TokenRefreshHistory(failureStreak = streak, lastSuccessAt = null))
+                verify(wideEventClient).flowStart(
+                    any(),
+                    anyOrNull(),
+                    argThat { this["consecutive_failures_bucket"] == expected },
+                    any(),
+                    any(),
+                    any(),
+                )
+                clearInvocations(wideEventClient)
+            }
+    }
+
+    @Test
+    fun `onStart buckets hours since the last success downwards and clamps at 30 days`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        listOf(
+            30.minutes to "0",
+            1.hours to "1",
+            3.hours to "1",
+            4.hours to "4",
+            23.hours to "4",
+            2.days to "24",
+            5.days to "72",
+            10.days to "168",
+            30.days to "720",
+            400.days to "720",
+        ).forEach { (age, expected) ->
+            startFlow(refreshHistory = TokenRefreshHistory(failureStreak = 0, lastSuccessAt = NOW.minusMillis(age.inWholeMilliseconds)))
+            verify(wideEventClient).flowStart(
+                any(),
+                anyOrNull(),
+                argThat { this["time_since_last_success_h_bucketed"] == expected },
+                any(),
+                any(),
+                any(),
+            )
+            clearInvocations(wideEventClient)
+        }
+    }
+
+    @Test
+    fun `onTokenReadFailed reports a missing refresh token entry`() = runTest {
+        startFlowWithId(wideEventId = 30L)
+        tokenDataStore.refreshTokenV2 = null
+
+        authWideEvent.onTokenReadFailed()
+
+        verify(wideEventClient).flowStep(30L, "token_read", false, mapOf("store_error" to "missing"))
+        verify(wideEventClient, never()).intervalStart(eq(30L), eq("fetch_jwks_latency_ms_bucketed"), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun `onTokenReadFailed reports a refresh token entry that cannot be decrypted`() = runTest {
+        startFlowWithId(wideEventId = 30L)
+        tokenDataStore.refreshTokenV2 = null
+        tokenDataStore.simulateUnreadableRefreshToken = true
+
+        authWideEvent.onTokenReadFailed()
+
+        verify(wideEventClient).flowStep(30L, "token_read", false, mapOf("store_error" to "unreadable"))
+    }
+
+    @Test
+    fun `onTokenReadFailed reports an unavailable token store`() = runTest {
+        startFlowWithId(wideEventId = 30L)
+        tokenDataStore.available = false
+
+        authWideEvent.onTokenReadFailed()
+
+        verify(wideEventClient).flowStep(30L, "token_read", false, mapOf("store_error" to "unavailable"))
+    }
+
+    @Test
+    fun `onTokensSaved sends token_save step`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(31L))
+        startFlow()
+
+        authWideEvent.onTokensSaved()
+
+        verify(wideEventClient).flowStep(31L, "token_save", true, emptyMap())
+    }
+
+    @Test
+    fun `onTokenSaveFailed reports a failed write when the token store is available`() = runTest {
+        startFlowWithId(wideEventId = 32L)
+
+        authWideEvent.onTokenSaveFailed()
+
+        verify(wideEventClient).flowStep(32L, "token_save", false, mapOf("store_error" to "write_failed"))
+    }
+
+    @Test
+    fun `onTokenSaveFailed reports an unavailable token store`() = runTest {
+        startFlowWithId(wideEventId = 32L)
+        tokenDataStore.available = false
+
+        authWideEvent.onTokenSaveFailed()
+
+        verify(wideEventClient).flowStep(32L, "token_save", false, mapOf("store_error" to "unavailable"))
+    }
+
+    @Test
+    fun `onSuccess resets the failure streak and records when and where the refresh succeeded`() = runTest {
+        givenFailureStreak(failureStreak = 3)
+        startFlowWithId(wideEventId = 40L)
+
+        authWideEvent.onSuccess()
+
+        assertEquals(0, store.getRefreshHistory().failureStreak)
+        assertEquals(NOW, store.getRefreshHistory().lastSuccessAt)
+        assertEquals("main", store.getRefreshHistory().lastSuccessProcess)
+    }
+
+    @Test
+    fun `onFailure adds to the failure streak`() = runTest {
+        givenFailureStreak(failureStreak = 1)
+        startFlowWithId(wideEventId = 41L)
+
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(2, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onFailure with a network error leaves the failure streak unchanged`() = runTest {
+        givenFailureStreak(failureStreak = 1)
+        startFlowWithId(wideEventId = 42L)
+
+        authWideEvent.onFailure(IOException())
+
+        assertEquals(1, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onFailure with a backend server error leaves the failure streak unchanged`() = runTest {
+        givenFailureStreak(failureStreak = 1)
+        startFlowWithId(wideEventId = 43L)
+
+        authWideEvent.onFailure(httpException(code = 503))
+
+        assertEquals(1, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onFailure with a backend rejection adds to the failure streak`() = runTest {
+        givenFailureStreak(failureStreak = 1)
+        startFlowWithId(wideEventId = 44L)
+
+        authWideEvent.onFailure(httpException(code = 400))
+
+        assertEquals(2, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onFailure after the refresh token could not be read leaves the failure streak unchanged`() = runTest {
+        tokenDataStore.refreshTokenV2 = null
+        startFlowWithId(wideEventId = 49L)
+
+        authWideEvent.onTokenReadFailed()
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(0, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `a refresh that reads the token counts its failure even when the previous refresh could not read it`() = runTest {
+        startFlowWithId(wideEventId = 50L)
+        authWideEvent.onTokenReadFailed()
+        authWideEvent.onFailure(IllegalStateException())
+        startFlowWithId(wideEventId = 51L)
+
+        authWideEvent.onTokenRead()
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(1, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onPlayLoginFailure with the recovery deferred adds to the failure streak once`() = runTest {
+        givenFailureStreak(failureStreak = 1)
+        startFlowWithId(wideEventId = 45L)
+        val refreshException = httpException(code = 400)
+
+        authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = refreshException, loginError = "UnknownError")
+        authWideEvent.onFailure(refreshException)
+
+        assertEquals(2, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onPlayLoginFailure with the user signed out leaves the failure streak to the sign out`() = runTest {
+        givenFailureStreak(failureStreak = 1)
+        startFlowWithId(wideEventId = 46L)
+        val refreshException = httpException(code = 400)
+
+        authWideEvent.onPlayLoginFailure(signedOut = true, refreshException = refreshException, loginError = "NoActivePurchase")
+        authWideEvent.onFailure(refreshException)
+
+        assertEquals(1, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onUnknownAccountError leaves the failure streak to the sign out`() = runTest {
+        givenFailureStreak(failureStreak = 1)
+        startFlowWithId(wideEventId = 47L)
+
+        authWideEvent.onUnknownAccountError()
+        authWideEvent.onFailure(httpException(code = 400))
+
+        assertEquals(1, store.getRefreshHistory().failureStreak)
+    }
+
+    @Test
+    fun `onSignOut clears the refresh history`() = runTest {
+        givenStoredRefreshHistory(TokenRefreshHistory(failureStreak = 2, lastSuccessAt = NOW, lastSuccessProcess = "main"))
+
+        authWideEvent.onSignOut()
+
+        assertEquals(TokenRefreshHistory(failureStreak = 0, lastSuccessAt = null), store.getRefreshHistory())
+    }
+
+    @Test
+    fun `a store that throws does not stop the wide event`() = runTest {
+        val throwingStore: AuthTokenRefreshWideEventStore = mock()
+        whenever(throwingStore.getRefreshHistory()).thenThrow(IllegalStateException())
+        whenever(throwingStore.isTokenStoreAvailable()).thenThrow(IllegalStateException())
+        whenever(throwingStore.recordRefreshSuccess(any(), any())).thenThrow(IllegalStateException())
+        authWideEvent = createWideEvent(store = throwingStore)
+        startFlowWithId(wideEventId = 48L)
+
+        authWideEvent.onTokenSaveFailed()
+        authWideEvent.onSuccess()
+
+        verify(wideEventClient).flowStep(48L, "token_save", false, emptyMap())
+        verify(wideEventClient).flowFinish(48L, FlowStatus.Success, emptyMap())
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `feature disabled leaves the refresh history untouched`() = runTest {
+        subscriptionsFeature.sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(false))
+        givenFailureStreak(failureStreak = 1)
+
+        startFlow(refreshHistory = TokenRefreshHistory(failureStreak = 1, lastSuccessAt = null))
+        authWideEvent.onSuccess()
+        authWideEvent.onFailure(IllegalStateException())
+
+        assertEquals(1, store.getRefreshHistory().failureStreak)
+        assertNull(store.getRefreshHistory().lastSuccessAt)
+    }
+
+    private fun httpException(code: Int): HttpException {
+        val responseBody = "error".toResponseBody("text/json".toMediaTypeOrNull())
+        return HttpException(Response.error<Void>(code, responseBody))
+    }
+
     @SuppressLint("DenyListedApi")
     @Test
     fun `feature disabled results in no interactions`() = runTest {
         subscriptionsFeature.sendAuthTokenRefreshWideEvent().setRawStoredState(Toggle.State(false))
 
-        authWideEvent.onStart(SubscriptionStatus.UNKNOWN)
+        startFlow()
         authWideEvent.onTokensFetched()
 
         verifyNoInteractions(wideEventClient)
+    }
+
+    private companion object {
+        val NOW: Instant = Instant.parse("2026-10-28T12:00:00Z")
     }
 }

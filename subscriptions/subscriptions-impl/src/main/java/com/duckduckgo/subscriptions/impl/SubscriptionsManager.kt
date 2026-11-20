@@ -72,6 +72,7 @@ import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.TokenStoreException
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.repository.isExpired
@@ -608,11 +609,8 @@ class RealSubscriptionsManager @Inject constructor(
                 coroutineScope.launch { authClient.tryLogout(accessTokenV2 = jwt) }
             }
         }
-        authRepository.setAccessTokenV2(null)
-        authRepository.setRefreshTokenV2(null)
-        authRepository.setAuthToken(null)
-        authRepository.setAccessToken(null)
-        authRepository.setAccount(null)
+        authRepository.clearTokens()
+        tokenRefreshWideEvent.onSignOut()
         authRepository.setSubscription(null)
         authRepository.setEntitlements(emptyList())
         authRepository.removeLocalPurchasedAt()
@@ -873,7 +871,10 @@ class RealSubscriptionsManager @Inject constructor(
         return coroutineScope.async {
             tokenRefreshMutex.withLock {
                 try {
-                    tokenRefreshWideEvent.onStart(subscriptionStatus())
+                    tokenRefreshWideEvent.onStart(
+                        subscriptionStatus = subscriptionStatus(),
+                        subscriptionPlatform = authRepository.getSubscription()?.platform,
+                    )
 
                     val lockResult = crossProcessLock.acquire(TOKEN_REFRESH_LOCK_KEY)
                     tokenRefreshWideEvent.onCrossProcessLockAcquired(lockResult)
@@ -910,7 +911,10 @@ class RealSubscriptionsManager @Inject constructor(
     }
 
     private suspend fun doRefreshAccessToken(): AccessToken {
-        val refreshToken = checkNotNull(authRepository.getRefreshTokenV2())
+        val refreshToken = authRepository.getRefreshTokenV2() ?: run {
+            tokenRefreshWideEvent.onTokenReadFailed()
+            throw TokenStoreException("Refresh token could not be read")
+        }
         tokenRefreshWideEvent.onTokenRead()
 
         /*
@@ -992,7 +996,13 @@ class RealSubscriptionsManager @Inject constructor(
             }
         }
 
-        saveTokens(newTokens)
+        try {
+            saveTokens(newTokens)
+        } catch (e: TokenStoreException) {
+            tokenRefreshWideEvent.onTokenSaveFailed()
+            throw e
+        }
+        tokenRefreshWideEvent.onTokensSaved()
         return AccessToken(newTokens.accessToken, newTokens.accessTokenClaims.expiresAt)
     }
 
@@ -1093,10 +1103,17 @@ class RealSubscriptionsManager @Inject constructor(
 
     private suspend fun saveTokens(tokens: ValidatedTokenPair) = with(tokens) {
         try {
-            authRepository.setAccessTokenV2(AccessToken(accessToken, accessTokenClaims.expiresAt))
-            authRepository.setRefreshTokenV2(RefreshToken(refreshToken, refreshTokenClaims.expiresAt))
-            authRepository.setEntitlements(accessTokenClaims.entitlements)
-            authRepository.setAccount(Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId))
+            val saved = try {
+                authRepository.saveTokensV2(
+                    accessToken = AccessToken(accessToken, accessTokenClaims.expiresAt),
+                    refreshToken = RefreshToken(refreshToken, refreshTokenClaims.expiresAt),
+                    entitlements = accessTokenClaims.entitlements,
+                    account = Account(email = accessTokenClaims.email, externalId = accessTokenClaims.accountExternalId),
+                )
+            } catch (e: Exception) {
+                throw TokenStoreException("Token pair write failed", e)
+            }
+            if (!saved) throw TokenStoreException("Token pair commit returned false")
             backgroundTokenRefresh.schedule()
         } catch (e: Exception) {
             pixelSender.reportAuthV2TokenStoreError()
