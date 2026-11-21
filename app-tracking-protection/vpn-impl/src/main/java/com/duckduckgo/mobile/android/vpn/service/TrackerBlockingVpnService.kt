@@ -142,6 +142,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
     }
 
+    private var activeTunExcludedApps: List<String> = emptyList()
+
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
     private var vpnStateServiceReference: IBinder? = null
@@ -306,7 +308,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             // stop the current networking stack
             vpnNetworkStack.onStopVpn(VpnStopReason.RESTART)
             vpnNetworkStack.onDestroyVpn()
-            // maybe we have changed the networking stack
+            // maybe we have changed the networking stack. Read it again: the main process registers VPN features in multiprocess
+            // prefs right before restarting, and this process may only see that write by now
             vpnNetworkStack = vpnNetworkStackProvider.provideNetworkStack()
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
@@ -322,7 +325,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
-        // Resolved once so the in-place decision, the wide event and the handover all see the same stack
+        // Resolved once so the in-place decision, the null tunnel's exclusions, the wide event and the handover all see the same stack
         val restartNetworkStack = if (restarting) vpnNetworkStackProvider.provideNetworkStack() else null
         val restartInPlace = restartNetworkStack != null && appTpRemoteFeatures.restartInPlace().isEnabled() &&
             VpnNetworkStackHandover.supportsInPlaceRestart(restartNetworkStack)
@@ -361,8 +364,17 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
 
         if (handover == null) {
+            // Apps the running tunnel excludes stay excluded, otherwise Android moves them into the null-route tunnel and closes
+            // their connections. A stack switch starts from no exclusions because the next stack may protect those apps
+            val nullTunExcludedApps = if (
+                restartNetworkStack?.name == vpnNetworkStack.name && appTpRemoteFeatures.keepExclusionsInNullTunnel().isEnabled()
+            ) {
+                activeTunExcludedApps
+            } else {
+                emptyList()
+            }
             // Create a null route tunnel so that leaks can't scape
-            val nullTun = createNullRouteTempTunnel()?.let {
+            val nullTun = createNullRouteTempTunnel(nullTunExcludedApps)?.let {
                 if (!it.waitForTunnelUpOrTimeout()) {
                     logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
                     null
@@ -387,6 +399,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
             }
             activeTun = nullTun
+            activeTunExcludedApps = nullTunExcludedApps
         }
 
         val nextNetworkStack = handover?.next ?: vpnNetworkStack
@@ -428,6 +441,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
         // Closes the tunnel this one replaces: the null-route tunnel, or the previous tunnel on an in-place restart
         activeTun = newTun
+        activeTunExcludedApps = tunnelConfig.appExclusionList.toList()
 
         vpnEnableWideEvent.onVpnPrepared()
 
@@ -490,7 +504,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
     }
 
-    private fun createNullRouteTempTunnel(): ParcelFileDescriptor? {
+    private fun createNullRouteTempTunnel(excludedApps: List<String>): ParcelFileDescriptor? {
         checkMainThread()
 
         return runCatching {
@@ -514,7 +528,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 }
                 // just so that we can connect to our BE
                 // TODO should we protect all comms with our controller BE? other VPNs do that
-                safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
+                safelyAddDisallowedApps((excludedApps + this@TrackerBlockingVpnService.packageName).distinct())
                 setBlocking(true)
                 setMtu(1280)
                 try {
@@ -681,6 +695,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnNetworkStack.onStopVpn(reason)
 
         activeTun = null
+        activeTunExcludedApps = emptyList()
 
         sendStopPixels(reason)
         vpnEnableWideEvent.onVpnStop(reason)
