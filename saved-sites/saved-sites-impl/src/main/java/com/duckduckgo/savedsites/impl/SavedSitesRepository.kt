@@ -178,11 +178,20 @@ class RealSavedSitesRepository(
         folders: MutableList<BookmarkFolder>,
         folderId: String,
     ): Pair<List<Bookmark>, List<BookmarkFolder>> {
-        val folderContent = folderContent(folderId)
-        bookmarks.addAll(folderContent.first)
-        folders.addAll(folderContent.second)
-        folderContent.second.forEach {
-            traverseBranch(bookmarks, folders, it.id)
+        // Iterative with a visited set: a corrupted relations table can contain a folder cycle,
+        // which would otherwise recurse forever and crash with a StackOverflowError (#5928).
+        val visitedFolderIds = mutableSetOf(folderId)
+        val pendingFolderIds = ArrayDeque(listOf(folderId))
+        while (pendingFolderIds.isNotEmpty()) {
+            val currentFolderId = pendingFolderIds.removeFirst()
+            val folderContent = folderContent(currentFolderId)
+            bookmarks.addAll(folderContent.first)
+            folderContent.second.forEach { childFolder ->
+                if (visitedFolderIds.add(childFolder.id)) {
+                    folders.add(childFolder)
+                    pendingFolderIds.add(childFolder.id)
+                }
+            }
         }
         return Pair(bookmarks, folders)
     }
