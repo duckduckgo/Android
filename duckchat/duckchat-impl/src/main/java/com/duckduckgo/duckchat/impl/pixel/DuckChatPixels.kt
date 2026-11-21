@@ -23,6 +23,7 @@ import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.wideevents.BrowserInteractionsPlugin
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.extensions.toBinaryString
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
@@ -361,6 +362,7 @@ class RealDuckChatPixels @Inject constructor(
     private val browserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin>,
     private val duckAiNewChatMetricPixelsPlugin: DuckAiNewChatMetricPixelsPlugin,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val swipeUpNewChatUsage: SwipeUpNewChatUsage,
 ) : DuckChatPixels {
 
     /** `first_prompt_new_install` must be attributable to a fresh install, never to an existing user who just updated. */
@@ -402,9 +404,7 @@ class RealDuckChatPixels @Inject constructor(
         inputScreenEnabled: Boolean,
         voice: Boolean,
     ) {
-        fireCountAndDaily(
-            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT,
-            DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY,
+        fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_COUNT, DuckChatPixelName.DUCK_CHAT_ENTRY_POINT_DAILY) {
             mapOf(
                 DuckChatPixelParameters.ENTRY_SOURCE to entryPoint.toPixelValue(),
                 DuckChatPixelParameters.DUCK_AI_ENABLED to duckAiEnabled.toString(),
@@ -412,8 +412,14 @@ class RealDuckChatPixels @Inject constructor(
                 DuckChatPixelParameters.OPENS_NEW_TAB to opensNewTab.toString(),
                 DuckChatPixelParameters.HAS_PROMPT to hasPrompt.toString(),
                 DuckChatPixelParameters.VOICE to voice.toString(),
-            ),
-        )
+            ) + recordSwipeUpNewChat(entryPoint)
+        }
+    }
+
+    private suspend fun recordSwipeUpNewChat(entryPoint: DuckChatEntryPoint): Map<String, String> {
+        if (entryPoint != DuckChatEntryPoint.SWIPE_UP_NEW_CHAT) return emptyMap()
+        val wasUsedBefore = swipeUpNewChatUsage.recordSwipe() ?: return emptyMap()
+        return mapOf(DuckChatPixelParameters.WAS_USED_BEFORE to wasUsedBefore.toBinaryString())
     }
 
     /**
@@ -1883,6 +1889,7 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT("aichat_new_chat_hint_tapped_count"),
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY("aichat_new_chat_hint_tapped_daily"),
     DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED("aichat_new_chat_hints_cap_reached"),
+    DUCK_CHAT_SWIPE_NEW_CHAT_USED_3_DAYS("aichat_swipe_new_chat_used_3_days_u"),
 }
 
 object DuckChatPixelParameters {
@@ -2229,6 +2236,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             // Same coverage for unified_input pixels added without the legacy m_ prefix.
             "aichat_unified_input_" to PixelParameter.removeAtb(),
             "aichat_new_chat_" to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_SWIPE_NEW_CHAT_USED_3_DAYS.pixelName to PixelParameter.removeAtb(),
         )
     }
 }

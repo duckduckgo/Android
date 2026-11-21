@@ -6140,7 +6140,7 @@ class BrowserTabViewModel @Inject constructor(
     }
 
     fun openNewDuckChatFromSwipeUp() {
-        openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
+        openNewDuckChatTab(DuckChatEntryPoint.SWIPE_UP_NEW_CHAT, fromDuckAiChat = true)
     }
 
     /** New Chat from the browsing menu, which is reachable from any view mode. */

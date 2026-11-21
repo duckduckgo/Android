@@ -263,7 +263,7 @@ class DuckAiEntryWideEvent @Inject constructor(
         if (!withContext(dispatchers.io()) { feature.value.self().isEnabled() }) return
         val flowId = wideEventClient.flowStart(
             name = "duckai_entry",
-            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2)),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false, flowStatus = FlowStatus.Unknown),
             metadata = mapOf(
                 "source" to source,
