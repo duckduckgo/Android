@@ -4,7 +4,7 @@
         "owners": ["malmstein"],
         "meta": {
             "type": "android-duckai-entry",
-            "version": "0.1"
+            "version": "0.2"
         },
         "feature": {
             "name": "duckai_entry",
@@ -46,6 +46,7 @@
                             "recent_chat_tab_switcher",
                             "recent_chat_contextual",
                             "chat_suggestion_input",
+                            "swipe_up_new_chat",
                             "tab_swipe",
                             "app_open"
                         ]
