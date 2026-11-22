@@ -24,15 +24,10 @@
             },
             {
                 "key": "context.name",
-                "description": "Entry point to the purchase flow. Origin string set by the offer-page URL query parameter or hardcoded at the app-settings call site. Includes web funnel origins (without `_android`) when the purchase starts from a web page. FE-controlled — new funnel names can be introduced without a schema change as long as they match the pattern. Empty string is allowed (sent when the URL carries `?origin=` with no value).",
+                "description": "Entry point to the purchase flow. Origin string set by the offer-page URL query parameter or hardcoded at the app-settings call site. FE-controlled — new funnel names can be introduced without a schema change as long as they match the pattern. Empty string is allowed (sent when the URL carries `?origin=` with no value).",
                 "type": "string",
-                "pattern": "^(funnel_[a-z0-9_]+(__[a-z0-9]+)?)?$",
-                "examples": [
-                    "funnel_appsettings_android",
-                    "funnel_purchase_offer_page_android",
-                    "funnel_duckai_android__modelpicker",
-                    "funnel_home_website__tagline"
-                ]
+                "pattern": "^(funnel_[a-z0-9_]+_android(__[a-z0-9]+)?)?$",
+                "examples": ["funnel_appsettings_android", "funnel_purchase_offer_page_android", "funnel_duckai_android__modelpicker"]
             },
             {
                 "key": "feature.data.ext.subscription_identifier",
