@@ -24,7 +24,7 @@
             },
             {
                 "key": "context.name",
-                "description": "Entry point to the purchase flow. Origin string set by the offer-page URL query parameter or hardcoded at the app-settings call site. FE-controlled — new funnel names can be introduced without a schema change as long as they match the pattern. Empty string is allowed (sent when the URL carries `?origin=` with no value).",
+                "description": "Entry point to the purchase flow. Origin string set by the offer-page URL query parameter or hardcoded at the app-settings call site. FE-controlled — new funnel names must be added to this list (kept in sync with the wide event definition). Empty string is allowed (sent when the URL carries `?origin=` with no value).",
                 "enum": [
                     "",
                     "funnel_addressbar_android__aitoggle",
