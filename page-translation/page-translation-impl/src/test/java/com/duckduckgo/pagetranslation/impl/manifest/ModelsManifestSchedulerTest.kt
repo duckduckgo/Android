@@ -25,6 +25,7 @@ import androidx.work.WorkManager
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -44,7 +45,12 @@ class ModelsManifestSchedulerTest {
     private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val workManager: WorkManager = mock()
     private val owner: LifecycleOwner = mock()
-    private val scheduler = ModelsManifestScheduler(feature, coroutineRule.testScope, coroutineRule.testDispatcherProvider, workManager)
+    private var isDeviceSupported = true
+    private val deviceSupport = object : PageTranslationDeviceSupport {
+        override fun isSupported() = isDeviceSupported
+    }
+    private val scheduler =
+        ModelsManifestScheduler(feature, deviceSupport, coroutineRule.testScope, coroutineRule.testDispatcherProvider, workManager)
 
     @Test
     fun skipEnqueuingWhenTranslationIsOffDespiteParentBeingOn() {
@@ -78,6 +84,16 @@ class ModelsManifestSchedulerTest {
         feature.translation().setRawStoredState(State(enable = true))
 
         verifyConnectedWorkEnqueuedOnce()
+    }
+
+    @Test
+    fun skipEnqueuingOnUnsupportedDevices() {
+        isDeviceSupported = false
+        feature.translation().setRawStoredState(State(enable = true))
+
+        scheduler.onCreate(owner)
+
+        verifyNoInteractions(workManager)
     }
 
     private fun verifyConnectedWorkEnqueuedOnce() {

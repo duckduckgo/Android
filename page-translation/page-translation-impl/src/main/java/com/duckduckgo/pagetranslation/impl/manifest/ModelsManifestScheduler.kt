@@ -26,6 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
@@ -36,11 +37,14 @@ import javax.inject.Inject
 @ContributesIntoSet(AppScope::class)
 class ModelsManifestScheduler @Inject constructor(
     private val feature: PageTranslationFeature,
+    private val deviceSupport: PageTranslationDeviceSupport,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
     private val workManager: WorkManager,
 ) : MainProcessLifecycleObserver {
     override fun onCreate(owner: LifecycleOwner) {
+        if (!deviceSupport.isSupported()) return
+
         appScope.launch(dispatchers.io()) {
             feature.translation().enabled().firstOrNull { isEnabled -> isEnabled } ?: return@launch
 

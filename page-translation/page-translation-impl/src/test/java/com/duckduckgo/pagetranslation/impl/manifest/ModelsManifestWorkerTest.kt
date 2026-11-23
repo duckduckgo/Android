@@ -23,6 +23,7 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -40,10 +41,21 @@ class ModelsManifestWorkerTest {
 
     private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java)
     private val fetcher: ModelsManifestFetcher = mock()
+    private var isDeviceSupported = true
 
     @Test
     fun succeedWithoutFetchingWhenTranslationIsOff() = runTest {
         feature.translation().setRawStoredState(State(enable = false))
+
+        assertEquals(Result.success(), createWorker().doWork())
+
+        verifyNoInteractions(fetcher)
+    }
+
+    @Test
+    fun succeedWithoutFetchingOnUnsupportedDevices() = runTest {
+        feature.translation().setRawStoredState(State(enable = true))
+        isDeviceSupported = false
 
         assertEquals(Result.success(), createWorker().doWork())
 
@@ -60,6 +72,9 @@ class ModelsManifestWorkerTest {
 
     private fun createWorker() = TestListenableWorkerBuilder<ModelsManifestWorker>(ApplicationProvider.getApplicationContext()).build().also {
         it.feature = feature
+        it.deviceSupport = object : PageTranslationDeviceSupport {
+            override fun isSupported() = isDeviceSupported
+        }
         it.fetcher = lazyOf(fetcher)
         it.dispatchers = coroutineRule.testDispatcherProvider
     }
