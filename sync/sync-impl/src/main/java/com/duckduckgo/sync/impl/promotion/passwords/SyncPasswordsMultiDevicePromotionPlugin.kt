@@ -40,6 +40,7 @@ import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.databinding.ViewSyncPasswordsMultiDevicePromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
@@ -52,8 +53,6 @@ import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsMultiDeviceProm
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsMultiDevicePromotionViewModel.Command.DismissPromotion
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsMultiDevicePromotionViewModel.Command.LaunchGetDesktopApp
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsMultiDevicePromotionViewModel.Command.LaunchSyncSettings
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -136,7 +135,10 @@ class SyncPasswordsMultiDevicePromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSettings() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswordsMultiDevice))
+        globalActivityStarter.start(
+            context,
+            SyncActivityStartSyncFlow(source = "promotion_passwords_multi_device"),
+        )
     }
 
     private suspend fun launchGetDesktopApp() {

@@ -34,6 +34,7 @@ import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.api.SyncState
 import com.duckduckgo.sync.api.SyncStateMonitor
 import com.duckduckgo.sync.impl.R
@@ -41,8 +42,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.BookmarkAddedDialog
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -99,7 +98,7 @@ class SetupSyncBookmarkAddedPromo @Inject constructor(
     private fun onLaunchSyncFlow(activity: AppCompatActivity) {
         val intent = globalActivityStarter.startIntent(
             activity,
-            SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialog),
+            SyncActivityStartSyncFlow(source = "promotion_bookmark_added_dialog"),
         )
         activity.startActivity(intent)
     }

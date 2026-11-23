@@ -30,7 +30,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -41,7 +40,7 @@ import kotlinx.coroutines.launch
 
 class ReadSyncCodeViewModel @AssistedInject constructor(
     @Assisted val entryPoint: SyncEntryPoint,
-    @Assisted private val launchSource: SyncLaunchSource,
+    @Assisted private val launchSource: String,
     private val clipboard: Clipboard,
     private val syncPixels: SyncPixels,
     private val codeDispatcher: SyncCodeDispatcher,
@@ -105,13 +104,13 @@ class ReadSyncCodeViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             entryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ): ReadSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val entryPoint: SyncEntryPoint,
-            private val launchSource: SyncLaunchSource,
+            private val launchSource: String,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")

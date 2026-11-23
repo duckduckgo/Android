@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui.pairing.process
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeContract.Input
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeContract.Output
@@ -54,7 +53,7 @@ class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
 
     data class Input(
         val codeSource: SyncCodeSource,
-        val launchSource: SyncLaunchSource,
+        val launchSource: String,
     )
 
     sealed interface Output {

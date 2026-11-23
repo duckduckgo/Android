@@ -28,7 +28,6 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeManualBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -44,8 +43,8 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
             "Missing fragment argument: '$ENTRY_POINT_ARG'"
         }
 
-    private val launchSource: SyncLaunchSource
-        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), LAUNCH_SOURCE_ARG, SyncLaunchSource::class.java)) {
+    private val launchSource: String
+        get() = requireNotNull(requireArguments().getString(LAUNCH_SOURCE_ARG)) {
             "Missing fragment argument: '$LAUNCH_SOURCE_ARG'"
         }
 
@@ -89,7 +88,7 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
 
         fun instance(
             entryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ) = ReadSyncCodeManualFragment().apply {
             arguments = bundleOf(
                 ENTRY_POINT_ARG to entryPoint,

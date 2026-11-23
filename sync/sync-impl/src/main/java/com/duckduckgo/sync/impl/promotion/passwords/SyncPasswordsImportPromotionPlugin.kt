@@ -45,6 +45,7 @@ import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncPasswordsImportPromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
@@ -53,8 +54,6 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.PasswordsImport
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsImportPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.passwords.SyncPasswordsImportPromotionViewModel.Command.LaunchSyncSetup
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -171,7 +170,10 @@ class SyncPasswordsImportPromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSetup() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionPasswordsImport))
+        globalActivityStarter.start(
+            context,
+            SyncActivityStartSyncFlow(source = "promotion_passwords_import"),
+        )
         callback?.dismissHost()
     }
 }

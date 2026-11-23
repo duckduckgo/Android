@@ -83,6 +83,9 @@ interface SyncAccountRepository {
     @WorkerThread
     fun createAccount(): Result<Boolean>
     fun isSignedIn(): Boolean
+
+    /** The last known sign-in state, safe to read on the main thread. Null until Sync has read it once after the process started. */
+    fun cachedIsSignedIn(): Boolean?
     fun processCode(code: SyncAuthCode, existingDeviceId: String? = null): Result<Boolean>
     fun getAccountInfo(): AccountInfo
     fun logout(deviceId: String): Result<Boolean>
@@ -797,6 +800,8 @@ class AppSyncAccountRepository @Inject constructor(
         }
 
     override fun isSignedIn() = syncStore.isSignedIn()
+
+    override fun cachedIsSignedIn() = syncStore.cachedIsSignedIn()
 
     override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
         val thisDeviceId = syncStore.deviceId.orEmpty()

@@ -56,7 +56,6 @@ import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
@@ -231,7 +230,7 @@ class SyncActivityViewModelTest {
     fun whenSyncThisDeviceThenBackupThisDeviceTappedPixelFired() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
 
-        testee.onSyncThisDevice()
+        testee.onSyncThisDevice(launchSource = "other")
 
         verify(syncPixels).fireBackupThisDeviceTapped()
     }
@@ -309,8 +308,52 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.commands().test {
-            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+            testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
             awaitItem().assertCommandType(IntroCreateAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoiningExistingAccountAndNotSignedInThenEmitCommandSyncWithAnotherDevice() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
+            awaitItem().assertCommandType(Command.SyncWithAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoiningExistingAccountAndCreateAccountDisabledThenEmitCommandSyncWithAnotherDevice() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
+            awaitItem().assertCommandType(Command.SyncWithAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoiningExistingAccountAndSetupFlowsDisabledThenContentIsShown() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -321,7 +364,7 @@ class SyncActivityViewModelTest {
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
 
         verify(syncPixels, never()).fireBackupThisDeviceTapped()
     }
@@ -334,7 +377,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.commands().test {
-            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+            testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -346,7 +389,7 @@ class SyncActivityViewModelTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
 
         testee.viewState().test {
             assertFalse(expectMostRecentItem().isContentHidden)
@@ -360,7 +403,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands().test {
-            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+            testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
             awaitItem().assertCommandType(Command.AddAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -371,7 +414,11 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands().test {
-            testee.processSyncWithDesktopDeepLink(launchSource = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice)
+            testee.processSourceDeepLink(
+                launchSource = "promotion_bookmark_multi_device_added_dialog",
+                joinExistingAccount = false,
+                offerDesktopApp = true,
+            )
             awaitItem().assertCommandType(Command.AskSyncWithDesktop::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -384,7 +431,11 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.commands().test {
-            testee.processSyncWithDesktopDeepLink(launchSource = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice)
+            testee.processSourceDeepLink(
+                launchSource = "promotion_bookmark_multi_device_added_dialog",
+                joinExistingAccount = false,
+                offerDesktopApp = true,
+            )
             awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -396,7 +447,11 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
         testee.commands().test {
-            testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice)
+            testee.processSourceDeepLink(
+                launchSource = "promotion_bookmark_multi_device_added_dialog",
+                joinExistingAccount = false,
+                offerDesktopApp = false,
+            )
             awaitItem().assertCommandType(Command.AddAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -428,7 +483,7 @@ class SyncActivityViewModelTest {
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
 
         testee.viewState().test {
             assertTrue(awaitItem().isContentHidden)
@@ -442,7 +497,7 @@ class SyncActivityViewModelTest {
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
         testee.onScreenExit()
 
         testee.viewState().test {
@@ -452,15 +507,84 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenLaunchedFromMultiDevicePromotionThenFirstViewStateShowsContent() = runViewModelTest {
+    fun whenCachedAsSignedInThenFlowStartShowsContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        assertFalse(testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenCachedAsSignedOutThenFlowStartHidesContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        assertTrue(testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenSignInStateNotCachedThenFlowStartHidesContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(null)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        assertTrue(testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenJoiningExistingAccountThenFlowStartShowsContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        assertFalse(testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenCachedAsSignedInThenFirstViewStateShowsContent() = runViewModelTest {
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.processSourceDeepLink(launchSource = "promotion_bookmarks_multi_device", joinExistingAccount = false, offerDesktopApp = false)
+
+        testee.viewState().test {
+            assertFalse(awaitItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOfferingDesktopAppAndSignedInThenContentIsShown() = runViewModelTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.processSourceDeepLink(
+            launchSource = "promotion_bookmark_multi_device_added_dialog",
+            joinExistingAccount = false,
+            offerDesktopApp = true,
+        )
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoiningExistingAccountThenContentIsShownForAuthentication() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         givenSetupFlowsAllowed()
         whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
-        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionBookmarksMultiDevice)
+        testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
 
         testee.viewState().test {
-            assertFalse(awaitItem().isContentHidden)
+            assertFalse(expectMostRecentItem().isContentHidden)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -478,7 +602,7 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(true)
         whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
 
-        testee.processSourceDeepLink(launchSource = SyncLaunchSource.PromotionPasswords)
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
 
         testee.viewState().test {
             assertFalse(expectMostRecentItem().isContentHidden)
@@ -489,7 +613,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runViewModelTest {
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -498,7 +622,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenSyncThisDeviceThenDoesNotAuthenticate() = runViewModelTest {
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             awaitItem()
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
@@ -509,7 +633,7 @@ class SyncActivityViewModelTest {
     fun whenSyncThisDeviceAndCanRestoreThenShowPreviousSessionReady() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
             assertEquals(SyncEntryPoint.SYNC_NEW_ACCOUNT, (command as ShowPreviousSessionReady).syncEntryPoint)
@@ -521,9 +645,9 @@ class SyncActivityViewModelTest {
     fun whenSyncThisDeviceThenOnFlowStartedCalled() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(launchSource = SyncLaunchSource.Other)
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = "other")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -532,9 +656,9 @@ class SyncActivityViewModelTest {
     fun whenSyncThisDeviceWithSourceThenOnFlowStartedCalledWithSource() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
-            testee.onSyncThisDevice(launchSource = SyncLaunchSource.PromotionPasswords)
+            testee.onSyncThisDevice(launchSource = "promotion_passwords")
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(launchSource = SyncLaunchSource.PromotionPasswords)
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = "promotion_passwords")
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -565,7 +689,7 @@ class SyncActivityViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertEquals(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
@@ -621,7 +745,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenSyncThisDeviceThenThisDeviceSyncInProgress() = runViewModelTest {
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
             cancelAndIgnoreRemainingEvents()
         }
@@ -630,7 +754,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenSyncThisDeviceCanceledThenThisDeviceSyncIdle() = runViewModelTest {
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
 
             testee.onSyncThisDeviceCanceled()
@@ -656,7 +780,7 @@ class SyncActivityViewModelTest {
         whenever(syncAutoRestoreManager.clearAutoRestoreData()).thenReturn(Result.Error(reason = "error"))
 
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
 
             testee.onContinueSetupAfterSkipRestore(SyncEntryPoint.SYNC_NEW_ACCOUNT)
@@ -1146,7 +1270,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(connectedDevices))
 
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
 
             testee.onDeviceConnected()

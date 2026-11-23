@@ -50,8 +50,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
-import com.duckduckgo.sync.api.SyncActivityStartSetupFlow
-import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncMessagePlugin
 import com.duckduckgo.sync.api.SyncSettingsPlugin
@@ -63,7 +62,6 @@ import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogScreenParams
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
@@ -112,9 +110,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
 @ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
-@ContributeToActivityStarter(SyncActivityStartSetupFlow::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
-@ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncBinding>()
 
@@ -147,25 +143,11 @@ class SyncActivity : DuckDuckGoActivity() {
     private val startSyncFlowParams
         get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)
 
-    private val startSetupFlowParams
-        get() = intent.getActivityParams(SyncActivityStartSetupFlow::class.java)
-
     private val launchSource
-        get() = startSyncFlowParams?.source
-            ?: startSetupFlowParams?.let { SyncLaunchSource.from(it.source) }
-            ?: SyncLaunchSource.from(intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source)
+        get() = startSyncFlowParams?.source ?: LAUNCH_SOURCE_OTHER
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
-
-    private val shouldDeepLinkStartSync
-        get() = startSyncFlowParams != null || startSetupFlowParams != null
-
-    private val isAnotherDeviceSync
-        get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
-
-    private val isMultiDevicePromotion
-        get() = launchSource in SyncActivityViewModel.MULTI_DEVICE_PROMOTIONS
 
     private val backUpNewAccountLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
@@ -337,19 +319,18 @@ class SyncActivity : DuckDuckGoActivity() {
 
         if (savedInstanceState == null) {
             val setupUrl = syncSetupUrl
+            val startSyncFlow = startSyncFlowParams
             when {
                 setupUrl != null -> viewModel.processSetupDeepLink(setupUrl)
-                shouldDeepLinkStartSync -> {
+                startSyncFlow != null -> {
                     // The Sync flow opens only after a background check, so we hide the settings to stop them from flashing until it does.
                     // We can't rely solely on the view state for that, because it arrives asynchronously and misses the first frame.
-                    // Multi-device promotions keep the settings visible, because their flows start from the settings of a syncing user.
-                    binding.root.isInvisible = !isMultiDevicePromotion
-                    when (startSyncFlowParams?.start) {
-                        SyncFlowStart.AskSyncWithDesktop -> viewModel.processSyncWithDesktopDeepLink(launchSource)
-                        else -> viewModel.processSourceDeepLink(launchSource)
-                    }
+                    binding.root.isInvisible = viewModel.processSourceDeepLink(
+                        launchSource = launchSource,
+                        joinExistingAccount = startSyncFlow.joinExistingAccount,
+                        offerDesktopApp = startSyncFlow.offerDesktopApp,
+                    )
                 }
-                isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
             }
         }
     }
@@ -866,5 +847,9 @@ class SyncActivity : DuckDuckGoActivity() {
             .setMessage(getString(error.message) + "\n" + error.reason)
             .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .show()
+    }
+
+    companion object {
+        const val LAUNCH_SOURCE_OTHER = "other"
     }
 }

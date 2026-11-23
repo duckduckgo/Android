@@ -42,11 +42,9 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.DailyStats
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
@@ -159,7 +157,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when signup direct pixel is called with other source then fired pixel includes other source`() {
-        testee.fireSignupDirectPixel(launchSource = SyncLaunchSource.Other)
+        testee.fireSignupDirectPixel(launchSource = "other")
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
@@ -172,7 +170,7 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when signup direct pixel is called with source then fired pixel includes source`() {
-        testee.fireSignupDirectPixel(launchSource = SyncLaunchSource.PromotionBookmarks)
+        testee.fireSignupDirectPixel(launchSource = "promotion_bookmarks")
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
@@ -411,7 +409,7 @@ class RealSyncPixelsTest {
     fun `when setup finished without a path then the pixel is fired`(
         @TestParameter screenType: ScreenType,
     ) {
-        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other, path = null, myRole = null, peerKind = null)
+        testee.fireSyncSetupFinishedSuccessfully(screenType, "other", path = null, myRole = null, peerKind = null)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
@@ -427,7 +425,18 @@ class RealSyncPixelsTest {
 
     @Test
     fun `when setup finished then the pixel carries the launch source`(
-        @TestParameter launchSource: SyncLaunchSource,
+        @TestParameter(
+            "promotion_bookmarks",
+            "promotion_bookmarks_multi_device",
+            "promotion_passwords",
+            "promotion_passwords_multi_device",
+            "promotion_bookmark_added_dialog",
+            "promotion_bookmark_multi_device_added_dialog",
+            "promotion_ai_chat",
+            "promotion_passwords_import",
+            "promotion_bookmarks_import",
+            "other",
+        ) launchSource: String,
     ) {
         testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT, launchSource, path = null, myRole = null, peerKind = null)
 
@@ -437,28 +446,46 @@ class RealSyncPixelsTest {
                 SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2.1",
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
                 SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to ScreenType.SYNC_CONNECT.value,
-                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to launchSource.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to launchSource,
                 SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
             ),
         )
     }
 
     @Test
-    fun `when launch source is not a known promotion then it maps to other`() {
-        assertEquals(SyncLaunchSource.Other, SyncLaunchSource.from("duckai_card"))
-        assertEquals(SyncLaunchSource.Other, SyncLaunchSource.from(null))
+    fun `when setup finished with an unknown launch source then the pixel carries other`() {
+        testee.fireSyncSetupFinishedSuccessfully(ScreenType.SYNC_CONNECT, "duckai_card", path = null, myRole = null, peerKind = null)
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_FLOW_VERSION to "v2.1",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to ScreenType.SYNC_CONNECT.value,
+                SyncPixelParameters.SYNC_SETUP_LAUNCH_SOURCE to "other",
+                SyncPixelParameters.SYNC_SETUP_MY_KIND to "ddg",
+            ),
+        )
     }
 
     @Test
-    fun `when launch source is a known promotion then it maps to that promotion`() {
-        assertEquals(SyncLaunchSource.PromotionPasswordsImport, SyncLaunchSource.from("promotion_passwords_import"))
+    fun `when signup direct pixel is called with an unknown source then fired pixel includes other source`() {
+        testee.fireSignupDirectPixel(launchSource = "duckai_card")
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_DIRECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "other",
+            ),
+        )
     }
 
     @Test
     fun `when setup finished for a recovery path then the pixel carries the path`(
         @TestParameter screenType: ScreenType,
     ) {
-        testee.fireSyncSetupFinishedSuccessfully(screenType, SyncLaunchSource.Other, SetupPath.RECOVERY, myRole = null, peerKind = null)
+        testee.fireSyncSetupFinishedSuccessfully(screenType, "other", SetupPath.RECOVERY, myRole = null, peerKind = null)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_SUCCESS,
@@ -479,7 +506,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSyncSetupFinishedSuccessfully(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             SetupPath.PAIRING,
             SetupRole.HOST,
             PeerKind.THIRD_PARTY,
@@ -506,7 +533,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSyncSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             SetupFailureReason.TRANSPORT_FAILURE,
             SetupPath.PAIRING,
             SetupRole.JOINER,
@@ -533,7 +560,7 @@ class RealSyncPixelsTest {
     fun `when setup failed without path role and peer then those params are omitted`(
         @TestParameter screenType: ScreenType,
     ) {
-        testee.fireSyncSetupFailed(screenType, SyncLaunchSource.Other, SetupFailureReason.UNEXPECTED_FAILURE)
+        testee.fireSyncSetupFailed(screenType, "other", SetupFailureReason.UNEXPECTED_FAILURE)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
@@ -554,7 +581,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.UpgradeRequired(codeMajor = 3, path = SetupPath.PAIRING, myRole = SetupRole.HOST),
         )
 
@@ -579,7 +606,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(
                 reason = "boom",
                 code = AccountErrorCodes.INVALID_CODE.code,
@@ -605,12 +632,12 @@ class RealSyncPixelsTest {
     fun `when setup failed for cancellation codes then pixel is not fired`() {
         testee.fireSetupFailed(
             ScreenType.SYNC_CONNECT,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "user", code = AccountErrorCodes.PAIRING_CANCELLED.code),
         )
         testee.fireSetupFailed(
             ScreenType.SYNC_CONNECT,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
         )
 
@@ -623,7 +650,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "Session timed out", code = AccountErrorCodes.SESSION_TIMEOUT.code),
         )
 
@@ -646,7 +673,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "create_account_failed", code = AccountErrorCodes.CREATE_ACCOUNT_FAILED.code),
         )
 
@@ -669,7 +696,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "upgrade_failed", code = AccountErrorCodes.ACCOUNT_UPGRADE_FAILED.code),
         )
 
@@ -692,7 +719,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "same_account", code = AccountErrorCodes.ALREADY_PAIRED.code),
         )
 
@@ -714,7 +741,7 @@ class RealSyncPixelsTest {
         @TestParameter screenType: ScreenType,
     ) {
         // v2 same-account case: both peers exchange intros and discover a matching user_id
-        testee.fireSetupFailed(screenType, SyncLaunchSource.Other, DispatchOutcome.AlreadyConnected)
+        testee.fireSetupFailed(screenType, "other", DispatchOutcome.AlreadyConnected)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
@@ -736,7 +763,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(
                 reason = "Session timed out",
                 code = AccountErrorCodes.SESSION_TIMEOUT.code,
@@ -764,7 +791,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupFailed(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "pairing_unavailable", code = AccountErrorCodes.PAIRING_UNAVAILABLE.code),
         )
 
@@ -785,7 +812,7 @@ class RealSyncPixelsTest {
     fun `when setup abandoned with a reason then the pixel carries the reason`(
         @TestParameter screenType: ScreenType,
     ) {
-        testee.fireSyncSetupAbandoned(screenType, SyncLaunchSource.Other, CancellationReason.CANCELLED_BEFORE_FINISHED)
+        testee.fireSyncSetupAbandoned(screenType, "other", CancellationReason.CANCELLED_BEFORE_FINISHED)
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -804,7 +831,7 @@ class RealSyncPixelsTest {
     fun `when setup abandoned without a reason then the reason is omitted`(
         @TestParameter screenType: ScreenType,
     ) {
-        testee.fireSyncSetupAbandoned(screenType, SyncLaunchSource.Other)
+        testee.fireSyncSetupAbandoned(screenType, "other")
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
@@ -824,7 +851,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupCancelledIfDenied(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "user_denied", code = AccountErrorCodes.PAIRING_CANCELLED.code),
         )
 
@@ -847,7 +874,7 @@ class RealSyncPixelsTest {
     ) {
         testee.fireSetupCancelledIfDenied(
             screenType,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "peer", code = AccountErrorCodes.PAIRING_REJECTED.code),
         )
 
@@ -868,7 +895,7 @@ class RealSyncPixelsTest {
     fun `when setup cancelled if denied for a non cancellation outcome then pixel is not fired`() {
         testee.fireSetupCancelledIfDenied(
             ScreenType.SYNC_CONNECT,
-            SyncLaunchSource.Other,
+            "other",
             DispatchOutcome.Failed(reason = "boom", code = AccountErrorCodes.PAIRING_FAILED.code),
         )
 

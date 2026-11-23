@@ -52,7 +52,6 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeCameraBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
@@ -83,8 +82,8 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             "Missing fragment argument: '$ENTRY_POINT_ARG'"
         }
 
-    private val launchSource: SyncLaunchSource
-        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), LAUNCH_SOURCE_ARG, SyncLaunchSource::class.java)) {
+    private val launchSource: String
+        get() = requireNotNull(requireArguments().getString(LAUNCH_SOURCE_ARG)) {
             "Missing fragment argument: '$LAUNCH_SOURCE_ARG'"
         }
 
@@ -373,7 +372,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
         fun instance(
             entryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ) = ReadSyncCodeCameraFragment().apply {
             arguments = bundleOf(
                 ENTRY_POINT_ARG to entryPoint,

@@ -38,6 +38,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin.Callback
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarksMultiDevicePromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
@@ -50,8 +51,6 @@ import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksMultiDeviceProm
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksMultiDevicePromotionViewModel.Command.DismissPromotion
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksMultiDevicePromotionViewModel.Command.LaunchGetDesktopApp
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksMultiDevicePromotionViewModel.Command.LaunchSyncSettings
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -133,7 +132,10 @@ class SyncBookmarksMultiDevicePromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSettings() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarksMultiDevice))
+        globalActivityStarter.start(
+            context,
+            SyncActivityStartSyncFlow(source = "promotion_bookmarks_multi_device"),
+        )
     }
 
     private suspend fun launchGetDesktopApp() {

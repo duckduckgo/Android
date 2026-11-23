@@ -131,6 +131,8 @@ class AppSyncDeviceIdsTest {
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
 
+            override fun cachedIsSignedIn(): Boolean? = null
+
             override fun isSignedIn(): Boolean = primaryKey != null
 
             override fun storeCredentials(
@@ -176,6 +178,8 @@ class AppSyncDeviceIdsTest {
             override var auditLogLastSeenEntryId: String? = null
 
             override fun isSignedInFlow() = emptyFlow<Boolean>()
+
+            override fun cachedIsSignedIn(): Boolean? = null
 
             override fun isSignedIn(): Boolean = false
 

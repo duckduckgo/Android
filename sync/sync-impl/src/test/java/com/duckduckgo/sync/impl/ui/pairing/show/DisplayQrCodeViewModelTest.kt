@@ -40,7 +40,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
@@ -110,7 +109,7 @@ class DisplayQrCodeViewModelTest {
         whenever(accountRepository.getAccountInfo()).thenReturn(AccountInfo(isSignedIn = false))
     }
 
-    private fun createTestee(source: SyncLaunchSource = SyncLaunchSource.Other) = DisplayQrCodeViewModel(
+    private fun createTestee(source: String = "other") = DisplayQrCodeViewModel(
         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         launchSource = source,
         accountRepository = accountRepository,
@@ -130,7 +129,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, SyncLaunchSource.Other, SetupPath.PAIRING, null, null)
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_EXCHANGE, "other", SetupPath.PAIRING, null, null)
     }
 
     @Test
@@ -336,7 +335,7 @@ class DisplayQrCodeViewModelTest {
             cancel()
         }
         verify(pixels).fireLoginPixel()
-        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SyncLaunchSource.Other, SetupPath.PAIRING, null, null)
+        verify(pixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, "other", SetupPath.PAIRING, null, null)
     }
 
     @Test
@@ -452,7 +451,7 @@ class DisplayQrCodeViewModelTest {
 
         verify(pixels).fireSyncSetupFailed(
             SYNC_CONNECT,
-            SyncLaunchSource.Other,
+            "other",
             SetupFailureReason.UNEXPECTED_FAILURE,
             SetupPath.PAIRING,
             null,
@@ -467,7 +466,7 @@ class DisplayQrCodeViewModelTest {
 
         createTestee()
 
-        verify(pixels).fireSyncSetupAbandoned(SYNC_CONNECT, SyncLaunchSource.Other, CancellationReason.CONFIRMATION_DENIED)
+        verify(pixels).fireSyncSetupAbandoned(SYNC_CONNECT, "other", CancellationReason.CONFIRMATION_DENIED)
     }
 
     @Test
