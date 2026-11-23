@@ -531,7 +531,7 @@ class RealSubscriptionsManager @Inject constructor(
 
     override suspend fun undoSubscriptionCancellation(activity: Activity): UndoCancellationResult = withContext(dispatcherProvider.io()) {
         try {
-            if (!subscriptionsFeature.value.undoSubscriptionCancellation().isEnabled()) {
+            if (!subscriptionsFeature.value.undoSubscriptionCancellationAllLanguages().isEnabled()) {
                 return@withContext UndoCancellationResult.NotEligible
             }
 

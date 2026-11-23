@@ -136,7 +136,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     private fun canUndoCancellation(subscription: Subscription): Boolean {
-        return subscriptionsFeature.undoSubscriptionCancellation().isEnabled() &&
+        return subscriptionsFeature.undoSubscriptionCancellationAllLanguages().isEnabled() &&
             subscription.status == NOT_AUTO_RENEWABLE &&
             subscription.platform == "google"
     }

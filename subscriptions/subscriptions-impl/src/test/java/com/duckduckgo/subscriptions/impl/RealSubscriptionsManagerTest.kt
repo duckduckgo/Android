@@ -3941,7 +3941,7 @@ class RealSubscriptionsManagerTest {
 
     @SuppressLint("DenyListedApi")
     private fun givenUndoSubscriptionCancellationEnabled(value: Boolean) {
-        subscriptionsFeature.undoSubscriptionCancellation().setRawStoredState(State(remoteEnableState = value))
+        subscriptionsFeature.undoSubscriptionCancellationAllLanguages().setRawStoredState(State(remoteEnableState = value))
     }
 
     private suspend fun givenPlanSwitchStarted(): MutableSharedFlow<PurchaseState> {

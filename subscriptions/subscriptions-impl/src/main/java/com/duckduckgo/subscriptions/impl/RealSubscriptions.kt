@@ -431,10 +431,10 @@ interface SubscriptionsFeature {
     fun stripeTierOptionsByCountry(): Toggle
 
     /**
-     * When enabled, Play subscribers see an option to undo a cancellation
+     * When enabled, Play subscribers in any language see an option to undo a cancellation
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun undoSubscriptionCancellation(): Toggle
+    fun undoSubscriptionCancellationAllLanguages(): Toggle
 
     /**
      * When enabled, the app keeps a backup refresh token and tries it before the Play Store when the backend
