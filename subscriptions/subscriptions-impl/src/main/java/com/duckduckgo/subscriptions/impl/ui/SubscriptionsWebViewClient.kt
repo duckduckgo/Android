@@ -20,10 +20,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.RenderProcessGoneDetail
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import com.duckduckgo.app.browser.SpecialUrlDetector
+import com.duckduckgo.subscriptions.impl.pixels.CancellationFlowLoadFailureReason
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionRestoreWideEvent
 
 class SubscriptionsWebViewClient(
@@ -31,7 +34,29 @@ class SubscriptionsWebViewClient(
     private val context: Context,
     private val onRenderProcessCrash: () -> Boolean,
     private val subscriptionRestoreWideEvent: SubscriptionRestoreWideEvent,
+    private val onMainFrameLoadError: ((reason: CancellationFlowLoadFailureReason, errorCode: Int) -> Unit)? = null,
 ) : WebViewClient() {
+
+    override fun onReceivedHttpError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        errorResponse: WebResourceResponse?,
+    ) {
+        val statusCode = errorResponse?.statusCode ?: return
+        if (request?.isForMainFrame == true && statusCode >= 400) {
+            onMainFrameLoadError?.invoke(CancellationFlowLoadFailureReason.HTTP, statusCode)
+        }
+    }
+
+    override fun onReceivedError(
+        view: WebView?,
+        request: WebResourceRequest?,
+        error: WebResourceError?,
+    ) {
+        if (request?.isForMainFrame == true) {
+            onMainFrameLoadError?.invoke(CancellationFlowLoadFailureReason.NETWORK, error?.errorCode ?: ERROR_UNKNOWN)
+        }
+    }
 
     override fun shouldOverrideUrlLoading(
         view: WebView,
