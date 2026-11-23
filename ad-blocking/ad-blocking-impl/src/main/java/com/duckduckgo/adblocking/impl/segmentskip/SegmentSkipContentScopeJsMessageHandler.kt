@@ -82,7 +82,7 @@ class SegmentSkipContentScopeJsMessageHandler @Inject constructor(
     )
 
     companion object {
-        internal const val FEATURE_NAME = "sponsorBlock"
+        internal const val FEATURE_NAME = "segmentSkip"
         private const val METHOD_GET_SEGMENTS = "getSegments"
         private const val METHOD_GET_CONFIG = "getConfig"
         private const val PARAM_VIDEO_ID = "videoID"
