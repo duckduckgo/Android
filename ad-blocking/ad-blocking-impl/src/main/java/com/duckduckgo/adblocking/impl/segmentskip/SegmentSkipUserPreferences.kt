@@ -40,7 +40,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -94,7 +94,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
                 try {
                     setModeMutex.withLock {
                         if (consent.value == null) {
-                            consent.value = dataStore.data.first().hasStoredConsent()
+                            consent.value = dataStore.data.firstOrNull()?.hasStoredConsent() == true
                         }
                     }
                 } catch (_: IOException) {
