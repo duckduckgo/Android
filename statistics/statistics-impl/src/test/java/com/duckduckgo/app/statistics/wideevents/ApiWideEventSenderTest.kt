@@ -32,6 +32,7 @@ import com.duckduckgo.common.utils.device.DeviceInfo
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.ResponseBody.Companion.toResponseBody
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Rule
@@ -561,6 +562,33 @@ class ApiWideEventSenderTest {
         assertFalse(requestCaptor.firstValue.toString().contains(PROCESS_START_CLEANUP_POLICY.ownerProcessName))
     }
 
+    @Test
+    fun `when event has a path then its steps and last step are sent and replace metadata with the same keys`() = runTest {
+        val event = createWideEvent(
+            id = 1L,
+            name = "flow",
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = mapOf("plan_type" to "premium", "last_step" to "stale"),
+            path = WideEventRepository.WideEventPath(
+                steps = listOf("started", "code_screen", "code_entry", "code_screen"),
+                lastStep = "code_screen",
+            ),
+        )
+
+        apiWideEventSender.sendWideEvent(event)
+
+        val requestCaptor = argumentCaptor<WideEventRequest>()
+        verify(wideEventService).sendWideEvent(requestCaptor.capture())
+        assertEquals(
+            mapOf(
+                "plan_type" to "premium",
+                "steps" to "started,code_screen,code_entry,code_screen",
+                "last_step" to "code_screen",
+            ),
+            requestCaptor.firstValue.feature.data?.ext,
+        )
+    }
+
     private fun createWideEvent(
         id: Long,
         name: String,
@@ -574,6 +602,7 @@ class ApiWideEventSenderTest {
         isFirstDailyOccurrence: Boolean = false,
         appVersion: String = "5.123.0",
         cleanupPolicy: WideEventRepository.CleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        path: WideEventRepository.WideEventPath? = null,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -589,6 +618,7 @@ class ApiWideEventSenderTest {
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
         appVersion = appVersion,
+        path = path,
     )
 
     private companion object {

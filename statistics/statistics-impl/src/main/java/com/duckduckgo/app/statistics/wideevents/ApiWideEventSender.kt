@@ -97,6 +97,11 @@ class ApiWideEventSender @Inject constructor(
             extData["step.$name"] = success.toString()
         }
 
+        event.path?.let { path ->
+            extData[PATH_STEPS_KEY] = path.steps.joinToString(",")
+            extData[PATH_LAST_STEP_KEY] = path.lastStep
+        }
+
         return if (extData.isNotEmpty()) {
             FeatureData(ext = extData)
         } else {
@@ -108,6 +113,8 @@ class ApiWideEventSender @Inject constructor(
         const val PLATFORM = "Android"
         const val TYPE = "app"
         const val APP_NAME = "DuckDuckGo Android"
+        const val PATH_STEPS_KEY = "steps"
+        const val PATH_LAST_STEP_KEY = "last_step"
     }
 }
 

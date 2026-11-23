@@ -83,6 +83,31 @@ class WideEventRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun appendToWideEventPath(
+        eventId: Long,
+        step: String,
+        metadata: Map<String, String?>,
+    ) {
+        val pathStep = step.filterNot { it == ',' }
+        require(pathStep.isNotEmpty()) { "Path step must not be empty: '$step'" }
+
+        updateWideEvent(eventId) { event ->
+            checkEventIsActive(event)
+
+            val path = when {
+                pathStep == event.lastPathStep -> event.path
+                event.path.size < WideEventRepository.MAX_PATH_SIZE -> event.path + pathStep
+                else -> event.path.take(WideEventRepository.MAX_PATH_SIZE - 1) + WideEventRepository.PATH_TRUNCATED
+            }
+
+            event.copy(
+                path = path,
+                lastPathStep = pathStep,
+                metadata = mergeMetadata(event.metadata, metadata),
+            )
+        }
+    }
+
     override suspend fun setWideEventStatus(
         eventId: Long,
         status: WideEventRepository.WideEventStatus,

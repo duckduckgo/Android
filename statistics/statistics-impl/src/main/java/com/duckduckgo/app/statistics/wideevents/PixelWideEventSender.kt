@@ -64,10 +64,15 @@ class PixelWideEventSender @Inject constructor(
             }
 
         val encodedParameters =
-            event.metadata
-                .filterValues { it != null }
-                .mapValues { it.value!! }
-                .mapKeys { PARAM_METADATA_PREFIX + it.key }
+            buildMap {
+                event.metadata.forEach { (key, value) ->
+                    if (value != null) put(PARAM_METADATA_PREFIX + key, value)
+                }
+                event.path?.let { path ->
+                    put(PARAM_PATH_STEPS, path.steps.joinToString(","))
+                    put(PARAM_PATH_LAST_STEP, path.lastStep)
+                }
+            }
 
         val basePixelName = PIXEL_NAME_PREFIX + event.name
         val countPixelName = basePixelName + COUNT_PIXEL_SUFFIX
@@ -137,6 +142,8 @@ class PixelWideEventSender @Inject constructor(
 
         const val PARAM_METADATA_PREFIX = "feature.data.ext."
         const val PARAM_METADATA_STEP_PREFIX = PARAM_METADATA_PREFIX + "step."
+        const val PARAM_PATH_STEPS = PARAM_METADATA_PREFIX + "steps"
+        const val PARAM_PATH_LAST_STEP = PARAM_METADATA_PREFIX + "last_step"
     }
 }
 

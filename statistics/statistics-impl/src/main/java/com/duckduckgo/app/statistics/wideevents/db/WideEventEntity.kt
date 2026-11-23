@@ -62,6 +62,10 @@ data class WideEventEntity(
     val isFirstDailyOccurrence: Boolean = false,
     @ColumnInfo(name = "app_version")
     val appVersion: String,
+    @ColumnInfo(name = "path", defaultValue = "[]")
+    val path: List<String> = emptyList(),
+    @ColumnInfo(name = "last_path_step")
+    val lastPathStep: String? = null,
 ) {
     data class MetadataEntry(
         @Json(name = "key")
@@ -174,6 +178,10 @@ class WideEventEntityTypeConverters @Inject constructor(
         )
     }
 
+    private val stringListAdapter: JsonAdapter<List<String>> by lazy {
+        moshi.adapter(Types.newParameterizedType(List::class.java, String::class.java))
+    }
+
     private val cleanupPolicyAdapter: JsonAdapter<WideEventEntity.CleanupPolicy> by lazy {
         moshi.adapter(WideEventEntity.CleanupPolicy::class.java)
     }
@@ -198,6 +206,12 @@ class WideEventEntityTypeConverters @Inject constructor(
 
     @TypeConverter
     fun toWideEventStepList(value: String): List<WideEventEntity.WideEventStep> = wideEventStepListAdapter.fromJson(value) ?: emptyList()
+
+    @TypeConverter
+    fun fromStringList(value: List<String>): String = stringListAdapter.toJson(value)
+
+    @TypeConverter
+    fun toStringList(value: String): List<String> = stringListAdapter.fromJson(value) ?: emptyList()
 
     @TypeConverter
     fun fromWideEventStatus(status: WideEventEntity.WideEventStatus?): String? = status?.statusCode

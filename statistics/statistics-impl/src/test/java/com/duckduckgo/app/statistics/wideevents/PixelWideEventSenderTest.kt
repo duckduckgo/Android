@@ -241,6 +241,35 @@ class PixelWideEventSenderTest {
         assertFalse(sent.keys.any { it.contains("owner") })
     }
 
+    @Test
+    fun `when event has a path then its steps and last step are sent and replace metadata with the same keys`() = runTest {
+        val event = createWideEvent(
+            id = 1L,
+            name = "flow",
+            status = WideEventRepository.WideEventStatus.UNKNOWN,
+            metadata = mapOf("plan_type" to "premium", "last_step" to "stale"),
+            path = WideEventRepository.WideEventPath(
+                steps = listOf("started", "code_screen", "code_entry", "code_screen"),
+                lastStep = "code_screen",
+            ),
+        )
+
+        pixelWideEventSender.sendWideEvent(event)
+
+        verify(pixel).enqueueFire(
+            pixelName = eq("wide_flow_c"),
+            parameters = any(),
+            encodedParameters = eq(
+                mapOf(
+                    "feature.data.ext.plan_type" to "premium",
+                    "feature.data.ext.steps" to "started,code_screen,code_entry,code_screen",
+                    "feature.data.ext.last_step" to "code_screen",
+                ),
+            ),
+            type = any(),
+        )
+    }
+
     private fun createWideEvent(
         id: Long,
         name: String,
@@ -254,6 +283,7 @@ class PixelWideEventSenderTest {
         isFirstDailyOccurrence: Boolean = false,
         appVersion: String = "5.123.0",
         cleanupPolicy: WideEventRepository.CleanupPolicy = DEFAULT_CLEANUP_POLICY,
+        path: WideEventRepository.WideEventPath? = null,
     ) = WideEventRepository.WideEvent(
         id = id,
         name = name,
@@ -269,6 +299,7 @@ class PixelWideEventSenderTest {
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
         appVersion = appVersion,
+        path = path,
     )
 
     private companion object {

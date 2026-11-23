@@ -32,6 +32,7 @@ fun WideEventEntity.mapToRepositoryWideEvent(): WideEventRepository.WideEvent =
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
         appVersion = appVersion,
+        path = lastPathStep?.let { WideEventRepository.WideEventPath(steps = path, lastStep = it) },
     )
 
 fun WideEventRepository.WideEventStatus.mapToDbWideEventStatus(): WideEventEntity.WideEventStatus =

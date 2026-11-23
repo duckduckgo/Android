@@ -57,6 +57,19 @@ wideEventClient.flowFinish(
 wideEventClient.flowAbort(wideEventId = flowId)
 ```
 
+### Recording the path
+
+`flowStep` records each step's outcome once, as `step.<name>`. To record where the flow went, in order and with returns
+to earlier steps, use `flowAppendToPath` instead of keeping `last_step` in metadata by hand:
+
+```kotlin
+wideEventClient.flowAppendToPath(wideEventId = flowId, step = "code_screen")
+```
+
+It sends `steps` (comma-separated, at most 20 entries, ending with `truncated` when longer) and `last_step`. A step equal
+to the previous one isn't added again, so re-renders and rotations are safe to report. The path is stored with the
+event, so a flow finished by its `CleanupPolicy` still sends it.
+
 ### FlowStatus
 
 ```kotlin

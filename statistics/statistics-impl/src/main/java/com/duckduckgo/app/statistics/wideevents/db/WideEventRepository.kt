@@ -37,6 +37,16 @@ interface WideEventRepository {
         metadata: Map<String, String?>,
     )
 
+    /**
+     * Appends [step] with its commas dropped to the event's path, unless it equals the last appended step. A path past
+     * [MAX_PATH_SIZE] entries keeps its first entries and ends with [PATH_TRUNCATED]. [metadata] is merged either way.
+     */
+    suspend fun appendToWideEventPath(
+        eventId: Long,
+        step: String,
+        metadata: Map<String, String?>,
+    )
+
     suspend fun setWideEventStatus(
         eventId: Long,
         status: WideEventStatus,
@@ -92,6 +102,16 @@ interface WideEventRepository {
         val metaVersion: String,
         val isFirstDailyOccurrence: Boolean = false,
         val appVersion: String,
+        val path: WideEventPath? = null,
+    )
+
+    /**
+     * @param steps Steps in the order they were appended, at most [MAX_PATH_SIZE] entries.
+     * @param lastStep The latest appended step, kept when [steps] ends with [PATH_TRUNCATED].
+     */
+    data class WideEventPath(
+        val steps: List<String>,
+        val lastStep: String,
     )
 
     data class WideEventStep(
@@ -141,4 +161,9 @@ interface WideEventRepository {
         val status: WideEventStatus,
         val metadata: Map<String, String>,
     )
+
+    companion object {
+        const val MAX_PATH_SIZE = 20
+        const val PATH_TRUNCATED = "truncated"
+    }
 }
