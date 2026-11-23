@@ -357,6 +357,14 @@
                     tools:visibility="visible" />
 
                 <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/cancelSubscription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:primaryText="@string/subscriptionSettingCancelSubscription"
+                    tools:visibility="visible" />
+
+                <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                     android:id="@+id/viewPlans"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

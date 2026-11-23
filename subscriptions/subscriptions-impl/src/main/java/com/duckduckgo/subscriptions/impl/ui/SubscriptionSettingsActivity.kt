@@ -21,6 +21,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -68,6 +69,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPlayStoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchCancellationFlow
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
@@ -107,6 +109,12 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         onDismissed = { viewModel.onWithdrawalDialogDismissed() },
         onHelpLinkClicked = { viewModel.onWithdrawalHelpLinkClicked() },
     )
+
+    private val cancellationFlowLauncher = registerForActivityResult(StartActivityForResult()) { result ->
+        viewModel.onCancellationFlowFinished(
+            storeCancellationRequested = result.resultCode == SubscriptionsWebViewActivity.RESULT_STORE_CANCELLATION_REQUESTED,
+        )
+    }
 
     private val toolbar
         get() = binding.includeToolbar.toolbar
@@ -184,6 +192,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             viewModel.onKeepSubscriptionClicked(this)
         }
 
+        binding.cancelSubscription.setClickListener {
+            viewModel.onCancelSubscriptionClicked()
+        }
+
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
         }
@@ -224,6 +236,13 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.verticalTierDivider.isVisible = false
         binding.pendingDowngradeInfoPanel.gone()
         binding.undoCancellationContainer.isVisible = false
+        binding.cancelSubscription.isVisible = false
+        val changePlanTitle = if (viewState.isCancellationFlowAvailable) {
+            string.subscriptionSettingManageSubscription
+        } else {
+            string.subscriptionSettingManagePaymentOrCancel
+        }
+        binding.changePlan.setPrimaryText(getString(changePlanTitle))
         binding.subscriptionActiveStatusIcon.setImageResource(drawable.ic_dot_green)
         binding.subscriptionActiveStatusIcon.contentDescription = getString(string.subscriptionActiveStatusIconContentDescription)
 
@@ -238,6 +257,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         } else {
             binding.viewPlans.isVisible = false
             binding.changePlan.isVisible = true
+            binding.cancelSubscription.isVisible = viewState.showCancelSubscription
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
 
@@ -325,7 +345,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 else -> {
                     binding.changePlan.setClickListener {
                         pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
-                        goToPlayStoreSubscription(viewState.subscriptionTier)
+                        viewModel.onManagePlayStoreSubscriptionClicked()
                     }
                 }
             }
@@ -426,7 +446,17 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             GoToPlayStoreSubscription -> (viewModel.viewState.value as? ViewState.Ready)?.let { goToPlayStoreSubscription(it.subscriptionTier) }
             ShowWithdrawalDialogError -> withdrawalDialog.showError()
             GoToWithdrawalHelp -> goToWithdrawalHelp()
+            LaunchCancellationFlow -> launchCancellationFlow()
         }
+    }
+
+    private fun launchCancellationFlow() {
+        val intent = globalActivityStarter.startIntent(this, SubscriptionCancellationFlowScreen)
+        if (intent == null) {
+            viewModel.onCancellationFlowFinished(storeCancellationRequested = true)
+            return
+        }
+        cancellationFlowLauncher.launch(intent)
     }
 
     private fun goToPlayStoreSubscription(tier: SubscriptionTier) {

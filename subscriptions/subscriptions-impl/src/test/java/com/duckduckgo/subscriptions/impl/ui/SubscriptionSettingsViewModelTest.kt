@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
@@ -24,6 +25,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.UndoCancellationResult
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
+import com.duckduckgo.subscriptions.impl.pixels.CancellationEntry
+import com.duckduckgo.subscriptions.impl.pixels.DaysSincePurchaseBucket
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
@@ -36,6 +39,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPlayStoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchCancellationFlow
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
@@ -64,6 +68,7 @@ import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.math.BigDecimal
+import java.util.Locale
 
 @SuppressLint("DenyListedApi")
 @RunWith(AndroidJUnit4::class)
@@ -81,6 +86,7 @@ class SubscriptionSettingsViewModelTest {
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val subscriptionWithdrawal: SubscriptionWithdrawal = mock()
+    private val appBuildConfig: AppBuildConfig = mock()
     private val currentPurchaseState = MutableSharedFlow<CurrentPurchase>()
 
     private lateinit var viewModel: SubscriptionSettingsViewModel
@@ -89,6 +95,7 @@ class SubscriptionSettingsViewModelTest {
     fun before() {
         runBlocking { whenever(subscriptionOnboardingExperiments.isTreatment()).thenReturn(false) }
         whenever(subscriptionsManager.currentPurchaseState).thenReturn(currentPurchaseState)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.US)
         viewModel = SubscriptionSettingsViewModel(
             subscriptionsManager,
             pixelSender,
@@ -99,6 +106,7 @@ class SubscriptionSettingsViewModelTest {
             subscriptionOnboardingExperiments,
             currentTimeProvider,
             subscriptionWithdrawal,
+            appBuildConfig,
         )
     }
 
@@ -1363,6 +1371,204 @@ class SubscriptionSettingsViewModelTest {
         }
     }
 
+    @Test
+    fun whenCancellationFlowEnabledForAutoRenewableGoogleSubscriptionThenShowCancelSubscription() = runTest {
+        givenCancellationFlowEnabled(true)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        val state = viewModel.viewState.value as Ready
+        assertTrue(state.isCancellationFlowAvailable)
+        assertTrue(state.showCancelSubscription)
+    }
+
+    @Test
+    fun whenCancellationFlowEnabledForCancelledGoogleSubscriptionThenShowManageButNotCancel() = runTest {
+        givenCancellationFlowEnabled(true)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        val state = viewModel.viewState.value as Ready
+        assertTrue(state.isCancellationFlowAvailable)
+        assertFalse(state.showCancelSubscription)
+    }
+
+    @Test
+    fun whenCancellationFlowDisabledThenDoNotShowCancelSubscription() = runTest {
+        givenCancellationFlowEnabled(false)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        val state = viewModel.viewState.value as Ready
+        assertFalse(state.isCancellationFlowAvailable)
+        assertFalse(state.showCancelSubscription)
+    }
+
+    @Test
+    fun whenCancellationFlowEnabledForNonGoogleSubscriptionThenDoNotShowCancelSubscription() = runTest {
+        givenCancellationFlowEnabled(true)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "stripe")
+
+        viewModel.onCreate(mock())
+
+        val state = viewModel.viewState.value as Ready
+        assertFalse(state.isCancellationFlowAvailable)
+        assertFalse(state.showCancelSubscription)
+    }
+
+    @Test
+    fun whenCancellationFlowEnabledAndLocaleIsNotEnUsThenDoNotShowCancelSubscription() = runTest {
+        givenCancellationFlowEnabled(true)
+        whenever(appBuildConfig.deviceLocale).thenReturn(Locale.UK)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onCreate(mock())
+
+        val state = viewModel.viewState.value as Ready
+        assertFalse(state.isCancellationFlowAvailable)
+        assertFalse(state.showCancelSubscription)
+    }
+
+    @Test
+    fun whenCancelSubscriptionClickedThenReportPixelAndLaunchCancellationFlow() = runTest {
+        viewModel.commands().test {
+            viewModel.onCancelSubscriptionClicked()
+            assertEquals(LaunchCancellationFlow, awaitItem())
+        }
+        verify(pixelSender).reportCancellationFlowCancelClick()
+    }
+
+    @Test
+    fun whenCancelSubscriptionClickedTwiceThenLaunchCancellationFlowOnce() = runTest {
+        viewModel.commands().test {
+            viewModel.onCancelSubscriptionClicked()
+            viewModel.onCancelSubscriptionClicked()
+            assertEquals(LaunchCancellationFlow, awaitItem())
+            expectNoEvents()
+        }
+        verify(pixelSender, times(1)).reportCancellationFlowCancelClick()
+    }
+
+    @Test
+    fun whenCancellationFlowFinishedRequestingStoreCancellationThenGoToPlayStore() = runTest {
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.commands().test {
+            viewModel.onCancellationFlowFinished(storeCancellationRequested = true)
+            assertEquals(GoToPlayStoreSubscription, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenCancellationFlowFinishedWithoutStoreCancellationThenDoNotGoToPlayStore() = runTest {
+        viewModel.commands().test {
+            viewModel.onCancellationFlowFinished(storeCancellationRequested = false)
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenCancellationFlowFinishedThenCancelSubscriptionCanBeClickedAgain() = runTest {
+        viewModel.commands().test {
+            viewModel.onCancelSubscriptionClicked()
+            assertEquals(LaunchCancellationFlow, awaitItem())
+            viewModel.onCancellationFlowFinished(storeCancellationRequested = false)
+            viewModel.onCancelSubscriptionClicked()
+            assertEquals(LaunchCancellationFlow, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenManagePlayStoreSubscriptionClickedThenGoToPlayStore() = runTest {
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+
+        viewModel.commands().test {
+            viewModel.onManagePlayStoreSubscriptionClicked()
+            assertEquals(GoToPlayStoreSubscription, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenReturningFromPlayStoreOpenedByCancellationFlowAndSubscriptionCancelledThenReportCancelled() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1234 + 3 * DAY_MILLIS)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google", activeOffers = listOf(ActiveOfferType.TRIAL))
+        viewModel.onCreate(mock())
+        viewModel.onCancellationFlowFinished(storeCancellationRequested = true)
+        viewModel.onStop(mock())
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google", activeOffers = listOf(ActiveOfferType.TRIAL))
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager).refreshSubscriptionData()
+        verify(pixelSender).reportCancellationFlowPlayStoreCancelled(
+            entry = CancellationEntry.CANCELLATION,
+            isFreeTrial = true,
+            daysSincePurchase = DaysSincePurchaseBucket.D2_7,
+        )
+    }
+
+    @Test
+    fun whenReturningFromPlayStoreOpenedByManageAndSubscriptionCancelledThenReportCancelledWithManageEntry() = runTest {
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(1234 + 40 * DAY_MILLIS)
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+        viewModel.onCreate(mock())
+        viewModel.onManagePlayStoreSubscriptionClicked()
+        viewModel.onStop(mock())
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+
+        viewModel.onResume(mock())
+
+        verify(pixelSender).reportCancellationFlowPlayStoreCancelled(
+            entry = CancellationEntry.MANAGE,
+            isFreeTrial = false,
+            daysSincePurchase = DaysSincePurchaseBucket.D31_PLUS,
+        )
+    }
+
+    @Test
+    fun whenReturningFromPlayStoreAndSubscriptionStillAutoRenewableThenDoNotReportCancelled() = runTest {
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+        viewModel.onCreate(mock())
+        viewModel.onManagePlayStoreSubscriptionClicked()
+        viewModel.onStop(mock())
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager).refreshSubscriptionData()
+        verify(pixelSender, never()).reportCancellationFlowPlayStoreCancelled(any(), any(), any())
+    }
+
+    @Test
+    fun whenResumedBeforeLeavingForPlayStoreThenDoNotCheckCancellation() = runTest {
+        stubReadySubscription(status = AUTO_RENEWABLE, platform = "google")
+        viewModel.onCreate(mock())
+        viewModel.onCancellationFlowFinished(storeCancellationRequested = true)
+
+        viewModel.onResume(mock())
+
+        verify(subscriptionsManager, never()).refreshSubscriptionData()
+    }
+
+    @Test
+    fun whenSubscriptionAlreadyCancelledBeforePlayStoreThenDoNotReportCancelled() = runTest {
+        givenUndoSubscriptionCancellationEnabled(false)
+        stubReadySubscription(status = NOT_AUTO_RENEWABLE, platform = "google")
+        viewModel.onCreate(mock())
+        viewModel.onManagePlayStoreSubscriptionClicked()
+        viewModel.onStop(mock())
+
+        viewModel.onResume(mock())
+
+        verify(pixelSender, never()).reportCancellationFlowPlayStoreCancelled(any(), any(), any())
+    }
+
+    private fun givenCancellationFlowEnabled(enabled: Boolean) {
+        subscriptionsFeature.subscriptionCancellationFlow().setRawStoredState(Toggle.State(enable = enabled))
+    }
+
     private fun givenUndoSubscriptionCancellationEnabled(enabled: Boolean) {
         subscriptionsFeature.undoSubscriptionCancellationAllLanguages().setRawStoredState(Toggle.State(enable = enabled))
     }
@@ -1395,6 +1601,7 @@ class SubscriptionSettingsViewModelTest {
 
     private companion object {
         private const val FIFTEEN_DAYS_MILLIS = 15L * 24 * 60 * 60 * 1000
+        private const val DAY_MILLIS = 24L * 60 * 60 * 1000
 
         // Midday UTC so the formatted date is the same in any test machine timezone
         private val ELIGIBILITY = WithdrawalEligibility(
