@@ -75,6 +75,15 @@ interface AuthRepository {
     suspend fun removeLocalPurchasedAt()
     suspend fun setPendingPlans(pendingPlans: List<PendingPlan>)
     suspend fun getPendingPlans(): List<PendingPlan>
+    suspend fun saveTokensV2(
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+        entitlements: List<Entitlement>,
+        account: Account,
+    ): Boolean
+    suspend fun clearTokens()
+    suspend fun isTokenStoreAvailable(): Boolean
+    suspend fun hasRefreshTokenEntry(): Boolean
 }
 
 @BindingContainer
@@ -82,13 +91,19 @@ interface AuthRepository {
 object AuthRepositoryModule {
     @Provides
     @SingleIn(AppScope::class)
+    fun provideSubscriptionsDataStore(sharedPreferencesProvider: SharedPreferencesProvider): SubscriptionsDataStore {
+        return SubscriptionsEncryptedDataStore(sharedPreferencesProvider)
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
     fun provideAuthRepository(
+        subscriptionsDataStore: SubscriptionsDataStore,
         dispatcherProvider: DispatcherProvider,
-        sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
         subscriptionsFeature: Lazy<SubscriptionsFeature>,
     ): AuthRepository {
-        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, subscriptionsFeature)
+        return RealAuthRepository(subscriptionsDataStore, dispatcherProvider, serpPromo, subscriptionsFeature)
     }
 }
 
@@ -381,7 +396,41 @@ internal class RealAuthRepository constructor(
             }.getOrDefault(emptyList())
         } ?: emptyList()
     }
+
+    override suspend fun saveTokensV2(
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+        entitlements: List<Entitlement>,
+        account: Account,
+    ): Boolean = withContext(dispatcherProvider.io()) {
+        val saved = subscriptionsDataStore.saveTokensV2(
+            accessToken = accessToken.jwt,
+            accessTokenExpiresAt = accessToken.expiresAt,
+            refreshToken = refreshToken.jwt,
+            refreshTokenExpiresAt = refreshToken.expiresAt,
+            entitlements = moshi.listToJson(entitlements),
+            email = account.email,
+            externalId = account.externalId,
+        )
+        if (saved) updateSerpPromoCookie()
+        saved
+    }
+
+    override suspend fun clearTokens() = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.clearTokens()
+        updateSerpPromoCookie()
+    }
+
+    override suspend fun isTokenStoreAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.isAvailable()
+    }
+
+    override suspend fun hasRefreshTokenEntry(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.hasRefreshTokenV2Entry()
+    }
 }
+
+class TokenStoreException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 data class AccessToken(
     val jwt: String,

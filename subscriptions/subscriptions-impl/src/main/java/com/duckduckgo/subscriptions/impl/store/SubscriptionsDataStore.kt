@@ -55,6 +55,22 @@ interface SubscriptionsDataStore {
     var pendingPlans: String?
 
     fun canUseEncryption(): Boolean
+
+    fun isAvailable(): Boolean
+
+    fun hasRefreshTokenV2Entry(): Boolean
+
+    fun saveTokensV2(
+        accessToken: String,
+        accessTokenExpiresAt: Instant,
+        refreshToken: String,
+        refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
+    ): Boolean
+
+    fun clearTokens(): Boolean
 }
 
 /**
@@ -260,6 +276,46 @@ internal class SubscriptionsEncryptedDataStore(
     override fun canUseEncryption(): Boolean {
         encryptedPreferences?.edit(commit = true) { putBoolean("test", true) }
         return encryptedPreferences?.getBoolean("test", false) == true
+    }
+
+    override fun isAvailable(): Boolean = encryptedPreferences != null
+
+    // A key that exists but reads as null is a value the store could not decrypt
+    override fun hasRefreshTokenV2Entry(): Boolean = encryptedPreferences?.contains(KEY_REFRESH_TOKEN_V2) == true
+
+    override fun saveTokensV2(
+        accessToken: String,
+        accessTokenExpiresAt: Instant,
+        refreshToken: String,
+        refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
+    ): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor
+            .putString(KEY_ACCESS_TOKEN_V2, accessToken)
+            .putLong(KEY_ACCESS_TOKEN_V2_EXPIRES_AT, accessTokenExpiresAt.toEpochMilli())
+            .putString(KEY_REFRESH_TOKEN_V2, refreshToken)
+            .putLong(KEY_REFRESH_TOKEN_V2_EXPIRES_AT, refreshTokenExpiresAt.toEpochMilli())
+            .putString(KEY_ENTITLEMENTS, entitlements)
+            .putString(KEY_EMAIL, email)
+            .putString(KEY_EXTERNAL_ID, externalId)
+            .commit()
+    }
+
+    override fun clearTokens(): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor
+            .remove(KEY_ACCESS_TOKEN_V2)
+            .remove(KEY_ACCESS_TOKEN_V2_EXPIRES_AT)
+            .remove(KEY_REFRESH_TOKEN_V2)
+            .remove(KEY_REFRESH_TOKEN_V2_EXPIRES_AT)
+            .remove(KEY_ACCESS_TOKEN)
+            .remove(KEY_AUTH_TOKEN)
+            .remove(KEY_EMAIL)
+            .remove(KEY_EXTERNAL_ID)
+            .commit()
     }
 
     companion object {
