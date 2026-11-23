@@ -99,23 +99,23 @@ class RealSegmentSkipUserPreferencesTest {
     }
 
     @Test
-    fun whenMvpEnabledThenNoticeCannotGrantConsentAfterReenabling() = runTest {
+    fun whenMvpEnabledAndNoNoticeThenReenablingDoesNotGrantConsent() = runTest {
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
         testee.setMode(SegmentSkipMode.OFF)
-        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = false)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(false, testee.consentFlow().first())
         assertEquals(false, testee.hasConsent())
     }
 
     @Test
-    fun whenMvpEnabledThenExistingConsentDoesNotAllowTelemetry() = runTest {
+    fun whenMvpEnabledThenExistingConsentStillAllowsTelemetry() = runTest {
         testee.setMode(SegmentSkipMode.OFF)
         testee.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(true, testee.hasConsent())
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
-        assertEquals(false, testee.hasConsent())
+        assertEquals(true, testee.hasConsent())
     }
 
     @Test
