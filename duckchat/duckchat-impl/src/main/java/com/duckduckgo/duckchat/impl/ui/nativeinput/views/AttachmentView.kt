@@ -55,6 +55,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
+import com.duckduckgo.duckchat.impl.pixel.AttachMenuItem
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.Job
@@ -387,6 +388,7 @@ class AttachmentView(
                 iconRes = com.duckduckgo.mobile.android.R.drawable.ic_camera_24,
                 titleRes = R.string.attachmentTakePhoto,
             ) {
+                viewModel?.onAttachMenuItemSelected(AttachMenuItem.CAMERA)
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
                 host?.requestCameraCapture(buildImagePickerCallback(AttachmentViewModel.ImageSource.CAMERA))
@@ -397,6 +399,7 @@ class AttachmentView(
                 iconRes = com.duckduckgo.mobile.android.R.drawable.ic_image_24,
                 titleRes = R.string.attachmentAttachPhoto,
             ) {
+                viewModel?.onAttachMenuItemSelected(AttachMenuItem.PHOTO_LIBRARY)
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
                 host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
@@ -409,6 +412,7 @@ class AttachmentView(
                 iconRes = R.drawable.ic_folder_24,
                 titleRes = R.string.attachmentAttachFile,
             ) {
+                viewModel?.onAttachMenuItemSelected(AttachMenuItem.FILE_PICKER)
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
                 host?.requestFilePicker(buildFilePickerCallback(), supportedFileTypes)
@@ -421,6 +425,7 @@ class AttachmentView(
                 iconRes = R.drawable.ic_page_content_attach_24,
                 titleRes = R.string.duckChatContextualAskAboutPage,
             ) {
+                viewModel?.onAttachMenuItemSelected(AttachMenuItem.PAGE)
                 popup.dismiss()
                 host?.askAboutPage()
             }
@@ -428,6 +433,7 @@ class AttachmentView(
 
         popupWindow = popup
         showAtPosition(popup)
+        viewModel?.onAttachMenuShown()
     }
 
     private fun addMenuItem(container: LinearLayout, iconRes: Int, titleRes: Int, onClick: () -> Unit) {

@@ -143,6 +143,13 @@ enum class DuckChatPixelSurface(val value: String) {
     }
 }
 
+enum class AttachMenuItem(val pixelValue: String) {
+    CAMERA("camera"),
+    PHOTO_LIBRARY("photo_library"),
+    FILE_PICKER("file_picker"),
+    PAGE("page"),
+}
+
 enum class DuckChatPixelPageType(val value: String) {
     NTP("ntp"),
     SERP("serp"),
@@ -310,6 +317,8 @@ interface DuckChatPixels {
     fun fireRecentChatDeleteConfirmed()
     fun fireRecentChatDeleteCancelled()
     fun fireCustomizeResponsesSelected(surface: DuckChatPixelSurface)
+    fun fireAttachMenuShown(surface: DuckChatPixelSurface)
+    fun fireAttachMenuItemSelected(item: AttachMenuItem, surface: DuckChatPixelSurface)
     fun fireOmnibarShown(toggleVisible: Boolean)
     fun fireOmnibarTextAreaFocused(landscape: Boolean)
     fun fireOmnibarQuerySubmitted(query: String, defaultMode: ToggleSelection?)
@@ -1159,6 +1168,25 @@ class RealDuckChatPixels @Inject constructor(
         )
     }
 
+    override fun fireAttachMenuShown(surface: DuckChatPixelSurface) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_SHOWN_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_SHOWN_DAILY,
+            surfaceParams(surface),
+        )
+    }
+
+    override fun fireAttachMenuItemSelected(item: AttachMenuItem, surface: DuckChatPixelSurface) {
+        fireCountAndDaily(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_ITEM_SELECTED_COUNT,
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_ITEM_SELECTED_DAILY,
+            mapOf(
+                DuckChatPixelParameters.ATTACH_MENU_ITEM to item.pixelValue,
+                DuckChatPixelParameters.SURFACE to surface.value,
+            ),
+        )
+    }
+
     override fun fireSubmitChangeModel(modelId: String, surface: DuckChatPixelSurface) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT,
@@ -1818,6 +1846,10 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_UNIFIED_INPUT_SHOW_MODEL_PICKER_DAILY("aichat_unified_input_show_model_picker_daily"),
     DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_COUNT("m_aichat_unified_input_customize_responses_selected_count"),
     DUCK_CHAT_UNIFIED_INPUT_CUSTOMIZE_RESPONSES_SELECTED_DAILY("m_aichat_unified_input_customize_responses_selected_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_SHOWN_COUNT("m_aichat_unified_input_attach_menu_shown_count"),
+    DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_SHOWN_DAILY("m_aichat_unified_input_attach_menu_shown_daily"),
+    DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_ITEM_SELECTED_COUNT("m_aichat_unified_input_attach_menu_item_selected_count"),
+    DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_ITEM_SELECTED_DAILY("m_aichat_unified_input_attach_menu_item_selected_daily"),
     DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_COUNT("aichat_unified_input_submit_change_model_count"),
     DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_DAILY("aichat_unified_input_submit_change_model_daily"),
     DUCK_CHAT_UNIFIED_INPUT_SUBMIT_CHANGE_MODEL_PROMPT_SENT_COUNT("aichat_unified_input_submit_change_model_prompt_sent_count"),
@@ -1924,6 +1956,7 @@ object DuckChatPixelParameters {
     const val DEFAULT_MODE = "default_mode"
     const val TOGGLE_VISIBLE = "toggle_visible"
     const val ATTACHMENT_SOURCE = "source"
+    const val ATTACH_MENU_ITEM = "item"
     const val FILE_VALIDATION_REASON = "reason"
     const val SURFACE = "surface"
     const val OUTCOME = "outcome"

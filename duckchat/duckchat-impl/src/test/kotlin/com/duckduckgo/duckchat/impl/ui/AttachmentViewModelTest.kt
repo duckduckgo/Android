@@ -38,6 +38,8 @@ import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.pixel.AttachMenuItem
+import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -887,6 +889,28 @@ class AttachmentViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenAttachMenuShownThenAttachMenuShownPixelFiredWithSurface() = runTest {
+        selectDuckAiTab()
+        advanceUntilIdle()
+
+        viewModel.onAttachMenuShown()
+
+        verify(duckChatPixels).fireAttachMenuShown(DuckChatPixelSurface.DUCK_AI)
+    }
+
+    @Test
+    fun whenAttachMenuItemSelectedThenItemSelectedPixelFiredWithItemAndSurface() = runTest {
+        selectDuckAiTab()
+        advanceUntilIdle()
+
+        AttachMenuItem.entries.forEach { viewModel.onAttachMenuItemSelected(it) }
+
+        AttachMenuItem.entries.forEach {
+            verify(duckChatPixels).fireAttachMenuItemSelected(it, DuckChatPixelSurface.DUCK_AI)
+        }
     }
 
     @Test

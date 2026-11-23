@@ -1119,6 +1119,29 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion", "unifiedInputSurface"]
     },
+    "m_aichat_unified_input_attach_menu_shown": {
+        "description": "The attach menu opened from the attach button in the Unified Input. Baseline for the planned attach menu changes.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_unified_input_attach_menu_item_selected": {
+        "description": "User selected an item in the Unified Input attach menu. Baseline for the planned attach menu changes.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            {
+                "key": "item",
+                "type": "string",
+                "description": "The attach menu item the user selected",
+                "enum": ["camera", "photo_library", "file_picker", "page"]
+            }
+        ]
+    },
     "m_aichat_unified_input_image_removed_count": {
         "description": "User removed an attached image from the Unified Input",
         "owners": ["malmstein"],
