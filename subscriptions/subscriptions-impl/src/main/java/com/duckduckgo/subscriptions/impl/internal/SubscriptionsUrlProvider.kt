@@ -28,6 +28,7 @@ interface SubscriptionsUrlProvider {
     val manageUrl: String
     val plansUrl: String
     val upgradeToProUrl: String
+    val cancelUrl: String
 }
 
 @SingleIn(AppScope::class)
@@ -46,4 +47,6 @@ class RealSubscriptionsUrlProvider @Inject constructor(
     override val plansUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans" }
 
     override val upgradeToProUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/plans?tier=pro" }
+
+    override val cancelUrl: String by lazy { "${subscriptionsBaseUrl.subscriptionsBaseUrl}/cancel" }
 }

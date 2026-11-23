@@ -456,6 +456,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun connectBillingBeforeQueryingPurchases(): Toggle
 
+    /**
+     * When enabled, eligible Play subscribers see "Cancel Subscription" in Subscription Settings, which opens the
+     * cancellation flow before the Play Store
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun subscriptionCancellationFlow(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),

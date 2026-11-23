@@ -81,6 +81,7 @@ class RealSubscriptionsTest {
         override val manageUrl = ""
         override val plansUrl = ""
         override val upgradeToProUrl = ""
+        override val cancelUrl = ""
     }
     private lateinit var subscriptions: RealSubscriptions
     private val subscriptionFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
