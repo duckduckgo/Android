@@ -60,12 +60,51 @@ class RealSegmentSkipUserPreferencesTest {
     private val testee = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
 
     @Test
+    fun whenDefaultEnabledOrLegacyModeThenConsentIsAbsent() = runTest {
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        assertEquals(false, testee.hasConsent())
+        testDataStore.edit { it[stringPreferencesKey("segment_skip_mode")] = "ALWAYS_SKIP" }
+        assertEquals(false, testee.consentFlow().first())
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true)
+        assertEquals(false, testee.consentFlow().first())
+    }
+
+    @Test
+    fun whenEnabledFromOffAfterNoticeThenConsentPersistsUntilOff() = runTest {
+        testee.setMode(SegmentSkipMode.OFF)
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        assertEquals(true, testee.consentFlow().first())
+        val recreated = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
+        assertEquals(true, recreated.consentFlow().first())
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(true, testee.hasConsent())
+        testee.setMode(SegmentSkipMode.OFF)
+        assertEquals(false, testee.hasConsent())
+        assertEquals(false, testee.consentFlow().first())
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK)
+        assertEquals(false, testee.consentFlow().first())
+    }
+
+    @Test
+    fun whenTurnedOffThenOnAgainConsentIsRestoredOnlyAfterNotice() = runTest {
+        testee.setMode(SegmentSkipMode.OFF)
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(true, testee.hasConsent())
+        testee.setMode(SegmentSkipMode.OFF)
+        assertEquals(false, testee.hasConsent())
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(true, testee.hasConsent())
+    }
+
+    @Test
     fun whenReadFailsThenModeIsOffAndNewCollectionCanRecover() = runTest {
         val failingStore: DataStore<Preferences> = mock()
-        var attempts = 0
+        var fails = true
         whenever(failingStore.data).thenReturn(
             flow {
-                if (attempts++ == 0) throw IOException()
+                if (fails) throw IOException()
                 emit(preferencesOf(stringPreferencesKey("segment_skip_mode") to "ALWAYS_SKIP"))
             },
         )
@@ -77,9 +116,8 @@ class RealSegmentSkipUserPreferencesTest {
         val preferences = RealSegmentSkipUserPreferences(failingStore, coroutineRule.testScope, testFeature)
 
         assertEquals(SegmentSkipMode.OFF, preferences.cachedMode())
-        assertEquals(1, attempts)
+        fails = false
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, preferences.modeFlow().first())
-        assertEquals(2, attempts)
         assertEquals(SegmentSkipMode.OFF, preferences.cachedMode())
     }
 

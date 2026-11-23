@@ -140,7 +140,9 @@ class RealSegmentSkipTest {
 
         override fun modeFlow(): Flow<SegmentSkipMode> = mode
         override fun cachedMode(): SegmentSkipMode = mode.value
-        override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+        override fun consentFlow(): Flow<Boolean> = kotlinx.coroutines.flow.flowOf(false)
+        override fun hasConsent(): Boolean = false
+        override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean {
             val changed = this.mode.value != mode
             this.mode.value = mode
             return changed

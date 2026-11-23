@@ -142,7 +142,8 @@ class SegmentSkipContentScopeJsMessageHandlerTest {
 
         override fun modeFlow(): Flow<SegmentSkipMode> = throw UnsupportedOperationException()
 
-        override suspend fun setMode(mode: SegmentSkipMode) = throw UnsupportedOperationException()
+        override fun consentFlow(): Flow<Boolean> = kotlinx.coroutines.flow.flowOf(false)
+        override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean) = throw UnsupportedOperationException()
     }
 
     private companion object {
