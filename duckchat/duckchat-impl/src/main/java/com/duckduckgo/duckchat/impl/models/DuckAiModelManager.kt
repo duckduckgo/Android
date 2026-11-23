@@ -77,6 +77,7 @@ interface DuckAiModelManager {
 
     suspend fun fetchModels()
 
+    /** Ignored while `resetModelForNewChats` is on, where the pick belongs to the tab's next chat instead. */
     suspend fun selectModel(model: AIChatModel)
 
     /**
@@ -91,6 +92,7 @@ interface DuckAiModelManager {
      */
     suspend fun selectProvider(provider: ModelProvider)
 
+    /** Ignored while `resetModelForNewChats` is on, like [selectModel]. */
     suspend fun selectReasoningMode(mode: ReasoningMode)
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
@@ -172,6 +174,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     private suspend fun restoreCachedSelection() {
+        if (resetsModelForNewChats()) return
         val cachedModel = dataStore.getSelectedModel()
         val cachedReasoningRaw = dataStore.getSelectedReasoningMode()
         if (cachedModel == null) {
@@ -217,10 +220,11 @@ class RealDuckAiModelManager @Inject constructor(
                         !it.isAccessible && !isSubscriptionEligible
                     }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
+                val resetForNewChats = resetsModelForNewChats()
                 stateMutex.withLock {
                     // Selection is resolved before sorting so the derived default keeps following
                     // endpoint order, and only the picker's display order changes.
-                    val selectedModelId = resolveSelection(models)
+                    val selectedModelId = if (resetForNewChats) NewChatDefaults.modelId(userTier, models) else resolveSelection(models)
                     val displayModels = models.sortLabelledFirst()
                     val selectedModel = models.find { it.id == selectedModelId }
                     val available = ReasoningResolver.availableModes(
@@ -228,7 +232,11 @@ class RealDuckAiModelManager @Inject constructor(
                         effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
                         isEligible = isSubscriptionEligible,
                     )
-                    val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+                    val nextReasoningMode = if (resetForNewChats) {
+                        NewChatDefaults.reasoningMode(preferred = null, available)
+                    } else {
+                        validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+                    }
 
                     _modelState.value = _modelState.value.copy(
                         models = displayModels,
@@ -296,12 +304,21 @@ class RealDuckAiModelManager @Inject constructor(
         return models.firstOrNull { it.isAccessible }?.id
     }
 
+    /**
+     * With this on, the global selection is always the tier default and picks live on the tab, so nothing
+     * here reads or writes the persisted pick: turning it off brings back the user's last-used model.
+     */
+    private suspend fun resetsModelForNewChats(): Boolean = withContext(dispatcherProvider.io()) {
+        duckChatFeature.value.resetModelForNewChats().isEnabled()
+    }
+
     private companion object {
         const val MAX_LABEL_LENGTH = 40
         const val PINNED_DEFAULT_MODEL_ID = "gpt-5.4-mini"
     }
 
     override suspend fun selectModel(model: AIChatModel) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 selectionRevision++
@@ -334,6 +351,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun selectProvider(provider: ModelProvider) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 selectionRevision++
@@ -371,6 +389,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun selectReasoningMode(mode: ReasoningMode) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 val match = _modelState.value.availableReasoningModes.firstOrNull { it.mode == mode }
