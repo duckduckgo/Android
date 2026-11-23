@@ -400,7 +400,9 @@ cmd_where() {
   local dump top
   # Read it whole first: grep -m1 on the live pipe makes dumpsys fail with SIGPIPE under pipefail.
   dump="$(a shell dumpsys activity activities | tr -d '\r')"
-  top="$(grep -m1 'topResumedActivity' <<<"$dump" | grep -o '[A-Za-z0-9_.]*/[A-Za-z0-9_.$]*' | head -1 || true)"
+  # API 31 prints no topResumedActivity line, only mResumedActivity.
+  top="$( { grep -m1 'topResumedActivity' <<<"$dump" || grep -m1 'mResumedActivity' <<<"$dump"; } \
+    | grep -o '[A-Za-z0-9_.]*/[A-Za-z0-9_.$]*' | head -1 || true)"
   if [[ "${top%%/*}" == "$PKG" ]]; then echo "${top##*.}"; else echo "-"; fi
 }
 
