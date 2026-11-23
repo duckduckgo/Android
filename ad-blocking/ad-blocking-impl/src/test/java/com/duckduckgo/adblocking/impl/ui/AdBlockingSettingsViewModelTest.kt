@@ -322,16 +322,16 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenSegmentSkipIsOffOrConsentedThenNoticeIsShown() = runTest {
+    fun whenMvpEnabledThenNoticeIsHiddenAcrossModeChanges() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         setSegmentSkipEnabled(true)
         segmentSkip.mode.value = SegmentSkipMode.OFF
         createViewModel().viewState.test {
-            assertEquals(true, expectMostRecentItem().showSegmentSkipConsent)
+            assertEquals(false, expectMostRecentItem().showSegmentSkipConsent)
             segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
             assertEquals(false, awaitItem().showSegmentSkipConsent)
-            segmentSkip.consent.value = true
-            assertEquals(true, awaitItem().showSegmentSkipConsent)
+            segmentSkip.mode.value = SegmentSkipMode.OFF
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
         }
     }
 
@@ -362,16 +362,16 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenEnablingFromOffThenModeAndConsentAreSaved() = runTest {
+    fun whenEnablingFromOffThenModeIsSavedWithoutConsent() = runTest {
         segmentSkip.mode.value = SegmentSkipMode.OFF
-        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.OFF, SegmentSkipMode.ALWAYS_SKIP)
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP)
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
-        assertEquals(true, segmentSkip.consent.value)
+        assertEquals(false, segmentSkip.consent.value)
     }
 
     @Test
     fun whenEnabledModeChangesThenConsentIsUnchanged() = runTest {
-        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_ASK, SegmentSkipMode.ALWAYS_SKIP)
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP)
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
         assertEquals(false, segmentSkip.consent.value)
     }

@@ -190,7 +190,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        viewModel.onSegmentSkipModeDialogSaved(currentMode, modes[selectedItem - 1])
+                        viewModel.onSegmentSkipModeDialogSaved(modes[selectedItem - 1])
                     }
                 },
             )

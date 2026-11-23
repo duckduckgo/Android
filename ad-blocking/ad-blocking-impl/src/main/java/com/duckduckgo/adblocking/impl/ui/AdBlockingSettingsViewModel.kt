@@ -101,11 +101,10 @@ class AdBlockingSettingsViewModel @Inject constructor(
         data class ShowSegmentSkipModeDialog(val mode: SegmentSkipMode) : Command()
     }
 
-    private val segmentSkipModeFlow: Flow<Pair<SegmentSkipMode, Boolean>?> = combine(
+    private val segmentSkipModeFlow: Flow<SegmentSkipMode?> = combine(
         segmentSkipFeature.mvpEnabled().enabled(),
         segmentSkip.modeFlow(),
-        segmentSkip.consentFlow(),
-    ) { mvpEnabled, mode, consent -> (mode to (mode == SegmentSkipMode.OFF || consent)).takeIf { mvpEnabled } }
+    ) { mvpEnabled, mode -> mode.takeIf { mvpEnabled } }
 
     val viewState: StateFlow<ViewState> = combine(
         statusChecker.observeState(),
@@ -126,8 +125,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
                 DuckPlayerSettingsPlacement.Standalone -> DuckPlayerSection.Link
                 DuckPlayerSettingsPlacement.Hidden -> DuckPlayerSection.None
             },
-            segmentSkipMode = segmentSkipMode?.first,
-            showSegmentSkipConsent = segmentSkipMode?.second == true,
+            segmentSkipMode = segmentSkipMode,
+            showSegmentSkipConsent = false,
         )
     }
         .stateIn(
@@ -176,8 +175,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSegmentSkipModeDialogSaved(currentMode: SegmentSkipMode, selectedMode: SegmentSkipMode) {
-        onSegmentSkipModeSelected(selectedMode, noticeShown = currentMode == SegmentSkipMode.OFF && selectedMode != SegmentSkipMode.OFF)
+    fun onSegmentSkipModeDialogSaved(selectedMode: SegmentSkipMode) {
+        onSegmentSkipModeSelected(selectedMode)
     }
 
     fun onSegmentSkipModeSelected(mode: SegmentSkipMode, noticeShown: Boolean = false) {

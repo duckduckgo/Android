@@ -99,6 +99,26 @@ class RealSegmentSkipUserPreferencesTest {
     }
 
     @Test
+    fun whenMvpEnabledThenNoticeCannotGrantConsentAfterReenabling() = runTest {
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        testee.setMode(SegmentSkipMode.OFF)
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(false, testee.consentFlow().first())
+        assertEquals(false, testee.hasConsent())
+    }
+
+    @Test
+    fun whenMvpEnabledThenExistingConsentDoesNotAllowTelemetry() = runTest {
+        testee.setMode(SegmentSkipMode.OFF)
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true)
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(true, testee.hasConsent())
+        feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        assertEquals(false, testee.hasConsent())
+    }
+
+    @Test
     fun whenReadFailsThenModeIsOffAndNewCollectionCanRecover() = runTest {
         val failingStore: DataStore<Preferences> = mock()
         var fails = true

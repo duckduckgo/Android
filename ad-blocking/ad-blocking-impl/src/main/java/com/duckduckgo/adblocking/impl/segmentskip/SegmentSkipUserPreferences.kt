@@ -83,7 +83,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
             emit(false)
         }.distinctUntilChanged()
 
-    override fun hasConsent(): Boolean = !revoked && consent.value
+    override fun hasConsent(): Boolean = !feature.mvpEnabled().isEnabled() && !revoked && consent.value
 
     override fun modeFlow(): Flow<SegmentSkipMode> = combine(
         dataStore.data,
@@ -116,8 +116,8 @@ class RealSegmentSkipUserPreferences @Inject constructor(
             changed = previous != mode
             prefs[KEY_MODE] = mode.name
             if (mode != SegmentSkipMode.OFF && previous == SegmentSkipMode.OFF) {
-                prefs[KEY_CONSENT] = noticeShown
-                granted = noticeShown
+                prefs[KEY_CONSENT] = noticeShown && !feature.mvpEnabled().isEnabled()
+                granted = prefs[KEY_CONSENT] == true
             }
         }
         synchronized(consentLock) {
