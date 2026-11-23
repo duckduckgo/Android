@@ -753,7 +753,13 @@ class AuthTokenRefreshWideEventTest {
         authWideEvent.onTokenReadFailed()
 
         verify(wideEventClient).flowStep(30L, "token_read", false, mapOf("store_error" to "missing"))
-        verify(wideEventClient, never()).intervalStart(eq(30L), eq("fetch_jwks_latency_ms_bucketed"), anyOrNull(), anyOrNull())
+        verify(wideEventClient, never()).intervalStart(
+            wideEventId = eq(30L),
+            key = eq("fetch_jwks_latency_ms_bucketed"),
+            timeout = anyOrNull(),
+            buckets = anyOrNull(),
+            rounding = any(),
+        )
     }
 
     @Test
