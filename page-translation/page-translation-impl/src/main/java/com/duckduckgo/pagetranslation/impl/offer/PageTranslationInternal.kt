@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pagetranslation.impl
+package com.duckduckgo.pagetranslation.impl.offer
 
 import com.duckduckgo.pagetranslation.api.PageTranslation
 

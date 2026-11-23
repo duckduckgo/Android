@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pagetranslation.impl
+package com.duckduckgo.pagetranslation.impl.store
 
 import android.content.SharedPreferences
 import com.duckduckgo.data.store.api.SharedPreferencesProvider

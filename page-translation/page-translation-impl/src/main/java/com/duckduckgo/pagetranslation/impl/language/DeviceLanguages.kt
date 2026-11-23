@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.pagetranslation.impl
+package com.duckduckgo.pagetranslation.impl.language
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope

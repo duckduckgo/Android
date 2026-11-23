@@ -17,6 +17,12 @@
 package com.duckduckgo.pagetranslation.impl
 
 import com.duckduckgo.pagetranslation.api.TabContent
+import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
+import com.duckduckgo.pagetranslation.impl.offer.Detection
+import com.duckduckgo.pagetranslation.impl.offer.OfferInput
+import com.duckduckgo.pagetranslation.impl.offer.PageTranslationInternal
+import com.duckduckgo.pagetranslation.impl.offer.TranslationOffer
+import com.duckduckgo.pagetranslation.impl.store.TranslationPreferencesStore
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test

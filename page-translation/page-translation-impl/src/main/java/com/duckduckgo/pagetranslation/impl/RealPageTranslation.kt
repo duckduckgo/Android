@@ -23,6 +23,11 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pagetranslation.api.PageTranslation
 import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.api.TranslationProgress
+import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
+import com.duckduckgo.pagetranslation.impl.offer.OfferInput
+import com.duckduckgo.pagetranslation.impl.offer.PageTranslationInternal
+import com.duckduckgo.pagetranslation.impl.offer.TranslationOffer
+import com.duckduckgo.pagetranslation.impl.store.TranslationPreferencesStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.duckduckgo.pagetranslation.impl
+package com.duckduckgo.pagetranslation.impl.store
 
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import org.junit.Assert.assertFalse
