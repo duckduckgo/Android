@@ -315,7 +315,6 @@ import com.duckduckgo.common.ui.view.hideKeyboard
 import com.duckduckgo.common.ui.view.isFullScreen
 import com.duckduckgo.common.ui.view.isImmersiveModeEnabled
 import com.duckduckgo.common.ui.view.makeSnackbarWithNoBottomInset
-import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -4088,10 +4087,6 @@ class BrowserTabFragment :
                     chatMenuPopup.contentView
                         .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewImage)
                         .isVisible = nativeSidebarEnabled
-                    // Dimmed rather than disabled: on an empty chat, tapping still focuses its input.
-                    chatMenuPopup.contentView
-                        .findViewById<View>(com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat)
-                        .setEnabledOpacity(!viewModel.isOnEmptyDuckAiChat())
                     setChatMenuItemText(
                         com.duckduckgo.duckchat.impl.R.id.chatMenuPopupNewChat,
                         if (plusMenuUpdateEnabled) {

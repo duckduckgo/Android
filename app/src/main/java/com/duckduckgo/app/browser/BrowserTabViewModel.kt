@@ -6150,8 +6150,6 @@ class BrowserTabViewModel @Inject constructor(
         openNewDuckChatTab(entryPoint, fromDuckAiChat = viewMode == ViewMode.DuckAI)
     }
 
-    fun isOnEmptyDuckAiChat(): Boolean = duckChat.isEmptyDuckAiChat(url)
-
     private fun browsingMenuDuckChatEntryPoint(viewMode: ViewMode): DuckChatEntryPoint = when (viewMode) {
         ViewMode.NewTab -> DuckChatEntryPoint.BROWSING_MENU_NTP
         ViewMode.DuckAI -> DuckChatEntryPoint.BROWSING_MENU_DUCKAI

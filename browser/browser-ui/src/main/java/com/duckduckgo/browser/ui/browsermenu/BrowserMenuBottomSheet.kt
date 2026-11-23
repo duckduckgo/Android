@@ -39,7 +39,6 @@ import com.duckduckgo.common.ui.view.MenuItemViewSize
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
-import com.duckduckgo.common.ui.view.setEnabledOpacity
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.mobile.android.R.drawable
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -469,7 +468,6 @@ class BrowserMenuBottomSheet(
             showVoiceChat = viewState.showDuckChatVoiceOption,
             showChatHistory = viewState.showDuckChatHistoryOption,
             showChatSettings = true,
-            isEmptyChat = viewState.isEmptyChat,
         )
         renderVpnMenu(viewState.vpnMenuState)
 
@@ -485,12 +483,9 @@ class BrowserMenuBottomSheet(
         showVoiceChat: Boolean,
         showChatHistory: Boolean,
         showChatSettings: Boolean,
-        isEmptyChat: Boolean = false,
     ) {
         duckAiSectionBinding.root.isVisible = showShortcuts || showChatSettings
         duckAiNewChatMenuItem.isVisible = showShortcuts
-        // Dimmed rather than disabled: on an empty chat, tapping still focuses its input.
-        duckAiNewChatMenuItem.setEnabledOpacity(!isEmptyChat)
         duckAiNewVoiceChatMenuItem.isVisible = showShortcuts && showVoiceChat
         duckChatHistoryMenuItem.isVisible = showShortcuts && showChatHistory
         duckChatSettingsMenuItem.isVisible = showChatSettings
