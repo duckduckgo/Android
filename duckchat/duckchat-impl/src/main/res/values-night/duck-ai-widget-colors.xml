@@ -17,4 +17,5 @@
 
 <resources>
     <color name="duckAiWidgetContainerColor">@color/white9</color>
+    <color name="duckAiWidgetDividerColor">@color/white12</color>
 </resources>

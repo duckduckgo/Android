@@ -199,12 +199,14 @@ class RealDuckChatTest {
         )
         val views = mock<android.widget.RemoteViews>()
         val renderer = com.duckduckgo.duckchat.impl.widget.DuckAiWidgetConfigurator(
-            duckChatFeature,
-            mockDuckChatFeatureRepository,
-            mock(),
-            dispatcherProvider,
+            duckChatFeature = duckChatFeature,
+            repository = mockDuckChatFeatureRepository,
+            duckChat = cold,
+            chats = com.duckduckgo.duckchat.impl.widget.DuckAiChatsWidgetChats(mockContext, mock()),
+            intents = com.duckduckgo.duckchat.impl.widget.fakeDuckAiWidgetIntents(),
+            dispatcherProvider = dispatcherProvider,
         )
-        val render = async { renderer.populateRemoteViews(mockContext, views) }
+        val render = async { renderer.populateRemoteViews(mockContext, 1, views) }
         readSetting.complete(true)
         render.await()
         coroutineRule.testScope.advanceUntilIdle()
@@ -1543,6 +1545,31 @@ class RealDuckChatTest {
         val url = testee.buildChatUrl(chatId = "abc-123")
 
         assertTrue(url == "https://duck.ai/chat?chatID=abc-123&native-input=true&duckai=5")
+    }
+
+    @Test
+    fun `when building a chat url without attribution then pending picker attribution is not consumed`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(true)
+
+        val url = testee.buildChatUrlWithoutAttribution(chatId = "abc-123")
+
+        assertEquals("https://duck.ai/chat?chatID=abc-123&native-input=true&duckai=5", url)
+        verify(mockAddressBarPickerAttributionRepository, never()).consumeAttributionToPicker()
+    }
+
+    @Test
+    fun `when building a chat url with a pending picker attribution then url contains origin`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(true)
+
+        val url = testee.buildChatUrl(chatId = "abc-123")
+
+        assertEquals("https://duck.ai/chat?chatID=abc-123&native-input=true&origin=funnel_addressbar_android__aitoggle&duckai=5", url)
     }
 
     @Test

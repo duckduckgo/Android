@@ -16,21 +16,26 @@
 package com.duckduckgo.duckchat.impl.widget
 
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT
+import android.appwidget.AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH
 import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
-import android.widget.RemoteViews
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ReceiverScope
-import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
 import com.duckduckgo.widget.api.HomeScreenWidgetLifecycle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import logcat.logcat
 import javax.inject.Inject
 
@@ -39,6 +44,9 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
 
     @Inject
     lateinit var duckAiWidgetConfigurator: DuckAiWidgetConfigurator
+
+    @Inject
+    lateinit var duckAiWidgetUpdater: DuckAiWidgetUpdater
 
     @Inject
     lateinit var pixel: Pixel
@@ -70,6 +78,7 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         logcat { "DuckAiWidgetProvider onUpdate" }
+        duckAiWidgetUpdater.startObservingIfNeeded()
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
         }
@@ -90,14 +99,16 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetId: Int,
     ) {
-        val views = RemoteViews(context.packageName, R.layout.duck_ai_widget_daynight)
+        val options = appWidgetManager.getAppWidgetOptions(appWidgetId)
+        val portrait = context.resources.configuration.orientation != Configuration.ORIENTATION_LANDSCAPE
+        val heightDp = options?.getInt(if (portrait) OPTION_APPWIDGET_MAX_HEIGHT else OPTION_APPWIDGET_MIN_HEIGHT, 0) ?: 0
+        val widthDp = options?.getInt(if (portrait) OPTION_APPWIDGET_MIN_WIDTH else OPTION_APPWIDGET_MAX_WIDTH, 0) ?: 0
 
         appCoroutineScope.launch {
-            duckAiWidgetConfigurator.populateRemoteViews(
-                context = context,
-                remoteViews = views,
-            )
-            appWidgetManager.updateAppWidget(appWidgetId, views)
+            renderLock.withLock {
+                val views = duckAiWidgetConfigurator.createRemoteViews(context, appWidgetId, heightDp, widthDp)
+                appWidgetManager.updateAppWidget(appWidgetId, views)
+            }
             logcat { "DuckAiWidgetProvider updateAppWidget completed for widget id = $appWidgetId" }
         }
     }
@@ -106,5 +117,10 @@ class DuckAiWidgetProvider : AppWidgetProvider() {
         super.onDisabled(context)
         pixel.fire(DuckChatPixelName.DUCK_AI_WIDGET_DELETED)
         homeScreenWidgetLifecycle.onWidgetDisabled()
+    }
+
+    private companion object {
+        // Receivers are instantiated per broadcast, so the lock must be process-wide.
+        val renderLock = Mutex()
     }
 }

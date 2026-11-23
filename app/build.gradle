@@ -557,7 +557,7 @@ dependencies {
     implementation project(':page-translation-impl')
 
     // Widgets
-    implementation "androidx.core:core-remoteviews:1.1.0"
+    implementation "androidx.core:core-remoteviews:_"
 
     // Deprecated. TODO: Stop using this artifact.
     implementation "androidx.legacy:legacy-support-v4:_"

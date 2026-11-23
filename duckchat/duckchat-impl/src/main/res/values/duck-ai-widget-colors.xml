@@ -18,6 +18,8 @@
     <color name="duckAiWidgetBackgroundColor">@color/searchWidgetBackgroundColor</color>
     <color name="duckAiWidgetSearchBarColor">@color/searchWidgetSearchBarBackgroundColor</color>
     <color name="duckAiWidgetContainerColor">@color/black9</color>
+    <color name="duckAiWidgetDividerColor">@color/black12</color>
     <color name="duckAiWidgetHintColor">@color/searchWidgetSearchBarHintColor</color>
+    <color name="duckAiWidgetTextColor">@color/searchWidgetSearchBarTrailingIconColor</color>
     <color name="duckAiWidgetOnContainerColor">@color/searchWidgetSearchBarTrailingIconColor</color>
 </resources>
