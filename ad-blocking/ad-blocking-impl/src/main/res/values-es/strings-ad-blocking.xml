@@ -17,6 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Omitir contenido patrocinado</string>
+    <string name="segment_skip_settings_description" instruction="Description of the Skip Sponsored Content setting. Learn more opens an explanation of ad blocking.">Omite segmentos patrocinados, como promociones pagadas. La comunidad de SponsorBlock notifica los segmentos, por lo que no todos los vídeos están cubiertos. <annotation type="learn_more_link">Más información</annotation></string>
+    <string name="segment_skip_mode_always_ask">Preguntar antes de omitir</string>
+    <string name="segment_skip_mode_always_skip">Siempre</string>
+    <string name="segment_skip_mode_off">Nunca</string>
     <string name="ad_blocking_settings_title">Bloqueo de anuncios en YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Bloquear anuncios en YouTube</string>
     <string name="ad_blocking_settings_description_with_consent">DuckDuckGo bloquea los anuncios de vídeo en YouTube, para que puedas ver vídeos sin interrupciones.\n\nCuando esté activado, DuckDuckGo detectará de forma anónima las interferencias en el bloqueo de anuncios o los errores de YouTube para mejorar tu experiencia y la de todos. DuckDuckGo nunca ve los vídeos que ves ni ningún dato de identificación personal. <annotation type="learn_more_link">Más información</annotation></string>
