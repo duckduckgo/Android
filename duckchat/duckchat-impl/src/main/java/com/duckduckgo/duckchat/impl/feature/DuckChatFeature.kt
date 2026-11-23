@@ -333,4 +333,12 @@ interface DuckChatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun newChatHints(): Toggle
+
+    /**
+     * @return `true` when the native input uses the simplified prompt box. Shares its name with the iOS flag
+     * so both platforms read the same remote config key.
+     * If the remote feature is not present defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun unifiedToggleInputSimplifiedPromptBox(): Toggle
 }
