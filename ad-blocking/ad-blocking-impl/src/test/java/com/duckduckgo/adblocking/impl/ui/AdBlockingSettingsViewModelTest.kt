@@ -336,6 +336,19 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
+    fun whenMvpEnabledWithExistingConsentThenNoticeIsShown() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSegmentSkipEnabled(true)
+        segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
+        segmentSkip.consent.value = true
+        createViewModel().viewState.test {
+            assertEquals(true, expectMostRecentItem().showSegmentSkipConsent)
+            segmentSkip.consent.value = false
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
+        }
+    }
+
+    @Test
     fun whenMvpDisabledThenPreviousNoticeConditionsStillApply() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         setSegmentSkipEnabled(false)

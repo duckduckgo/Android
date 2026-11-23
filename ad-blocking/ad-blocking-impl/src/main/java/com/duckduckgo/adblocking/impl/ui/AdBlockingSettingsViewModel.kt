@@ -106,7 +106,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
         segmentSkip.modeFlow(),
         segmentSkip.consentFlow(),
     ) { mvpEnabled, mode, consent ->
-        mode.takeIf { mvpEnabled } to (!mvpEnabled && (mode == SegmentSkipMode.OFF || consent))
+        mode.takeIf { mvpEnabled } to (consent || (!mvpEnabled && mode == SegmentSkipMode.OFF))
     }
 
     val viewState: StateFlow<ViewState> = combine(
