@@ -33,7 +33,7 @@ class SegmentSkipTelemetryPixelInterceptor @Inject constructor(
 ) : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {
         val name = chain.request().url.pathSegments.last()
-        if (name in gatedNames && !preferences.hasConsent()) {
+        if (name.startsWith(TELEMETRY_PREFIX, ignoreCase = true) && !preferences.hasConsent()) {
             return Response.Builder()
                 .code(200)
                 .protocol(Protocol.HTTP_2)
@@ -48,7 +48,6 @@ class SegmentSkipTelemetryPixelInterceptor @Inject constructor(
     override fun getInterceptor(): Interceptor = this
 
     private companion object {
-        val gatedNames = setOf("segmentSkip_errors_hour", "segmentSkip_errors_day")
-            .flatMap { name -> listOf("${name}_android_phone", "${name}_android_tablet") }.toSet()
+        const val TELEMETRY_PREFIX = "webTelemetry_segmentSkip"
     }
 }

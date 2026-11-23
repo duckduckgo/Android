@@ -28,36 +28,48 @@ class SegmentSkipTelemetryPixelInterceptorTest {
     private val interceptor = SegmentSkipTelemetryPixelInterceptor(preferences)
 
     @Test
-    fun whenConsentAbsentThenBothEventsAreDroppedSuccessfully() {
-        for (event in listOf("segmentSkip_errors_hour", "segmentSkip_errors_day")) {
-            for (device in listOf("phone", "tablet")) {
-                val response = interceptor.intercept(FakeChain("$BASE/${event}_android_$device", expectedResponseCode = 418))
-                assertEquals(200, response.code)
-                assertEquals("Dropped Segment Skip telemetry", response.message)
-            }
+    fun whenConsentAbsentThenNewTelemetryIsDroppedSuccessfully() {
+        for (event in newTelemetryNames) {
+            val response = interceptor.intercept(FakeChain("$BASE/$event", expectedResponseCode = 418))
+            assertEquals(200, response.code)
+            assertEquals("Dropped Segment Skip telemetry", response.message)
         }
     }
 
     @Test
-    fun whenConsentPresentThenBothEventsProceed() {
+    fun whenConsentPresentThenNewTelemetryProceeds() {
         whenever(preferences.hasConsent()).thenReturn(true)
-        for (event in listOf("segmentSkip_errors_hour", "segmentSkip_errors_day")) {
-            for (device in listOf("phone", "tablet")) {
-                val url = "$BASE/${event}_android_$device"
+        for (event in newTelemetryNames) {
+            assertEquals(418, interceptor.intercept(FakeChain("$BASE/$event", expectedResponseCode = 418)).code)
+        }
+    }
+
+    @Test
+    fun whenNamesOnlyResembleEventsThenTheyProceedRegardlessOfConsent() {
+        for (consent in listOf(false, true)) {
+            whenever(preferences.hasConsent()).thenReturn(consent)
+            for (event in listOf(
+                "segmentSkip_errors_hour_android_phone",
+                "segmentSkip_errors_hour_android_tablet",
+                "segmentSkip_errors_day_android_phone",
+                "segmentSkip_errors_day_android_tablet",
+                "segmentSkip_errors_hourly_android_phone",
+                "segmentSkip_errors_day_extra_android_phone",
+                "webTelemetry_youtubeInterference_day.buffering_android_phone",
+                "other_android_phone",
+            )) {
+                val url = "$BASE/$event"
                 assertEquals(418, interceptor.intercept(FakeChain(url, expectedResponseCode = 418)).code)
             }
         }
     }
 
-    @Test
-    fun whenNamesOnlyResembleEventsThenTheyProceed() {
-        for (event in listOf("segmentSkip_errors_hourly_android_phone", "segmentSkip_errors_day_extra_android_phone", "other_android_phone")) {
-            val url = "$BASE/$event"
-            assertEquals(418, interceptor.intercept(FakeChain(url, expectedResponseCode = 418)).code)
-        }
-    }
-
     private companion object {
         const val BASE = "https://improving.duckduckgo.com/t"
+        val newTelemetryNames = listOf(
+            "webTelemetry_segmentSkip_errors_hour_android_phone",
+            "webTelemetry_segmentSkip_errors_day_android_tablet",
+            "WEBTELEMETRY_SEGMENTSKIP_other_android_tablet",
+        )
     }
 }
