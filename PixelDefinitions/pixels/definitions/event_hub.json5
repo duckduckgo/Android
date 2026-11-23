@@ -702,5 +702,97 @@
             },
             "eventHubAttributionPeriod"
         ]
+    },
+    // Immediate pixels fire once per detection, so they have no count or attributionPeriod.
+    "webTelemetry_adwall": {
+        "description": "Fired once per detection of an adwall on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_admiralAdwall": {
+        "description": "Fired once per detection of an Admiral-served adwall on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_recaptcha": {
+        "description": "Fired once per detection of a Google reCAPTCHA challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_hcaptcha": {
+        "description": "Fired once per detection of an hCaptcha challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_turnstile": {
+        "description": "Fired once per detection of a Cloudflare Turnstile challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_cloudflare": {
+        "description": "Fired once per detection of a Cloudflare interstitial challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_datadome": {
+        "description": "Fired once per detection of a DataDome challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_imperva": {
+        "description": "Fired once per detection of an Imperva challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_arkose": {
+        "description": "Fired once per detection of an Arkose Labs (FunCaptcha) challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_geetest": {
+        "description": "Fired once per detection of a GeeTest challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_awswaf": {
+        "description": "Fired once per detection of an AWS WAF challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_perimeterx": {
+        "description": "Fired once per detection of a PerimeterX challenge on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "webTelemetry_captcha_other": {
+        "description": "Fired once per detection of a captcha challenge that matches no known provider on a page. Fired immediately by the eventHub feature, without aggregation.",
+        "owners": ["GuiltyDolphin"],
+        "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     }
 }
