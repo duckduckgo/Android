@@ -19,8 +19,10 @@ package com.duckduckgo.sync.impl.wideevents
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncBuildConfig
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_1
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
@@ -29,6 +31,7 @@ import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SyncSetupWideEvent {
@@ -53,10 +56,16 @@ interface SyncSetupWideEvent {
 @ContributesBinding(AppScope::class)
 class SyncSetupWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
+    private val syncFeature: Lazy<SyncFeature>,
+    private val dispatchers: DispatcherProvider,
     private val buildConfig: SyncBuildConfig,
 ) : SyncSetupWideEvent {
 
     private var cachedFlowId: Long? = null
+
+    private suspend fun isEventEnabled(): Boolean = withContext(dispatchers.io()) {
+        syncFeature.value.sendSyncSetupWideEvent().isEnabled()
+    }
 
     private suspend fun getCurrentWideEventId(): Long? {
         if (cachedFlowId == null) {
@@ -69,6 +78,8 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     override suspend fun onFlowStarted(launchSource: SyncLaunchSource) {
+        if (!isEventEnabled()) return
+
         getCurrentWideEventId()?.let { existingId ->
             wideEventClient.flowFinish(
                 wideEventId = existingId,
@@ -96,60 +107,70 @@ class SyncSetupWideEventImpl @Inject constructor(
      * and leaving the screen finishes the flow as [FlowStatus.Cancelled].
      */
     override suspend fun onDeviceAuthNotEnrolled() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_DEVICE_AUTH_NOT_ENROLLED, success = true)
     }
 
     override suspend fun onUserAuthSuccess() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_USER_AUTH, success = true)
     }
 
     override suspend fun onIntroScreenShown() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_INTRO_SCREEN_SHOWN, success = true)
     }
 
     override suspend fun onSyncEnabled() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_SYNC_ENABLED, success = true)
     }
 
     override suspend fun onAccountCreationApiStarted() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.intervalStart(wideEventId = id, key = KEY_ACCOUNT_CREATION_LATENCY)
     }
 
     override suspend fun onAccountCreationApiFinished() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.intervalEnd(wideEventId = id, key = KEY_ACCOUNT_CREATION_LATENCY)
     }
 
     override suspend fun onInitialSyncStarted() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.intervalStart(wideEventId = id, key = KEY_INITIAL_SYNC_LATENCY)
     }
 
     override suspend fun onInitialSyncFinished() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.intervalEnd(wideEventId = id, key = KEY_INITIAL_SYNC_LATENCY)
     }
 
     override suspend fun onAccountCreated() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_ACCOUNT_CREATED, success = true)
     }
 
     override suspend fun onAccountCreationFailed() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowFinish(
@@ -160,6 +181,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     override suspend fun onRecoveryCodeShown() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowStep(wideEventId = id, stepName = STEP_RECOVERY_CODE_SHOWN, success = true)
@@ -168,6 +190,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     override suspend fun onRecoveryCodeGenerationFailed() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowFinish(
@@ -178,6 +201,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     override suspend fun onFlowCancelled() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowFinish(
@@ -188,6 +212,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     override suspend fun onSyncRestoreStarted() {
+        if (!isEventEnabled()) return
         val id = getCurrentWideEventId() ?: return
 
         wideEventClient.flowAbort(wideEventId = id)

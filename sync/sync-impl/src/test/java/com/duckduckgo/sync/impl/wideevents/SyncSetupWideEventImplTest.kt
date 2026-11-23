@@ -19,24 +19,34 @@ package com.duckduckgo.sync.impl.wideevents
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncBuildConfig
+import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(TestParameterInjector::class)
 class SyncSetupWideEventImplTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val wideEventClient: WideEventClient = mock()
+    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
     var isAuthRequired = true
     private val buildConfig = mock<SyncBuildConfig> {
@@ -47,8 +57,12 @@ class SyncSetupWideEventImplTest {
 
     @Before
     fun setup() {
+        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(true))
+
         wideEvent = SyncSetupWideEventImpl(
             wideEventClient = wideEventClient,
+            syncFeature = lazy { syncFeature },
+            dispatchers = coroutineRule.testDispatcherProvider,
             buildConfig = buildConfig,
         )
     }
@@ -94,6 +108,16 @@ class SyncSetupWideEventImplTest {
             wideEventId = 99L,
             status = FlowStatus.Unknown,
         )
+    }
+
+    @Test
+    fun `feature disabled results in no interactions`() = runTest {
+        syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(false))
+
+        wideEvent.onFlowStarted()
+        wideEvent.onIntroScreenShown()
+
+        verifyNoInteractions(wideEventClient)
     }
 
     @Test
