@@ -17,8 +17,13 @@
 package com.duckduckgo.sync.impl.auditlog
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
@@ -52,13 +57,64 @@ class RealAuditLogSyncHookTest {
         assertEquals(2, checker.checkCount)
     }
 
+    @Test
+    fun whenNoCheckHasStartedThenAwaitReturnsAtOnce() = runTest {
+        hook.awaitRunningCheck()
+
+        assertEquals(0, checker.checkCount)
+    }
+
+    @Test
+    fun whenCheckIsRunningThenAwaitReturnsOnlyAfterItEnds() = runTest {
+        val release = CompletableDeferred<Unit>()
+        checker.release = release
+        hook.onSyncSucceeded()
+
+        val waiting = async { hook.awaitRunningCheck() }
+        runCurrent()
+        assertFalse(waiting.isCompleted)
+
+        release.complete(Unit)
+        runCurrent()
+        assertTrue(waiting.isCompleted)
+    }
+
+    @Test
+    fun whenSyncSucceedsWhileCheckIsRunningThenAwaitStillWaitsForThatCheck() = runTest {
+        val release = CompletableDeferred<Unit>()
+        checker.release = release
+        hook.onSyncSucceeded()
+        hook.onSyncSucceeded()
+
+        val waiting = async { hook.awaitRunningCheck() }
+        runCurrent()
+        assertFalse(waiting.isCompleted)
+        assertEquals(1, checker.checkCount)
+
+        release.complete(Unit)
+        runCurrent()
+        assertTrue(waiting.isCompleted)
+    }
+
+    @Test
+    fun whenCheckThrowsThenAwaitReturns() = runTest {
+        checker.throwOnNextCheck = IllegalStateException()
+        hook.onSyncSucceeded()
+
+        hook.awaitRunningCheck()
+
+        assertEquals(1, checker.checkCount)
+    }
+
     private class FakeAuditLogChecker : AuditLogChecker {
         var checkCount = 0
             private set
         var throwOnNextCheck: Exception? = null
+        var release: CompletableDeferred<Unit>? = null
 
         override suspend fun check(): AuditLogCheckResult {
             checkCount++
+            release?.await()
             throwOnNextCheck?.let {
                 throwOnNextCheck = null
                 throw it

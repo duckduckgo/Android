@@ -32,6 +32,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
+import com.duckduckgo.sync.impl.auditlog.AuditLogSyncHook
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
@@ -58,10 +59,16 @@ class SyncBackgroundWorker(
     @Inject
     lateinit var deviceSyncState: DeviceSyncState
 
+    @Inject
+    lateinit var auditLogSyncHook: AuditLogSyncHook
+
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
             if (deviceSyncState.isUserSignedInOnDevice()) {
                 syncEngine.triggerSync(BACKGROUND_SYNC)
+
+                // WorkManager keeps the process unfrozen only until doWork returns, and the check runs on the app scope.
+                auditLogSyncHook.awaitRunningCheck()
             }
             return@withContext Result.success()
         }
