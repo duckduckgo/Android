@@ -143,14 +143,16 @@ class RealModelsManifestStore internal constructor(
         null
     }
 
-    // pairs and file keys become directory and file names, so a model with anything but plain contract values is dropped
+    // pairs and file keys become directory and file names and sizes drive the storage check, so only plain contract values are kept
     private fun getValidModels(models: Map<String, TranslationModel>): Map<String, TranslationModel> = buildMap {
         for ((pair, model) in models) {
             val knownFiles = model.files.filterKeys { it in KNOWN_FILE_KEYS }
             val isValid = LANGUAGE_CODE.matches(model.sourceLanguage) &&
                 LANGUAGE_CODE.matches(model.targetLanguage) &&
                 pair == "${model.sourceLanguage}-${model.targetLanguage}" &&
-                knownFiles.keys in VALID_FILE_SETS
+                knownFiles.keys in VALID_FILE_SETS &&
+                model.totalBytes > 0 &&
+                knownFiles.values.all { it.bytes > 0 && it.decompressedSize > 0 }
 
             if (isValid) {
                 put(pair, model.copy(files = knownFiles))

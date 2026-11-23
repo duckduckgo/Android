@@ -138,12 +138,15 @@ class ModelsManifestStoreTest {
     }
 
     @Test
-    fun dropModelsWhosePairOrFilesCouldNotBeUsedAsNames() = runTest {
+    fun dropModelsWithUnusableNamesOrSizes() = runTest {
         store.replaceIfSupported(
             manifestOf(
                 model("en-de", "de", "en", VOCAB_FILES),
                 model("..-en", "..", "en", VOCAB_FILES),
                 model("es-en", "es", "en", listOf("model", "vocab")),
+                model("de-en", "de", "en", VOCAB_FILES).replace("\"bytes\":1", "\"bytes\":0"),
+                model("pt-en", "pt", "en", VOCAB_FILES).replace("\"decompressedSize\":1", "\"decompressedSize\":-1"),
+                model("en-es", "en", "es", VOCAB_FILES).replace("\"totalBytes\":1", "\"totalBytes\":0"),
                 model("fr-en", "fr", "en", VOCAB_FILES),
             ),
             OLD_TAG,
