@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auth.AuthPrompt
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -122,6 +123,7 @@ class SyncActivityViewModel @Inject constructor(
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val loginAuditLogFeature: LoginAuditLogFeature,
     private val auditLogStateStore: AuditLogCheckStateStore,
+    private val newLoginNotifier: NewLoginNotifier,
 ) : ViewModel() {
 
     private val syncStateObserverJob = ConflatedJob()
@@ -685,6 +687,7 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             // Only the logins on screen: one found while the user tapped Close must still show.
             auditLogStateStore.update { state -> state.copy(pendingLogins = state.pendingLogins.filterNot { it.entryId in shown }) }
+            newLoginNotifier.cancel()
         }
     }
 
