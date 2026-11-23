@@ -38,6 +38,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -82,7 +83,6 @@ class RealSegmentSkipUserPreferencesTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(true, testee.hasConsent())
         testee.setMode(SegmentSkipMode.OFF)
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(false, testee.hasConsent())
         assertEquals(false, testee.consentFlow().first())
         testee.setMode(SegmentSkipMode.ALWAYS_ASK)
@@ -96,7 +96,6 @@ class RealSegmentSkipUserPreferencesTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(true, testee.hasConsent())
         testee.setMode(SegmentSkipMode.OFF)
-        coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(false, testee.hasConsent())
         testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
@@ -192,6 +191,37 @@ class RealSegmentSkipUserPreferencesTest {
         val first = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
         val second = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
         assertEquals(listOf(false, true), listOf(first.await(), second.await()).sorted())
+    }
+
+    @Test
+    fun whenSavingOffFailsThenConsentIsSuppressedDuringSaveAndRestoredAfterFailure() = runTest {
+        testee.setMode(SegmentSkipMode.OFF)
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true)
+        val saveStarted = CompletableDeferred<Unit>()
+        val failSave = CompletableDeferred<Unit>()
+        val failingStore = object : DataStore<Preferences> by testDataStore {
+            override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences {
+                saveStarted.complete(Unit)
+                failSave.await()
+                throw IOException()
+            }
+        }
+        val preferences = RealSegmentSkipUserPreferences(failingStore, coroutineRule.testScope, feature)
+        assertTrue(preferences.consentFlow().first())
+
+        val save = async { runCatching { preferences.setMode(SegmentSkipMode.OFF) } }
+        saveStarted.await()
+        try {
+            assertFalse(preferences.hasConsent())
+            assertFalse(preferences.consentFlow().first())
+        } finally {
+            failSave.complete(Unit)
+        }
+
+        assertTrue(save.await().exceptionOrNull() is IOException)
+        assertEquals(SegmentSkipMode.ALWAYS_ASK, preferences.modeFlow().first())
+        assertTrue(preferences.consentFlow().first())
+        assertTrue(preferences.hasConsent())
     }
 
     @Test
