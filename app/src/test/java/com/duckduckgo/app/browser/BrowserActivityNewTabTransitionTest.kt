@@ -34,6 +34,8 @@ import com.duckduckgo.app.browser.databinding.ActivityBrowserBinding
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SearchWidgetDuckAi
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
+import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.AppBrowserNav
 import com.duckduckgo.app.browser.tabs.TabManager
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
@@ -46,12 +48,17 @@ import com.duckduckgo.app.browser.tabs.transition.PendingNewTabTransition
 import com.duckduckgo.app.browser.tabs.transition.RealNewTabTransitionState
 import com.duckduckgo.app.browser.tabs.transition.RealPendingNewTabTransitions
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
+import com.duckduckgo.app.tabs.DuckChatLaunch
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.InputMode
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -63,6 +70,7 @@ import org.mockito.Mockito.CALLS_REAL_METHODS
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doCallRealMethod
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
@@ -120,6 +128,7 @@ class BrowserActivityNewTabTransitionTest {
         setField("viewModel\$delegate", lazyOf(viewModel))
         setField("binding\$delegate", bindingDelegate())
         setField("pendingInputModeTargets", mutableMapOf<String, InputMode>())
+        setField("pendingNativeInputLaunches", mutableMapOf<String, NativeInputLaunch>())
         setField("externalLaunchTabIds", mutableSetOf<String>())
         setField("newTabTransitionConfig", NewTabTransitionConfig.DEFAULT)
         whenever(adapter.itemCount).thenAnswer { listed.size }
@@ -420,6 +429,92 @@ class BrowserActivityNewTabTransitionTest {
     }
 
     @Test
+    fun nativeInputLaunchIsStoredForTheNewTabAndConsumedOnce() {
+        processIntentWhileOnScreen(duckAiIntent(launch = DuckChatLaunch.ImageGeneration()))
+
+        assertNull(browser.consumeNativeInputLaunchForTab(OTHER))
+        assertEquals(NativeInputLaunch.IMAGE_GENERATION, browser.consumeNativeInputLaunchForTab(ADDED))
+        assertNull(browser.consumeNativeInputLaunchForTab(ADDED))
+    }
+
+    @Test
+    fun nativeInputLaunchIsStoredForTheNewTabAndConsumedOnceWithSwipingOff() {
+        swiping = false
+        processIntentWhileOnScreen(duckAiIntent(launch = DuckChatLaunch.CameraCapture()))
+
+        assertNull(browser.consumeNativeInputLaunchForTab(OTHER))
+        assertEquals(NativeInputLaunch.CAMERA_CAPTURE, browser.consumeNativeInputLaunchForTab(ADDED))
+        assertNull(browser.consumeNativeInputLaunchForTab(ADDED))
+    }
+
+    @Test
+    fun voiceLaunchDelegatesToOpenVoiceDuckChatWithoutLaunchingATabOrReportingTwice() {
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Voice(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+
+        val duckChat: DuckChat = mock()
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verify(duckChat).openVoiceDuckChat(DuckChatEntryPoint.WIDGET_DUCK_AI)
+        verify(duckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
+        verify(duckChat, never()).getDuckChatUrl(any(), any(), any())
+        verifyBlocking(tabManager, never()) { openNewTab(anyOrNull(), anyOrNull(), any()) }
+        verifyBlocking(viewModel, never()) { onOpenInNewTabRequested(any(), anyOrNull(), any()) }
+    }
+
+    @Test
+    fun widgetLaunchIntoAReusedEmptyTabReportsTheEntryWithoutANewTab() {
+        viewModel.stub { onBlocking { findEmptyDuckAiTabId() } doReturn OTHER }
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+        val duckChat: DuckChat = mock()
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verifyBlocking(tabManager) { switchToTab(OTHER) }
+        verify(duckChat).reportDuckChatEntry(DuckChatEntryPoint.WIDGET_DUCK_AI, opensNewTab = false, hasPrompt = false)
+    }
+
+    @Test
+    fun widgetLaunchWithoutAnEmptyTabReportsTheEntryWithANewTab() {
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+        val duckChat: DuckChat = mock { on { getDuckChatUrl("", false) } doReturn URL }
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verify(duckChat).reportDuckChatEntry(DuckChatEntryPoint.WIDGET_DUCK_AI, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun widgetImageLaunchIntoAReusedEmptyTabLeavesNoForceImageFlagBehind() {
+        viewModel.stub { onBlocking { findEmptyDuckAiTabId() } doReturn SOURCE }
+        val nativeInput = mock<NativeInputManager> { on { isNativeInputShown() } doReturn true }
+        val selectedTab = mock<BrowserTabFragment> {
+            on { tabId } doReturn SOURCE
+            on { nativeInputManager } doReturn nativeInput
+        }
+        doCallRealMethod().whenever(selectedTab).applyNativeInputLaunch(any())
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.ImageGeneration(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+
+        processIntentWhileOnScreen(intent, sourceTab = selectedTab)
+
+        verify(nativeInput).applyLaunch(eq(SOURCE), any<DuckChatLaunch.ImageGeneration>())
+        assertFalse(browser.consumeDuckChatForceImageGeneration())
+    }
+
+    @Test
+    fun newChatLaunchWithoutUrlBuildsTheChatUrlAtTapTime() {
+        val intent = AppBrowserNav().openDuckChat(host, launch = DuckChatLaunch.Open(DuckChatLaunchOrigin.HOME_SCREEN_WIDGET))
+
+        val duckChat: DuckChat = mock { on { getDuckChatUrl("", false) } doReturn URL }
+
+        processIntentWhileOnScreen(intent, duckChat)
+
+        verify(duckChat, never()).openVoiceDuckChat(any())
+        verifyBlocking(tabManager) { openNewTab(eq(URL), anyOrNull(), any()) }
+        assertTabOpened()
+    }
+
+    @Test
     fun duckAiChatFromAWidgetDoesNotGrowIn() {
         processIntentWhileOnScreen(BrowserActivity.intent(host, SearchWidgetDuckAi, openDuckChat = true, duckChatUrl = URL))
         assertTabOpened()
@@ -506,26 +601,34 @@ class BrowserActivityNewTabTransitionTest {
         verify(pending, never()).register(any(), any())
     }
 
-    private fun duckAiIntent(textSelection: String? = null): Intent = AppBrowserNav().openDuckChat(
+    private fun duckAiIntent(
+        textSelection: String? = null,
+        launch: DuckChatLaunch = textSelection?.let { DuckChatLaunch.TextSelection(it) } ?: DuckChatLaunch.Open(),
+    ): Intent = AppBrowserNav().openDuckChat(
         context = host,
         hasSessionActive = false,
         duckChatUrl = URL,
-        forceImageGeneration = false,
-        forceLaunchContextual = false,
-        textSelection = textSelection,
+        launch = launch,
     )
 
     // The browser on screen is paused while it gets an intent.
-    private fun processIntentWhileOnScreen(intent: Intent) {
+    private fun processIntentWhileOnScreen(
+        intent: Intent,
+        duckChat: DuckChat = mock(),
+        sourceTab: BrowserTabFragment = mock { on { tabId } doReturn SOURCE },
+    ) {
         controller.pause()
-        processIntent(intent)
+        processIntent(intent, duckChat, sourceTab)
     }
 
-    private fun processIntent(intent: Intent) {
-        val sourceTab: BrowserTabFragment = mock { on { tabId } doReturn SOURCE }
+    private fun processIntent(
+        intent: Intent,
+        duckChat: DuckChat = mock(),
+        sourceTab: BrowserTabFragment = mock { on { tabId } doReturn SOURCE },
+    ) {
         browser.emailProtectionLinkVerifier = mock()
         browser.syncUrlIdentifier = mock()
-        browser.duckChat = mock()
+        browser.duckChat = duckChat
         browser.duckAiEntryCallback = lazyOf(mock())
         browser.omnibarEntryConverter = mock { on { convertQueryToUrl(any(), anyOrNull(), any(), any()) } doReturn URL }
         whenever(tabManager.getSelectedTabId()).thenReturn(SOURCE)
@@ -580,5 +683,6 @@ class BrowserActivityNewTabTransitionTest {
         const val OTHER = "other"
         const val REPLACEMENT = "replacement"
         const val URL = "https://example.com"
+        const val VOICE_URL = "https://duck.ai/?mode=voice-mode"
     }
 }

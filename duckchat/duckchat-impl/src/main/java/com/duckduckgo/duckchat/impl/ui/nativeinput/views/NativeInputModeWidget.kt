@@ -58,6 +58,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -195,7 +196,7 @@ interface NativeInputWidget {
         onPageContextRemoved: () -> Unit,
     )
     fun storePendingPrompt(query: String)
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false)
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open())
     fun setOmnibarPosition(isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
@@ -1548,13 +1549,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
     }
 
-    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean) {
+    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch) {
         activeTabId = tabId
         setOmnibarPosition(isBottom)
         doOnAttach {
-            viewModel.configure(tabId, isDuckAiMode, isBottom, forceImageGeneration)
+            viewModel.configure(tabId, isDuckAiMode, isBottom, launch)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
+            if (shouldLaunchCameraCapture(isDuckAiMode, launch, viewModel.supportsImageUpload())) launchCameraCapture()
+        }
+    }
+
+    // Same sink the attach menu's "Take photo" feeds, reached through the ViewModel the attachment plugin shares,
+    // so the launch needs no attachment view to exist yet.
+    private fun launchCameraCapture() {
+        requestCameraCapture { uris ->
+            val images = uris?.toList().orEmpty()
+            if (images.isNotEmpty()) attachmentViewModel?.onImagesPicked(images, AttachmentViewModel.ImageSource.CAMERA)
         }
     }
 
@@ -2140,6 +2151,12 @@ internal fun hasPendingAdoptedAttachments(
     pendingImages: List<SubmittedImage>,
     pendingFiles: List<SubmittedFile>,
 ): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
+
+internal fun shouldLaunchCameraCapture(
+    isDuckAiMode: Boolean,
+    launch: DuckChatLaunch,
+    supportsImageUpload: Boolean,
+): Boolean = isDuckAiMode && launch is DuckChatLaunch.CameraCapture && supportsImageUpload
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on

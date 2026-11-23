@@ -27,6 +27,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.DuckAiTabSessionRepository
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -46,7 +47,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.toPixelValue
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
@@ -188,8 +188,17 @@ interface DuckChatInternal : DuckChat {
      */
     fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint)
 
+    /** Single source of truth for the URL that opens a Duck.ai voice chat. */
+    fun getVoiceDuckChatUrl(): String
+
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
+
+    /**
+     * Same URL as [buildChatUrl] but never reads or consumes the pending address bar picker attribution.
+     * For surfaces that render URLs without the user opening them.
+     */
+    fun buildChatUrlWithoutAttribution(chatId: String): String
 
     /**
      * Calls onClose when a close event is emitted.
@@ -724,23 +733,12 @@ class RealDuckChat @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             // Only force image generation once an image-capable model is selected, otherwise the tool
             // would be unavailable. The new tab this opens consumes the flag when its input configures.
-            val forceImageGeneration = ensureImageCapableModelSelected()
+            val launch = if (duckAiModelManager.ensureImageCapableModelSelected()) DuckChatLaunch.ImageGeneration() else DuckChatLaunch.Open()
             withContext(dispatchers.main()) {
                 reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-                openDuckChat(emptyMap(), forceNewSession = true, forceImageGeneration = forceImageGeneration)
+                openDuckChat(emptyMap(), forceNewSession = true, launch = launch)
             }
         }
-    }
-
-    private suspend fun ensureImageCapableModelSelected(): Boolean {
-        val state = duckAiModelManager.modelState.value
-        val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
-        if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return true
-        val imageCapableModel = state.models.firstOrNull {
-            it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
-        } ?: return false
-        duckAiModelManager.selectModel(imageCapableModel)
-        return true
     }
 
     override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {
@@ -792,9 +790,11 @@ class RealDuckChat @Inject constructor(
     override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openVoiceDuckChat" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false, voice = true)
-        val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
-        openDuckChat(parameters, forceNewSession = true)
+        openDuckChatUrl(getVoiceDuckChatUrl(), forceNewSession = true)
     }
+
+    override fun getVoiceDuckChatUrl(): String =
+        appendParameters(mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE) + nativeChatInputParameters(), getDuckChatLink())
 
     override fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint) {
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
@@ -824,9 +824,16 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChat(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
-        forceImageGeneration: Boolean = false,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ) {
-        val url = appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink())
+        openDuckChatUrl(appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink()), forceNewSession, launch)
+    }
+
+    private fun openDuckChatUrl(
+        url: String,
+        forceNewSession: Boolean = false,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
                 when {
@@ -836,7 +843,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
-                openDuckChatSession(url, hasSessionActive, forceImageGeneration)
+                openDuckChatSession(url, hasSessionActive, launch)
             }
         }
     }
@@ -844,12 +851,12 @@ class RealDuckChat @Inject constructor(
     private fun openDuckChatSession(
         url: String,
         hasSessionActive: Boolean,
-        forceImageGeneration: Boolean = false,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ) {
         // if a new query was submitted we force a new session
         // we want to lose the context of the previous one if the user wanted a new query from outside Duck.ai
         browserNav
-            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, forceImageGeneration = forceImageGeneration)
+            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, launch = launch)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)
@@ -862,10 +869,10 @@ class RealDuckChat @Inject constructor(
     private fun resolveDuckAiUrl(link: String): String =
         link.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
 
-    private fun nativeChatInputParameters(): Map<String, String> {
+    private fun nativeChatInputParameters(consumeAttribution: Boolean = true): Map<String, String> {
         if (!isNativeChatInputEnabled) return emptyMap()
         val params = mutableMapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE)
-        if (addressBarPickerAttributionRepository.consumeAttributionToPicker()) {
+        if (consumeAttribution && addressBarPickerAttributionRepository.consumeAttributionToPicker()) {
             params[ORIGIN_QUERY_NAME] = ORIGIN_VALUE_ADDRESS_BAR_PICKER
         }
         return params
@@ -951,6 +958,10 @@ class RealDuckChat @Inject constructor(
 
     override fun buildChatUrl(chatId: String): String {
         return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeChatInputParameters(), getDuckChatLink())
+    }
+
+    override fun buildChatUrlWithoutAttribution(chatId: String): String {
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeChatInputParameters(consumeAttribution = false), getDuckChatLink())
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {

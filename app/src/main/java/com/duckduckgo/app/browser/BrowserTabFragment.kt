@@ -162,6 +162,7 @@ import com.duckduckgo.app.browser.model.BasicAuthenticationCredentials
 import com.duckduckgo.app.browser.model.BasicAuthenticationRequest
 import com.duckduckgo.app.browser.model.LongPressTarget
 import com.duckduckgo.app.browser.nativeinput.NativeInputCallbacks
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.browser.nativeinput.NativeInputManager
 import com.duckduckgo.app.browser.navigation.bar.BrowserNavigationBarViewIntegration
 import com.duckduckgo.app.browser.navigation.bar.view.BrowserNavigationBarObserver
@@ -240,6 +241,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -733,6 +735,10 @@ class BrowserTabFragment :
     // opened the tab and handed to the viewmodel in loadData. Not persisted: only meaningful for the
     // tab's initial launch within this process.
     var inputModeTarget: InputMode? = null
+
+    // One-shot native input instructions for this tab's first Duck.ai show (e.g. from a home-screen widget).
+    // Not persisted, for the same reason as inputModeTarget.
+    var nativeInputLaunch: NativeInputLaunch? = null
 
     private val initialUrl get() = requireArguments().getString(URL_EXTRA_ARG)
 
@@ -1413,7 +1419,11 @@ class BrowserTabFragment :
         }
     }
 
-    private fun showNativeInput(query: String = "", forceImageGeneration: Boolean = false, textSelection: String? = null) {
+    private fun showNativeInput(
+        query: String = "",
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        textSelection: String? = null,
+    ) {
         viewModel.onSearchInputOpened(prefill = query.ifEmpty { omnibar.getText() })
         nativeInputManager.showNativeInput(
             tabId = tabId,
@@ -1423,7 +1433,7 @@ class BrowserTabFragment :
             currentTabUrl = viewModel.siteLiveData.asFlow().map { it?.url },
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
-            forceImageGeneration = forceImageGeneration,
+            launch = launch,
             textSelection = textSelection,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
@@ -2505,7 +2515,11 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
-        showNativeInput(forceImageGeneration = forceImageGeneration, textSelection = browserActivity?.consumePendingDuckChatTextSelection())
+        val pendingLaunch = nativeInputLaunch.also { nativeInputLaunch = null }
+        showNativeInput(
+            launch = if (forceImageGeneration) DuckChatLaunch.ImageGeneration() else pendingLaunch?.toDuckChatLaunch() ?: DuckChatLaunch.Open(),
+            textSelection = browserActivity?.consumePendingDuckChatTextSelection(),
+        )
     }
 
     private fun showMaliciousWarning(
@@ -2649,6 +2663,14 @@ class BrowserTabFragment :
 
     fun openSavedSite(url: String) {
         viewModel.onUserSubmittedQuery(url, QueryOrigin.FromBookmark)
+    }
+
+    fun applyNativeInputLaunch(launch: NativeInputLaunch) {
+        if (nativeInputManager.isNativeInputShown()) {
+            nativeInputManager.applyLaunch(tabId = tabId, launch = launch.toDuckChatLaunch())
+        } else {
+            nativeInputLaunch = launch
+        }
     }
 
     fun submitQuery(query: String) {
