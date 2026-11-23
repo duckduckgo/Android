@@ -99,7 +99,7 @@ class ModelsManifestSchedulerTest {
     private fun verifyConnectedWorkEnqueuedOnce() {
         val request = argumentCaptor<OneTimeWorkRequest>()
 
-        verify(workManager).enqueueUniqueWork(eq(MANIFEST_WORK_NAME), eq(ExistingWorkPolicy.KEEP), request.capture())
+        verify(workManager).enqueueUniqueWork(eq(MANIFEST_WORK_NAME), eq(ExistingWorkPolicy.REPLACE), request.capture())
 
         assertEquals(NetworkType.CONNECTED, request.firstValue.workSpec.constraints.requiredNetworkType)
         assertEquals(ModelsManifestWorker::class.java.name, request.firstValue.workSpec.workerClassName)
