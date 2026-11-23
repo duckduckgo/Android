@@ -91,6 +91,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -119,6 +120,7 @@ class RealDuckChatPixelsTest {
     private val mockBrowserInteractionsPlugin: BrowserInteractionsPlugin = mock()
     private val mockBrowserInteractionsPlugins: PluginPoint<BrowserInteractionsPlugin> = mock()
     private val mockDuckAiNewChatMetricPixelsPlugin: DuckAiNewChatMetricPixelsPlugin = mock()
+    private val mockSwipeUpNewChatUsage: SwipeUpNewChatUsage = mock()
     private val fakeMetricsPixelExtension = FakeMetricsPixelExtension()
 
     private val newChatMetric = MetricsPixel(
@@ -153,6 +155,7 @@ class RealDuckChatPixelsTest {
             browserInteractionsPlugins = mockBrowserInteractionsPlugins,
             duckAiNewChatMetricPixelsPlugin = mockDuckAiNewChatMetricPixelsPlugin,
             duckAiSessionCallback = mock(),
+            swipeUpNewChatUsage = mockSwipeUpNewChatUsage,
         )
     }
 
@@ -649,6 +652,64 @@ class RealDuckChatPixelsTest {
         )
         verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_COUNT, params)
         verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when swipe up new chat entry then records the swipe and adds was_used_before`() = runTest {
+        whenever(mockSwipeUpNewChatUsage.recordSwipe()).thenReturn(true)
+
+        testee.sendDuckChatEntryPixel(
+            entryPoint = DuckChatEntryPoint.SWIPE_UP_NEW_CHAT,
+            opensNewTab = true,
+            hasPrompt = false,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+        )
+        advanceUntilIdle()
+
+        val params = mapOf(
+            "source" to "swipe_up_new_chat",
+            "voice" to "false",
+            "duck_ai_enabled" to "true",
+            "input_screen_enabled" to "true",
+            "opens_new_tab" to "true",
+            "has_prompt" to "false",
+            "was_used_before" to "1",
+        )
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_COUNT, params)
+        verify(mockPixel).fire(DUCK_CHAT_ENTRY_POINT_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
+    fun `when swipe up new chat usage cannot be read then was_used_before is omitted`() = runTest {
+        whenever(mockSwipeUpNewChatUsage.recordSwipe()).thenReturn(null)
+
+        testee.sendDuckChatEntryPixel(
+            DuckChatEntryPoint.SWIPE_UP_NEW_CHAT,
+            opensNewTab = true,
+            hasPrompt = false,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+        )
+        advanceUntilIdle()
+
+        val parameters = argumentCaptor<Map<String, String>>()
+        verify(mockPixel).fire(eq(DUCK_CHAT_ENTRY_POINT_COUNT), parameters.capture(), eq(emptyMap()), eq(Pixel.PixelType.Count))
+        assertFalse(parameters.firstValue.containsKey("was_used_before"))
+    }
+
+    @Test
+    fun `when other entry then swipe usage is not recorded`() = runTest {
+        testee.sendDuckChatEntryPixel(
+            DuckChatEntryPoint.DUCK_AI_NEW_CHAT,
+            opensNewTab = true,
+            hasPrompt = false,
+            duckAiEnabled = true,
+            inputScreenEnabled = true,
+        )
+        advanceUntilIdle()
+
+        verifyNoInteractions(mockSwipeUpNewChatUsage)
     }
 
     @Test

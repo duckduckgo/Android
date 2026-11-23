@@ -488,7 +488,13 @@
                 "description": "Whether the Search and Duck.ai input capability is enabled."
             },
             { "key": "opens_new_tab", "type": "boolean", "description": "Whether this entry opens a new browser tab." },
-            { "key": "has_prompt", "type": "boolean", "description": "Whether a non-blank prompt is automatically submitted on entry." }
+            { "key": "has_prompt", "type": "boolean", "description": "Whether a non-blank prompt is automatically submitted on entry." },
+            {
+                "key": "was_used_before",
+                "type": "integer",
+                "description": "Sent only with source=swipe_up_new_chat: 1 if the user had swiped up for a new chat before, else 0.",
+                "enum": [0, 1]
+            }
         ]
     },
     "m_aichat_duck_ai_direct_navigation_count": {
@@ -2192,6 +2198,13 @@
         "description": "The user has ignored New Chat hints in enough New Chats that the hints stop showing. Once per install, the first time the cap is reached.",
         "owners": ["karlenDimla"],
         "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_swipe_new_chat_used_3_days_u": {
+        "description": "Fires once per install when the user swipes up past the end of a Duck.ai chat for a new chat on a third distinct local day. Compare with unique users sending m_aichat_entry_point with source=swipe_up_new_chat for the habit rate.",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["user_interaction"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     }

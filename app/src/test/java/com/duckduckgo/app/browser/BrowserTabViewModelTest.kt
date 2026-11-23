@@ -14866,7 +14866,7 @@ class BrowserTabViewModelTest {
             assertEquals("abc", sourceTabId)
         }
         verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
-        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.SWIPE_UP_NEW_CHAT, opensNewTab = true, hasPrompt = false)
     }
 
     @Test

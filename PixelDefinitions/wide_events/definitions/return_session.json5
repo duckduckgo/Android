@@ -4,7 +4,7 @@
         "owners": ["YoussefKeyrouz"],
         "meta": {
             "type": "android-return-session",
-            "version": "0.2"
+            "version": "0.3"
         },
         "feature": {
             "name": "return_session",
@@ -128,7 +128,8 @@
                             "duck_ai_new_chat",
                             "recent_chat_tab_switcher",
                             "recent_chat_contextual",
-                            "chat_suggestion_input"
+                            "chat_suggestion_input",
+                            "swipe_up_new_chat"
                         ]
                     }
                 }

@@ -290,7 +290,7 @@ class RealReturnSessionWideEventTest {
     }
 
     @Test
-    fun `when session starts then it declares definition version 1_0_1`() = runTest {
+    fun `when session starts then it declares definition version 1_0_3`() = runTest {
         startSession()
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
 
@@ -300,7 +300,7 @@ class RealReturnSessionWideEventTest {
             metadata = any(),
             cleanupPolicy = any(),
             samplingProbability = any(),
-            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2))),
+            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 3))),
         )
     }
 

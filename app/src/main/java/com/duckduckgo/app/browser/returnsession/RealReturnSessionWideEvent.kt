@@ -366,7 +366,7 @@ class RealReturnSessionWideEvent @Inject constructor(
     private companion object {
         const val TAG = "RealReturnSessionWideEvent"
         const val FEATURE_NAME = "return_session"
-        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 2)
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 3)
         const val REASON_SEARCH_SUBMITTED = "search_submitted"
         const val REASON_URL_SUBMITTED = "url_submitted"
         const val REASON_AI_PROMPT_SUBMITTED = "ai_prompt_submitted"
