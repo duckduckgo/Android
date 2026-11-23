@@ -191,7 +191,7 @@ class DuckAiWidgetProviderTest {
             whenever(repository.isDuckChatUserEnabled()).thenReturn(true)
             whenever(duckChat.isChatHistoryAvailable()).thenReturn(true)
         }
-        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
     }
 
     private fun runBlockingStub(block: suspend () -> Unit) = kotlinx.coroutines.runBlocking { block() }

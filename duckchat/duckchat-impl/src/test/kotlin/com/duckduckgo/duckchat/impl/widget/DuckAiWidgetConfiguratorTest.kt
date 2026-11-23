@@ -143,7 +143,7 @@ class DuckAiWidgetConfiguratorTest {
     fun whenChatsAvailableThenListShownAndTemplateLaunchesDuckAi() = runTest {
         stubDuckAi(enabled = true, historyAvailable = true)
         whenever(chatStore.getChats()).thenReturn(listOf(chat("a"), chat("b", pinned = true)))
-        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
@@ -152,8 +152,8 @@ class DuckAiWidgetConfiguratorTest {
         verify(remoteViews).setPendingIntentTemplate(eq(R.id.chatsList), captor.capture())
         assertEquals(null, shadowOf(captor.firstValue).savedIntent.extras)
         assertEquals(DuckAiWidgetTarget.CHAT.requestCode, shadowOf(captor.firstValue).requestCode)
-        verify(duckChat).buildChatUrl("a")
-        verify(duckChat).buildChatUrl("b")
+        verify(duckChat).buildChatUrlWithoutAttribution("a")
+        verify(duckChat).buildChatUrlWithoutAttribution("b")
     }
 
     @Test
@@ -167,7 +167,7 @@ class DuckAiWidgetConfiguratorTest {
                 chat("pinned", pinned = true, lastEdit = "2026-02-01T00:00:00.000Z"),
             ),
         )
-        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
@@ -202,7 +202,7 @@ class DuckAiWidgetConfiguratorTest {
             chat("pinned-voice", pinned = true, isVoice = true, lastEdit = "2026-01-01T00:00:07.000Z"),
         )
         whenever(chatStore.getChats()).thenReturn(chats)
-        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
@@ -232,7 +232,7 @@ class DuckAiWidgetConfiguratorTest {
                 chat("b", lastEdit = "2026-02-01T00:00:00.000Z"),
             ),
         )
-        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
@@ -513,7 +513,7 @@ class DuckAiWidgetConfiguratorTest {
         duckChatFeature.self().setRawStoredState(State(true))
         whenever(repository.isDuckChatUserEnabled()).thenReturn(enabled)
         whenever(duckChat.isChatHistoryAvailable()).thenReturn(historyAvailable)
-        whenever(duckChat.buildChatUrl(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenAnswer { "https://duck.ai/?chatID=${it.arguments[0]}" }
         if (historyAvailable) whenever(chatStore.getChats()).thenReturn(chats)
     }
 

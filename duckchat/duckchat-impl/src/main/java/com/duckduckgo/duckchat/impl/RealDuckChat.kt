@@ -195,6 +195,12 @@ interface DuckChatInternal : DuckChat {
     fun buildChatUrl(chatId: String): String
 
     /**
+     * Same URL as [buildChatUrl] but never reads or consumes the pending address bar picker attribution.
+     * For surfaces that render URLs without the user opening them.
+     */
+    fun buildChatUrlWithoutAttribution(chatId: String): String
+
+    /**
      * Calls onClose when a close event is emitted.
      */
     fun observeCloseEvent(
@@ -863,10 +869,10 @@ class RealDuckChat @Inject constructor(
     private fun resolveDuckAiUrl(link: String): String =
         link.toUri().buildUpon().authority(duckAiHostProvider.getHost()).build().toString()
 
-    private fun nativeChatInputParameters(): Map<String, String> {
+    private fun nativeChatInputParameters(consumeAttribution: Boolean = true): Map<String, String> {
         if (!isNativeChatInputEnabled) return emptyMap()
         val params = mutableMapOf(NATIVE_INPUT_QUERY_NAME to NATIVE_INPUT_QUERY_VALUE)
-        if (addressBarPickerAttributionRepository.consumeAttributionToPicker()) {
+        if (consumeAttribution && addressBarPickerAttributionRepository.consumeAttributionToPicker()) {
             params[ORIGIN_QUERY_NAME] = ORIGIN_VALUE_ADDRESS_BAR_PICKER
         }
         return params
@@ -952,6 +958,10 @@ class RealDuckChat @Inject constructor(
 
     override fun buildChatUrl(chatId: String): String {
         return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeChatInputParameters(), getDuckChatLink())
+    }
+
+    override fun buildChatUrlWithoutAttribution(chatId: String): String {
+        return appendParameters(mapOf(CHAT_ID_QUERY_NAME to chatId) + nativeChatInputParameters(consumeAttribution = false), getDuckChatLink())
     }
 
     override suspend fun setDefaultTogglePosition(position: DefaultTogglePosition) {

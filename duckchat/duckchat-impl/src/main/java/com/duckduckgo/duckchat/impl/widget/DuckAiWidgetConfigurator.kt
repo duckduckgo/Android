@@ -206,7 +206,7 @@ class DuckAiWidgetConfigurator @Inject constructor(
         val widgetChats = if (duckChat.isChatHistoryAvailable()) runCatching { chats.getChats() }.getOrDefault(emptyList()) else emptyList()
         return State(
             chats = widgetChats,
-            chatUrls = widgetChats.associate { it.chatId to duckChat.buildChatUrl(it.chatId) },
+            chatUrls = widgetChats.associate { it.chatId to duckChat.buildChatUrlWithoutAttribution(it.chatId) },
         )
     }
 

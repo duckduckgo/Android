@@ -1548,6 +1548,31 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun `when building a chat url without attribution then pending picker attribution is not consumed`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(true)
+
+        val url = testee.buildChatUrlWithoutAttribution(chatId = "abc-123")
+
+        assertEquals("https://duck.ai/chat?chatID=abc-123&native-input=true&duckai=5", url)
+        verify(mockAddressBarPickerAttributionRepository, never()).consumeAttributionToPicker()
+    }
+
+    @Test
+    fun `when building a chat url with a pending picker attribution then url contains origin`() = runTest {
+        duckChatFeature.nativeChatInput().setRawStoredState(State(enable = true))
+        testee.onPrivacyConfigDownloaded()
+        coroutineRule.testScope.advanceUntilIdle()
+        whenever(mockAddressBarPickerAttributionRepository.consumeAttributionToPicker()).thenReturn(true)
+
+        val url = testee.buildChatUrl(chatId = "abc-123")
+
+        assertEquals("https://duck.ai/chat?chatID=abc-123&native-input=true&origin=funnel_addressbar_android__aitoggle&duckai=5", url)
+    }
+
+    @Test
     fun `when url can be handled by webview return true`() {
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath"))
         assertTrue(testee.canHandleOnAiWebView("https://duck.ai/somepath/someotherpath?test=1"))
