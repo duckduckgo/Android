@@ -499,6 +499,9 @@ dependencies {
     playImplementation project(':credential-exchange-impl')
     fdroidImplementation project(':credential-exchange-dummy-impl')
 
+    internalImplementation project(':age-signals-impl')
+    playImplementation project(':age-signals-impl')
+
     implementation project(':subscriptions-api')
 
     internalImplementation project(':subscriptions-impl')
