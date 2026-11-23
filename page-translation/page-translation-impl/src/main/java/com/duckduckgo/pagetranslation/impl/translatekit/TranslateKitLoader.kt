@@ -48,16 +48,25 @@ class RealTranslateKitLibrary @Inject constructor(
     override fun isInitialized(): Boolean = TranslateKit.isInitialized()
 }
 
+interface TranslateKitLoader {
+    /** Starts loading translate-kit once, in the background, when page translation is on. */
+    fun loadIfNeeded()
+
+    /** True when page translation is on and translate-kit loaded. */
+    fun isAvailable(): Boolean
+}
+
 @SingleIn(AppScope::class)
-class TranslateKitLoader @Inject constructor(
+@ContributesBinding(AppScope::class)
+class RealTranslateKitLoader @Inject constructor(
     private val library: TranslateKitLibrary,
     private val feature: PageTranslationFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
-) {
+) : TranslateKitLoader {
     private val isLoadingStarted = AtomicBoolean(false)
 
-    fun loadIfNeeded() {
+    override fun loadIfNeeded() {
         if (isLoadingStarted.get()) return
 
         appScope.launch(dispatchers.io()) {
@@ -71,5 +80,5 @@ class TranslateKitLoader @Inject constructor(
         }
     }
 
-    fun isAvailable(): Boolean = feature.translation().isEnabled() && library.isInitialized()
+    override fun isAvailable(): Boolean = feature.translation().isEnabled() && library.isInitialized()
 }

@@ -33,7 +33,7 @@ class TranslateKitLoaderTest {
 
     private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java)
     private val library = FakeTranslateKitLibrary()
-    private val loader = TranslateKitLoader(library, feature, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
+    private val loader = RealTranslateKitLoader(library, feature, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
 
     @Test
     fun initializeLibraryOnceWhenPagesFinishWithFlagOn() {
