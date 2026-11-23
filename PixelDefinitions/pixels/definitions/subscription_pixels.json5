@@ -469,5 +469,61 @@
         "triggers": ["user_interaction"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": ["appVersion", "freeTrial"]
+    },
+    "subscription_cancellation_cancel_click": {
+        "description": "The user tapped Cancel Subscription in Subscription Settings, which opens the subscription cancellation flow.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "subscription_cancellation_play_store_cancelled": {
+        "description": "A Google Play subscription that was set to auto-renew is no longer set to auto-renew after the user returns from the Play Store subscription screen, opened from the cancellation flow or from Manage Subscription in Subscription Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "entry",
+                "type": "string",
+                "description": "Which Subscription Settings row opened the Play Store subscription screen",
+                "enum": ["cancellation", "manage"]
+            },
+            "freeTrial",
+            {
+                "key": "days_since_purchase",
+                "type": "string",
+                "description": "Days between the subscription start date and the cancellation, bucketed: d1 is days 0-1, d2_7 is days 2-7, d8_30 is days 8-30, d31_plus is day 31 onwards",
+                "enum": ["d1", "d2_7", "d8_30", "d31_plus"]
+            }
+        ]
+    },
+    "subscription_cancellation_flow_load_failure": {
+        "description": "The cancellation flow page failed to load, from a network error or an HTTP 4xx/5xx response, so the app falls back to the Play Store subscription screen.",
+        "owners": ["nalcalag"],
+        "triggers": ["exception"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "Whether the page failed with an HTTP error response or a network error",
+                "enum": ["http", "network"]
+            },
+            {
+                "key": "error_code",
+                "type": "integer",
+                "description": "The HTTP status code (400-599) for http failures, or the WebViewClient ERROR_* code (negative) for network failures"
+            }
+        ]
+    },
+    "subscription_cancellation_feature-info_failure": {
+        "description": "The cancellation flow page asked to show a feature info screen for a feature the app does not recognize, so no screen is shown.",
+        "owners": ["nalcalag"],
+        "triggers": ["exception"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
     }
 }

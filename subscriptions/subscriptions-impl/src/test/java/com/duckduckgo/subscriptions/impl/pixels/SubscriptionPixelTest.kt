@@ -13,6 +13,10 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_NOT_SEEN_D7
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PAYWALL_SHOWN_FIRST_TIME
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.PURCHASE_SUCCESS_ORIGIN
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_CANCEL_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_FEATURE_INFO_FAILURE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_FLOW_LOAD_FAILURE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_PLAY_STORE_CANCELLED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED
@@ -62,6 +66,10 @@ class SubscriptionPixelTest(
                 SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_DISMISS,
                 SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_SHOWN,
                 SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_CLICK,
+                SUBSCRIPTION_CANCELLATION_CANCEL_CLICK,
+                SUBSCRIPTION_CANCELLATION_PLAY_STORE_CANCELLED,
+                SUBSCRIPTION_CANCELLATION_FLOW_LOAD_FAILURE,
+                SUBSCRIPTION_CANCELLATION_FEATURE_INFO_FAILURE,
             ),
         )
 
