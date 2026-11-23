@@ -164,7 +164,7 @@ class RealDuckChatTest {
         )
         coroutineRule.testScope.advanceUntilIdle()
 
-        whenever(mockBrowserNav.openDuckChat(any(), any(), anyOrNull(), any())).thenReturn(mockIntent)
+        whenever(mockBrowserNav.openDuckChat(any(), any(), anyOrNull(), any(), anyOrNull())).thenReturn(mockIntent)
         whenever(mockBrowserNav.closeDuckChat(any())).thenReturn(mockIntent)
     }
 
@@ -2119,7 +2119,7 @@ class RealDuckChatTest {
         testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.ImageGeneration()), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 
@@ -2130,7 +2130,7 @@ class RealDuckChatTest {
         testee.openDuckChatImageGeneration(DuckChatEntryPoint.BROWSING_MENU_WEBPAGE)
         coroutineRule.testScope.advanceUntilIdle()
 
-        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.Open()))
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.Open()), anyOrNull())
         verify(mockContext).startActivity(mockIntent)
     }
 

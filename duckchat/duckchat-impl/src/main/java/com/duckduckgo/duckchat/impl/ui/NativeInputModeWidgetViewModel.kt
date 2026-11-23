@@ -729,7 +729,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open()) {
+    fun configure(
+        tabId: String,
+        isDuckAiMode: Boolean,
+        isBottom: Boolean,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        overrideModelId: String? = null,
+    ) {
         imageLaunchJob.cancel()
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
@@ -750,14 +756,27 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             null
         }
         // The selected model can change after a launch (a widget tap) was built, so the tool is only preselected
-        // once an image-capable model is selected; otherwise the options clear it again.
+        // once an image-capable model is selected; otherwise the options clear it again. When new chats start on
+        // the default model, the global selection stays put and the tab picks the image-capable model instead.
         if (isDuckAiMode && launch is DuckChatLaunch.ImageGeneration) {
             imageLaunchJob += viewModelScope.launch {
-                if (modelManager.ensureImageCapableModelSelected()) {
+                val imageCapable = modelManager.ensureImageCapableModelSelected() &&
+                    (!duckChatFeature.resetModelForNewChats().isEnabled() || pickImageCapableModel(tabId))
+                if (imageCapable) {
                     nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
                 }
             }
         }
+        if (isDuckAiMode && overrideModelId != null) pickNewChatModel(overrideModelId)
+    }
+
+    private fun pickImageCapableModel(tabId: String): Boolean {
+        val modelState = modelManager.modelState.value
+        val newChat = modelState.forTab(nativeInputStateProvider.stateForTab(tabId).value)
+        if (newChat.models.firstOrNull { it.id == newChat.selectedModelId }?.supportsTool(Tool.IMAGE_GENERATION) == true) return true
+        val capable = modelState.models.firstOrNull { it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION) } ?: return false
+        nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = capable.id) }
+        return true
     }
 
     fun supportsImageUpload(): Boolean = modelManager.modelState.value.supportsImageUpload(duckChatInternal.isImageUploadEnabled())

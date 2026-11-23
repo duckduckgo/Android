@@ -40,12 +40,14 @@ interface BrowserNav {
      *
      * @param duckChatUrl the URL to open, or null to start a new chat.
      * @param launch how Duck.ai is launched and where the launch comes from.
+     * @param overrideModelId when set, the new tab's native input starts its next new chat on this model.
      */
     fun openDuckChat(
         context: Context,
         hasSessionActive: Boolean = false,
         duckChatUrl: String? = null,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        overrideModelId: String? = null,
     ): Intent
     fun closeDuckChat(context: Context): Intent
 

@@ -191,6 +191,9 @@ interface DuckChatInternal : DuckChat {
     /** Single source of truth for the URL that opens a Duck.ai voice chat. */
     fun getVoiceDuckChatUrl(): String
 
+    /** Opens Duck.ai from [entryPoint] like [openDuckChat], with the tab's next new chat starting on [overrideModelId]. */
+    fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?)
+
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
@@ -720,9 +723,13 @@ class RealDuckChat @Inject constructor(
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
     override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
+        openDuckChat(entryPoint, overrideModelId = null)
+    }
+
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?) {
         logcat { "Duck.ai: openDuckChat" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-        openDuckChat(emptyMap())
+        openDuckChat(emptyMap(), overrideModelId = overrideModelId)
     }
 
     override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {
@@ -833,14 +840,16 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        overrideModelId: String? = null,
     ) {
-        openDuckChatUrl(appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink()), forceNewSession, launch)
+        openDuckChatUrl(appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink()), forceNewSession, launch, overrideModelId)
     }
 
     private fun openDuckChatUrl(
         url: String,
         forceNewSession: Boolean = false,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        overrideModelId: String? = null,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
@@ -851,7 +860,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
-                openDuckChatSession(url, hasSessionActive, launch)
+                openDuckChatSession(url, hasSessionActive, launch, overrideModelId)
             }
         }
     }
@@ -860,11 +869,12 @@ class RealDuckChat @Inject constructor(
         url: String,
         hasSessionActive: Boolean,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        overrideModelId: String? = null,
     ) {
         // if a new query was submitted we force a new session
         // we want to lose the context of the previous one if the user wanted a new query from outside Duck.ai
         browserNav
-            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, launch = launch)
+            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, launch = launch, overrideModelId = overrideModelId)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)

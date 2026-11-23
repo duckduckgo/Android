@@ -40,7 +40,7 @@ class DuckAiWidgetIntentsFillInTest {
 
     // Mirrors BrowserActivity.intent(): the URL and every launch extra are always written, even when empty.
     private val nav: BrowserNav = mock<BrowserNav>().also {
-        whenever(it.openDuckChat(any(), any(), anyOrNull(), any())).thenAnswer { call ->
+        whenever(it.openDuckChat(any(), any(), anyOrNull(), any(), anyOrNull())).thenAnswer { call ->
             val fromWidget = (call.getArgument<DuckChatLaunch>(3) as? DuckChatLaunch.Open)?.origin == DuckChatLaunchOrigin.HOME_SCREEN_WIDGET
             Intent()
                 .putExtra("DUCK_CHAT_URL", call.getArgument<String?>(2))

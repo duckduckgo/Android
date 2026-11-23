@@ -1969,14 +1969,15 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenResetModelForNewChatsThenEnsureImageCapablePublishesImageModelWithoutPersisting() = runTest {
+    fun whenResetModelForNewChatsThenEnsureImageCapableOnlyReportsAnImageModelAndLeavesTheSelection() = runTest {
         duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
         givenModels(remoteModel("text"), remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)))
+        val selectedBefore = testee.modelState.value.selectedModelId
         clearInvocations(dataStore)
 
         assertTrue(testee.ensureImageCapableModelSelected())
 
-        assertEquals("image", testee.modelState.value.selectedModelId)
+        assertEquals(selectedBefore, testee.modelState.value.selectedModelId)
         verify(dataStore, never()).setSelectedModel(anyOrNull())
         verify(dataStore, never()).setSelectedProvider(anyOrNull())
     }

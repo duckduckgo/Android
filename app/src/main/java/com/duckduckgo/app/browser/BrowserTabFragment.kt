@@ -1452,6 +1452,7 @@ class BrowserTabFragment :
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
         textSelection: String? = null,
         files: List<Uri> = emptyList(),
+        overrideModelId: String? = null,
     ) {
         viewModel.onSearchInputOpened(prefill = query.ifEmpty { omnibar.getText() })
         nativeInputManager.showNativeInput(
@@ -1465,6 +1466,7 @@ class BrowserTabFragment :
             launch = launch,
             textSelection = textSelection,
             files = files,
+            overrideModelId = overrideModelId,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -2547,10 +2549,12 @@ class BrowserTabFragment :
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
         val pendingLaunch = nativeInputLaunch.also { nativeInputLaunch = null }
         val (textSelection, files) = browserActivity?.consumeDuckChatAttachmentsForTab(tabId) ?: (null to emptyList())
+        val overrideModelId = if (nativeInputManager.isNativeInputShown()) null else browserActivity?.consumeDuckChatOverrideModelId()
         showNativeInput(
             launch = if (forceImageGeneration) DuckChatLaunch.ImageGeneration() else pendingLaunch?.toDuckChatLaunch() ?: DuckChatLaunch.Open(),
             textSelection = textSelection,
             files = files,
+            overrideModelId = overrideModelId,
         )
     }
 

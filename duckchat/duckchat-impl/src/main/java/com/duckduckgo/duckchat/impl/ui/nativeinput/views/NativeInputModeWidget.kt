@@ -197,7 +197,13 @@ interface NativeInputWidget {
         onPageContextRemoved: () -> Unit,
     )
     fun storePendingPrompt(query: String)
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open())
+    fun configure(
+        tabId: String,
+        isDuckAiMode: Boolean,
+        isBottom: Boolean,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
+        overrideModelId: String? = null,
+    )
     fun setOmnibarPosition(isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
@@ -1558,11 +1564,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
     }
 
-    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch) {
+    override fun configure(
+        tabId: String,
+        isDuckAiMode: Boolean,
+        isBottom: Boolean,
+        launch: DuckChatLaunch,
+        overrideModelId: String?,
+    ) {
         activeTabId = tabId
         setOmnibarPosition(isBottom)
         doOnAttach {
-            viewModel.configure(tabId, isDuckAiMode, isBottom, launch)
+            viewModel.configure(tabId, isDuckAiMode, isBottom, launch, overrideModelId)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
             if (shouldLaunchCameraCapture(isDuckAiMode, launch, viewModel.supportsImageUpload())) launchCameraCapture()

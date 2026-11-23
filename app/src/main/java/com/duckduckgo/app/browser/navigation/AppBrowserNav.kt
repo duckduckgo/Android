@@ -63,6 +63,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         hasSessionActive: Boolean,
         duckChatUrl: String?,
         launch: DuckChatLaunch,
+        overrideModelId: String?,
     ): Intent {
         val contextual = launch as? DuckChatLaunch.ContextualChat
         val externalSelection = launch as? DuckChatLaunch.TextSelection
@@ -84,6 +85,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = launch is DuckChatLaunch.ImageGeneration,
+            duckChatOverrideModelId = overrideModelId,
             duckChatVoice = launch is DuckChatLaunch.Voice,
             openDuckChatHistory = launch is DuckChatLaunch.ChatHistory,
             duckChatTextSelection = contextual?.textSelection ?: externalSelection?.text,
