@@ -884,7 +884,7 @@ class BrowserTabFragment :
             if (result.resultCode == RESULT_OK) {
                 // Handle any result data if needed
                 result.data?.let { intent ->
-                    intent.getStringExtra(TabSwitcherActivity.EXTRA_KEY_SELECTED_TAB_ID)?.let { browserActivity?.onTabSelectedFromSwitcher(it) }
+                    intent.getStringExtra(TabSwitcherActivity.EXTRA_KEY_SELECTED_TAB_ID)?.let { browserActivity?.requestNativeInputFocus(it) }
                     intent.extras?.let { extras ->
                         val deletedTabIds = extras.getStringArrayList(TabSwitcherActivity.EXTRA_KEY_DELETED_TAB_IDS)
                         if (!deletedTabIds.isNullOrEmpty()) {
@@ -3149,6 +3149,11 @@ class BrowserTabFragment :
                 binding.autoCompleteSuggestionsList.gone()
 
                 browserActivity?.openExistingTab(it.tabId)
+            }
+
+            is Command.FocusEmptyDuckAiChat -> {
+                if (it.tabId != tabId) browserActivity?.openExistingTab(it.tabId)
+                browserActivity?.requestNativeInputFocus(it.tabId)
             }
 
             is Command.ShowAutoconsentAnimation -> showAutoconsentAnimation(it.isCosmetic)
