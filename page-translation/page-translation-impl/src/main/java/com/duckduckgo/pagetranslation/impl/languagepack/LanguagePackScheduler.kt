@@ -29,6 +29,8 @@ import androidx.work.WorkInfo.State.SUCCEEDED
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
+import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason.DOWNLOAD_ERROR
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.DOWNLOADED_BYTES_KEY
@@ -67,6 +69,8 @@ interface LanguagePackScheduler {
 @ContributesBinding(AppScope::class)
 class RealLanguagePackScheduler @Inject constructor(
     private val workManager: WorkManager,
+    private val feature: PageTranslationFeature,
+    private val deviceSupport: PageTranslationDeviceSupport,
 ) : LanguagePackScheduler {
     override fun download(pair: String) = enqueue(pair, ExistingWorkPolicy.KEEP)
 
@@ -78,6 +82,9 @@ class RealLanguagePackScheduler @Inject constructor(
         }
 
     private fun enqueue(pair: String, policy: ExistingWorkPolicy) {
+        // before Android 12 a queued job would show its download notification before the worker sees the feature is off
+        if (!feature.translation().isEnabled() || !deviceSupport.isSupported()) return
+
         workManager.enqueueUniqueWork(
             getWorkName(pair),
             policy,

@@ -25,6 +25,7 @@ import androidx.work.workDataOf
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult
@@ -34,12 +35,16 @@ import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.ModelFile
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
@@ -52,9 +57,10 @@ class LanguagePackWorkerTest {
     val coroutineRule = CoroutineTestRule()
 
     private val context: Context = ApplicationProvider.getApplicationContext()
-    private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java)
+    private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val store: ModelsManifestStore = mock()
     private val fetcher: LanguagePackFetcher = mock()
+    private var isDeviceSupported = true
 
     @Test
     fun failWithoutDownloadingWhenTranslationIsOff() = runTest {
@@ -63,6 +69,29 @@ class LanguagePackWorkerTest {
         assertEquals(Result.failure(), createWorker().doWork())
 
         verifyNoInteractions(fetcher)
+    }
+
+    @Test
+    fun failWithoutDownloadingOnUnsupportedDevices() = runTest {
+        setTranslationEnabled(true)
+        isDeviceSupported = false
+
+        assertEquals(Result.failure(), createWorker().doWork())
+
+        verifyNoInteractions(fetcher)
+    }
+
+    @Test
+    fun stopDownloadingWhenTranslationIsTurnedOff() = runTest {
+        setTranslationEnabled(true)
+        whenever(store.readManifest()).thenReturn(MANIFEST)
+        whenever(fetcher.fetch(any(), any(), any(), any())).doSuspendableAnswer { awaitCancellation() }
+
+        val work = async { createWorker().doWork() }
+        runCurrent()
+        setTranslationEnabled(false)
+
+        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), work.await())
     }
 
     @Test
@@ -113,6 +142,9 @@ class LanguagePackWorkerTest {
         .build()
         .also {
             it.feature = feature
+            it.deviceSupport = object : PageTranslationDeviceSupport {
+                override fun isSupported() = isDeviceSupported
+            }
             it.store = store
             it.fetcher = lazyOf(fetcher)
             it.dispatchers = coroutineRule.testDispatcherProvider

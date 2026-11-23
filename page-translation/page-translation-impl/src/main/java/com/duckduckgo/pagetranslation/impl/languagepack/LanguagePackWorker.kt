@@ -27,6 +27,7 @@ import androidx.work.workDataOf
 import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.R
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
@@ -34,6 +35,12 @@ import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.Fetc
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult.NOT_ENOUGH_STORAGE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult.SUCCESS
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import javax.inject.Inject
@@ -48,6 +55,9 @@ internal class LanguagePackWorker(
     lateinit var feature: PageTranslationFeature
 
     @Inject
+    lateinit var deviceSupport: PageTranslationDeviceSupport
+
+    @Inject
     lateinit var store: ModelsManifestStore
 
     @Inject
@@ -58,17 +68,35 @@ internal class LanguagePackWorker(
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
         val pair = inputData.getString(PAIR_KEY)
-        if (pair == null || !feature.translation().isEnabled()) return@withContext Result.failure()
+        if (pair == null || !feature.translation().isEnabled() || !deviceSupport.isSupported()) return@withContext Result.failure()
 
         val manifest = store.readManifest()
         val model = manifest?.models?.get(pair) ?: return@withContext Result.failure()
 
-        val result = fetcher.value.fetch(
-            baseUrl = manifest.baseUrl,
-            model = model,
-            stagingDirectory = getStagingDirectory(applicationContext, pair),
-        ) { downloadedBytes ->
-            setProgress(workDataOf(DOWNLOADED_BYTES_KEY to downloadedBytes, TOTAL_BYTES_KEY to model.totalBytes))
+        val result = coroutineScope {
+            val fetch = async {
+                fetcher.value.fetch(
+                    baseUrl = manifest.baseUrl,
+                    model = model,
+                    stagingDirectory = getStagingDirectory(applicationContext, pair),
+                ) { downloadedBytes ->
+                    setProgress(workDataOf(DOWNLOADED_BYTES_KEY to downloadedBytes, TOTAL_BYTES_KEY to model.totalBytes))
+                }
+            }
+            val stopWhenDisabled = launch {
+                feature.translation().enabled().firstOrNull { isEnabled -> !isEnabled } ?: return@launch
+                fetch.cancel()
+            }
+
+            try {
+                fetch.await()
+            } catch (_: CancellationException) {
+                // rethrows when the system stopped the job, otherwise the feature was turned off
+                ensureActive()
+                FAILURE
+            } finally {
+                stopWhenDisabled.cancel()
+            }
         }
 
         when (result) {
