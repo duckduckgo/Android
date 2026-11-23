@@ -33,6 +33,7 @@ import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.privacy.config.api.CustomPrivacyConfigUrlStatus
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
@@ -57,8 +58,9 @@ class RealScriptletUpdaterTest {
     private val validator: ScriptletSignatureValidator = mock()
     private val pixel: Pixel = mock()
     private val appBuildConfig: AppBuildConfig = mock<AppBuildConfig>().also { whenever(it.flavor).thenReturn(BuildFlavor.PLAY) }
+    private val customPrivacyConfigUrlStatus: CustomPrivacyConfigUrlStatus = mock()
 
-    private val updater = RealScriptletUpdater(repository, downloader, validator, pixel, appBuildConfig)
+    private val updater = RealScriptletUpdater(repository, downloader, validator, pixel, appBuildConfig, customPrivacyConfigUrlStatus)
 
     private val isolatedPath = "scriptlets/isolated/ublock-filters.js"
     private val mainPath = "scriptlets/main/ublock-filters.js"
@@ -151,19 +153,46 @@ class RealScriptletUpdaterTest {
         verifyNoMoreInteractions(pixel)
     }
 
-    @Test
-    fun whenValidationFailsInInternalBuildThenUnsignedScriptletsAreStored() = runTest {
-        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
-        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.success(isolatedBytes))
-        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.success(mainBytes))
-        whenever(validator.validate(isolatedBytes, isolatedEntry.signature))
-            .thenReturn(ScriptletValidationResult.Invalid.SignatureVerificationFailed)
-        whenever(validator.validate(mainBytes, mainEntry.signature))
-            .thenReturn(ScriptletValidationResult.Invalid.SignatureVerificationFailed)
+    private suspend fun givenUnsignedScriptletsFrom(baseUrl: String): AdBlockingExtensionSettings {
+        val isolated = ScriptletEntry(url = "$baseUrl/isolated.js", signature = "")
+        val main = ScriptletEntry(url = "$baseUrl/main.js", signature = "")
+        whenever(downloader.download(isolated.url)).thenReturn(kotlin.Result.success(isolatedBytes))
+        whenever(downloader.download(main.url)).thenReturn(kotlin.Result.success(mainBytes))
+        whenever(validator.validate(any(), any())).thenReturn(ScriptletValidationResult.Invalid.SignatureFormat)
+        return AdBlockingExtensionSettings(version = "proto", scriptlets = mapOf(isolatedPath to isolated, mainPath to main))
+    }
 
-        assertEquals(ScriptletUpdateResult.Success, updater.update(validSettings))
-        verify(repository).storeScriptlets(eq(validSettings.version), any())
+    @Test
+    fun whenInternalBuildUsesCustomConfigAndAllowedHostThenUnsignedScriptletsAreStored() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(customPrivacyConfigUrlStatus.isEnabled()).thenReturn(true)
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        val settings = givenUnsignedScriptletsFrom("https://raw.githubusercontent.com/duckduckgo/content-blocker-extension/abc")
+
+        assertEquals(ScriptletUpdateResult.Success, updater.update(settings))
+        verify(repository).storeScriptlets(eq("proto"), any())
+    }
+
+    @Test
+    fun whenInternalBuildWithoutCustomConfigThenUnsignedScriptletsAreRejected() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(customPrivacyConfigUrlStatus.isEnabled()).thenReturn(false)
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        val settings = givenUnsignedScriptletsFrom("https://raw.githubusercontent.com/duckduckgo/content-blocker-extension/abc")
+
+        assertEquals(ScriptletUpdateResult.Retry, updater.update(settings))
+        verify(repository, never()).storeScriptlets(any(), any())
+    }
+
+    @Test
+    fun whenInternalBuildUsesCustomConfigButHostNotAllowedThenUnsignedScriptletsAreRejected() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(customPrivacyConfigUrlStatus.isEnabled()).thenReturn(true)
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        val settings = givenUnsignedScriptletsFrom("https://raw.githubusercontent.com/someone-else/repo/abc")
+
+        assertEquals(ScriptletUpdateResult.Retry, updater.update(settings))
+        verify(repository, never()).storeScriptlets(any(), any())
     }
 
     @Test
@@ -303,7 +332,8 @@ class RealScriptletUpdaterTest {
                 else -> error("unexpected url: $url")
             }
         }
-        val shortCircuitingUpdater = RealScriptletUpdater(repository, shortCircuitingDownloader, validator, pixel, appBuildConfig)
+        val shortCircuitingUpdater =
+            RealScriptletUpdater(repository, shortCircuitingDownloader, validator, pixel, appBuildConfig, customPrivacyConfigUrlStatus)
 
         assertEquals(ScriptletUpdateResult.Retry, shortCircuitingUpdater.update(validSettings))
         assertTrue("isolated download should have started in parallel", isolatedDownloadStarted.isCompleted)

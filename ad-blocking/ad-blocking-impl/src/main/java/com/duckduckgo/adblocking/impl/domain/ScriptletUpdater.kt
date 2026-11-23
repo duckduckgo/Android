@@ -32,6 +32,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.privacy.config.api.CustomPrivacyConfigUrlStatus
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.async
@@ -41,6 +42,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.net.URI
 import javax.inject.Inject
 
 sealed interface ScriptletUpdateResult {
@@ -60,7 +62,15 @@ class RealScriptletUpdater @Inject constructor(
     private val validator: ScriptletSignatureValidator,
     private val pixel: Pixel,
     private val appBuildConfig: AppBuildConfig,
+    private val customPrivacyConfigUrlStatus: CustomPrivacyConfigUrlStatus,
 ) : ScriptletUpdater {
+
+    private fun acceptsUnsigned(url: String): Boolean {
+        if (appBuildConfig.flavor != BuildFlavor.INTERNAL || !customPrivacyConfigUrlStatus.isEnabled()) return false
+        val uri = runCatching { URI(url) }.getOrNull() ?: return false
+        if (uri.scheme != "https") return false
+        return (uri.host == "raw.githubusercontent.com" && uri.path.startsWith("/duckduckgo/")) || uri.host == "duckduckgo.github.io"
+    }
 
     override suspend fun update(settings: AdBlockingExtensionSettings): ScriptletUpdateResult {
         val storedVersion = repository.getStoredVersion()
@@ -88,8 +98,8 @@ class RealScriptletUpdater @Inject constructor(
                             } else {
                                 name to bytes
                             }
-                            // Prototype only: internal builds accept unsigned scriptlets so test builds can load unpublished ones.
-                            is ScriptletValidationResult.Invalid -> if (appBuildConfig.flavor == BuildFlavor.INTERNAL) {
+                            // Prototype only: lets test builds load unpublished scriptlets from a preview config.
+                            is ScriptletValidationResult.Invalid -> if (acceptsUnsigned(entry.url)) {
                                 logcat(WARN) { "ScriptletUpdater: accepting unsigned $name in internal build: $validationResult" }
                                 if (bytes.isEmpty()) null else name to bytes
                             } else {
