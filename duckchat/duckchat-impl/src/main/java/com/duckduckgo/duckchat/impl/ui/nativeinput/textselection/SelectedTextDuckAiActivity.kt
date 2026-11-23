@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
 
 import android.content.Intent
 import android.os.Bundle
-import com.duckduckgo.app.tabs.Attachment.Text
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -49,7 +48,7 @@ class SelectedTextDuckAiActivity : DuckDuckGoActivity() {
                     this,
                     duckChatUrl = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false),
                     forceLaunchContextual = !isExternalSelection(),
-                    attachments = listOf(Text(selection)),
+                    textSelection = selection,
                 ),
             )
         }

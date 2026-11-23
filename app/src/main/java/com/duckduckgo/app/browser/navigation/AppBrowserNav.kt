@@ -23,7 +23,6 @@ import android.net.Uri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
-import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -60,9 +59,10 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
         duckChatUrl: String,
         forceImageGeneration: Boolean,
         forceLaunchContextual: Boolean,
-        attachments: List<Attachment>,
+        textSelection: String?,
+        files: List<Uri>,
     ): Intent {
-        val isExternal = attachments.isNotEmpty() && !forceLaunchContextual
+        val isExternal = (textSelection != null || files.isNotEmpty()) && !forceLaunchContextual
         return BrowserActivity.intent(
             context = context,
             launchSource = if (isExternal) SelectedTextSearch else InAppNavigation,
@@ -71,8 +71,8 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = forceImageGeneration,
-            duckChatTextSelection = attachments.filterIsInstance<Attachment.Text>().firstOrNull()?.text,
-        ).attachFiles(attachments.filterIsInstance<Attachment.File>().map { it.uri })
+            duckChatTextSelection = textSelection,
+        ).attachFiles(files)
     }
 
     private fun Intent.attachFiles(uris: List<Uri>): Intent = apply {

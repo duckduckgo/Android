@@ -28,7 +28,6 @@ import androidx.annotation.VisibleForTesting
 import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -379,17 +378,17 @@ class AttachmentViewModel @Inject constructor(
         val textSelectionLimitReached: Boolean,
     )
 
-    fun addAttachments(tabId: String, attachments: List<Attachment>) {
-        val textSelections = attachments.filterIsInstance<Attachment.Text>()
-        textSelections.forEach { textSelectionRepository.add(tabId, it.text, url = "") }
-        if (textSelections.isNotEmpty()) bindTextSelections(tabId)
+    fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>) {
+        textSelection?.let {
+            textSelectionRepository.add(tabId, it, url = "")
+            bindTextSelections(tabId)
+        }
 
-        val uris = attachments.filterIsInstance<Attachment.File>().map { it.uri }
-        if (uris.isEmpty()) return
+        if (files.isEmpty()) return
         viewModelScope.launch {
             val modelState = modelManager.modelState.first { it.models.isNotEmpty() }
-            val files = withContext(dispatchers.io()) { uris.filter { it.isAllowedSource() && it.isAttachable(modelState) } }
-            if (files.isNotEmpty()) onMixedAttachmentsPicked(files)
+            val attachable = withContext(dispatchers.io()) { files.filter { it.isAllowedSource() && it.isAttachable(modelState) } }
+            if (attachable.isNotEmpty()) onMixedAttachmentsPicked(attachable)
         }
     }
 

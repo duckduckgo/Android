@@ -21,7 +21,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import androidx.core.content.IntentCompat
-import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
@@ -33,7 +32,7 @@ import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Exists purely to pull out the shared text, images and files and attach them to a new Duck.ai chat.
+ * Exists purely to pull out the shared images and files and attach them to a new Duck.ai chat.
  * This needs to be its own Activity so that we can customize the label that is user-facing, presented in the share sheet and "Open with".
  */
 @InjectWith(ActivityScope::class)
@@ -47,16 +46,15 @@ class ShareToDuckAiActivity : DuckDuckGoActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val text = intent.getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()?.takeIf { it.isNotBlank() }
-        val attachments = listOfNotNull(text?.let(Attachment::Text)) + sharedFiles(intent).map(Attachment::File)
-        if (attachments.isNotEmpty()) {
+        val files = sharedFiles(intent)
+        if (files.isNotEmpty()) {
             duckChatInternal.reportDuckChatEntry(DuckChatEntryPoint.SHARE_SHEET, opensNewTab = true, hasPrompt = false)
             try {
                 startActivity(
                     browserNav.openDuckChat(
                         this,
                         duckChatUrl = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false),
-                        attachments = attachments,
+                        files = files,
                     ),
                 )
             } catch (e: SecurityException) {

@@ -46,7 +46,6 @@ import com.duckduckgo.app.browser.tabs.transition.PendingNewTabTransition
 import com.duckduckgo.app.browser.tabs.transition.RealNewTabTransitionState
 import com.duckduckgo.app.browser.tabs.transition.RealPendingNewTabTransitions
 import com.duckduckgo.app.pixels.BrowserModeSwitchSource
-import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -513,7 +512,7 @@ class BrowserActivityNewTabTransitionTest {
         duckChatUrl = URL,
         forceImageGeneration = false,
         forceLaunchContextual = false,
-        attachments = listOfNotNull(textSelection?.let(Attachment::Text)),
+        textSelection = textSelection,
     )
 
     // The browser on screen is paused while it gets an intent.

@@ -240,7 +240,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
-import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.TabManagerFeatureFlags
 import com.duckduckgo.app.tabs.ui.GridViewColumnCalculator
 import com.duckduckgo.app.tabs.ui.TabSwitcherActivity
@@ -1417,7 +1416,8 @@ class BrowserTabFragment :
     private fun showNativeInput(
         query: String = "",
         forceImageGeneration: Boolean = false,
-        attachments: List<Attachment> = emptyList(),
+        textSelection: String? = null,
+        files: List<Uri> = emptyList(),
     ) {
         viewModel.onSearchInputOpened(prefill = query.ifEmpty { omnibar.getText() })
         nativeInputManager.showNativeInput(
@@ -1429,7 +1429,8 @@ class BrowserTabFragment :
             query = query,
             initialInputMode = viewModel.consumeInitialInputMode(),
             forceImageGeneration = forceImageGeneration,
-            attachments = attachments,
+            textSelection = textSelection,
+            files = files,
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = { text -> onUserEnteredText(text) },
                 onClearAutocomplete = {
@@ -2510,10 +2511,8 @@ class BrowserTabFragment :
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
-        showNativeInput(
-            forceImageGeneration = forceImageGeneration,
-            attachments = browserActivity?.consumeDuckChatAttachmentsForTab(tabId).orEmpty(),
-        )
+        val (textSelection, files) = browserActivity?.consumeDuckChatAttachmentsForTab(tabId) ?: (null to emptyList())
+        showNativeInput(forceImageGeneration = forceImageGeneration, textSelection = textSelection, files = files)
     }
 
     private fun showMaliciousWarning(

@@ -58,7 +58,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -207,7 +206,7 @@ interface NativeInputWidget {
     fun setWidgetRootView(view: View)
 
     fun getTextSelectionsJson(): JSONArray?
-    fun addAttachments(tabId: String, attachments: List<Attachment>)
+    fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>)
 
     /**
      * Binds a reactive source of the active chat id for this tab.
@@ -390,7 +389,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var pageContextRemovedAction: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
     private var pendingAttachmentsTabId: String? = null
-    private var pendingAttachments: List<Attachment> = emptyList()
+    private var pendingTextSelection: String? = null
+    private var pendingFiles: List<Uri> = emptyList()
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached, when the attachment ViewModel cannot be resolved yet, so the values are held here and
@@ -1492,15 +1492,17 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getTextSelectionsJson(): JSONArray? = attachmentViewModel?.getTextSelectionsJson()
 
-    override fun addAttachments(tabId: String, attachments: List<Attachment>) {
+    override fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>) {
         val viewModel = attachmentViewModel
         if (viewModel == null) {
             pendingAttachmentsTabId = tabId
-            pendingAttachments = attachments
+            pendingTextSelection = textSelection
+            pendingFiles = files
             return
         }
-        pendingAttachments = emptyList()
-        viewModel.addAttachments(tabId, attachments)
+        pendingTextSelection = null
+        pendingFiles = emptyList()
+        viewModel.addAttachments(tabId, textSelection, files)
     }
 
     override fun setContextualAttachmentActions(
@@ -1624,7 +1626,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyPendingAttachmentState() {
         val viewModel = attachmentViewModel ?: return
         pendingPageContext?.let { viewModel.setPageContext(it) }
-        pendingAttachmentsTabId?.let { if (pendingAttachments.isNotEmpty()) addAttachments(it, pendingAttachments) }
+        pendingAttachmentsTabId?.let { tabId ->
+            if (pendingTextSelection != null || pendingFiles.isNotEmpty()) addAttachments(tabId, pendingTextSelection, pendingFiles)
+        }
         if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
             viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
         }

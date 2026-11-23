@@ -51,7 +51,6 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.app.tabs.Attachment
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.tabs.TabSwitcherButton
@@ -164,7 +163,8 @@ interface NativeInputManager {
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode? = null,
         forceImageGeneration: Boolean = false,
-        attachments: List<Attachment> = emptyList(),
+        textSelection: String? = null,
+        files: List<Uri> = emptyList(),
     )
 
     fun hideNativeInput(animate: Boolean = true, isNavigation: Boolean = false): Boolean
@@ -637,7 +637,8 @@ class RealNativeInputManager @Inject constructor(
         callbacks: NativeInputCallbacks,
         initialInputMode: InputMode?,
         forceImageGeneration: Boolean,
-        attachments: List<Attachment>,
+        textSelection: String?,
+        files: List<Uri>,
     ) {
         if (!::rootView.isInitialized) return
 
@@ -707,7 +708,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, attachments)
+        attachWidget(widgetView, navBarView, isBottom, tabId, forceImageGeneration, textSelection, files)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -728,7 +729,7 @@ class RealNativeInputManager @Inject constructor(
                 widgetView,
                 lifecycleOwner,
                 currentTabUrl,
-                armOnAttach = !forceImageGeneration && attachments.isEmpty(),
+                armOnAttach = !forceImageGeneration && textSelection == null && files.isEmpty(),
             )
         }
         lifecycleOwner.lifecycleScope.launch {
@@ -1525,7 +1526,8 @@ class RealNativeInputManager @Inject constructor(
         isBottom: Boolean,
         tabId: String,
         forceImageGeneration: Boolean,
-        attachments: List<Attachment>,
+        textSelection: String?,
+        files: List<Uri>,
     ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
@@ -1560,7 +1562,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 forceImageGeneration = forceImageGeneration,
             )
-            if (attachments.isNotEmpty()) addAttachments(tabId, attachments)
+            if (textSelection != null || files.isNotEmpty()) addAttachments(tabId, textSelection, files)
         }
 
         applyWindowChrome(widgetView, isBottom)
@@ -1574,7 +1576,7 @@ class RealNativeInputManager @Inject constructor(
         // finishes before the enter morph.
         pendingEnterOwnsAnimating = enterStarted
 
-        if (forceImageGeneration || attachments.isNotEmpty()) {
+        if (forceImageGeneration || textSelection != null || files.isNotEmpty()) {
             widgetView.doOnAttach {
                 if (widgetRoot === widgetView) {
                     widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)

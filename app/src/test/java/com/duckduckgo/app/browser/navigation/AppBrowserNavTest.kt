@@ -23,7 +23,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
-import com.duckduckgo.app.tabs.Attachment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -61,7 +60,7 @@ class AppBrowserNavTest {
             duckChatUrl = "https://duck.ai",
             forceImageGeneration = false,
             forceLaunchContextual = false,
-            attachments = listOf(Attachment.File(first), Attachment.File(second)),
+            files = listOf(first, second),
         )
 
         val clipData = intent.clipData!!
@@ -77,7 +76,7 @@ class AppBrowserNavTest {
             duckChatUrl = "https://duck.ai",
             forceImageGeneration = false,
             forceLaunchContextual = false,
-            attachments = listOf(Attachment.File(Uri.parse("content://test/1"))),
+            files = listOf(Uri.parse("content://test/1")),
         )
 
         assertEquals(

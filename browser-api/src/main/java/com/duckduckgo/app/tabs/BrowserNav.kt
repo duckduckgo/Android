@@ -39,7 +39,8 @@ interface BrowserNav {
      *
      * @param forceImageGeneration when true, the new tab's native input preselects the image-generation tool.
      * @param forceLaunchContextual when true, opens the contextual Duck.ai flow instead of a full screen tab.
-     * @param attachments files and at most one [Attachment.Text] to attach to the Duck.ai input.
+     * @param textSelection text to attach to the Duck.ai input, if any.
+     * @param files content URIs of files to attach to the Duck.ai input.
      */
     fun openDuckChat(
         context: Context,
@@ -47,7 +48,8 @@ interface BrowserNav {
         duckChatUrl: String,
         forceImageGeneration: Boolean = false,
         forceLaunchContextual: Boolean = false,
-        attachments: List<Attachment> = emptyList(),
+        textSelection: String? = null,
+        files: List<Uri> = emptyList(),
     ): Intent
     fun closeDuckChat(context: Context): Intent
 
@@ -56,19 +58,4 @@ interface BrowserNav {
      * identified by [tabId].
      */
     fun openExistingTab(context: Context, tabId: String): Intent
-}
-
-/**
- * Content attached to the input when opening Duck.ai
- */
-sealed interface Attachment {
-    data class Text(
-        /** Text to be attached. */
-        val text: String,
-    ) : Attachment
-
-    data class File(
-        /** Content URI of the file to be attached. */
-        val uri: Uri,
-    ) : Attachment
 }
