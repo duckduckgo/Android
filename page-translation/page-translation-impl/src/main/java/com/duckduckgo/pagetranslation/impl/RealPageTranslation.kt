@@ -35,6 +35,7 @@ import javax.inject.Inject
 @SingleIn(FragmentScope::class)
 class RealPageTranslation @Inject constructor(
     private val preferencesStore: TranslationPreferencesStore,
+    private val deviceLanguages: DeviceLanguages,
 ) : PageTranslationInternal {
 
     override val progress: StateFlow<TranslationProgress> = MutableStateFlow(TranslationProgress.Idle)
@@ -54,7 +55,7 @@ class RealPageTranslation @Inject constructor(
         if (input.content != TabContent.WebPage) return TranslationOffer.Nothing
 
         val detected = input.detection?.language?.baseLanguage() ?: return TranslationOffer.Nothing
-        val languages = input.deviceLanguages.map { it.baseLanguage() }
+        val languages = deviceLanguages.get().map { it.baseLanguage() }
         val preferred = languages.firstOrNull() ?: return TranslationOffer.Nothing
 
         if (detected == preferred) return TranslationOffer.Nothing

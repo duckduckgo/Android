@@ -36,10 +36,6 @@ data class OfferInput(
      */
     val detection: Detection?,
     /**
-     * Language tags, the preferred one first.
-     */
-    val deviceLanguages: List<String>,
-    /**
      * True on the reload after Show Original or after a failed translation.
      */
     val bannerSuppressed: Boolean,

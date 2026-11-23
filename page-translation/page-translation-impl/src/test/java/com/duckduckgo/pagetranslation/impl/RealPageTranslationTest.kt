@@ -18,14 +18,22 @@ package com.duckduckgo.pagetranslation.impl
 
 import com.duckduckgo.pagetranslation.api.TabContent
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 class RealPageTranslationTest {
 
-    private val preferencesStore = FakeTranslationPreferencesStore()
-    private val testee: PageTranslationInternal = RealPageTranslation(preferencesStore)
+    private val preferencesStore: TranslationPreferencesStore = mock()
+    private val deviceLanguages: DeviceLanguages = mock()
+    private val testee: PageTranslationInternal = RealPageTranslation(preferencesStore, deviceLanguages)
 
-    private var deviceLanguages = listOf("en")
+    @Before
+    fun setUp() {
+        whenever(preferencesStore.askToTranslatePages).thenReturn(true)
+        whenever(deviceLanguages.get()).thenReturn(listOf("en"))
+    }
 
     private fun decide(
         content: TabContent = TabContent.WebPage,
@@ -35,7 +43,6 @@ class RealPageTranslationTest {
         OfferInput(
             content = content,
             detection = language?.let(::Detection),
-            deviceLanguages = deviceLanguages,
             bannerSuppressed = bannerSuppressed,
         ),
     ) { from, to -> to in setOf("en", "fr") && from in setOf("fr", "de", "es", "en") }
@@ -54,7 +61,7 @@ class RealPageTranslationTest {
 
     @Test
     fun whenDetectionIsNotReliableThenNothing() {
-        deviceLanguages = listOf("en", "es")
+        whenever(deviceLanguages.get()).thenReturn(listOf("en", "es"))
         assertEquals(TranslationOffer.Nothing, decide(language = null))
     }
 
@@ -65,13 +72,13 @@ class RealPageTranslationTest {
 
     @Test
     fun whenDetectedLanguageIsSecondaryDeviceLanguageWithNoPairThenNothing() {
-        deviceLanguages = listOf("en", "ja")
+        whenever(deviceLanguages.get()).thenReturn(listOf("en", "ja"))
         assertEquals(TranslationOffer.Nothing, decide(language = "ja"))
     }
 
     @Test
     fun whenPairExistsOnlyToASecondaryDeviceLanguageThenNothing() {
-        deviceLanguages = listOf("de", "fr")
+        whenever(deviceLanguages.get()).thenReturn(listOf("de", "fr"))
         assertEquals(TranslationOffer.Nothing, decide(language = "es"))
     }
 
@@ -82,47 +89,47 @@ class RealPageTranslationTest {
 
     @Test
     fun whenDetectedLanguageIsASecondaryDeviceLanguageThenMenuRowOnly() {
-        deviceLanguages = listOf("en", "fr")
+        whenever(deviceLanguages.get()).thenReturn(listOf("en", "fr"))
         assertEquals(TranslationOffer.MenuRowOnly, decide(language = "fr"))
     }
 
     @Test
     fun whenDetectedLanguageIsThePreferredDeviceLanguageThenNothing() {
-        deviceLanguages = listOf("en", "fr")
+        whenever(deviceLanguages.get()).thenReturn(listOf("en", "fr"))
         assertEquals(TranslationOffer.Nothing, decide(language = "en"))
     }
 
     @Test
     fun whenFirstDeviceLanguageIsPreferredThenItIsTheTranslationTarget() {
-        deviceLanguages = listOf("fr-FR", "en-US")
+        whenever(deviceLanguages.get()).thenReturn(listOf("fr-FR", "en-US"))
         assertEquals(TranslationOffer.Nothing, decide(language = "fr"))
         assertEquals(TranslationOffer.MenuRowOnly, decide(language = "en"))
     }
 
     @Test
     fun whenThereAreNoDeviceLanguagesThenNothing() {
-        deviceLanguages = emptyList()
+        whenever(deviceLanguages.get()).thenReturn(emptyList())
         assertEquals(TranslationOffer.Nothing, decide())
     }
 
     @Test
     fun whenRegionalVariantsDifferThenOnlyBaseLanguageIsCompared() {
-        deviceLanguages = listOf("en_US")
+        whenever(deviceLanguages.get()).thenReturn(listOf("en_US"))
         assertEquals(TranslationOffer.Nothing, decide(language = "en-GB"))
-        deviceLanguages = listOf("en-US", "fr-FR")
+        whenever(deviceLanguages.get()).thenReturn(listOf("en-US", "fr-FR"))
         assertEquals(TranslationOffer.MenuRowOnly, decide(language = "FR-ca"))
     }
 
     @Test
     fun whenAskToTranslatePagesIsOffThenMenuRowOnly() {
-        preferencesStore.askToTranslatePages = false
+        whenever(preferencesStore.askToTranslatePages).thenReturn(false)
         assertEquals(TranslationOffer.MenuRowOnly, decide())
     }
 
     @Test
     fun whenAskToTranslatePagesIsOffAndLanguageIsSecondaryDeviceLanguageThenMenuRowOnly() {
-        preferencesStore.askToTranslatePages = false
-        deviceLanguages = listOf("en", "fr")
+        whenever(preferencesStore.askToTranslatePages).thenReturn(false)
+        whenever(deviceLanguages.get()).thenReturn(listOf("en", "fr"))
         assertEquals(TranslationOffer.MenuRowOnly, decide(language = "fr"))
     }
 
@@ -138,18 +145,14 @@ class RealPageTranslationTest {
 
     @Test
     fun whenBannerIsSuppressedAndLanguageIsSecondaryDeviceLanguageThenMenuRowOnly() {
-        deviceLanguages = listOf("en", "fr")
+        whenever(deviceLanguages.get()).thenReturn(listOf("en", "fr"))
         assertEquals(TranslationOffer.MenuRowOnly, decide(bannerSuppressed = true, language = "fr"))
     }
 
     @Test
     fun whenDetectionIsReliableButNoPairIsSupportedThenNeitherBannerNorMenuRow() {
         assertEquals(TranslationOffer.Nothing, decide(language = "ja"))
-        preferencesStore.askToTranslatePages = false
+        whenever(preferencesStore.askToTranslatePages).thenReturn(false)
         assertEquals(TranslationOffer.Nothing, decide(language = "ja"))
     }
-}
-
-private class FakeTranslationPreferencesStore : TranslationPreferencesStore {
-    override var askToTranslatePages: Boolean = true
 }
