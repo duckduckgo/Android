@@ -18,19 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="segment_skip_settings_title">Omite conținutul sponsorizat</string>
-    <string name="segment_skip_settings_description" instruction="Description of the Skip Sponsored Content setting. Learn more opens an explanation of ad blocking.">Sare peste segmentele sponsorizate, precum promoțiile plătite. Segmentele sunt raportate de comunitatea SponsorBlock, așa că nu toate videoclipurile sunt acoperite. <annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="segment_skip_mode_always_ask">Întreabă înainte de a omite</string>
     <string name="segment_skip_mode_always_skip">Întotdeauna</string>
     <string name="segment_skip_mode_off">Niciodată</string>
     <string name="ad_blocking_settings_title">Blocarea reclamelor pe YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Blochează reclamele pe YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blochează reclamele video de pe YouTube, astfel încât să poți viziona videoclipuri fără întrerupere. \n\nCând este activat, DuckDuckGo va detecta anonim interferențele de blocare a reclamelor sau erorile YouTube pentru a îmbunătăți experiența tuturor utilizatorilor. DuckDuckGo nu vede niciodată videoclipurile pe care le vizionezi sau orice informații de identificare personală. <annotation type="learn_more_link">Află mai multe</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blochează reclamele video pe YouTube, astfel încât să poți viziona videoclipuri fără întrerupere. <annotation type="learn_more_link">Află mai multe</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Deschide videoclipurile într-un mod cinematografic fără distrageri, care te împiedică să influențezi fluxul de YouTube prin ceea ce vizionezi.</string>
     <string name="ad_blocking_settings_duck_player_link">Cauți Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Blocarea reclamelor</string>
-    <string name="ad_blocking_settings_header_description">Blochează tehnologiile de urmărire invazive înainte de a se încărca, eliminând eficient reclamele care se bazează pe urmărire.</string>
     <string name="contingencyMessageTitle">Blocarea reclamelor pe YouTube este indisponibilă</string>
     <string name="contingencyMessageContent">Blocarea reclamelor a fost afectată de modificările recente aduse YouTube. Lucrăm pentru a remedia aceste probleme și apreciem înțelegerea ta.</string>
     <string name="contingencyMessagePrimaryButton">Am înțeles</string>

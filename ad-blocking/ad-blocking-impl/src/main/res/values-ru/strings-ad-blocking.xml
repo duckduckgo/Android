@@ -18,19 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="segment_skip_settings_title">Пропуск спонсорского контента</string>
-    <string name="segment_skip_settings_description" instruction="Description of the Skip Sponsored Content setting. Learn more opens an explanation of ad blocking.">Пропускает спонсорские сегменты, например платные рекламные интеграции. Сегменты отмечает сообщество SponsorBlock, поэтому размечены не все видео. <annotation type="learn_more_link">Подробнее</annotation></string>
     <string name="segment_skip_mode_always_ask">Спрашивать о пропуске</string>
     <string name="segment_skip_mode_always_skip">Всегда</string>
     <string name="segment_skip_mode_off">Никогда</string>
     <string name="ad_blocking_settings_title">Блокировка рекламы на YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Блокировать рекламу на YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. \n\nКогда эта функция включена, DuckDuckGo анонимно обнаруживает помехи при блокировке рекламы или ошибки YouTube, чтобы сделать работу удобнее для всех. DuckDuckGo никогда не видит, какие видео вы просматриваете, и не отслеживает никакую личную информацию, по которой вас можно идентифицировать. <annotation type="learn_more_link">Подробнее</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo блокирует видеорекламу на YouTube, чтобы вы могли смотреть видео без перерывов. <annotation type="learn_more_link">Подробнее</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Проигрыватель Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Открывает видео в режиме кинотеатра без отвлекающих элементов, чтобы просмотренные видео не влияли на вашу ленту YouTube.</string>
     <string name="ad_blocking_settings_duck_player_link">Ищешь Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Блокировка рекламы</string>
-    <string name="ad_blocking_settings_header_description">Блокирует трекеры, следящие за вашей активностью, еще до их загрузки, фактически устраняя рекламу на основе отслеживания.</string>
     <string name="contingencyMessageTitle">Блокировка рекламы на YouTube недоступна</string>
     <string name="contingencyMessageContent">Недавние изменения на YouTube повлияли на работу блокировки рекламы. Мы занимаемся решением этой проблемы и благодарим вас за понимание.</string>
     <string name="contingencyMessagePrimaryButton">Понятно</string>
