@@ -129,9 +129,8 @@ class RealAdBlockingStatusChecker @Inject constructor(
         ) { userSetting, pixelConsent, disabledUntilRelaunch ->
             when {
                 disabledUntilRelaunch -> AdBlockingState.Disabled.UntilRelaunch
-                userSetting == true && pixelConsent == false -> AdBlockingState.Enabled.WithoutPixelConsent
-                // Consent is null when the setting was stored before consent was tracked, which only a settings toggle could have done.
-                userSetting == true -> AdBlockingState.Enabled.WithPixelConsent
+                userSetting == true && pixelConsent == true -> AdBlockingState.Enabled.WithPixelConsent
+                userSetting == true -> AdBlockingState.Enabled.WithoutPixelConsent
                 userSetting == false -> AdBlockingState.Disabled.Permanent
                 else -> AdBlockingState.Enabled.Default
             }
