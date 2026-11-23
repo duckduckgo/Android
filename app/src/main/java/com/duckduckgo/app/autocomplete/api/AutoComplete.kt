@@ -74,8 +74,10 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 import kotlin.math.max
 
@@ -115,11 +117,19 @@ class AutoCompleteApi constructor(
         get() = tabRepositoryProvider.forMode(browserMode)
 
     private val localSuggestionsFirst: Boolean by lazy {
-        isOmnibar && autocompleteSpeedFeature.localSuggestionsFirst().isEnabled()
+        isOmnibar && autocompleteSpeedFeature.self().isEnabled()
     }
 
     private val searchRequestsInFlight = mutableMapOf<String, Deferred<List<AutoCompleteSearchSuggestion>>>()
     private val latestSearchResults = MutableStateFlow<SearchResults?>(null)
+    private val searchRequestsStarted = AtomicLong()
+
+    private val reuseLastSearchResponse: Boolean by lazy { autocompleteSpeedFeature.self().isEnabled() }
+
+    // The query the omnibar shows is often asked for again: by the omnibar's own pipeline as well as the typing one, and
+    // when the omnibar is focused again after a search. Only the latest response is kept, so any other query is requested.
+    @Volatile
+    private var lastSearchResponse: SearchResponse? = null
 
     init {
         if (config.showInstalledApps) {
@@ -160,8 +170,8 @@ class AutoCompleteApi constructor(
 
     /**
      * Local matches are emitted without waiting for the search results, which keep their usual place between the top hits
-     * and the remaining local matches. Until they arrive, the latest search results received for an earlier query that
-     * still start with [query] stand in for them, so the list keeps updating while the user types.
+     * and the remaining local matches. Until they arrive, the latest search results received for an earlier query stand
+     * in for them (see [standInFor]), so the list updates in place while the user types instead of emptying first.
      */
     private fun autoCompleteLocalSuggestionsFirst(query: String): Flow<AutoCompleteResult> {
         return combine(
@@ -188,10 +198,7 @@ class AutoCompleteApi constructor(
         val standIns = launch {
             latestSearchResults
                 .filter { it?.query != query }
-                .collect { latest ->
-                    val standIn = latest?.suggestions.orEmpty().filter { it.phrase.startsWith(query, ignoreCase = true) }
-                    send(standIn)
-                }
+                .collect { latest -> send(latest?.standInFor(query).orEmpty()) }
         }
         val suggestions = searchRequest(query).await()
         standIns.cancelAndJoin()
@@ -200,14 +207,21 @@ class AutoCompleteApi constructor(
 
     /**
      * Runs in the app scope: the omnibar restarts its pipeline on every keystroke, and a request cancelled there would never
-     * return while the user keeps typing. Left to finish, its results stand in for the next query's.
+     * return while the user keeps typing. Left to finish, its results stand in for the next query's, unless a request
+     * started after it has already returned: responses can arrive out of order, and a slow one for an older query must not
+     * replace newer results.
      */
     private fun searchRequest(query: String): Deferred<List<AutoCompleteSearchSuggestion>> = synchronized(searchRequestsInFlight) {
         searchRequestsInFlight.getOrPut(query) {
+            val requestNumber = searchRequestsStarted.incrementAndGet()
             coroutineScope.async(dispatchers.io()) {
-                val result = runCatching { autoCompleteService.autoComplete(query).map { it.toSearchSuggestion() } }
+                val result = runCatching { fetchSearchResults(query).map { it.toSearchSuggestion() } }
                 synchronized(searchRequestsInFlight) { searchRequestsInFlight.remove(query) }
-                result.onSuccess { latestSearchResults.value = SearchResults(query, it) }
+                result.onSuccess { suggestions ->
+                    latestSearchResults.update { latest ->
+                        if (latest == null || latest.requestNumber < requestNumber) SearchResults(query, suggestions, requestNumber) else latest
+                    }
+                }
                 result.getOrDefault(emptyList())
             }
         }
@@ -428,12 +442,19 @@ class AutoCompleteApi constructor(
     private fun getAutoCompleteSearchResults(query: String) = flow {
         val searchSuggestionsList = mutableListOf<AutoCompleteSearchSuggestion>()
         runCatching {
-            val rawResults = autoCompleteService.autoComplete(query)
+            val rawResults = fetchSearchResults(query)
             for (rawResult in rawResults) {
                 searchSuggestionsList.add(rawResult.toSearchSuggestion())
             }
             emit(searchSuggestionsList.toList())
         }.getOrElse { emit(searchSuggestionsList.toList()) }
+    }
+
+    private suspend fun fetchSearchResults(query: String): List<AutoCompleteServiceRawResult> {
+        if (reuseLastSearchResponse) {
+            lastSearchResponse?.takeIf { it.query == query }?.let { return it.results }
+        }
+        return autoCompleteService.autoComplete(query).also { lastSearchResponse = SearchResponse(query, it) }
     }
 
     private fun AutoCompleteServiceRawResult.toSearchSuggestion() = AutoCompleteSearchSuggestion(
@@ -642,6 +663,22 @@ class AutoCompleteApi constructor(
     private data class SearchResults(
         val query: String,
         val suggestions: List<AutoCompleteSearchSuggestion>,
+        val requestNumber: Long,
+    ) {
+        /**
+         * While the user extends or trims the query these results are for, they stay as they are: the list then changes
+         * once, when the new results arrive. Results for an unrelated query (the input reopened on another search) only
+         * stand in where they still match, so another query's suggestions never show.
+         */
+        fun standInFor(newQuery: String): List<AutoCompleteSearchSuggestion> {
+            val related = newQuery.startsWith(query, ignoreCase = true) || query.startsWith(newQuery, ignoreCase = true)
+            return if (related) suggestions else suggestions.filter { it.phrase.startsWith(newQuery, ignoreCase = true) }
+        }
+    }
+
+    private data class SearchResponse(
+        val query: String,
+        val results: List<AutoCompleteServiceRawResult>,
     )
 
     private data class RankedSuggestion<T : AutoCompleteSuggestion>(
