@@ -123,9 +123,14 @@
                 ]
             },
             {
+                "key": "feature.data.ext.backup_recovery_result",
+                "description": "What the backup refresh token gave after the backend rejected the main refresh token. 'not_available' means there was no backup the app could use, so it was not sent. 'rejected' means the backend refused the backup, or answered with tokens the app could not accept, and the backup was deleted. 'network_error' means the call did not complete or the backend had an outage, and the backup was kept for the next refresh. 'recovered' means the backup returned a new token pair.",
+                "enum": ["not_available", "rejected", "network_error", "recovered"]
+            },
+            {
                 "key": "feature.data.ext.recovery_strategy",
-                "description": "How the app tried to recover the session after the backend rejected the refresh token. Only present when a recovery ran.",
-                "enum": ["play_login"]
+                "description": "How the app tried to recover the session after the backend rejected the refresh token. 'backup_token' means the backup refresh token decided the outcome, 'play_login' the Play store login fallback. Only present when a recovery ran.",
+                "enum": ["backup_token", "play_login"]
             },
             {
                 "key": "feature.data.ext.recovery_outcome",
@@ -233,6 +238,11 @@
             {
                 "key": "feature.data.ext.step.token_validation",
                 "description": "true if the newly fetched tokens passed validation, false if either token failed it. See token_validation_failed_token and token_validation_failure_reason.",
+                "type": "boolean"
+            },
+            {
+                "key": "feature.data.ext.step.backup_recovery",
+                "description": "true if the backup refresh token recovered the session, false if it did not; see backup_recovery_result",
                 "type": "boolean"
             },
             {
