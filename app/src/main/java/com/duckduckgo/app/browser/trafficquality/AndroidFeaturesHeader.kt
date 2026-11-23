@@ -17,8 +17,6 @@
 package com.duckduckgo.app.browser.trafficquality
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.trafficquality.Result.Allowed
-import com.duckduckgo.app.browser.trafficquality.Result.NotAllowed
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -30,24 +28,15 @@ import javax.inject.Inject
 @ContributesIntoSet(scope = AppScope::class)
 class AndroidFeaturesHeaderPlugin @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val customHeaderAllowedChecker: CustomHeaderAllowedChecker,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val androidFeaturesHeaderProvider: AndroidFeaturesHeaderProvider,
-    private val appVersionProvider: AppVersionHeaderProvider,
 ) : CustomHeadersPlugin {
 
     override fun getHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
         if (!isFeatureEnabled() || browserMode == BrowserMode.FIRE || !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return emptyMap()
         }
-        val appVersion = when (customHeaderAllowedChecker.isAllowed()) {
-            is Allowed -> appVersionProvider.provide(isStub = false)
-            NotAllowed -> appVersionProvider.provide(isStub = true)
-        }
-        return mapOf(
-            X_DUCKDUCKGO_ANDROID_HEADER to androidFeaturesHeaderProvider.provide(),
-            X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER to appVersion,
-        )
+        return mapOf(X_DUCKDUCKGO_ANDROID_HEADER to androidFeaturesHeaderProvider.provide())
     }
 
     private fun isFeatureEnabled(): Boolean {
@@ -57,6 +46,5 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
 
     companion object {
         internal const val X_DUCKDUCKGO_ANDROID_HEADER = "x-duckduckgo-android"
-        internal const val X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER = "x-duckduckgo-android-version"
     }
 }
