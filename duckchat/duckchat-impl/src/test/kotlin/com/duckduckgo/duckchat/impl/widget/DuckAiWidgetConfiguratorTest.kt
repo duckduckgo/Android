@@ -496,7 +496,7 @@ class DuckAiWidgetConfiguratorTest {
         stubDuckAi(enabled = true, historyAvailable = true)
         duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = dynamicColors))
         whenever(chatStore.getChats()).thenReturn(listOf(chat("a")))
-        whenever(duckChat.buildChatUrl(any())).thenReturn(CHAT_URL)
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenReturn(CHAT_URL)
 
         testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
 
