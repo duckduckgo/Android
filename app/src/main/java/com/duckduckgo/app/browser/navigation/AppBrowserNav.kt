@@ -16,8 +16,10 @@
 
 package com.duckduckgo.app.browser.navigation
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.BrowserLaunchSource
 import com.duckduckgo.app.browser.mode.DuckAiWidget
@@ -72,6 +74,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             is DuckChatLaunch.ChatHistory -> launch.origin.toLaunchSource()
             is DuckChatLaunch.ContextualChat -> InAppNavigation
             is DuckChatLaunch.TextSelection -> SelectedTextSearch
+            is DuckChatLaunch.SharedFiles -> SelectedTextSearch
         }
         return BrowserActivity.intent(
             context = context,
@@ -85,7 +88,14 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             openDuckChatHistory = launch is DuckChatLaunch.ChatHistory,
             duckChatTextSelection = contextual?.textSelection ?: externalSelection?.text,
             nativeInputLaunch = NativeInputLaunch.from(launch),
-        )
+        ).attachFiles((launch as? DuckChatLaunch.SharedFiles)?.files.orEmpty())
+    }
+
+    private fun Intent.attachFiles(uris: List<Uri>): Intent = apply {
+        uris.firstOrNull()?.let { firstUri ->
+            clipData = ClipData.newRawUri(null, firstUri).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
     }
 
     private fun DuckChatLaunchOrigin.toLaunchSource(): BrowserLaunchSource = when (this) {

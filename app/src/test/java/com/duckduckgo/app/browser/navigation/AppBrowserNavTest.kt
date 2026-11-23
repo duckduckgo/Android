@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.browser.navigation
 
+import android.content.Intent
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
@@ -50,6 +52,29 @@ class AppBrowserNavTest {
         val intent = testee.openInNewTab(context, "https://example.com")
 
         assertNull(intent.getStringExtra(BrowserActivity.SOURCE_TAB_ID_EXTRA))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithSharedFilesThenAllUrisInClipDataWithReadGrant() {
+        val first = Uri.parse("content://test/1")
+        val second = Uri.parse("content://test/2")
+
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.SharedFiles(listOf(first, second)))
+
+        val clipData = intent.clipData!!
+        assertEquals(listOf(first, second), (0 until clipData.itemCount).map { clipData.getItemAt(it).uri })
+        assertTrue(intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
+    }
+
+    @Test
+    fun whenOpenDuckChatWithSharedFilesThenLaunchSourceIsSelectedTextSearch() {
+        val intent = testee.openDuckChat(
+            context,
+            duckChatUrl = DUCK_AI_URL,
+            launch = DuckChatLaunch.SharedFiles(listOf(Uri.parse("content://test/1"))),
+        )
+
+        assertEquals(SelectedTextSearch.toPixelLaunchSourceValue(), intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE))
     }
 
     @Test

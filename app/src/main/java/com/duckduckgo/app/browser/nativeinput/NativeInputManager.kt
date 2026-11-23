@@ -165,6 +165,7 @@ interface NativeInputManager {
         initialInputMode: InputMode? = null,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
         textSelection: String? = null,
+        files: List<Uri> = emptyList(),
     )
 
     /** Applies [launch] to the Duck.ai input already shown, which [showNativeInput] ignores. */
@@ -641,6 +642,7 @@ class RealNativeInputManager @Inject constructor(
         initialInputMode: InputMode?,
         launch: DuckChatLaunch,
         textSelection: String?,
+        files: List<Uri>,
     ) {
         if (!::rootView.isInitialized) return
 
@@ -710,7 +712,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId, launch, textSelection)
+        attachWidget(widgetView, navBarView, isBottom, tabId, launch, textSelection, files)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -725,13 +727,13 @@ class RealNativeInputManager @Inject constructor(
         )
         syncBackArrowToNavBar()
         if (omnibarController.isDuckAiMode()) {
-            // Image generation and text selection focus the input themselves; arming on attach would let the
+            // Image generation and shared attachments focus the input themselves; arming on attach would let the
             // non-new-chat path close that keyboard again.
             bindTabInputFocus(
                 widgetView,
                 lifecycleOwner,
                 currentTabUrl,
-                armOnAttach = launch !is DuckChatLaunch.ImageGeneration && textSelection == null,
+                armOnAttach = launch !is DuckChatLaunch.ImageGeneration && textSelection == null && files.isEmpty(),
             )
         }
         lifecycleOwner.lifecycleScope.launch {
@@ -1529,6 +1531,7 @@ class RealNativeInputManager @Inject constructor(
         tabId: String,
         launch: DuckChatLaunch,
         textSelection: String?,
+        files: List<Uri>,
     ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
@@ -1563,7 +1566,7 @@ class RealNativeInputManager @Inject constructor(
                 isBottom = isBottom,
                 launch = launch,
             )
-            textSelection?.let { bindTextSelections(tabId, it) }
+            if (textSelection != null || files.isNotEmpty()) addAttachments(tabId, textSelection, files)
         }
 
         applyWindowChrome(widgetView, isBottom)
@@ -1577,7 +1580,7 @@ class RealNativeInputManager @Inject constructor(
         // finishes before the enter morph.
         pendingEnterOwnsAnimating = enterStarted
 
-        if (launch is DuckChatLaunch.ImageGeneration) {
+        if (launch is DuckChatLaunch.ImageGeneration || textSelection != null || files.isNotEmpty()) {
             widgetView.doOnAttach {
                 if (widgetRoot === widgetView) {
                     widgetFrom(widgetView)?.focusInput(rootView.context as? Activity)

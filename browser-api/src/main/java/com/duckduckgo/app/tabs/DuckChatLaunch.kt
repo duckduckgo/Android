@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.tabs
 
+import android.net.Uri
+
 /**
  * How Duck.ai is launched.
  */
@@ -63,9 +65,16 @@ sealed interface DuckChatLaunch {
     data class ContextualChat(val textSelection: String?) : DuckChatLaunch
 
     /**
-     * Opens a new full screen Duck.ai tab, in regular mode.
+     * Opens a new full screen Duck.ai tab, in regular mode, with a text selection attached to its input.
      *
      * @param text selected from another app.
      */
     data class TextSelection(val text: String) : DuckChatLaunch
+
+    /**
+     * Opens a new full screen Duck.ai tab, in regular mode, with files attached to its input.
+     *
+     * @param files content URIs shared from another app.
+     */
+    data class SharedFiles(val files: List<Uri>) : DuckChatLaunch
 }

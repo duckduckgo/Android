@@ -37,7 +37,7 @@ private fun DuckChatLaunch.origin(): DuckChatLaunchOrigin? = when (this) {
     is DuckChatLaunch.CameraCapture -> origin
     is DuckChatLaunch.Voice -> origin
     is DuckChatLaunch.ChatHistory -> origin
-    is DuckChatLaunch.ContextualChat, is DuckChatLaunch.TextSelection -> null
+    is DuckChatLaunch.ContextualChat, is DuckChatLaunch.TextSelection, is DuckChatLaunch.SharedFiles -> null
 }
 
 /** A [BrowserNav] whose widget launch intents expose arguments as extras, so tests can assert on them. */

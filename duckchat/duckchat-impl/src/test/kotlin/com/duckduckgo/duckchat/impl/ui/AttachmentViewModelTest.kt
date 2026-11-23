@@ -305,7 +305,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenAtSelectionLimitThenNoLimitErrorUntilAnotherIsAttempted() = runTest {
-        viewModel.bindTextSelections("tab-1", textSelection = null)
+        viewModel.bindTextSelections("tab-1")
         repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
 
         assertNull(viewModel.attachmentState.value.textSelectionLimitError)
@@ -313,7 +313,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenSelectionRefusedAtLimitThenLimitErrorShown() = runTest {
-        viewModel.bindTextSelections("tab-1", textSelection = null)
+        viewModel.bindTextSelections("tab-1")
         repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
 
         textSelectionRepository.add("tab-1", "one too many", "https://example.com")
@@ -323,7 +323,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenSelectionRemovedAfterLimitThenLimitErrorCleared() = runTest {
-        viewModel.bindTextSelections("tab-1", textSelection = null)
+        viewModel.bindTextSelections("tab-1")
         repeat(TextSelectionRepository.MAX_SELECTIONS) { textSelectionRepository.add("tab-1", "selection $it", "https://example.com") }
         textSelectionRepository.add("tab-1", "one too many", "https://example.com")
         val target = textSelectionRepository.selections("tab-1").value.first()
@@ -335,7 +335,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenOnlyTextSelectionsAttachedThenHasNoStandaloneAttachments() = runTest {
-        viewModel.bindTextSelections("tab-1", "selected words")
+        viewModel.addAttachments("tab-1", textSelection = "selected words", files = emptyList())
 
         assertTrue(viewModel.attachmentState.value.hasAttachments)
         assertFalse(viewModel.attachmentState.value.hasStandaloneAttachments)
@@ -364,15 +364,15 @@ class AttachmentViewModelTest {
     }
 
     @Test
-    fun whenBoundWithTextSelectionThenItIsAttachedToThatTab() = runTest {
-        viewModel.bindTextSelections("tab-1", "selected words")
+    fun whenTextSelectionAddedThenItIsAttachedToThatTab() = runTest {
+        viewModel.addAttachments("tab-1", textSelection = "selected words", files = emptyList())
 
         assertEquals(listOf("selected words"), viewModel.attachmentState.value.textSelections.map { it.text })
     }
 
     @Test
-    fun whenBoundWithoutTextSelectionThenNothingIsAttached() = runTest {
-        viewModel.bindTextSelections("tab-1", textSelection = null)
+    fun whenBoundWithNoSelectionsThenNothingIsAttached() = runTest {
+        viewModel.bindTextSelections("tab-1")
 
         assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
     }
@@ -381,15 +381,15 @@ class AttachmentViewModelTest {
     fun whenBoundToADifferentTabThenOtherTabsSelectionsAreNotShown() = runTest {
         textSelectionRepository.add("tab-other", "not mine", "https://example.com")
 
-        viewModel.bindTextSelections("tab-1", textSelection = null)
+        viewModel.bindTextSelections("tab-1")
 
         assertTrue(viewModel.attachmentState.value.textSelections.isEmpty())
     }
 
     @Test
     fun whenTextSelectionRemovedThenItIsDroppedFromState() = runTest {
-        viewModel.bindTextSelections("tab-1", "keep me")
-        viewModel.bindTextSelections("tab-1", "remove me")
+        viewModel.addAttachments("tab-1", textSelection = "keep me", files = emptyList())
+        viewModel.addAttachments("tab-1", textSelection = "remove me", files = emptyList())
         val idToRemove = viewModel.attachmentState.value.textSelections.last().id
 
         viewModel.removeTextSelection(idToRemove)
@@ -399,7 +399,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenTextSelectionsConsumedThenTheyAreClearedFromState() = runTest {
-        viewModel.bindTextSelections("tab-1", "selected words")
+        viewModel.addAttachments("tab-1", textSelection = "selected words", files = emptyList())
 
         viewModel.getTextSelectionsJson()
 
@@ -409,7 +409,7 @@ class AttachmentViewModelTest {
 
     @Test
     fun whenNoTextSelectionsToConsumeThenJourneyNotSubmitted() = runTest {
-        viewModel.bindTextSelections("tab-1", textSelection = null)
+        viewModel.bindTextSelections("tab-1")
 
         viewModel.getTextSelectionsJson()
 
@@ -837,6 +837,164 @@ class AttachmentViewModelTest {
         advanceUntilIdle()
 
         assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenFileAddedBeforeModelsLoadThenItIsAttachedOnceTheyLoad() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/doc.pdf", providerPackage = "com.other.app")
+        modelStateFlow.value = ModelState()
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+
+        modelStateFlow.value = ModelState(models = listOf(aModel(id = "m1", supportedFileTypes = listOf("application/pdf"))), selectedModelId = "m1")
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenFileFromAnotherAppsProviderAddedThenItIsAttached() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/doc.pdf", providerPackage = "com.other.app")
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenFileFromOwnProviderAddedThenItIsDropped() = runTest {
+        val uri = givenSharedPdf("content://com.duckduckgo.provider/private.pdf", providerPackage = ownPackage)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenDownloadFromOwnProviderAddedThenItIsAttached() = runTest {
+        val uri = givenSharedPdf("content://$ownPackage.provider/external_files/Download/doc.pdf", providerPackage = ownPackage)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.files.size)
+    }
+
+    @Test
+    fun whenAppSpecificExternalFileFromOwnProviderAddedThenItIsDropped() = runTest {
+        val uri = givenSharedPdf("content://$ownPackage.provider/external_files/Download/../Android/data/doc.pdf", providerPackage = ownPackage)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenOwnProviderPathCannotBeResolvedThenItIsDroppedWithoutCrashing() = runTest {
+        val uri = givenSharedPdf("content://$ownPackage.provider/external_files/Download/a%00.pdf", providerPackage = ownPackage)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenOwnProviderFileAddedWithEncodedUserIdPrefixThenItIsDropped() = runTest {
+        val uri = givenSharedPdf("content://0%40$ownPackage.provider/sync/recovery.pdf", providerPackage = ownPackage)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenOwnProviderFileAddedWithUserIdPrefixThenItIsDropped() = runTest {
+        val uri = givenSharedPdf("content://0@$ownPackage.provider/sync/recovery.pdf", providerPackage = ownPackage)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenFileSchemeUriAddedThenItIsDropped() = runTest {
+        val uri = givenSharedPdf("file:///data/data/com.duckduckgo/private.pdf", providerPackage = null)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenFileTypeUnsupportedBySelectedModelAddedThenItIsDropped() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/doc.pdf", providerPackage = "com.other.app")
+        modelStateFlow.value = ModelState(
+            models = listOf(
+                aModel(id = "m1", supportedFileTypes = listOf("text/plain")),
+                aModel(id = "m2", supportedFileTypes = listOf("application/pdf")),
+            ),
+            selectedModelId = "m1",
+        )
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.files.isEmpty())
+    }
+
+    @Test
+    fun whenImageSharedAndImageUploadDisabledThenItIsDropped() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/photo.jpg", providerPackage = "com.other.app")
+        whenever(context.contentResolver.getType(uri)).thenReturn("image/jpeg")
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(false)
+        modelStateFlow.value = ModelState(models = listOf(aModel(id = "m1", supportsImageUpload = true)), selectedModelId = "m1")
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.images.isEmpty())
+    }
+
+    @Test
+    fun whenImageSharedAndImageUploadEnabledThenItIsAdded() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/photo.jpg", providerPackage = "com.other.app")
+        whenever(context.contentResolver.getType(uri)).thenReturn("image/jpeg")
+        whenever(context.contentResolver.openInputStream(uri)).thenReturn(java.io.ByteArrayInputStream(ByteArray(8)))
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        modelStateFlow.value = ModelState(models = listOf(aModel(id = "m1", supportsImageUpload = true)), selectedModelId = "m1")
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.images.size)
+    }
+
+    private val ownPackage = "com.duckduckgo.mobile.android"
+
+    private fun givenSharedPdf(rawUri: String, providerPackage: String?): Uri {
+        val uri = Uri.parse(rawUri)
+        val contentResolver: android.content.ContentResolver = mock()
+        val packageManager: android.content.pm.PackageManager = mock()
+        whenever(context.contentResolver).thenReturn(contentResolver)
+        whenever(context.packageManager).thenReturn(packageManager)
+        whenever(context.packageName).thenReturn(ownPackage)
+        whenever(contentResolver.getType(uri)).thenReturn("application/pdf")
+        modelStateFlow.value = ModelState(models = listOf(aModel(id = "m1", supportedFileTypes = listOf("application/pdf"))), selectedModelId = "m1")
+        uri.authority?.substringAfterLast('@')?.let { authority ->
+            val provider = providerPackage?.let { android.content.pm.ProviderInfo().apply { packageName = it } }
+            whenever(packageManager.resolveContentProvider(authority, 0)).thenReturn(provider)
+        }
+        fileAttachmentProcessor.givenProcessFileReturns(uri, aFileAttachment())
+        return uri
     }
 
     @Test

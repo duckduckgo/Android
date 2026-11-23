@@ -289,6 +289,13 @@ interface DuckChatFeature {
     fun duckAiTextSelectionAction(): Toggle
 
     /**
+     * @return `true` when "Ask Duck.ai" is offered in the system share sheet.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiShareSheetAction(): Toggle
+
+    /**
      * @return `true` when native Duck.ai usage-limit and high-usage model notices may be shown.
      * If the remote feature is not present defaults to `internal`.
      */

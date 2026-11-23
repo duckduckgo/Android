@@ -23,6 +23,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.Intent.EXTRA_TEXT
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -1128,7 +1129,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 duckChat.openVoiceDuckChat(entryPoint)
                 return
             }
-            pendingDuckChatTextSelection = textSelection
+            val files = intent.clipData?.let { clip -> (0 until clip.itemCount).mapNotNull { clip.getItemAt(it).uri } }.orEmpty()
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
             pendingDuckChatForceImageGeneration = intent.getBooleanExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, false)
             val entryPoint = intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { runCatching { DuckChatEntryPoint.valueOf(it) }.getOrNull() }
@@ -1144,6 +1145,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 sourceTabId = sourceTabId,
                 newTabTransition = newTabTransition,
                 nativeInputLaunch = intent.nativeInputLaunch(),
+                textSelection = textSelection,
+                files = files,
                 entryPoint = entryPoint,
                 reuseEmptyTab = duckChatUrl == null && entryPoint == DuckChatEntryPoint.WIDGET_DUCK_AI,
             )
@@ -1420,8 +1423,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         globalActivityStarter.start(this, DownloadsScreenNoParams)
     }
 
-    private var pendingDuckChatTextSelection: String? = null
-    fun consumePendingDuckChatTextSelection(): String? = pendingDuckChatTextSelection.also { pendingDuckChatTextSelection = null }
+    private val pendingDuckChatAttachments = mutableMapOf<String, Pair<String?, List<Uri>>>()
+    fun consumeDuckChatAttachmentsForTab(tabId: String): Pair<String?, List<Uri>> = pendingDuckChatAttachments.remove(tabId) ?: (null to emptyList())
 
     private fun Intent.nativeInputLaunch(): NativeInputLaunch? = NativeInputLaunch.fromName(getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
 
@@ -1432,6 +1435,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         nativeInputLaunch: NativeInputLaunch? = null,
         entryPoint: DuckChatEntryPoint? = null,
         reuseEmptyTab: Boolean = false,
+        textSelection: String? = null,
+        files: List<Uri> = emptyList(),
     ) {
         if (reuseEmptyTab) {
             // Held open so the first-frame gate waits for the reused tab instead of settling on the current one.
@@ -1439,7 +1444,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             lifecycleScope.launch {
                 val emptyTabId = viewModel.findEmptyDuckAiTabId()
                 if (emptyTabId == null) {
-                    launchDuckAi(url, sourceTabId, newTabTransition, nativeInputLaunch, entryPoint, reuseEmptyTab = false)
+                    launchDuckAi(url, sourceTabId, newTabTransition, nativeInputLaunch, entryPoint, reuseEmptyTab = false, textSelection, files)
                     return@launch
                 }
                 entryPoint?.let { duckChat.reportDuckChatEntry(it, opensNewTab = false, hasPrompt = false) }
@@ -1470,11 +1475,14 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 isExternal = false,
                 newTabTransition = newTabTransition,
                 nativeInputLaunch = nativeInputLaunch,
+                duckChatTextSelection = textSelection,
+                duckChatFiles = files,
             )
         } else {
             val landingId = onIntentOpening()
             lifecycleScope.launch {
                 val tabId = viewModel.onOpenInNewTabRequested(query = fullScreenUrl, sourceTabId = returnTabId, skipHome = false)
+                if (textSelection != null || files.isNotEmpty()) pendingDuckChatAttachments[tabId] = textSelection to files
                 onIntentLanded(tabId, landingId)
                 newTabTransition?.let { registerNewTabTransition(tabId, it) }
                 if (nativeInputLaunch != null) {
@@ -2137,6 +2145,8 @@ open class BrowserActivity : DuckDuckGoActivity() {
         newTabTransition: PendingNewTabTransition? = null,
         launchingAppPackage: String? = null,
         nativeInputLaunch: NativeInputLaunch? = null,
+        duckChatTextSelection: String? = null,
+        duckChatFiles: List<Uri> = emptyList(),
     ) {
         val landingId = onIntentOpening()
         lifecycleScope.launch {
@@ -2155,6 +2165,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
                 }
                 if (nativeInputLaunch != null) {
                     pendingNativeInputLaunches[tabId] = nativeInputLaunch
+                }
+                if (duckChatTextSelection != null || duckChatFiles.isNotEmpty()) {
+                    pendingDuckChatAttachments[tabId] = duckChatTextSelection to duckChatFiles
                 }
             } else {
                 val tabId = viewModel.onNewTabRequested()
