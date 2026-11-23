@@ -186,13 +186,39 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
-    fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+    fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelReportsThePromptsModel() = runTest {
         viewModel.start("tab-1")
         whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
         whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
 
         viewModel.commands.test {
             viewModel.onSuggestionSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "model-1",
+            reasoningEffort = "high",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab-1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+        )
+    }
+
+    @Test
+    fun whenSuggestionPromptCarriesNoModelThenPixelReportsTheGlobalSelectionTheRequestFallsBackTo() = runTest {
+        viewModel.start("tab-1")
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        viewModel.commands.test {
+            viewModel.onSuggestionSubmitted(samplePrompt.copy(modelId = null, reasoningEffort = null))
             assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
         }
 
@@ -212,7 +238,7 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
-    fun whenSummarizeSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+    fun whenSummarizeSubmittedThenUnifiedInputPromptSubmittedPixelReportsThePromptsModel() = runTest {
         viewModel.start("tab-1")
         viewModel.onPageContextReceived(validContext)
         whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
@@ -225,8 +251,8 @@ class DuckChatContextualEntryViewModelTest {
 
         verify(duckChatPixels).firePromptSubmitted(
             selectedTool = "none",
-            modelId = "gpt-5.2",
-            reasoningEffort = "low",
+            modelId = "model-1",
+            reasoningEffort = "high",
             hasImageAttachment = false,
             hasFileAttachment = false,
             hasText = true,

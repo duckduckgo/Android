@@ -273,8 +273,14 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureQuickAction() {
         binding.entryPromptQuickAction.setOnClickListener {
             if (viewModel.viewState.value.attachedContext == null) return@setOnClickListener
-            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(summarizePromptResource()), null, null, null, null, null))
+            viewModel.onSummarizeSubmitted(composerPrompt(getString(summarizePromptResource())))
         }
+    }
+
+    // Sent on the composer's model and effort, like a typed prompt, rather than the global selection.
+    private fun composerPrompt(text: String): NativeInputPrompt {
+        val widget = binding.entryNativeInputCard.widget
+        return NativeInputPrompt(text, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), null, null, null)
     }
 
     private fun configureWindowInsets() {
@@ -299,7 +305,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun configureSuggestions() {
         binding.entrySuggestionsView.onSuggestionSelected = { suggestion ->
-            viewModel.onSuggestionSubmitted(NativeInputPrompt(suggestion.prompt, null, null, null, null, null))
+            viewModel.onSuggestionSubmitted(composerPrompt(suggestion.prompt))
         }
 
         binding.entrySuggestionsView.onContentChanged = { updateQuickActionVisibility() }
@@ -367,7 +373,8 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     ) {
         if (query.isBlank()) return
         if (isDuckAiResult) {
-            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null), voice = true)
+            val prompt = if (_binding != null) composerPrompt(query) else NativeInputPrompt(query, null, null, null, null, null)
+            viewModel.onPromptSubmitted(prompt, voice = true)
         } else {
             startActivity(browserNav.openInNewTab(requireContext(), query))
             dismiss()
