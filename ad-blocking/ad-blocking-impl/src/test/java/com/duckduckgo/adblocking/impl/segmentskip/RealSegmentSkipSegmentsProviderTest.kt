@@ -22,15 +22,19 @@ import com.squareup.moshi.Types
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
+import okhttp3.OkHttpClient
+import okhttp3.Protocol
+import okhttp3.ResponseBody
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import retrofit2.Converter
 import retrofit2.Response
-import retrofit2.http.GET
-import retrofit2.http.Path
+import retrofit2.Retrofit
 import java.io.IOException
+import java.lang.reflect.Type
 
 class RealSegmentSkipSegmentsProviderTest {
 
@@ -48,10 +52,28 @@ class RealSegmentSkipSegmentsProviderTest {
     )
 
     @Test
-    fun whenUsingMockDatasetThenSegmentsStillUseProductionEndpoint() {
-        val method = SegmentSkipService::class.java.declaredMethods.single { it.name == "getSegments" }
-        assertEquals("https://duckduckgo.com/sponsorblock/v1/segments/{hashPrefix}", method.getAnnotation(GET::class.java)?.value)
-        assertEquals("hashPrefix", method.parameterAnnotations[0].filterIsInstance<Path>().single().value)
+    fun whenLookingUpSegmentsThenRequestUsesMatchesEndpoint() = runTest {
+        var requestUrl: okhttp3.HttpUrl? = null
+        val client = OkHttpClient.Builder().addInterceptor { chain ->
+            requestUrl = chain.request().url
+            okhttp3.Response.Builder()
+                .request(chain.request())
+                .protocol(Protocol.HTTP_1_1)
+                .code(200)
+                .message("OK")
+                .body("[]".toResponseBody())
+                .build()
+        }.build()
+        val converter = object : Converter.Factory() {
+            override fun responseBodyConverter(type: Type, annotations: Array<Annotation>, retrofit: Retrofit): Converter<ResponseBody, *> =
+                Converter<ResponseBody, List<VideoSegmentsResponse>> { emptyList() }
+        }
+        val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").client(client)
+            .addConverterFactory(converter).build().create(SegmentSkipService::class.java)
+
+        service.getSegments("abcd")
+
+        assertEquals("https://protection.duckduckgo.com/api/protection/segmentSkip/v1/android/matches?hashPrefix=abcd", requestUrl.toString())
     }
 
     @Test
