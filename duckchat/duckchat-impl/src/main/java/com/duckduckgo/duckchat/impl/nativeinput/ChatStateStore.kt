@@ -41,6 +41,7 @@ class ChatStateStore @Inject constructor() {
 
     fun clear(key: String) {
         flows.remove(key)
+        flows.remove(contextualKey(key))
     }
 
     fun clearAll() {

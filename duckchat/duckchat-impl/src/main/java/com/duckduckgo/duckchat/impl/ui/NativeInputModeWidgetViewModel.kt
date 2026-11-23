@@ -535,8 +535,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         .distinctUntilChanged()
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val chatState: Flow<ChatState> = activeTabId.filterNotNull()
-        .flatMapLatest { tabId -> chatStateStore.stateFor(tabId) }
+    val chatState: Flow<ChatState> = combine(activeTabId.filterNotNull(), widgetConfig) { tabId, config ->
+        if (config.inputContext == NativeInputState.InputContext.DUCK_AI_CONTEXTUAL) ChatStateStore.contextualKey(tabId) else tabId
+    }
+        .distinctUntilChanged()
+        .flatMapLatest { key -> chatStateStore.stateFor(key) }
 
     val state: SharedFlow<NativeInputState> = combine(
         baseState,
@@ -774,13 +777,13 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun configureContextual(tabId: String) {
-        activeTabId.value = tabId
         widgetConfig.update {
             it.copy(
                 inputContext = NativeInputState.InputContext.DUCK_AI_CONTEXTUAL,
                 toggleSelection = NativeInputState.ToggleSelection.DUCK_AI,
             )
         }
+        activeTabId.value = tabId
         replayPendingState(tabId)
     }
 
