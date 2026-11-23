@@ -16,11 +16,17 @@
 
 package com.duckduckgo.app.browser.navigation
 
+import android.content.Intent
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.SelectedTextSearch
+import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
+import com.duckduckgo.app.tabs.Attachment
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -42,5 +48,41 @@ class AppBrowserNavTest {
         val intent = testee.openInNewTab(context, "https://example.com")
 
         assertNull(intent.getStringExtra(BrowserActivity.SOURCE_TAB_ID_EXTRA))
+    }
+
+    @Test
+    fun whenOpenDuckChatWithMultipleFilesThenAllUrisInClipDataWithReadGrant() {
+        val first = Uri.parse("content://test/1")
+        val second = Uri.parse("content://test/2")
+
+        val intent = testee.openDuckChat(
+            context = context,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai",
+            forceImageGeneration = false,
+            forceLaunchContextual = false,
+            attachments = listOf(Attachment.File(first), Attachment.File(second)),
+        )
+
+        val clipData = intent.clipData!!
+        assertEquals(listOf(first, second), (0 until clipData.itemCount).map { clipData.getItemAt(it).uri })
+        assertTrue(intent.flags and Intent.FLAG_GRANT_READ_URI_PERMISSION != 0)
+    }
+
+    @Test
+    fun whenOpenDuckChatWithOnlyFilesThenLaunchSourceIsSelectedTextSearch() {
+        val intent = testee.openDuckChat(
+            context = context,
+            hasSessionActive = false,
+            duckChatUrl = "https://duck.ai",
+            forceImageGeneration = false,
+            forceLaunchContextual = false,
+            attachments = listOf(Attachment.File(Uri.parse("content://test/1"))),
+        )
+
+        assertEquals(
+            SelectedTextSearch.toPixelLaunchSourceValue(),
+            intent.getStringExtra(BrowserActivity.LAUNCH_SOURCE_PIXEL_VALUE),
+        )
     }
 }
