@@ -18,6 +18,7 @@ package com.duckduckgo.adblocking.impl.segmentskip
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
@@ -32,6 +33,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import java.io.IOException
 import javax.inject.Inject
@@ -51,7 +53,11 @@ interface SegmentSkipUserPreferences {
      */
     fun cachedMode(): SegmentSkipMode
 
-    suspend fun setMode(mode: SegmentSkipMode): Boolean
+    fun consentFlow(): Flow<Boolean>
+
+    fun hasConsent(): Boolean
+
+    suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean = false): Boolean
 }
 
 @SingleIn(AppScope::class)
@@ -64,6 +70,20 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     private val mode: StateFlow<SegmentSkipMode> =
         modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode(feature.mvpEnabled().isEnabled()))
+
+    @Volatile private var revoked = false
+    private val consentLock = Any()
+    private var changeGeneration = 0L
+
+    private val consent = consentFlow().stateIn(appScope, SharingStarted.Eagerly, false)
+
+    override fun consentFlow(): Flow<Boolean> = dataStore.data.map { it[KEY_CONSENT] == true && it[KEY_MODE] != SegmentSkipMode.OFF.name }
+        .catch { cause ->
+            if (cause !is IOException) throw cause
+            emit(false)
+        }.distinctUntilChanged()
+
+    override fun hasConsent(): Boolean = !revoked && consent.value
 
     override fun modeFlow(): Flow<SegmentSkipMode> = combine(
         dataStore.data,
@@ -80,8 +100,13 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     override fun cachedMode(): SegmentSkipMode = mode.value
 
-    override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+    override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean {
         var changed = false
+        val generation = synchronized(consentLock) {
+            if (mode == SegmentSkipMode.OFF) revoked = true
+            ++changeGeneration
+        }
+        var granted = false
         dataStore.edit { prefs ->
             val previous = prefs[KEY_MODE]?.let { stored ->
                 SegmentSkipMode.entries.firstOrNull {
@@ -90,6 +115,13 @@ class RealSegmentSkipUserPreferences @Inject constructor(
             } ?: defaultMode(feature.mvpEnabled().isEnabled())
             changed = previous != mode
             prefs[KEY_MODE] = mode.name
+            if (mode != SegmentSkipMode.OFF && previous == SegmentSkipMode.OFF) {
+                prefs[KEY_CONSENT] = noticeShown
+                granted = noticeShown
+            }
+        }
+        synchronized(consentLock) {
+            if (granted && changeGeneration == generation) revoked = false
         }
         return changed
     }
@@ -98,6 +130,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
 
     private companion object {
+        val KEY_CONSENT = booleanPreferencesKey("segment_skip_telemetry_consent")
         val KEY_MODE = stringPreferencesKey("segment_skip_mode")
     }
 }

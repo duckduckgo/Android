@@ -38,6 +38,7 @@ import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
+import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -79,12 +80,8 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         binding.adBlockingStatusIndicator.setStatus(StatusIndicatorView.Status.ALWAYS_ON)
         setupToolbar(binding.includeToolbar.toolbar)
 
-        binding.duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
-        binding.duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
-        binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
-        binding.segmentSkipModeEntry.setClickListener { viewModel.onSegmentSkipModeClicked() }
-        binding.segmentSkipDescription.addClickableSpan(
-            textSequence = getText(R.string.segment_skip_settings_description),
+        binding.adBlockingHeaderDescription.addClickableSpan(
+            textSequence = getText(R.string.ad_blocking_settings_header_description_v2),
             spans = listOf(
                 "learn_more_link" to object : DuckDuckGoClickableSpan() {
                     override fun onClick(widget: View) {
@@ -93,6 +90,10 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                 },
             ),
         )
+        binding.duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
+        binding.duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
+        binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
+        binding.segmentSkipModeEntry.setClickListener { viewModel.onSegmentSkipModeClicked() }
 
         configureEdgeToEdgeInsets()
         observeViewModel()
@@ -124,6 +125,12 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         )
         binding.segmentSkipModeEntry.isVisible = state.segmentSkipMode != null
         binding.segmentSkipDescription.isVisible = state.segmentSkipMode != null
+        val segmentSkipDescription = if (state.showSegmentSkipConsent) {
+            R.string.segment_skip_settings_description_with_consent
+        } else {
+            R.string.segment_skip_settings_description_v2
+        }
+        binding.segmentSkipDescription.setText(segmentSkipDescription)
         state.segmentSkipMode?.let { binding.segmentSkipModeEntry.setSecondaryText(getString(it.labelRes())) }
         if (state.isContingencyMode) {
             binding.adBlockingDescription.gone()
@@ -139,20 +146,11 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
             return
         }
         val descriptionRes = if (showConsentDescription) {
-            R.string.ad_blocking_settings_description_with_consent
+            R.string.ad_blocking_settings_description_with_consent_v2
         } else {
-            R.string.ad_blocking_settings_description
+            R.string.ad_blocking_settings_description_v2
         }
-        binding.adBlockingDescription.addClickableSpan(
-            textSequence = getText(descriptionRes),
-            spans = listOf(
-                "learn_more_link" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.onLearnMoreClicked()
-                    }
-                },
-            ),
-        )
+        binding.adBlockingDescription.setText(descriptionRes)
         binding.adBlockingDescription.show()
     }
 
@@ -178,6 +176,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                         DuckPlayerSettingsNoParams,
                     )
                     is AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog -> showSegmentSkipModeDialog(command.mode)
+                    is AdBlockingSettingsViewModel.Command.ShowSegmentSkipConsentDialog -> showSegmentSkipConsentDialog(command.mode)
                 }
             }
             .launchIn(lifecycleScope)
@@ -193,7 +192,24 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        viewModel.onSegmentSkipModeSelected(modes[selectedItem - 1])
+                        viewModel.onSegmentSkipModeDialogSaved(currentMode, modes[selectedItem - 1])
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showSegmentSkipConsentDialog(mode: SegmentSkipMode) {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.segment_skip_settings_title)
+            .setMessage(R.string.segment_skip_settings_description_with_consent)
+            .setPositiveButton(R.string.segment_skip_enable)
+            .setNegativeButton(CommonR.string.cancel)
+            .setCancellable(true)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onSegmentSkipModeSelected(mode, noticeShown = true)
                     }
                 },
             )

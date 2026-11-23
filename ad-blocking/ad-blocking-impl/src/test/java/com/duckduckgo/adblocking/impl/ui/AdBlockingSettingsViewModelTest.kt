@@ -322,6 +322,20 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
+    fun whenSegmentSkipIsOffOrConsentedThenNoticeIsShown() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSegmentSkipEnabled(true)
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().viewState.test {
+            assertEquals(true, expectMostRecentItem().showSegmentSkipConsent)
+            segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
+            segmentSkip.consent.value = true
+            assertEquals(true, awaitItem().showSegmentSkipConsent)
+        }
+    }
+
+    @Test
     fun whenSegmentSkipModeClickedThenShowsDialogWithCurrentMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         segmentSkip.mode.value = SegmentSkipMode.OFF
@@ -333,6 +347,48 @@ class AdBlockingSettingsViewModelTest {
         }
         verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
+    }
+
+    @Test
+    fun whenDialogIsOpenedWithoutSelectionThenModeAndConsentStayUnchanged() = runTest {
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        val viewModel = createViewModel()
+        viewModel.commands.test {
+            viewModel.onSegmentSkipModeClicked()
+            awaitItem()
+        }
+        assertEquals(SegmentSkipMode.OFF, segmentSkip.mode.value)
+        assertEquals(false, segmentSkip.consent.value)
+    }
+
+    @Test
+    fun whenEnablingFromOffThenNoticeIsRequestedBeforeSaving() = runTest {
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        val viewModel = createViewModel()
+        viewModel.commands.test {
+            viewModel.onSegmentSkipModeDialogSaved(SegmentSkipMode.OFF, SegmentSkipMode.ALWAYS_SKIP)
+            assertEquals(AdBlockingSettingsViewModel.Command.ShowSegmentSkipConsentDialog(SegmentSkipMode.ALWAYS_SKIP), awaitItem())
+            assertEquals(SegmentSkipMode.OFF, segmentSkip.mode.value)
+            assertEquals(false, segmentSkip.consent.value)
+        }
+    }
+
+    @Test
+    fun whenEnabledModeIsReselectedThenNoNoticeIsRequested() = runTest {
+        val viewModel = createViewModel()
+        viewModel.commands.test {
+            viewModel.onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_ASK, SegmentSkipMode.ALWAYS_SKIP)
+            expectNoEvents()
+            assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
+            assertEquals(false, segmentSkip.noticeShown)
+        }
+    }
+
+    @Test
+    fun whenSelectionFollowsNoticeThenItReachesPreferences() = runTest {
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        assertEquals(true, segmentSkip.noticeShown)
     }
 
     @Test
@@ -380,13 +436,17 @@ class AdBlockingSettingsViewModelTest {
 
     private class FakeSegmentSkip : SegmentSkip {
         val mode = MutableStateFlow(SegmentSkipMode.ALWAYS_ASK)
+        val consent = MutableStateFlow(false)
+        var noticeShown = false
         var failSave = false
 
         override fun config(): SegmentSkipConfig = throw UnsupportedOperationException()
         override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> = throw UnsupportedOperationException()
         override fun modeFlow(): Flow<SegmentSkipMode> = mode
-        override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+        override fun consentFlow(): Flow<Boolean> = consent
+        override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean {
             if (failSave) throw java.io.IOException()
+            this.noticeShown = noticeShown
             val changed = this.mode.value != mode
             this.mode.value = mode
             return changed

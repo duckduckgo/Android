@@ -70,7 +70,7 @@
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_2"
                 android:gravity="center"
-                android:text="@string/ad_blocking_settings_header_description"
+                android:text="@string/ad_blocking_settings_header_description_v2"
                 app:textType="secondary"
                 app:typography="body2" />
 
@@ -134,7 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_2"
-                android:text="@string/segment_skip_settings_description"
+                android:text="@string/segment_skip_settings_description_v2"
                 android:visibility="gone"
                 app:textType="secondary"
                 app:typography="body2"
