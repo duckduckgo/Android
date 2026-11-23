@@ -336,6 +336,27 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
+    fun whenMvpDisabledThenPreviousNoticeConditionsStillApply() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSegmentSkipEnabled(false)
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().viewState.test {
+            assertEquals(true, expectMostRecentItem().showSegmentSkipConsent)
+            segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
+            segmentSkip.consent.value = true
+            assertEquals(true, awaitItem().showSegmentSkipConsent)
+        }
+    }
+
+    @Test
+    fun whenNoticeWasShownThenEnablingFromOffGrantsConsent() = runTest {
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        assertEquals(true, segmentSkip.consent.value)
+    }
+
+    @Test
     fun whenSegmentSkipModeClickedThenShowsDialogWithCurrentMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         segmentSkip.mode.value = SegmentSkipMode.OFF
@@ -364,14 +385,14 @@ class AdBlockingSettingsViewModelTest {
     @Test
     fun whenEnablingFromOffThenModeIsSavedWithoutConsent() = runTest {
         segmentSkip.mode.value = SegmentSkipMode.OFF
-        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP)
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, noticeShown = false)
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
         assertEquals(false, segmentSkip.consent.value)
     }
 
     @Test
     fun whenEnabledModeChangesThenConsentIsUnchanged() = runTest {
-        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP)
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, noticeShown = false)
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
         assertEquals(false, segmentSkip.consent.value)
     }
