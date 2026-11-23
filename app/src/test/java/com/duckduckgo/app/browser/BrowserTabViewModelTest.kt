@@ -7195,6 +7195,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedQueryInRegularModeThenHeadersRequestedForRegularMode() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertEquals(BrowserMode.REGULAR, fakeCustomHeadersPlugin.lastBrowserMode)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryInFireModeThenHeadersRequestedForFireMode() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertEquals(BrowserMode.FIRE, fakeCustomHeadersPlugin.lastBrowserMode)
+    }
+
+    @Test
     fun whenUserSubmittedQueryIfAndroidFeaturesReturnsNoHeaderThenDoNotAddHeaderToUrl() {
         givenCustomHeadersProviderReturnsNoHeaders()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
@@ -14672,7 +14693,12 @@ class BrowserTabViewModelTest {
     class FakeCustomHeadersProvider(
         var headers: Map<String, String>,
     ) : CustomHeadersProvider {
-        override fun getCustomHeaders(url: String): Map<String, String> = headers
+        var lastBrowserMode: BrowserMode? = null
+
+        override fun getCustomHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
+            lastBrowserMode = browserMode
+            return headers
+        }
     }
 
     class FakeContentScopeScriptsSubscriptionEventPlugin(

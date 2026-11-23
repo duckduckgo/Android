@@ -16,6 +16,7 @@
 
 package com.duckduckgo.privacy.config.impl.features.gpc
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomHeadersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.Gpc
@@ -27,7 +28,7 @@ class GpcHeaderPlugin @Inject constructor(
     private val gpc: Gpc,
 ) : CustomHeadersPlugin {
 
-    override fun getHeaders(url: String): Map<String, String> {
+    override fun getHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
         return gpc.getHeaders(url)
     }
 }

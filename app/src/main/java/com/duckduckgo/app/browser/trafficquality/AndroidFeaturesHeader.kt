@@ -21,6 +21,7 @@ import com.duckduckgo.app.browser.trafficquality.Result.Allowed
 import com.duckduckgo.app.browser.trafficquality.Result.NotAllowed
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomHeadersPlugin
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesIntoSet
@@ -35,7 +36,7 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
     private val appVersionProvider: AppVersionHeaderProvider,
 ) : CustomHeadersPlugin {
 
-    override fun getHeaders(url: String): Map<String, String> {
+    override fun getHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
         if (isFeatureEnabled() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return when (val result = customHeaderAllowedChecker.isAllowed()) {
                 is Allowed -> {
