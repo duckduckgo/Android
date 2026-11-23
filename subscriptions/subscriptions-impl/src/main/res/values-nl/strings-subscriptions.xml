@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Je terugbetaling wordt verwerkt.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">We konden je opzegging niet automatisch verwerken. Ga naar <annotation type="withdrawal_help_link">deze pagina</annotation> om je opzegging af te ronden.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Verloopt</string>
+    <string name="subscriptionExpiringIconContentDescription">Abonnement verloopt</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Je abonnement verloopt op %1$s.</string>
+    <string name="subscriptionKeepSubscription">Abonnement behouden</string>
+
 </resources>

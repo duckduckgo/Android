@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Tvoj se povrat novca obrađuje.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nismo mogli automatski obraditi tvoje povlačenje. Za dovršavanje povlačenja posjeti <annotation type="withdrawal_help_link">ovu stranicu</annotation>.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Istječe</string>
+    <string name="subscriptionExpiringIconContentDescription">Pretplata istječe</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Tvoja pretplata istječe %1$s.</string>
+    <string name="subscriptionKeepSubscription">Zadrži pretplatu</string>
+
 </resources>

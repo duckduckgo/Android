@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Apdorojamas pinigų grąžinimas.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nepavyko automatiškai apdoroti prenumeratos atsisakymo. Apsilankyk <annotation type="withdrawal_help_link">šiame puslapyje</annotation>, kad užbaigtum atsisakymą.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Baigia galioti</string>
+    <string name="subscriptionExpiringIconContentDescription">Prenumerata netrukus baigs galioti</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Tavo prenumerata baigs galioti %1$s.</string>
+    <string name="subscriptionKeepSubscription">Tęsti prenumeratą</string>
+
 </resources>

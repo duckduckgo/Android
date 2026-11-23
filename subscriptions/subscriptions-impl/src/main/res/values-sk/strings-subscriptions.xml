@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Vrátenie peňazí sa spracúva.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nepodarilo sa nám automaticky spracovať tvoje odstúpenie od predplatného. Navštív <annotation type="withdrawal_help_link">túto stránku</annotation> a dokonči odstúpenie od predplatného.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Platnosť sa končí</string>
+    <string name="subscriptionExpiringIconContentDescription">Platnosť predplatného sa končí</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Platnosť tvojho predplatného vyprší dňa %1$s.</string>
+    <string name="subscriptionKeepSubscription">Ponechať predplatné</string>
+
 </resources>
