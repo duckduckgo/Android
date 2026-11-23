@@ -492,17 +492,57 @@ class DuckAiWidgetConfiguratorTest {
         assertEquals(activity.getColor(R.color.duckAiWidgetTextColor), row.findViewById<TextView>(R.id.chatsItemTitle).currentTextColor)
     }
 
+    @Test
+    @Config(sdk = [34])
+    fun whenDynamicColorsTurnedOffAndReappliedThenChatRowTintCleared() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = true)
+        whenever(chatStore.getChats()).thenReturn(listOf(chat("a")))
+        whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenReturn(CHAT_URL)
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = true))
+        val row = firstChatItem().apply(activity, FrameLayout(activity))
+        val icon = row.findViewById<ImageView>(R.id.chatsItemIcon)
+        assertEquals(BlendMode.SRC, icon.backgroundTintBlendMode)
+
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = false))
+        firstChatItem().reapply(activity, row)
+
+        assertNull(icon.backgroundTintList)
+        assertEquals(BlendMode.SRC_IN, icon.backgroundTintBlendMode)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDynamicColorsTurnedOffAndReappliedThenWidgetTintsCleared() = runTest {
+        stubDuckAi(enabled = true, historyAvailable = false)
+        val tinted = listOf(R.id.duckAiWidgetContainer, R.id.promptBarContainer, R.id.actionVoice, R.id.dividerTop)
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = true))
+        val root = sizedVariants(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 50)).first().apply(activity, FrameLayout(activity))
+        tinted.forEach { assertEquals(BlendMode.SRC, root.findViewById<View>(it).backgroundTintBlendMode) }
+
+        duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = false))
+        sizedVariants(testee.createRemoteViews(activity, APP_WIDGET_ID, heightDp = 50)).first().reapply(activity, root)
+
+        tinted.forEach {
+            assertNull(root.findViewById<View>(it).backgroundTintList)
+            assertEquals(BlendMode.SRC_IN, root.findViewById<View>(it).backgroundTintBlendMode)
+        }
+    }
+
     private suspend fun populateAndApplyFirstChatRow(dynamicColors: Boolean): View {
         stubDuckAi(enabled = true, historyAvailable = true)
         duckChatFeature.duckAiWidgetDynamicColors().setRawStoredState(State(enable = dynamicColors))
         whenever(chatStore.getChats()).thenReturn(listOf(chat("a")))
         whenever(duckChat.buildChatUrlWithoutAttribution(any())).thenReturn(CHAT_URL)
 
-        testee.populateRemoteViews(activity, APP_WIDGET_ID, remoteViews)
+        return firstChatItem().apply(activity, FrameLayout(activity))
+    }
 
+    private suspend fun firstChatItem(): RemoteViews {
+        val views: RemoteViews = mock()
+        testee.populateRemoteViews(activity, APP_WIDGET_ID, views)
         val captor = argumentCaptor<RemoteViews.RemoteCollectionItems>()
-        verify(remoteViews).setRemoteAdapter(eq(R.id.chatsList), captor.capture())
-        return captor.firstValue.getItemView(0).apply(activity, FrameLayout(activity))
+        verify(views).setRemoteAdapter(eq(R.id.chatsList), captor.capture())
+        return captor.firstValue.getItemView(0)
     }
 
     @Test
