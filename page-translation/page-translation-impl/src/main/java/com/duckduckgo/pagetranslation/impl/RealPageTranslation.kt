@@ -25,13 +25,17 @@ import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.api.TranslationProgress
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(FragmentScope::class, binding = binding<PageTranslation>())
+@ContributesBinding(FragmentScope::class, binding = binding<PageTranslationInternal>())
 @SingleIn(FragmentScope::class)
-class RealPageTranslation @Inject constructor() : PageTranslation {
+class RealPageTranslation @Inject constructor(
+    private val preferencesStore: TranslationPreferencesStore,
+) : PageTranslationInternal {
 
     override val progress: StateFlow<TranslationProgress> = MutableStateFlow(TranslationProgress.Idle)
 
@@ -42,4 +46,23 @@ class RealPageTranslation @Inject constructor() : PageTranslation {
     override fun detach(webView: WebView) = Unit
 
     override fun onTabStateChanged(isVisible: Boolean, content: TabContent) = Unit
+
+    override fun decide(
+        input: OfferInput,
+        hasLanguagePair: (from: String, to: String) -> Boolean,
+    ): TranslationOffer {
+        if (input.content != TabContent.WebPage) return TranslationOffer.Nothing
+
+        val detected = input.detection?.language?.baseLanguage() ?: return TranslationOffer.Nothing
+        val languages = input.deviceLanguages.map { it.baseLanguage() }
+        val preferred = languages.firstOrNull() ?: return TranslationOffer.Nothing
+
+        if (detected == preferred) return TranslationOffer.Nothing
+        if (!hasLanguagePair(detected, preferred)) return TranslationOffer.Nothing
+
+        val bannerAllowed = detected !in languages && preferencesStore.askToTranslatePages && !input.bannerSuppressed
+        return if (bannerAllowed) TranslationOffer.BannerAndMenuRow else TranslationOffer.MenuRowOnly
+    }
+
+    private fun String.baseLanguage(): String = substringBefore('-').substringBefore('_').lowercase()
 }
