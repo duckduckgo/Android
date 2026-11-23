@@ -39,6 +39,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +64,11 @@ class RealSegmentSkipUserPreferencesTest {
     private val feature = FakeFeatureToggleFactory.create(SegmentSkipFeature::class.java)
     private val testee = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
 
+    @Before
+    fun startMainProcess() {
+        testee.onCreate(mock())
+    }
+
     @Test
     fun whenDefaultEnabledOrLegacyModeThenConsentIsAbsent() = runTest {
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
@@ -79,6 +85,8 @@ class RealSegmentSkipUserPreferencesTest {
         testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
         assertEquals(true, testee.consentFlow().first())
         val recreated = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
+        assertFalse(recreated.hasConsent())
+        recreated.onCreate(mock())
         assertEquals(true, recreated.consentFlow().first())
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(true, testee.hasConsent())
@@ -207,6 +215,7 @@ class RealSegmentSkipUserPreferencesTest {
             }
         }
         val preferences = RealSegmentSkipUserPreferences(failingStore, coroutineRule.testScope, feature)
+        preferences.onCreate(mock())
         assertTrue(preferences.consentFlow().first())
 
         val save = async { runCatching { preferences.setMode(SegmentSkipMode.OFF) } }

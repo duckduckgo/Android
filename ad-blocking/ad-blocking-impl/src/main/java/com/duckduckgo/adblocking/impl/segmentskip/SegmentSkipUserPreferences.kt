@@ -22,11 +22,15 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
@@ -69,12 +73,13 @@ interface SegmentSkipUserPreferences {
 }
 
 @SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<SegmentSkipUserPreferences>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealSegmentSkipUserPreferences @Inject constructor(
     @AdBlockingPreferences private val dataStore: DataStore<Preferences>,
-    @AppCoroutineScope appScope: CoroutineScope,
+    @AppCoroutineScope private val appScope: CoroutineScope,
     private val feature: SegmentSkipFeature,
-) : SegmentSkipUserPreferences {
+) : SegmentSkipUserPreferences, MainProcessLifecycleObserver {
 
     private val mode: StateFlow<SegmentSkipMode> =
         modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode(feature.mvpEnabled().isEnabled()))
@@ -83,7 +88,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     private val consent = MutableStateFlow<Boolean?>(null)
 
-    init {
+    override fun onCreate(owner: LifecycleOwner) {
         appScope.launch {
             setModeMutex.withLock {
                 if (consent.value == null) {
