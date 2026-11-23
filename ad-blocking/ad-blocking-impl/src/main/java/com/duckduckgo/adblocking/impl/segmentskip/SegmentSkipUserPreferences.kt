@@ -35,6 +35,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.io.IOException
 import javax.inject.Inject
 
@@ -72,8 +74,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode(feature.mvpEnabled().isEnabled()))
 
     @Volatile private var revoked = false
-    private val consentLock = Any()
-    private var changeGeneration = 0L
+    private val setModeMutex = Mutex()
 
     private val consent = consentFlow().stateIn(appScope, SharingStarted.Eagerly, false)
 
@@ -100,12 +101,9 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     override fun cachedMode(): SegmentSkipMode = mode.value
 
-    override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean {
+    override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean = setModeMutex.withLock {
+        if (mode == SegmentSkipMode.OFF) revoked = true
         var changed = false
-        val generation = synchronized(consentLock) {
-            if (mode == SegmentSkipMode.OFF) revoked = true
-            ++changeGeneration
-        }
         var granted = false
         dataStore.edit { prefs ->
             val previous = prefs[KEY_MODE]?.let { stored ->
@@ -120,10 +118,8 @@ class RealSegmentSkipUserPreferences @Inject constructor(
                 granted = noticeShown
             }
         }
-        synchronized(consentLock) {
-            if (granted && changeGeneration == generation) revoked = false
-        }
-        return changed
+        if (granted) revoked = false
+        changed
     }
 
     private fun defaultMode(mvpEnabled: Boolean): SegmentSkipMode =

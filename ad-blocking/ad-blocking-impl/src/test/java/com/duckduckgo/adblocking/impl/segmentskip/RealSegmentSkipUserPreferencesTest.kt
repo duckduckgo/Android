@@ -29,12 +29,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -187,6 +190,35 @@ class RealSegmentSkipUserPreferencesTest {
         val first = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
         val second = async { testee.setMode(SegmentSkipMode.ALWAYS_SKIP) }
         assertEquals(listOf(false, true), listOf(first.await(), second.await()).sorted())
+    }
+
+    @Test
+    fun whenGrantAndOffOverlapThenOffIsAppliedLast() = runTest {
+        testee.setMode(SegmentSkipMode.OFF)
+        val grantStarted = CompletableDeferred<Unit>()
+        val finishGrant = CompletableDeferred<Unit>()
+        val pausedStore = object : DataStore<Preferences> by testDataStore {
+            override suspend fun updateData(transform: suspend (Preferences) -> Preferences): Preferences {
+                if (!grantStarted.isCompleted) {
+                    grantStarted.complete(Unit)
+                    finishGrant.await()
+                }
+                return testDataStore.updateData(transform)
+            }
+        }
+        val preferences = RealSegmentSkipUserPreferences(pausedStore, coroutineRule.testScope, feature)
+        val grant = async(start = CoroutineStart.UNDISPATCHED) { preferences.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true) }
+        grantStarted.await()
+        val off = async(start = CoroutineStart.UNDISPATCHED) { preferences.setMode(SegmentSkipMode.OFF) }
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertFalse(off.isCompleted)
+        finishGrant.complete(Unit)
+        grant.await()
+        off.await()
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(SegmentSkipMode.OFF, preferences.modeFlow().first())
+        assertFalse(preferences.consentFlow().first())
+        assertFalse(preferences.hasConsent())
     }
 
     @Test
