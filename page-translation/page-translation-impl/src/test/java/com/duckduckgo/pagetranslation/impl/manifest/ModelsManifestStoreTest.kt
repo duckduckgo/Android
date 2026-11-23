@@ -125,6 +125,34 @@ class ModelsManifestStoreTest {
     }
 
     @Test
+    fun keepValidModelsAndOnlyTheirContractFiles() = runTest {
+        store.replaceIfSupported(
+            manifestOf(model("fr-en", "fr", "en", VOCAB_FILES + "extra"), model("ru-en", "ru", "en", SPLIT_VOCAB_FILES)),
+            OLD_TAG,
+        )
+
+        val models = store.readManifest()!!.models
+        assertEquals(setOf("fr-en", "ru-en"), models.keys)
+        assertEquals(VOCAB_FILES.toSet(), models.getValue("fr-en").files.keys)
+        assertEquals(SPLIT_VOCAB_FILES.toSet(), models.getValue("ru-en").files.keys)
+    }
+
+    @Test
+    fun dropModelsWhosePairOrFilesCouldNotBeUsedAsNames() = runTest {
+        store.replaceIfSupported(
+            manifestOf(
+                model("en-de", "de", "en", VOCAB_FILES),
+                model("..-en", "..", "en", VOCAB_FILES),
+                model("es-en", "es", "en", listOf("model", "vocab")),
+                model("fr-en", "fr", "en", VOCAB_FILES),
+            ),
+            OLD_TAG,
+        )
+
+        assertEquals(setOf("fr-en"), store.readManifest()!!.models.keys)
+    }
+
+    @Test
     fun keepPreviousFileAndETagReadableWhenPreferenceCommitFails() = runTest {
         store.replaceIfSupported(MANIFEST, OLD_TAG)
 
@@ -153,6 +181,17 @@ class ModelsManifestStoreTest {
 
     private fun getStoredFile(): File = directory.listFiles()!!.single()
 
+    private fun manifestOf(vararg models: String) = """{"schemaVersion":1,"baseUrl":"/","models":{${models.joinToString(",")}}}"""
+
+    private fun model(pair: String, source: String, target: String, files: List<String>): String {
+        val fileEntries = files.joinToString(
+            ",",
+        ) { """"$it":{"path":"$it.zst","bytes":1,"sha256":"a","decompressedSize":1,"decompressedHash":"b"}""" }
+
+        return """"$pair":{"sourceLanguage":"$source","targetLanguage":"$target","version":"1","architecture":"base-memory",""" +
+            """"totalBytes":1,"files":{$fileEntries}}"""
+    }
+
     private companion object {
         const val MANIFEST_PREFERENCES_FILE_NAME = "manifest.preferences_pb"
         const val MANIFEST_DIRECTORY_NAME = "page-translation"
@@ -173,6 +212,8 @@ class ModelsManifestStoreTest {
         const val EXPECTED_FAILURE_MESSAGE = "Expected a failed write"
 
         const val OLD_TAG = "\"first\""
+        val VOCAB_FILES = listOf("model", "lexicalShortlist", "vocab")
+        val SPLIT_VOCAB_FILES = listOf("model", "lexicalShortlist", "srcVocab", "trgVocab")
         const val NEW_TAG = "W/\"second\""
 
         val MANIFEST = """

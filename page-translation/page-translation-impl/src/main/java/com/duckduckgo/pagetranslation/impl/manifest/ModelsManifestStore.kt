@@ -25,6 +25,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
@@ -133,15 +134,41 @@ class RealModelsManifestStore internal constructor(
     }
 
     private fun parse(body: String): ModelsManifest? = try {
-        adapter.fromJson(body)?.takeIf { it.schemaVersion <= SUPPORTED_SCHEMA_VERSION }
+        adapter.fromJson(body)
+            ?.takeIf { it.schemaVersion <= SUPPORTED_SCHEMA_VERSION }
+            ?.let { manifest -> manifest.copy(models = getValidModels(manifest.models)) }
     } catch (_: JsonDataException) {
         null
     } catch (_: IOException) {
         null
     }
 
+    // pairs and file keys become directory and file names, so a model with anything but plain contract values is dropped
+    private fun getValidModels(models: Map<String, TranslationModel>): Map<String, TranslationModel> = buildMap {
+        for ((pair, model) in models) {
+            val knownFiles = model.files.filterKeys { it in KNOWN_FILE_KEYS }
+            val isValid = LANGUAGE_CODE.matches(model.sourceLanguage) &&
+                LANGUAGE_CODE.matches(model.targetLanguage) &&
+                pair == "${model.sourceLanguage}-${model.targetLanguage}" &&
+                knownFiles.keys in VALID_FILE_SETS
+
+            if (isValid) {
+                put(pair, model.copy(files = knownFiles))
+            } else {
+                logcat(ERROR) { "Ignored an invalid page translation model in the manifest" }
+            }
+        }
+    }
+
     private companion object {
         const val SUPPORTED_SCHEMA_VERSION = 1
+
+        val LANGUAGE_CODE = Regex("[a-z]{2,3}")
+        val VALID_FILE_SETS = setOf(
+            setOf("model", "lexicalShortlist", "vocab"),
+            setOf("model", "lexicalShortlist", "srcVocab", "trgVocab"),
+        )
+        val KNOWN_FILE_KEYS = VALID_FILE_SETS.flatten().toSet()
 
         const val MANIFEST_DIRECTORY = "page-translation"
         const val MANIFEST_FILE_NAME = "models.json"
