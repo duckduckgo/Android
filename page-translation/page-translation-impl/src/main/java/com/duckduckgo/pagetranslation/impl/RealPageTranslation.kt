@@ -24,11 +24,13 @@ import com.duckduckgo.pagetranslation.api.PageTranslation
 import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.api.TranslationProgress
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class)
+@SingleIn(FragmentScope::class)
 class RealPageTranslation @Inject constructor() : PageTranslation {
 
     override val progress: StateFlow<TranslationProgress> = MutableStateFlow(TranslationProgress.Idle)
