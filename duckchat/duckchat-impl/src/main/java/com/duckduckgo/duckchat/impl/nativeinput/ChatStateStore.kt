@@ -52,6 +52,6 @@ class ChatStateStore @Inject constructor() {
         flows.computeIfAbsent(key) { MutableStateFlow(ChatState.HIDE) }
 
     companion object {
-        fun contextualKey(tabId: String): String = "contextual:$tabId"
+        fun contextualKey(key: String): String = "contextual:$key"
     }
 }
