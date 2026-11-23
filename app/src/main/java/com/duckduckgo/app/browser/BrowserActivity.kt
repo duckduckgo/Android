@@ -1626,6 +1626,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatUrl: String? = null,
             duckChatSessionActive: Boolean = false,
             duckChatForceImageGeneration: Boolean = false,
+            openDuckChatHistory: Boolean = false,
             deletedTabCount: Int = 0,
             launchingAppPackage: String? = null,
         ): Intent {
@@ -1648,6 +1649,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_URL, duckChatUrl)
             intent.putExtra(DUCK_CHAT_SESSION_ACTIVE, duckChatSessionActive)
             intent.putExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, duckChatForceImageGeneration)
+            intent.putExtra(OPEN_DUCK_CHAT_HISTORY, openDuckChatHistory)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
             intent.putExtra(IN_APP_NAVIGATION_EXTRA, launchSource == InAppNavigation)
@@ -1685,6 +1687,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
 
         private const val IDLE_RETURN_FIRST_FRAME_TIMEOUT_MS = 500L
         private const val OPEN_DUCK_CHAT = "OPEN_DUCK_CHAT_EXTRA"
+        const val OPEN_DUCK_CHAT_HISTORY = "OPEN_DUCK_CHAT_HISTORY_EXTRA"
         private const val DUCK_CHAT_CONTEXTUAL = "DUCK_CHAT_CONTEXTUAL_EXTRA"
         private const val DUCK_CHAT_TEXT_SELECTION = "DUCK_CHAT_TEXT_SELECTION_EXTRA"
         private const val DUCK_CHAT_ENTRY_POINT_EXTRA = "DUCK_CHAT_ENTRY_POINT_EXTRA"
