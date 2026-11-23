@@ -73,7 +73,7 @@ class ModelsManifestStoreTest {
     }
 
     private fun createStore(dataStore: DataStore<Preferences>) =
-        ModelsManifestStore({ temporaryFolder.root.resolve(MANIFEST_DIRECTORY_NAME) }, dataStore, coroutineRule.testDispatcherProvider)
+        RealModelsManifestStore({ temporaryFolder.root.resolve(MANIFEST_DIRECTORY_NAME) }, dataStore, coroutineRule.testDispatcherProvider)
 
     private companion object {
         const val MANIFEST_PREFERENCES_FILE_NAME = "manifest.preferences_pb"

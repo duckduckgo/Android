@@ -35,12 +35,14 @@ internal class ModelsManifestWorker(
     lateinit var feature: PageTranslationFeature
 
     @Inject
+    lateinit var fetcher: Lazy<ModelsManifestFetcher>
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
         if (!feature.translation().isEnabled()) return@withContext Result.success()
 
-        val store = ModelsManifestStore(applicationContext, dispatchers)
-        ModelsManifestFetcher(store, dispatchers).fetch()
+        fetcher.value.fetch()
     }
 }

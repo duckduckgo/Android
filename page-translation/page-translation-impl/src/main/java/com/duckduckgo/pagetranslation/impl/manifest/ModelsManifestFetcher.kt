@@ -18,29 +18,28 @@ package com.duckduckgo.pagetranslation.impl.manifest
 
 import androidx.work.ListenableWorker.Result
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.pagetranslation.impl.ModelsHttpClient
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
-import okhttp3.CookieJar
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
 import java.net.HttpURLConnection.HTTP_OK
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-internal class ModelsManifestFetcher(
+class ModelsManifestFetcher @Inject constructor(
     private val store: ModelsManifestStore,
+    @ModelsHttpClient private val client: Lazy<OkHttpClient>,
     private val dispatchers: DispatcherProvider,
 ) {
-    suspend fun fetch(url: String = MANIFEST_URL): Result = withContext(dispatchers.io()) {
+    suspend fun fetch(): Result = withContext(dispatchers.io()) {
         try {
-            val request = Request.Builder()
-                .url(url)
-                .header(USER_AGENT_HEADER, USER_AGENT_VALUE)
+            val request = Request.Builder().url(MANIFEST_URL)
             store.getEtagForRequest()?.let { request.header(IF_NONE_MATCH_HEADER, it) }
 
-            client.newCall(request.build()).execute().use { response ->
+            client.value.newCall(request.build()).execute().use { response ->
                 when (response.code) {
                     HTTP_OK -> {
                         store.replaceIfSupported(response.body?.string().orEmpty(), response.header(ETAG_HEADER))
@@ -62,18 +61,10 @@ internal class ModelsManifestFetcher(
         }
     }
 
-    private companion object {
+    companion object {
         const val MANIFEST_URL = "https://staticcdn.duckduckgo.com/translations/models/models.json"
 
-        const val USER_AGENT_HEADER = "User-Agent"
-        const val USER_AGENT_VALUE = "DuckDuckGo"
         const val IF_NONE_MATCH_HEADER = "If-None-Match"
         const val ETAG_HEADER = "ETag"
-
-        val client = OkHttpClient.Builder()
-            .cookieJar(CookieJar.NO_COOKIES)
-            .followRedirects(followRedirects = false)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .build()
     }
 }

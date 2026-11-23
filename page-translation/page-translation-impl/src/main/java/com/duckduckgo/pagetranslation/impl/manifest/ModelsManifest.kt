@@ -19,7 +19,7 @@ package com.duckduckgo.pagetranslation.impl.manifest
 import androidx.annotation.Keep
 
 @Keep
-internal data class ModelsManifest(
+data class ModelsManifest(
     val schemaVersion: Int,
     val generated: String? = null,
     val baseUrl: String,

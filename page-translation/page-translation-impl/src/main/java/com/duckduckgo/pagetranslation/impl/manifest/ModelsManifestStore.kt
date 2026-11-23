@@ -24,10 +24,13 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -37,16 +40,31 @@ import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption.ATOMIC_MOVE
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import javax.inject.Inject
 
 private const val MANIFEST_PREFERENCES_NAME = "page_translation_manifest"
 
 private val Context.manifestPreferences by preferencesDataStore(name = MANIFEST_PREFERENCES_NAME)
 
-internal class ModelsManifestStore(
+interface ModelsManifestStore {
+    /** Returns null when no manifest is stored or the stored one can't be read. */
+    suspend fun readManifest(): ModelsManifest?
+
+    /** Returns null, and forgets the ETag, when the stored manifest can't be read, so the next request fetches it in full. */
+    suspend fun getEtagForRequest(): String?
+
+    /** Replaces the stored manifest and its ETag, unless the body isn't a manifest this app supports. */
+    suspend fun replaceIfSupported(body: String, etag: String?)
+}
+
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class)
+class RealModelsManifestStore internal constructor(
     private val directory: () -> File,
     private val preferences: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
-) {
+) : ModelsManifestStore {
+    @Inject
     constructor(
         context: Context,
         dispatchers: DispatcherProvider,
@@ -56,7 +74,7 @@ internal class ModelsManifestStore(
         dispatchers,
     )
 
-    suspend fun readManifest(): ModelsManifest? = withContext(dispatchers.io()) {
+    override suspend fun readManifest(): ModelsManifest? = withContext(dispatchers.io()) {
         try {
             val isAlternateFile = preferences.data.firstOrNull()?.get(ALTERNATE_FILE) ?: return@withContext null
 
@@ -66,7 +84,7 @@ internal class ModelsManifestStore(
         }
     }
 
-    suspend fun getEtagForRequest(): String? = withContext(dispatchers.io()) {
+    override suspend fun getEtagForRequest(): String? = withContext(dispatchers.io()) {
         if (readManifest() != null) {
             return@withContext preferences.data.firstOrNull()?.get(ETAG)
         }
@@ -83,7 +101,7 @@ internal class ModelsManifestStore(
         null
     }
 
-    suspend fun replaceIfSupported(body: String, etag: String?): Unit = withContext(dispatchers.io()) {
+    override suspend fun replaceIfSupported(body: String, etag: String?): Unit = withContext(dispatchers.io()) {
         if (parse(body) == null) {
             logcat(ERROR) { "Rejected page translation models manifest" }
             return@withContext
