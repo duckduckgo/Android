@@ -14,6 +14,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.EXPIRED
@@ -1176,6 +1177,97 @@ class SubscriptionWebViewViewModelTest {
         viewModel.commands().test {
             viewModel.processJsCallbackMessage("test", "activateSubscription", null, null)
             assertTrue(awaitItem() is Command.RestoreSubscription)
+        }
+    }
+
+    @Test
+    fun whenShowFeatureInfoAndFeatureIsNetPThenShowFeatureInfoCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "useSubscription",
+                "showFeatureInfo",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.NETP}"}"""),
+            )
+            assertEquals(Command.ShowFeatureInfo(SubscriptionOnboardingFeature.VPN), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowFeatureInfoAndFeatureIsItrThenShowFeatureInfoCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "useSubscription",
+                "showFeatureInfo",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.ITR}"}"""),
+            )
+            assertEquals(Command.ShowFeatureInfo(SubscriptionOnboardingFeature.ITR), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowFeatureInfoAndFeatureIsRowItrThenShowFeatureInfoCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "useSubscription",
+                "showFeatureInfo",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.ROW_ITR}"}"""),
+            )
+            assertEquals(Command.ShowFeatureInfo(SubscriptionOnboardingFeature.ITR), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowFeatureInfoAndFeatureIsPirThenShowFeatureInfoCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "useSubscription",
+                "showFeatureInfo",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.PIR}"}"""),
+            )
+            assertEquals(Command.ShowFeatureInfo(SubscriptionOnboardingFeature.PIR), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowFeatureInfoAndFeatureIsDuckAiThenShowFeatureInfoCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage(
+                "useSubscription",
+                "showFeatureInfo",
+                null,
+                JSONObject("""{"feature":"${SubscriptionsConstants.DUCK_AI}"}"""),
+            )
+            assertEquals(Command.ShowFeatureInfo(SubscriptionOnboardingFeature.DUCK_AI), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenShowFeatureInfoAndFeatureIsUnknownThenFailurePixelSentAndNoCommand() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("useSubscription", "showFeatureInfo", null, JSONObject("""{"feature":"Bogus"}"""))
+            ensureAllEventsConsumed()
+        }
+        verify(pixelSender).reportCancellationFlowFeatureInfoFailure()
+    }
+
+    @Test
+    fun whenShowFeatureInfoWithoutDataThenFailurePixelSentAndNoCommand() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("useSubscription", "showFeatureInfo", null, null)
+            ensureAllEventsConsumed()
+        }
+        verify(pixelSender).reportCancellationFlowFeatureInfoFailure()
+    }
+
+    @Test
+    fun whenRequestCancellationThenRequestStoreCancellationCommandSent() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("useSubscription", "requestCancellation", null, JSONObject("{}"))
+            assertEquals(Command.RequestStoreCancellation, awaitItem())
         }
     }
 

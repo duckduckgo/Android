@@ -28,6 +28,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState.ENABLED
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.Experiment
@@ -218,6 +219,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "requestNotificationsPermission" -> id?.let { requestNotificationsPermission(it) }
             "showNotificationsDeniedDialog" -> id?.let { showNotificationsDeniedDialog(it, data) }
             "completeStripePayment" -> completeStripePayment(featureName, method, id)
+            "showFeatureInfo" -> showFeatureInfo(data)
+            "requestCancellation" -> requestCancellation()
             else -> {
                 // NOOP
             }
@@ -389,6 +392,29 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
         }
     }
+    private fun showFeatureInfo(data: JSONObject?) {
+        val feature = when (runCatching { data?.getString("feature") }.getOrNull()) {
+            NETP -> SubscriptionOnboardingFeature.VPN
+            ITR, ROW_ITR -> SubscriptionOnboardingFeature.ITR
+            PIR -> SubscriptionOnboardingFeature.PIR
+            DUCK_AI -> SubscriptionOnboardingFeature.DUCK_AI
+            else -> null
+        }
+        viewModelScope.launch {
+            if (feature == null) {
+                pixelSender.reportCancellationFlowFeatureInfoFailure()
+            } else {
+                command.send(ShowFeatureInfo(feature))
+            }
+        }
+    }
+
+    private fun requestCancellation() {
+        viewModelScope.launch {
+            command.send(RequestStoreCancellation)
+        }
+    }
+
     private fun activateSubscription() {
         viewModelScope.launch(dispatcherProvider.io()) {
             if (!subscriptionsManager.subscriptionStatus().isActive()) {
@@ -966,6 +992,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class GoToNetP(val activityParams: ActivityParams) : Command()
         data object GoToDuckAI : Command()
         data object Reload : Command()
+        data class ShowFeatureInfo(val feature: SubscriptionOnboardingFeature) : Command()
+        data object RequestStoreCancellation : Command()
     }
 
     companion object {

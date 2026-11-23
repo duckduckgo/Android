@@ -176,6 +176,8 @@ class SubscriptionMessagingInterface @Inject constructor(
             "requestNotificationsPermission",
             "showNotificationsDeniedDialog",
             "completeStripePayment",
+            "showFeatureInfo",
+            "requestCancellation",
         )
     }
 

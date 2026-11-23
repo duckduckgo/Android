@@ -81,7 +81,9 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
@@ -108,10 +110,12 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.OpenNotificationSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestNotificationsPermission
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestStoreCancellation
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ShowNotificationsDeniedDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ShowFeatureInfo
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionChangeSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView
@@ -232,6 +236,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
         pendingNotificationsPermissionRequestId = null
     }
+    private var isShowingFeatureInfo = false
+    private val featureInfoLauncher = registerForActivityResult(StartActivityForResult()) {
+        isShowingFeatureInfo = false
+    }
+
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
@@ -586,6 +595,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is ShowNotificationsDeniedDialog -> showNotificationsDeniedDialog(command.id, command.days)
             is OpenNotificationSettings -> openNotificationSettings()
             Reload -> binding.webview.reload()
+            is ShowFeatureInfo -> showFeatureInfo(command.feature)
+            RequestStoreCancellation -> Unit
         }
     }
 
@@ -594,6 +605,13 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: $url"
         }
         binding.webview.loadUrl(url)
+    }
+
+    private fun showFeatureInfo(feature: SubscriptionOnboardingFeature) {
+        if (isShowingFeatureInfo) return
+        val intent = globalActivityStarter.startIntent(this, SubscriptionOnboardingFeatureInfoScreen(feature)) ?: return
+        isShowingFeatureInfo = true
+        featureInfoLauncher.launch(intent)
     }
 
     private fun goToPIRDashboard() {
