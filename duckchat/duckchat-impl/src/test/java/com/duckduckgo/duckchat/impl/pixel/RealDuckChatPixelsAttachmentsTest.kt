@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -53,6 +54,45 @@ class RealDuckChatPixelsAttachmentsTest {
         duckAiNewChatMetricPixelsPlugin = mock(),
         duckAiSessionCallback = mock(),
     )
+
+    @Test
+    fun whenAttachMenuShownThenCountAndDailyWithSurface() = runTest {
+        testee.fireAttachMenuShown(DuckChatPixelSurface.CONTEXTUAL_CHAT)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "contextual_chat")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_SHOWN_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenAttachMenuItemSelectedThenItemParamUsesPixelValue() = runTest {
+        val expected = mapOf(
+            AttachMenuItem.CAMERA to "camera",
+            AttachMenuItem.PHOTO_LIBRARY to "photo_library",
+            AttachMenuItem.FILE_PICKER to "file_picker",
+            AttachMenuItem.PAGE to "page",
+        )
+        assertEquals(AttachMenuItem.entries.toSet(), expected.keys)
+
+        expected.forEach { (item, value) ->
+            testee.fireAttachMenuItemSelected(item, DuckChatPixelSurface.ADDRESS_BAR)
+
+            val params = mapOf(
+                DuckChatPixelParameters.ATTACH_MENU_ITEM to value,
+                DuckChatPixelParameters.SURFACE to "address_bar",
+            )
+            verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_ITEM_SELECTED_COUNT, parameters = params)
+            verify(pixel).fire(
+                DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_ATTACH_MENU_ITEM_SELECTED_DAILY,
+                parameters = params,
+                type = Pixel.PixelType.Daily(),
+            )
+        }
+    }
 
     @Test
     fun whenImageAttachedFromCameraThenSourceParam() = runTest {

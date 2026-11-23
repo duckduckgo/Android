@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
+import com.duckduckgo.duckchat.impl.pixel.AttachMenuItem
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -176,6 +177,14 @@ class AttachmentViewModel @Inject constructor(
             supportedFileTypes = supportedFileTypes,
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = AttachmentState())
+
+    fun onAttachMenuShown() {
+        duckChatPixels.fireAttachMenuShown(surface.value)
+    }
+
+    fun onAttachMenuItemSelected(item: AttachMenuItem) {
+        duckChatPixels.fireAttachMenuItemSelected(item, surface.value)
+    }
 
     fun onImagesPicked(uris: List<Uri>, source: ImageSource) {
         viewModelScope.launch {
