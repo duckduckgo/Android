@@ -35,14 +35,6 @@ data class TrafficQualityAppVersion(
     val appVersion: Int,
     val daysUntilLoggingStarts: Int,
     val daysLogging: Int,
-    val featuresLogged: TrafficQualityAppVersionFeatures,
-)
-
-data class TrafficQualityAppVersionFeatures(
-    val gpc: Boolean,
-    val cpm: Boolean,
-    val appTP: Boolean,
-    val netP: Boolean,
 )
 
 @ContributesBinding(AppScope::class)

@@ -37,26 +37,17 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
 ) : CustomHeadersPlugin {
 
     override fun getHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
-        if (isFeatureEnabled() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return when (val result = customHeaderAllowedChecker.isAllowed()) {
-                is Allowed -> {
-                    val headers = mutableMapOf<String, String>()
-                    androidFeaturesHeaderProvider.provide(result.config)?.let { headerValue ->
-                        headers.put(X_DUCKDUCKGO_ANDROID_HEADER, headerValue)
-                    }
-                    appVersionProvider.provide(isStub = false).let { headerValue ->
-                        headers.put(X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER, headerValue)
-                    }
-                    headers
-                }
-
-                NotAllowed -> {
-                    mapOf(X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER to appVersionProvider.provide(isStub = true))
-                }
-            }
-        } else {
+        if (!isFeatureEnabled() || browserMode == BrowserMode.FIRE || !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return emptyMap()
         }
+        val appVersion = when (customHeaderAllowedChecker.isAllowed()) {
+            is Allowed -> appVersionProvider.provide(isStub = false)
+            NotAllowed -> appVersionProvider.provide(isStub = true)
+        }
+        return mapOf(
+            X_DUCKDUCKGO_ANDROID_HEADER to androidFeaturesHeaderProvider.provide(),
+            X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER to appVersion,
+        )
     }
 
     private fun isFeatureEnabled(): Boolean {
