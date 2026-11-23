@@ -73,7 +73,6 @@ class RealSegmentSkipUserPreferences @Inject constructor(
     private val mode: StateFlow<SegmentSkipMode> =
         modeFlow().stateIn(appScope, SharingStarted.Eagerly, defaultMode(feature.mvpEnabled().isEnabled()))
 
-    @Volatile private var revoked = false
     private val setModeMutex = Mutex()
 
     private val consent = consentFlow().stateIn(appScope, SharingStarted.Eagerly, false)
@@ -84,7 +83,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
             emit(false)
         }.distinctUntilChanged()
 
-    override fun hasConsent(): Boolean = !revoked && consent.value
+    override fun hasConsent(): Boolean = consent.value
 
     override fun modeFlow(): Flow<SegmentSkipMode> = combine(
         dataStore.data,
@@ -102,9 +101,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
     override fun cachedMode(): SegmentSkipMode = mode.value
 
     override suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean): Boolean = setModeMutex.withLock {
-        if (mode == SegmentSkipMode.OFF) revoked = true
         var changed = false
-        var granted = false
         dataStore.edit { prefs ->
             val previous = prefs[KEY_MODE]?.let { stored ->
                 SegmentSkipMode.entries.firstOrNull {
@@ -115,10 +112,8 @@ class RealSegmentSkipUserPreferences @Inject constructor(
             prefs[KEY_MODE] = mode.name
             if (mode != SegmentSkipMode.OFF && previous == SegmentSkipMode.OFF) {
                 prefs[KEY_CONSENT] = userConsent
-                granted = userConsent
             }
         }
-        if (granted) revoked = false
         changed
     }
 
