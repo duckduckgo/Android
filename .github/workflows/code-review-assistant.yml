@@ -154,8 +154,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           if [ "$MODE" = review ]; then request="${PR} ci"; else request="reconcile ci"; fi
-          # A finished run has been seen to keep the claude process alive, so it gets a
-          # deadline; the records it wrote before then still get pushed.
+          # Background subagents and wakeups can keep claude running long after the review
+          # is done, so a review ends once its records are committed, and every run gets a
+          # deadline. Records written before either still get pushed.
           timeout --kill-after=30s 30m claude -p "/android-factory:code-review-assistant ${request}" \
             --plugin-dir "$RUNNER_TEMP/review-plugin" \
             --model "$MODEL" \
@@ -165,8 +166,23 @@ jobs:
             --permission-mode dontAsk \
             --allowedTools Bash Read Grep Glob Write Edit Agent TodoWrite Skill \
             --output-format stream-json --verbose \
-            > "$RUNNER_TEMP/transcript.jsonl" 2> "$RUNNER_TEMP/transcript.err" \
-            || echo "::warning::claude exited with status $?"
+            > "$RUNNER_TEMP/transcript.jsonl" 2> "$RUNNER_TEMP/transcript.err" &
+          pid=$!
+          while kill -0 "$pid" 2>/dev/null; do
+            if [ "$MODE" = review ] && [ -s "$WORK/review.md" ] \
+              && git -C "$WORK/records" log --format=%s origin/records..HEAD 2>/dev/null | grep -q '^Record review of'; then
+              sleep 15
+              if kill -0 "$pid" 2>/dev/null; then
+                echo "Records committed; ending claude"
+                kill -TERM "$pid" 2>/dev/null || true
+              fi
+              break
+            fi
+            sleep 10
+          done
+          status=0
+          wait "$pid" || status=$?
+          if [ "$status" -ne 0 ] && [ "$status" -ne 143 ]; then echo "::warning::claude exited with status $status"; fi
           # Event types and tool names only: the transcript itself must not reach this public log.
           echo "results: $(jq -c 'select(.type=="result") | .subtype' "$RUNNER_TEMP/transcript.jsonl" | tr '\n' ' ')"
           echo "last tools: $(jq -r 'select(.type=="assistant") | .message.content[]? | select(.type=="tool_use") | .name' "$RUNNER_TEMP/transcript.jsonl" | tail -5 | tr '\n' ' ')"
