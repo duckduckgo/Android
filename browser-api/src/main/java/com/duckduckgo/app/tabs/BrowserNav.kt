@@ -62,6 +62,13 @@ interface BrowserNav {
  * Content attached to the input when opening Duck.ai
  */
 sealed interface Attachment {
-    data class Text(val text: String) : Attachment
-    data class File(val uri: Uri) : Attachment
+    data class Text(
+        /** Text to be attached. */
+        val text: String,
+    ) : Attachment
+
+    data class File(
+        /** Content URI of the file to be attached. */
+        val uri: Uri,
+    ) : Attachment
 }
