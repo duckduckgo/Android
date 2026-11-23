@@ -1364,7 +1364,7 @@ class SubscriptionSettingsViewModelTest {
     }
 
     private fun givenUndoSubscriptionCancellationEnabled(enabled: Boolean) {
-        subscriptionsFeature.undoSubscriptionCancellation().setRawStoredState(Toggle.State(enable = enabled))
+        subscriptionsFeature.undoSubscriptionCancellationAllLanguages().setRawStoredState(Toggle.State(enable = enabled))
     }
 
     private suspend fun stubReadySubscription(
