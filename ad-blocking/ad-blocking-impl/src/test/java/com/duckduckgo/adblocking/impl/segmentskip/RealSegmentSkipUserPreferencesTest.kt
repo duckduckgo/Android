@@ -158,6 +158,42 @@ class RealSegmentSkipUserPreferencesTest {
     }
 
     @Test
+    fun whenStartupRetriesAreExhaustedThenReadsResumeOnForeground() = runTest {
+        val recoveringStore: DataStore<Preferences> = mock()
+        var reads = 0
+        var fails = true
+        whenever(recoveringStore.data).thenReturn(
+            flow {
+                reads++
+                if (fails) throw IOException()
+                emit(
+                    preferencesOf(
+                        stringPreferencesKey("segment_skip_mode") to "ALWAYS_ASK",
+                        booleanPreferencesKey("segment_skip_telemetry_consent") to true,
+                    ),
+                )
+            },
+        )
+        val preferences = RealSegmentSkipUserPreferences(recoveringStore, coroutineRule.testScope, feature)
+        val scheduler = coroutineRule.testScope.testScheduler
+        scheduler.runCurrent()
+        val readsBeforeStartup = reads
+
+        preferences.onCreate(mock())
+        scheduler.runCurrent()
+        preferences.onResume(mock())
+        scheduler.advanceUntilIdle()
+        assertEquals(3, reads - readsBeforeStartup)
+        assertFalse(preferences.hasConsent())
+
+        fails = false
+        preferences.onResume(mock())
+        scheduler.advanceUntilIdle()
+        assertEquals(4, reads - readsBeforeStartup)
+        assertTrue(preferences.hasConsent())
+    }
+
+    @Test
     fun whenReadFailsThenModeIsOffAndNewCollectionCanRecover() = runTest {
         val failingStore: DataStore<Preferences> = mock()
         var fails = true

@@ -31,6 +31,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -88,17 +89,30 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     private val consent = MutableStateFlow<Boolean?>(null)
 
+    private var consentLoadJob: Job? = null
+
     override fun onCreate(owner: LifecycleOwner) {
-        appScope.launch {
-            while (consent.value == null) {
+        loadConsent()
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        loadConsent()
+    }
+
+    private fun loadConsent() {
+        if (consent.value != null || consentLoadJob?.isActive == true) return
+
+        consentLoadJob = appScope.launch {
+            repeat(CONSENT_READ_ATTEMPTS) { attempt ->
                 try {
                     setModeMutex.withLock {
                         if (consent.value == null) {
                             consent.value = dataStore.data.firstOrNull()?.hasStoredConsent() == true
                         }
                     }
+                    return@launch
                 } catch (_: IOException) {
-                    delay(CONSENT_READ_RETRY_MILLIS)
+                    if (attempt + 1 < CONSENT_READ_ATTEMPTS) delay(CONSENT_READ_RETRY_MILLIS)
                 }
             }
         }
@@ -156,6 +170,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
 
     private companion object {
+        const val CONSENT_READ_ATTEMPTS = 3
         const val CONSENT_READ_RETRY_MILLIS = 1_000L
         val KEY_CONSENT = booleanPreferencesKey("segment_skip_telemetry_consent")
         val KEY_MODE = stringPreferencesKey("segment_skip_mode")
