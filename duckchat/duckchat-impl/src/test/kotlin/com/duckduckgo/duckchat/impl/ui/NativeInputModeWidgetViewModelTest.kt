@@ -1670,6 +1670,33 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndFooterSwitchesModelInNewChatThenTabPickIsWritten() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+
+        viewModel.selectModelById("picked-model")
+        advanceUntilIdle()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        verify(modelManager, never()).selectModel(any())
+    }
+
+    @Test
+    fun whenFooterSwitchesModelWithResetOffThenGlobalSelectionChangesAndNoTabPick() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+
+        viewModel.selectModelById("picked-model")
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        verify(modelManager).selectModel(pickableModels().models.last())
+    }
+
+    @Test
     fun whenResetModelForNewChatsAndImageGenerationLaunchOnAModelWithoutItThenTabPicksAnImageModel() = runTest {
         duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
         val imageModel = aiModel(id = "image-model", supported = emptyList()).copy(supportedTools = listOf(Tool.IMAGE_GENERATION))

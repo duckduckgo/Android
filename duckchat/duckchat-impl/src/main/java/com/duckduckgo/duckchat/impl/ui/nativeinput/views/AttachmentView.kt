@@ -350,6 +350,7 @@ class AttachmentView(
                 host?.showAttachmentChooser(true)
                 host?.requestFilePicker(buildImagePickerCallback(AttachmentViewModel.ImageSource.PHOTO_LIBRARY), listOf("image/*"))
             }
+            is NewChatHintCommand.PickModel -> host?.pickNewChatModel(request.modelId)
             is NewChatHintCommand.CreateImage -> Unit
         }
     }

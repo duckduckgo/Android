@@ -300,6 +300,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         ?.let { modelManager.modelState.value.forTab(it) }
 
     fun pickNewChatModel(modelId: String) {
+        imageLaunchJob.cancel()
         val tabId = activeTabId.value ?: return
         nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = modelId) }
     }
@@ -508,6 +509,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
 
     fun selectModelById(modelId: String) {
         imageLaunchJob.cancel()
+        if (!hasActiveChat() && duckChatFeature.resetModelForNewChats().isEnabled()) {
+            pickNewChatModel(modelId)
+            return
+        }
         val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
         viewModelScope.launch { modelManager.selectModel(model) }
     }
@@ -749,6 +754,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         } else {
             null
         }
+        val overrideModelId = (launch as? DuckChatLaunch.Open)?.overrideModelId
+        if (isDuckAiMode && overrideModelId != null) pickNewChatModel(overrideModelId)
         // The selected model can change after a launch (a widget tap) was built, so the tool is only preselected
         // once an image-capable model is selected; otherwise the options clear it again. When new chats start on
         // the default model, the global selection stays put and the tab picks the image-capable model instead.
@@ -761,8 +768,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 }
             }
         }
-        val overrideModelId = (launch as? DuckChatLaunch.Open)?.overrideModelId
-        if (isDuckAiMode && overrideModelId != null) pickNewChatModel(overrideModelId)
     }
 
     private fun pickImageCapableModel(tabId: String): Boolean {
