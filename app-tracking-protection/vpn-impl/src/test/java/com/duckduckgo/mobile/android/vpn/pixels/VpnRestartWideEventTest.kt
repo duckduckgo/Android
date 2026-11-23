@@ -16,6 +16,7 @@
 
 package com.duckduckgo.mobile.android.vpn.pixels
 
+import com.duckduckgo.app.statistics.wideevents.BucketRounding
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -85,6 +86,7 @@ class VpnRestartWideEventTest {
             key = eq("restart_duration_ms_bucketed"),
             timeout = anyOrNull(),
             buckets = eq(setOf(100.milliseconds, 250.milliseconds, 500.milliseconds, 1.seconds, 2.seconds, 5.seconds, 10.seconds, 30.seconds)),
+            rounding = eq(BucketRounding.RoundDown),
         )
     }
 
@@ -159,6 +161,7 @@ class VpnRestartWideEventTest {
                 key = eq("tunnel_establish_duration_ms_bucketed"),
                 timeout = anyOrNull(),
                 buckets = any(),
+                rounding = any(),
             )
             verify(wideEventClient).intervalEnd(wideEventId = 42L, key = "tunnel_establish_duration_ms_bucketed")
             verify(wideEventClient).flowStep(wideEventId = eq(42L), stepName = eq("tunnel_establish"), success = eq(true), metadata = any())
@@ -188,7 +191,7 @@ class VpnRestartWideEventTest {
         wideEvent.onPhaseStarted(Phase.NETWORK_STACK_START)
         advanceUntilIdle()
 
-        verify(wideEventClient, never()).intervalStart(any(), eq("network_stack_start_duration_ms_bucketed"), anyOrNull(), anyOrNull())
+        verify(wideEventClient, never()).intervalStart(any(), eq("network_stack_start_duration_ms_bucketed"), anyOrNull(), anyOrNull(), any())
     }
 
     @Test
@@ -247,6 +250,8 @@ class VpnRestartWideEventTest {
         advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = eq(1L), status = eq(FlowStatus.Unknown), metadata = any())
-        verify(wideEventClient).intervalStart(wideEventId = eq(2L), key = eq("restart_duration_ms_bucketed"), timeout = anyOrNull(), buckets = any())
+        verify(
+            wideEventClient,
+        ).intervalStart(wideEventId = eq(2L), key = eq("restart_duration_ms_bucketed"), timeout = anyOrNull(), buckets = any(), rounding = any())
     }
 }

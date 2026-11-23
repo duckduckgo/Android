@@ -132,6 +132,7 @@ class WideEventClientImpl @Inject constructor(
         key: String,
         timeout: Duration?,
         buckets: Set<Duration>?,
+        rounding: BucketRounding,
     ): Result<Unit> {
         if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
         if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
@@ -143,6 +144,7 @@ class WideEventClientImpl @Inject constructor(
                 name = key,
                 timeout = timeout?.toJavaDuration(),
                 buckets = buckets?.map { it.toJavaDuration() },
+                rounding = rounding.mapToRepositoryBucketRounding(),
             )
         }
     }
@@ -175,6 +177,12 @@ private fun FlowStatus.mapToWideEventStatus(): Pair<WideEventRepository.WideEven
         is FlowStatus.Failure -> WideEventRepository.WideEventStatus.FAILURE to mapOf("failure_reason" to reason)
         FlowStatus.Success -> WideEventRepository.WideEventStatus.SUCCESS to emptyMap()
         FlowStatus.Unknown -> WideEventRepository.WideEventStatus.UNKNOWN to emptyMap()
+    }
+
+private fun BucketRounding.mapToRepositoryBucketRounding(): WideEventRepository.BucketRounding =
+    when (this) {
+        BucketRounding.RoundDown -> WideEventRepository.BucketRounding.ROUND_DOWN
+        BucketRounding.RoundUp -> WideEventRepository.BucketRounding.ROUND_UP
     }
 
 private fun CleanupPolicy.mapToRepositoryCleanupPolicy(ownerProcessName: String): WideEventRepository.CleanupPolicy {

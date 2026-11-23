@@ -24,6 +24,7 @@ import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration4To5
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration5To6
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration6To7
+import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration7To8
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
@@ -54,6 +55,7 @@ class WideEventDatabaseModule {
                 WideEventsMigration4To5,
                 WideEventsMigration5To6(appBuildConfig.versionName),
                 WideEventsMigration6To7,
+                WideEventsMigration7To8,
             )
             .fallbackToDestructiveMigration()
             .enableMultiInstanceInvalidation()

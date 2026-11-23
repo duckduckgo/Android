@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.statistics.wideevents
 
+import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.BucketRounding
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupDecision
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEvent
@@ -169,7 +170,7 @@ class WideEventCleanupPolicyEvaluatorTest {
     private fun interval(
         startedAt: Instant,
         timeout: Duration?,
-    ) = WideEventInterval(name = "interval", startedAt = startedAt, timeout = timeout, buckets = null)
+    ) = WideEventInterval(name = "interval", startedAt = startedAt, timeout = timeout, buckets = null, rounding = BucketRounding.ROUND_DOWN)
 
     private fun event(
         policy: CleanupPolicy,

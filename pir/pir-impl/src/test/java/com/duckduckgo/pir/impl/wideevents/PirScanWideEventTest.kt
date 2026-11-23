@@ -539,6 +539,7 @@ class PirScanWideEventTest {
             eq("decile_0_10_duration_ms_bucketed"),
             any(),
             any(),
+            any(),
         )
     }
 
