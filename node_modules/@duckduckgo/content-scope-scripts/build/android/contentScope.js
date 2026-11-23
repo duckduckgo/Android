@@ -994,7 +994,7 @@
       "textSelection",
       "chromeWebstorePatching",
       "selectionTools",
-      "sponsorBlock",
+      "segmentSkip",
       "pageTranslation"
     ]
   );
@@ -1024,7 +1024,7 @@
       "tabSuspension",
       "chromeWebstorePatching",
       "browserUiLock",
-      "sponsorBlock"
+      "segmentSkip"
     ],
     "apple-broker-protection": ["brokerProtection"],
     "apple-ai-clear": ["duckAiDataClearing"],
@@ -1043,7 +1043,7 @@
       "messageBridge",
       "pageContext",
       "browserUiLock",
-      "sponsorBlock"
+      "segmentSkip"
     ],
     "android-broker-protection": ["brokerProtection"],
     "android-ai-clear": ["duckAiDataClearing"],
@@ -16139,10 +16139,10 @@ ${iframeContent}
     }
   };
 
-  // src/features/sponsor-block.js
+  // src/features/segment-skip.js
   init_define_import_meta_trackerLookup();
 
-  // src/features/sponsor-block/helpers.js
+  // src/features/segment-skip/helpers.js
   init_define_import_meta_trackerLookup();
   function isYouTubeHost(hostname) {
     return ["youtube.com", "youtube-nocookie.com"].some((host) => hostname === host || hostname.endsWith(`.${host}`));
@@ -16179,13 +16179,13 @@ ${iframeContent}
     return setting.filter((s) => typeof s === "string" && isValidSelector(s));
   }
 
-  // src/features/sponsor-block/assets/DuckDuckGo-Color-16.svg
+  // src/features/segment-skip/assets/DuckDuckGo-Color-16.svg
   var DuckDuckGo_Color_16_default = '<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">\n<g id="Icon Left" clip-path="url(#clip0_0_54)">\n<path id="Shape" d="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16Z" fill-rule="evenodd" clip-rule="evenodd" fill="#DE5833"/>\n<path id="Shape_2" d="M9.1254 13.9688C9.1254 13.9063 9.14073 13.892 8.94206 13.496C8.41406 12.4387 7.88339 10.948 8.12473 9.98667C8.16873 9.812 7.6274 3.51867 7.24473 3.316C6.8194 3.08934 6.29607 2.72977 5.8174 2.64977C5.57454 2.61091 5.25611 2.62932 5.00718 2.66284C4.96294 2.6688 4.96111 2.74832 5.00339 2.76265C5.16682 2.81802 5.36526 2.91415 5.48221 3.0595C5.50435 3.08702 5.47464 3.13029 5.43935 3.13159C5.32911 3.13568 5.12912 3.18189 4.86526 3.40601C4.83474 3.43193 4.86009 3.48006 4.89937 3.47229C5.46643 3.3601 6.04556 3.41538 6.38686 3.72559C6.409 3.74572 6.39742 3.78184 6.36855 3.78968C3.40677 4.59456 3.99308 7.17096 4.78154 10.3327C5.48385 13.1489 5.74813 14.0566 5.83146 14.3331C5.83953 14.3599 5.85835 14.3811 5.88435 14.3915C6.90388 14.7975 9.1254 14.8155 9.1254 14.125V13.9688Z" fill-rule="evenodd" clip-rule="evenodd" fill="#DDDDDD"/>\n<path id="Shape_3" d="M15 8C15 11.866 11.866 15 8 15C4.13401 15 1 11.866 1 8C1 4.13401 4.13401 1 8 1C11.866 1 15 4.13401 15 8ZM6.02601 13.6677C5.75412 12.7749 5.35321 11.3871 4.95582 9.75814L4.8995 9.52782C4.22146 6.75831 3.66766 4.49627 6.70289 3.78563C6.73064 3.77914 6.74421 3.74596 6.72584 3.72417C6.37759 3.31103 5.72519 3.17562 4.90027 3.4602C4.86643 3.47188 4.83706 3.43776 4.85808 3.40879C5.01984 3.18583 5.33595 3.01439 5.49201 2.93924C5.52427 2.9237 5.52231 2.87647 5.48814 2.86578C5.39552 2.83678 5.24384 2.79384 5.07048 2.76256C3.23828 3.78958 2 5.75018 2 8C2 10.6221 3.68205 12.8514 6.02601 13.6677ZM5.31908 2.63078C6.12593 2.22714 7.03644 2 8 2C11.3137 2 14 4.68629 14 8C14 10.894 11.9512 13.3094 9.22488 13.8749C8.53517 12.2837 7.84711 10.3636 8.54675 10.2548C8.57621 10.2503 8.59486 10.2155 8.58077 10.1892C7.15372 7.52966 8.88278 7.72311 9.75596 7.82081C9.97141 7.84492 10.1348 7.86319 10.1857 7.83134C10.4442 7.66976 10.2835 4.12232 8.03945 3.6404C8.03038 3.63845 8.02204 3.63337 8.01626 3.6261C7.45682 2.92138 6.39035 2.5674 5.31908 2.63078Z" fill-rule="evenodd" clip-rule="evenodd" fill="white"/>\n<path id="Shape_4" d="M10.5353 11.3372C10.3645 11.258 9.70761 11.7291 9.27164 12.0907C9.18052 11.9618 9.00872 11.8681 8.62118 11.9355C8.28199 11.9944 8.09475 12.0762 8.0112 12.2172C7.47585 12.0142 6.5752 11.701 6.35761 12.0035C6.11977 12.3342 6.41705 13.8986 6.73294 14.1017C6.89788 14.2077 7.68677 13.7007 8.09873 13.351C8.1652 13.4446 8.2722 13.4982 8.49219 13.4931C8.82488 13.4854 9.3645 13.408 9.44826 13.2531C9.45334 13.2437 9.45772 13.2325 9.46145 13.2198C9.88489 13.3781 10.6301 13.5456 10.7966 13.5206C11.2305 13.4554 10.7362 11.4302 10.5353 11.3372Z" fill="#269B61"/>\n<g id="Shape_5">\n<path d="M9.31078 12.137C9.32875 12.1691 9.34319 12.2029 9.35547 12.2372C9.41583 12.406 9.51418 12.9431 9.43981 13.0758C9.36544 13.2084 8.88239 13.2725 8.5844 13.2776C8.28641 13.2828 8.21933 13.1738 8.15896 13.005C8.11067 12.8699 8.0869 12.5524 8.08748 12.3706C8.07526 12.1009 8.1738 12.0061 8.62923 11.9324C8.96626 11.8778 9.14445 11.9413 9.24731 12.0498C9.72579 11.6927 10.5241 11.1887 10.602 11.2808C10.9903 11.7401 11.0393 12.8334 10.9553 13.2733C10.9278 13.4171 9.64216 13.1308 9.64216 12.9757C9.64216 12.3318 9.47507 12.1551 9.31078 12.137Z" fill="#269B61"/>\n<path d="M6.49457 11.9359C6.59986 11.7693 7.45375 11.9765 7.92247 12.1851C7.92247 12.1851 7.82616 12.6215 7.9795 13.1356C8.02436 13.286 6.90113 13.9553 6.75452 13.8402C6.58508 13.7071 6.27324 12.2862 6.49457 11.9359Z" fill="#269B61"/>\n</g>\n<path id="Shape_6" d="M6.90861 8.55085C6.9777 8.25042 7.29952 7.68433 8.44874 7.69808C9.02975 7.69566 9.75145 7.69783 10.2299 7.64348C10.9411 7.5627 11.4689 7.39068 11.8207 7.2566C12.3182 7.06681 12.4947 7.10914 12.5566 7.2227C12.6246 7.34747 12.5445 7.56294 12.3707 7.76128C12.0386 8.14014 11.4417 8.43371 10.3875 8.52084C9.33335 8.60797 8.63496 8.32519 8.33432 8.78559C8.20466 8.98415 8.30491 9.45214 9.32438 9.59951C10.702 9.79833 11.8334 9.35995 11.9732 9.62471C12.113 9.88947 11.3077 10.4281 9.92787 10.4394C8.54802 10.4507 7.68615 9.95631 7.38051 9.71056C6.99273 9.39877 6.8192 8.94406 6.90861 8.55085Z" fill-rule="evenodd" clip-rule="evenodd" fill="#FAB341"/>\n<g id="Shape_7" opacity="0.8">\n<path d="M8.66576 5.26578C8.74272 5.13975 8.91339 5.04248 9.1927 5.04248C9.47201 5.04248 9.60341 5.15362 9.69437 5.27756C9.71287 5.30277 9.68484 5.33244 9.65614 5.32003C9.64924 5.31705 9.64224 5.314 9.63514 5.31089C9.53299 5.26628 9.40757 5.2115 9.1927 5.20844C8.96289 5.20518 8.81799 5.26273 8.72673 5.31234C8.69598 5.32905 8.64752 5.29565 8.66576 5.26578Z" fill="#14307E"/>\n<path d="M5.52123 5.42702C5.79244 5.31368 6.00559 5.32833 6.15628 5.36398C6.18801 5.37148 6.21006 5.33734 6.18469 5.31688C6.06773 5.22254 5.80596 5.10542 5.46456 5.23272C5.16002 5.34628 5.01647 5.58223 5.01563 5.73735C5.01543 5.77391 5.09064 5.77701 5.11009 5.74606C5.16265 5.66245 5.25002 5.54036 5.52123 5.42702Z" fill="#14307E"/>\n<path d="M9.42994 6.98988C9.19017 6.98988 8.99569 6.79593 8.99569 6.55722C8.99569 6.31851 9.19017 6.12457 9.42994 6.12457C9.66972 6.12457 9.8642 6.31851 9.8642 6.55722C9.8642 6.79593 9.66972 6.98988 9.42994 6.98988ZM9.73579 6.41389C9.73579 6.35208 9.68517 6.302 9.62336 6.302C9.56155 6.302 9.51147 6.35208 9.51093 6.41389C9.51093 6.4757 9.56155 6.52578 9.62336 6.52578C9.6857 6.52578 9.73579 6.4757 9.73579 6.41389Z" fill-rule="evenodd" clip-rule="evenodd" fill="#14307E"/>\n<path d="M6.5528 6.85665C6.5528 7.13532 6.32635 7.36124 6.04662 7.36124C5.76742 7.36124 5.54044 7.13532 5.54044 6.85665C5.54044 6.57798 5.76742 6.35206 6.04662 6.35206C6.32582 6.35206 6.5528 6.57798 6.5528 6.85665ZM6.40361 6.68934C6.40361 6.61741 6.345 6.5588 6.27254 6.5588C6.20061 6.5588 6.142 6.61688 6.14146 6.68934C6.14146 6.76127 6.20007 6.81989 6.27254 6.81989C6.345 6.81989 6.40361 6.76127 6.40361 6.68934Z" fill-rule="evenodd" clip-rule="evenodd" fill="#14307E"/>\n</g>\n</g>\n<defs>\n<clipPath id="clip0_0_54">\n<rect width="16" height="16" fill="white"/>\n</clipPath>\n</defs>\n</svg>\n';
 
-  // src/features/sponsor-block/assets/Skip-Recolorable-16.svg
+  // src/features/segment-skip/assets/Skip-Recolorable-16.svg
   var Skip_Recolorable_16_default = '<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">\n<g id="Skip-Recolorable-16" clip-path="url(#clip0_0_43)">\n<path id="Background" d="M8 16C12.4183 16 16 12.4183 16 8C16 3.58172 12.4183 0 8 0C3.58172 0 0 3.58172 0 8C0 12.4183 3.58172 16 8 16Z" fill-rule="evenodd" clip-rule="evenodd" fill="#454443" stroke="#454443"/>\n<g id="Foreground">\n<path d="M12 5C12 4.65482 11.7202 4.375 11.375 4.375C11.0298 4.375 10.75 4.65482 10.75 5V11C10.75 11.3452 11.0298 11.625 11.375 11.625C11.7202 11.625 12 11.3452 12 11V5Z" fill="white"/>\n<path d="M4 5.44492C4 4.53967 5.05965 4.04907 5.74991 4.63475L8.76119 7.18977C9.26131 7.61411 9.26131 8.38577 8.76119 8.81011L5.74991 11.3651C5.05965 11.9508 4 11.4602 4 10.555V5.44492Z" fill="white"/>\n</g>\n</g>\n<defs>\n<clipPath id="clip0_0_43">\n<rect width="16" height="16" fill="white"/>\n</clipPath>\n</defs>\n</svg>\n';
 
-  // src/features/sponsor-block.js
+  // src/features/segment-skip.js
   var DEFAULT_PROGRESS_BAR_SELECTORS = [
     ".ytp-progress-bar",
     ".ytChapteredProgressBarHost",
@@ -16197,8 +16197,8 @@ ${iframeContent}
   var DEFAULT_SKIP_BUTTON_HOST_SELECTORS = ["#player-container-id", "#player-controls", "#movie_player", ".html5-video-player"];
   var DEFAULT_AD_SHOWING_SELECTORS = [".ad-showing"];
   var SKIP_BUTTON_TIMEOUT_MS = 8e3;
-  var OVERLAY_CLASS = "ddg-sponsorblock-overlay";
-  var SKIP_BUTTON_CLASS = "ddg-sponsorblock-skip";
+  var OVERLAY_CLASS = "ddg-segmentskip-overlay";
+  var SKIP_BUTTON_CLASS = "ddg-segmentskip-skip";
   var STYLES = `
 .${OVERLAY_CLASS} { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
 .${OVERLAY_CLASS} > div { position: absolute; top: 0; bottom: 0; min-width: 2px; background: rgb(76, 186, 60); }
@@ -16267,7 +16267,7 @@ img { display: block; width: 16px; height: 16px; }
     });
   }
   var _videoID, _active2, _enabled, _skipMode, _segments, _seekedInto, _overlay, _renderedDuration, _skipButton, _skipSegment, _skipButtonFor, _skipButtonTimedOut, _skipButtonTimer, _skipButtonMsLeft, _skipButtonCountdownStart, _progressBarSelectors, _skipButtonHostSelectors, _adShowingSelectors, _doc;
-  var SponsorBlock = class extends ContentFeature {
+  var SegmentSkip = class extends ContentFeature {
     constructor() {
       super(...arguments);
       /** @type {string | null} */
@@ -16549,7 +16549,7 @@ img { display: block; width: 16px; height: 16px; }
   _skipButtonHostSelectors = new WeakMap();
   _adShowingSelectors = new WeakMap();
   _doc = new WeakMap();
-  var sponsor_block_default = SponsorBlock;
+  var segment_skip_default = SegmentSkip;
 
   // ddg:platformFeatures:ddg:platformFeatures
   var ddg_platformFeatures_default = {
@@ -16576,7 +16576,7 @@ img { display: block; width: 16px; height: 16px; }
     ddg_feature_messageBridge: message_bridge_default,
     ddg_feature_pageContext: PageContext,
     ddg_feature_browserUiLock: BrowserUiLock,
-    ddg_feature_sponsorBlock: sponsor_block_default
+    ddg_feature_segmentSkip: segment_skip_default
   };
 
   // src/url-change.js
@@ -16656,7 +16656,7 @@ img { display: block; width: 16px; height: 16px; }
     const importConfig = {
       trackerLookup: define_import_meta_trackerLookup_default,
       injectName: "android",
-      contentScopeScriptsVersion: "22.4.0"
+      contentScopeScriptsVersion: "23.0.0"
     };
     const bundledFeatureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] ?? [] : [];
     const featuresToLoad = isGloballyDisabled(args) ? platformSpecificFeatures : args.site.enabledFeatures || bundledFeatureNames;
