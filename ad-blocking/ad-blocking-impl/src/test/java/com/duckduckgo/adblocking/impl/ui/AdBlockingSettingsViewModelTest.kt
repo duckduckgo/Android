@@ -306,7 +306,9 @@ class AdBlockingSettingsViewModelTest {
         setSegmentSkipEnabled(false)
 
         createViewModel().viewState.test {
-            assertNull(expectMostRecentItem().segmentSkipMode)
+            val state = expectMostRecentItem()
+            assertNull(state.segmentSkipMode)
+            assertFalse(state.showSegmentSkipConsent)
         }
     }
 
@@ -349,12 +351,15 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenMvpDisabledThenPreviousNoticeConditionsStillApply() = runTest {
+    fun whenOnlySoftLaunchEnabledThenShowsSettingAndConsentNoticeInNeverMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         setSegmentSkipEnabled(false)
+        segmentSkipFeature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
         segmentSkip.mode.value = SegmentSkipMode.OFF
         createViewModel().viewState.test {
-            assertEquals(true, expectMostRecentItem().showSegmentSkipConsent)
+            val state = expectMostRecentItem()
+            assertEquals(SegmentSkipMode.OFF, state.segmentSkipMode)
+            assertTrue(state.showSegmentSkipConsent)
             segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
             assertEquals(false, awaitItem().showSegmentSkipConsent)
             segmentSkip.consent.value = true

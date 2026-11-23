@@ -20,7 +20,6 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.adblocking.impl.di.AdBlockingPreferences
@@ -33,6 +32,7 @@ import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -40,8 +40,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -90,18 +90,21 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         appScope.launch {
-            setModeMutex.withLock {
-                if (consent.value == null) {
-                    consent.value = dataStore.data.catch { cause ->
-                        if (cause !is IOException) throw cause
-                        emit(emptyPreferences())
-                    }.first().hasStoredConsent()
+            while (consent.value == null) {
+                try {
+                    setModeMutex.withLock {
+                        if (consent.value == null) {
+                            consent.value = dataStore.data.first().hasStoredConsent()
+                        }
+                    }
+                } catch (_: IOException) {
+                    delay(CONSENT_READ_RETRY_MILLIS)
                 }
             }
         }
     }
 
-    override fun consentFlow(): Flow<Boolean> = consent.filterNotNull()
+    override fun consentFlow(): Flow<Boolean> = consent.map { it == true }.distinctUntilChanged()
 
     override fun hasConsent(): Boolean = consent.value == true
 
@@ -153,6 +156,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
         if (mvpEnabled) SegmentSkipMode.ALWAYS_ASK else SegmentSkipMode.OFF
 
     private companion object {
+        const val CONSENT_READ_RETRY_MILLIS = 1_000L
         val KEY_CONSENT = booleanPreferencesKey("segment_skip_telemetry_consent")
         val KEY_MODE = stringPreferencesKey("segment_skip_mode")
     }
