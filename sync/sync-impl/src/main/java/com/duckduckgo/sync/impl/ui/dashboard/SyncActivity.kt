@@ -325,6 +325,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureWarningMessages()
         configureRecoverySection()
         configureDeviceActivityItem()
+        configureNewDeviceBanner()
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
@@ -377,8 +378,18 @@ class SyncActivity : DuckDuckGoActivity() {
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
         )
+        renderNewDeviceBanner(viewState.newDeviceBanner)
         renderEnabledState(viewState)
         renderDisabledState(viewState)
+    }
+
+    private fun renderNewDeviceBanner(banner: NewDeviceBanner?) {
+        binding.includeNewDeviceBanner.apply {
+            root.isVisible = banner != null
+            if (banner == null) return
+            newDeviceBannerTitle.text = banner.title(resources)
+            newDeviceBannerBody.text = banner.body(resources)
+        }
     }
 
     private fun renderEnabledState(viewState: ViewState) {
@@ -668,6 +679,13 @@ class SyncActivity : DuckDuckGoActivity() {
     private fun configureDeviceActivityItem() {
         binding.includeEnabledView.deviceActivityItem.setOnClickListener {
             viewModel.onDeviceActivityClicked()
+        }
+    }
+
+    private fun configureNewDeviceBanner() {
+        binding.includeNewDeviceBanner.apply {
+            newDeviceBannerReview.setOnClickListener { viewModel.onNewDeviceBannerReviewClicked() }
+            newDeviceBannerClose.setOnClickListener { viewModel.onNewDeviceBannerCloseClicked() }
         }
     }
 

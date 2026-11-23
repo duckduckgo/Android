@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
+import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.sync.store.SyncStore
@@ -212,6 +213,43 @@ class RealAuditLogCheckStateStoreTest {
             """[{"entry_id":"entry-1","device_id":"device-1","device_name":"Device 1","occurred_at":"2026-11-10T10:00:01Z","extra":true}]"""
 
         assertEquals(listOf(login(1)), testee.read().pendingLogins)
+    }
+
+    @Test
+    fun whenPendingLoginsCollectedThenEmitsStoredList() = runTest {
+        testee.update { it.copy(pendingLogins = listOf(login(1))) }
+
+        testee.pendingLogins().test {
+            assertEquals(listOf(login(1)), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPendingListChangesThenEmitsNewList() = runTest {
+        testee.pendingLogins().test {
+            assertEquals(emptyList<PendingLogin>(), awaitItem())
+
+            testee.update { it.copy(pendingLogins = listOf(login(1))) }
+            assertEquals(listOf(login(1)), awaitItem())
+
+            testee.update { it.copy(pendingLogins = emptyList()) }
+            assertEquals(emptyList<PendingLogin>(), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOnlyCursorChangesThenPendingLoginsDoesNotEmitAgain() = runTest {
+        testee.update { it.copy(pendingLogins = listOf(login(1))) }
+
+        testee.pendingLogins().test {
+            assertEquals(listOf(login(1)), awaitItem())
+
+            testee.update { it.copy(cursor = "after-2") }
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun login(n: Int) = PendingLogin(

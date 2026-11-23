@@ -40,6 +40,7 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.AuthPrompt
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
@@ -76,6 +77,7 @@ import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.toAutoRestorePixelSource
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -84,8 +86,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -115,11 +121,13 @@ class SyncActivityViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val loginAuditLogFeature: LoginAuditLogFeature,
+    private val auditLogStateStore: AuditLogCheckStateStore,
 ) : ViewModel() {
 
     private val syncStateObserverJob = ConflatedJob()
     private val backgroundRefreshJob = ConflatedJob()
     private val fetchDevicesJob = ConflatedJob()
+    private val newDeviceBannerJob = ConflatedJob()
 
     // @Volatile because loadAutoRestoreState() writes these on the IO dispatcher while
     // onScreenExit() reads them from a different coroutine launched on the IO dispatcher.
@@ -134,6 +142,8 @@ class SyncActivityViewModel @Inject constructor(
     // We hide the settings while a deep link starts a Sync flow, so they don't flash before the flow's screen covers them.
     // It lives outside viewState because signedOutState() would reset it.
     private val isContentHidden = MutableStateFlow(false)
+
+    private val newDeviceBanner = MutableStateFlow<NewDeviceBanner?>(null)
 
     val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
@@ -150,6 +160,8 @@ class SyncActivityViewModel @Inject constructor(
             observeState()
         }.combine(isContentHidden) { state, isContentHidden ->
             state.copy(isContentHidden = isContentHidden)
+        }.combine(newDeviceBanner) { state, banner ->
+            state.copy(newDeviceBanner = banner)
         }.flowOn(dispatchers.io())
 
     private fun observeState() {
@@ -172,6 +184,25 @@ class SyncActivityViewModel @Inject constructor(
                 schedulePeriodicRefresh()
             }.flowOn(dispatchers.io())
             .launchIn(viewModelScope)
+        observeNewDeviceBanner()
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private fun observeNewDeviceBanner() {
+        // Sign-out clears the pending logins without the store's flow emitting, so start again on each sign-in and sign-out.
+        newDeviceBannerJob += syncStateMonitor.syncState()
+            .map { it != OFF }
+            .distinctUntilChanged()
+            .flatMapLatest { newDeviceBannerUpdates() }
+            .onEach { newDeviceBanner.value = it }
+            .flowOn(dispatchers.io())
+            .launchIn(viewModelScope)
+    }
+
+    private suspend fun newDeviceBannerUpdates(): Flow<NewDeviceBanner?> {
+        val canShow = syncAccountRepository.isSignedIn() && loginAuditLogFeature.isNotificationEnabled()
+        if (!canShow) return flowOf(null)
+        return auditLogStateStore.pendingLogins().map { NewDeviceBanner.from(it) }
     }
 
     private fun schedulePeriodicRefresh() {
@@ -250,6 +281,7 @@ class SyncActivityViewModel @Inject constructor(
         val isThisDeviceSyncing: Boolean = false,
         val isContentHidden: Boolean = false,
         val showDeviceActivity: Boolean = false,
+        val newDeviceBanner: NewDeviceBanner? = null,
     )
 
     sealed class SetupFlows {
@@ -641,6 +673,18 @@ class SyncActivityViewModel @Inject constructor(
     fun onDeviceActivityClicked() {
         viewModelScope.launch {
             command.send(Command.LaunchDeviceActivity)
+        }
+    }
+
+    fun onNewDeviceBannerReviewClicked() {
+        onDeviceActivityClicked()
+    }
+
+    fun onNewDeviceBannerCloseClicked() {
+        val shown = newDeviceBanner.value?.entryIds ?: return
+        viewModelScope.launch(dispatchers.io()) {
+            // Only the logins on screen: one found while the user tapped Close must still show.
+            auditLogStateStore.update { state -> state.copy(pendingLogins = state.pendingLogins.filterNot { it.entryId in shown }) }
         }
     }
 

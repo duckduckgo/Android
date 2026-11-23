@@ -54,6 +54,10 @@
                     app:sharedPrefsKeyForDismiss="key_component_dismissed_in_sync_settings" />
             </FrameLayout>
 
+            <include
+                android:id="@+id/includeNewDeviceBanner"
+                layout="@layout/view_sync_new_device_banner" />
+
             <com.duckduckgo.sync.impl.ui.dashboard.SyncHeaderView
                 android:id="@+id/syncHeader"
                 android:layout_width="match_parent"
