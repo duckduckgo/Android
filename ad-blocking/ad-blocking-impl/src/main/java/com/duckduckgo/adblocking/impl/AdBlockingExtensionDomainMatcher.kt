@@ -51,6 +51,10 @@ class RealAdBlockingExtensionDomainMatcher @Inject constructor() : AdBlockingExt
         val DOMAINS = listOf(
             Domain("youtube.com"),
             Domain("youtube-nocookie.com"),
+            Domain("pornhub.com"),
+            Domain("xvideos.com"),
+            Domain("xhamster.com"),
+            Domain("xnxx.com"),
         )
     }
 }

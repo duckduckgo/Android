@@ -29,6 +29,8 @@ import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SCRIPTLET
 import com.duckduckgo.adblocking.impl.ScriptletDownloader
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -57,6 +59,7 @@ class RealScriptletUpdater @Inject constructor(
     private val downloader: ScriptletDownloader,
     private val validator: ScriptletSignatureValidator,
     private val pixel: Pixel,
+    private val appBuildConfig: AppBuildConfig,
 ) : ScriptletUpdater {
 
     override suspend fun update(settings: AdBlockingExtensionSettings): ScriptletUpdateResult {
@@ -85,7 +88,11 @@ class RealScriptletUpdater @Inject constructor(
                             } else {
                                 name to bytes
                             }
-                            is ScriptletValidationResult.Invalid -> {
+                            // Prototype only: internal builds accept unsigned scriptlets so test builds can load unpublished ones.
+                            is ScriptletValidationResult.Invalid -> if (appBuildConfig.flavor == BuildFlavor.INTERNAL) {
+                                logcat(WARN) { "ScriptletUpdater: accepting unsigned $name in internal build: $validationResult" }
+                                if (bytes.isEmpty()) null else name to bytes
+                            } else {
                                 logcat(WARN) { "ScriptletUpdater: validation failed for $name: $validationResult" }
                                 throw ScriptletFailure.Validation(validationResult::class.simpleName ?: "Unknown")
                             }

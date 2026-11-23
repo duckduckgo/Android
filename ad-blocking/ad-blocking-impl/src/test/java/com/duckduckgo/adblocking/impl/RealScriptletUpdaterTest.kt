@@ -31,6 +31,8 @@ import com.duckduckgo.adblocking.impl.domain.ScriptletValidationResult
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionSettings
 import com.duckduckgo.adblocking.impl.remoteconfig.ScriptletEntry
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runTest
@@ -54,8 +56,9 @@ class RealScriptletUpdaterTest {
     private val downloader: ScriptletDownloader = mock()
     private val validator: ScriptletSignatureValidator = mock()
     private val pixel: Pixel = mock()
+    private val appBuildConfig: AppBuildConfig = mock<AppBuildConfig>().also { whenever(it.flavor).thenReturn(BuildFlavor.PLAY) }
 
-    private val updater = RealScriptletUpdater(repository, downloader, validator, pixel)
+    private val updater = RealScriptletUpdater(repository, downloader, validator, pixel, appBuildConfig)
 
     private val isolatedPath = "scriptlets/isolated/ublock-filters.js"
     private val mainPath = "scriptlets/main/ublock-filters.js"
@@ -146,6 +149,21 @@ class RealScriptletUpdaterTest {
             parameters = mapOf("reason" to "SignatureVerificationFailed"),
         )
         verifyNoMoreInteractions(pixel)
+    }
+
+    @Test
+    fun whenValidationFailsInInternalBuildThenUnsignedScriptletsAreStored() = runTest {
+        whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
+        whenever(repository.getStoredVersion()).thenReturn("0.0.0")
+        whenever(downloader.download(isolatedEntry.url)).thenReturn(kotlin.Result.success(isolatedBytes))
+        whenever(downloader.download(mainEntry.url)).thenReturn(kotlin.Result.success(mainBytes))
+        whenever(validator.validate(isolatedBytes, isolatedEntry.signature))
+            .thenReturn(ScriptletValidationResult.Invalid.SignatureVerificationFailed)
+        whenever(validator.validate(mainBytes, mainEntry.signature))
+            .thenReturn(ScriptletValidationResult.Invalid.SignatureVerificationFailed)
+
+        assertEquals(ScriptletUpdateResult.Success, updater.update(validSettings))
+        verify(repository).storeScriptlets(eq(validSettings.version), any())
     }
 
     @Test
@@ -285,7 +303,7 @@ class RealScriptletUpdaterTest {
                 else -> error("unexpected url: $url")
             }
         }
-        val shortCircuitingUpdater = RealScriptletUpdater(repository, shortCircuitingDownloader, validator, pixel)
+        val shortCircuitingUpdater = RealScriptletUpdater(repository, shortCircuitingDownloader, validator, pixel, appBuildConfig)
 
         assertEquals(ScriptletUpdateResult.Retry, shortCircuitingUpdater.update(validSettings))
         assertTrue("isolated download should have started in parallel", isolatedDownloadStarted.isCompleted)
