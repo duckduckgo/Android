@@ -39,7 +39,7 @@ interface BrowserNav {
      *
      * @param forceImageGeneration when true, the new tab's native input preselects the image-generation tool.
      * @param forceLaunchContextual when true, opens the contextual Duck.ai flow instead of a full screen tab.
-     * @param attachments text and files to attach to the Duck.ai input.
+     * @param attachments files and at most one [Attachment.Text] to attach to the Duck.ai input.
      */
     fun openDuckChat(
         context: Context,
