@@ -365,7 +365,7 @@ class AdBlockingSettingsViewModelTest {
     @Test
     fun whenNoticeWasShownThenEnablingFromOffGrantsConsent() = runTest {
         segmentSkip.mode.value = SegmentSkipMode.OFF
-        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
         assertEquals(true, segmentSkip.consent.value)
     }
 
@@ -398,14 +398,14 @@ class AdBlockingSettingsViewModelTest {
     @Test
     fun whenEnablingFromOffThenModeIsSavedWithoutConsent() = runTest {
         segmentSkip.mode.value = SegmentSkipMode.OFF
-        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, noticeShown = false)
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, userConsent = false)
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
         assertEquals(false, segmentSkip.consent.value)
     }
 
     @Test
     fun whenEnabledModeChangesThenConsentIsUnchanged() = runTest {
-        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, noticeShown = false)
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, userConsent = false)
         assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
         assertEquals(false, segmentSkip.consent.value)
     }
@@ -462,9 +462,9 @@ class AdBlockingSettingsViewModelTest {
         override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> = throw UnsupportedOperationException()
         override fun modeFlow(): Flow<SegmentSkipMode> = mode
         override fun consentFlow(): Flow<Boolean> = consent
-        override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean {
+        override suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean): Boolean {
             if (failSave) throw java.io.IOException()
-            if (this.mode.value == SegmentSkipMode.OFF && mode != SegmentSkipMode.OFF) consent.value = noticeShown
+            if (this.mode.value == SegmentSkipMode.OFF && mode != SegmentSkipMode.OFF) consent.value = userConsent
             val changed = this.mode.value != mode
             this.mode.value = mode
             return changed

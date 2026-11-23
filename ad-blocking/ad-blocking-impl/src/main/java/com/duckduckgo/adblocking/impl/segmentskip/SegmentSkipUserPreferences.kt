@@ -59,7 +59,7 @@ interface SegmentSkipUserPreferences {
 
     fun hasConsent(): Boolean
 
-    suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean = false): Boolean
+    suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean = false): Boolean
 }
 
 @SingleIn(AppScope::class)
@@ -101,7 +101,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     override fun cachedMode(): SegmentSkipMode = mode.value
 
-    override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean = setModeMutex.withLock {
+    override suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean): Boolean = setModeMutex.withLock {
         if (mode == SegmentSkipMode.OFF) revoked = true
         var changed = false
         var granted = false
@@ -114,8 +114,8 @@ class RealSegmentSkipUserPreferences @Inject constructor(
             changed = previous != mode
             prefs[KEY_MODE] = mode.name
             if (mode != SegmentSkipMode.OFF && previous == SegmentSkipMode.OFF) {
-                prefs[KEY_CONSENT] = noticeShown
-                granted = noticeShown
+                prefs[KEY_CONSENT] = userConsent
+                granted = userConsent
             }
         }
         if (granted) revoked = false

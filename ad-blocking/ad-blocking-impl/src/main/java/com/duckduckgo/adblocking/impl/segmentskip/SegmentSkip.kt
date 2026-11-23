@@ -50,7 +50,7 @@ interface SegmentSkip {
 
     fun consentFlow(): Flow<Boolean>
 
-    suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean = false): Boolean
+    suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean = false): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -87,7 +87,7 @@ class RealSegmentSkip @Inject constructor(
 
     override fun consentFlow(): Flow<Boolean> = userPreferences.consentFlow()
 
-    override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean = userPreferences.setMode(mode, noticeShown)
+    override suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean): Boolean = userPreferences.setMode(mode, userConsent)
 
     private fun isEnabled(): Boolean = segmentSkipFeature.mvpEnabled().isEnabled()
 

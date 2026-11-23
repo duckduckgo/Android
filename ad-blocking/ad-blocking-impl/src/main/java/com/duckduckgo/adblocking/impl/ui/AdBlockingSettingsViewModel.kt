@@ -178,14 +178,14 @@ class AdBlockingSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSegmentSkipModeDialogSaved(selectedMode: SegmentSkipMode, noticeShown: Boolean) {
-        onSegmentSkipModeSelected(selectedMode, noticeShown)
+    fun onSegmentSkipModeDialogSaved(selectedMode: SegmentSkipMode, userConsent: Boolean) {
+        onSegmentSkipModeSelected(selectedMode, userConsent)
     }
 
-    fun onSegmentSkipModeSelected(mode: SegmentSkipMode, noticeShown: Boolean = false) {
+    fun onSegmentSkipModeSelected(mode: SegmentSkipMode, userConsent: Boolean = false) {
         viewModelScope.launch {
             val changed = try {
-                segmentSkip.setMode(mode, noticeShown)
+                segmentSkip.setMode(mode, userConsent)
             } catch (e: IOException) {
                 return@launch
             }

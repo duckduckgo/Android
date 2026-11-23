@@ -68,14 +68,14 @@ class RealSegmentSkipUserPreferencesTest {
         assertEquals(false, testee.hasConsent())
         testDataStore.edit { it[stringPreferencesKey("segment_skip_mode")] = "ALWAYS_SKIP" }
         assertEquals(false, testee.consentFlow().first())
-        testee.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true)
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true)
         assertEquals(false, testee.consentFlow().first())
     }
 
     @Test
     fun whenEnabledFromOffAfterNoticeThenConsentPersistsUntilOff() = runTest {
         testee.setMode(SegmentSkipMode.OFF)
-        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
         assertEquals(true, testee.consentFlow().first())
         val recreated = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
         assertEquals(true, recreated.consentFlow().first())
@@ -91,12 +91,12 @@ class RealSegmentSkipUserPreferencesTest {
     @Test
     fun whenTurnedOffThenOnAgainConsentIsRestoredOnlyAfterNotice() = runTest {
         testee.setMode(SegmentSkipMode.OFF)
-        testee.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true)
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(true, testee.hasConsent())
         testee.setMode(SegmentSkipMode.OFF)
         assertEquals(false, testee.hasConsent())
-        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(true, testee.hasConsent())
     }
@@ -105,7 +105,7 @@ class RealSegmentSkipUserPreferencesTest {
     fun whenMvpEnabledAndNoNoticeThenReenablingDoesNotGrantConsent() = runTest {
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
         testee.setMode(SegmentSkipMode.OFF)
-        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, noticeShown = false)
+        testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = false)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(false, testee.consentFlow().first())
         assertEquals(false, testee.hasConsent())
@@ -114,7 +114,7 @@ class RealSegmentSkipUserPreferencesTest {
     @Test
     fun whenMvpEnabledThenExistingConsentStillAllowsTelemetry() = runTest {
         testee.setMode(SegmentSkipMode.OFF)
-        testee.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true)
+        testee.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(true, testee.hasConsent())
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
@@ -207,7 +207,7 @@ class RealSegmentSkipUserPreferencesTest {
             }
         }
         val preferences = RealSegmentSkipUserPreferences(pausedStore, coroutineRule.testScope, feature)
-        val grant = async(start = CoroutineStart.UNDISPATCHED) { preferences.setMode(SegmentSkipMode.ALWAYS_ASK, noticeShown = true) }
+        val grant = async(start = CoroutineStart.UNDISPATCHED) { preferences.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true) }
         grantStarted.await()
         val off = async(start = CoroutineStart.UNDISPATCHED) { preferences.setMode(SegmentSkipMode.OFF) }
         coroutineRule.testScope.testScheduler.advanceUntilIdle()

@@ -192,7 +192,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         viewModel.onSegmentSkipModeDialogSaved(
                             modes[selectedItem - 1],
-                            noticeShown = binding.segmentSkipDescription.isShown && viewModel.viewState.value.showSegmentSkipConsent,
+                            userConsent = binding.segmentSkipDescription.isShown && viewModel.viewState.value.showSegmentSkipConsent,
                         )
                     }
                 },
