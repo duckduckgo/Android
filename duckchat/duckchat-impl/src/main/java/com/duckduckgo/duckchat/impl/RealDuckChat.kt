@@ -47,7 +47,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
-import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.pixel.toPixelValue
 import com.duckduckgo.duckchat.impl.repository.AddressBarPickerAttributionRepository
@@ -188,6 +187,9 @@ interface DuckChatInternal : DuckChat {
      * Opens DuckChat with a new session.
      */
     fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint)
+
+    /** Single source of truth for the URL that opens a Duck.ai voice chat. */
+    fun getVoiceDuckChatUrl(): String
 
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
@@ -725,23 +727,12 @@ class RealDuckChat @Inject constructor(
         appCoroutineScope.launch(dispatchers.io()) {
             // Only force image generation once an image-capable model is selected, otherwise the tool
             // would be unavailable. The new tab this opens consumes the flag when its input configures.
-            val launch = if (ensureImageCapableModelSelected()) DuckChatLaunch.ImageGeneration() else DuckChatLaunch.Open()
+            val launch = if (duckAiModelManager.ensureImageCapableModelSelected()) DuckChatLaunch.ImageGeneration() else DuckChatLaunch.Open()
             withContext(dispatchers.main()) {
                 reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
                 openDuckChat(emptyMap(), forceNewSession = true, launch = launch)
             }
         }
-    }
-
-    private suspend fun ensureImageCapableModelSelected(): Boolean {
-        val state = duckAiModelManager.modelState.value
-        val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
-        if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return true
-        val imageCapableModel = state.models.firstOrNull {
-            it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
-        } ?: return false
-        duckAiModelManager.selectModel(imageCapableModel)
-        return true
     }
 
     override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) {
@@ -793,9 +784,11 @@ class RealDuckChat @Inject constructor(
     override fun openVoiceDuckChat(entryPoint: DuckChatEntryPoint) {
         logcat { "Duck.ai: openVoiceDuckChat" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false, voice = true)
-        val parameters = mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE)
-        openDuckChat(parameters, forceNewSession = true)
+        openDuckChatUrl(getVoiceDuckChatUrl(), forceNewSession = true)
     }
+
+    override fun getVoiceDuckChatUrl(): String =
+        appendParameters(mapOf(MODE_QUERY_NAME to VOICE_MODE_QUERY_VALUE) + nativeChatInputParameters(), getDuckChatLink())
 
     override fun openNewDuckChatSession(entryPoint: DuckChatEntryPoint) {
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
@@ -827,7 +820,14 @@ class RealDuckChat @Inject constructor(
         forceNewSession: Boolean = false,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ) {
-        val url = appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink())
+        openDuckChatUrl(appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink()), forceNewSession, launch)
+    }
+
+    private fun openDuckChatUrl(
+        url: String,
+        forceNewSession: Boolean = false,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
+    ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
                 when {

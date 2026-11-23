@@ -64,7 +64,13 @@ data class ModelState(
      * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
      * */
     val chatScopedReasoningMode: ReasoningMode? = null,
-)
+) {
+    /**
+     * Models not loaded yet count as supported, so the entry points are not hidden while they fetch.
+     */
+    fun supportsImageUpload(imageUploadEnabled: Boolean): Boolean =
+        imageUploadEnabled && (models.isEmpty() || models.firstOrNull { it.id == selectedModelId }?.supportsImageUpload == true)
+}
 
 interface DuckAiModelManager {
     val modelState: StateFlow<ModelState>
@@ -72,6 +78,12 @@ interface DuckAiModelManager {
     suspend fun fetchModels()
 
     suspend fun selectModel(model: AIChatModel)
+
+    /**
+     * Switches to the first accessible image-capable model unless the selected one already is.
+     * Returns false when no such model exists.
+     */
+    suspend fun ensureImageCapableModelSelected(): Boolean
 
     /**
      * Pins the user to a provider rather than to one of its models, so they keep following the
@@ -111,6 +123,7 @@ class RealDuckAiModelManager @Inject constructor(
     // with availableReasoningModes. This mutex serializes those operations so each one sees a
     // consistent view of the previous state.
     private val stateMutex = Mutex()
+    private var selectionRevision = 0L
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -291,17 +304,39 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun selectModel(model: AIChatModel) {
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
-                dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
-                dataStore.setSelectedProvider(null)
-                publishSelection(modelId = model.id, model = model)
-                logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
+                selectionRevision++
+                persistModelSelection(model)
             }
+        }
+    }
+
+    private suspend fun persistModelSelection(model: AIChatModel) {
+        dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
+        dataStore.setSelectedProvider(null)
+        publishSelection(modelId = model.id, model = model)
+        logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
+    }
+
+    override suspend fun ensureImageCapableModelSelected(): Boolean = withContext(dispatcherProvider.io()) {
+        val revision = stateMutex.withLock { selectionRevision }
+        if (_modelState.value.models.isEmpty()) fetchModels()
+        stateMutex.withLock {
+            if (selectionRevision != revision) return@withLock false
+            val state = _modelState.value
+            val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
+            if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return@withLock true
+            val imageCapableModel = state.models.firstOrNull {
+                it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
+            } ?: return@withLock false
+            persistModelSelection(imageCapableModel)
+            true
         }
     }
 
     override suspend fun selectProvider(provider: ModelProvider) {
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
+                selectionRevision++
                 dataStore.setSelectedModel(null)
                 dataStore.setSelectedProvider(provider.name)
 
