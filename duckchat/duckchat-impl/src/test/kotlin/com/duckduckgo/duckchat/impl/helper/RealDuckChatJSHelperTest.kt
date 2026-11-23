@@ -1814,6 +1814,24 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenContextualResponseStateReceivedThenOnlyContextualChatStateUpdated() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "responseState",
+                "123",
+                JSONObject(mapOf("status" to "streaming")),
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
+            ),
+        )
+
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-1")).value)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
     fun whenErrorResponseStateReceivedThenUpdateChatStateWithError() = runTest {
         val featureName = "aiChat"
         val method = "responseState"
