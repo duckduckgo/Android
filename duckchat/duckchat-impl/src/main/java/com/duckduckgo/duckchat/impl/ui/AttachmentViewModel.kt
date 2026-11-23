@@ -39,6 +39,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -59,6 +60,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -148,7 +150,10 @@ class AttachmentViewModel @Inject constructor(
         ) { images, files, pageContext, selections, limitReached ->
             AttachmentLists(images, files, pageContext, selections, limitReached)
         },
-        modelManager.modelState,
+        // Starts from the global selection so attachments work before a tab has published any state.
+        combine(modelManager.modelState, nativeInputStateProvider.state.onStart<NativeInputState?> { emit(null) }) { modelState, inputState ->
+            inputState?.let(modelState::forTab) ?: modelState
+        },
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesUsed) { imgSent, filesUsed -> Pair(imgSent, filesUsed) },
         isDuckAiModeFlow,
     ) { (images, files, pageContext, selections, selectionLimitReached), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->

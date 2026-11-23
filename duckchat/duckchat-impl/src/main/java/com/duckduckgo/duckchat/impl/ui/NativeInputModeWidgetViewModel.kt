@@ -58,8 +58,11 @@ import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
+import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
@@ -277,15 +280,33 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         // Existing chat whose model is no longer in the list: fall through to global so submission
         // carries (global model, global effort). New chat with picker off: nothing to send.
         if (chat == null && !_modelPickerEnabled.value) return null
-        return modelManager.getSelectedModelId()
+        return newChatPick()?.selectedModelId ?: modelManager.getSelectedModelId()
     }
 
     fun getResolvedReasoningEffort(): String? {
-        val chat = validChat() ?: return modelManager.getResolvedReasoningEffort()
+        val chat = validChat() ?: return when (val pick = newChatPick()) {
+            null -> modelManager.getResolvedReasoningEffort()
+            else -> ReasoningResolver.effortFor(pick.selectedReasoningMode, pick.availableReasoningModes)?.rawValue
+        }
         val resolution = ReasoningResolver.forChat(chat, modelManager.modelState.value)
             ?: return modelManager.getResolvedReasoningEffort()
         val mode = ReasoningResolver.resolveMode(persisted = resolution.mode, available = resolution.available)
         return ReasoningResolver.effortFor(mode, resolution.available)?.rawValue
+    }
+
+    /** The selection for this tab's new chat when the user picked one for it; null leaves the global selection. */
+    private fun newChatPick(): ModelState? = currentInputState()
+        ?.takeIf { it.chatId == null && (it.newChatModelId != null || it.newChatReasoningMode != null) }
+        ?.let { modelManager.modelState.value.forTab(it) }
+
+    fun pickNewChatModel(modelId: String) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = modelId) }
+    }
+
+    fun pickNewChatReasoningMode(mode: ReasoningMode) {
+        val tabId = activeTabId.value ?: return
+        nativeInputStatePublisher.update(tabId) { it.copy(newChatReasoningMode = mode.rawValue) }
     }
 
     fun getSelectedTool(): String? {
@@ -661,6 +682,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         // Ends the FE recovery model-change window for the active tab.
         endModelChangeMode()
+        // Read for the prompt by now, so the tab's next new chat starts on the default again.
+        if (tabId != null) nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = null, newChatReasoningMode = null) }
     }
 
     // Read from this widget's own config so the contextual sheet, which shares the browser tab's id, never passes as the full-screen chat.

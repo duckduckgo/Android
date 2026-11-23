@@ -367,6 +367,35 @@ class ModelPickerViewModelTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndModelTappedInNewChatThenPickGoesToTheTabNotTheGlobalSelection() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val model = freeModel("f")
+
+        testee.modelChanges.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            assertEquals(PickerModelChange.PickNewChatModel("f"), awaitItem())
+            verify(modelManager, never()).selectModel(any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatPickIsSetThenChipAndTickFollowIt() = runTest {
+        val global = freeModel("global", shortName = "Global")
+        val picked = freeModel("picked", shortName = "Picked")
+        stateFlow.value = ModelState(models = listOf(global, picked), selectedModelId = "global", selectedModelShortName = "Global")
+
+        nativeInputState.value = nativeInputState.value.copy(newChatModelId = "picked")
+        runCurrent()
+
+        assertEquals("picked", testee.effectiveModelId.value)
+        assertEquals("Picked", testee.chipLabel.value)
+        assertEquals("picked", testee.selectedModelIdForMenu())
+    }
+
+    @Test
     fun whenAccessibleModelTappedWithDifferentIdThenModelSelectedPixelFired() = runTest {
         whenever(modelManager.getSelectedModelId()).thenReturn("current")
         val model = freeModel("new")

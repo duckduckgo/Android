@@ -30,8 +30,10 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
@@ -55,6 +57,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -73,6 +76,8 @@ class HighUsageModelFooterPluginTest {
     )
     private val modelState = MutableStateFlow(ModelState())
     private val modelManager: DuckAiModelManager = mock()
+    private val inputState = MutableStateFlow(NativeInputState.zero())
+    private val nativeInputStateProvider: NativeInputStateProvider = mock { on { state } doReturn inputState }
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
     private val host = FakeNativeInputFooterHost()
@@ -99,6 +104,22 @@ class HighUsageModelFooterPluginTest {
             assertFalse(awaitItem().visible)
 
             modelState.value = highUsageModel()
+
+            assertTrue(awaitItem().visible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatPickIsAHighUsageModelThenFooterShows() = runTest {
+        val opus = AIChatModel("claude-opus-4-8", "opus", "Opus", "Opus 4.8", listOf("free"), isAccessible = true)
+        modelState.value = ModelState(models = listOf(opus), selectedModelId = "other", selectedModelShortName = "Other")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertFalse(awaitItem().visible)
+
+            inputState.value = inputState.value.copy(newChatModelId = opus.id)
 
             assertTrue(awaitItem().visible)
             cancelAndIgnoreRemainingEvents()
@@ -328,6 +349,7 @@ class HighUsageModelFooterPluginTest {
 
     private fun plugin(dismissalStore: HighUsageModelNoticeDismissalStore) = HighUsageModelFooterPlugin(
         modelManager = modelManager,
+        nativeInputStateProvider = nativeInputStateProvider,
         duckChatFeature = feature,
         resolver = HighUsageModelNoticeResolver(),
         dismissalStore = dismissalStore,

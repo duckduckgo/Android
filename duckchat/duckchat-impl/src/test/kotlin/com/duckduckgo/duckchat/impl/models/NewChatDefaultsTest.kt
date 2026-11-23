@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.models
 
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort.HIGH
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort.LOW
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort.NONE
@@ -24,6 +25,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningMode.FAST
 import com.duckduckgo.duckchat.impl.models.ReasoningMode.REASONING
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Test
 
 class NewChatDefaultsTest {
@@ -78,6 +80,74 @@ class NewChatDefaultsTest {
     @Test
     fun whenPreferredUnsupportedThenFast() {
         assertEquals(FAST, NewChatDefaults.reasoningMode(EXTENDED_REASONING, modes(NONE, LOW)))
+    }
+
+    @Test
+    fun whenNoPickThenNewChatUsesGlobalSelection() {
+        val state = modelState(selected = luna)
+
+        assertSame(state, state.forNewChat(pickedModelId = null, pickedReasoningMode = null))
+    }
+
+    @Test
+    fun whenModelPickedThenNewChatUsesItOnFast() {
+        val result = modelState(selected = luna).forNewChat(pickedModelId = "gpt-5.6-terra", pickedReasoningMode = null)
+
+        assertEquals("gpt-5.6-terra", result.selectedModelId)
+        assertEquals(terra.shortName, result.selectedModelShortName)
+        assertEquals(FAST, result.selectedReasoningMode)
+        assertEquals(listOf(FAST, REASONING, EXTENDED_REASONING), result.availableReasoningModes.map { it.mode })
+    }
+
+    @Test
+    fun whenPickedModelInaccessibleThenNewChatUsesGlobalSelection() {
+        val state = modelState(selected = luna, extra = terra.copy(isAccessible = false))
+
+        val result = state.forNewChat(pickedModelId = "gpt-5.6-terra", pickedReasoningMode = null)
+
+        assertEquals("gpt-6-luna", result.selectedModelId)
+    }
+
+    @Test
+    fun whenPickedEffortSupportedByPickedModelThenKept() {
+        val result = modelState(selected = luna).forNewChat(pickedModelId = "gpt-5.6-terra", pickedReasoningMode = "extended_reasoning")
+
+        assertEquals(EXTENDED_REASONING, result.selectedReasoningMode)
+    }
+
+    @Test
+    fun whenPickedEffortUnsupportedByPickedModelThenFastElseFirstAccessible() {
+        val onFastModel = modelState(selected = luna).forNewChat(pickedModelId = "gpt-6-luna", pickedReasoningMode = "extended_reasoning")
+        val onNoFastModel = modelState(selected = luna, extra = other).forNewChat(pickedModelId = "other", pickedReasoningMode = "fast")
+
+        assertEquals(FAST, onFastModel.selectedReasoningMode)
+        assertEquals(REASONING, onNoFastModel.selectedReasoningMode)
+    }
+
+    @Test
+    fun whenTabHasChatThenItsPickIsIgnored() {
+        val state = modelState(selected = luna)
+        val tab = NativeInputState.zero().copy(chatId = "chat", newChatModelId = "gpt-5.6-terra")
+
+        assertSame(state, state.forTab(tab))
+    }
+
+    @Test
+    fun whenTabHasNoChatThenItsPickApplies() {
+        val tab = NativeInputState.zero().copy(newChatModelId = "gpt-5.6-terra")
+
+        assertEquals("gpt-5.6-terra", modelState(selected = luna).forTab(tab).selectedModelId)
+    }
+
+    private fun modelState(selected: AIChatModel, extra: AIChatModel? = null): ModelState {
+        val available = ReasoningResolver.availableModes(selected.supportedReasoningEfforts)
+        return ModelState(
+            models = listOfNotNull(luna, terra.takeIf { extra?.id != it.id }, extra),
+            selectedModelId = selected.id,
+            selectedModelShortName = selected.shortName,
+            selectedReasoningMode = NewChatDefaults.reasoningMode(null, available),
+            availableReasoningModes = available,
+        )
     }
 
     private fun modes(vararg efforts: ReasoningEffort) = ReasoningResolver.availableModes(efforts.toList())

@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
+import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.PickerSurface
@@ -303,6 +304,45 @@ class ReasoningModePickerViewModelTest {
             expectNoEvents()
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndModeTappedInNewChatThenPickGoesToTheTabNotTheGlobalSelection() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        modelState.value = ModelState(
+            availableReasoningModes = listOf(
+                AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE),
+                AvailableReasoningMode(ReasoningMode.REASONING, ReasoningEffort.LOW),
+            ),
+        )
+        runCurrent()
+
+        testee.newChatModePicks.test {
+            testee.onModeTapped(ReasoningMode.REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            assertEquals(ReasoningMode.REASONING, awaitItem())
+            verify(modelManager, never()).selectReasoningMode(any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatPickIsSetThenRowsFollowThePickedModelAndMode() = runTest {
+        val global = aiModel("global", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW))
+        val picked = aiModel("picked", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW, ReasoningEffort.HIGH))
+        modelState.value = ModelState(
+            models = listOf(global, picked),
+            selectedModelId = "global",
+            selectedReasoningMode = ReasoningMode.FAST,
+            availableReasoningModes = ReasoningResolver.availableModes(global.supportedReasoningEfforts),
+        )
+
+        nativeInputState.value = nativeInputState.value.copy(newChatModelId = "picked", newChatReasoningMode = "extended_reasoning")
+        runCurrent()
+
+        assertEquals(ReasoningMode.EXTENDED_REASONING, testee.state.value.displayedMode)
+        assertEquals(3, testee.state.value.rows.size)
     }
 
     @Test
