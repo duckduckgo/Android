@@ -348,6 +348,17 @@ class RealNativeInputStateStoreTest {
     }
 
     @Test
+    fun whenClearTabThenContextualChatStateForThatTabIsReset() {
+        chatStateStore.update(ChatStateStore.contextualKey("tab-a"), ChatState.STREAMING)
+        chatStateStore.update(ChatStateStore.contextualKey("tab-b"), ChatState.STREAMING)
+
+        testee.clearTab("tab-a")
+
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-a")).value)
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-b")).value)
+    }
+
+    @Test
     fun whenClearAllThenChatStateForEveryTabIsReset() {
         chatStateStore.update("tab-a", ChatState.STREAMING)
 
