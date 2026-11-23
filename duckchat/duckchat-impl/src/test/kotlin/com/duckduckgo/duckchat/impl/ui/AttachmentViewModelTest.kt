@@ -954,6 +954,20 @@ class AttachmentViewModelTest {
         assertTrue(viewModel.attachmentState.value.images.isEmpty())
     }
 
+    @Test
+    fun whenImageSharedAndImageUploadEnabledThenItIsAdded() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/photo.jpg", providerPackage = "com.other.app")
+        whenever(context.contentResolver.getType(uri)).thenReturn("image/jpeg")
+        whenever(context.contentResolver.openInputStream(uri)).thenReturn(java.io.ByteArrayInputStream(ByteArray(8)))
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        modelStateFlow.value = ModelState(models = listOf(aModel(id = "m1", supportsImageUpload = true)), selectedModelId = "m1")
+
+        viewModel.addAttachments("tab-1", listOf(Attachment.File(uri)))
+        advanceUntilIdle()
+
+        assertEquals(1, viewModel.attachmentState.value.images.size)
+    }
+
     private val ownPackage = "com.duckduckgo.mobile.android"
 
     private fun givenSharedPdf(rawUri: String, providerPackage: String?): Uri {
