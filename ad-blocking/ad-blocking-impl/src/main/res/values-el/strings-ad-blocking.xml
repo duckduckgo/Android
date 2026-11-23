@@ -17,6 +17,11 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Παράλειψη χορηγούμενου περιεχομένου</string>
+    <string name="segment_skip_settings_description" instruction="Description of the Skip Sponsored Content setting. Learn more opens an explanation of ad blocking.">Παραλείπει χορηγούμενα τμήματα, όπως πληρωμένες προωθήσεις. Τα τμήματα αναφέρονται από την κοινότητα SponsorBlock, επομένως δεν καλύπτεται κάθε βίντεο. <annotation type="learn_more_link">Μάθετε περισσότερα</annotation></string>
+    <string name="segment_skip_mode_always_ask">Ερώτηση πριν από την παράλειψη</string>
+    <string name="segment_skip_mode_always_skip">Πάντα</string>
+    <string name="segment_skip_mode_off">Ποτέ</string>
     <string name="ad_blocking_settings_title">Αποκλεισμός διαφημίσεων YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Απόκλεισε τις διαφημίσεις στο YouTube</string>
     <string name="ad_blocking_settings_description_with_consent">Το DuckDuckGo αποκλείει τις διαφημίσεις βίντεο στο YouTube, ώστε να μπορείς να βλέπεις βίντεο χωρίς διακοπές. \n\nΌταν είναι ενεργοποιημένο, το DuckDuckGo θα ανιχνεύει ανώνυμα παρεμβολές αποκλεισμού διαφημίσεων ή σφάλματα YouTube, για να βελτιώνει την εμπειρία για όλους. Το DuckDuckGo δεν βλέπει ποτέ ποια βίντεο παρακολουθείς ούτε τυχόν προσωπικά στοιχεία ταυτοποίησης. <annotation type="learn_more_link">Μάθε περισσότερα</annotation></string>

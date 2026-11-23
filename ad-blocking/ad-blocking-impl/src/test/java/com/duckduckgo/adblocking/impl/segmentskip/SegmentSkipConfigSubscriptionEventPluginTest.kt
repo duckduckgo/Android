@@ -36,7 +36,7 @@ class SegmentSkipConfigSubscriptionEventPluginTest {
         whenever(segmentSkip.config()).thenReturn(SegmentSkipConfig(enabled = true, skipMode = SegmentSkipSkipMode.MANUAL))
 
         with(plugin.getSubscriptionEventData()) {
-            assertEquals("sponsorBlock", featureName)
+            assertEquals("segmentSkip", featureName)
             assertEquals("onConfigChanged", subscriptionName)
             assertTrue(params.getBoolean("enabled"))
             assertEquals("manual", params.getString("skipMode"))

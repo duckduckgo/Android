@@ -30,7 +30,9 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.model.Entitlement
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -45,6 +47,8 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
+import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -1165,6 +1169,7 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes: List<String>? = null,
         supportedReasoningEffort: List<String>? = null,
         reasoningEffortAccess: List<RemoteReasoningEffortAccess>? = null,
+        supportedTools: List<String>? = null,
         label: String? = null,
     ) = RemoteAIChatModel(
         id = id,
@@ -1178,6 +1183,7 @@ class RealDuckAiModelManagerTest {
         supportedFileTypes = supportedFileTypes,
         supportedReasoningEffort = supportedReasoningEffort,
         reasoningEffortAccess = reasoningEffortAccess,
+        supportedTools = supportedTools,
         label = label,
     )
 
@@ -1812,6 +1818,86 @@ class RealDuckAiModelManagerTest {
         )
 
         verify(dataStore).setSelectedProvider(null)
+    }
+
+    @Test
+    fun whenModelChosenDuringColdImageLaunchThenExplicitChoiceWins() = runTest {
+        val response = CompletableDeferred<AIChatModelsResponse>()
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        modelsService.stub {
+            onBlocking { getModels(any(), anyOrNull(), anyOrNull()) } doSuspendableAnswer { response.await() }
+        }
+        testee = createManager()
+        val imageLaunch = async { testee.ensureImageCapableModelSelected() }
+        testScheduler.runCurrent()
+        testee.selectModel(
+            AIChatModel("text", "text", "text", "text", listOf("free"), isAccessible = true),
+        )
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("text", "text"))
+
+        response.complete(
+            AIChatModelsResponse(listOf(remoteModel("text"), remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)))),
+        )
+
+        assertFalse(imageLaunch.await())
+        assertEquals("text", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenColdModelFetchFailsThenImageGenerationIsUnavailable() = runTest {
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenAnswer { throw java.io.IOException("offline") }
+        testee = createManager()
+
+        assertFalse(testee.ensureImageCapableModelSelected())
+        assertTrue(testee.modelState.value.models.isEmpty())
+    }
+
+    @Test
+    fun whenSelectedModelSupportsImageGenerationThenEnsureImageCapableReturnsTrueWithoutSwitching() = runTest {
+        givenModels(remoteModel("text"), remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)))
+        testee.selectModel(testee.modelState.value.models.first { it.id == "image" })
+        clearInvocations(dataStore)
+
+        assertTrue(testee.ensureImageCapableModelSelected())
+
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        assertEquals("image", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenSelectedModelCannotGenerateImagesThenEnsureImageCapableSwitchesToAccessibleCapableModel() = runTest {
+        givenModels(
+            remoteModel("text"),
+            remoteModel("locked", accessTier = listOf("plus"), supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)),
+            remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)),
+        )
+        testee.selectModel(testee.modelState.value.models.first { it.id == "text" })
+
+        assertTrue(testee.ensureImageCapableModelSelected())
+
+        assertEquals("image", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenNoAccessibleModelCanGenerateImagesThenEnsureImageCapableReturnsFalseWithoutSwitching() = runTest {
+        givenModels(
+            remoteModel("text"),
+            remoteModel("locked", accessTier = listOf("plus"), supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)),
+        )
+        testee.selectModel(testee.modelState.value.models.first { it.id == "text" })
+
+        assertFalse(testee.ensureImageCapableModelSelected())
+
+        assertEquals("text", testee.modelState.value.selectedModelId)
+    }
+
+    private suspend fun givenModels(vararg models: RemoteAIChatModel) {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(models.toList()))
+        testee = createManager()
+        testee.fetchModels()
     }
 
     /** [DuckChatDataStore] is a mock, so the provider key has to remember what was written to it. */

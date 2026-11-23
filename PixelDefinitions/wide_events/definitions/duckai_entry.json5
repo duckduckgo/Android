@@ -4,7 +4,7 @@
         "owners": ["malmstein"],
         "meta": {
             "type": "android-duckai-entry",
-            "version": "0.1"
+            "version": "0.2"
         },
         "feature": {
             "name": "duckai_entry",
@@ -37,6 +37,7 @@
                             "contextual_chat",
                             "widget_quick_actions",
                             "widget_favorite",
+                            "widget_duck_ai",
                             "system_search",
                             "digital_assistant",
                             "deep_link_other",

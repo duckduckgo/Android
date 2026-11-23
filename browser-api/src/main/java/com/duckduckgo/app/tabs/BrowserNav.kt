@@ -18,7 +18,6 @@ package com.duckduckgo.app.tabs
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 
 /**
  * Public interface to provide navigation Intents related to browser screen
@@ -35,21 +34,18 @@ interface BrowserNav {
     fun openInCurrentTab(context: Context, url: String): Intent
 
     /**
-     * Returns an Intent that opens Duck.ai full screen in a new tab.
+     * Returns an Intent that opens Duck.ai as described by [launch]: a new full screen tab by default,
+     * the contextual sheet on the current tab for [DuckChatLaunch.ContextualChat], or the chat history
+     * screen for [DuckChatLaunch.ChatHistory].
      *
-     * @param forceImageGeneration when true, the new tab's native input preselects the image-generation tool.
-     * @param forceLaunchContextual when true, opens the contextual Duck.ai flow instead of a full screen tab.
-     * @param textSelection text to attach to the Duck.ai input, if any.
-     * @param files content URIs of files to attach to the Duck.ai input.
+     * @param duckChatUrl the URL to open, or null to start a new chat.
+     * @param launch how Duck.ai is launched and where the launch comes from.
      */
     fun openDuckChat(
         context: Context,
         hasSessionActive: Boolean = false,
-        duckChatUrl: String,
-        forceImageGeneration: Boolean = false,
-        forceLaunchContextual: Boolean = false,
-        textSelection: String? = null,
-        files: List<Uri> = emptyList(),
+        duckChatUrl: String? = null,
+        launch: DuckChatLaunch = DuckChatLaunch.Open(),
     ): Intent
     fun closeDuckChat(context: Context): Intent
 

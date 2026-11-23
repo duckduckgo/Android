@@ -22,6 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -29,8 +30,11 @@ import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 interface AuditLogSyncHook {
-    /** Starts an audit log check in the background and returns at once. The checker skips it if a check is already running. */
+    /** Starts an audit log check in the background and returns at once. Skips it if a check is already running. */
     fun onSyncSucceeded()
+
+    /** Suspends until the check started by [onSyncSucceeded] ends. Returns at once if none is running. */
+    suspend fun awaitRunningCheck()
 }
 
 @SingleIn(AppScope::class)
@@ -41,16 +45,26 @@ class RealAuditLogSyncHook @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : AuditLogSyncHook {
 
+    private val lock = Any()
+    private var runningCheck: Job? = null
+
     override fun onSyncSucceeded() {
-        appCoroutineScope.launch(dispatchers.io()) {
-            try {
-                checker.check()
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                // The app scope has no exception handler, so anything that escapes here crashes the app.
-                logcat(WARN) { "Sync-AuditLog: check threw ${e.javaClass.simpleName}" }
+        synchronized(lock) {
+            if (runningCheck?.isCompleted == false) return
+
+            runningCheck = appCoroutineScope.launch(dispatchers.io()) {
+                try {
+                    checker.check()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    logcat(WARN) { "Sync-AuditLog: check threw ${e.javaClass.simpleName}" }
+                }
             }
         }
+    }
+
+    override suspend fun awaitRunningCheck() {
+        synchronized(lock) { runningCheck }?.join()
     }
 }

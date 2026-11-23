@@ -22,6 +22,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.core.content.IntentCompat
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
@@ -54,7 +55,7 @@ class ShareToDuckAiActivity : DuckDuckGoActivity() {
                     browserNav.openDuckChat(
                         this,
                         duckChatUrl = duckChatInternal.getDuckChatUrl(query = "", autoPrompt = false),
-                        files = files,
+                        launch = DuckChatLaunch.SharedFiles(files),
                     ),
                 )
             } catch (e: SecurityException) {
