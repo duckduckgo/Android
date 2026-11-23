@@ -32,17 +32,22 @@ class SegmentSkipTelemetryPixelInterceptor @Inject constructor(
     private val preferences: SegmentSkipUserPreferences,
 ) : Interceptor, PixelInterceptorPlugin {
     override fun intercept(chain: Interceptor.Chain): Response {
-        val name = chain.request().url.pathSegments.last()
-        if (name.startsWith(TELEMETRY_PREFIX, ignoreCase = true) && !preferences.hasConsent()) {
-            return Response.Builder()
-                .code(200)
-                .protocol(Protocol.HTTP_2)
-                .body("Segment Skip telemetry dropped".toResponseBody())
-                .message("Dropped Segment Skip telemetry")
-                .request(chain.request())
-                .build()
+        val request = chain.request()
+        val name = request.url.pathSegments.last()
+        if (!name.startsWith(TELEMETRY_PREFIX, ignoreCase = true)) return chain.proceed(request)
+
+        val (code, message) = when (preferences.cachedConsent()) {
+            true -> return chain.proceed(request)
+            false -> 200 to "Dropped Segment Skip telemetry"
+            null -> 503 to "Segment Skip consent not loaded"
         }
-        return chain.proceed(chain.request())
+        return Response.Builder()
+            .code(code)
+            .protocol(Protocol.HTTP_2)
+            .body(message.toResponseBody())
+            .message(message)
+            .request(request)
+            .build()
     }
 
     override fun getInterceptor(): Interceptor = this

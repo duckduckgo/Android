@@ -68,7 +68,8 @@ interface SegmentSkipUserPreferences {
 
     fun consentFlow(): Flow<Boolean>
 
-    fun hasConsent(): Boolean
+    /** Null until the stored decision has been read or a user choice establishes it. */
+    fun cachedConsent(): Boolean?
 
     suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean = false): Boolean
 }
@@ -120,7 +121,7 @@ class RealSegmentSkipUserPreferences @Inject constructor(
 
     override fun consentFlow(): Flow<Boolean> = consent.map { it == true }.distinctUntilChanged()
 
-    override fun hasConsent(): Boolean = consent.value == true
+    override fun cachedConsent(): Boolean? = consent.value
 
     override fun modeFlow(): Flow<SegmentSkipMode> = combine(
         dataStore.data,

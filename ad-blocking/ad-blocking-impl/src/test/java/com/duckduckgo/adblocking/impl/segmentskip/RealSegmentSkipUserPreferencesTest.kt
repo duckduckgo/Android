@@ -39,6 +39,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -73,7 +74,8 @@ class RealSegmentSkipUserPreferencesTest {
     @Test
     fun whenDefaultEnabledOrLegacyModeThenConsentIsAbsent() = runTest {
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
-        assertEquals(false, testee.hasConsent())
+        coroutineRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(false, testee.cachedConsent())
         testDataStore.edit { it[stringPreferencesKey("segment_skip_mode")] = "ALWAYS_SKIP" }
         assertEquals(false, testee.consentFlow().first())
         testee.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true)
@@ -86,13 +88,13 @@ class RealSegmentSkipUserPreferencesTest {
         testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
         assertEquals(true, testee.consentFlow().first())
         val recreated = RealSegmentSkipUserPreferences(testDataStore, coroutineRule.testScope, feature)
-        assertFalse(recreated.hasConsent())
+        assertNull(recreated.cachedConsent())
         recreated.onCreate(mock())
         assertTrue(recreated.consentFlow().first { it })
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        assertEquals(true, testee.hasConsent())
+        assertEquals(true, testee.cachedConsent())
         testee.setMode(SegmentSkipMode.OFF)
-        assertEquals(false, testee.hasConsent())
+        assertEquals(false, testee.cachedConsent())
         assertEquals(false, testee.consentFlow().first())
         testee.setMode(SegmentSkipMode.ALWAYS_ASK)
         assertEquals(false, testee.consentFlow().first())
@@ -103,12 +105,12 @@ class RealSegmentSkipUserPreferencesTest {
         testee.setMode(SegmentSkipMode.OFF)
         testee.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        assertEquals(true, testee.hasConsent())
+        assertEquals(true, testee.cachedConsent())
         testee.setMode(SegmentSkipMode.OFF)
-        assertEquals(false, testee.hasConsent())
+        assertEquals(false, testee.cachedConsent())
         testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        assertEquals(true, testee.hasConsent())
+        assertEquals(true, testee.cachedConsent())
     }
 
     @Test
@@ -118,7 +120,7 @@ class RealSegmentSkipUserPreferencesTest {
         testee.setMode(SegmentSkipMode.ALWAYS_SKIP, userConsent = false)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(false, testee.consentFlow().first())
-        assertEquals(false, testee.hasConsent())
+        assertEquals(false, testee.cachedConsent())
     }
 
     @Test
@@ -126,9 +128,9 @@ class RealSegmentSkipUserPreferencesTest {
         testee.setMode(SegmentSkipMode.OFF)
         testee.setMode(SegmentSkipMode.ALWAYS_ASK, userConsent = true)
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
-        assertEquals(true, testee.hasConsent())
+        assertEquals(true, testee.cachedConsent())
         feature.mvpEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
-        assertEquals(true, testee.hasConsent())
+        assertEquals(true, testee.cachedConsent())
     }
 
     @Test
@@ -149,12 +151,12 @@ class RealSegmentSkipUserPreferencesTest {
         val preferences = RealSegmentSkipUserPreferences(recoveringStore, coroutineRule.testScope, feature)
         preferences.onCreate(mock())
         coroutineRule.testScope.testScheduler.runCurrent()
-        assertFalse(preferences.hasConsent())
+        assertNull(preferences.cachedConsent())
         assertFalse(preferences.consentFlow().first())
 
         fails = false
         assertTrue(preferences.consentFlow().first { it })
-        assertTrue(preferences.hasConsent())
+        assertEquals(true, preferences.cachedConsent())
     }
 
     @Test
@@ -184,13 +186,13 @@ class RealSegmentSkipUserPreferencesTest {
         preferences.onResume(mock())
         scheduler.advanceUntilIdle()
         assertEquals(3, reads - readsBeforeStartup)
-        assertFalse(preferences.hasConsent())
+        assertNull(preferences.cachedConsent())
 
         fails = false
         preferences.onResume(mock())
         scheduler.advanceUntilIdle()
         assertEquals(4, reads - readsBeforeStartup)
-        assertTrue(preferences.hasConsent())
+        assertEquals(true, preferences.cachedConsent())
     }
 
     @Test
@@ -284,7 +286,7 @@ class RealSegmentSkipUserPreferencesTest {
         val save = async { runCatching { preferences.setMode(SegmentSkipMode.OFF) } }
         saveStarted.await()
         try {
-            assertFalse(preferences.hasConsent())
+            assertEquals(false, preferences.cachedConsent())
             assertFalse(preferences.consentFlow().first())
         } finally {
             failSave.complete(Unit)
@@ -293,7 +295,7 @@ class RealSegmentSkipUserPreferencesTest {
         assertTrue(save.await().exceptionOrNull() is IOException)
         assertEquals(SegmentSkipMode.ALWAYS_ASK, preferences.modeFlow().first())
         assertTrue(preferences.consentFlow().first())
-        assertTrue(preferences.hasConsent())
+        assertEquals(true, preferences.cachedConsent())
     }
 
     @Test
@@ -322,7 +324,7 @@ class RealSegmentSkipUserPreferencesTest {
         coroutineRule.testScope.testScheduler.advanceUntilIdle()
         assertEquals(SegmentSkipMode.OFF, preferences.modeFlow().first())
         assertFalse(preferences.consentFlow().first())
-        assertFalse(preferences.hasConsent())
+        assertEquals(false, preferences.cachedConsent())
     }
 
     @Test

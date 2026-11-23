@@ -29,6 +29,7 @@ class SegmentSkipTelemetryPixelInterceptorTest {
 
     @Test
     fun whenConsentAbsentThenNewTelemetryIsDroppedSuccessfully() {
+        whenever(preferences.cachedConsent()).thenReturn(false)
         for (event in newTelemetryNames) {
             val response = interceptor.intercept(FakeChain("$BASE/$event", expectedResponseCode = 418))
             assertEquals(200, response.code)
@@ -37,8 +38,20 @@ class SegmentSkipTelemetryPixelInterceptorTest {
     }
 
     @Test
+    fun whenConsentHasNotLoadedThenPixelIsDeferredUntilNextSend() {
+        val chain = FakeChain("$BASE/${newTelemetryNames.first()}", expectedResponseCode = 204)
+        whenever(preferences.cachedConsent()).thenReturn(null)
+        interceptor.intercept(chain).use { response ->
+            assertEquals(503, response.code)
+        }
+
+        whenever(preferences.cachedConsent()).thenReturn(true)
+        assertEquals(204, interceptor.intercept(chain).code)
+    }
+
+    @Test
     fun whenConsentPresentThenNewTelemetryProceeds() {
-        whenever(preferences.hasConsent()).thenReturn(true)
+        whenever(preferences.cachedConsent()).thenReturn(true)
         for (event in newTelemetryNames) {
             assertEquals(418, interceptor.intercept(FakeChain("$BASE/$event", expectedResponseCode = 418)).code)
         }
@@ -46,8 +59,8 @@ class SegmentSkipTelemetryPixelInterceptorTest {
 
     @Test
     fun whenNamesOnlyResembleEventsThenTheyProceedRegardlessOfConsent() {
-        for (consent in listOf(false, true)) {
-            whenever(preferences.hasConsent()).thenReturn(consent)
+        for (consent in listOf(null, false, true)) {
+            whenever(preferences.cachedConsent()).thenReturn(consent)
             for (event in listOf(
                 "segmentSkip_errors_hour_android_phone",
                 "segmentSkip_errors_hour_android_tablet",
