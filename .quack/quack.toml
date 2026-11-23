@@ -1,0 +1,2 @@
+[recipes]
+'com\.duckduckgo\.mobile\.android(\.debug)?' = "recipes.ts"

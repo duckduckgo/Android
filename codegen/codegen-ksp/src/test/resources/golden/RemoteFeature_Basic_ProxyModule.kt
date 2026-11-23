@@ -5,6 +5,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.feature.toggles.`internal`.api.FeatureTogglesCallback
 import com.duckduckgo.feature.toggles.api.FeatureSettings
+import com.duckduckgo.feature.toggles.api.FeatureToggleNames
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
@@ -56,6 +57,11 @@ public object TestFeature_ProxyModule {
             }
         }
   }
+
+  @Provides
+  @IntoSet
+  public fun providesTestFeatureToggleNames(): FeatureToggleNames =
+      FeatureToggleNames("testFeature", listOf("fooFeature"))
 
   @Provides
   @IntoSet

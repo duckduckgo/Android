@@ -144,6 +144,7 @@ class ContributesRemoteFeatureProcessorTest {
         interface FeatureTogglesInventory {
             suspend fun getAll(): List<Toggle>
         }
+        data class FeatureToggleNames(val featureName: String, val subFeatureNames: List<String>)
         """.trimIndent(),
     )
 

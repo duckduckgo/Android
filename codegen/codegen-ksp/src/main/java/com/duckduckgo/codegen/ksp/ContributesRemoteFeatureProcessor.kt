@@ -73,6 +73,7 @@ class ContributesRemoteFeatureProcessor(
         private val TOGGLE_STATE_COHORT = ClassName("com.duckduckgo.feature.toggles.api", "Toggle", "State", "Cohort")
         private val FEATURE_TOGGLES = ClassName("com.duckduckgo.feature.toggles.api", "FeatureToggles")
         private val FEATURE_TOGGLES_INVENTORY = ClassName("com.duckduckgo.feature.toggles.api", "FeatureTogglesInventory")
+        private val FEATURE_TOGGLE_NAMES = ClassName("com.duckduckgo.feature.toggles.api", "FeatureToggleNames")
         private val FEATURE_SETTINGS = ClassName("com.duckduckgo.feature.toggles.api", "FeatureSettings")
         private val FEATURE_SETTINGS_STORE = ClassName("com.duckduckgo.feature.toggles.api", "FeatureSettings", "Store")
         private val FEATURE_EXCEPTION = ClassName("com.duckduckgo.feature.toggles.api", "FeatureException")
@@ -821,6 +822,23 @@ class ContributesRemoteFeatureProcessor(
                     ),
                 )
                 .returns(FEATURE_TOGGLES_INVENTORY)
+                .build(),
+        )
+
+        val subFeatureNames = declaredFunctions
+            .map { it.simpleName.asString() }
+            .filter { it != "self" }
+        typeSpecBuilder.addFunction(
+            FunSpec.builder("provides${boundType.simpleName.asString()}ToggleNames")
+                .addAnnotation(PROVIDES)
+                .addAnnotation(INTO_SET)
+                .addStatement(
+                    "return %T(%S, listOf(${subFeatureNames.joinToString { "%S" }}))",
+                    FEATURE_TOGGLE_NAMES,
+                    featureName,
+                    *subFeatureNames.toTypedArray(),
+                )
+                .returns(FEATURE_TOGGLE_NAMES)
                 .build(),
         )
 

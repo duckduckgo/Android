@@ -103,6 +103,7 @@ dependencies {
 
     implementation "com.squareup.logcat:logcat:_"
     implementation "io.github.vishwakarma:zjsonpatch:_"
+    implementation "io.mehow.quack:quack:_"
 
     testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"

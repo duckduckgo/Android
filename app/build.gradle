@@ -581,6 +581,7 @@ dependencies {
     implementation AndroidX.webkit
     // Backs the internal-flavor PageLoadTracer (src/internal); other flavors bind a no-op instead.
     internalImplementation AndroidX.tracing
+    internalImplementation "io.mehow.quack:quack:_"
     implementation Square.okHttp3.okHttp
     implementation "com.squareup.okhttp3:okhttp-tls:_"
     implementation Square.retrofit2.retrofit
