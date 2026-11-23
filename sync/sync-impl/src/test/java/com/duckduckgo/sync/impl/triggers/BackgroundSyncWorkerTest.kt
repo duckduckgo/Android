@@ -23,6 +23,10 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
+import com.duckduckgo.sync.impl.auditlog.AuditLogSyncHook
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.async
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert
 import org.junit.Before
@@ -40,6 +44,7 @@ internal class BackgroundSyncWorkerTest {
 
     private val mockSyncEngine: SyncEngine = mock()
     private val mockSyncState: DeviceSyncState = mock()
+    private val auditLogSyncHook = FakeAuditLogSyncHook()
 
     private lateinit var context: Context
 
@@ -55,6 +60,7 @@ internal class BackgroundSyncWorkerTest {
             worker.syncEngine = mockSyncEngine
             worker.dispatchers = coroutineRule.testDispatcherProvider
             worker.deviceSyncState = mockSyncState
+            worker.auditLogSyncHook = auditLogSyncHook
 
             whenever(mockSyncState.isUserSignedInOnDevice()).thenReturn(true)
 
@@ -71,6 +77,7 @@ internal class BackgroundSyncWorkerTest {
             worker.syncEngine = mockSyncEngine
             worker.dispatchers = coroutineRule.testDispatcherProvider
             worker.deviceSyncState = mockSyncState
+            worker.auditLogSyncHook = auditLogSyncHook
 
             whenever(mockSyncState.isUserSignedInOnDevice()).thenReturn(false)
 
@@ -79,4 +86,58 @@ internal class BackgroundSyncWorkerTest {
             verifyNoInteractions(mockSyncEngine)
             Assert.assertEquals(result, ListenableWorker.Result.success())
         }
+
+    @Test
+    fun whenDoWorkTriggeredAndSyncEnabledThenWaitsForAuditLogCheckAfterSync() =
+        runTest {
+            val worker = TestListenableWorkerBuilder<SyncBackgroundWorker>(context = context).build()
+            worker.syncEngine = mockSyncEngine
+            worker.dispatchers = coroutineRule.testDispatcherProvider
+            worker.deviceSyncState = mockSyncState
+            worker.auditLogSyncHook = auditLogSyncHook
+            whenever(mockSyncState.isUserSignedInOnDevice()).thenReturn(true)
+            whenever(mockSyncEngine.triggerSync(BACKGROUND_SYNC)).then { auditLogSyncHook.syncTriggered = true }
+            val release = CompletableDeferred<Unit>()
+            auditLogSyncHook.release = release
+
+            val result = async { worker.doWork() }
+            runCurrent()
+            Assert.assertFalse(result.isCompleted)
+            Assert.assertTrue(auditLogSyncHook.awaitedAfterSync)
+
+            release.complete(Unit)
+            Assert.assertEquals(ListenableWorker.Result.success(), result.await())
+        }
+
+    @Test
+    fun whenDoWorkTriggeredAndSyncDisabledThenDoesNotWaitForAuditLogCheck() =
+        runTest {
+            val worker = TestListenableWorkerBuilder<SyncBackgroundWorker>(context = context).build()
+            worker.syncEngine = mockSyncEngine
+            worker.dispatchers = coroutineRule.testDispatcherProvider
+            worker.deviceSyncState = mockSyncState
+            worker.auditLogSyncHook = auditLogSyncHook
+            whenever(mockSyncState.isUserSignedInOnDevice()).thenReturn(false)
+
+            worker.doWork()
+
+            Assert.assertEquals(0, auditLogSyncHook.awaitCount)
+        }
+
+    private class FakeAuditLogSyncHook : AuditLogSyncHook {
+        var syncTriggered = false
+        var awaitedAfterSync = false
+            private set
+        var awaitCount = 0
+            private set
+        var release: CompletableDeferred<Unit>? = null
+
+        override fun onSyncSucceeded() = Unit
+
+        override suspend fun awaitRunningCheck() {
+            awaitCount++
+            awaitedAfterSync = syncTriggered
+            release?.await()
+        }
+    }
 }
