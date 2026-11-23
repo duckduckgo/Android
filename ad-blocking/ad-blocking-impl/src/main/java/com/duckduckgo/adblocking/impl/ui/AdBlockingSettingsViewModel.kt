@@ -99,7 +99,6 @@ class AdBlockingSettingsViewModel @Inject constructor(
         data class OpenLearnMore(val url: String) : Command()
         data object OpenDuckPlayerSettings : Command()
         data class ShowSegmentSkipModeDialog(val mode: SegmentSkipMode) : Command()
-        data class ShowSegmentSkipConsentDialog(val mode: SegmentSkipMode) : Command()
     }
 
     private val segmentSkipModeFlow: Flow<Pair<SegmentSkipMode, Boolean>?> = combine(
@@ -178,11 +177,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
     }
 
     fun onSegmentSkipModeDialogSaved(currentMode: SegmentSkipMode, selectedMode: SegmentSkipMode) {
-        if (currentMode == SegmentSkipMode.OFF && selectedMode != SegmentSkipMode.OFF) {
-            viewModelScope.launch { commandChannel.send(Command.ShowSegmentSkipConsentDialog(selectedMode)) }
-        } else {
-            onSegmentSkipModeSelected(selectedMode)
-        }
+        onSegmentSkipModeSelected(selectedMode, noticeShown = currentMode == SegmentSkipMode.OFF && selectedMode != SegmentSkipMode.OFF)
     }
 
     fun onSegmentSkipModeSelected(mode: SegmentSkipMode, noticeShown: Boolean = false) {

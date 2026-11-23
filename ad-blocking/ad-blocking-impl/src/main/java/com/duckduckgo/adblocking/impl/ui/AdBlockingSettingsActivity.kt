@@ -38,7 +38,6 @@ import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.StatusIndicatorView
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.dialog.RadioListAlertDialogBuilder
-import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -176,7 +175,6 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                         DuckPlayerSettingsNoParams,
                     )
                     is AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog -> showSegmentSkipModeDialog(command.mode)
-                    is AdBlockingSettingsViewModel.Command.ShowSegmentSkipConsentDialog -> showSegmentSkipConsentDialog(command.mode)
                 }
             }
             .launchIn(lifecycleScope)
@@ -193,23 +191,6 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
                         viewModel.onSegmentSkipModeDialogSaved(currentMode, modes[selectedItem - 1])
-                    }
-                },
-            )
-            .show()
-    }
-
-    private fun showSegmentSkipConsentDialog(mode: SegmentSkipMode) {
-        TextAlertDialogBuilder(this)
-            .setTitle(R.string.segment_skip_settings_title)
-            .setMessage(R.string.segment_skip_settings_description_with_consent)
-            .setPositiveButton(R.string.segment_skip_enable)
-            .setNegativeButton(CommonR.string.cancel)
-            .setCancellable(true)
-            .addEventListener(
-                object : TextAlertDialogBuilder.EventListener() {
-                    override fun onPositiveButtonClicked() {
-                        viewModel.onSegmentSkipModeSelected(mode, noticeShown = true)
                     }
                 },
             )

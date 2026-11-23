@@ -362,33 +362,18 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
-    fun whenEnablingFromOffThenNoticeIsRequestedBeforeSaving() = runTest {
+    fun whenEnablingFromOffThenModeAndConsentAreSaved() = runTest {
         segmentSkip.mode.value = SegmentSkipMode.OFF
-        val viewModel = createViewModel()
-        viewModel.commands.test {
-            viewModel.onSegmentSkipModeDialogSaved(SegmentSkipMode.OFF, SegmentSkipMode.ALWAYS_SKIP)
-            assertEquals(AdBlockingSettingsViewModel.Command.ShowSegmentSkipConsentDialog(SegmentSkipMode.ALWAYS_SKIP), awaitItem())
-            assertEquals(SegmentSkipMode.OFF, segmentSkip.mode.value)
-            assertEquals(false, segmentSkip.consent.value)
-        }
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.OFF, SegmentSkipMode.ALWAYS_SKIP)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
+        assertEquals(true, segmentSkip.consent.value)
     }
 
     @Test
-    fun whenEnabledModeIsReselectedThenNoNoticeIsRequested() = runTest {
-        val viewModel = createViewModel()
-        viewModel.commands.test {
-            viewModel.onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_ASK, SegmentSkipMode.ALWAYS_SKIP)
-            expectNoEvents()
-            assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
-            assertEquals(false, segmentSkip.noticeShown)
-        }
-    }
-
-    @Test
-    fun whenSelectionFollowsNoticeThenItReachesPreferences() = runTest {
-        segmentSkip.mode.value = SegmentSkipMode.OFF
-        createViewModel().onSegmentSkipModeSelected(SegmentSkipMode.ALWAYS_SKIP, noticeShown = true)
-        assertEquals(true, segmentSkip.noticeShown)
+    fun whenEnabledModeChangesThenConsentIsUnchanged() = runTest {
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_ASK, SegmentSkipMode.ALWAYS_SKIP)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
+        assertEquals(false, segmentSkip.consent.value)
     }
 
     @Test
@@ -437,7 +422,6 @@ class AdBlockingSettingsViewModelTest {
     private class FakeSegmentSkip : SegmentSkip {
         val mode = MutableStateFlow(SegmentSkipMode.ALWAYS_ASK)
         val consent = MutableStateFlow(false)
-        var noticeShown = false
         var failSave = false
 
         override fun config(): SegmentSkipConfig = throw UnsupportedOperationException()
@@ -446,7 +430,7 @@ class AdBlockingSettingsViewModelTest {
         override fun consentFlow(): Flow<Boolean> = consent
         override suspend fun setMode(mode: SegmentSkipMode, noticeShown: Boolean): Boolean {
             if (failSave) throw java.io.IOException()
-            this.noticeShown = noticeShown
+            if (this.mode.value == SegmentSkipMode.OFF && mode != SegmentSkipMode.OFF) consent.value = noticeShown
             val changed = this.mode.value != mode
             this.mode.value = mode
             return changed
