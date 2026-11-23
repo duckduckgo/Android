@@ -23,3 +23,8 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 android {
     namespace 'com.duckduckgo.pagetranslation.api'
 }
+
+dependencies {
+    implementation KotlinX.coroutines.core
+    implementation AndroidX.annotation
+}

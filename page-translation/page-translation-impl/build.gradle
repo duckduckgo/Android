@@ -32,4 +32,6 @@ dependencies {
     implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':page-translation-api')
+
+    implementation KotlinX.coroutines.core
 }
