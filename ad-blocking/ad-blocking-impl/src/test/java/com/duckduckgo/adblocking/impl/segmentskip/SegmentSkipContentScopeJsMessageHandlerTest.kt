@@ -112,17 +112,17 @@ class SegmentSkipContentScopeJsMessageHandlerTest {
 
     @Test
     fun whenMessageHasNoIdThenNoResponseIsSent() {
-        handler.process(JsMessage("contentScopeScripts", "sponsorBlock", "getConfig", JSONObject(), null), jsMessaging, null)
+        handler.process(JsMessage("contentScopeScripts", "segmentSkip", "getConfig", JSONObject(), null), jsMessaging, null)
 
         verify(jsMessaging, never()).onResponse(any())
     }
 
     private fun send(method: String, params: JSONObject = JSONObject()): JSONObject {
-        handler.process(JsMessage("contentScopeScripts", "sponsorBlock", method, params, "id"), jsMessaging, null)
+        handler.process(JsMessage("contentScopeScripts", "segmentSkip", method, params, "id"), jsMessaging, null)
         val captor = argumentCaptor<JsCallbackData>()
         verify(jsMessaging, atLeastOnce()).onResponse(captor.capture())
         return captor.lastValue.also {
-            assertEquals("sponsorBlock", it.featureName)
+            assertEquals("segmentSkip", it.featureName)
             assertEquals(method, it.method)
             assertEquals("id", it.id)
         }.params
