@@ -18,7 +18,7 @@ package com.duckduckgo.pagetranslation.impl.manifest
 
 import androidx.work.ListenableWorker.Result
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestFetcher.Companion.MANIFEST_URL
+import com.duckduckgo.pagetranslation.impl.manifest.RealModelsManifestFetcher.Companion.MANIFEST_URL
 import kotlinx.coroutines.test.runTest
 import okhttp3.Call
 import okhttp3.OkHttpClient
@@ -46,7 +46,7 @@ class ModelsManifestFetcherTest {
     private val store: ModelsManifestStore = mock()
     private val call: Call = mock()
     private val client: OkHttpClient = mock { on { newCall(any()) } doReturn call }
-    private val fetcher = ModelsManifestFetcher(store, lazyOf(client), coroutineRule.testDispatcherProvider)
+    private val fetcher = RealModelsManifestFetcher(store, lazyOf(client), coroutineRule.testDispatcherProvider)
 
     @Test
     fun requestManifestWithStoredETag() = runTest {

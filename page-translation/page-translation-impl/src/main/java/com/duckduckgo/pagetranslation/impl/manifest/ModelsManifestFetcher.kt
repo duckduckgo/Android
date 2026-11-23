@@ -18,7 +18,9 @@ package com.duckduckgo.pagetranslation.impl.manifest
 
 import androidx.work.ListenableWorker.Result
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.impl.ModelsHttpClient
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -29,12 +31,18 @@ import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
 import java.net.HttpURLConnection.HTTP_OK
 import javax.inject.Inject
 
-class ModelsManifestFetcher @Inject constructor(
+interface ModelsManifestFetcher {
+    /** Revalidates the stored manifest, and asks for a retry when the server can't be reached or fails. */
+    suspend fun fetch(): Result
+}
+
+@ContributesBinding(AppScope::class)
+class RealModelsManifestFetcher @Inject constructor(
     private val store: ModelsManifestStore,
     @ModelsHttpClient private val client: Lazy<OkHttpClient>,
     private val dispatchers: DispatcherProvider,
-) {
-    suspend fun fetch(): Result = withContext(dispatchers.io()) {
+) : ModelsManifestFetcher {
+    override suspend fun fetch(): Result = withContext(dispatchers.io()) {
         try {
             val request = Request.Builder().url(MANIFEST_URL)
             store.getEtagForRequest()?.let { request.header(IF_NONE_MATCH_HEADER, it) }
