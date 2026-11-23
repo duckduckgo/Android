@@ -20,8 +20,12 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.ModelFile
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import okhttp3.Call
+import okhttp3.Callback
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
@@ -36,6 +40,7 @@ import okio.Timeout
 import okio.buffer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -57,8 +62,10 @@ class LanguagePackFetcherTest {
 
     private val client: OkHttpClient = mock()
     private val stagingDirectory get() = temporaryFolder.root.resolve(PAIR)
-    private var usableSpace = Long.MAX_VALUE
-    private val fetcher = RealLanguagePackFetcher(lazyOf(client), coroutineRule.testDispatcherProvider) { usableSpace }
+    private val usableSpace = ArrayDeque(listOf(Long.MAX_VALUE))
+    private val fetcher = RealLanguagePackFetcher(lazyOf(client), coroutineRule.testDispatcherProvider) {
+        if (usableSpace.size > 1) usableSpace.removeFirst() else usableSpace.first()
+    }
     private val progress = mutableListOf<Long>()
 
     @Test
@@ -87,7 +94,7 @@ class LanguagePackFetcherTest {
 
     @Test
     fun failWithoutRequestsWhenStorageCannotHoldDownloadedAndDecompressedFiles() = runTest {
-        usableSpace = MODEL.files.values.sumOf { it.bytes + it.decompressedSize } - 1
+        usableSpace[0] = MODEL.files.values.sumOf { it.bytes + it.decompressedSize } - 1
 
         assertEquals(FetchResult.NOT_ENOUGH_STORAGE, fetch())
 
@@ -99,12 +106,14 @@ class LanguagePackFetcherTest {
         respondWith(MODEL_URL to ok(MODEL_BODY), VOCAB_URL to (NOT_FOUND to "".toResponseBody()))
 
         assertEquals(FetchResult.FAILURE, fetch())
+
+        assertFalse(stagingDirectory.exists())
     }
 
     @Test
     fun failWhenRequestFails() = runTest {
         val call: Call = mock()
-        whenever(call.execute()).thenThrow(IOException())
+        whenever(call.enqueue(any())).thenAnswer { it.getArgument<Callback>(0).onFailure(call, IOException()) }
         whenever(client.newCall(any())).thenReturn(call)
 
         assertEquals(FetchResult.FAILURE, fetch())
@@ -117,6 +126,39 @@ class LanguagePackFetcherTest {
         assertEquals(FetchResult.FAILURE, fetch())
     }
 
+    @Test
+    fun reportNotEnoughStorageWhenVolumeFillsDuringDownload() = runTest {
+        usableSpace += 0L
+        respondWith(MODEL_URL to (OK to InterruptedBody()))
+
+        assertEquals(FetchResult.NOT_ENOUGH_STORAGE, fetch())
+
+        assertFalse(stagingDirectory.exists())
+    }
+
+    @Test
+    fun failWithoutRequestsWhenStagingDirectoryCannotBeCreated() = runTest {
+        temporaryFolder.root.resolve(BLOCKING_FILE).writeText(BLOCKING_FILE)
+
+        assertEquals(FetchResult.FAILURE, fetcher.fetch(BASE_URL, MODEL, temporaryFolder.root.resolve(BLOCKING_FILE).resolve(PAIR)) {})
+
+        verifyNoInteractions(client)
+    }
+
+    @Test
+    fun cancelRequestAndKeepStagingDirectoryWhenJobIsStopped() = runTest {
+        val call: Call = mock()
+        whenever(client.newCall(any())).thenReturn(call)
+
+        val fetching = launch { fetch() }
+        runCurrent()
+        fetching.cancelAndJoin()
+
+        verify(call).cancel()
+        assertTrue(stagingDirectory.exists())
+        assertEquals(emptyList<String>(), stagingDirectory.list()!!.toList())
+    }
+
     private suspend fun fetch(model: TranslationModel = MODEL) =
         fetcher.fetch(BASE_URL, model, stagingDirectory) { progress += it }
 
@@ -125,9 +167,10 @@ class LanguagePackFetcherTest {
             val request = invocation.getArgument<Request>(0)
             val (code, body) = responses.toMap().getValue(request.url.toString())
             mock<Call>().also { call ->
-                whenever(call.execute()).thenReturn(
-                    Response.Builder().request(request).protocol(Protocol.HTTP_1_1).code(code).message("").body(body).build(),
-                )
+                whenever(call.enqueue(any())).thenAnswer {
+                    val response = Response.Builder().request(request).protocol(Protocol.HTTP_1_1).code(code).message("").body(body).build()
+                    it.getArgument<Callback>(0).onResponse(call, response)
+                }
             }
         }
     }
@@ -161,6 +204,7 @@ class LanguagePackFetcherTest {
         const val MODEL_BODY = "model-bytes"
         const val VOCAB_BODY = "vocab"
         const val LEFTOVER_FILE = "partial.zst"
+        const val BLOCKING_FILE = "not-a-directory"
 
         val MODEL = TranslationModel(
             sourceLanguage = "fr",
