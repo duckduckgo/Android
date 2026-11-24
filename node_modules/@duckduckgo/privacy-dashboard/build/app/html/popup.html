@@ -20,6 +20,13 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
         <title>DuckDuckGo</title>
+        <style>
+            body {
+                /* Token is replaced by native so background isn't white while Privacy Dashboard initializes */
+                --loading-color: $LOADING_COLOR$;
+                background: var(--loading-color);
+            }
+        </style>
         <script src="../public/js/polyfill-loader.js"></script>
         <link rel="stylesheet" href="../public/css/android.css" />
         <link rel="stylesheet" href="../public/css/base.css" />
