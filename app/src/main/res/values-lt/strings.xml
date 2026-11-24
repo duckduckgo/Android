@@ -1002,8 +1002,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Pradėk privatų DI pokalbį su „Duck.ai“ arba perjunk į Paiešką, kad naršytum saugiai.<br/><br/>„Duck.ai“ gali naudoti visur, kur tik matai pokalbio piktogramą.]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Taip pat siūlome mokamą prenumeratą, į kurią įeina pažangūs DI modeliai su didesniais GPT ir „Claude“ pokalbių limitais, saugus VPN ir dar daugiau.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Vėliau visada galėsi tai pakeisti nuostatose.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Nusistatyk viską pagal save</string>
+    <string name="downloadReasonBody">Pasirink vieną labiausiai tave dominantį variantą, ir greitai tau viską paruošime.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Ieškok ir\nnaršyk privačiai</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Bendrauk su DI\nprivačiai</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Išjunk\nDI funkcijas</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Blokuok reklamas\nir iškylančiuosius langus</string>
+    <string name="downloadReasonPrimaryCta">Kitas</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Pataikei ten, kur reikia!<br/>Apsauga aktyvuota.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Tavo paieška – pagal tave.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Paieškos istorija</string>
+    <string name="searchPathPreferenceHistorySecondary">Rodyk neseniai aplankytas svetaines paieškos pasiūlymuose. Privatu – tik tavo įrenginyje.</string>
+    <string name="searchPathPreferenceSafePrimary">Saugi paieška</string>
+    <string name="searchPathPreferenceSafeSecondary">Nerodyk abejotino (daugiausia suaugusiesiems skirto) turinio rezultatuose.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">O dabar išbandyk privačią paiešką!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Bendrauk privačiai su populiariais DI modeliais per „Duck.ai“</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Pokalbiai nuasmeninami, paskyros nereikia. Be to, tai nemokama!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Išbandyk „Duck.ai“</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Praleisk</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Pataikei ten, kur reikia!<br/>Apsauga aktyvuota.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Ieškok internete privačiai ir blokuok sekiklius</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Pasirink, kurį DI išbandysi pirmiausia</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">Su „Duck.ai“ modelį gali pakeisti bet kada.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Nori, kad naujos kortelės atsidarytų su DI pokalbiu?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Gali perjungti į paiešką vienu bakstelėjimu</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Pradėk privatų DI pokalbį su „Duck.ai“ arba perjunk į Paiešką, kad naršytum saugiai.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Pataikei ten, kur reikia!\nDI funkcijos išjungtos.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Jokių DI parengtų atsakymų paieškoje</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Paslėpk DI sugeneruotus vaizdus paieškoje</string>
+    <string name="noAiPathPreferenceSelectorTitle">Paieška be DI</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Įtrauk DI sugeneruotus atsakymus į paieškos rezultatus</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Paslėpk DI sugeneruotus vaizdus</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Atfiltruok žinomas DI brukalų svetaines iš vaizdų paieškos rezultatų</string>
+    <string name="noAiPathDuckAiStateTitle">Nori galimybės privačiai bendrauti su populiariais DI modeliais?</string>
+    <string name="noAiPathDuckAiStateBody">„Duck.ai“ platformoje nuasmeniname tavo pokalbius ir niekada nenaudojame jų DI mokyti.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Internetas – be jokio triukšmo.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Pataikei ten, kur reikia!<br/>Reklamų blokavimas aktyvuotas.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Tik paieška</string>
     <string name="input_screen_user_pref_with_ai_updated">Perjungti\npaiešką ir „Duck.ai“</string>
