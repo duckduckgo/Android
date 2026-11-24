@@ -50,8 +50,8 @@ class ModelsManifestScheduler @Inject constructor(
 
             workManager.enqueueUniqueWork(
                 MANIFEST_WORK_NAME,
-                // a fetch still waiting to retry from an earlier launch would otherwise delay this launch's revalidation
-                ExistingWorkPolicy.REPLACE,
+                // onCreate also runs when WorkManager starts the process for this job's own retry, so replacing it would defeat the backoff
+                ExistingWorkPolicy.KEEP,
                 OneTimeWorkRequestBuilder<ModelsManifestWorker>()
                     .setConstraints(Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build())
                     .build(),
