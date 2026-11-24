@@ -2927,6 +2927,13 @@ class BrowserTabFragment :
                 globalActivityStarter.start(requireContext(), SyncActivityStartSyncFlow(source = null))
             }
 
+            is Command.LaunchSyncPairing -> {
+                globalActivityStarter.start(
+                    requireContext(),
+                    SyncActivityStartSyncFlow(source = it.launchSource, joinExistingAccount = true),
+                )
+            }
+
             is Command.DialNumber -> {
                 val intent = Intent(Intent.ACTION_DIAL)
                 intent.data = Uri.parse("tel:${it.telephoneNumber}")
