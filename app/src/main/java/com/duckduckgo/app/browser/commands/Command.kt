@@ -90,6 +90,10 @@ sealed class Command {
 
     data object LaunchSyncSetup : Command()
 
+    data class LaunchSyncPairing(
+        val launchSource: String?,
+    ) : Command()
+
     class DialNumber(
         val telephoneNumber: String,
     ) : Command()
