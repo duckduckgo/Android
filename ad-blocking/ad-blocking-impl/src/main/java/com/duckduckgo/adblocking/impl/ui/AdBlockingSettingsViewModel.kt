@@ -27,19 +27,23 @@ import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_ENABLED_C
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_ENABLED_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_OPENED_COUNT
 import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.AD_BLOCKING_SETTINGS_OPENED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_DAILY
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_COUNT
+import com.duckduckgo.adblocking.impl.AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_UPDATED_DAILY
 import com.duckduckgo.adblocking.impl.AdBlockingSettingsRepository
 import com.duckduckgo.adblocking.impl.domain.AdBlockingState
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacement
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsPlacementProvider
 import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlock
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockFeature
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkip
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipFeature
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
 import com.duckduckgo.adblocking.impl.store.AdBlockingSessionStore
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenDuckPlayerSettings
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.OpenLearnMore
-import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog
+import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
@@ -53,6 +57,7 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.IOException
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
@@ -64,8 +69,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
     private val pixel: Pixel,
     duckPlayer: DuckPlayer,
     duckPlayerSettingsPlacementProvider: DuckPlayerSettingsPlacementProvider,
-    sponsorBlockFeature: SponsorBlockFeature,
-    private val sponsorBlock: SponsorBlock,
+    segmentSkipFeature: SegmentSkipFeature,
+    private val segmentSkip: SegmentSkip,
 ) : ViewModel() {
 
     init {
@@ -80,7 +85,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val duckPlayerMode: PrivatePlayerMode = AlwaysAsk,
         val isContingencyMode: Boolean = false,
         val duckPlayerSection: DuckPlayerSection = DuckPlayerSection.None,
-        val sponsorBlockMode: SponsorBlockMode? = null,
+        val segmentSkipMode: SegmentSkipMode? = null,
+        val showSegmentSkipConsent: Boolean = false,
     )
 
     sealed interface DuckPlayerSection {
@@ -92,21 +98,26 @@ class AdBlockingSettingsViewModel @Inject constructor(
     sealed class Command {
         data class OpenLearnMore(val url: String) : Command()
         data object OpenDuckPlayerSettings : Command()
-        data class ShowSponsorBlockModeDialog(val mode: SponsorBlockMode) : Command()
+        data class ShowSegmentSkipModeDialog(val mode: SegmentSkipMode) : Command()
     }
 
-    private val sponsorBlockModeFlow: Flow<SponsorBlockMode?> = combine(
-        sponsorBlockFeature.mvpEnabled().enabled(),
-        sponsorBlock.modeFlow(),
-    ) { mvpEnabled, mode -> mode.takeIf { mvpEnabled } }
+    private val segmentSkipModeFlow: Flow<Pair<SegmentSkipMode?, Boolean>> = combine(
+        segmentSkipFeature.mvpEnabled().enabled(),
+        segmentSkipFeature.softLaunchEnabled().enabled(),
+        segmentSkip.modeFlow(),
+        segmentSkip.consentFlow(),
+    ) { mvpEnabled, softLaunchEnabled, mode, consent ->
+        val showConsent = consent || (!mvpEnabled && softLaunchEnabled && mode == SegmentSkipMode.OFF)
+        mode.takeIf { mvpEnabled || softLaunchEnabled } to showConsent
+    }
 
     val viewState: StateFlow<ViewState> = combine(
         statusChecker.observeState(),
         duckPlayer.observeUserPreferences(),
         feature.enableContingencyMode().enabled(),
         duckPlayerSettingsPlacementProvider.placementFlow(),
-        sponsorBlockModeFlow,
-    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement, sponsorBlockMode ->
+        segmentSkipModeFlow,
+    ) { state, duckPlayerPreferences, contingencyModeOn, duckPlayerSettingsPlacement, segmentSkipMode ->
         ViewState(
             isEnabled = state is AdBlockingState.Enabled,
             disabledUntilRelaunch = state is AdBlockingState.Disabled.UntilRelaunch,
@@ -119,7 +130,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
                 DuckPlayerSettingsPlacement.Standalone -> DuckPlayerSection.Link
                 DuckPlayerSettingsPlacement.Hidden -> DuckPlayerSection.None
             },
-            sponsorBlockMode = sponsorBlockMode,
+            segmentSkipMode = segmentSkipMode.first,
+            showSegmentSkipConsent = segmentSkipMode.second,
         )
     }
         .stateIn(
@@ -159,16 +171,31 @@ class AdBlockingSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSponsorBlockModeClicked() {
+    fun onSegmentSkipModeClicked() {
+        pixel.fire(SEGMENT_SKIP_SETTINGS_CLICKED_DAILY, type = Pixel.PixelType.Daily())
+        pixel.fire(SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
         viewModelScope.launch {
-            val mode = sponsorBlock.modeFlow().firstOrNull() ?: return@launch
-            commandChannel.send(ShowSponsorBlockModeDialog(mode))
+            val mode = segmentSkip.modeFlow().firstOrNull() ?: return@launch
+            commandChannel.send(ShowSegmentSkipModeDialog(mode))
         }
     }
 
-    fun onSponsorBlockModeSelected(mode: SponsorBlockMode) {
+    fun onSegmentSkipModeDialogSaved(selectedMode: SegmentSkipMode, userConsent: Boolean) {
+        onSegmentSkipModeSelected(selectedMode, userConsent)
+    }
+
+    fun onSegmentSkipModeSelected(mode: SegmentSkipMode, userConsent: Boolean = false) {
         viewModelScope.launch {
-            sponsorBlock.setMode(mode)
+            val changed = try {
+                segmentSkip.setMode(mode, userConsent)
+            } catch (e: IOException) {
+                return@launch
+            }
+            if (changed) {
+                val parameters = mapOf("segment_skip_status" to mode.pixelValue)
+                pixel.fire(SEGMENT_SKIP_SETTINGS_UPDATED_DAILY, parameters = parameters, type = Pixel.PixelType.Daily())
+                pixel.fire(SEGMENT_SKIP_SETTINGS_UPDATED_COUNT, parameters = parameters)
+            }
         }
     }
 

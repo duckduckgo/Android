@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.install
 
+import android.content.Context
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.edit
@@ -51,6 +52,7 @@ import logcat.LogPriority.WARN
 import logcat.logcat
 import java.io.File
 import javax.inject.Inject
+import kotlin.math.abs
 
 interface ReinstallDetector {
     /**
@@ -72,6 +74,7 @@ object InstallSeenPersistentStorageKey : PersistentStorageKey(
 @ContributesBinding(AppScope::class, binding = binding<ReinstallDetector>())
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class RealReinstallDetector @Inject constructor(
+    private val context: Context,
     private val dispatcherProvider: DispatcherProvider,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
     private val persistentStorage: PersistentStorage,
@@ -79,6 +82,7 @@ class RealReinstallDetector @Inject constructor(
     private val pixel: Pixel,
     private val currentTimeProvider: CurrentTimeProvider,
     private val appBuildConfig: AppBuildConfig,
+    private val visibleLaunchDetector: VisibleLaunchDetector,
 ) : ReinstallDetector, MainProcessLifecycleObserver {
 
     private val sdkInt: Int = Build.VERSION.SDK_INT
@@ -91,7 +95,7 @@ class RealReinstallDetector @Inject constructor(
     // launch, and a second check could see the marker the first one just created and answer "reinstall" for a new install.
     // It runs in the app scope, so a cancelled caller only stops waiting; the check still saves its answer.
     // Not reentrant: the check must not call isAppReinstall(). Started lazily rather than built in a `by lazy` block, because
-    // the flag write it launches waits on it too and could otherwise re-enter the initializer.
+    // the marker write it launches waits on it too and could otherwise re-enter the initializer.
     private val reinstallCheck: Deferred<CheckOutcome> = appCoroutineScope.async(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
         runCatching {
             val savedValue = savedAppReinstallValue()
@@ -103,17 +107,18 @@ class RealReinstallDetector @Inject constructor(
         }.getOrDefault(CheckOutcome(isReinstall = false, answerSaved = false))
     }
 
-    // Keeps the two flag writers (after a new-install check, and on app start) from calling Block Store at once
-    private val installSeenFlagWriteMutex = Mutex()
+    private val markerWriteMutex = Mutex()
 
     override fun onCreate(owner: LifecycleOwner) {
-        if (sdkInt >= 30) return
-
-        // Below Android 11 a later reinstall is only detected if this install wrote the Block Store flag. Installs from before
-        // the flag existed, or whose first write failed, may never ask on their own, so make sure it gets written.
         appCoroutineScope.launch(dispatcherProvider.io()) {
-            isAppReinstall()
-            storeInstallSeenFlagIfMissing()
+            if (sdkInt >= 30) {
+                createDownloadsFolderIfPending()
+            } else {
+                // Below Android 11 a later reinstall is only detected if this install wrote the Block Store flag. Installs from
+                // before the flag existed, or whose first write failed, may never ask on their own, so make sure it gets written.
+                isAppReinstall()
+                storeInstallSeenFlagIfMissing()
+            }
         }
     }
 
@@ -174,11 +179,22 @@ class RealReinstallDetector @Inject constructor(
         else -> "10+"
     }
 
-    private suspend fun storeInstallSeenFlagIfMissing() = installSeenFlagWriteMutex.withLock {
-        if (canStoreInstallSeenFlag()) {
-            storeInstallSeenFlag()
+    // Both markers outlive a wipe of the app's data, so they are only written once the user has seen the app. Some stores (Galaxy
+    // Store is one we have seen) launch the app out of sight while installing it and then wipe its data, and a marker written by
+    // that launch would make the first real launch look like a reinstall. Re-checked after waiting: the other writer may have
+    // written the marker in the meantime.
+    private suspend fun writeMarkerOnceLaunchIsVisible(isPending: suspend () -> Boolean, write: suspend () -> Unit) {
+        if (!isPending()) return
+        visibleLaunchDetector.awaitVisibleLaunch()
+        markerWriteMutex.withLock {
+            if (isPending()) write()
         }
     }
+
+    private suspend fun storeInstallSeenFlagIfMissing() = writeMarkerOnceLaunchIsVisible(
+        isPending = ::canStoreInstallSeenFlag,
+        write = ::storeInstallSeenFlag,
+    )
 
     // Only safe once this install's answer is on disk: otherwise, after a restart, the flag alone would make this install look
     // like a reinstall. Waiting for the shared check means a check still saving its answer has finished, and its result says
@@ -214,19 +230,81 @@ class RealReinstallDetector @Inject constructor(
         if (preferences.contains(APP_REINSTALLED_KEY)) preferences.getBoolean(APP_REINSTALLED_KEY, false) else null
 
     /**
+     * @param markerPending saved in the same write as the answer, so the folder is never left to create without its answer on disk
      * @return false if the answer may not have reached disk. Android keeps it readable in memory even then.
      */
-    private fun saveAppReinstallValue(isReinstall: Boolean): Boolean = runCatching {
-        preferences.edit().putBoolean(APP_REINSTALLED_KEY, isReinstall).commit()
+    private fun saveAppReinstallValue(isReinstall: Boolean, markerPending: Boolean = false): Boolean = runCatching {
+        val editor = preferences.edit().putBoolean(APP_REINSTALLED_KEY, isReinstall)
+        if (markerPending) editor.putBoolean(REINSTALL_MARKER_PENDING_KEY, true)
+        editor.commit()
     }.getOrDefault(false)
 
     // The answer is saved before the folder is created. If only the folder were written, the next launch would find it and
     // answer "reinstall" for a new install; if only the answer is saved, a later reinstall goes undetected, which is the lesser harm.
     private fun detectAndSaveWithDownloadsFolder(): CheckOutcome {
-        val ddgDirectoryExists = getDownloadsDirectory().list()?.asList().orEmpty().contains(DDG_DOWNLOADS_DIRECTORY)
-        val saved = saveAppReinstallValue(ddgDirectoryExists)
-        if (!ddgDirectoryExists && saved) createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
+        val downloadsDirectory = getDownloadsDirectory()
+        val ddgDirectoryExists = downloadsDirectory.list()?.asList().orEmpty().contains(DDG_DOWNLOADS_DIRECTORY)
+        val saved = saveAppReinstallValue(ddgDirectoryExists, markerPending = !ddgDirectoryExists)
+        if (!ddgDirectoryExists && saved) {
+            appCoroutineScope.launch(dispatcherProvider.io()) { createDownloadsFolderIfPending() }
+        }
+        if (ddgDirectoryExists) runCatching { reportFolderAge(File(downloadsDirectory, DDG_DOWNLOADS_DIRECTORY)) }
         return CheckOutcome(ddgDirectoryExists, saved)
+    }
+
+    private suspend fun createDownloadsFolderIfPending() = writeMarkerOnceLaunchIsVisible(
+        isPending = ::canCreateDownloadsFolder,
+        write = {
+            createNewDirectory(DDG_DOWNLOADS_DIRECTORY)
+            if (File(getDownloadsDirectory(), DDG_DOWNLOADS_DIRECTORY).exists()) {
+                runCatching { preferences.edit(commit = true) { remove(REINSTALL_MARKER_PENDING_KEY) } }
+            }
+        },
+    )
+
+    // Only pending for an install whose check found no folder, so a folder the user deleted later is not brought back. Read
+    // before waiting for the check, which this must not start for any other install.
+    private suspend fun canCreateDownloadsFolder(): Boolean {
+        val markerPending = runCatching { preferences.getBoolean(REINSTALL_MARKER_PENDING_KEY, false) }.getOrDefault(false)
+        return markerPending && reinstallCheck.await().answerSaved
+    }
+
+    // Some stores (Galaxy Store is one we have seen) launch the app out of sight while installing it and then wipe its data, but the
+    // folder that launch created survives and makes the first real launch look like a reinstall. The folder age shows how often.
+    private fun reportFolderAge(directory: File) {
+        val modifiedAt = directory.lastModified()
+        val installedAt = context.packageManager.getPackageInfo(context.packageName, 0).firstInstallTime
+        if (modifiedAt == 0L || installedAt == 0L) return
+
+        val distanceFromInstallMs = abs(modifiedAt - installedAt)
+        val age = when {
+            distanceFromInstallMs <= 10_000L -> ReinstallFolderAge.UP_TO_10_SECONDS
+            distanceFromInstallMs <= 2 * 60_000L -> ReinstallFolderAge.UP_TO_2_MINUTES
+            distanceFromInstallMs <= 10 * 60_000L -> ReinstallFolderAge.UP_TO_10_MINUTES
+            else -> ReinstallFolderAge.OVER_10_MINUTES
+        }
+        logcat(INFO) { "Reinstall check: folder changed ${(modifiedAt - installedAt) / 1000}s from install time" }
+        pixel.fire(
+            ReinstallDetectorPixelName.FOLDER_AGE,
+            parameters = mapOf(PARAM_AGE to age.value, PARAM_INSTALLER to installer().value),
+            type = Unique(),
+        )
+    }
+
+    private fun installer(): ReinstallFolderInstaller = when (runCatching { installerPackageName() }.getOrNull()) {
+        GALAXY_STORE_PACKAGE -> ReinstallFolderInstaller.GALAXY_STORE
+        PLAY_STORE_PACKAGE -> ReinstallFolderInstaller.PLAY_STORE
+        else -> ReinstallFolderInstaller.OTHER
+    }
+
+    private fun installerPackageName(): String? {
+        val packageManager = context.packageManager
+        return if (Build.VERSION.SDK_INT >= 30) {
+            packageManager.getInstallSourceInfo(context.packageName).installingPackageName
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getInstallerPackageName(context.packageName)
+        }
     }
 
     private fun getDownloadsDirectory(): File {
@@ -260,9 +338,14 @@ class RealReinstallDetector @Inject constructor(
         private const val PREFERENCES_FILE_NAME = "com.duckduckgo.app.buildconfig.cache"
         private const val APP_REINSTALLED_KEY = "appReinstalled"
         private const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
+        private const val REINSTALL_MARKER_PENDING_KEY = "reinstallMarkerPending"
         private const val PARAM_RESULT = "result"
         private const val PARAM_DURATION = "duration"
+        private const val PARAM_AGE = "age"
+        private const val PARAM_INSTALLER = "installer"
         private const val DDG_DOWNLOADS_DIRECTORY = "DuckDuckGo"
+        private const val GALAXY_STORE_PACKAGE = "com.sec.android.app.samsungapps"
+        private const val PLAY_STORE_PACKAGE = "com.android.vending"
 
         // Nothing else bounds this step: the pre-ATB time limit can't stop it, so a stuck Play services call would hold back the ATB
         private const val BLOCK_STORE_TIME_LIMIT_MS = 10_000L

@@ -64,7 +64,8 @@ import com.duckduckgo.app.ValueCaptorObserver
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsSharedPreferences
 import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
-import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
+import com.duckduckgo.app.autocomplete.SuggestQueryTiming
+import com.duckduckgo.app.autocomplete.SuggestQueryTimingProvider
 import com.duckduckgo.app.autocomplete.api.AutoCompleteApi
 import com.duckduckgo.app.autocomplete.api.AutoCompleteScorer
 import com.duckduckgo.app.autocomplete.api.AutoCompleteService
@@ -676,7 +677,6 @@ class BrowserTabViewModelTest {
     private var fakeAndroidConfigBrowserFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val fakeCustomTabsFeature = FakeFeatureToggleFactory.create(CustomTabsFeature::class.java)
     private val fakeAppLinkFeature = FakeFeatureToggleFactory.create(AppLinkFeature::class.java)
-    private val mockAutocompleteTabsFeature: AutocompleteTabsFeature = mock()
     private val fakeCustomHeadersPlugin = FakeCustomHeadersProvider(emptyMap())
     private val mockToggleReports: ToggleReports = mock()
     private val mockBrokenSitePrompt: BrokenSitePrompt = mock()
@@ -772,6 +772,7 @@ class BrowserTabViewModelTest {
     private var fakeProgressBarUpgradeFeature = FakeFeatureToggleFactory.create(ProgressBarUpgradeFeature::class.java)
     private val fakeAutocompleteHistoryDeleteFeature = FakeFeatureToggleFactory.create(AutocompleteHistoryDeleteFeature::class.java)
     private val fakeAutocompleteSpeedFeature = FakeFeatureToggleFactory.create(AutocompleteSpeedFeature::class.java)
+    private var suggestQueryTiming: SuggestQueryTiming? = null
     private val fakeCurrentTimeProvider = object : CurrentTimeProvider {
         override fun elapsedRealtime(): Long = coroutineRule.testDispatcher.scheduler.currentTime
         override fun currentTimeMillis(): Long = coroutineRule.testDispatcher.scheduler.currentTime
@@ -843,7 +844,6 @@ class BrowserTabViewModelTest {
                     mockAutoCompleteScorer,
                     tabRepositoryProvider,
                     BrowserMode.REGULAR,
-                    mockAutocompleteTabsFeature,
                     fakeAutocompleteSpeedFeature,
                     mockDuckChat,
                     mockHistory,
@@ -885,8 +885,6 @@ class BrowserTabViewModelTest {
             val mockFeatureToggle: com.duckduckgo.feature.toggles.api.Toggle = mock()
             whenever(mockFeatureToggle.isEnabled()).thenReturn(false)
             whenever(mockStandardizedLeadingIconToggle.self()).thenReturn(mockFeatureToggle)
-            whenever(mockAutocompleteTabsFeature.self()).thenReturn(mockEnabledToggle)
-            whenever(mockAutocompleteTabsFeature.self().isEnabled()).thenReturn(true)
             whenever(mockSitePermissionsManager.hasSitePermanentPermission(any(), any())).thenReturn(false)
             whenever(mockToggleReports.shouldPrompt()).thenReturn(false)
             whenever(subscriptions.isEligible()).thenReturn(false)
@@ -1137,9 +1135,11 @@ class BrowserTabViewModelTest {
                 duckAiSessionCallback = mockDuckAiSessionCallback,
                 duckAiEntryCallback = lazy { mockDuckAiEntryCallback },
                 browserMenuAcknowledgement = mockBrowserMenuAcknowledgement,
-                autocompleteSpeedFeature = fakeAutocompleteSpeedFeature,
                 currentTimeProvider = fakeCurrentTimeProvider,
                 trackerStatsWriter = mockTrackerStatsWriter,
+                suggestQueryTimingProvider = object : SuggestQueryTimingProvider {
+                    override fun timing(): SuggestQueryTiming? = suggestQueryTiming
+                },
             )
 
         if (loadData) {
@@ -3974,7 +3974,7 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSuggestQueriesNotThrottledThenQueryWaitsForTypingPause() = runTest {
+    fun whenNoSuggestQueryTimingThenQueryWaitsForTypingPause() = runTest {
         stubAutoCompleteSourcesForQuery()
 
         testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
@@ -3986,44 +3986,124 @@ class BrowserTabViewModelTest {
     }
 
     @Test
-    fun whenSuggestQueriesThrottledThenFirstQuerySentImmediately() = runTest {
-        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
-        stubAutoCompleteSourcesForQuery()
-
-        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
-
-        assertEquals("query", autoCompleteViewState().searchResults.query)
-    }
-
-    @Test
-    fun whenSuggestQueriesThrottledAndUserKeepsTypingThenQueriesSentEveryThrottlePeriod() = runTest {
-        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
-        stubAutoCompleteSourcesForQuery()
-        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
+    fun whenTwoPhaseTimingThenQueriesSentAtPhase1MarksWhateverTheTypingSpeed() = runTest {
+        useTwoPhaseTiming()
 
         testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
         advanceTimeBy(100)
         testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
-        advanceTimeBy(50)
-        testee.triggerAutocomplete("que", hasFocus = true, hasQueryChanged = true)
-        advanceTimeBy(40)
-        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(99)
+        assertEquals("", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
 
-        advanceTimeBy(20)
-        assertEquals("que", autoCompleteViewState().searchResults.query)
+        testee.triggerAutocomplete("que", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(100)
+        testee.triggerAutocomplete("quer", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(98)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("quer", autoCompleteViewState().searchResults.query)
     }
 
     @Test
-    fun whenSuggestQueriesThrottledAndUserPausesThenNextQuerySentImmediately() = runTest {
-        fakeAutocompleteSpeedFeature.throttleSuggestQueries().setRawStoredState(State(enable = true))
-        stubAutoCompleteSourcesForQuery()
-        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
+    fun whenTwoPhaseTimingAndPhase1OverThenQueriesDebounced() = runTest {
+        useTwoPhaseTiming()
 
         testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
-        advanceTimeBy(300)
+        advanceTimeBy(500)
         testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(299)
+        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndQueryClearedThenPhase1StartsAgain() = runTest {
+        useTwoPhaseTiming()
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("x", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("x", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndOmnibarRefocusedThenPhase1StartsAgain() = runTest {
+        useTwoPhaseTiming()
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("q", hasFocus = false, hasQueryChanged = false)
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = false)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndUserKeepsTypingThenPhase1ResultsShownWhenTheyArrive() = runTest {
+        useTwoPhaseTiming()
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).doSuspendableAnswer {
+            delay(100)
+            emptyList()
+        }
+
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(150)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(100)
+        testee.triggerAutocomplete("que", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(100)
+        testee.triggerAutocomplete("quer", hasFocus = true, hasQueryChanged = true)
 
         assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndInputOpensWithPrefilledTextThenPhase1StartsAtFirstKeystroke() = runTest {
+        useTwoPhaseTiming()
+
+        testee.onSearchInputOpened(prefill = "query")
+        testee.triggerAutocomplete("query", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("query x", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("query", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("query x", autoCompleteViewState().searchResults.query)
+    }
+
+    @Test
+    fun whenTwoPhaseTimingAndInputReopenedThenPhase1StartsAgain() = runTest {
+        useTwoPhaseTiming()
+
+        testee.onSearchInputOpened(prefill = "")
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.onSearchInputOpened(prefill = "q")
+        testee.triggerAutocomplete("q", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(1000)
+        testee.triggerAutocomplete("qu", hasFocus = true, hasQueryChanged = true)
+        advanceTimeBy(199)
+        assertEquals("q", autoCompleteViewState().searchResults.query)
+        advanceTimeBy(2)
+        assertEquals("qu", autoCompleteViewState().searchResults.query)
+    }
+
+    private suspend fun useTwoPhaseTiming() {
+        suggestQueryTiming = SuggestQueryTiming(phase1MarksMillis = listOf(200L, 400L), debounceMillis = 300L)
+        stubAutoCompleteSourcesForQuery()
+        whenever(mockAutoCompleteService.autoComplete(any(), any(), any())).thenReturn(emptyList())
     }
 
     /** Stubs every autocomplete source so the AutoCompleteApi produces a non-empty result for "query". */
@@ -7115,6 +7195,27 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenUserSubmittedQueryInRegularModeThenHeadersRequestedForRegularMode() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertEquals(BrowserMode.REGULAR, fakeCustomHeadersPlugin.lastBrowserMode)
+    }
+
+    @Test
+    fun whenUserSubmittedQueryInFireModeThenHeadersRequestedForFireMode() = runTest {
+        browserMode = BrowserMode.FIRE
+        resetChannels()
+        initialiseViewModel()
+        whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
+
+        testee.onUserSubmittedQuery("foo")
+
+        assertEquals(BrowserMode.FIRE, fakeCustomHeadersPlugin.lastBrowserMode)
+    }
+
+    @Test
     fun whenUserSubmittedQueryIfAndroidFeaturesReturnsNoHeaderThenDoNotAddHeaderToUrl() {
         givenCustomHeadersProviderReturnsNoHeaders()
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
@@ -7399,7 +7500,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
         assertCommandNotIssued<Command.ShowAppLinkPrompt>()
     }
@@ -7922,7 +8023,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertTrue(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertTrue(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7933,7 +8034,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.example.origin"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7944,7 +8045,7 @@ class BrowserTabViewModelTest {
 
         testee.handleAppLink(appLinkResolvingTo("com.google.android.youtube"), isForMainFrame = true, hasGesture = true)
 
-        assertCommandIssued<Command.OpenAppLink> { assertFalse(closeTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertFalse(leaveTabOnLaunch) }
     }
 
     @Test
@@ -7955,7 +8056,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -7965,7 +8066,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertTrue(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -7976,7 +8077,7 @@ class BrowserTabViewModelTest {
 
         testee.handleNonHttpAppLink(nonHttpTo("com.example.origin"), hasGesture = true)
 
-        assertCommandIssued<Command.HandleNonHttpAppLink> { assertFalse(closeTabOnTrustedCallerLaunch) }
+        assertCommandIssued<Command.HandleNonHttpAppLink> { assertFalse(leaveTabOnTrustedCallerLaunch) }
     }
 
     @Test
@@ -8121,7 +8222,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8135,7 +8236,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertTrue(finishCustomTabOnLaunch)
+            assertTrue(leaveTabOnLaunch)
         }
     }
 
@@ -8149,7 +8250,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8164,7 +8265,7 @@ class BrowserTabViewModelTest {
         verify(mockAppLinksHandler).handleAppLink(any(), eq(urlType), any(), any(), any(), any(), any(), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
         assertCommandIssued<Command.OpenAppLink> {
-            assertFalse(finishCustomTabOnLaunch)
+            assertFalse(leaveTabOnLaunch)
         }
     }
 
@@ -8314,7 +8415,7 @@ class BrowserTabViewModelTest {
             mockAppLinksHandler,
         ).handleAppLink(eq(true), eq(urlType), eq(false), eq("com.example.app"), eq(false), any(), eq(true), appLinkCaptor.capture())
         appLinkCaptor.lastValue.invoke()
-        assertCommandIssued<Command.OpenAppLink> { assertTrue(finishCustomTabOnLaunch) }
+        assertCommandIssued<Command.OpenAppLink> { assertTrue(leaveTabOnLaunch) }
         assertCommandNotIssued<Command.ShowAppLinkPrompt>()
     }
 
@@ -8399,7 +8500,7 @@ class BrowserTabViewModelTest {
             assertTrue(trustedCallerOnly)
             assertFalse(showConfirmation)
             assertEquals("com.example.app", trustedCallerPackage)
-            assertTrue(finishCustomTabOnTrustedCallerLaunch)
+            assertTrue(leaveTabOnTrustedCallerLaunch)
         }
         assertCommandNotIssued<NavigationCommand.Navigate>()
     }
@@ -8585,7 +8686,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType, hasGesture = false))
         assertCommandIssued<Command.HandleNonHttpAppLink> {
-            assertTrue(this.finishCustomTabOnTrustedCallerLaunch)
+            assertTrue(this.leaveTabOnTrustedCallerLaunch)
         }
     }
 
@@ -8598,7 +8699,7 @@ class BrowserTabViewModelTest {
         val urlType = SpecialUrlDetector.UrlType.NonHttpAppLink("example://details", Intent(), exampleUrl)
         assertTrue(testee.handleNonHttpAppLink(urlType, hasGesture = false))
         assertCommandIssued<Command.HandleNonHttpAppLink> {
-            assertFalse(this.finishCustomTabOnTrustedCallerLaunch)
+            assertFalse(this.leaveTabOnTrustedCallerLaunch)
         }
     }
 
@@ -14592,7 +14693,12 @@ class BrowserTabViewModelTest {
     class FakeCustomHeadersProvider(
         var headers: Map<String, String>,
     ) : CustomHeadersProvider {
-        override fun getCustomHeaders(url: String): Map<String, String> = headers
+        var lastBrowserMode: BrowserMode? = null
+
+        override fun getCustomHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
+            lastBrowserMode = browserMode
+            return headers
+        }
     }
 
     class FakeContentScopeScriptsSubscriptionEventPlugin(
@@ -14720,7 +14826,7 @@ class BrowserTabViewModelTest {
 
         testee.openNewDuckChatFromChatMenu()
 
-        assertCommandIssued<Command.SwitchToTab> { assertEquals("empty", tabId) }
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("empty", tabId) }
         verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
         verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
         verify(mockDuckAiSessionCallback, never()).onExitIntent(any(), any())
@@ -14734,11 +14840,11 @@ class BrowserTabViewModelTest {
 
         testee.openNewDuckChat(ViewMode.Browser("https://example.com"))
 
-        assertCommandIssued<Command.SwitchToTab> { assertEquals("empty", tabId) }
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("empty", tabId) }
     }
 
     @Test
-    fun whenCurrentChatIsEmptyThenPreferItToAnotherEmptyChat() = runTest {
+    fun whenCurrentChatIsEmptyThenFocusItInsteadOfAnotherEmptyChat() = runTest {
         whenever(mockTabRepository.getTabs()).thenReturn(
             listOf(TabEntity("other", url = "https://duck.ai/"), TabEntity("abc", url = "https://duck.ai/")),
         )
@@ -14749,7 +14855,7 @@ class BrowserTabViewModelTest {
         verify(mockDuckAiSessionCallback, never()).onNewChatCreated(any())
         verify(mockDuckChat, never()).reportDuckChatEntry(any(), any(), any(), any())
         assertCommandNotIssued<Command.OpenInNewTab>()
-        assertCommandNotIssued<Command.SwitchToTab>()
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("abc", tabId) }
     }
 
     @Test
@@ -14763,6 +14869,41 @@ class BrowserTabViewModelTest {
         testee.openNewDuckChatFromChatMenu()
 
         assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
+    fun whenOnlySharedConversationExistsThenCreateNewChat() = runTest {
+        val url = "https://duck.ai/share/shared-id"
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("shared", url = url)))
+        whenever(mockDuckChat.isDuckChatUrl(url.toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromChatMenu()
+
+        assertCommandNotIssued<Command.FocusEmptyDuckAiChat>()
+        assertCommandIssued<Command.OpenInNewTab> { assertEquals(duckChatURL, query) }
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpThenOpensNewTabWithEmptyChat() = runTest {
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandIssued<Command.OpenInNewTab> {
+            assertEquals(duckChatURL, query)
+            assertEquals("abc", sourceTabId)
+        }
+        verify(mockDuckAiSessionCallback).onNewChatCreated("abc")
+        verify(mockDuckChat).reportDuckChatEntry(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, opensNewTab = true, hasPrompt = false)
+    }
+
+    @Test
+    fun whenNewChatRequestedBySwipingUpAndCurrentChatIsEmptyThenItIsFocused() = runTest {
+        whenever(mockTabRepository.getTabs()).thenReturn(listOf(TabEntity("abc", url = "https://duck.ai/")))
+        whenever(mockDuckChat.isDuckChatUrl("https://duck.ai/".toUri())).thenReturn(true)
+
+        testee.openNewDuckChatFromSwipeUp()
+
+        assertCommandNotIssued<Command.OpenInNewTab>()
+        assertCommandIssued<Command.FocusEmptyDuckAiChat> { assertEquals("abc", tabId) }
     }
 
     @Test

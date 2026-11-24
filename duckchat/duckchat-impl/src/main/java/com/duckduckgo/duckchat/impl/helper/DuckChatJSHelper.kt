@@ -46,6 +46,8 @@ import com.duckduckgo.duckchat.impl.ModelTier
 import com.duckduckgo.duckchat.impl.ReportMetric
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolsExecutor
 import com.duckduckgo.duckchat.impl.contextual.PdfPageContextResolver
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
@@ -160,9 +162,11 @@ class RealDuckChatJSHelper @Inject constructor(
     private val pdfPageContextResolver: PdfPageContextResolver,
     private val chatStateStore: ChatStateStore,
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val attentionTracker: DuckAiResponseAttentionTracker,
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
     private val tabSessions: DuckAiTabSessionRepository,
     private val newChatHintsUsage: NewChatHintsUsage,
+    private val clientToolsExecutor: ClientToolsExecutor,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -203,7 +207,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_GET_AI_CHAT_NATIVE_CONFIG_VALUES ->
                 id?.let {
-                    getAIChatNativeConfigValues(featureName, method, it, mode, browserMode)
+                    getAIChatNativeConfigValues(featureName, method, it, mode, browserMode, pageUrl)
                 }
 
             METHOD_GET_AI_CHATS ->
@@ -248,7 +252,9 @@ class RealDuckChatJSHelper @Inject constructor(
                         ?.let { status -> chatStateStore.update(tabId, status) }
                 }
                 if (mode == Mode.FULL && tabId.isNotEmpty()) {
-                    responseWaitWideEvent.onResponseState(tabId, data?.optString("status").orEmpty())
+                    val status = data?.optString("status").orEmpty()
+                    responseWaitWideEvent.onResponseState(tabId, status)
+                    attentionTracker.onResponseState(tabId, status)
                 }
                 data?.optJSONObject("attachments")?.let { attachments ->
                     val usage = AIChatAttachmentUsage(
@@ -296,6 +302,12 @@ class RealDuckChatJSHelper @Inject constructor(
                 id?.let {
                     val selector = extractOpenKeyboardSelector(data) ?: DEFAULT_SELECTOR
                     getOpenKeyboardResponse(featureName, method, it, selector)
+                }
+
+            METHOD_EXECUTE_CLIENT_TOOL ->
+                id?.let {
+                    val reply = clientToolsExecutor.execute(data, pageUrl, tabId, browserMode)
+                    JsCallbackData(reply, featureName, method, it)
                 }
 
             METHOD_EDIT_PROMPT ->
@@ -528,6 +540,7 @@ class RealDuckChatJSHelper @Inject constructor(
         id: String,
         mode: Mode,
         browserMode: BrowserMode,
+        pageUrl: String?,
     ): JsCallbackData {
         val supportsSubscription = withContext(dispatcherProvider.io()) {
             runCatching {
@@ -575,6 +588,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_PROMO_CARDS, duckChatFeature.duckAiPromoCards().isEnabled())
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
+                clientToolsExecutor.clientToolsConfig(pageUrl, browserMode)?.let { put(CLIENT_TOOLS, it) }
             }.also { logcat { "DuckChat-Sync: getAIChatNativeConfigValues $it" } }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
@@ -658,6 +672,7 @@ class RealDuckChatJSHelper @Inject constructor(
         val pending = pendingNativePromptStore.consume()
         if (pending != null && mode == Mode.FULL && tabId.isNotEmpty()) {
             responseWaitWideEvent.onNativePromptSubmitted(tabId, browserMode, pending.reasoningEffort, pending.selectedTool)
+            attentionTracker.onNativePromptSubmitted(tabId, browserMode)
         }
         val jsonPayload = JSONObject().apply {
             put(PLATFORM, ANDROID)
@@ -893,6 +908,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val GET_AI_CHATS_CHATS = "chats"
         private const val MAX_CHATS_LIMIT = 20
         private const val METHOD_EDIT_PROMPT = "editPrompt"
+        private const val METHOD_EXECUTE_CLIENT_TOOL = "executeClientTool"
         private const val METHOD_CANCEL_EDIT = "cancelEdit"
         private const val METHOD_AI_CHAT_PROMO_VISIBILITY = "aiChatPromoVisibility"
 
@@ -936,6 +952,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val INSTALL_TYPE_NEW = "new"
         private const val INSTALL_TYPE_RETURNING = "returning"
         private const val INSTALL_AGE = "installAge"
+        private const val CLIENT_TOOLS = "clientTools"
         private const val REPORT_METRIC = "reportMetric"
         private const val PLATFORM = "platform"
         private const val ANDROID = "android"

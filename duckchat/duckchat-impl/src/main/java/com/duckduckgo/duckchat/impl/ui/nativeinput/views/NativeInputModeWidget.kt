@@ -58,6 +58,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.ui.PulseAnimation
 import com.duckduckgo.browsermode.api.BrowserMode
@@ -195,7 +196,7 @@ interface NativeInputWidget {
         onPageContextRemoved: () -> Unit,
     )
     fun storePendingPrompt(query: String)
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false)
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open())
     fun setOmnibarPosition(isBottom: Boolean)
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
@@ -205,8 +206,8 @@ interface NativeInputWidget {
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
-    fun bindTextSelections(tabId: String, textSelection: String?)
     fun getTextSelectionsJson(): JSONArray?
+    fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>)
 
     /**
      * Binds a reactive source of the active chat id for this tab.
@@ -388,8 +389,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private var askAboutPageAction: (() -> Unit)? = null
     private var pageContextRemovedAction: (() -> Unit)? = null
     private var pendingPageContext: PageContextAttachment? = null
-    private var pendingTextSelectionsTabId: String? = null
+    private var pendingAttachmentsTabId: String? = null
     private var pendingTextSelection: String? = null
+    private var pendingFiles: List<Uri> = emptyList()
 
     // adoptEditAttachments() can be called (from EditPromptActivity.onCreate) before the widget is
     // attached, when the attachment ViewModel cannot be resolved yet, so the values are held here and
@@ -1489,16 +1491,20 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getPageContext(): PageContextAttachment? = attachmentViewModel?.getPageContext()
 
-    override fun bindTextSelections(tabId: String, textSelection: String?) {
-        pendingTextSelectionsTabId = tabId
-        pendingTextSelection = textSelection
-        attachmentViewModel?.let { vm ->
-            vm.bindTextSelections(tabId, textSelection)
-            pendingTextSelection = null
-        }
-    }
-
     override fun getTextSelectionsJson(): JSONArray? = attachmentViewModel?.getTextSelectionsJson()
+
+    override fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>) {
+        val viewModel = attachmentViewModel
+        if (viewModel == null) {
+            pendingAttachmentsTabId = tabId
+            pendingTextSelection = textSelection
+            pendingFiles = files
+            return
+        }
+        pendingTextSelection = null
+        pendingFiles = emptyList()
+        viewModel.addAttachments(tabId, textSelection, files)
+    }
 
     override fun setContextualAttachmentActions(
         onAskAboutPage: () -> Unit,
@@ -1548,13 +1554,23 @@ class NativeInputModeWidget @JvmOverloads constructor(
         (parent as? NativeInputLayout)?.setOmnibarPosition(isBottom)
     }
 
-    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean) {
+    override fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch) {
         activeTabId = tabId
         setOmnibarPosition(isBottom)
         doOnAttach {
-            viewModel.configure(tabId, isDuckAiMode, isBottom, forceImageGeneration)
+            viewModel.configure(tabId, isDuckAiMode, isBottom, launch)
             publishGatingSnapshot()
             if (isDuckAiMode) selectChatTab()
+            if (shouldLaunchCameraCapture(isDuckAiMode, launch, viewModel.supportsImageUpload())) launchCameraCapture()
+        }
+    }
+
+    // Same sink the attach menu's "Take photo" feeds, reached through the ViewModel the attachment plugin shares,
+    // so the launch needs no attachment view to exist yet.
+    private fun launchCameraCapture() {
+        requestCameraCapture { uris ->
+            val images = uris?.toList().orEmpty()
+            if (images.isNotEmpty()) attachmentViewModel?.onImagesPicked(images, AttachmentViewModel.ImageSource.CAMERA)
         }
     }
 
@@ -1563,6 +1579,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         isContextualWidget = true
         doOnAttach {
             viewModel.configureContextual(tabId)
+            attachmentViewModel?.bindTextSelections(tabId)
             publishGatingSnapshot()
             selectChatTab()
         }
@@ -1620,7 +1637,9 @@ class NativeInputModeWidget @JvmOverloads constructor(
     private fun applyPendingAttachmentState() {
         val viewModel = attachmentViewModel ?: return
         pendingPageContext?.let { viewModel.setPageContext(it) }
-        pendingTextSelectionsTabId?.let { bindTextSelections(it, pendingTextSelection) }
+        pendingAttachmentsTabId?.let { tabId ->
+            if (pendingTextSelection != null || pendingFiles.isNotEmpty()) addAttachments(tabId, pendingTextSelection, pendingFiles)
+        }
         if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
             viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
         }
@@ -2140,6 +2159,12 @@ internal fun hasPendingAdoptedAttachments(
     pendingImages: List<SubmittedImage>,
     pendingFiles: List<SubmittedFile>,
 ): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
+
+internal fun shouldLaunchCameraCapture(
+    isDuckAiMode: Boolean,
+    launch: DuckChatLaunch,
+    supportsImageUpload: Boolean,
+): Boolean = isDuckAiMode && launch is DuckChatLaunch.CameraCapture && supportsImageUpload
 
 /**
  * Plugin controls (model picker, reasoning picker, options, attach button) are shown only on

@@ -30,7 +30,7 @@ import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
-import com.duckduckgo.duckchat.api.toChatIdOrNull
+import com.duckduckgo.duckchat.api.isDuckAiConversation
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
@@ -160,7 +160,7 @@ class ChatHistoryViewModel @Inject constructor(
 
     private suspend fun findEmptyChatTabId(): String? {
         val emptyChats = tabRepository.getTabs().filter { tab ->
-            tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null } == true
+            tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && !it.isDuckAiConversation(duckChat) } == true
         }
         val selectedTabId = tabRepository.getSelectedTab()?.tabId
         return (emptyChats.firstOrNull { it.tabId == selectedTabId } ?: emptyChats.firstOrNull())?.tabId

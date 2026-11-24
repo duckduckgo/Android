@@ -289,6 +289,13 @@ interface DuckChatFeature {
     fun duckAiTextSelectionAction(): Toggle
 
     /**
+     * @return `true` when "Ask Duck.ai" is offered in the system share sheet.
+     * If the remote feature is not present defaults to `INTERNAL`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiShareSheetAction(): Toggle
+
+    /**
      * @return `true` when native Duck.ai usage-limit and high-usage model notices may be shown.
      * If the remote feature is not present defaults to `internal`.
      */
@@ -333,4 +340,18 @@ interface DuckChatFeature {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun newChatHints(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai home-screen widget can be added from the launcher's widget picker.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiWidget(): Toggle
+
+    /**
+     * @return `true` when the Duck.ai home-screen widget follows the system colour palette on Android 12+.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun duckAiWidgetDynamicColors(): Toggle
 }

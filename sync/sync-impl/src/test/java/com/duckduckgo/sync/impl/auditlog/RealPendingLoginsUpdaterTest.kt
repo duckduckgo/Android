@@ -48,7 +48,7 @@ class RealPendingLoginsUpdaterTest {
     private val deviceInfoDecryptor = FakeDeviceInfoDecryptor()
 
     private val testee = RealPendingLoginsUpdater(
-        RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor),
+        RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, coroutineTestRule.testDispatcherProvider),
         deviceInfoDecryptor,
         coroutineTestRule.testDispatcherProvider,
     )

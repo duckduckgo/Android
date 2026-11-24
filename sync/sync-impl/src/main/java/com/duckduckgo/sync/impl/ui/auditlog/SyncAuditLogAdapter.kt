@@ -20,39 +20,66 @@ import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogEntryBinding
+import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogErrorBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogHeaderBinding
+import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogLoadingBinding
 import com.duckduckgo.sync.impl.iconRes
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.Entry
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.Header
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.LoadMoreFailed
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.LoadingMore
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Footer
+import com.duckduckgo.mobile.android.R as CommonR
 
 sealed interface SyncAuditLogListItem {
     data object Header : SyncAuditLogListItem
     data class Entry(val row: SyncAuditLogRow) : SyncAuditLogListItem
+    data object LoadingMore : SyncAuditLogListItem
+    data object LoadMoreFailed : SyncAuditLogListItem
 }
 
-class SyncAuditLogAdapter : ListAdapter<SyncAuditLogListItem, ViewHolder>(ItemCallback) {
+class SyncAuditLogAdapter(
+    private val onRetryClicked: () -> Unit,
+) : ListAdapter<SyncAuditLogListItem, ViewHolder>(ItemCallback) {
 
-    fun submitRows(rows: List<SyncAuditLogRow>) {
-        submitList(listOf(Header) + rows.map(::Entry))
+    fun submitRows(
+        rows: List<SyncAuditLogRow>,
+        footer: Footer,
+        onCommitted: () -> Unit,
+    ) {
+        val footerItem = when (footer) {
+            Footer.NONE -> null
+            Footer.LOADING -> LoadingMore
+            Footer.ERROR -> LoadMoreFailed
+        }
+        submitList(listOf(Header) + rows.map(::Entry) + listOfNotNull(footerItem)) { onCommitted() }
     }
 
     override fun getItemViewType(position: Int): Int = when (getItem(position)) {
         Header -> R.layout.item_sync_audit_log_header
         is Entry -> R.layout.item_sync_audit_log_entry
+        LoadingMore -> R.layout.item_sync_audit_log_loading
+        LoadMoreFailed -> R.layout.item_sync_audit_log_error
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
-            R.layout.item_sync_audit_log_header -> HeaderViewHolder(ItemSyncAuditLogHeaderBinding.inflate(inflater, parent, false))
+            R.layout.item_sync_audit_log_header -> StaticViewHolder(ItemSyncAuditLogHeaderBinding.inflate(inflater, parent, false).root)
             R.layout.item_sync_audit_log_entry -> EntryViewHolder(ItemSyncAuditLogEntryBinding.inflate(inflater, parent, false))
+            R.layout.item_sync_audit_log_loading -> StaticViewHolder(ItemSyncAuditLogLoadingBinding.inflate(inflater, parent, false).root)
+            R.layout.item_sync_audit_log_error -> StaticViewHolder(
+                ItemSyncAuditLogErrorBinding.inflate(inflater, parent, false).root.apply { setOnClickListener { onRetryClicked() } },
+            )
             else -> error("Unknown view type: $viewType")
         }
     }
@@ -69,7 +96,7 @@ private object ItemCallback : DiffUtil.ItemCallback<SyncAuditLogListItem>() {
     override fun areContentsTheSame(oldItem: SyncAuditLogListItem, newItem: SyncAuditLogListItem): Boolean = oldItem == newItem
 }
 
-private class HeaderViewHolder(binding: ItemSyncAuditLogHeaderBinding) : ViewHolder(binding.root)
+private class StaticViewHolder(view: View) : ViewHolder(view)
 
 private class EntryViewHolder(private val binding: ItemSyncAuditLogEntryBinding) : ViewHolder(binding.root) {
 
@@ -83,6 +110,7 @@ private class EntryViewHolder(private val binding: ItemSyncAuditLogEntryBinding)
             setPrimaryText(context.getString(R.string.syncAuditLogRowTitle, row.time.format(context.resources), context.getString(action)))
             setSecondaryText(row.item.deviceName)
             setLeadingIconDrawable(icon(row.item))
+            if (row.highlighted) setBackgroundColor(context.getColorFromAttr(CommonR.attr.daxColorAccentAltPrimary)) else background = null
         }
     }
 

@@ -19,7 +19,6 @@ package com.duckduckgo.devicemigration.impl
 import android.content.SharedPreferences
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
-import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
@@ -61,7 +60,6 @@ class RealDeviceMigrationTest {
     }
     private var unupdatedSinceFirstInstall = true
     private val feature = FakeFeatureToggleFactory.create(DeviceMigrationFeature::class.java)
-    private var hasAtb = false
     private var signedInToSync = false
     private val deviceSyncState: DeviceSyncState = mock {
         on { isUserSignedInOnDevice() } doAnswer { signedInToSync }
@@ -70,10 +68,6 @@ class RealDeviceMigrationTest {
     private val defaultBrowserDetector: DefaultBrowserDetector = mock {
         on { isDefaultBrowser() } doAnswer { isDefaultBrowser }
     }
-    private val statisticsDataStore: StatisticsDataStore = mock {
-        on { hasInstallationStatistics } doAnswer { hasAtb }
-    }
-
     private val transferred get() = provider.getSharedPreferences(TRANSFERRED_FILE)
     private val local get() = provider.getSharedPreferences(LOCAL_FILE)
 
@@ -85,7 +79,6 @@ class RealDeviceMigrationTest {
             override fun isUnupdatedSinceFirstInstall() = unupdatedSinceFirstInstall
         },
         deviceMigrationFeature = feature,
-        statisticsDataStore = statisticsDataStore,
         deviceSyncState = lazyOf(deviceSyncState),
         defaultBrowserDetector = lazyOf(defaultBrowserDetector),
         dispatchers = coroutineRule.testDispatcherProvider,
@@ -250,42 +243,6 @@ class RealDeviceMigrationTest {
     }
 
     @Test
-    fun whenFreshInstallWithoutMarkersOrAtbThenNotMigrated() = runTest {
-        assertFalse(testee.isMigratedInstall())
-        assertNull(testee.sourceDeviceIsNewInstall())
-    }
-
-    @Test
-    fun whenFreshInstallWithoutMarkersButWithAtbThenMigratedFromEstablishedPhone() = runTest {
-        hasAtb = true
-
-        assertTrue(testee.isMigratedInstall())
-        assertEquals(false, testee.sourceDeviceIsNewInstall())
-    }
-
-    @Test
-    fun whenAtbFallbackDetectedThenStillMigratedAfterRestart() = runTest {
-        hasAtb = true
-        assertTrue(testee.isMigratedInstall())
-        onCreate()
-
-        val restarted = newInstance()
-
-        assertTrue(restarted.isMigratedInstall())
-        assertEquals(false, restarted.sourceDeviceIsNewInstall())
-        assertFalse(transferred.getBoolean(KEY_IS_NEW_INSTALL, true))
-    }
-
-    @Test
-    fun whenUpdatedInstallWithoutMarkersButWithAtbThenNotMigrated() = runTest {
-        unupdatedSinceFirstInstall = false
-        hasAtb = true
-
-        assertFalse(testee.isMigratedInstall())
-        assertNull(testee.sourceDeviceIsNewInstall())
-    }
-
-    @Test
     fun whenRestoredFromBackupAndUpdatedBeforeFirstOpenThenMigratedFromEstablishedPhone() = runTest {
         unupdatedSinceFirstInstall = false
         local.edit().putBoolean(KEY_RESTORED_FROM_BACKUP, true).commit()
@@ -310,15 +267,6 @@ class RealDeviceMigrationTest {
         onCreate()
 
         assertTrue(newInstance().isMigratedInstall())
-    }
-
-    @Test
-    fun whenAtbWrittenAfterBeforeAtbInitThenFreshInstallNotMigrated() = runTest {
-        testee.beforeAtbInit()
-        hasAtb = true
-
-        assertFalse(testee.isMigratedInstall())
-        assertFalse(newInstance().isMigratedInstall())
     }
 
     @Test

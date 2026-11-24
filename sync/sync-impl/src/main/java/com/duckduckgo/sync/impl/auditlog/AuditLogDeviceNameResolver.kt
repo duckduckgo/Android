@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
-import androidx.annotation.WorkerThread
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.DecryptedDevice
 import com.duckduckgo.sync.impl.DeviceFieldDecryptor
@@ -33,19 +33,23 @@ import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LATER_INFO
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LEGACY
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.PLACEHOLDER
 import dev.zacsweers.metro.ContributesBinding
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
-@WorkerThread
 interface AuditLogDeviceNameResolver {
     /**
      * Returns a device name for every [AuditLogEntryType.LOGIN] and [AuditLogEntryType.LOGOUT] entry, keyed by entry id.
      *
-     * [entries] must be newest first, as the server returns them. Pass every entry loaded so far (all pages),
-     * because a login and the `device_info_added` that has its name can be on different pages.
+     * [entries] must be newest first, as the server returns them. A login and the `device_info_added` that has its name can be on
+     * different pages: pass every entry loaded so far, or pass the pages already named as [newerEntries]. Those are newer than all of
+     * [entries], newest first, and are used to find names only; they get no name of their own.
      */
-    fun resolve(entries: List<DecodedAuditLogEntry>): Map<String, ResolvedDeviceName>
+    suspend fun resolve(
+        entries: List<DecodedAuditLogEntry>,
+        newerEntries: List<DecodedAuditLogEntry> = emptyList(),
+    ): Map<String, ResolvedDeviceName>
 }
 
 data class ResolvedDeviceName(
@@ -65,11 +69,23 @@ enum class DeviceNameSource {
 class RealAuditLogDeviceNameResolver @Inject constructor(
     private val deviceInfoDecryptor: DeviceInfoDecryptor,
     private val deviceFieldDecryptor: DeviceFieldDecryptor,
+    private val dispatchers: DispatcherProvider,
 ) : AuditLogDeviceNameResolver {
 
-    override fun resolve(entries: List<DecodedAuditLogEntry>): Map<String, ResolvedDeviceName> {
-        val decoded = entries.filterIsInstance<Decoded>()
-        if (decoded.none { it.type in NAMED_TYPES }) return emptyMap()
+    override suspend fun resolve(
+        entries: List<DecodedAuditLogEntry>,
+        newerEntries: List<DecodedAuditLogEntry>,
+    ): Map<String, ResolvedDeviceName> = withContext(dispatchers.io()) {
+        resolveBlocking(entries, newerEntries)
+    }
+
+    private fun resolveBlocking(
+        entries: List<DecodedAuditLogEntry>,
+        newerEntries: List<DecodedAuditLogEntry>,
+    ): Map<String, ResolvedDeviceName> {
+        val context = newerEntries.filterIsInstance<Decoded>()
+        val decoded = context + entries.filterIsInstance<Decoded>()
+        if (decoded.drop(context.size).none { it.type in NAMED_TYPES }) return emptyMap()
 
         val session = when (val result = deviceInfoDecryptor.openSession()) {
             is DeviceInfoSessionResult.Available -> MemoisedSession(result.session)
@@ -77,6 +93,7 @@ class RealAuditLogDeviceNameResolver @Inject constructor(
         }
         // Input is newest first, so everything before an entry's index happened after it.
         val names = decoded.withIndex()
+            .drop(context.size)
             .filter { it.value.type in NAMED_TYPES }
             .associate { (index, entry) -> entry.id to resolve(entry, newerEntries = decoded.subList(0, index), session) }
 

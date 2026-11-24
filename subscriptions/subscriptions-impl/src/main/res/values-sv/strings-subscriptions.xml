@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Din återbetalning behandlas.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Vi kunde inte behandla din uppsägning automatiskt. Besök <annotation type="withdrawal_help_link">den här sidan</annotation> för att slutföra uppsägningen.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Går ut</string>
+    <string name="subscriptionExpiringIconContentDescription">Abonnemanget löper ut</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Ditt abonnemang löper ut den %1$s.</string>
+    <string name="subscriptionKeepSubscription">Behåll abonnemang</string>
+
 </resources>

@@ -16,8 +16,13 @@
 
 package com.duckduckgo.app.install
 
+import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.InstallSourceInfo
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Environment
+import android.view.Display
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
@@ -28,6 +33,8 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.persistentstorage.api.PersistentStorageKey
@@ -53,6 +60,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -76,6 +84,13 @@ class RealReinstallDetectorTest {
     private val pixel: Pixel = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock()
     private val appBuildConfig: AppBuildConfig = mock()
+    private val packageManager: PackageManager = mock()
+    private val context: Context = mock {
+        on { packageName } doReturn PACKAGE_NAME
+        on { packageManager } doReturn packageManager
+    }
+    private val reinstallMarkerFeature = FakeFeatureToggleFactory.create(ReinstallMarkerFeature::class.java)
+    private val visibleLaunchDetector = RealVisibleLaunchDetector(reinstallMarkerFeature)
     private val ddgDownloadsDirectory = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
         "DuckDuckGo",
@@ -85,6 +100,7 @@ class RealReinstallDetectorTest {
     fun setUp() {
         ddgDownloadsDirectory.deleteRecursively()
         whenever(appBuildConfig.isNewInstall()).thenReturn(true)
+        whenever(packageManager.getPackageInfo(PACKAGE_NAME, 0)).thenReturn(PackageInfo())
     }
 
     @After
@@ -94,12 +110,136 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenDdgDownloadsDirectoryIsMissingThenIsNotReinstallAndDirectoryIsCreated() = runTest {
+    fun whenDdgDownloadsDirectoryIsMissingThenIsNotReinstallAndTheCheckDoesNotCreateTheDirectory() = runTest {
         val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
 
-        assertFalse(reinstallDetectorWith(preferences).isAppReinstall())
+        assertFalse(reinstallDetector.isAppReinstall())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertTrue(preferences.getBoolean(REINSTALL_MARKER_PENDING_KEY, false))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenTheAppBecomesVisibleAfterANewInstallCheckThenDirectoryIsCreated() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+
+        assertFalse(reinstallDetector.isAppReinstall())
+        resumeActivityOnDefaultDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertTrue(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.contains(REINSTALL_MARKER_PENDING_KEY))
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertFalse(reinstallDetector.isAppReinstall())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenTheAppIsVisibleBeforeANewInstallCheckThenDirectoryIsCreatedAfterTheCheck() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+
+        reinstallDetector.onCreate(mock())
+        resumeActivityOnDefaultDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertFalse(ddgDownloadsDirectory.exists())
+
+        assertFalse(reinstallDetector.isAppReinstall())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
         assertTrue(ddgDownloadsDirectory.exists())
         assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenTheAppIsOnlyResumedOnAPrivateDisplayThenDirectoryIsNotCreated() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+
+        reinstallDetector.onCreate(mock())
+        assertFalse(reinstallDetector.isAppReinstall())
+        resumeActivityOnPrivateDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenTheCheckRanInAnEarlierLaunchThatWasNeverVisibleThenTheNextVisibleLaunchCreatesTheDirectory() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val hiddenLaunch = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+        hiddenLaunch.onCreate(mock())
+        assertFalse(hiddenLaunch.isAppReinstall())
+        resumeActivityOnPrivateDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertFalse(ddgDownloadsDirectory.exists())
+
+        val nextLaunchVisibility = RealVisibleLaunchDetector(reinstallMarkerFeature)
+        val nextLaunch = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            visibleLaunchDetector = nextLaunchVisibility,
+        )
+        nextLaunch.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertFalse(ddgDownloadsDirectory.exists())
+
+        nextLaunchVisibility.onActivityResumed(activityOn(displayId = Display.DEFAULT_DISPLAY))
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertTrue(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.contains(REINSTALL_MARKER_PENDING_KEY))
+        assertFalse(nextLaunch.isAppReinstall())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenAnExistingInstallHasNoDirectoryAndNoneIsPendingThenAVisibleLaunchDoesNotCreateIt() = runTest {
+        val preferences = InMemorySharedPreferences().apply { putBoolean(APP_REINSTALLED_KEY, false) }
+        val reinstallDetector = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+
+        reinstallDetector.onCreate(mock())
+        resumeActivityOnDefaultDisplay()
+        assertFalse(reinstallDetector.isAppReinstall())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertFalse(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.contains(REINSTALL_MARKER_PENDING_KEY))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenNoDirectoryIsPendingThenAppStartDoesNotWaitForAVisibleLaunch() = runTest {
+        val preferences = InMemorySharedPreferences().apply { putBoolean(APP_REINSTALLED_KEY, false) }
+        val visibleLaunchDetector = CountingVisibleLaunchDetector()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            visibleLaunchDetector = visibleLaunchDetector,
+        )
+
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(0, visibleLaunchDetector.calls)
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenDdgDownloadsDirectoryExistsThenNoDirectoryIsLeftPending() = runTest {
+        ddgDownloadsDirectory.mkdirs()
+        val preferences = InMemorySharedPreferences()
+
+        assertTrue(reinstallDetectorWith(preferences).isAppReinstall())
+        assertFalse(preferences.contains(REINSTALL_MARKER_PENDING_KEY))
     }
 
     @Test
@@ -115,7 +255,16 @@ class RealReinstallDetectorTest {
     @Test
     @Config(sdk = [34])
     fun whenSavingTheAnswerFailsThenIsNotReinstallAndDirectoryIsNotCreated() = runTest {
-        assertFalse(reinstallDetectorWith(FailingToSaveSharedPreferences()).isAppReinstall())
+        val reinstallDetector = reinstallDetectorWith(
+            FailingToSaveSharedPreferences(),
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        )
+
+        reinstallDetector.onCreate(mock())
+        assertFalse(reinstallDetector.isAppReinstall())
+        resumeActivityOnDefaultDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
         // With the folder in place but no saved answer, the next launch would answer "reinstall" for this new install
         assertFalse(ddgDownloadsDirectory.exists())
     }
@@ -160,7 +309,7 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [29])
-    fun whenBelowAndroid11AndInstallSeenFlagIsMissingThenIsNotReinstallAndFlagIsStored() = runTest {
+    fun whenBelowAndroid11AndInstallSeenFlagIsMissingThenIsNotReinstallAndFlagIsStoredOnceTheAppIsVisible() = runTest {
         val preferences = InMemorySharedPreferences()
         val reinstallDetector = reinstallDetectorWith(
             preferences,
@@ -170,9 +319,35 @@ class RealReinstallDetectorTest {
 
         assertFalse(reinstallDetector.isAppReinstall())
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
-        assertNotNull(persistentStorage.values[InstallSeenPersistentStorageKey.key])
+        assertEquals(0, persistentStorage.storeCalls)
         assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+
+        resumeActivityOnDefaultDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertNotNull(persistentStorage.values[InstallSeenPersistentStorageKey.key])
         assertTrue(preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false))
+        assertFalse(reinstallDetector.isAppReinstall())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndTheAppIsOnlyResumedOnAPrivateDisplayThenFlagIsNotStored() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+
+        reinstallDetector.onCreate(mock())
+        assertFalse(reinstallDetector.isAppReinstall())
+        resumeActivityOnPrivateDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(0, persistentStorage.storeCalls)
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertFalse(preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false))
     }
 
     @Test
@@ -208,6 +383,7 @@ class RealReinstallDetectorTest {
     @Config(sdk = [29])
     fun whenBelowAndroid11AndStoringTheFlagNeverFinishesThenCallersDoNotWaitForIt() = runTest {
         persistentStorage.storeNeverAnswers = true
+        resumeActivityOnDefaultDisplay()
         val preferences = InMemorySharedPreferences()
         val reinstallDetector = reinstallDetectorWith(
             preferences,
@@ -229,6 +405,7 @@ class RealReinstallDetectorTest {
     @Config(sdk = [29])
     fun whenBelowAndroid11AndStoringTheFlagFailedThenAppStartStoresIt() = runTest {
         persistentStorage.failStore = true
+        resumeActivityOnDefaultDisplay()
         val preferences = InMemorySharedPreferences()
         val reinstallDetector = reinstallDetectorWith(
             preferences,
@@ -249,7 +426,7 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [29])
-    fun whenBelowAndroid11AndExistingInstallHasNoAnswerThenAppStartStoresTheFlag() = runTest {
+    fun whenBelowAndroid11AndExistingInstallHasNoAnswerThenAppStartStoresTheFlagOnceTheAppIsVisible() = runTest {
         val preferences = InMemorySharedPreferences()
         val reinstallDetector = reinstallDetectorWith(
             preferences,
@@ -259,9 +436,65 @@ class RealReinstallDetectorTest {
 
         reinstallDetector.onCreate(mock())
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertEquals(0, persistentStorage.storeCalls)
+
+        resumeActivityOnDefaultDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         assertNotNull(persistentStorage.values[InstallSeenPersistentStorageKey.key])
-        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+        assertTrue(preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false))
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndTheCheckRanInAnEarlierLaunchThatWasNeverVisibleThenTheNextVisibleLaunchStoresTheFlag() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val hiddenLaunch = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+        )
+        hiddenLaunch.onCreate(mock())
+        resumeActivityOnPrivateDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertEquals(0, persistentStorage.storeCalls)
+
+        val nextLaunchVisibility = RealVisibleLaunchDetector(reinstallMarkerFeature)
+        val nextLaunch = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            appCoroutineScope = coroutineTestRule.testScope,
+            visibleLaunchDetector = nextLaunchVisibility,
+        )
+        nextLaunch.onCreate(mock())
+        nextLaunchVisibility.onActivityResumed(activityOn(displayId = Display.DEFAULT_DISPLAY))
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertNotNull(persistentStorage.values[InstallSeenPersistentStorageKey.key])
+        assertTrue(preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false))
+        assertFalse(nextLaunch.isAppReinstall())
+        assertEquals(1, persistentStorage.retrieveCalls)
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenBelowAndroid11AndFlagAlreadyStoredThenAppStartDoesNotWaitForAVisibleLaunch() = runTest {
+        val preferences = InMemorySharedPreferences().apply {
+            putBoolean(APP_REINSTALLED_KEY, false)
+            putBoolean(INSTALL_SEEN_FLAG_STORED_KEY, true)
+        }
+        val visibleLaunchDetector = CountingVisibleLaunchDetector()
+        val reinstallDetector = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            visibleLaunchDetector = visibleLaunchDetector,
+        )
+
+        reinstallDetector.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(0, visibleLaunchDetector.calls)
     }
 
     @Test
@@ -278,6 +511,7 @@ class RealReinstallDetectorTest {
         )
 
         reinstallDetector.onCreate(mock())
+        resumeActivityOnDefaultDisplay()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         assertEquals(0, persistentStorage.retrieveCalls)
@@ -286,7 +520,7 @@ class RealReinstallDetectorTest {
 
     @Test
     @Config(sdk = [34])
-    fun whenAndroidVersionIs11OrAboveThenAppStartDoesNothing() = runTest {
+    fun whenAndroidVersionIs11OrAboveThenAppStartDoesNotRunTheCheck() = runTest {
         val preferences = InMemorySharedPreferences()
         val reinstallDetector = reinstallDetectorWith(
             preferences,
@@ -295,6 +529,7 @@ class RealReinstallDetectorTest {
         )
 
         reinstallDetector.onCreate(mock())
+        resumeActivityOnDefaultDisplay()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         assertFalse(preferences.contains(APP_REINSTALLED_KEY))
@@ -322,16 +557,18 @@ class RealReinstallDetectorTest {
     fun whenFirstCallerIsCancelledThenAnswerIsStillSavedAndReused() = runBlocking {
         val preferences = SlowToSaveSharedPreferences()
         val reinstallDetector = reinstallDetectorWith(preferences)
+        resumeActivityOnDefaultDisplay()
 
         val first = async(dispatcherProvider.io()) { reinstallDetector.isAppReinstall() }
         assertTrue(preferences.saveStarted.await(5, TimeUnit.SECONDS))
         first.cancel()
 
         assertTrue(runCatching { first.await() }.exceptionOrNull() is CancellationException)
+        assertFalse(reinstallDetector.isAppReinstall())
+        assertTrue(ddgDownloadsDirectoryCreated())
         // The marker now exists, so checking Downloads again would answer "reinstall"
         assertFalse(reinstallDetector.isAppReinstall())
         assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
-        assertTrue(ddgDownloadsDirectory.exists())
     }
 
     @Test
@@ -386,6 +623,7 @@ class RealReinstallDetectorTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
         )
+        resumeActivityOnDefaultDisplay()
 
         assertFalse(reinstallDetector.isAppReinstall())
         reinstallDetector.onCreate(mock())
@@ -405,6 +643,7 @@ class RealReinstallDetectorTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
         )
+        resumeActivityOnDefaultDisplay()
 
         assertFalse(reinstallDetector.isAppReinstall())
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
@@ -422,6 +661,7 @@ class RealReinstallDetectorTest {
         val preferences = SlowToCommitAnswerSharedPreferences()
         val appCoroutineScope = CoroutineScope(SupervisorJob() + dispatcherProvider.io())
         val reinstallDetector = reinstallDetectorWith(preferences, appCoroutineScope = appCoroutineScope)
+        resumeActivityOnDefaultDisplay()
 
         try {
             val first = async(dispatcherProvider.io()) { reinstallDetector.isAppReinstall() }
@@ -450,6 +690,7 @@ class RealReinstallDetectorTest {
             dispatcherProvider = coroutineTestRule.testDispatcherProvider,
             appCoroutineScope = coroutineTestRule.testScope,
         )
+        resumeActivityOnDefaultDisplay()
 
         assertFalse(reinstallDetector.isAppReinstall())
         reinstallDetector.onCreate(mock())
@@ -550,6 +791,7 @@ class RealReinstallDetectorTest {
         )
 
         reinstallDetector.onCreate(mock())
+        resumeActivityOnDefaultDisplay()
         coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
 
         assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
@@ -568,8 +810,6 @@ class RealReinstallDetectorTest {
     @Test
     @Config(sdk = [29])
     fun whenBelowAndroid11ThenCheckResultPixelReportsHowLongTheBlockStoreReadTook() = runTest {
-        // Keeps every check a fresh install: a stored flag would make the next one find it
-        persistentStorage.failStore = true
         val expectedBuckets = mapOf(
             500L to "0-0.5",
             1_500L to "0.5-1.5",
@@ -588,6 +828,164 @@ class RealReinstallDetectorTest {
         }
     }
 
+    @Test
+    @Config(sdk = [34])
+    fun whenFolderChangedSecondsBeforeGalaxyStoreInstallThenFolderAgePixelIsSentAndAnswerIsUnchanged() = runTest {
+        givenFolderChangedRelativeToInstall(offsetMs = -5_000L)
+        givenInstaller("com.sec.android.app.samsungapps")
+
+        assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
+
+        verifyFolderAgePixel(age = "0-10s", installer = "galaxy_store")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenFolderChangedAMinuteAfterPlayStoreInstallThenFolderAgePixelReportsUpTo2Minutes() = runTest {
+        givenFolderChangedRelativeToInstall(offsetMs = 60_000L)
+        givenInstaller("com.android.vending")
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyFolderAgePixel(age = "10s-2m", installer = "play_store")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenFolderChangedMinutesFromInstallByUnknownInstallerThenFolderAgePixelReportsOther() = runTest {
+        givenFolderChangedRelativeToInstall(offsetMs = -5 * 60_000L)
+        givenInstaller(null)
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyFolderAgePixel(age = "2-10m", installer = "other")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenReadingInstallerFailsThenFolderAgePixelReportsOther() = runTest {
+        givenFolderChangedRelativeToInstall(offsetMs = 0L)
+        whenever(packageManager.getInstallSourceInfo(PACKAGE_NAME)).thenThrow(PackageManager.NameNotFoundException("not found"))
+
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verifyFolderAgePixel(age = "0-10s", installer = "other")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenFolderChangedMoreThan10MinutesFromInstallThenFolderAgePixelReportsOver10Minutes() = runTest {
+        givenFolderChangedRelativeToInstall(offsetMs = -10 * 60_000L - 1)
+        givenInstaller("com.android.vending")
+
+        assertTrue(reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall())
+
+        verifyFolderAgePixel(age = "10m+", installer = "play_store")
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenFolderIsMissingThenFolderAgePixelIsNotSent() = runTest {
+        reinstallDetectorWith(InMemorySharedPreferences()).isAppReinstall()
+
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.FOLDER_AGE), any(), any(), any())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenReadingInstallTimeFailsThenAnswerIsStillReinstallAndFolderAgePixelIsNotSent() = runTest {
+        ddgDownloadsDirectory.mkdirs()
+        whenever(packageManager.getPackageInfo(PACKAGE_NAME, 0)).thenThrow(PackageManager.NameNotFoundException())
+        val preferences = InMemorySharedPreferences()
+
+        assertTrue(reinstallDetectorWith(preferences).isAppReinstall())
+        assertTrue(preferences.getBoolean(APP_REINSTALLED_KEY, false))
+        verify(pixel, never()).fire(eq(ReinstallDetectorPixelName.FOLDER_AGE), any(), any(), any())
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenKillSwitchIsOffThenDirectoryIsCreatedWithoutAVisibleLaunch() = runTest {
+        reinstallMarkerFeature.self().setRawStoredState(State(enable = false))
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+
+        assertFalse(reinstallDetector.isAppReinstall())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertTrue(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.contains(REINSTALL_MARKER_PENDING_KEY))
+        assertFalse(preferences.getBoolean(APP_REINSTALLED_KEY, true))
+    }
+
+    @Test
+    @Config(sdk = [34])
+    fun whenKillSwitchIsTurnedOffAfterAHiddenLaunchThenTheNextLaunchCreatesThePendingDirectory() = runTest {
+        val preferences = InMemorySharedPreferences()
+        val hiddenLaunch = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+        assertFalse(hiddenLaunch.isAppReinstall())
+        resumeActivityOnPrivateDisplay()
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+        assertFalse(ddgDownloadsDirectory.exists())
+
+        reinstallMarkerFeature.self().setRawStoredState(State(enable = false))
+        val nextLaunch = reinstallDetectorWith(
+            preferences,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+            visibleLaunchDetector = RealVisibleLaunchDetector(reinstallMarkerFeature),
+        )
+        nextLaunch.onCreate(mock())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertTrue(ddgDownloadsDirectory.exists())
+        assertFalse(preferences.contains(REINSTALL_MARKER_PENDING_KEY))
+        assertFalse(nextLaunch.isAppReinstall())
+    }
+
+    @Test
+    @Config(sdk = [29])
+    fun whenKillSwitchIsOffBelowAndroid11ThenFlagIsStoredWithoutAVisibleLaunch() = runTest {
+        reinstallMarkerFeature.self().setRawStoredState(State(enable = false))
+        val preferences = InMemorySharedPreferences()
+        val reinstallDetector = reinstallDetectorWith(preferences, dispatcherProvider = coroutineTestRule.testDispatcherProvider)
+
+        assertFalse(reinstallDetector.isAppReinstall())
+        coroutineTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        assertEquals(1, persistentStorage.storeCalls)
+        assertTrue(preferences.getBoolean(INSTALL_SEEN_FLAG_STORED_KEY, false))
+    }
+
+    private fun givenFolderChangedRelativeToInstall(offsetMs: Long) {
+        ddgDownloadsDirectory.mkdirs()
+        val installedAt = 1_800_000_000_000L
+        ddgDownloadsDirectory.setLastModified(installedAt + offsetMs)
+        whenever(packageManager.getPackageInfo(PACKAGE_NAME, 0)).thenReturn(PackageInfo().apply { firstInstallTime = installedAt })
+    }
+
+    private fun resumeActivityOnDefaultDisplay() {
+        visibleLaunchDetector.onActivityResumed(activityOn(displayId = Display.DEFAULT_DISPLAY))
+    }
+
+    private fun resumeActivityOnPrivateDisplay() {
+        visibleLaunchDetector.onActivityResumed(activityOn(displayId = 7, flags = Display.FLAG_PRIVATE))
+    }
+
+    private fun ddgDownloadsDirectoryCreated(): Boolean {
+        val deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5)
+        while (!ddgDownloadsDirectory.exists() && System.nanoTime() < deadline) Thread.sleep(10)
+        return ddgDownloadsDirectory.exists()
+    }
+
+    private fun verifyFolderAgePixel(age: String, installer: String) {
+        verify(pixel).fire(
+            eq(ReinstallDetectorPixelName.FOLDER_AGE),
+            eq(mapOf("age" to age, "installer" to installer)),
+            any(),
+            eq(Unique()),
+        )
+    }
+
     private fun verifyCheckResultPixel(result: String, duration: String = "0-0.5") {
         verify(pixel).fire(
             eq(ReinstallDetectorPixelName.BLOCK_STORE_CHECK_RESULT),
@@ -597,14 +995,21 @@ class RealReinstallDetectorTest {
         )
     }
 
+    private fun givenInstaller(packageName: String?) {
+        val installSourceInfo: InstallSourceInfo = mock { on { installingPackageName } doReturn packageName }
+        whenever(packageManager.getInstallSourceInfo(PACKAGE_NAME)).thenReturn(installSourceInfo)
+    }
+
     private fun reinstallDetectorWith(
         preferences: SharedPreferences,
         dispatcherProvider: DispatcherProvider = this.dispatcherProvider,
         appCoroutineScope: CoroutineScope = coroutineTestRule.testScope,
+        visibleLaunchDetector: VisibleLaunchDetector = this.visibleLaunchDetector,
     ): RealReinstallDetector {
         val sharedPreferencesProvider: SharedPreferencesProvider = mock()
         whenever(sharedPreferencesProvider.getSharedPreferences(any(), any(), any())).thenReturn(preferences)
         return RealReinstallDetector(
+            context = context,
             dispatcherProvider = dispatcherProvider,
             sharedPreferencesProvider = sharedPreferencesProvider,
             persistentStorage = persistentStorage,
@@ -612,7 +1017,16 @@ class RealReinstallDetectorTest {
             pixel = pixel,
             currentTimeProvider = currentTimeProvider,
             appBuildConfig = appBuildConfig,
+            visibleLaunchDetector = visibleLaunchDetector,
         )
+    }
+
+    private class CountingVisibleLaunchDetector : VisibleLaunchDetector {
+        var calls = 0
+
+        override suspend fun awaitVisibleLaunch() {
+            calls++
+        }
     }
 
     private class FailingToSaveAnswerSharedPreferences(
@@ -732,9 +1146,11 @@ class RealReinstallDetectorTest {
         override fun edit(): SharedPreferences.Editor = this
 
         override fun putBoolean(key: String, value: Boolean): SharedPreferences.Editor {
-            saves.incrementAndGet()
-            saveStarted.countDown()
-            Thread.sleep(SAVE_DELAY_MS)
+            if (key == APP_REINSTALLED_KEY) {
+                saves.incrementAndGet()
+                saveStarted.countDown()
+                Thread.sleep(SAVE_DELAY_MS)
+            }
             delegate.putBoolean(key, value)
             return this
         }
@@ -755,7 +1171,9 @@ class RealReinstallDetectorTest {
 
     private companion object {
         const val APP_REINSTALLED_KEY = "appReinstalled"
+        const val PACKAGE_NAME = "com.duckduckgo.mobile.android"
         const val INSTALL_SEEN_FLAG_STORED_KEY = "installSeenFlagStored"
+        const val REINSTALL_MARKER_PENDING_KEY = "reinstallMarkerPending"
         const val SAVE_DELAY_MS = 300L
     }
 }

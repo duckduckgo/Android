@@ -40,6 +40,9 @@ import com.duckduckgo.subscriptions.impl.auth.AccessTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.AuthClient
 import com.duckduckgo.subscriptions.impl.auth.AuthJwtValidator
 import com.duckduckgo.subscriptions.impl.auth.BackgroundTokenRefresh
+import com.duckduckgo.subscriptions.impl.auth.BackupRecoveryResult
+import com.duckduckgo.subscriptions.impl.auth.BackupTokenManager
+import com.duckduckgo.subscriptions.impl.auth.BackupTokenState
 import com.duckduckgo.subscriptions.impl.auth.CrossProcessLock
 import com.duckduckgo.subscriptions.impl.auth.PkceGenerator
 import com.duckduckgo.subscriptions.impl.auth.PkceGeneratorImpl
@@ -59,9 +62,12 @@ import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboa
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Account
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
+import com.duckduckgo.subscriptions.impl.repository.BackupRefreshToken
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
+import com.duckduckgo.subscriptions.impl.repository.RefreshToken
 import com.duckduckgo.subscriptions.impl.repository.Subscription
+import com.duckduckgo.subscriptions.impl.repository.TokenStoreException
 import com.duckduckgo.subscriptions.impl.serp_promo.FakeSerpPromo
 import com.duckduckgo.subscriptions.impl.services.ActiveOfferResponse
 import com.duckduckgo.subscriptions.impl.services.ConfirmationBody
@@ -173,6 +179,7 @@ class RealSubscriptionsManagerTest {
     private val backgroundTokenRefresh: BackgroundTokenRefresh = mock()
     private val crossProcessLock: CrossProcessLock = mock()
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments = mock()
+    private val backupTokenManager: BackupTokenManager = mock()
     private lateinit var subscriptionsManager: RealSubscriptionsManager
 
     @Before
@@ -180,6 +187,7 @@ class RealSubscriptionsManagerTest {
         whenever(context.packageName).thenReturn("packageName")
         whenever(playBillingManager.purchaseState).thenReturn(flowOf())
         whenever(crossProcessLock.acquire(any(), any())).thenReturn(Result.success(FakeLockHandle()))
+        whenever(backupTokenManager.recover(any())).thenReturn(BackupRecoveryResult.Failure.NotAvailable)
         subscriptionsManager = RealSubscriptionsManager(
             subscriptionsService,
             authRepository,
@@ -204,6 +212,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
     }
 
@@ -242,6 +251,20 @@ class RealSubscriptionsManagerTest {
         val result = subscriptionsManager.recoverSubscriptionFromStore()
 
         assertTrue(result is RecoverSubscriptionResult.Failure)
+    }
+
+    @Test
+    fun whenRecoverSubscriptionFromStoreAndTokenCommitFailsThenReturnFailureAndStoreNothing() = runTest {
+        givenUserIsNotSignedIn()
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+        authDataStore.simulateTokenCommitFailure = true
+
+        val result = subscriptionsManager.recoverSubscriptionFromStore()
+
+        assertTrue(result is RecoverSubscriptionResult.Failure)
+        assertNull(authDataStore.accessTokenV2)
+        assertNull(authDataStore.refreshTokenV2)
     }
 
     @Test
@@ -1015,6 +1038,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.subscriptionStatus.test {
@@ -1052,6 +1076,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.subscriptionStatus.test {
@@ -1093,6 +1118,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1148,6 +1174,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1198,6 +1225,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1243,6 +1271,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1281,6 +1310,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.currentPurchaseState.test {
@@ -1792,15 +1822,13 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
         manager.signOut()
+        verify(mockRepo).clearTokens()
         verify(mockRepo).setSubscription(null)
-        verify(mockRepo).setAccount(null)
-        verify(mockRepo).setAuthToken(null)
-        verify(mockRepo).setAccessToken(null)
         verify(mockRepo).setEntitlements(emptyList())
-        verify(mockRepo).setAccessTokenV2(null)
-        verify(mockRepo).setRefreshTokenV2(null)
+        verify(mockRepo).removeLocalPurchasedAt()
     }
 
     @Test
@@ -1846,6 +1874,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         manager.subscriptionStatus.test {
@@ -2199,6 +2228,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
 
         assertFalse(subscriptionsManager.canSupportEncryption())
@@ -2330,6 +2360,7 @@ class RealSubscriptionsManagerTest {
             vpnReminderNotificationScheduler,
             featureTogglesInventory,
             subscriptionOnboardingExperiments,
+            backupTokenManager,
         )
         givenSubscriptionExists(status = INACTIVE)
         assertTrue(manager.entitlementSet.first().isEmpty())
@@ -2438,6 +2469,240 @@ class RealSubscriptionsManagerTest {
 
         assertTrue(result is AccessTokenResult.Failure)
         verify(pixelSender).reportAuthV2TokenStoreError()
+    }
+
+    @Test
+    fun whenRefreshStartsThenStatusPlatformAndBackupStateArePassedToWideEvent() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds()
+        whenever(backupTokenManager.getState(accountExternalId = "1234")).thenReturn(BackupTokenState.STALE)
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onStart(
+            subscriptionStatus = AUTO_RENEWABLE,
+            subscriptionPlatform = "google",
+            backupTokenState = BackupTokenState.STALE,
+        )
+    }
+
+    @Test
+    fun whenRefreshSucceedsThenBackupMintIsRequestedWithTheSpentRefreshToken() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
+        givenAccessTokenIsExpired()
+        val spentRefreshToken = authRepository.getRefreshTokenV2()!!
+        givenV2AccessTokenRefreshSucceeds(newRefreshToken = "new refresh token")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager).mintIfNeeded(spentRefreshToken = spentRefreshToken, accountExternalId = "1234")
+    }
+
+    @Test
+    fun whenRejectedRefreshTokenIsRecoveredThroughStoreLoginThenNoBackupMintIsRequested() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        givenPurchaseStored()
+        givenStoreLoginSucceeds()
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager, never()).mintIfNeeded(spentRefreshToken = any(), accountExternalId = any())
+    }
+
+    @Test
+    fun whenNewTokensFailToSaveThenNoBackupMintIsRequested() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds()
+        authDataStore.simulateTokenCommitFailure = true
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager, never()).mintIfNeeded(spentRefreshToken = any(), accountExternalId = any())
+    }
+
+    @Test
+    fun whenRefreshTokenIsRejectedAndBackupRecoversThenUserStaysSignedInWithTheRecoveredTokens() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        val recovered = givenBackupRecovers(accountExternalId = "1234")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertEquals(recovered.tokens.accessToken, (result as AccessTokenResult.Success).accessToken)
+        assertEquals(recovered.tokens.refreshToken, authRepository.getRefreshTokenV2()?.jwt)
+        assertTrue(subscriptionsManager.isSignedInV2())
+        verify(playBillingManager, never()).getLatestPurchase()
+        verify(tokenRefreshWideEvent).onBackupRecovery(recovered)
+        verify(pixelSender).reportAuthV2InvalidRefreshTokenRecovered()
+        verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
+    }
+
+    @Test
+    fun whenBackupRecoversThenSpentBackupIsDeletedAndNewOneIsMintedFromIt() = runTest {
+        givenUserIsSignedIn(accountExternalId = "1234")
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        val recovered = givenBackupRecovers(accountExternalId = "1234")
+        val storedBackup = BackupRefreshToken(
+            jwt = recovered.spentBackupRefreshToken.jwt,
+            expiresAt = recovered.spentBackupRefreshToken.expiresAt,
+            accountExternalId = "1234",
+            issuedAt = timeProvider.currentTime,
+        )
+        authRepository.saveBackupRefreshToken(storedBackup)
+
+        subscriptionsManager.getAccessToken()
+
+        assertNull(authRepository.getBackupRefreshToken())
+        verify(backupTokenManager).mintIfNeeded(spentRefreshToken = recovered.spentBackupRefreshToken, accountExternalId = "1234")
+    }
+
+    @Test
+    fun whenBackupRecoveryHitsNetworkErrorThenUserStaysSignedInAndStoreLoginIsNotAttempted() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        whenever(backupTokenManager.recover(any())).thenReturn(BackupRecoveryResult.Failure.NetworkError)
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertTrue(subscriptionsManager.isSignedInV2())
+        verify(playBillingManager, never()).getLatestPurchase()
+        verify(tokenRefreshWideEvent).onBackupRecovery(BackupRecoveryResult.Failure.NetworkError)
+        verify(backupTokenManager, never()).mintIfNeeded(spentRefreshToken = any(), accountExternalId = any())
+    }
+
+    @Test
+    fun whenBackupIsRejectedThenStoreLoginStillRecoversTheSession() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        whenever(backupTokenManager.recover(any())).thenReturn(BackupRecoveryResult.Failure.Rejected)
+        givenPurchaseStored()
+        givenStoreLoginSucceeds(newAccessToken = "new access token")
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+        verify(tokenRefreshWideEvent).onBackupRecovery(BackupRecoveryResult.Failure.Rejected)
+        verify(tokenRefreshWideEvent).onPlayLoginSuccess()
+    }
+
+    @Test
+    fun whenAccountNoLongerExistsThenBackupRecoveryIsNotAttempted() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "unknown_account")
+
+        subscriptionsManager.getAccessToken()
+
+        verify(backupTokenManager, never()).recover(any())
+    }
+
+    @Test
+    fun whenSigningInThenBackupIsCheckedAgainstTheNewAccount() = runTest {
+        givenValidateV2TokensSucceeds()
+
+        subscriptionsManager.signInV2(accessToken = FAKE_ACCESS_TOKEN_V2, refreshToken = FAKE_REFRESH_TOKEN_V2)
+
+        verify(backupTokenManager).deleteIfAccountChanged(newAccountExternalId = "1234")
+    }
+
+    @Test
+    fun whenRefreshSucceedsThenTokenSaveAndSuccessAreReportedToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds()
+
+        subscriptionsManager.getAccessToken()
+
+        verify(tokenRefreshWideEvent).onTokensSaved()
+        verify(tokenRefreshWideEvent).onSuccess()
+    }
+
+    @Test
+    fun whenRefreshSucceedsThenEntitlementsAndAccountAreSavedWithTheTokens() = runTest {
+        givenUserIsSignedIn(accountExternalId = "5678")
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newRefreshToken = "new refresh token")
+
+        subscriptionsManager.getAccessToken()
+
+        assertEquals("new refresh token", authDataStore.refreshTokenV2)
+        assertEquals("1234", authDataStore.externalId)
+        assertEquals(listOf(Entitlement(product = NetP.value, name = "subscriber")), authRepository.getEntitlements())
+    }
+
+    @Test
+    fun whenRefreshTokenIsMissingThenTokenReadFailureIsReportedToWideEvent() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        authDataStore.refreshTokenV2 = null
+
+        runCatching { subscriptionsManager.refreshAccessToken() }
+
+        verify(tokenRefreshWideEvent).onTokenReadFailed()
+        verify(tokenRefreshWideEvent).onFailure(any<TokenStoreException>())
+    }
+
+    @Test
+    fun whenRefreshIsRejectedAndRecoverySignsOutThenWideEventIsToldAboutTheSignOut() = runTest {
+        givenUserIsSignedIn()
+        givenSubscriptionExists()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "invalid_token")
+        givenPurchaseStored()
+        givenStoreLoginFails()
+
+        subscriptionsManager.getAccessToken()
+
+        assertFalse(subscriptionsManager.isSignedIn())
+        verify(tokenRefreshWideEvent).onSignOut()
+    }
+
+    @Test
+    fun whenRefreshFailsWithUnknownAccountThenWideEventIsToldAboutTheSignOut() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshFails(error = "unknown_account")
+
+        subscriptionsManager.getAccessToken()
+
+        assertFalse(subscriptionsManager.isSignedIn())
+        verify(tokenRefreshWideEvent).onSignOut()
+    }
+
+    @Test
+    fun whenTokenCommitFailsThenTokenSaveFailureIsReportedAndOldTokensAreKept() = runTest {
+        givenUserIsSignedIn()
+        givenAccessTokenIsExpired()
+        givenV2AccessTokenRefreshSucceeds(newAccessToken = "new access token")
+        authDataStore.simulateTokenCommitFailure = true
+
+        val result = subscriptionsManager.getAccessToken()
+
+        assertTrue(result is AccessTokenResult.Failure)
+        assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
+        assertEquals("1234", authDataStore.externalId)
+        verify(tokenRefreshWideEvent).onTokenSaveFailed()
+        verify(tokenRefreshWideEvent, never()).onTokensSaved()
+        verify(pixelSender).reportAuthV2TokenStoreError()
+    }
+
+    @Test
+    fun whenSignOutThenWideEventIsToldAboutTheSignOut() = runTest {
+        givenUserIsSignedIn()
+
+        subscriptionsManager.signOut()
+
+        verify(tokenRefreshWideEvent).onSignOut()
     }
 
     private suspend fun givenUrlPortalSucceeds() {
@@ -2719,6 +2984,35 @@ class RealSubscriptionsManagerTest {
                 accountExternalId = "1234",
             ),
         )
+    }
+
+    private suspend fun givenBackupRecovers(accountExternalId: String): BackupRecoveryResult.Recovered {
+        val accessTokenClaims = AccessTokenClaims(
+            expiresAt = timeProvider.currentTime + Duration.ofHours(4),
+            accountExternalId = accountExternalId,
+            email = null,
+            entitlements = listOf(Entitlement(product = NetP.value, name = "subscriber")),
+        )
+        val refreshTokenClaims = RefreshTokenClaims(
+            expiresAt = timeProvider.currentTime + Duration.ofDays(30),
+            accountExternalId = accountExternalId,
+        )
+        val recoveredTokens = ValidatedTokenPair(
+            accessToken = "recovered access token",
+            accessTokenClaims = accessTokenClaims,
+            refreshToken = "recovered refresh token",
+            refreshTokenClaims = refreshTokenClaims,
+        )
+        val spentBackupRefreshToken = RefreshToken(
+            jwt = "backup refresh token",
+            expiresAt = timeProvider.currentTime + Duration.ofDays(20),
+        )
+        val recovered = BackupRecoveryResult.Recovered(
+            tokens = recoveredTokens,
+            spentBackupRefreshToken = spentBackupRefreshToken,
+        )
+        whenever(backupTokenManager.recover(accountExternalId)).thenReturn(recovered)
+        return recovered
     }
 
     private suspend fun givenAccessTokenIsExpired() {
@@ -3647,7 +3941,7 @@ class RealSubscriptionsManagerTest {
 
     @SuppressLint("DenyListedApi")
     private fun givenUndoSubscriptionCancellationEnabled(value: Boolean) {
-        subscriptionsFeature.undoSubscriptionCancellation().setRawStoredState(State(remoteEnableState = value))
+        subscriptionsFeature.undoSubscriptionCancellationAllLanguages().setRawStoredState(State(remoteEnableState = value))
     }
 
     private suspend fun givenPlanSwitchStarted(): MutableSharedFlow<PurchaseState> {

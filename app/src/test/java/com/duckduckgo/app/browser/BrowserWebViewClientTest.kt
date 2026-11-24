@@ -74,7 +74,6 @@ import com.duckduckgo.app.browser.pageloadpixel.PageLoadedHandler
 import com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedHandler
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.trafficquality.AndroidFeaturesHeaderPlugin
-import com.duckduckgo.app.browser.trafficquality.CustomHeaderAllowedChecker
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.app.browser.uriloaded.UriLoadedManager
 import com.duckduckgo.app.global.model.Site
@@ -177,7 +176,6 @@ class BrowserWebViewClientTest {
     private val subscriptions: Subscriptions = mock()
     private val mockDuckPlayer: DuckPlayer = mock()
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock()
-    private val mockCustomHeaderGracePeriodChecker: CustomHeaderAllowedChecker = mock()
     private val mockFeaturesHeaderProvider: AndroidFeaturesHeaderProvider = mock()
     private val openInNewTabFlow: MutableSharedFlow<OpenDuckPlayerInNewTab> = MutableSharedFlow()
     private val mockUriLoadedManager: UriLoadedManager = mock()
@@ -186,10 +184,8 @@ class BrowserWebViewClientTest {
     private val mockAndroidFeaturesHeaderPlugin =
         AndroidFeaturesHeaderPlugin(
             mockDuckDuckGoUrlDetector,
-            mockCustomHeaderGracePeriodChecker,
             mockAndroidBrowserConfigFeature,
             mockFeaturesHeaderProvider,
-            mock(),
         )
     private val mockDuckChat: DuckChat = mock()
     private val pageLoadWideEvent: PageLoadWideEvent = mock()

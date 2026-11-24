@@ -965,6 +965,62 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "aichat_responding-service_started": {
+        "description": "The app started the Duck.ai responding foreground service, which keeps the app alive while a response the user left is generating.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "restricted",
+                "type": "boolean",
+                "description": "Whether battery usage was set to Restricted (ActivityManager.isBackgroundRestricted) at the start"
+            }
+        ]
+    },
+    "aichat_responding-service_start_failed": {
+        "description": "The Duck.ai responding foreground service failed to start or to enter the foreground. The service was stopped instead of crashing.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "enum": [
+                    "request_not_allowed",
+                    "late_request_not_allowed",
+                    "request_failed",
+                    "foreground_not_allowed",
+                    "foreground_failed"
+                ],
+                "description": "Which step failed. request_*: Context.startForegroundService, late_request_* when keep-alive was requested after the app had already left the foreground. foreground_*: Service.startForeground, including creating its notification. *_not_allowed: Android refused it (IllegalStateException), *_failed: another exception"
+            }
+        ]
+    },
+    "aichat_responding-service_interrupted": {
+        "description": "On a cold start, the app found that the previous process ended while the Duck.ai responding foreground service was keeping it alive.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "restricted",
+                "type": "boolean",
+                "description": "Whether battery usage was set to Restricted (ActivityManager.isBackgroundRestricted) at the start of the interrupted run"
+            }
+        ]
+    },
+    "aichat_responding-service_timed_out": {
+        "description": "Android's shortService time limit ended the Duck.ai responding foreground service before the app stopped it.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_unified_input_image_generation_selected_count": {
         "description": "User selected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
@@ -2131,6 +2187,20 @@
                 "enum": [1, 2, 3]
             }
         ]
+    },
+    "m_aichat_widget_added": {
+        "description": "Triggered when the Duck.ai home-screen widget is added",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_widget_deleted": {
+        "description": "Triggered when the Duck.ai home-screen widget is removed",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
     },
     "aichat_new_chat_hints_cap_reached": {
         "description": "The user has ignored New Chat hints in enough New Chats that the hints stop showing. Once per install, the first time the cap is reached.",

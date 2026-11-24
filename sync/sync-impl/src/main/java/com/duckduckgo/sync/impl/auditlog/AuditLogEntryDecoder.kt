@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
-import androidx.annotation.WorkerThread
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.AccountInfoKeyUnavailableReason
 import com.duckduckgo.sync.impl.AccountInfoPrivateKeyProvider
@@ -34,15 +34,15 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
+import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.time.Instant
 import javax.inject.Inject
 
-@WorkerThread
 interface AuditLogEntryDecoder {
     /** Returns one result per entry, in the same order. The account_info private key is fetched at most once per call. */
-    fun decode(entries: List<AuditLogEntry>): AuditLogDecodeResult
+    suspend fun decode(entries: List<AuditLogEntry>): AuditLogDecodeResult
 }
 
 /**
@@ -89,9 +89,14 @@ enum class AuditLogEntrySkipReason {
 class RealAuditLogEntryDecoder @Inject constructor(
     private val accountInfoPrivateKeyProvider: AccountInfoPrivateKeyProvider,
     private val syncJweCrypto: SyncJweCrypto,
+    private val dispatchers: DispatcherProvider,
 ) : AuditLogEntryDecoder {
 
-    override fun decode(entries: List<AuditLogEntry>): AuditLogDecodeResult {
+    override suspend fun decode(entries: List<AuditLogEntry>): AuditLogDecodeResult = withContext(dispatchers.io()) {
+        decodeBlocking(entries)
+    }
+
+    private fun decodeBlocking(entries: List<AuditLogEntry>): AuditLogDecodeResult {
         val keyResult = lazy { accountInfoPrivateKeyProvider.privateKey() }
         val decoded = entries.map { entry ->
             if (entry.version != SUPPORTED_VERSION) {

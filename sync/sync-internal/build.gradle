@@ -28,6 +28,7 @@ android {
 
 dependencies {
     implementation project(':sync-impl')
+    implementation project(':sync-lib')
     implementation project(':sync-api')
     implementation project(':navigation-api')
     implementation project(':sync-store')
@@ -56,6 +57,8 @@ dependencies {
     implementation "com.journeyapps:zxing-android-embedded:_"
     implementation "com.google.zxing:core:_"
 
+    implementation AndroidX.work.runtimeKtx
+    implementation Square.moshi
     implementation "com.squareup.logcat:logcat:_"
     implementation Square.retrofit2.converter.moshi
 
@@ -67,6 +70,7 @@ dependencies {
     testImplementation CashApp.turbine
     testImplementation AndroidX.archCore.testing
     testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }

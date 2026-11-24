@@ -294,8 +294,7 @@ class RealConnectedDevicesRepositoryTest {
     // ----- entries_v2 device-list path (Track C) ----------------------------------------------
 
     @Test
-    fun whenV2FlagOnAndEntriesV2PresentThenUsesV2Decryptor() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun whenEntriesV2PresentThenUsesV2Decryptor() {
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
@@ -323,7 +322,6 @@ class RealConnectedDevicesRepositoryTest {
 
     @Test
     fun whenDeviceInfoPublishedDuringTheDevicesRequestThenDecryptorGetsThePrePublishSnapshot() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
@@ -345,7 +343,6 @@ class RealConnectedDevicesRepositoryTest {
 
     @Test
     fun whenOwnRowFallsBackWithReadAndWriteEnabledThenLegacyPixelFires() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
@@ -370,7 +367,6 @@ class RealConnectedDevicesRepositoryTest {
 
     @Test
     fun whenOwnRowFallsBackWithWriteDisabledThenLegacyPixelDoesNotFire() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(false))
         whenever(syncStore.token).thenReturn(token)
@@ -395,7 +391,6 @@ class RealConnectedDevicesRepositoryTest {
 
     @Test
     fun whenKeyIsUnavailableThenOnlyKeyUnavailablePixelFires() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
         syncFeature.canWriteUnifiedDeviceList().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
@@ -451,7 +446,6 @@ class RealConnectedDevicesRepositoryTest {
 
     @Test
     fun whenOtherRowDecryptFailsToPlaceholderThenBothPixelsFire() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
@@ -478,8 +472,7 @@ class RealConnectedDevicesRepositoryTest {
     }
 
     @Test
-    fun whenV2FlagOnAndEntriesV2NullThenFallsBackToLegacyDecryptOfEntries() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun whenEntriesV2NullThenFallsBackToLegacyDecryptOfEntries() {
         givenAuthenticatedDevice()
         prepareForEncryption()
         val ddgDevice = Device(deviceId = deviceId, deviceName = deviceName, jwIat = "", deviceType = deviceFactor)
@@ -495,8 +488,7 @@ class RealConnectedDevicesRepositoryTest {
     }
 
     @Test
-    fun whenV2FlagOnAndDeviceListApiFailsThenReturnsGenericError() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun whenDeviceListApiFailsThenReturnsGenericError() {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncApi.getDevices(anyString())).thenReturn(Error(reason = "boom"))
@@ -507,8 +499,7 @@ class RealConnectedDevicesRepositoryTest {
     }
 
     @Test
-    fun whenV2FlagOnAndDecryptorReportsLogoutThenLogoutIsCalledForOtherDevices() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
+    fun whenDecryptorReportsLogoutThenLogoutIsCalledForOtherDevices() {
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.deviceId).thenReturn(deviceId)
@@ -527,9 +518,8 @@ class RealConnectedDevicesRepositoryTest {
     }
 
     @Test
-    fun whenV2FlagOnAndDecryptFailsForThisDeviceThenDoesNotLogoutSelf() {
+    fun whenDecryptFailsForThisDeviceThenDoesNotLogoutSelf() {
         // Safety: never log out the local device, even if decrypt fails for it.
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.deviceId).thenReturn(deviceId)
@@ -544,20 +534,6 @@ class RealConnectedDevicesRepositoryTest {
         testee.getConnectedDevices(reportAccountErrorPixel = true)
 
         verifyNoInteractions(remoteDeviceLogout)
-    }
-
-    @Test
-    fun whenV2FlagOffThenLegacyPathUntouchedAndV2DecryptorNotCalled() {
-        // Sanity: with flag off, behaviour matches pre-Track-C.
-        whenever(syncStore.token).thenReturn(token)
-        whenever(syncStore.primaryKey).thenReturn(primaryKey)
-        whenever(syncStore.deviceId).thenReturn(deviceId)
-        prepareForEncryption()
-        whenever(syncApi.getDevices(anyString())).thenReturn(getDevicesSuccess)
-
-        testee.getConnectedDevices(reportAccountErrorPixel = true)
-
-        verify(thirdPartyDeviceListDecryptor, never()).decryptAll(any(), anyOrNull(), any())
     }
 
     @Test
@@ -643,7 +619,6 @@ class RealConnectedDevicesRepositoryTest {
     }
 
     private fun givenThisDeviceInfoUnresolvedOnRead(unresolved: Boolean = true) {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)
         whenever(syncStore.deviceId).thenReturn(deviceId)
@@ -663,7 +638,6 @@ class RealConnectedDevicesRepositoryTest {
     }
 
     private fun givenAccountInfoDdgWrapUnavailable() {
-        syncFeature.canUseV2ConnectFlow().setRawStoredState(State(true))
         syncFeature.canReadUnifiedDeviceList().setRawStoredState(State(true))
         whenever(syncStore.token).thenReturn(token)
         whenever(syncStore.primaryKey).thenReturn(primaryKey)

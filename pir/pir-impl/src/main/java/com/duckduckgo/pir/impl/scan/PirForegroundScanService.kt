@@ -32,6 +32,7 @@ import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
@@ -70,6 +71,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     lateinit var pirScanWideEvent: PirScanWideEvent
 
     private var isRunInProgress = false
+    private var currentRunMode: PirRunMode? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -124,6 +126,11 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 stopSelf()
                 return@launch
             }
+            currentRunMode = runMode
+            if (runMode == PirRunMode.SCAN_ONLY) {
+                runCatching { startForegroundWithScanNotification() }
+                    .onFailure { logcat(WARN) { "PIR-SCAN: Could not update the scan notification: ${it.message}" } }
+            }
             pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
             stopSelf()
         }
@@ -147,9 +154,17 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             .onFailure { logcat(WARN) { "PIR-SCAN: Could not show the scan notification: ${it.message}" } }
     }
 
+    /**
+     * The service must go foreground before eligibility resolves, so the notification starts with the feature name
+     * and is re-posted with the free scan title once the run turns out to be scan-only.
+     */
     private fun startForegroundWithScanNotification() {
+        val title = when (currentRunMode) {
+            PirRunMode.SCAN_ONLY -> R.string.pirFreemiumNotificationTitle
+            PirRunMode.SCAN_AND_OPT_OUT, null -> R.string.pirFeatureName
+        }
         val notification: Notification = pirNotificationManager.createScanStatusNotification(
-            title = getString(R.string.pirFeatureName),
+            title = getString(title),
             message = getString(R.string.pirNotificationMessageInProgress),
         )
         ServiceCompat.startForeground(
@@ -180,6 +195,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             pirJobsRunner.stop()
         }
         isRunInProgress = false
+        currentRunMode = null
     }
 
     companion object {

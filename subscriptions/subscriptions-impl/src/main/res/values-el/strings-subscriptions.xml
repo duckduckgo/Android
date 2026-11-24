@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Η επιστροφή χρημάτων σας διεκπεραιώνεται.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Δεν μπορέσαμε να επεξεργαστούμε αυτόματα την υπαναχώρησή σας. Επισκεφθείτε <annotation type="withdrawal_help_link">αυτήν τη σελίδα</annotation> για να ολοκληρώσετε την υπαναχώρησή σας.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Λήγει</string>
+    <string name="subscriptionExpiringIconContentDescription">Η συνδρομή λήγει</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Η συνδρομή σας θα λήξει %1$s.</string>
+    <string name="subscriptionKeepSubscription">Διατήρηση συνδρομής</string>
+
 </resources>

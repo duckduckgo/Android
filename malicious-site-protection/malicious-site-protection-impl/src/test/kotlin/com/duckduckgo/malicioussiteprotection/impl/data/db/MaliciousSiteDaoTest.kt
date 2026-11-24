@@ -19,13 +19,14 @@ package com.duckduckgo.malicioussiteprotection.impl.data.db
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.common.utils.versionedset.VersionedSetDelta
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
-import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
@@ -85,14 +86,14 @@ class MaliciousSiteDaoTest {
     @Test
     fun testUpdateHashPrefixesWithReplaceDeletesOldEntries() = runTest {
         dao.insertHashPrefixes(listOf(HashPrefixEntity(hashPrefix = "prefix1", type = Feed.PHISHING.name)))
-        val hashPrefixes = PhishingHashPrefixesWithRevision(
+        val hashPrefixes = VersionedSetDelta(
             revision = 1,
             replace = true,
             delete = setOf(),
             insert = setOf("prefix2"),
         )
 
-        dao.updateHashPrefixes(hashPrefixes)
+        dao.updateHashPrefixes(Feed.PHISHING, hashPrefixes)
 
         assertNotNull(dao.getHashPrefix("prefix2"))
         assertNull(dao.getHashPrefix("prefix1"))
@@ -101,17 +102,40 @@ class MaliciousSiteDaoTest {
     @Test
     fun testUpdateHashPrefixesWithoutReplaceDoesNotDeleteOldEntries() = runTest {
         dao.insertHashPrefixes(listOf(HashPrefixEntity(hashPrefix = "prefix1", type = Feed.PHISHING.name)))
-        val hashPrefixes = PhishingHashPrefixesWithRevision(
+        val hashPrefixes = VersionedSetDelta(
             revision = 1,
             replace = false,
             delete = setOf(),
             insert = setOf("prefix2"),
         )
 
-        dao.updateHashPrefixes(hashPrefixes)
+        dao.updateHashPrefixes(Feed.PHISHING, hashPrefixes)
 
         assertNotNull(dao.getHashPrefix("prefix2"))
         assertNotNull(dao.getHashPrefix("prefix1"))
+    }
+
+    @Test
+    fun testHashPrefixDeltaDeletesAndInsertsOnlyForItsFeed() = runTest {
+        dao.insertHashPrefixes(
+            listOf(
+                HashPrefixEntity(hashPrefix = "old", type = Feed.PHISHING.name),
+                HashPrefixEntity(hashPrefix = "other", type = Feed.MALWARE.name),
+            ),
+        )
+        dao.insertRevision(RevisionEntity(feed = Feed.PHISHING.name, type = Type.HASH_PREFIXES.name, revision = 1))
+        dao.insertRevision(RevisionEntity(feed = Feed.MALWARE.name, type = Type.HASH_PREFIXES.name, revision = 1))
+
+        dao.updateHashPrefixes(
+            Feed.PHISHING,
+            VersionedSetDelta(insert = setOf("new"), delete = setOf("old", "other"), revision = 2, replace = false),
+        )
+
+        assertNull(dao.getHashPrefix("old"))
+        assertEquals(Feed.PHISHING.name, dao.getHashPrefix("new")?.type)
+        assertEquals(Feed.MALWARE.name, dao.getHashPrefix("other")?.type)
+        assertEquals(2, dao.getLatestRevision(Feed.PHISHING.name, Type.HASH_PREFIXES.name)?.revision)
+        assertEquals(1, dao.getLatestRevision(Feed.MALWARE.name, Type.HASH_PREFIXES.name)?.revision)
     }
 
     @Test
@@ -152,14 +176,14 @@ class MaliciousSiteDaoTest {
     fun testHashPrefixesNotUpdatedIfRevisionIsLowerThanCurrent() = runTest {
         dao.insertHashPrefixes(listOf(HashPrefixEntity(hashPrefix = "prefix1", type = Feed.PHISHING.name)))
         dao.insertRevision(RevisionEntity(feed = Feed.PHISHING.name, type = Type.HASH_PREFIXES.name, revision = 2))
-        val hashPrefixes = PhishingHashPrefixesWithRevision(
+        val hashPrefixes = VersionedSetDelta(
             revision = 1,
             replace = true,
             delete = setOf(),
             insert = setOf("prefix2"),
         )
 
-        dao.updateHashPrefixes(hashPrefixes)
+        dao.updateHashPrefixes(Feed.PHISHING, hashPrefixes)
 
         assertNotNull(dao.getHashPrefix("prefix1"))
         assertNull(dao.getHashPrefix("prefix2"))
@@ -169,14 +193,14 @@ class MaliciousSiteDaoTest {
     fun testHashPrefixesUpdatedIfRevisionIsHigherThanCurrent() = runTest {
         dao.insertHashPrefixes(listOf(HashPrefixEntity(hashPrefix = "prefix1", type = Feed.PHISHING.name)))
         dao.insertRevision(RevisionEntity(feed = Feed.PHISHING.name, type = Type.HASH_PREFIXES.name, revision = 1))
-        val hashPrefixes = PhishingHashPrefixesWithRevision(
+        val hashPrefixes = VersionedSetDelta(
             revision = 2,
             replace = true,
             delete = setOf(),
             insert = setOf("prefix2"),
         )
 
-        dao.updateHashPrefixes(hashPrefixes)
+        dao.updateHashPrefixes(Feed.PHISHING, hashPrefixes)
 
         assertNull(dao.getHashPrefix("prefix1"))
         assertNotNull(dao.getHashPrefix("prefix2"))

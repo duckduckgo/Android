@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Deine Rückerstattung wird bearbeitet.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Wir konnten deine Kündigung nicht automatisch bearbeiten. Bitte besuche <annotation type="withdrawal_help_link">diese Seite</annotation>, um deine Kündigung abzuschließen.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Läuft ab</string>
+    <string name="subscriptionExpiringIconContentDescription">Abonnement läuft ab</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Dein Abonnement läuft am %1$s ab.</string>
+    <string name="subscriptionKeepSubscription">Abonnement behalten</string>
+
 </resources>

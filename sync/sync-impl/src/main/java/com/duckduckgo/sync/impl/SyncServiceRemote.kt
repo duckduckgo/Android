@@ -96,6 +96,7 @@ interface SyncApi {
     fun getAuditLogBefore(
         token: String,
         cursor: String,
+        limit: Int? = null,
     ): AuditLogResult
 
     /**
@@ -243,7 +244,6 @@ class SyncServiceRemote @Inject constructor(
     private val syncService: SyncService,
     private val syncStore: SyncStore,
     private val setKeysIfAbsentCall: SetKeysIfAbsentCall,
-    private val syncFeature: SyncFeature,
 ) : SyncApi {
     override fun createAccount(
         userID: String,
@@ -334,7 +334,8 @@ class SyncServiceRemote @Inject constructor(
     override fun getAuditLogBefore(
         token: String,
         cursor: String,
-    ): AuditLogResult = fetchAuditLog(token, after = null, before = cursor, limit = null)
+        limit: Int?,
+    ): AuditLogResult = fetchAuditLog(token, after = null, before = cursor, limit = limit)
 
     private fun fetchAuditLog(
         token: String,
@@ -834,7 +835,7 @@ class SyncServiceRemote @Inject constructor(
         // token swap can 401 on the old token while the account is still valid. Only wipe local state
         // when the token that failed is still the current one (or unknown, preserving prior behavior).
         val tokenStillCurrent = requestToken == null || requestToken == syncStore.token
-        if (!tokenStillCurrent && syncFeature.preventStaleTokenLogout().isEnabled()) return
+        if (!tokenStillCurrent) return
 
         syncStore.clearAll()
     }

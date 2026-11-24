@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">O teu reembolso está a ser processado.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Não conseguimos processar automaticamente a tua desistência. Visita <annotation type="withdrawal_help_link">esta página</annotation> para concluíres a desistência.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">A expirar</string>
+    <string name="subscriptionExpiringIconContentDescription">Subscrição a expirar</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">A tua subscrição vai expirar em %1$s.</string>
+    <string name="subscriptionKeepSubscription">Manter subscrição</string>
+
 </resources>

@@ -92,7 +92,7 @@ class DuckAiEntryWideEventTest {
         feature.self().setRawStoredState(Toggle.State(true))
         whenever(duckChat.isDuckChatUrl(any())).thenAnswer { it.getArgument<android.net.Uri>(0).host == "duck.ai" }
         whenever(client.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(1L), Result.success(2L))
-        whenever(client.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
+        whenever(client.intervalStart(any(), any(), anyOrNull(), anyOrNull(), any())).thenReturn(Result.success(Unit))
         whenever(client.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
         whenever(client.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(client.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
@@ -641,7 +641,7 @@ class DuckAiEntryWideEventTest {
         testee.onPromptSubmitted("tab")
         testee.onClose()
         coroutineRule.testScope.advanceUntilIdle()
-        verify(client, never()).intervalStart(any(), any(), anyOrNull(), anyOrNull())
+        verify(client, never()).intervalStart(any(), any(), anyOrNull(), anyOrNull(), any())
         verify(client, never()).flowFinish(any(), any(), any())
     }
 }

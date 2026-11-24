@@ -23,6 +23,7 @@ import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
@@ -47,6 +48,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
@@ -158,6 +160,7 @@ class NativeInputModeWidgetViewModelTest {
     }
     private val chatStateStore = ChatStateStore()
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
+    private val attentionTracker: DuckAiResponseAttentionTracker = mock()
     private val newChatHintsUsage: NewChatHintsUsage = mock()
     private val newChatHintsPixels: NewChatHintsPixels = mock()
     private val newChatDetector: NewChatDetector = mock { on { observe(any()) } doReturn emptyFlow() }
@@ -274,6 +277,7 @@ class NativeInputModeWidgetViewModelTest {
             appCoroutineScope = TestScope(coroutineRule.testDispatcher),
             chatStateStore = chatStateStore,
             responseWaitWideEvent = responseWaitWideEvent,
+            attentionTracker = attentionTracker,
             newChatHintsUsage = newChatHintsUsage,
             newChatHintsPixels = newChatHintsPixels,
             newChatDetector = newChatDetector,
@@ -511,25 +515,150 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun reproCameraWithUploadDisabledBeforeModelsLoad() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(false)
+        assertTrue(modelStateFlow.value.models.isEmpty())
+        val launchCamera = com.duckduckgo.duckchat.impl.ui.nativeinput.views.shouldLaunchCameraCapture(
+            true,
+            DuckChatLaunch.CameraCapture(),
+            testee.supportsImageUpload(),
+        )
+        assertEquals("launch camera while image uploads are remotely disabled", false, launchCamera)
+    }
+
+    @Test
+    fun reproColdImageWidgetLosesSelectionAfterCatalogArrives() = runTest {
+        val service = mock<com.duckduckgo.duckchat.impl.models.DuckAiModelsService>()
+        val dataStore = mock<com.duckduckgo.duckchat.impl.store.DuckChatDataStore>()
+        val host = mock<com.duckduckgo.duckchat.api.DuckAiHostProvider>()
+        whenever(host.getHost()).thenReturn("duck.ai")
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(emptySet()))
+        whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(flowOf(com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE)
+        val manager = com.duckduckgo.duckchat.impl.models.RealDuckAiModelManager(
+            service, dataStore, subscriptions, host, lazy { duckChatFeature }, lazy { duckChatPixels }, mock(),
+            coroutineRule.testDispatcherProvider, coroutineRule.testScope,
+        )
+        whenever(modelManager.modelState).thenReturn(manager.modelState)
+        modelManager.stub { onBlocking { ensureImageCapableModelSelected() } doSuspendableAnswer { manager.ensureImageCapableModelSelected() } }
+        testee = createViewModel()
+        assertTrue(manager.modelState.value.models.isEmpty())
+        val model = com.duckduckgo.duckchat.impl.models.RemoteAIChatModel(
+            id = "image",
+            name = "image",
+            accessTier = listOf("free"),
+            entityHasAccess = true,
+            supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue),
+        )
+        whenever(service.getModels(any(), org.mockito.kotlin.anyOrNull(), org.mockito.kotlin.anyOrNull()))
+            .thenReturn(com.duckduckgo.duckchat.impl.models.AIChatModelsResponse(listOf(model)))
+        testee.configure("cold-tab", true, false, DuckChatLaunch.ImageGeneration())
+        advanceUntilIdle()
+        assertTrue(manager.modelState.value.models.single().supportsTool(Tool.IMAGE_GENERATION))
+        assertEquals(
+            "image-capable catalog loaded",
+            Tool.IMAGE_GENERATION.rawValue,
+            nativeInputStateProvider.stateForTab("cold-tab").value.selectedTool,
+        )
+    }
+
+    @Test
+    fun whenImageLaunchPendingThenExplicitToolChoiceWins() = runTest {
+        val ready = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        modelManager.stub { onBlocking { ensureImageCapableModelSelected() } doSuspendableAnswer { ready.await() } }
+        testee.configure("tab-1", true, false, DuckChatLaunch.ImageGeneration())
+
+        testee.setSelectedTool(null)
+        ready.complete(true)
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
+    fun whenImageLaunchPendingThenNewLaunchWins() = runTest {
+        val ready = kotlinx.coroutines.CompletableDeferred<Boolean>()
+        modelManager.stub { onBlocking { ensureImageCapableModelSelected() } doSuspendableAnswer { ready.await() } }
+        testee.configure("tab-1", true, false, DuckChatLaunch.ImageGeneration())
+
+        testee.configure("tab-1", true, false, DuckChatLaunch.Open())
+        ready.complete(true)
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
     fun whenConfigureDuckAiModeAndForceImageGenerationThenImageToolSelectedForTab() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, forceImageGeneration = true)
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(true)
+
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.ImageGeneration())
 
         assertEquals(
             Tool.IMAGE_GENERATION.rawValue,
             nativeInputStateProvider.stateForTab("tab-1").value.selectedTool,
         )
+        verify(modelManager).ensureImageCapableModelSelected()
     }
 
     @Test
+    fun whenConfigureForImageGenerationAndNoCapableModelThenToolNotSelected() = runTest {
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(false)
+
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.ImageGeneration())
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
+    }
+
+    @Test
+    fun whenSelectedModelSupportsImageUploadAndSettingOnThenSupportsImageUpload() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        modelStateFlow.value = ModelState(models = listOf(toolModel("m", imageUpload = true)), selectedModelId = "m")
+
+        assertTrue(testee.supportsImageUpload())
+    }
+
+    @Test
+    fun whenImageUploadSettingOffThenDoesNotSupportImageUpload() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(false)
+        modelStateFlow.value = ModelState(models = listOf(toolModel("m", imageUpload = true)), selectedModelId = "m")
+
+        assertFalse(testee.supportsImageUpload())
+    }
+
+    @Test
+    fun whenSelectedModelDoesNotSupportImageUploadThenDoesNotSupportImageUpload() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        modelStateFlow.value = ModelState(models = listOf(toolModel("m", imageUpload = false)), selectedModelId = "m")
+
+        assertFalse(testee.supportsImageUpload())
+    }
+
+    private fun toolModel(
+        id: String,
+        vararg tools: Tool,
+        imageUpload: Boolean = false,
+    ) = AIChatModel(
+        id = id,
+        name = id,
+        displayName = id,
+        shortName = id,
+        accessTier = emptyList(),
+        isAccessible = true,
+        supportedTools = tools.toList(),
+        supportsImageUpload = imageUpload,
+    )
+
+    @Test
     fun whenConfigureDuckAiModeAndNotForceImageGenerationThenNoToolSelected() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, forceImageGeneration = false)
+        testee.configure(tabId = "tab-1", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open())
 
         assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
     }
 
     @Test
     fun whenConfigureBrowserModeAndForceImageGenerationThenNoToolSelected() = runTest {
-        testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, forceImageGeneration = true)
+        testee.configure(tabId = "tab-1", isDuckAiMode = false, isBottom = false, launch = DuckChatLaunch.ImageGeneration())
 
         assertNull(nativeInputStateProvider.stateForTab("tab-1").value.selectedTool)
     }
@@ -2073,6 +2202,7 @@ class NativeInputModeWidgetViewModelTest {
         )
 
         verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", BrowserMode.FIRE, "medium", Tool.IMAGE_GENERATION.rawValue)
+        verify(attentionTracker).onNativePromptSubmitted("tab-A", BrowserMode.FIRE)
     }
 
     @Test
@@ -2090,6 +2220,7 @@ class NativeInputModeWidgetViewModelTest {
         )
 
         verifyNoInteractions(responseWaitWideEvent)
+        verifyNoInteractions(attentionTracker)
     }
 
     @Test
@@ -2108,6 +2239,7 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.fireStopGenerationTapped()
 
         verifyNoInteractions(responseWaitWideEvent)
+        verifyNoInteractions(attentionTracker)
     }
 
     @Test
@@ -2119,6 +2251,7 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.fireStopGenerationTapped()
 
         verify(responseWaitWideEvent).onStopTapped("tab-A")
+        verify(attentionTracker).onStopTapped("tab-A")
     }
 
     @Test

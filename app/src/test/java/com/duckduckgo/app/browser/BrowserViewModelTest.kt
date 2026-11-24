@@ -18,8 +18,10 @@ package com.duckduckgo.app.browser
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.net.Uri
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.BrowserViewModel.Command
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserDetector
@@ -47,6 +49,7 @@ import com.duckduckgo.common.ui.tabs.SwipingTabsFeature
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.State
@@ -64,10 +67,12 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
@@ -82,6 +87,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @SuppressLint("DenyListedApi")
+@RunWith(AndroidJUnit4::class)
 class BrowserViewModelTest {
 
     @get:Rule
@@ -116,6 +122,7 @@ class BrowserViewModelTest {
     }
     private val mockFireModeAvailability: FireModeAvailability = mock()
     private val mockDuckAiSessionCallback: DuckAiSessionCallback = mock()
+    private val mockDuckChat: DuckChat = mock()
 
     // The activity's frozen BrowserMode value injected into BrowserViewModel; defaults to REGULAR.
     private var browserMode = BrowserMode.REGULAR
@@ -876,6 +883,74 @@ class BrowserViewModelTest {
         verify(mockPixel, never()).fire(eq(AppPixelName.BROWSER_MODE_SWITCHED), any(), any(), any())
     }
 
+    @Test
+    fun whenNoDuckAiTabThenNoEmptyTabFound() = runTest {
+        givenTabs(webTab)
+
+        assertNull(testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenEmptyDuckAiTabExistsThenItsIdIsReturned() = runTest {
+        givenTabs(webTab, emptyDuckAiTab)
+
+        assertEquals("empty", testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenSelectedTabIsEmptyDuckAiTabThenItIsPreferred() = runTest {
+        givenTabs(emptyDuckAiTab, otherEmptyDuckAiTab, selected = otherEmptyDuckAiTab)
+
+        assertEquals("other-empty", testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenSelectedTabIsNotEmptyThenFirstEmptyDuckAiTabIsReturned() = runTest {
+        givenTabs(webTab, emptyDuckAiTab, otherEmptyDuckAiTab, selected = webTab)
+
+        assertEquals("empty", testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenDuckAiTabHasChatIdThenItIsIgnored() = runTest {
+        givenTabs(TabEntity(tabId = "chat", url = "https://duck.ai/?chatID=abc"))
+
+        assertNull(testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenDuckAiTabIsInVoiceModeThenItIsIgnored() = runTest {
+        givenTabs(TabEntity(tabId = "voice", url = "https://duck.ai/?mode=voice-mode"))
+
+        assertNull(testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenOnlyDuckAiWebSettingsIsOpenThenThereIsNoEmptyChatTab() = runTest {
+        val settings = TabEntity(tabId = "settings", url = "https://duck.ai?settings=open")
+        givenTabs(settings, selected = settings)
+
+        assertNull(testee.findEmptyDuckAiTabId())
+    }
+
+    @Test
+    fun whenSelectedTabHasPendingPromptThenTheEmptyChatTabIsReturned() = runTest {
+        val prompt = TabEntity(tabId = "pending-prompt", url = "https://duck.ai/?q=hello&prompt=1")
+        givenTabs(prompt, emptyDuckAiTab, selected = prompt)
+
+        assertEquals("empty", testee.findEmptyDuckAiTabId())
+    }
+
+    private suspend fun givenTabs(vararg tabs: TabEntity, selected: TabEntity? = null) {
+        whenever(mockDuckChat.isDuckChatUrl(any())).thenAnswer { (it.getArgument<Uri>(0)).host == "duck.ai" }
+        whenever(mockTabRepository.getTabs()).thenReturn(tabs.toList())
+        whenever(mockTabRepository.getSelectedTab()).thenReturn(selected)
+    }
+
+    private val webTab = TabEntity(tabId = "web", url = "https://example.com")
+    private val emptyDuckAiTab = TabEntity(tabId = "empty", url = "https://duck.ai/?native-input=true")
+    private val otherEmptyDuckAiTab = TabEntity(tabId = "other-empty", url = "https://duck.ai/")
+
     private fun initTestee() {
         testee = BrowserViewModel(
             tabRepository = mockTabRepository,
@@ -895,6 +970,7 @@ class BrowserViewModelTest {
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
             duckAiSessionCallback = mockDuckAiSessionCallback,
+            duckChat = mockDuckChat,
         )
     }
 
@@ -920,6 +996,7 @@ class BrowserViewModelTest {
             fireModeAvailability = mockFireModeAvailability,
             browserMode = browserMode,
             duckAiSessionCallback = mockDuckAiSessionCallback,
+            duckChat = mockDuckChat,
         )
     }
 

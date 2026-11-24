@@ -486,6 +486,40 @@ class WideEventClientTest {
                 name = key,
                 timeout = Duration.ofSeconds(5),
                 buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
+            )
+        }
+
+    @Test
+    fun `when intervalStart called without rounding then forwards round down`() =
+        runTest {
+            wideEventClient.intervalStart(wideEventId = 1L, key = "k")
+
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
+            )
+        }
+
+    @Test
+    fun `when intervalStart called with round up then forwards round up`() =
+        runTest {
+            val result = wideEventClient.intervalStart(
+                wideEventId = 1L,
+                key = "k",
+                rounding = BucketRounding.RoundUp,
+            )
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
+                rounding = WideEventRepository.BucketRounding.ROUND_UP,
             )
         }
 
@@ -505,6 +539,7 @@ class WideEventClientTest {
                 name = "k",
                 timeout = null,
                 buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
             )
         }
 
@@ -524,6 +559,7 @@ class WideEventClientTest {
                 name = "k",
                 timeout = null,
                 buckets = null,
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
             )
         }
 
@@ -548,7 +584,7 @@ class WideEventClientTest {
             val wideEventId = 303L
             val key = "network_call"
             val exception = RuntimeException("Database error")
-            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull(), anyOrNull())).thenThrow(exception)
+            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull(), anyOrNull(), any())).thenThrow(exception)
 
             val result = wideEventClient.intervalStart(wideEventId, key, 5.seconds)
 

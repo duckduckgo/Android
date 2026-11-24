@@ -120,7 +120,17 @@ data class WideEventEntity(
         val timeout: Duration?,
         @Json(name = "buckets")
         val buckets: List<Duration>?,
+        @Json(name = "rounding")
+        val rounding: BucketRounding,
     )
+
+    enum class BucketRounding {
+        @Json(name = "round_down")
+        ROUND_DOWN,
+
+        @Json(name = "round_up")
+        ROUND_UP,
+    }
 }
 
 @ProvidedTypeConverter

@@ -353,7 +353,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         binding.thirdPartyRecoveryCodeDecodedTextView.text = decodeThirdPartyRecoveryCode(viewState.thirdPartyRecoveryCode)
         binding.checkLinkingCodeResultTextView.text = viewState.checkLinkingCodeResult
         binding.connectedDevicesList.removeAllViews()
-        binding.blockStoreFeatureFlag.text = viewState.blockStoreFeatureFlagText
         binding.blockStoreAvailability.text = viewState.blockStoreAvailabilityText
         binding.blockStoreApiInUse.text = viewState.blockStoreApiLevelText
         binding.blockStoreDeviceLockStatus.text = viewState.blockStoreDeviceLockText
@@ -366,12 +365,6 @@ class SyncInternalSettingsActivity : DuckDuckGoActivity() {
         }
         binding.syncInternalEnvironment.setSecondaryText(viewState.environment)
 
-        binding.canUseV2ConnectFlowToggle.quietlySetIsChecked(viewState.canUseV2ConnectFlowEnabled) { _, enabled ->
-            viewModel.onCanUseV2ConnectFlowFlagChanged(enabled)
-        }
-        binding.canShowV2ConnectCodeToggle.quietlySetIsChecked(viewState.canShowV2ConnectCodeEnabled) { _, enabled ->
-            viewModel.onCanShowV2ConnectCodeFlagChanged(enabled)
-        }
         binding.accessCredentialsTextView.text = viewState.accessCredentialsText
         binding.scopedTokenResultTextView.text = viewState.scopedTokenResult
         binding.v2StoreFieldsTextView.text = viewState.v2StoreFieldsText

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.AccountInfoKeyUnavailableReason
 import com.duckduckgo.sync.impl.DecryptedDevice
 import com.duckduckgo.sync.impl.DeviceFieldDecryptor
@@ -33,8 +34,10 @@ import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.INFO
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LATER_INFO
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LEGACY
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.PLACEHOLDER
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -46,10 +49,13 @@ import java.time.Instant
 
 class AuditLogDeviceNameResolverTest {
 
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
     private val session: DeviceInfoDecryptor.Session = mock()
     private val deviceInfoDecryptor: DeviceInfoDecryptor = mock()
     private val deviceFieldDecryptor: DeviceFieldDecryptor = mock()
-    private val resolver = RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor)
+    private val resolver = RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, coroutineTestRule.testDispatcherProvider)
 
     @Before
     fun setup() {
@@ -59,7 +65,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenDeviceInfoDecryptsThenNameFromInfo() {
+    fun whenDeviceInfoDecryptsThenNameFromInfo() = runTest {
         givenInfo("info-a", "Phone A", "phone")
 
         val result = resolver.resolve(listOf(entry("e1", LOGIN, device("a", info = "info-a"))))
@@ -68,7 +74,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenLoginHasNoInfoThenNameFromLaterDeviceInfoAdded() {
+    fun whenLoginHasNoInfoThenNameFromLaterDeviceInfoAdded() = runTest {
         givenInfo("info-a", "Phone A", "phone")
 
         val result = resolver.resolve(
@@ -82,7 +88,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenSeveralDeviceInfoAddedBeforeNextLoginThenOldestUsed() {
+    fun whenSeveralDeviceInfoAddedBeforeNextLoginThenOldestUsed() = runTest {
         givenInfo("info-new", "Newer name", null)
         givenInfo("info-old", "Older name", null)
 
@@ -98,7 +104,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenOldestDeviceInfoAddedDoesNotDecryptThenNextOldestUsed() {
+    fun whenOldestDeviceInfoAddedDoesNotDecryptThenNextOldestUsed() = runTest {
         givenInfo("info-new", "Newer name", null)
 
         val result = resolver.resolve(
@@ -113,7 +119,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedIsAfterTheDevicesNextLoginThenNotUsedForEarlierLogin() {
+    fun whenDeviceInfoAddedIsAfterTheDevicesNextLoginThenNotUsedForEarlierLogin() = runTest {
         givenInfo("info-a", "Phone A", null)
 
         val result = resolver.resolve(
@@ -129,7 +135,35 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedIsForAnotherDeviceThenNotUsed() {
+    fun whenNewerEntriesGivenThenLoginNamedFromDeviceInfoAddedInThem() = runTest {
+        givenInfo("info-a", "Phone A", "phone")
+
+        val result = resolver.resolve(
+            entries = listOf(entry("e1", LOGIN, device("a"))),
+            newerEntries = listOf(
+                entry("e3", LOGOUT, device("b", info = "info-b"), actor = device("b")),
+                entry("e2", DEVICE_INFO_ADDED, device("a", info = "info-a")),
+            ),
+        )
+
+        assertEquals(mapOf("e1" to ResolvedDeviceName("Phone A", "phone", LATER_INFO)), result)
+    }
+
+    @Test
+    fun whenNewerEntriesHaveTheDevicesNextLoginThenItsDeviceInfoAddedNotUsed() = runTest {
+        givenInfo("info-a", "Phone A", null)
+
+        val result = resolver.resolve(
+            entries = listOf(entry("e1", LOGIN, device("a"))),
+            newerEntries = listOf(entry("e3", DEVICE_INFO_ADDED, device("a", info = "info-a")), entry("e2", LOGIN, device("a"))),
+        )
+
+        assertEquals(setOf("e1"), result.keys)
+        assertEquals(PLACEHOLDER, result["e1"]?.source)
+    }
+
+    @Test
+    fun whenDeviceInfoAddedIsForAnotherDeviceThenNotUsed() = runTest {
         givenInfo("info-b", "Phone B", null)
 
         val result = resolver.resolve(
@@ -143,7 +177,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedIsOlderThanLoginThenNotUsed() {
+    fun whenDeviceInfoAddedIsOlderThanLoginThenNotUsed() = runTest {
         givenInfo("info-a", "Phone A", null)
 
         val result = resolver.resolve(
@@ -157,7 +191,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenNoInfoThenLegacyNameUsed() {
+    fun whenNoInfoThenLegacyNameUsed() = runTest {
         val legacyDevice = device("a")
         whenever(deviceFieldDecryptor.decrypt(legacyDevice)).thenReturn(Result.Success(DecryptedDevice("a", "Legacy A", "desktop")))
 
@@ -167,7 +201,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenInfoDoesNotDecryptThenLegacyNameUsed() {
+    fun whenInfoDoesNotDecryptThenLegacyNameUsed() = runTest {
         val legacyDevice = device("a", info = "info-broken")
         whenever(deviceFieldDecryptor.decrypt(legacyDevice)).thenReturn(Result.Success(DecryptedDevice("a", "Legacy A", null)))
 
@@ -175,21 +209,21 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenDdgLegacyNameDoesNotDecryptThenPlaceholderWithNoType() {
+    fun whenDdgLegacyNameDoesNotDecryptThenPlaceholderWithNoType() = runTest {
         val result = resolver.resolve(listOf(entry("e1", LOGIN, device("a", credentialId = "ddg"))))
 
         assertEquals(mapOf("e1" to ResolvedDeviceName("Unknown device", null, PLACEHOLDER)), result)
     }
 
     @Test
-    fun whenThirdPartyLegacyNameDoesNotDecryptThenPlaceholderWithBrowserType() {
+    fun whenThirdPartyLegacyNameDoesNotDecryptThenPlaceholderWithBrowserType() = runTest {
         val result = resolver.resolve(listOf(entry("e1", LOGIN, device("a", credentialId = "3party"))))
 
         assertEquals(mapOf("e1" to ResolvedDeviceName("Unknown device", "Browser", PLACEHOLDER)), result)
     }
 
     @Test
-    fun whenLogoutThenRemovedDeviceNameResolvedWithoutLaterInfo() {
+    fun whenLogoutThenRemovedDeviceNameResolvedWithoutLaterInfo() = runTest {
         givenInfo("info-a", "Phone A", null)
 
         val result = resolver.resolve(
@@ -203,7 +237,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedOrSkippedEntriesThenNoNameReturnedForThem() {
+    fun whenDeviceInfoAddedOrSkippedEntriesThenNoNameReturnedForThem() = runTest {
         givenInfo("info-a", "Phone A", null)
 
         val result = resolver.resolve(
@@ -217,7 +251,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenKeyUnavailableThenLegacyUsedWithoutDecryptingInfo() {
+    fun whenKeyUnavailableThenLegacyUsedWithoutDecryptingInfo() = runTest {
         whenever(deviceInfoDecryptor.openSession())
             .thenReturn(DeviceInfoSessionResult.Unavailable(AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED))
         val legacyDevice = device("a", info = "info-a")
@@ -230,14 +264,14 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenManyEntriesThenOneSessionOpened() {
+    fun whenManyEntriesThenOneSessionOpened() = runTest {
         resolver.resolve(listOf(entry("e2", LOGIN, device("b", info = "info-b")), entry("e1", LOGIN, device("a", info = "info-a"))))
 
         verify(deviceInfoDecryptor, times(1)).openSession()
     }
 
     @Test
-    fun whenSameInfoOnManyRowsThenDecryptedOnce() {
+    fun whenSameInfoOnManyRowsThenDecryptedOnce() = runTest {
         givenInfo("info-a", "Phone A", null)
 
         val result = resolver.resolve(
@@ -253,7 +287,7 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
-    fun whenNoRowsToNameThenNoSessionOpened() {
+    fun whenNoRowsToNameThenNoSessionOpened() = runTest {
         resolver.resolve(listOf(entry("e1", DEVICE_INFO_ADDED, device("a", info = "info-a"))))
 
         verify(deviceInfoDecryptor, never()).openSession()

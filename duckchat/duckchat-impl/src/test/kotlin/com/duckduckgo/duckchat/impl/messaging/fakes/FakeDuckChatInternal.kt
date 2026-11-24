@@ -169,6 +169,8 @@ class FakeDuckChatInternal(
 
     override val editPromptRequests: Flow<EditPromptRequest> = _editPromptRequests.asSharedFlow()
 
+    override val showShareSheetAction: StateFlow<Boolean> = MutableStateFlow(false)
+
     override fun isImageUploadEnabled(): Boolean = false
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
@@ -220,6 +222,10 @@ class FakeDuckChatInternal(
     override fun openDuckChatImageGeneration(entryPoint: DuckChatEntryPoint) { }
 
     override fun buildChatUrl(chatId: String): String = "https://duck.ai?chatID=$chatId"
+
+    override fun buildChatUrlWithoutAttribution(chatId: String): String = "https://duck.ai?chatID=$chatId"
+
+    override fun getVoiceDuckChatUrl(): String = "https://duck.ai?mode=voice-mode"
 
     private val _defaultTogglePosition = MutableStateFlow<String?>(null)
 

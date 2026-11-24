@@ -48,7 +48,7 @@ class DuckAiSelectionJourneyWideEventTest {
 
     @Before
     fun setup() = runTest {
-        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
+        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(Duration.ZERO))
         whenever(wideEventClient.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
         testee = RealDuckAiSelectionJourneyWideEvent(
@@ -78,7 +78,7 @@ class DuckAiSelectionJourneyWideEventTest {
         attach("tab-A", flowId = 1L)
 
         verify(wideEventClient).flowStart(eq("duckai-selection-journey"), anyOrNull(), any(), any(), any(), any())
-        verify(wideEventClient).intervalStart(eq(1L), eq("latency.journey_duration_ms_bucketed"), anyOrNull(), anyOrNull())
+        verify(wideEventClient).intervalStart(eq(1L), eq("latency.journey_duration_ms_bucketed"), anyOrNull(), anyOrNull(), any())
     }
 
     @Test
@@ -164,7 +164,7 @@ class DuckAiSelectionJourneyWideEventTest {
         attach("tab-A", flowId = 2L)
 
         finishedWith(1L, FlowStatus.Cancelled, "outcome.terminal_reason" to "session_expired")
-        verify(wideEventClient).intervalStart(eq(2L), any(), anyOrNull(), anyOrNull())
+        verify(wideEventClient).intervalStart(eq(2L), any(), anyOrNull(), anyOrNull(), any())
     }
 
     @Test
@@ -187,7 +187,7 @@ class DuckAiSelectionJourneyWideEventTest {
         testee.onPromptSubmitted("tab-A")
         idle()
 
-        verify(wideEventClient, never()).intervalStart(any(), any(), anyOrNull(), anyOrNull())
+        verify(wideEventClient, never()).intervalStart(any(), any(), anyOrNull(), anyOrNull(), any())
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
 

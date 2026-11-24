@@ -135,7 +135,7 @@ class DeviceMigrationPlanProviderTest {
 
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
 
-        verify(pixel).fire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
+        verify(pixel).enqueueFire(AppPixelName.DEVICE_MIGRATION_ALL_SET_PROMPT_BUTTON_CLICKED, type = Unique())
     }
 
     @Test

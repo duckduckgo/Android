@@ -52,7 +52,8 @@ import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayer.DuckPlayerState.ENABLED
 import com.duckduckgo.adclick.api.AdClickManager
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
-import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
+import com.duckduckgo.app.autocomplete.SuggestQueryTiming
+import com.duckduckgo.app.autocomplete.SuggestQueryTimingProvider
 import com.duckduckgo.app.browser.LongPressHandler.RequiredAction
 import com.duckduckgo.app.browser.SSLErrorType.EXPIRED
 import com.duckduckgo.app.browser.SSLErrorType.GENERIC
@@ -184,6 +185,7 @@ import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.duckchat.isEmptyDuckAiChat
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -405,7 +407,6 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.PromoRecordObserver
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
-import com.duckduckgo.duckchat.api.toChatIdOrNull
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -634,9 +635,9 @@ class BrowserTabViewModel @Inject constructor(
     private val duckAiSessionCallback: DuckAiSessionCallback,
     private val duckAiEntryCallback: Lazy<DuckAiEntryCallback>,
     private val browserMenuAcknowledgement: BrowserMenuAcknowledgement,
-    private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
     private val currentTimeProvider: CurrentTimeProvider,
     private val trackerStatsWriter: TrackerStatsWriter,
+    private val suggestQueryTimingProvider: SuggestQueryTimingProvider,
 ) : ViewModel(),
     WebViewClientListener,
     EditSavedSiteListener,
@@ -786,10 +787,14 @@ class BrowserTabViewModel @Inject constructor(
 
     private var autoCompleteJob = ConflatedJob()
 
-    // Kept outside the pipeline because triggerAutocomplete restarts it on every keystroke.
+    private val suggestQueryTiming: SuggestQueryTiming? by lazy { suggestQueryTimingProvider.timing() }
+
+    // Set by the first keystroke after the search input opens or is cleared; phase 1 of [suggestQueryTiming] counts from it.
     @Volatile
-    private var lastAutoCompleteQueryAtMillis: Long? = null
-    private val throttleAutoCompleteQueries: Boolean by lazy { autocompleteSpeedFeature.throttleSuggestQueries().isEnabled() }
+    private var autoCompleteSessionStartedAtMillis: Long? = null
+
+    // Text the search input opened with: setting it is not the user typing, so it doesn't start a session.
+    private var autoCompleteSessionPrefill: String = ""
 
     private var serpLogoJob = ConflatedJob()
     private var favouriteSerpLogoUrl: String? = null
@@ -1301,9 +1306,6 @@ class BrowserTabViewModel @Inject constructor(
             autoCompleteStateFlow
                 .debounce { autoCompleteQueryDelayMillis() }
                 .distinctUntilChanged()
-                .onEach { query ->
-                    if (query.isNotBlank()) lastAutoCompleteQueryAtMillis = currentTimeProvider.elapsedRealtime()
-                }
                 .flatMapLatest { autoComplete.autoComplete(it) }
                 .flowOn(dispatchers.io())
                 .onEach { result -> onAutoCompleteResultReceived(result) }
@@ -1312,16 +1314,9 @@ class BrowserTabViewModel @Inject constructor(
                 .launchIn(viewModelScope)
     }
 
-    /**
-     * When throttling, a query goes out as soon as [AUTOCOMPLETE_THROTTLE_MILLIS] have passed since the previous one, so
-     * suggestions keep updating while the user types instead of waiting for a pause.
-     */
-    private fun autoCompleteQueryDelayMillis(): Long {
-        if (!throttleAutoCompleteQueries) return AUTOCOMPLETE_DEBOUNCE_MILLIS
-        val lastQueryAt = lastAutoCompleteQueryAtMillis ?: return 0
-        val sinceLastQuery = currentTimeProvider.elapsedRealtime() - lastQueryAt
-        return (AUTOCOMPLETE_THROTTLE_MILLIS - sinceLastQuery).coerceAtLeast(0)
-    }
+    private fun autoCompleteQueryDelayMillis(): Long =
+        suggestQueryTiming?.delayMillis(autoCompleteSessionStartedAtMillis, currentTimeProvider.elapsedRealtime())
+            ?: AUTOCOMPLETE_DEBOUNCE_MILLIS
 
     private fun onAutoCompleteResultReceived(result: AutoCompleteResult) {
         logcat { "Autocomplete: ${result.suggestions}" }
@@ -1779,7 +1774,7 @@ class BrowserTabViewModel @Inject constructor(
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
 
-    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it, browserMode) } ?: emptyMap()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -3321,7 +3316,16 @@ class BrowserTabViewModel @Inject constructor(
         hasFocus: Boolean,
         hasQueryChanged: Boolean,
     ) {
-        autoCompleteJob.cancel()
+        val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
+
+        // With two-phase timing the pipeline keeps running while the user types, so a query sent at a phase 1 mark still
+        // delivers its suggestions after the next keystroke. Otherwise every keystroke restarts it.
+        val keepAutoCompleteRunning = suggestQueryTiming != null &&
+            hasFocus &&
+            query.isNotBlank() &&
+            autoCompleteSuggestionsEnabled &&
+            autoCompleteJob.isActive
+        if (!keepAutoCompleteRunning) autoCompleteJob.cancel()
 
         // When the omnibar gains focus on a non-SERP page, it programmatically expands the shortened URL
         // to the full URL. That isn't a user-initiated change, so treat the text as unchanged when it
@@ -3343,7 +3347,6 @@ class BrowserTabViewModel @Inject constructor(
                 currentAutoCompleteViewState().searchResults
             }
 
-        val autoCompleteSuggestionsEnabled = autoCompleteSettings.autoCompleteSuggestionsEnabled
         // On SERP, autocomplete should appear immediately on focus — the user almost always wants to
         // refine the pre-filled query, so suggestions are useful even before any text change.
         val showAutoCompleteSuggestions =
@@ -3367,13 +3370,24 @@ class BrowserTabViewModel @Inject constructor(
                     searchResults = autoCompleteSearchResults,
                 )
 
+        if (!hasFocus || query.isBlank()) {
+            autoCompleteSessionStartedAtMillis = null
+        } else if (autoCompleteSessionStartedAtMillis == null && effectiveHasQueryChanged && query.trim() != autoCompleteSessionPrefill) {
+            autoCompleteSessionStartedAtMillis = currentTimeProvider.elapsedRealtime()
+        }
+
         if (hasFocus && autoCompleteSuggestionsEnabled) {
             autoCompleteStateFlow.value = query.trim()
         }
 
         // Started after the query update so the new pipeline's first value is this query, not the previous one: with
         // throttling, that first value is the one sent without delay.
-        configureAutoComplete()
+        if (!keepAutoCompleteRunning) configureAutoComplete()
+    }
+
+    fun onSearchInputOpened(prefill: String) {
+        autoCompleteSessionStartedAtMillis = null
+        autoCompleteSessionPrefill = prefill.trim()
     }
 
     /**
@@ -4277,12 +4291,8 @@ class BrowserTabViewModel @Inject constructor(
         hasGesture: Boolean,
     ): Boolean {
         val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
-        val customTabCallerOverridesNever = appLinksHandler.isTrustedCaller(
-            appLink,
-            trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true),
-        )
-        val plainTabCallerOverridesNever = appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller())
-        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled && (customTabCallerOverridesNever || plainTabCallerOverridesNever)
+        val trustedCallerOverridesDisabledAppLinks = !appLinksEnabled &&
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = true))
         return appLinksHandler.handleAppLink(
             isForMainFrame,
             appLink,
@@ -4320,20 +4330,13 @@ class BrowserTabViewModel @Inject constructor(
 
     private fun appLinkClicked(appLink: AppLink, hasGesture: Boolean) {
         val inCustomTab = customTab != null
-        val callerPackage = customTab?.clientPackage ?: customTab?.referrerPackage
         when {
-            appLinksHandler.isTrustedCaller(appLink, plainTabTrustedCaller()) -> {
-                plainTabLaunchingApp = null
-                command.value = OpenAppLink(appLink, closeTabOnLaunch = true)
-            }
             inCustomTab && !customTabsFeature.handleTrustedCallers().isEnabled() -> command.value = OpenAppLink(appLink)
-            inCustomTab && appLinksHandler.isTrustedCaller(appLink, callerPackage) -> {
-                // The handoff opens another app, leaving a stale custom tab behind; close it, but only once
+            appLinksHandler.isTrustedCaller(appLink, trustedCallerPackage(nonHttpLink = false, overridingDisabledAppLinks = false)) -> {
+                consumePlainTabTrust()
+                // The handoff opens another app, leaving a stale tab behind; leave it, but only once
                 // the app has actually launched, so a failed launch doesn't strand the user on a closed tab.
-                command.value = OpenAppLink(
-                    appLink,
-                    finishCustomTabOnLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
-                )
+                command.value = OpenAppLink(appLink, leaveTabOnLaunch = leaveTabAfterTrustedHandoff())
             }
             inCustomTab && appLinksHandler.isAlwaysTriggerDomain(appLink) -> command.value = OpenAppLink(appLink)
             appSettingsPreferencesStore.showAppLinksPrompt -> command.value = ShowAppLinkPrompt(appLink)
@@ -4346,11 +4349,19 @@ class BrowserTabViewModel @Inject constructor(
         nonHttpLink: Boolean,
         overridingDisabledAppLinks: Boolean,
     ): String? {
+        val customTab = customTab ?: return plainTabTrustedCaller()
         val enabled = customTabsFeature.handleTrustedCallers().isEnabled() &&
             (!nonHttpLink || customTabsFeature.handleTrustedCallersNonHttpLinks().isEnabled()) &&
             (!overridingDisabledAppLinks || customTabsFeature.handleTrustedCallersWhenAppLinksDisabled().isEnabled())
-        if (!enabled) return null
-        return customTab?.let { it.clientPackage ?: it.referrerPackage }
+        return if (enabled) customTab.clientPackage ?: customTab.referrerPackage else null
+    }
+
+    private fun leaveTabAfterTrustedHandoff(): Boolean =
+        customTab == null || customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled()
+
+    // A plain tab trusts its launching app once; a custom tab keeps its caller for the whole session.
+    private fun consumePlainTabTrust() {
+        if (customTab == null) plainTabLaunchingApp = null
     }
 
     override fun handleNonHttpAppLink(
@@ -4366,42 +4377,20 @@ class BrowserTabViewModel @Inject constructor(
         hasGesture: Boolean = false,
     ) {
         if (!nonHttpAppLinkChecker.isPermitted(appLink.intent)) return
-        val plainTabCaller = plainTabTrustedCaller()
-        val headers = getUrlHeaders(appLink.fallbackUrl)
-        if (!appSettingsPreferencesStore.appLinksEnabled) {
-            val customTabCaller = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = true)
-            when {
-                customTabCaller != null -> command.value = HandleNonHttpAppLink(
-                    nonHttpAppLink = appLink,
-                    headers = headers,
-                    showConfirmation = false,
-                    trustedCallerPackage = customTabCaller,
-                    finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
-                    trustedCallerOnly = true,
-                )
-                plainTabCaller != null -> {
-                    plainTabLaunchingApp = null
-                    command.value = HandleNonHttpAppLink(
-                        nonHttpAppLink = appLink,
-                        headers = headers,
-                        showConfirmation = false,
-                        trustedCallerPackage = plainTabCaller,
-                        trustedCallerOnly = true,
-                        closeTabOnTrustedCallerLaunch = true,
-                    )
-                }
-                else -> navigateToFallbackUrl(appLink.fallbackUrl)
-            }
+        val appLinksEnabled = appSettingsPreferencesStore.appLinksEnabled
+        val trustedCaller = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = !appLinksEnabled)
+        if (!appLinksEnabled && trustedCaller == null) {
+            navigateToFallbackUrl(appLink.fallbackUrl)
             return
         }
-        if (plainTabCaller != null) plainTabLaunchingApp = null
+        if (trustedCaller != null) consumePlainTabTrust()
         command.value = HandleNonHttpAppLink(
             nonHttpAppLink = appLink,
-            headers = headers,
-            showConfirmation = appSettingsPreferencesStore.showAppLinksPrompt,
-            trustedCallerPackage = trustedCallerPackage(nonHttpLink = true, overridingDisabledAppLinks = false) ?: plainTabCaller,
-            finishCustomTabOnTrustedCallerLaunch = customTabsFeature.closeTabAfterTrustedCallerNavigation().isEnabled(),
-            closeTabOnTrustedCallerLaunch = plainTabCaller != null,
+            headers = getUrlHeaders(appLink.fallbackUrl),
+            showConfirmation = appLinksEnabled && appSettingsPreferencesStore.showAppLinksPrompt,
+            trustedCallerPackage = trustedCaller,
+            trustedCallerOnly = !appLinksEnabled,
+            leaveTabOnTrustedCallerLaunch = trustedCaller != null && leaveTabAfterTrustedHandoff(),
         )
     }
 
@@ -6164,6 +6153,10 @@ class BrowserTabViewModel @Inject constructor(
         openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
     }
 
+    fun openNewDuckChatFromSwipeUp() {
+        openNewDuckChatTab(DuckChatEntryPoint.DUCK_AI_NEW_CHAT, fromDuckAiChat = true)
+    }
+
     /** New Chat from the browsing menu, which is reachable from any view mode. */
     fun openNewDuckChat(viewMode: ViewMode) {
         val entryPoint = browsingMenuDuckChatEntryPoint(viewMode)
@@ -6182,12 +6175,10 @@ class BrowserTabViewModel @Inject constructor(
         fromDuckAiChat: Boolean,
     ) {
         viewModelScope.launch {
-            val emptyChats = tabRepository.getTabs().filter { tab ->
-                tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && it.toChatIdOrNull(duckChat) == null } == true
-            }
+            val emptyChats = tabRepository.getTabs().filter { duckChat.isEmptyDuckAiChat(it.url) }
             val emptyChat = emptyChats.firstOrNull { it.tabId == tabId } ?: emptyChats.firstOrNull()
             if (emptyChat != null) {
-                if (emptyChat.tabId != tabId) command.value = Command.SwitchToTab(emptyChat.tabId)
+                command.value = Command.FocusEmptyDuckAiChat(emptyChat.tabId)
                 return@launch
             }
             if (fromDuckAiChat) {
@@ -6451,7 +6442,6 @@ class BrowserTabViewModel @Inject constructor(
 
         private const val REFRESH_TRIGGER_DEBOUNCE_MILLIS = 200L
         private const val AUTOCOMPLETE_DEBOUNCE_MILLIS = 300L
-        private const val AUTOCOMPLETE_THROTTLE_MILLIS = 200L
 
         // Minimum progress to show web content again after decided to hide web content (possible spoofing attack).
         // We think that progress is enough to assume next site has already loaded new content.

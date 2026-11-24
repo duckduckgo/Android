@@ -26,6 +26,10 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.Types
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -48,10 +52,12 @@ data class AuditLogCheckState(
     val cursor: String? = null,
     /** Oldest first. */
     val pendingLogins: List<PendingLogin> = emptyList(),
+    /** Id of the newest entry loaded the last time Device Activity opened with no error. Entries above it in the log are unseen. */
+    val lastSeenEntryId: String? = null,
 )
 
 /**
- * Stored state of the audit log checker. It lives in [SyncStore], so signing out clears it.
+ * Stored state of the audit log checker and of what Device Activity last showed. It lives in [SyncStore], so signing out clears it.
  * All reads and writes share one lock, so every caller gets an atomic read-modify-write.
  * Unreadable stored data reads as an empty list.
  */
@@ -63,6 +69,12 @@ interface AuditLogCheckStateStore {
      * Nothing is written while signed out. A write keeps only the newest [MAX_PENDING_LOGINS] pending logins.
      */
     suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?)
+
+    /**
+     * Emits the stored pending logins now and again after each [update] that changes them.
+     * Sign-out clears [SyncStore] without an [update], so collect again after the account changes.
+     */
+    fun pendingLogins(): Flow<List<PendingLogin>>
 
     companion object {
         const val MAX_PENDING_LOGINS = 100
@@ -77,6 +89,7 @@ class RealAuditLogCheckStateStore @Inject constructor(
 ) : AuditLogCheckStateStore {
 
     private val mutex = Mutex()
+    private val changes = MutableStateFlow(0L)
 
     override suspend fun read(): AuditLogCheckState = withContext(dispatchers.io()) {
         mutex.withLock { readState() }
@@ -84,7 +97,8 @@ class RealAuditLogCheckStateStore @Inject constructor(
 
     override suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?) = withContext(dispatchers.io()) {
         mutex.withLock {
-            val updated = transform(readState()) ?: return@withLock
+            val current = readState()
+            val updated = transform(current) ?: return@withLock
             // Sign-out wipes SyncStore outside this lock; without this check a late write would bring back the old account's state.
             if (!syncStore.isSignedIn()) return@withLock
 
@@ -92,10 +106,20 @@ class RealAuditLogCheckStateStore @Inject constructor(
             // and the caller dedupes by entry id. The other order would lose those logins.
             syncStore.auditLogPending = encode(updated.pendingLogins)
             syncStore.auditLogCursor = updated.cursor
+            if (updated.lastSeenEntryId != current.lastSeenEntryId) syncStore.auditLogLastSeenEntryId = updated.lastSeenEntryId
+            changes.value++
         }
     }
 
-    private fun readState() = AuditLogCheckState(cursor = syncStore.auditLogCursor, pendingLogins = decode(syncStore.auditLogPending))
+    override fun pendingLogins(): Flow<List<PendingLogin>> = changes
+        .map { read().pendingLogins }
+        .distinctUntilChanged()
+
+    private fun readState() = AuditLogCheckState(
+        cursor = syncStore.auditLogCursor,
+        pendingLogins = decode(syncStore.auditLogPending),
+        lastSeenEntryId = syncStore.auditLogLastSeenEntryId,
+    )
 
     private fun encode(logins: List<PendingLogin>): String? {
         val capped = logins.takeLast(AuditLogCheckStateStore.MAX_PENDING_LOGINS)

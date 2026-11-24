@@ -2,14 +2,15 @@ name: Code review assistant
 
 # Runs android-factory:code-review-assistant without a reviewer: on a sample of
 # new PRs (shadow mode, nothing is posted), on demand, and once a day to
-# reconcile earlier reviews with the comments on merged PRs.
+# reconcile earlier reviews with the comments on merged PRs. PRs from the auto
+# harness carry the `auto` label and are reviewed even when a bot opened them.
 # This repo is public, so nothing the review reads or writes reaches the log,
 # the step summary or an artifact: the output goes to the records branch of
 # duckduckgo/claude-skills-factory-android, which is internal.
 
 on:
   pull_request:
-    types: [opened, ready_for_review]
+    types: [opened, ready_for_review, labeled]
     paths-ignore:
       - "**/res/values*/**"
       - "**/*.md"
@@ -62,6 +63,9 @@ jobs:
           INPUT_PR: ${{ inputs.pr }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           DRAFT: ${{ github.event.pull_request.draft }}
+          ACTION: ${{ github.event.action }}
+          ADDED_LABEL: ${{ github.event.label.name }}
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
           HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
           AUTHOR: ${{ github.event.pull_request.user.login }}
           SAMPLE: ${{ vars.CODE_REVIEW_SAMPLE || '4' }}
@@ -72,8 +76,17 @@ jobs:
             workflow_dispatch) mode="$INPUT_MODE"; pr="$INPUT_PR" ;;
             pull_request)
               mode=review; pr="$PR_NUMBER"
+              bot=false
+              if [ "$AUTHOR" = daxmobile ] || [[ "$AUTHOR" == *"[bot]" ]]; then bot=true; fi
+              # The auto harness labels its PRs a few seconds after opening them, so a
+              # bot's PR is reviewed on that label (or when it leaves draft with it), and
+              # every other PR when it opens.
+              if [ "$ACTION" = labeled ]; then
+                if [ "$ADDED_LABEL" != auto ] || [ "$bot" = false ]; then run=false; fi
+              elif [ "$bot" = true ]; then
+                if [ "$ACTION" != ready_for_review ] || ! grep -q '"auto"' <<< "$LABELS"; then run=false; fi
+              fi
               if [ "$DRAFT" = true ] || [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ] \
-                || [ "$AUTHOR" = daxmobile ] || [[ "$AUTHOR" == *"[bot]" ]] \
                 || [ "$SAMPLE" -eq 0 ] || [ $((pr % SAMPLE)) -ne 0 ]; then
                 run=false
               fi
@@ -192,6 +205,7 @@ jobs:
         if: always()
         env:
           KEY: ${{ secrets.CODE_REVIEW_RECORDS_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           if [ ! -d "$WORK/records/.git" ]; then
             echo "No records clone to push"
@@ -203,6 +217,10 @@ jobs:
             cp "$WORK/review.md" "records/ci/pr-${PR}.md"
             if [ -f "$WORK/findings.json" ]; then cp "$WORK/findings.json" "records/ci/pr-${PR}.json"; fi
             if [ -f "$WORK/candidates.json" ]; then cp "$WORK/candidates.json" "records/ci/pr-${PR}.candidates.json"; fi
+            # Read the labels now rather than from the event: the auto label can land after the PR opens.
+            GH_TOKEN="$GITHUB_TOKEN" gh pr view "$PR" -R "$GITHUB_REPOSITORY" --json author,labels \
+              --jq '{auto: ([.labels[].name] | index("auto") != null), author: .author.login}' \
+              > "records/ci/pr-${PR}.meta.json" || rm -f "records/ci/pr-${PR}.meta.json"
             git add records/ci
             git commit -q -m "Add CI review of duckduckgo/Android#${PR}"
           fi

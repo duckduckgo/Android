@@ -209,4 +209,10 @@
     <string name="subscriptionWithdrawnRefundWithoutAmount">Ton remboursement est en cours de traitement.</string>
     <string name="subscriptionWithdrawErrorAlert" instruction="Error shown when the withdrawal request fails. The text inside the annotation is a link to a help page">Nous n\'avons pas pu traiter automatiquement votre demande de rétractation. Veuillez visiter <annotation type="withdrawal_help_link">cette page</annotation> pour finaliser votre demande de rétractation.</string>
 
+    <!-- Undo subscription cancellation -->
+    <string name="subscriptionStatusExpiring">Expire bientôt</string>
+    <string name="subscriptionExpiringIconContentDescription">Abonnement arrivant à expiration</string>
+    <string name="subscriptionWillExpireOn" instruction="Placeholder is the date the subscription expires, e.g. October 22, 2026">Votre abonnement expirera le %1$s.</string>
+    <string name="subscriptionKeepSubscription">Conserver l\'abonnement</string>
+
 </resources>

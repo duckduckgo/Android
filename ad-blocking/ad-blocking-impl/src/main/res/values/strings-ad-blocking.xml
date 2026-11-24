@@ -16,15 +16,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Skip Sponsored Content</string>
+    <string name="segment_skip_mode_always_ask">Ask to Skip</string>
+    <string name="segment_skip_mode_always_skip">Always</string>
+    <string name="segment_skip_mode_off">Never</string>
     <string name="ad_blocking_settings_title">YouTube Ad Blocking</string>
     <string name="ad_blocking_settings_toggle_title">Block Ads on YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blocks video ads on YouTube, so you can watch videos without interruption. \n\nWhen on, DuckDuckGo will anonymously detect ad blocking interference or YouTube errors, to improve the experience for everyone. DuckDuckGo never sees which videos you view or any personally identifiable information. <annotation type="learn_more_link">Learn more</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blocks video ads on YouTube, so you can watch videos without interruption. <annotation type="learn_more_link">Learn more</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Opens videos in a distraction-free theater mode that prevents what you watch from influencing your YouTube feed.</string>
     <string name="ad_blocking_settings_duck_player_link">Looking for Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Ad Blocking</string>
-    <string name="ad_blocking_settings_header_description">Blocks invasive trackers before they load, effectively eliminating ads that rely on tracking.</string>
     <string name="contingencyMessageTitle">YouTube Ad Blocking Unavailable</string>
     <string name="contingencyMessageContent">Ad Blocking has been affected by recent changes to YouTube. We\'re working to fix these issues and appreciate your understanding.</string>
     <string name="contingencyMessagePrimaryButton">Got It</string>

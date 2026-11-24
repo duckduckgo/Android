@@ -50,13 +50,11 @@ import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.C
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.DialogType
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Factory
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Factory.Provider
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.pairing.showExchangeV1PairingError
 import com.duckduckgo.sync.impl.ui.pairing.showExchangeV2PairingError
 import com.duckduckgo.sync.impl.ui.pairing.showLeadingProgressSpinner
 import com.google.android.material.snackbar.Snackbar
@@ -164,7 +162,6 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
             is ShowMessage -> showMessage(command.message)
             is ShareCode -> shareText(command.code)
             is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
-            is ShowV1Error -> showV1Error(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()
         }
@@ -256,12 +253,6 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
 
     private fun shareText(text: String) {
         shareAction.shareText(this, text)
-    }
-
-    private fun showV1Error(error: ShowV1Error) {
-        showExchangeV1PairingError(error.content) {
-            viewModel.onErrorDialogDismissed()
-        }
     }
 
     private fun showV2Error(error: ShowV2Error) {

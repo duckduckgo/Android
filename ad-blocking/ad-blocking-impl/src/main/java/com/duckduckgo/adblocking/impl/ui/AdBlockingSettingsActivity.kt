@@ -28,7 +28,7 @@ import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Disabled
 import com.duckduckgo.adblocking.api.duckplayer.PrivatePlayerMode.Enabled
 import com.duckduckgo.adblocking.impl.R
 import com.duckduckgo.adblocking.impl.databinding.ActivityAdBlockingSettingsBinding
-import com.duckduckgo.adblocking.impl.sponsorblock.SponsorBlockMode
+import com.duckduckgo.adblocking.impl.segmentskip.SegmentSkipMode
 import com.duckduckgo.adblocking.impl.ui.AdBlockingSettingsViewModel.DuckPlayerSection
 import com.duckduckgo.browser.api.ui.BrowserScreens
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
@@ -79,10 +79,20 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         binding.adBlockingStatusIndicator.setStatus(StatusIndicatorView.Status.ALWAYS_ON)
         setupToolbar(binding.includeToolbar.toolbar)
 
+        binding.adBlockingHeaderDescription.addClickableSpan(
+            textSequence = getText(R.string.ad_blocking_settings_header_description_v2),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onLearnMoreClicked()
+                    }
+                },
+            ),
+        )
         binding.duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
-        binding.sponsorBlockModeEntry.setClickListener { viewModel.onSponsorBlockModeClicked() }
+        binding.segmentSkipModeEntry.setClickListener { viewModel.onSegmentSkipModeClicked() }
 
         configureEdgeToEdgeInsets()
         observeViewModel()
@@ -112,9 +122,15 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                 else -> getString(R.string.duck_player_mode_always_ask)
             },
         )
-        binding.sponsorBlockModeEntry.isVisible = state.sponsorBlockMode != null
-        binding.sponsorBlockDescription.isVisible = state.sponsorBlockMode != null
-        state.sponsorBlockMode?.let { binding.sponsorBlockModeEntry.setSecondaryText(getString(it.labelRes())) }
+        binding.segmentSkipModeEntry.isVisible = state.segmentSkipMode != null
+        binding.segmentSkipDescription.isVisible = state.segmentSkipMode != null
+        val segmentSkipDescription = if (state.showSegmentSkipConsent) {
+            R.string.segment_skip_settings_description_with_consent
+        } else {
+            R.string.segment_skip_settings_description_v2
+        }
+        binding.segmentSkipDescription.setText(segmentSkipDescription)
+        state.segmentSkipMode?.let { binding.segmentSkipModeEntry.setSecondaryText(getString(it.labelRes())) }
         if (state.isContingencyMode) {
             binding.adBlockingDescription.gone()
             binding.contingencyModeItem.show()
@@ -129,20 +145,11 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
             return
         }
         val descriptionRes = if (showConsentDescription) {
-            R.string.ad_blocking_settings_description_with_consent
+            R.string.ad_blocking_settings_description_with_consent_v2
         } else {
-            R.string.ad_blocking_settings_description
+            R.string.ad_blocking_settings_description_v2
         }
-        binding.adBlockingDescription.addClickableSpan(
-            textSequence = getText(descriptionRes),
-            spans = listOf(
-                "learn_more_link" to object : DuckDuckGoClickableSpan() {
-                    override fun onClick(widget: View) {
-                        viewModel.onLearnMoreClicked()
-                    }
-                },
-            ),
-        )
+        binding.adBlockingDescription.setText(descriptionRes)
         binding.adBlockingDescription.show()
     }
 
@@ -167,32 +174,35 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                         this,
                         DuckPlayerSettingsNoParams,
                     )
-                    is AdBlockingSettingsViewModel.Command.ShowSponsorBlockModeDialog -> showSponsorBlockModeDialog(command.mode)
+                    is AdBlockingSettingsViewModel.Command.ShowSegmentSkipModeDialog -> showSegmentSkipModeDialog(command.mode)
                 }
             }
             .launchIn(lifecycleScope)
     }
 
-    private fun showSponsorBlockModeDialog(currentMode: SponsorBlockMode) {
-        val modes = SponsorBlockMode.entries
+    private fun showSegmentSkipModeDialog(currentMode: SegmentSkipMode) {
+        val modes = listOf(SegmentSkipMode.ALWAYS_SKIP, SegmentSkipMode.ALWAYS_ASK, SegmentSkipMode.OFF)
         RadioListAlertDialogBuilder(this)
-            .setTitle(getString(R.string.sponsor_block_settings_title))
+            .setTitle(getString(R.string.segment_skip_settings_title))
             .setOptions(modes.map { it.labelRes() }, modes.indexOf(currentMode) + 1)
             .setPositiveButton(CommonR.string.dialogSave)
             .setNegativeButton(CommonR.string.cancel)
             .addEventListener(
                 object : RadioListAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked(selectedItem: Int) {
-                        viewModel.onSponsorBlockModeSelected(modes[selectedItem - 1])
+                        viewModel.onSegmentSkipModeDialogSaved(
+                            modes[selectedItem - 1],
+                            userConsent = binding.segmentSkipDescription.isShown && viewModel.viewState.value.showSegmentSkipConsent,
+                        )
                     }
                 },
             )
             .show()
     }
 
-    private fun SponsorBlockMode.labelRes(): Int = when (this) {
-        SponsorBlockMode.ALWAYS_ASK -> R.string.sponsor_block_mode_always_ask
-        SponsorBlockMode.ALWAYS_SKIP -> R.string.sponsor_block_mode_always_skip
-        SponsorBlockMode.OFF -> R.string.sponsor_block_mode_off
+    private fun SegmentSkipMode.labelRes(): Int = when (this) {
+        SegmentSkipMode.ALWAYS_ASK -> R.string.segment_skip_mode_always_ask
+        SegmentSkipMode.ALWAYS_SKIP -> R.string.segment_skip_mode_always_skip
+        SegmentSkipMode.OFF -> R.string.segment_skip_mode_off
     }
 }

@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.BucketRounding.ROUND_DOWN
+import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.BucketRounding.ROUND_UP
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.FAILURE
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.SUCCESS
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStep
@@ -553,6 +555,7 @@ class WideEventRepositoryTest {
                 name = "interval_1",
                 timeout = Duration.ofSeconds(10),
                 buckets = DEFAULT_BUCKETS,
+                rounding = ROUND_DOWN,
             )
 
             val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
@@ -577,6 +580,7 @@ class WideEventRepositoryTest {
                 name = "interval_1",
                 timeout = Duration.ofSeconds(10),
                 buckets = DEFAULT_BUCKETS,
+                rounding = ROUND_DOWN,
             )
 
             val expectedDuration = Duration.ofSeconds(15)
@@ -605,6 +609,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_DOWN,
         )
 
         timeProvider.currentTime += Duration.ofMillis(500)
@@ -630,6 +635,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_DOWN,
         )
 
         timeProvider.currentTime += Duration.ofSeconds(5)
@@ -655,6 +661,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_DOWN,
         )
 
         // 7 seconds is between 5s and 10s buckets, should map to 5s (lower end)
@@ -681,6 +688,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_DOWN,
         )
 
         // 15 minutes is greater than largest bucket (10 minutes)
@@ -707,6 +715,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = listOf(Duration.ofMillis(100), Duration.ofMillis(500), Duration.ofSeconds(2)),
+            rounding = ROUND_DOWN,
         )
 
         timeProvider.currentTime += Duration.ofMillis(750)
@@ -732,6 +741,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(2)),
+            rounding = ROUND_DOWN,
         )
 
         timeProvider.currentTime += Duration.ofSeconds(10)
@@ -757,6 +767,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
+            rounding = ROUND_DOWN,
         )
 
         timeProvider.currentTime += Duration.ofMillis(50)
@@ -782,6 +793,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = null,
+            rounding = ROUND_DOWN,
         )
 
         timeProvider.currentTime += Duration.ofMillis(1234)
@@ -808,6 +820,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = customBuckets,
+            rounding = ROUND_DOWN,
         )
 
         val readBack = wideEventRepository.getWideEvents(setOf(eventId)).single()
@@ -832,6 +845,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = unorderedBuckets,
+            rounding = ROUND_DOWN,
         )
 
         val readBack = wideEventRepository.getWideEvents(setOf(eventId)).single()
@@ -860,6 +874,7 @@ class WideEventRepositoryTest {
                     name = "interval_1",
                     timeout = null,
                     buckets = listOf(Duration.ofMillis(-1), Duration.ofMillis(100)),
+                    rounding = ROUND_DOWN,
                 )
             }
         }
@@ -881,6 +896,7 @@ class WideEventRepositoryTest {
             name = "interval_1",
             timeout = null,
             buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_DOWN,
         )
 
         timeProvider.currentTime -= Duration.ofMillis(5)
@@ -889,6 +905,85 @@ class WideEventRepositoryTest {
 
         assertEquals(Duration.ofMillis(-5), duration)
         assertEquals("-1", event.metadata["interval_1"])
+    }
+
+    @Test
+    fun `when ending a round-up interval with duration less than smallest bucket, maps to smallest bucket`() = runTest {
+        assertEquals("1000", recordedRoundUpBucket(elapsed = Duration.ofMillis(500)))
+    }
+
+    @Test
+    fun `when ending a round-up interval with duration between buckets, maps to upper bucket`() = runTest {
+        assertEquals("10000", recordedRoundUpBucket(elapsed = Duration.ofSeconds(7)))
+    }
+
+    @Test
+    fun `when ending a round-up interval with duration exactly at bucket boundary, maps to that bucket`() = runTest {
+        assertEquals("5000", recordedRoundUpBucket(elapsed = Duration.ofSeconds(5)))
+    }
+
+    @Test
+    fun `when ending a round-up interval with duration greater than largest bucket, maps to largest bucket`() = runTest {
+        assertEquals(Duration.ofMinutes(10).toMillis().toString(), recordedRoundUpBucket(elapsed = Duration.ofMinutes(15)))
+    }
+
+    @Test
+    fun `when ending a round-up interval with negative duration, maps to minus one bucket`() = runTest {
+        assertEquals("-1", recordedRoundUpBucket(elapsed = Duration.ofMillis(-5)))
+    }
+
+    @Test
+    fun `interval rounding survives a persistence round-trip`() = runTest {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "round_down_interval",
+            timeout = null,
+            buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_DOWN,
+        )
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "round_up_interval",
+            timeout = null,
+            buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_UP,
+        )
+
+        val intervals = wideEventRepository.getWideEvents(setOf(eventId)).single().activeIntervals
+        assertEquals(ROUND_DOWN, intervals.single { it.name == "round_down_interval" }.rounding)
+        assertEquals(ROUND_UP, intervals.single { it.name == "round_up_interval" }.rounding)
+    }
+
+    private suspend fun recordedRoundUpBucket(elapsed: Duration): String? {
+        val eventId = wideEventRepository.insertWideEvent(
+            name = "interval_event",
+            flowEntryPoint = null,
+            metadata = emptyMap(),
+            cleanupPolicy = DEFAULT_CLEANUP_POLICY,
+            metaType = "android-test-event",
+            metaVersion = "1.0.0",
+        )
+
+        wideEventRepository.startInterval(
+            eventId = eventId,
+            name = "interval_1",
+            timeout = null,
+            buckets = DEFAULT_BUCKETS,
+            rounding = ROUND_UP,
+        )
+
+        timeProvider.currentTime += elapsed
+        wideEventRepository.endInterval(eventId, "interval_1")
+        return wideEventRepository.getWideEvents(setOf(eventId)).single().metadata["interval_1"]
     }
 
     @Test

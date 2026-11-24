@@ -18,20 +18,15 @@ package com.duckduckgo.sync.impl.setup
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealSyncUrlIdentifier @Inject constructor(
-    private val syncFeature: SyncFeature,
-) : SyncUrlIdentifier {
+class RealSyncUrlIdentifier @Inject constructor() : SyncUrlIdentifier {
 
     override fun shouldDelegateToSyncSetup(intentText: String?): Boolean {
         if (intentText == null) return false
-        if (syncFeature.canInterceptSyncSetupUrls().isEnabled().not()) return false
-
         return intentText.isValidSyncUrl()
     }
 

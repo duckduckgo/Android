@@ -78,5 +78,26 @@
             }
         ],
         "expires": "2027-04-30"
+    },
+    "atb_reinstall_check_folder_age": {
+        "description": "The reinstall check on Android 11 and later found the Downloads/DuckDuckGo folder, so it counted the install as a reinstall. Reports how far the folder's last change was from the app's install time. Sent at most once per install, on the first launch that runs the check. A Galaxy Store install can launch the app out of sight before the user opens it and then wipe its data; the folder that launch created survives, so a new user is counted as returning, with a folder changed within seconds of the install time. The 10m+ bucket covers all other folder-based reinstalls, so the share of reinstalls near the install time can be read per store from this pixel alone. Reporting only: it doesn't change the answer",
+        "owners": ["cmonfortep"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "age",
+                "description": "How far the folder's last change was from the install time, before or after it",
+                "type": "string",
+                "enum": ["0-10s", "10s-2m", "2-10m", "10m+"]
+            },
+            {
+                "key": "installer",
+                "description": "The store that installed the app: galaxy_store, play_store, or other for any other installer or when it can't be read",
+                "type": "string",
+                "enum": ["galaxy_store", "play_store", "other"]
+            }
+        ]
     }
 }

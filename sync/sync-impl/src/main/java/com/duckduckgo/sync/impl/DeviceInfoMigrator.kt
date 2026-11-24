@@ -93,7 +93,7 @@ class RealDeviceInfoMigrator @Inject constructor(
                 return Precheck.Stop(Error(reason = "DeviceInfoMigration: not signed in"))
             }
 
-        if (!syncFeature.canWriteDeviceInfo()) {
+        if (!syncFeature.canWriteUnifiedDeviceList().isEnabled()) {
             logcat { "Sync-UnifiedDevices: migration skipped — writing device_info is disabled" }
             return Precheck.Stop(Success(Unit))
         }

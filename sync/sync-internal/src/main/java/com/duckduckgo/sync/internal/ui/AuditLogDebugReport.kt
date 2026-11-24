@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.internal.ui
 
-import androidx.annotation.WorkerThread
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.sync.impl.DeviceV2
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.auditlog.AuditLogDeviceNameResolver
@@ -26,6 +26,7 @@ import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Skipped
 import com.duckduckgo.sync.impl.auditlog.ResolvedDeviceName
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
@@ -33,10 +34,14 @@ class AuditLogDebugReport @Inject constructor(
     private val syncApi: SyncApi,
     private val decoder: AuditLogEntryDecoder,
     private val resolver: AuditLogDeviceNameResolver,
+    private val dispatchers: DispatcherProvider,
 ) {
 
-    @WorkerThread
-    fun fetchAndDescribe(token: String, ownDeviceId: String?): String {
+    suspend fun fetchAndDescribe(token: String, ownDeviceId: String?): String = withContext(dispatchers.io()) {
+        describeLatest(token, ownDeviceId)
+    }
+
+    private suspend fun describeLatest(token: String, ownDeviceId: String?): String {
         val result = syncApi.getAuditLogLatest(token)
         if (result !is AuditLogResult.Success) {
             logcat { "Sync-AuditLog: internal fetch failed: $result" }

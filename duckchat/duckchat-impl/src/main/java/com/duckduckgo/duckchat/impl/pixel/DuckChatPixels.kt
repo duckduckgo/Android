@@ -110,6 +110,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SU
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.PRODUCT_TELEMETRY_SURFACE_KEYBOARD_USAGE_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.SERP_SETTINGS_OPEN_HIDE_AI_GENERATED_IMAGES
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
+import com.duckduckgo.duckchat.impl.responding.RespondingServiceStartFailure
 import com.duckduckgo.feature.toggles.api.send
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
@@ -223,6 +224,10 @@ interface DuckChatPixels {
     fun reportVoiceServiceStarted()
     fun reportVoiceServiceKilled()
     fun reportVoiceServiceStartFailed()
+    fun reportRespondingServiceStarted(restricted: Boolean)
+    fun reportRespondingServiceStartFailed(reason: RespondingServiceStartFailure)
+    fun reportRespondingServiceInterrupted(restricted: Boolean)
+    fun reportRespondingServiceTimedOut()
 
     fun fireImageGenerationSelected(surface: DuckChatPixelSurface)
     fun fireImageGenerationDeselected(surface: DuckChatPixelSurface)
@@ -794,6 +799,7 @@ class RealDuckChatPixels @Inject constructor(
         DuckChatHistorySource.CONTEXTUAL_CHAT -> "contextual_chat"
         DuckChatHistorySource.SIDEBAR -> "sidebar"
         DuckChatHistorySource.TAB_SWITCHER -> "tab_switcher"
+        DuckChatHistorySource.WIDGET -> "widget"
     }
 
     override fun reportContextualOpenDuckAiMenuTapped() {
@@ -985,6 +991,22 @@ class RealDuckChatPixels @Inject constructor(
             DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_COUNT,
             DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_DAILY,
         )
+    }
+
+    override fun reportRespondingServiceStarted(restricted: Boolean) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_STARTED, mapOf(DuckChatPixelParameters.RESTRICTED to restricted.toString()))
+    }
+
+    override fun reportRespondingServiceStartFailed(reason: RespondingServiceStartFailure) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_START_FAILED, mapOf(DuckChatPixelParameters.REASON to reason.pixelValue))
+    }
+
+    override fun reportRespondingServiceInterrupted(restricted: Boolean) {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_INTERRUPTED, mapOf(DuckChatPixelParameters.RESTRICTED to restricted.toString()))
+    }
+
+    override fun reportRespondingServiceTimedOut() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT)
     }
 
     override fun fireImageGenerationSelected(surface: DuckChatPixelSurface) = fireCountAndDaily(
@@ -1687,6 +1709,10 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_VOICE_SERVICE_KILLED("m_aichat_voice_service_killed"),
     DUCK_CHAT_VOICE_SERVICE_START_FAILED_COUNT("m_aichat_voice_service_start_failed_count"),
     DUCK_CHAT_VOICE_SERVICE_START_FAILED_DAILY("m_aichat_voice_service_start_failed_daily"),
+    DUCK_CHAT_RESPONDING_SERVICE_STARTED("aichat_responding-service_started"),
+    DUCK_CHAT_RESPONDING_SERVICE_START_FAILED("aichat_responding-service_start_failed"),
+    DUCK_CHAT_RESPONDING_SERVICE_INTERRUPTED("aichat_responding-service_interrupted"),
+    DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT("aichat_responding-service_timed_out"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST("m_aichat_contextual_fire_button_tapped_first"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_DAILY("m_aichat_contextual_fire_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_COUNT("m_aichat_contextual_fire_button_tapped_count"),
@@ -1858,9 +1884,13 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_COUNT("aichat_new_chat_hint_tapped_count"),
     DUCK_CHAT_NEW_CHAT_HINT_TAPPED_DAILY("aichat_new_chat_hint_tapped_daily"),
     DUCK_CHAT_NEW_CHAT_HINTS_CAP_REACHED("aichat_new_chat_hints_cap_reached"),
+    DUCK_AI_WIDGET_ADDED("m_aichat_widget_added"),
+    DUCK_AI_WIDGET_DELETED("m_aichat_widget_deleted"),
 }
 
 object DuckChatPixelParameters {
+    const val RESTRICTED = "restricted"
+    const val REASON = "reason"
     const val ENTRY_SOURCE = "source"
     const val DUCK_AI_ENABLED = "duck_ai_enabled"
     const val INPUT_SCREEN_ENABLED = "input_screen_enabled"
@@ -2109,6 +2139,10 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_KILLED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_VOICE_SERVICE_START_FAILED_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_STARTED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_START_FAILED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_INTERRUPTED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST.pixelName to PixelParameter.removeAtb(),
@@ -2175,6 +2209,8 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_HISTORY_DOWNLOAD_SELECTED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_HISTORY_SCREEN_SHOWN_DAILY.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_AI_WIDGET_ADDED.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_AI_WIDGET_DELETED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_VOICE_CHAT_TAPPED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_OMNIBAR_MENU_NEW_IMAGE_TAPPED_COUNT.pixelName to PixelParameter.removeAtb(),

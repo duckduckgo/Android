@@ -60,7 +60,9 @@ serial() {
   esac
 }
 
+# prove.py points VERIFY_EVIDENCE_DIR at its attempt folder, so a proof's captures never mix with another run's.
 evidence_dir() {
+  if [[ -n "${VERIFY_EVIDENCE_DIR:-}" ]]; then mkdir -p "$VERIFY_EVIDENCE_DIR"; echo "$VERIFY_EVIDENCE_DIR"; return; fi
   local s; s="$(serial)"
   local d="$EVIDENCE_ROOT/$(run_id)/$(label "$s" | tr -c 'A-Za-z0-9._-\n' '_')"
   mkdir -p "$d"; echo "$d"
@@ -315,7 +317,8 @@ cmd_doctor() {
   else echo "FAIL $s not online"; ok=0; fi
   if owned "$s"; then
     kill -0 "$(cat "$STATE/dev/$s/pid")" 2>/dev/null && echo "INFO emulator started by this run" || { echo "FAIL emulator process gone"; ok=0; }
-  else echo "INFO user's device: no reset, uninstall or data clearing without asking"; fi
+  else echo "INFO user's device: no reset, uninstall or data clearing without asking"
+       echo "INFO user's device: screenshots and video can show notifications; turn on Do Not Disturb before a run you publish"; fi
   command -v android >/dev/null && echo "PASS android CLI for driving" || { echo "FAIL android CLI not on PATH"; ok=0; }
   command -v node >/dev/null && echo "PASS node $(node --version) for web commands" || { echo "FAIL node not on PATH"; ok=0; }
   echo "INFO worktree $(git -C "$REPO" rev-parse --abbrev-ref HEAD)@$(git -C "$REPO" rev-parse --short HEAD), dirty files: $(git -C "$REPO" status --porcelain | wc -l | tr -d ' ')"
@@ -397,7 +400,9 @@ cmd_where() {
   local dump top
   # Read it whole first: grep -m1 on the live pipe makes dumpsys fail with SIGPIPE under pipefail.
   dump="$(a shell dumpsys activity activities | tr -d '\r')"
-  top="$(grep -m1 'topResumedActivity' <<<"$dump" | grep -o '[A-Za-z0-9_.]*/[A-Za-z0-9_.$]*' | head -1 || true)"
+  # API 31 prints no topResumedActivity line, only mResumedActivity.
+  top="$( { grep -m1 'topResumedActivity' <<<"$dump" || grep -m1 'mResumedActivity' <<<"$dump"; } \
+    | grep -o '[A-Za-z0-9_.]*/[A-Za-z0-9_.$]*' | head -1 || true)"
   if [[ "${top%%/*}" == "$PKG" ]]; then echo "${top##*.}"; else echo "-"; fi
 }
 
@@ -455,6 +460,8 @@ cmd_checked() { lp checked "${1:?usage: verify.sh checked <resource-id> [index]}
 # Screenshot plus the element tree beside it, and a sidecar naming the activity and commit.
 cmd_shot() {
   local name="${1:?usage: verify.sh shot <name>.png}" d; d="$(evidence_dir)"
+  # Evidence is uploaded for reviewers, so an open notification shade must not put the user's notifications in it.
+  a shell cmd statusbar collapse >/dev/null 2>&1 || true
   a exec-out screencap -p > "$d/$name"
   [[ -s "$d/$name" ]] || die "screencap returned nothing"
   (layout_json) > "$d/$name.layout.json" 2>/dev/null || true
@@ -562,9 +569,9 @@ probe_install() {
 # probe <host,host...> [mode] [timeout_ms]: one "RESULT run=.. host=.. mode=.. outcome=.." line per host.
 # Exit 1 when the run didn't finish, so a host without a result is never read as an outcome.
 cmd_probe() {
-  local usage="usage: verify.sh probe <host,host...> [single|window|split|late-sni] [timeout_ms]"
+  local usage="usage: verify.sh probe <host,host...> [single|window|split|late-sni|ip] [timeout_ms]"
   local hosts="${1:?$usage}" mode="${2:-single}" timeout="${3:-3000}" run="$RANDOM$RANDOM" lines="" wait_s n
-  case "$mode" in single|window|split|late-sni) ;; *) die "$usage" ;; esac
+  case "$mode" in single|window|split|late-sni|ip) ;; *) die "$usage" ;; esac
   probe_install
   a shell am start -S -W -n "$PROBE_PKG/.ProbeActivity" \
     --es hosts "$hosts" --es mode "$mode" --ei timeout "$timeout" --es run "$run" >/dev/null

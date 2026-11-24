@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.sync.impl.AccountInfoKeyUnavailableReason
 import com.duckduckgo.sync.impl.AccountInfoPrivateKeyProvider
 import com.duckduckgo.sync.impl.AccountInfoPrivateKeyResult
@@ -28,7 +29,9 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogEntrySkipReason.UNKNOWN_VERSION
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Skipped
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
@@ -40,12 +43,15 @@ import java.time.Instant
 
 class AuditLogEntryDecoderTest {
 
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
+
     private val privateKeyProvider: AccountInfoPrivateKeyProvider = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
-    private val decoder = RealAuditLogEntryDecoder(privateKeyProvider, syncJweCrypto)
+    private val decoder = RealAuditLogEntryDecoder(privateKeyProvider, syncJweCrypto, coroutineTestRule.testDispatcherProvider)
 
     @Test
-    fun whenLoginPayloadThenDecoded() {
+    fun whenLoginPayloadThenDecoded() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", """{"type":"login","occurred_at":"2026-09-02T14:03:11Z","device":$DEVICE_A}""")
 
@@ -58,7 +64,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenLogoutPayloadThenDecodedWithActor() {
+    fun whenLogoutPayloadThenDecodedWithActor() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", """{"type":"logout","occurred_at":"2026-09-02T14:03:11Z","device":$DEVICE_A,"actor":$DEVICE_B}""")
 
@@ -71,7 +77,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenDeviceInfoAddedPayloadThenDecoded() {
+    fun whenDeviceInfoAddedPayloadThenDecoded() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", """{"type":"device_info_added","occurred_at":"2026-09-02T14:03:11Z","device":$DEVICE_A}""")
 
@@ -81,7 +87,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenVersionIsNumberThenDecoded() {
+    fun whenVersionIsNumberThenDecoded() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", LOGIN_PAYLOAD)
 
@@ -91,7 +97,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenVersionIsUnknownThenSkippedWithoutDecrypting() {
+    fun whenVersionIsUnknownThenSkippedWithoutDecrypting() = runTest {
         givenKeyAvailable()
 
         val result = decodeEntries(listOf(entry("e1", rawVersion = "2"), entry("e2", rawVersion = null)))
@@ -101,7 +107,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenKeyUnavailableThenEveryReadableEntrySkippedAsKeyNotFound() {
+    fun whenKeyUnavailableThenEveryReadableEntrySkippedAsKeyNotFound() = runTest {
         whenever(privateKeyProvider.privateKey())
             .thenReturn(AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.NO_KEY_ON_SERVER))
 
@@ -117,7 +123,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenKeyFetchIsRateLimitedThenReasonReturnedSoCallerCanRetry() {
+    fun whenKeyFetchIsRateLimitedThenReasonReturnedSoCallerCanRetry() = runTest {
         whenever(privateKeyProvider.privateKey())
             .thenReturn(AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.RATE_LIMITED))
 
@@ -125,7 +131,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenKeyAvailableThenNoKeyUnavailableReason() {
+    fun whenKeyAvailableThenNoKeyUnavailableReason() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", LOGIN_PAYLOAD)
 
@@ -133,7 +139,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenPayloadDoesNotDecryptThenSkipped() {
+    fun whenPayloadDoesNotDecryptThenSkipped() = runTest {
         givenKeyAvailable()
         whenever(syncJweCrypto.jweDecryptRsaOaep("jwe-1", PRIVATE_KEY)).thenThrow(RuntimeException("bad tag"))
 
@@ -141,7 +147,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenPayloadIsNotJsonThenSkipped() {
+    fun whenPayloadIsNotJsonThenSkipped() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", "{ malformed")
 
@@ -149,7 +155,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenPayloadHasNoDeviceIdThenSkipped() {
+    fun whenPayloadHasNoDeviceIdThenSkipped() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", """{"type":"login","occurred_at":"2026-09-02T14:03:11Z","device":{"name":"n"}}""")
 
@@ -157,7 +163,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenOccurredAtIsNotATimestampThenSkipped() {
+    fun whenOccurredAtIsNotATimestampThenSkipped() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", """{"type":"login","occurred_at":"yesterday","device":$DEVICE_A}""")
 
@@ -165,7 +171,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenTypeIsUnknownThenSkipped() {
+    fun whenTypeIsUnknownThenSkipped() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", """{"type":"password_changed","occurred_at":"2026-09-02T14:03:11Z","device":$DEVICE_A}""")
 
@@ -173,7 +179,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenMixedEntriesThenInputOrderKept() {
+    fun whenMixedEntriesThenInputOrderKept() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", LOGIN_PAYLOAD)
         givenPayload("jwe-3", LOGIN_PAYLOAD)
@@ -184,7 +190,7 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenManyEntriesThenPrivateKeyFetchedOnce() {
+    fun whenManyEntriesThenPrivateKeyFetchedOnce() = runTest {
         givenKeyAvailable()
         givenPayload("jwe-1", LOGIN_PAYLOAD)
         givenPayload("jwe-2", LOGIN_PAYLOAD)
@@ -195,14 +201,14 @@ class AuditLogEntryDecoderTest {
     }
 
     @Test
-    fun whenNoEntryNeedsDecryptingThenPrivateKeyNotFetched() {
+    fun whenNoEntryNeedsDecryptingThenPrivateKeyNotFetched() = runTest {
         decoder.decode(listOf(entry("e1", rawVersion = "2")))
         decoder.decode(emptyList())
 
         verify(privateKeyProvider, never()).privateKey()
     }
 
-    private fun decodeEntries(entries: List<AuditLogEntry>) = decoder.decode(entries).entries
+    private suspend fun decodeEntries(entries: List<AuditLogEntry>) = decoder.decode(entries).entries
 
     private fun givenKeyAvailable() {
         whenever(privateKeyProvider.privateKey()).thenReturn(AccountInfoPrivateKeyResult.Available(PRIVATE_KEY))

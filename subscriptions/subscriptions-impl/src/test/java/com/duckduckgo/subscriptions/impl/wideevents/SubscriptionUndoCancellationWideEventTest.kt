@@ -130,7 +130,7 @@ class SubscriptionUndoCancellationWideEventTest {
             success = true,
             metadata = mapOf("method" to "in_app"),
         )
-        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any(), any())
     }
 
     @Test
@@ -150,6 +150,7 @@ class SubscriptionUndoCancellationWideEventTest {
             key = eq("activation_latency_ms_bucketed"),
             timeout = eq(10.minutes),
             buckets = any(),
+            rounding = any(),
         )
         verify(wideEventClient, never()).flowFinish(any(), any(), any())
     }
@@ -187,6 +188,7 @@ class SubscriptionUndoCancellationWideEventTest {
             key = eq("activation_latency_ms_bucketed"),
             timeout = eq(10.minutes),
             buckets = any(),
+            rounding = any(),
         )
         verify(wideEventClient).flowStep(wideEventId = 123L, stepName = "billing_flow_purchase", success = true)
     }

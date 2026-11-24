@@ -23,6 +23,7 @@ import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
+import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browser.api.autocomplete.AutoComplete
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteResult
@@ -36,6 +37,7 @@ import com.duckduckgo.browser.api.autocomplete.AutoCompleteFactory
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesViewModel
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.ViewScope
@@ -48,6 +50,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.EditPromptRequest
+import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.feature.maxUrlSuggestions
@@ -136,6 +139,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     chatStateStore: ChatStateStore,
     private val responseWaitWideEvent: DuckAiResponseWaitWideEvent,
+    private val attentionTracker: DuckAiResponseAttentionTracker,
     private val newChatHintsUsage: NewChatHintsUsage,
     private val newChatHintsPixels: NewChatHintsPixels,
     private val newChatDetector: NewChatDetector,
@@ -182,6 +186,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private val currentChat = MutableStateFlow<DuckAiChat?>(null)
     private var currentChatJob: Job? = null
     private var newChatShownJob: Job? = null
+    private val imageLaunchJob = ConflatedJob()
 
     // Kept in sync via bindCurrentUrlSource so submission pixels can read the tab's URL
     // synchronously — a suspend re-read at fire time would race the navigation the submission triggers.
@@ -354,7 +359,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             )
         }
         inputOutcomeTracker.promptSubmitted(submitMethod)
-        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool) }
+        activeDuckAiTabId(surface)?.let {
+            responseWaitWideEvent.onNativePromptSubmitted(it, browserMode, reasoningEffort, rawTool)
+            attentionTracker.onNativePromptSubmitted(it, browserMode)
+        }
     }
 
     fun fireSentPromptInChat() = duckChatPixels.fireSentPromptInChat(currentSurface())
@@ -369,7 +377,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun fireStopGenerationTapped() {
         val surface = currentSurface()
         duckChatPixels.fireStopGenerationTapped(surface)
-        activeDuckAiTabId(surface)?.let { responseWaitWideEvent.onStopTapped(it) }
+        activeDuckAiTabId(surface)?.let {
+            responseWaitWideEvent.onStopTapped(it)
+            attentionTracker.onStopTapped(it)
+        }
     }
 
     // The edit screen's synthetic key never matches a tab, so a flow started under it could only expire unwatched.
@@ -475,6 +486,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun selectModelById(modelId: String) {
+        imageLaunchJob.cancel()
         val model = modelManager.modelState.value.models.firstOrNull { it.id == modelId } ?: return
         viewModelScope.launch { modelManager.selectModel(model) }
     }
@@ -608,6 +620,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun setSelectedTool(tool: String?) {
+        imageLaunchJob.cancel()
         val tabId = activeTabId.value ?: return
         nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = tool) }
     }
@@ -690,7 +703,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, forceImageGeneration: Boolean = false) {
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open()) {
+        imageLaunchJob.cancel()
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
         val position = if (isBottom) NativeInputState.InputPosition.BOTTOM else NativeInputState.InputPosition.TOP
@@ -709,12 +723,18 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         } else {
             null
         }
-        // An "open Duck.ai for image generation" launch preselects image generation on the new tab.
-        // The image-capable model was already selected when the launch was requested.
-        if (isDuckAiMode && forceImageGeneration) {
-            nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+        // The selected model can change after a launch (a widget tap) was built, so the tool is only preselected
+        // once an image-capable model is selected; otherwise the options clear it again.
+        if (isDuckAiMode && launch is DuckChatLaunch.ImageGeneration) {
+            imageLaunchJob += viewModelScope.launch {
+                if (modelManager.ensureImageCapableModelSelected()) {
+                    nativeInputStatePublisher.update(tabId) { it.copy(selectedTool = Tool.IMAGE_GENERATION.rawValue) }
+                }
+            }
         }
     }
+
+    fun supportsImageUpload(): Boolean = modelManager.modelState.value.supportsImageUpload(duckChatInternal.isImageUploadEnabled())
 
     private fun replayPendingState(tabId: String) {
         if (hasPendingChatId) {
@@ -766,6 +786,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     }
 
     fun configureContextual(tabId: String) {
+        imageLaunchJob.cancel()
         activeTabId.value = tabId
         widgetConfig.update {
             it.copy(
@@ -782,6 +803,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * `state` only re-publishes when a value changes.
      */
     fun configureForEdit(sessionId: String) {
+        imageLaunchJob.cancel()
         activeTabId.value = editStateKey(sessionId)
         widgetConfig.value = WidgetConfig(
             inputContext = NativeInputState.InputContext.DUCK_AI,
