@@ -22,7 +22,6 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -36,16 +35,13 @@ internal class ModelsManifestWorker(
     lateinit var feature: PageTranslationFeature
 
     @Inject
-    lateinit var deviceSupport: PageTranslationDeviceSupport
-
-    @Inject
     lateinit var fetcher: Lazy<ModelsManifestFetcher>
 
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        if (!feature.translation().isEnabled() || !deviceSupport.isSupported()) return@withContext Result.success()
+        if (!feature.translation().isEnabled()) return@withContext Result.success()
 
         fetcher.value.fetch()
     }
