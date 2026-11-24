@@ -86,11 +86,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.impl.HttpsUpgradeStep
 import com.duckduckgo.request.interception.impl.RequestExemptions
 import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -178,7 +178,7 @@ class BrowserModule {
     fun webViewRequestInterceptor(
         resourceSurrogates: ResourceSurrogates,
         trackerDetector: TrackerDetector,
-        httpsUpgrader: HttpsUpgrader,
+        httpsUpgradeStep: HttpsUpgradeStep,
         privacyProtectionCountDao: PrivacyProtectionCountDao,
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
@@ -196,7 +196,7 @@ class BrowserModule {
         WebViewRequestInterceptor(
             resourceSurrogates,
             trackerDetector,
-            httpsUpgrader,
+            httpsUpgradeStep,
             privacyProtectionCountDao,
             adClickManager,
             cloakedCnameDetector,

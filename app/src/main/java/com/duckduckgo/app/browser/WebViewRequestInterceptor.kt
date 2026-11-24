@@ -42,12 +42,12 @@ import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttp
-import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.impl.BlocklistVerdict
+import com.duckduckgo.request.interception.impl.HttpsUpgradeStep
 import com.duckduckgo.request.interception.impl.RequestExemptions
 import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
@@ -87,7 +87,7 @@ interface RequestInterceptor {
 class WebViewRequestInterceptor(
     private val resourceSurrogates: ResourceSurrogates,
     private val trackerDetector: TrackerDetector,
-    private val httpsUpgrader: HttpsUpgrader,
+    private val httpsUpgradeStep: HttpsUpgradeStep,
     private val privacyProtectionCountDao: PrivacyProtectionCountDao,
     private val adClickManager: AdClickManager,
     private val cloakedCnameDetector: CloakedCnameDetector,
@@ -164,8 +164,7 @@ class WebViewRequestInterceptor(
 
         if (appUrlPixel(url)) return null
 
-        if (shouldUpgrade(request)) {
-            val newUri = url?.let { httpsUpgrader.upgrade(url) }
+        httpsUpgradeStep.upgradeOrNull(request)?.let { newUri ->
 
             withContext(dispatchers.main()) {
                 // Must run before loadUrl: the cancelled http request's callbacks must see the upgrade
@@ -173,7 +172,7 @@ class WebViewRequestInterceptor(
                 webView.loadUrl(newUri.toString(), requestRewriteDecision.getHeaders(request))
             }
 
-            appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementUpgradeCount() }
+            httpsUpgradeStep.recordUpgrade()
             return WebResourceResponse(null, null, null)
         }
 
@@ -405,9 +404,6 @@ class WebViewRequestInterceptor(
             null
         }
     }
-
-    private fun shouldUpgrade(request: WebResourceRequest) =
-        request.isForMainFrame && request.url != null && httpsUpgrader.shouldUpgrade(request.url)
 
     private fun trackingEvent(
         request: WebResourceRequest,

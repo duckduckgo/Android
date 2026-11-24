@@ -26,6 +26,8 @@ interface HttpsUpgrader {
 
     fun upgrade(uri: Uri): Uri
 
+    suspend fun recordUpgrade()
+
     @WorkerThread
     fun reloadData()
 }

@@ -20,6 +20,8 @@ import android.net.Uri
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.isHttps
 import com.duckduckgo.common.utils.toHttps
 import com.duckduckgo.di.scopes.AppScope
@@ -32,6 +34,7 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.util.concurrent.locks.ReentrantLock
 import javax.inject.Inject
@@ -51,6 +54,8 @@ class HttpsUpgraderImpl @Inject constructor(
     private val bloomFalsePositiveDao: HttpsFalsePositivesDao,
     private val toggle: FeatureToggle,
     private val https: Https,
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao,
+    private val dispatchers: DispatcherProvider,
 ) : HttpsUpgrader, MainProcessLifecycleObserver {
 
     private var bloomFilter: BloomFilter? = null
@@ -89,6 +94,10 @@ class HttpsUpgraderImpl @Inject constructor(
     }
 
     override fun upgrade(uri: Uri): Uri = uri.toHttps
+
+    override suspend fun recordUpgrade() = withContext(dispatchers.io()) {
+        privacyProtectionCountDao.incrementUpgradeCount()
+    }
 
     @WorkerThread
     private fun isInUpgradeList(host: String): Boolean {

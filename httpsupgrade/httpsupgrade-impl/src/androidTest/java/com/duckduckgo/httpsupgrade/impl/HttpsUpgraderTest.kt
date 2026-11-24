@@ -47,7 +47,9 @@ class HttpsUpgraderTest {
     fun before() {
         whenever(mockHttpsBloomFilterFactory.create()).thenReturn(bloomFilter)
         whenever(mockFeatureToggle.isFeatureEnabled(PrivacyFeatureName.HttpsFeatureName.value)).thenReturn(true)
-        testee = HttpsUpgraderImpl(mockHttpsBloomFilterFactory, mockBloomFalsePositiveListDao, mockFeatureToggle, mockHttps)
+        testee = HttpsUpgraderImpl(
+            mockHttpsBloomFilterFactory, mockBloomFalsePositiveListDao, mockFeatureToggle, mockHttps, mock(), mock(),
+        )
         testee.reloadData()
     }
 
