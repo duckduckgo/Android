@@ -17,6 +17,7 @@
 package com.duckduckgo.pagetranslation.impl.languagepack
 
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.sha256
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.impl.languagepack.RealLanguagePackFetcher.Companion.COMPRESSED_FILE_SUFFIX
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
@@ -32,10 +33,6 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
-import okio.HashingSink
-import okio.blackholeSink
-import okio.buffer
-import okio.source
 import java.io.File
 import java.io.IOException
 import javax.inject.Inject
@@ -106,12 +103,7 @@ class RealLanguagePackInstaller @Inject constructor(
         return stagingDirectory.renameTo(packDirectory)
     }
 
-    private fun File.matches(size: Long, sha256: String): Boolean = length() == size && getSha256().equals(sha256, ignoreCase = true)
-
-    private fun File.getSha256(): String = HashingSink.sha256(blackholeSink()).use { sink ->
-        source().buffer().use { it.readAll(sink) }
-        sink.hash.hex()
-    }
+    private fun File.matches(size: Long, sha256: String): Boolean = length() == size && this.sha256().equals(sha256, ignoreCase = true)
 
     companion object {
         const val MANIFEST_ENTRY_FILE_NAME = "manifest-entry.json"
