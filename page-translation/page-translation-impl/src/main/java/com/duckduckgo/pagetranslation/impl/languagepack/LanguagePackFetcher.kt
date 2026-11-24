@@ -55,11 +55,17 @@ interface LanguagePackFetcher {
 }
 
 @ContributesBinding(AppScope::class)
-class RealLanguagePackFetcher @Inject constructor(
-    @ModelsHttpClient private val client: Lazy<OkHttpClient>,
+class RealLanguagePackFetcher internal constructor(
+    private val client: Lazy<OkHttpClient>,
     private val dispatchers: DispatcherProvider,
-    private val getUsableSpace: (File) -> Long = File::getUsableSpace,
+    private val getUsableSpace: (File) -> Long,
 ) : LanguagePackFetcher {
+    @Inject
+    constructor(
+        @ModelsHttpClient client: Lazy<OkHttpClient>,
+        dispatchers: DispatcherProvider,
+    ) : this(client, dispatchers, File::getUsableSpace)
+
     override suspend fun fetch(
         baseUrl: String,
         model: TranslationModel,
