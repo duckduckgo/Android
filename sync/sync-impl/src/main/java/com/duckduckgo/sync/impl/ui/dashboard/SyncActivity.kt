@@ -322,6 +322,7 @@ class SyncActivity : DuckDuckGoActivity() {
         authPromptRenderer.bind(viewModel.authPrompts)
 
         if (savedInstanceState == null) {
+            viewModel.onScreenOpened(launchSource)
             val setupUrl = syncSetupUrl
             val startSyncFlow = startSyncFlowParams
             when {

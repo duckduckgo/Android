@@ -222,8 +222,10 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreatedThenSyncSettingsShownPixelFired() = runViewModelTest {
-        verify(syncPixels).fireSyncSettingsShown()
+    fun whenScreenOpenedThenSyncSettingsShownPixelFiredWithLaunchSource() = runViewModelTest {
+        testee.onScreenOpened(launchSource = "typed_url_duck_com")
+
+        verify(syncPixels).fireSyncSettingsShown("typed_url_duck_com")
     }
 
     @Test

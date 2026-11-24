@@ -146,8 +146,8 @@ class SyncActivityViewModel @Inject constructor(
 
     val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
-    init {
-        syncPixels.fireSyncSettingsShown()
+    fun onScreenOpened(launchSource: String) {
+        syncPixels.fireSyncSettingsShown(launchSource)
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow().onStart {
