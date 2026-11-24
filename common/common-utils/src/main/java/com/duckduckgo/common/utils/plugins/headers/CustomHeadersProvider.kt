@@ -16,6 +16,7 @@
 
 package com.duckduckgo.common.utils.plugins.headers
 
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -27,9 +28,10 @@ interface CustomHeadersProvider {
     /**
      * Returns a [Map] of custom headers that should be added to the request.
      * @param url The url of the request.
+     * @param browserMode The mode of the tab making the request.
      * @return A [Map] of headers.
      */
-    fun getCustomHeaders(url: String): Map<String, String>
+    fun getCustomHeaders(url: String, browserMode: BrowserMode): Map<String, String>
 
     /**
      * A plugin point for custom headers that should be added to all requests.
@@ -41,9 +43,10 @@ interface CustomHeadersProvider {
          * Returns a [Map] of headers that should be added to the request IF the url passed allows for them to be
          * added.
          * @param url The url of the request.
+         * @param browserMode The mode of the tab making the request.
          * @return A [Map] of headers.
          */
-        fun getHeaders(url: String): Map<String, String>
+        fun getHeaders(url: String, browserMode: BrowserMode): Map<String, String>
     }
 }
 
@@ -52,10 +55,10 @@ class RealCustomHeadersProvider @Inject constructor(
     private val customHeadersPluginPoint: PluginPoint<CustomHeadersProvider.CustomHeadersPlugin>,
 ) : CustomHeadersProvider {
 
-    override fun getCustomHeaders(url: String): Map<String, String> {
+    override fun getCustomHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
         val customHeaders = mutableMapOf<String, String>()
         customHeadersPluginPoint.getPlugins().forEach {
-            customHeaders.putAll(it.getHeaders(url))
+            customHeaders.putAll(it.getHeaders(url, browserMode))
         }
         return customHeaders.toMap()
     }

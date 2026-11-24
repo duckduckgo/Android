@@ -1774,7 +1774,7 @@ class BrowserTabViewModel @Inject constructor(
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
 
-    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it, browserMode) } ?: emptyMap()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
