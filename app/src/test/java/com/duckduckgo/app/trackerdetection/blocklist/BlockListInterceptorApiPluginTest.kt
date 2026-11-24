@@ -166,9 +166,8 @@ class BlockListInterceptorApiPluginTest {
         assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
     }
 
-    // Event Hub spec EH-M-SET-1
     @Test
-    fun `when settings include metrics and cohort is treatment use treatment URL`() {
+    fun `EH-M-SET-1 treatment cohort uses treatment URL when settings include metrics`() {
         testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
             State(
                 remoteEnableState = true,
@@ -187,9 +186,8 @@ class BlockListInterceptorApiPluginTest {
         assertEquals(getUrl("anotherTreatmentUrl"), result.request.url.toString())
     }
 
-    // Event Hub spec EH-M-SET-1
     @Test
-    fun `when settings include metrics and cohort is control use control URL`() {
+    fun `EH-M-SET-1 control cohort uses control URL when settings include metrics`() {
         testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
             State(
                 remoteEnableState = true,
