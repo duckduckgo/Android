@@ -55,15 +55,18 @@ class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
         }
     }
 
+    private fun enclosingResourceOf(node: Node): Node =
+        generateSequence(node.parentNode) { it.parentNode }.firstOrNull { it.nodeName in RESOURCE_ELEMENTS } ?: node.parentNode
+
     private fun isNodeNotTranslatable(node: Node) : Boolean {
-        val translatable = node.parentNode.attributes.getNamedItem("translatable")
+        val translatable = enclosingResourceOf(node).attributes.getNamedItem("translatable")
         val translatableValue = (translatable as Attr?)?.value
         return translatableValue != SdkConstants.VALUE_FALSE
     }
 
     private fun doesNodeContainPlaceholdersWithoutInstructionsOrParentInstructions(node: Node, parentHasInstruction: Boolean) : Boolean {
         val text = node.nodeValue
-        val instruction = node.parentNode.attributes.getNamedItem("instruction")?.nodeValue
+        val instruction = enclosingResourceOf(node).attributes.getNamedItem("instruction")?.nodeValue
         return PLACEHOLDERS.firstOrNull { text.contains(it) } != null && (instruction.isNullOrEmpty() && !parentHasInstruction)
     }
 
@@ -100,6 +103,8 @@ class MissingInstructionDetector : ResourceXmlDetector(), XmlScanner {
 
 
     companion object {
+        private val RESOURCE_ELEMENTS = setOf("string", "item")
+
         val PLACEHOLDERS = listOf(
             "%s", "%d", "%f", "%o", "%1${'$'}"
         )
