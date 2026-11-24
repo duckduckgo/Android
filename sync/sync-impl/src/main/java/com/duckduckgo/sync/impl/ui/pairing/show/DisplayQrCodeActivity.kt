@@ -42,7 +42,6 @@ import com.duckduckgo.sync.impl.databinding.DialogSyncCheckOtherDeviceBinding
 import com.duckduckgo.sync.impl.databinding.DialogSyncConnectingBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command
@@ -77,7 +76,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
     lateinit var shareAction: ShareAction
 
     private val launchSource
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
             "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
         }
 
@@ -280,7 +279,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)

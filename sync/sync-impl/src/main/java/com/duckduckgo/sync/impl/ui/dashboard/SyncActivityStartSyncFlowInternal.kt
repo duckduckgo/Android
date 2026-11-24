@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2024 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +17,15 @@
 package com.duckduckgo.sync.impl.ui.dashboard
 
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 
-data class SyncActivityStartSyncFlow(
-    val source: SyncLaunchSource,
-    val start: SyncFlowStart = SyncFlowStart.Direct,
+/**
+ * [SyncActivityStartSyncFlow] with the options only Sync's own promotions use.
+ *
+ * @property offerDesktopApp if the user already syncs, first asks whether to sync with a desktop app they have or get one.
+ */
+internal data class SyncActivityStartSyncFlowInternal(
+    val source: String?,
+    val joinExistingAccount: Boolean = false,
+    val offerDesktopApp: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
-
-enum class SyncFlowStart {
-    Direct,
-    AskSyncWithDesktop,
-}

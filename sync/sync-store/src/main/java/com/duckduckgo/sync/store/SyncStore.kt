@@ -72,6 +72,12 @@ interface SyncStore {
 
     fun isSignedInFlow(): Flow<Boolean>
 
+    /**
+     * The last known sign-in state, kept in memory so it can be read on the main thread without touching disk.
+     * Null until the store has read it once after the process started.
+     */
+    fun cachedIsSignedIn(): Boolean?
+
     fun isSignedIn(): Boolean
 
     fun storeCredentials(
@@ -287,6 +293,8 @@ constructor(
     override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
+
+    override fun cachedIsSignedIn(): Boolean? = isSignedInStateFlow.replayCache.firstOrNull()
 
     override fun isSignedIn() = !primaryKey.isNullOrEmpty() && !userId.isNullOrEmpty()
 

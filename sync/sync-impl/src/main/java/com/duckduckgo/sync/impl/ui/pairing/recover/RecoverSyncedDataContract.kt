@@ -19,7 +19,6 @@ package com.duckduckgo.sync.impl.ui.pairing.recover
 import android.content.Context
 import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataContract.Input
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataContract.Output
@@ -53,7 +52,7 @@ class RecoverSyncedDataContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val launchSource: SyncLaunchSource,
+        val launchSource: String,
         val isAuthRequired: Boolean,
     )
 

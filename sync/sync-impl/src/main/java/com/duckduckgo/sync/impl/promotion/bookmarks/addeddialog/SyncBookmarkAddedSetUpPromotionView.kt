@@ -32,6 +32,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarkAddedSetUpPromotionBinding
@@ -42,8 +43,6 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.B
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedSetUpPromotionInteractor.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedSetUpPromotionInteractor.Command.DismissPromotion
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedSetUpPromotionInteractor.Command.LaunchSyncSetup
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -130,7 +129,10 @@ class SyncBookmarkAddedSetUpPromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSetup() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialog))
+        globalActivityStarter.start(
+            context,
+            SyncActivityStartSyncFlow(source = "promotion_bookmark_added_dialog"),
+        )
     }
 }
 

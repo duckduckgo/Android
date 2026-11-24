@@ -37,7 +37,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
@@ -58,7 +57,7 @@ import kotlinx.coroutines.withContext
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
     @Assisted private val syncEntryPoint: SyncEntryPoint,
-    @Assisted private val launchSource: SyncLaunchSource,
+    @Assisted private val launchSource: String,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
@@ -263,13 +262,13 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             syncEntryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val syncEntryPoint: SyncEntryPoint,
-            private val launchSource: SyncLaunchSource,
+            private val launchSource: String,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")

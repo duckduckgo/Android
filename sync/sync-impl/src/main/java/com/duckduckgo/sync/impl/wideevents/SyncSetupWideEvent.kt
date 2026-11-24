@@ -27,7 +27,8 @@ import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.UI_VERSION_V2
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.impl.pixels.toKnownLaunchSource
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity.Companion.LAUNCH_SOURCE_OTHER
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -35,7 +36,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SyncSetupWideEvent {
-    suspend fun onFlowStarted(launchSource: SyncLaunchSource = SyncLaunchSource.Other)
+    suspend fun onFlowStarted(launchSource: String = LAUNCH_SOURCE_OTHER)
     suspend fun onDeviceAuthNotEnrolled()
     suspend fun onUserAuthSuccess()
     suspend fun onIntroScreenShown()
@@ -77,7 +78,7 @@ class SyncSetupWideEventImpl @Inject constructor(
         return cachedFlowId
     }
 
-    override suspend fun onFlowStarted(launchSource: SyncLaunchSource) {
+    override suspend fun onFlowStarted(launchSource: String) {
         if (!isEventEnabled()) return
 
         getCurrentWideEventId()?.let { existingId ->
@@ -90,7 +91,7 @@ class SyncSetupWideEventImpl @Inject constructor(
 
         cachedFlowId = wideEventClient.flowStart(
             name = FLOW_NAME,
-            flowEntryPoint = launchSource.value,
+            flowEntryPoint = launchSource.toKnownLaunchSource(),
             metadata = buildMap {
                 put(KEY_USER_AUTH_REQUIRED, buildConfig.isAuthRequired.toString())
                 putAll(uiMetadata())

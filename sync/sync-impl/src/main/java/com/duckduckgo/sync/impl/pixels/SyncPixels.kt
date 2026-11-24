@@ -69,7 +69,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity.Companion.LAUNCH_SOURCE_OTHER
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
@@ -109,7 +109,7 @@ interface SyncPixels {
      * Fired when user sets up a sync account directly.
      * @param launchSource: the entry point that opened Sync.
      */
-    fun fireSignupDirectPixel(launchSource: SyncLaunchSource)
+    fun fireSignupDirectPixel(launchSource: String)
 
     fun fireSyncAccountErrorPixel(
         result: Error,
@@ -138,12 +138,12 @@ interface SyncPixels {
     fun fireSetupAuthenticationResult(result: AuthenticationResult, source: AuthenticationSource)
     fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         path: SetupPath?,
         myRole: SetupRole?,
         peerKind: PeerKind?,
     )
-    fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: SyncLaunchSource, reason: CancellationReason? = null)
+    fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: String, reason: CancellationReason? = null)
     fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType)
     fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
     fun fireSyncSetupCodePastedParseFailure(screenType: ScreenType, reason: SetupFailureReason? = null)
@@ -168,7 +168,7 @@ interface SyncPixels {
      */
     fun fireSyncSetupFailed(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         reason: SetupFailureReason,
         path: SetupPath? = null,
         myRole: SetupRole? = null,
@@ -380,13 +380,13 @@ class RealSyncPixels @Inject constructor(
      */
     private fun setupSuccessParams(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         path: SetupPath?,
         myRole: SetupRole?,
         peerKind: PeerKind?,
     ): Map<String, String> = buildMap {
         put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
-        put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.value)
+        put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.toKnownLaunchSource())
         if (path != null) put(SYNC_SETUP_PATH, path.value)
         if (myRole != null) put(SYNC_SETUP_MY_ROLE, myRole.value)
         if (peerKind != null) put(SYNC_SETUP_PEER_KIND, peerKind.value)
@@ -421,11 +421,11 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireSignupDirectPixel(launchSource: SyncLaunchSource) {
+    override fun fireSignupDirectPixel(launchSource: String) {
         pixel.fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
             parameters = buildMap {
-                putAll(buildSourceMap(launchSource.value))
+                putAll(buildSourceMap(launchSource.toKnownLaunchSource()))
                 putAll(setupUiMetadata())
             },
         )
@@ -733,12 +733,12 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: SyncLaunchSource, reason: CancellationReason?) {
+    override fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: String, reason: CancellationReason?) {
         pixel.fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
             parameters = buildMap {
                 put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
-                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.value)
+                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.toKnownLaunchSource())
                 if (reason != null) put(SYNC_SETUP_REASON, reason.value)
                 putAll(setupFlowMetadata())
             },
@@ -747,7 +747,7 @@ class RealSyncPixels @Inject constructor(
 
     override fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         path: SetupPath?,
         myRole: SetupRole?,
         peerKind: PeerKind?,
@@ -760,7 +760,7 @@ class RealSyncPixels @Inject constructor(
 
     override fun fireSyncSetupFailed(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         reason: SetupFailureReason,
         path: SetupPath?,
         myRole: SetupRole?,
@@ -771,7 +771,7 @@ class RealSyncPixels @Inject constructor(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             parameters = buildMap {
                 put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
-                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.value)
+                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.toKnownLaunchSource())
                 put(SYNC_SETUP_REASON, reason.value)
                 if (path != null) put(SYNC_SETUP_PATH, path.value)
                 if (myRole != null) put(SYNC_SETUP_MY_ROLE, myRole.value)
@@ -1336,7 +1336,23 @@ internal fun Int.toSetupFailureReason(): SetupFailureReason = when (this) {
  * setup errors (the latter pending the cancellation-telemetry follow-up).
  */
 
-internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, launchSource: SyncLaunchSource, outcome: DispatchOutcome) {
+private val KNOWN_LAUNCH_SOURCES = setOf(
+    "promotion_bookmarks",
+    "promotion_bookmarks_multi_device",
+    "promotion_passwords",
+    "promotion_passwords_multi_device",
+    "promotion_bookmark_added_dialog",
+    "promotion_bookmark_multi_device_added_dialog",
+    "promotion_ai_chat",
+    "promotion_passwords_import",
+    "promotion_bookmarks_import",
+    LAUNCH_SOURCE_OTHER,
+)
+
+// Launch sources arrive as free-form strings through the public SyncActivityStartSyncFlow, so we send only the ones we know.
+internal fun String.toKnownLaunchSource(): String = takeIf { it in KNOWN_LAUNCH_SOURCES } ?: LAUNCH_SOURCE_OTHER
+
+internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, launchSource: String, outcome: DispatchOutcome) {
     when (outcome) {
         is UpgradeRequired ->
             fireSyncSetupFailed(screenType, launchSource, SetupFailureReason.NEEDS_UPGRADE, outcome.path, outcome.myRole, outcome.peerKind)
@@ -1366,7 +1382,7 @@ internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, launchSource: Sy
 // Both devices fire the "abandoned" pixel on a v2 confirmation denial — from each device's POV the
 // setup ended via denial. PAIRING_CANCELLED is this device's own denial; PAIRING_REJECTED is the peer's
 // denial received on the wire.
-internal fun SyncPixels.fireSetupCancelledIfDenied(screenType: ScreenType, launchSource: SyncLaunchSource, outcome: DispatchOutcome) {
+internal fun SyncPixels.fireSetupCancelledIfDenied(screenType: ScreenType, launchSource: String, outcome: DispatchOutcome) {
     if (outcome is Failed &&
         (outcome.code == AccountErrorCodes.PAIRING_CANCELLED.code || outcome.code == AccountErrorCodes.PAIRING_REJECTED.code)
     ) {

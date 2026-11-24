@@ -47,7 +47,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
@@ -102,7 +101,7 @@ class ProcessSyncCodeViewModelTest {
 
     private fun createTestee(
         codeSource: SyncCodeSource = SyncCodeSource.Scanned("sync-url", SyncEntryPoint.SYNC_NEW_ACCOUNT),
-        launchSource: SyncLaunchSource = SyncLaunchSource.Other,
+        launchSource: String = "other",
     ): ProcessSyncCodeViewModel {
         whenever(accountRepository.getAccountInfo()).thenReturn(accountInfo)
         return ProcessSyncCodeViewModel(
@@ -827,7 +826,7 @@ class ProcessSyncCodeViewModelTest {
             cancel()
         }
         verify(syncPixels).fireLoginPixel()
-        verify(syncPixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, SyncLaunchSource.Other, null, null, null)
+        verify(syncPixels).fireSyncSetupFinishedSuccessfully(SYNC_CONNECT, "other", null, null, null)
     }
 
     @Test
