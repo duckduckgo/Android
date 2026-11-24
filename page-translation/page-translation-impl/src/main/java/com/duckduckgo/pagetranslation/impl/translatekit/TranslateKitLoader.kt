@@ -29,6 +29,8 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.io.File
+import java.io.IOException
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -36,6 +38,10 @@ interface TranslateKitLibrary {
     fun init()
 
     fun isInitialized(): Boolean
+
+    /** Decompresses the zstd [compressedFile] into [outputFile]. Requires [init] first and throws [IOException] on bad input. */
+    @Throws(IOException::class)
+    fun decompressZstd(compressedFile: File, outputFile: File)
 }
 
 @Suppress("DenyListedApi", "unused")
@@ -46,6 +52,8 @@ class RealTranslateKitLibrary @Inject constructor(
     override fun init() = TranslateKit.init(context)
 
     override fun isInitialized(): Boolean = TranslateKit.isInitialized()
+
+    override fun decompressZstd(compressedFile: File, outputFile: File) = TranslateKit.decompressZstd(compressedFile.path, outputFile.path)
 }
 
 interface TranslateKitLoader {
