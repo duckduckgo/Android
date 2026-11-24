@@ -102,6 +102,20 @@
                 android:visibility="gone" />
         </FrameLayout>
 
+        <FrameLayout
+            android:id="@+id/translationBannerTop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/daxDialogOnboardingCtaContent"
+            android:elevation="@dimen/keyline_4" />
+
+        <FrameLayout
+            android:id="@+id/translationBannerBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/bottomBrowserOutlineStroke"
+            android:elevation="@dimen/keyline_4" />
+
         <com.duckduckgo.app.browser.duckchat.SwipeUpNewChatIndicator
             android:id="@+id/swipeUpNewChatIndicator"
             android:layout_width="match_parent"
@@ -115,7 +129,8 @@
             android:id="@+id/swipeRefreshContainer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_below="@id/daxDialogOnboardingCtaContent">
+            android:layout_above="@id/translationBannerBottom"
+            android:layout_below="@id/translationBannerTop">
 
             <FrameLayout
                 android:layout_width="match_parent"
