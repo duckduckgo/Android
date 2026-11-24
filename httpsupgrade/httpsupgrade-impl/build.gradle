@@ -44,9 +44,9 @@ dependencies {
     implementation Square.retrofit2.retrofit
 
     testImplementation project(':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.work.testing
     testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"

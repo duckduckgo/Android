@@ -611,7 +611,7 @@ class WebViewRequestInterceptorTest {
             appCoroutineScope = coroutineTestRule.testScope,
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
-            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
+            trackerStatsWriter = mockTrackerStatsWriter,
         )
         val caller = launch(start = CoroutineStart.UNDISPATCHED) {
             testee.shouldIntercept(request = mockRequest, documentUri = null, webView = webView, webViewClientListener = null)
