@@ -42,6 +42,7 @@ import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
@@ -81,7 +82,9 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
@@ -142,6 +145,7 @@ class NewUserOnboardingPlanProviderTest {
     }
     private val providerOptions = listOf(TestOption("openai"), TestOption("anthropic"), TestOption("gemma"))
     private val duckAiModelChoice = FakeOnboardingDuckAiModelChoice(options = providerOptions)
+    private val extendedOnboardingFeatureToggles = FakeFeatureToggleFactory.create(ExtendedOnboardingFeatureToggles::class.java)
     private val togglePositionOptions = listOf(TestOption("duckAI"), TestOption("lastUsed"))
     private val togglePositionPlugin = FakeOnboardingSingleChoiceDataPlugin(
         id = OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition,
@@ -212,6 +216,7 @@ class NewUserOnboardingPlanProviderTest {
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
             duckAiModelChoice = duckAiModelChoice,
+            extendedOnboardingFeatureToggles = extendedOnboardingFeatureToggles,
             deviceMigration = deviceMigration,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -546,6 +551,25 @@ class NewUserOnboardingPlanProviderTest {
             ),
             orchestrator.state.value,
         )
+    }
+
+    @Test
+    fun `when the model choice is turned off remotely then the step is skipped`() = runTest {
+        extendedOnboardingFeatureToggles.duckAiModelChoice().setRawStoredState(State(enable = false))
+
+        startSegmentedAtAiProviderChoice()
+
+        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
+    @Test
+    fun `when the model choice is turned off remotely then its options are not prefetched`() = runTest {
+        extendedOnboardingFeatureToggles.duckAiModelChoice().setRawStoredState(State(enable = false))
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+
+        start()
+
+        assertEquals(0, duckAiModelChoice.prefetchCount)
     }
 
     @Test

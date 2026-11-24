@@ -45,6 +45,7 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.welcome.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -127,6 +128,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
     private val duckAiModelChoice: OnboardingDuckAiModelChoice,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val deviceMigration: DeviceMigration,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
@@ -283,7 +285,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         val duckAiStateChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiState)
 
         // Warms the options up while the user is still several screens away from the step that renders them.
-        appCoroutineScope.launch(dispatchers.io()) { duckAiModelChoice.prefetch() }
+        appCoroutineScope.launch(dispatchers.io()) { if (isDuckAiModelChoiceEnabled()) duckAiModelChoice.prefetch() }
         appCoroutineScope.launch(dispatchers.io()) { togglePositionChoice?.prefetch() }
 
         return rootPlan(
@@ -745,9 +747,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private suspend fun singleChoiceDataPlugin(id: OnboardingSingleChoiceDataPlugin.Id): OnboardingSingleChoiceDataPlugin? =
         singleChoiceDataPlugins.getPlugins().firstOrNull { it.id == id }
 
+    private suspend fun isDuckAiModelChoiceEnabled(): Boolean = withContext(dispatchers.io()) {
+        extendedOnboardingFeatureToggles.duckAiModelChoice().isEnabled()
+    }
+
     private fun modelProviderStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
-        val options = SuspendMemo { duckAiModelChoice.options() }
+        val options = SuspendMemo { if (isDuckAiModelChoiceEnabled()) duckAiModelChoice.options() else emptyList() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.MODEL_PROVIDER,
             pixelName = pixelName,

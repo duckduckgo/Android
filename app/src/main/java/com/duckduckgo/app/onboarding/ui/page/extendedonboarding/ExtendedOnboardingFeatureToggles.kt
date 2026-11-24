@@ -49,4 +49,8 @@ interface ExtendedOnboardingFeatureToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun contextualOnboardingTimeLimit(): Toggle
+
+    /** Remote kill switch for the Duck.ai model step of the segmented onboarding. When off, the step is skipped. */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun duckAiModelChoice(): Toggle
 }
