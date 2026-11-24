@@ -183,17 +183,6 @@ object SyncStoreModule {
     fun provideSyncAutoRestoreDataStore(context: Context): DataStore<Preferences> {
         return context.autoRestoreDataStore
     }
-
-    private val Context.notificationsDataStore: DataStore<Preferences> by preferencesDataStore(
-        name = "com.duckduckgo.sync.notifications",
-    )
-
-    @Provides
-    @SingleIn(AppScope::class)
-    @SyncNotificationsStore
-    fun provideSyncNotificationsDataStore(context: Context): DataStore<Preferences> {
-        return context.notificationsDataStore
-    }
 }
 
 @Qualifier
@@ -201,6 +190,3 @@ annotation class SyncPromotion
 
 @Qualifier
 annotation class SyncAutoRestoreStore
-
-@Qualifier
-annotation class SyncNotificationsStore

@@ -23,9 +23,6 @@ import android.content.Context
 import android.provider.Settings
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.core.Preferences
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -40,7 +37,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 import org.junit.runner.RunWith
 import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
@@ -52,17 +48,14 @@ class RealNewLoginNotificationPermissionTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private val temporaryFolder = TemporaryFolder.builder().assureDeletion().build().also { it.create() }
-
-    private val dataStore: DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        scope = coroutineTestRule.testScope,
-        produceFile = { temporaryFolder.newFile("temp.preferences_pb") },
-    )
-
     private val context = InstrumentationRegistry.getInstrumentation().targetContext
     private val notificationManager = NotificationManagerCompat.from(context)
 
-    private val permission = newPermission()
+    private val permission = RealNewLoginNotificationPermission(
+        context = context,
+        notificationManager = notificationManager,
+        dispatchers = coroutineTestRule.testDispatcherProvider,
+    )
 
     @Before
     fun setUp() {
@@ -121,41 +114,17 @@ class RealNewLoginNotificationPermissionTest {
     }
 
     @Test
-    fun whenPermissionNeverRequestedThenRequestPermission() = runTest {
-        givenPermissionGranted(false)
-
-        assertEquals(REQUEST_PERMISSION, permission.nextStep(shouldShowRationale = false))
-    }
-
-    @Test
     fun whenPermissionRefusedOnceThenRequestPermissionAgain() = runTest {
         givenPermissionGranted(false)
-        permission.onPermissionRequested()
 
         assertEquals(REQUEST_PERMISSION, permission.nextStep(shouldShowRationale = true))
     }
 
     @Test
-    fun whenRationaleShownFromAnotherPromptThenRequestPermission() = runTest {
+    fun whenPermissionMissingAndNoRationaleThenOpenSettings() = runTest {
         givenPermissionGranted(false)
-
-        assertEquals(REQUEST_PERMISSION, permission.nextStep(shouldShowRationale = true))
-    }
-
-    @Test
-    fun whenPermissionRequestedBeforeAndNoRationaleThenOpenSettings() = runTest {
-        givenPermissionGranted(false)
-        permission.onPermissionRequested()
 
         assertEquals(OPEN_SETTINGS, permission.nextStep(shouldShowRationale = false))
-    }
-
-    @Test
-    fun whenPermissionRequestedThenRememberedByNewInstance() = runTest {
-        givenPermissionGranted(false)
-        permission.onPermissionRequested()
-
-        assertEquals(OPEN_SETTINGS, newPermission().nextStep(shouldShowRationale = false))
     }
 
     @Test
@@ -208,13 +177,6 @@ class RealNewLoginNotificationPermissionTest {
         assertEquals(context.packageName, intent.getStringExtra(Settings.EXTRA_APP_PACKAGE))
         assertEquals(NEW_LOGIN_CHANNEL_ID, intent.getStringExtra(Settings.EXTRA_CHANNEL_ID))
     }
-
-    private fun newPermission() = RealNewLoginNotificationPermission(
-        context = context,
-        notificationManager = notificationManager,
-        dataStore = dataStore,
-        dispatchers = coroutineTestRule.testDispatcherProvider,
-    )
 
     private fun givenPermissionGranted(granted: Boolean) {
         val app = shadowOf(context as Application)

@@ -24,17 +24,11 @@ import android.os.Build
 import android.provider.Settings
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.edit
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step
-import com.duckduckgo.sync.impl.di.SyncNotificationsStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -49,11 +43,6 @@ interface NewLoginNotificationPermission {
      * @param shouldShowRationale the result of `ActivityCompat.shouldShowRequestPermissionRationale(activity, POST_NOTIFICATIONS)`
      */
     suspend fun nextStep(shouldShowRationale: Boolean): Step
-
-    /**
-     * Call this each time the system permission dialog is requested.
-     */
-    suspend fun onPermissionRequested()
 
     /**
      * The system screen where the user can turn on what [canPost] needs.
@@ -72,7 +61,6 @@ interface NewLoginNotificationPermission {
 class RealNewLoginNotificationPermission @Inject constructor(
     private val context: Context,
     private val notificationManager: NotificationManagerCompat,
-    @SyncNotificationsStore private val dataStore: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,
 ) : NewLoginNotificationPermission {
 
@@ -84,15 +72,10 @@ class RealNewLoginNotificationPermission @Inject constructor(
         when {
             canPost() -> Step.NONE
             hasPermission() -> Step.OPEN_SETTINGS
-            // Without a rationale, Android does not tell "never asked" from "refused twice", and after two refusals it no longer shows the dialog.
-            shouldShowRationale || !wasPermissionRequested() -> Step.REQUEST_PERMISSION
+            shouldShowRationale -> Step.REQUEST_PERMISSION
+            // Without a rationale the dialog was never shown or is blocked after two refusals; Android does not tell them apart.
+            // Onboarding already asks, so blocked is likely, and settings works in both cases.
             else -> Step.OPEN_SETTINGS
-        }
-    }
-
-    override suspend fun onPermissionRequested() {
-        withContext(dispatchers.io()) {
-            dataStore.edit { it[permissionRequestedKey] = true }
         }
     }
 
@@ -107,16 +90,13 @@ class RealNewLoginNotificationPermission @Inject constructor(
     }
 
     private fun hasPermission(): Boolean =
-        Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+        Build.VERSION.SDK_INT < 33 ||
             ContextCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
 
     private fun isChannelOff(): Boolean =
         notificationManager.getNotificationChannelCompat(NEW_LOGIN_CHANNEL_ID)?.importance == NotificationManagerCompat.IMPORTANCE_NONE
 
-    private suspend fun wasPermissionRequested(): Boolean = dataStore.data.first()[permissionRequestedKey] ?: false
-
     internal companion object {
         const val NEW_LOGIN_CHANNEL_ID = "com.duckduckgo.sync.newLogin"
-        private val permissionRequestedKey = booleanPreferencesKey("new_login_permission_requested")
     }
 }
