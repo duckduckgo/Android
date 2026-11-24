@@ -17,14 +17,17 @@
 package com.duckduckgo.sync.impl.auditlog
 
 import android.app.Notification
+import android.app.PendingIntent
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.engine.SyncEngineLifecycle
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogScreenParams
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
@@ -53,6 +56,7 @@ class RealNewLoginNotifier @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val stateStore: AuditLogCheckStateStore,
     private val loginAuditLogFeature: LoginAuditLogFeature,
+    private val globalActivityStarter: GlobalActivityStarter,
     private val dispatchers: DispatcherProvider,
 ) : NewLoginNotifier, SyncEngineLifecycle {
 
@@ -119,7 +123,20 @@ class RealNewLoginNotifier @Inject constructor(
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setOnlyAlertOnce(!alert)
+            .setContentIntent(deviceActivityIntent())
+            .setAutoCancel(true)
             .build()
+
+    private fun deviceActivityIntent(): PendingIntent? {
+        val intent = globalActivityStarter.startIntent(context, SyncAuditLogScreenParams(openedFromNotification = true)) ?: return null
+        // No parent stack: when the app is open, Back returns to what the user was doing instead of a rebuilt Settings path.
+        return PendingIntent.getActivity(
+            context,
+            NEW_LOGIN_NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+    }
 
     internal companion object {
         const val NEW_LOGIN_NOTIFICATION_ID = 9451
