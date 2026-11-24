@@ -43,6 +43,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -63,6 +64,7 @@ class LanguagePackWorkerTest {
     private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val store: ModelsManifestStore = mock()
     private val fetcher: LanguagePackFetcher = mock()
+    private val installer: LanguagePackInstaller = mock()
 
     @Test
     fun failWithoutDownloadingWhenTranslationIsOff() = runTest {
@@ -101,10 +103,37 @@ class LanguagePackWorkerTest {
         setTranslationEnabled(true)
         whenever(store.readManifest()).thenReturn(MANIFEST)
         whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.SUCCESS)
+        whenever(installer.install(any(), any(), any())).thenReturn(true)
 
         assertEquals(Result.success(), createWorker().doWork())
 
         verify(fetcher).fetch(eq(BASE_URL), eq(MODEL), eq(context.filesDir.resolve(STAGING_PATH)), any())
+        verify(installer).install(MODEL, context.filesDir.resolve(STAGING_PATH), context.filesDir.resolve(PACK_PATH))
+    }
+
+    @Test
+    fun reportDownloadErrorReasonWhenInstallFails() = runTest {
+        setTranslationEnabled(true)
+        whenever(store.readManifest()).thenReturn(MANIFEST)
+        whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.SUCCESS)
+        whenever(installer.install(any(), any(), any())).thenReturn(false)
+
+        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), createWorker().doWork())
+    }
+
+    @Test
+    fun discardDownloadWhenManifestMovedPairToAnotherVersion() = runTest {
+        setTranslationEnabled(true)
+        whenever(store.readManifest()).thenReturn(MANIFEST, MANIFEST.copy(models = mapOf(PAIR to MODEL.copy(version = "4.0"))))
+        whenever(fetcher.fetch(any(), any(), any(), any())).doSuspendableAnswer {
+            context.filesDir.resolve(STAGING_PATH).mkdirs()
+            FetchResult.SUCCESS
+        }
+
+        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), createWorker().doWork())
+
+        assertFalse(context.filesDir.resolve(STAGING_PATH).exists())
+        verifyNoInteractions(installer)
     }
 
     @Test
@@ -153,6 +182,7 @@ class LanguagePackWorkerTest {
             it.feature = feature
             it.store = store
             it.fetcher = lazyOf(fetcher)
+            it.installer = lazyOf(installer)
             it.dispatchers = coroutineRule.testDispatcherProvider
         }
 
@@ -160,6 +190,7 @@ class LanguagePackWorkerTest {
         const val PAIR = "fr-en"
         const val BASE_URL = "https://models.test/"
         const val STAGING_PATH = "page-translation/packs/fr-en.tmp"
+        const val PACK_PATH = "page-translation/packs/fr-en"
 
         val MODEL = TranslationModel(
             sourceLanguage = "fr",
