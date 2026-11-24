@@ -88,13 +88,12 @@ fun DaxBrandButton(
         DaxButton(
             text = text,
             onClick = onClick,
-            size = size,
+            dimensions = DaxBrandButtonDefaults.dimensions(size),
             colors = DaxBrandButtonDefaults.colors(),
             rippleConfiguration = DaxBrandButtonDefaults.rippleConfiguration(),
             leadingIconPainter = leadingIconPainter,
             modifier = modifier,
             enabled = enabled,
-            height = DaxBrandButtonDefaults.height(size),
         )
     }
 }
@@ -146,9 +145,12 @@ private object DaxBrandButtonDefaults {
     val adsColorButtonBrandTextDisabled: Color
         @Composable @ReadOnlyComposable get() = adsColorButtonBrandText.copy(alpha = DisabledAlpha)
 
-    fun height(size: DaxButtonSize): DaxButtonHeight = when (size) {
-        DaxButtonSize.Small -> DaxButtonHeight(min = 40.dp, verticalPadding = 6.dp)
-        DaxButtonSize.Large -> DaxButtonHeight(min = 56.dp, verticalPadding = 12.dp)
+    fun dimensions(size: DaxButtonSize): DaxButtonDimensions {
+        val standard = DaxButtonDimensions.standard(size)
+        return when (size) {
+            DaxButtonSize.Small -> standard.copy(hasFlexibleHeight = true, minHeight = 40.dp, verticalPadding = 6.dp)
+            DaxButtonSize.Large -> standard.copy(hasFlexibleHeight = true, minHeight = 56.dp, verticalPadding = 12.dp)
+        }
     }
 
     @Composable @ReadOnlyComposable
@@ -301,3 +303,6 @@ private fun DaxBrandButtonDuckSansWrappedLargePreview() {
         )
     }
 }
+
+private const val WrappedPreviewLabel = "A label long enough to wrap onto a second line"
+private val WrappedPreviewWidth = 160.dp

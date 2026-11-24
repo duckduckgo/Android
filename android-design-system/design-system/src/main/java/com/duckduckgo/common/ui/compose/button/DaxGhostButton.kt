@@ -18,7 +18,6 @@
 
 package com.duckduckgo.common.ui.compose.button
 
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.RippleConfiguration
 import androidx.compose.runtime.Composable
@@ -66,7 +65,7 @@ fun DaxGhostButton(
     DaxButton(
         text = text,
         onClick = onClick,
-        size = size,
+        dimensions = DaxButtonDimensions.standard(size),
         colors = DaxGhostButtonDefaults.colors(),
         rippleConfiguration = DaxGhostButtonDefaults.rippleConfiguration(),
         leadingIconPainter = leadingIconPainter,
@@ -172,31 +171,6 @@ private fun DaxGhostButtonWithIconLargePreview(
             onClick = { },
             enabled = enabled,
             leadingIconPainter = painterResource(R.drawable.ic_add_24_solid_color),
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxGhostButtonWrappedSmallPreview() {
-    PreviewBox {
-        DaxGhostButton(
-            text = WrappedPreviewLabel,
-            onClick = { },
-            modifier = Modifier.width(WrappedPreviewWidth),
-        )
-    }
-}
-
-@PreviewLightDark
-@Composable
-private fun DaxGhostButtonWrappedLargePreview() {
-    PreviewBox {
-        DaxGhostButton(
-            text = WrappedPreviewLabel,
-            onClick = { },
-            modifier = Modifier.width(WrappedPreviewWidth),
-            size = DaxButtonSize.Large,
         )
     }
 }

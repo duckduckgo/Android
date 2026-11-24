@@ -40,17 +40,17 @@ class DaxStackedButtonsTest {
     val compose = createComposeRule()
 
     @Test
-    fun primaryStackedButtonPillsAreTwelveDpApart() {
+    fun primaryStackedButtonPillsAreEightDpApart() {
         show { DaxPrimaryStackedButtons(it) }
 
-        assertVisibleGaps(12f)
+        assertVisibleGaps(8f)
     }
 
     @Test
-    fun destructiveStackedButtonPillsAreTwelveDpApart() {
+    fun destructiveStackedButtonPillsAreEightDpApart() {
         show { DaxDestructiveStackedButtons(it) }
 
-        assertVisibleGaps(12f)
+        assertVisibleGaps(8f)
     }
 
     private fun show(stack: @Composable (ImmutableList<DaxStackedButton>) -> Unit) {

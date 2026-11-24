@@ -180,11 +180,6 @@ class ComponentButtonsFragment : Fragment() {
                     leadingIconPainter = painterResource(R.drawable.ic_device_desktop_16),
                 )
                 DaxPrimaryButton(text = "Primary Disabled", onClick = {}, enabled = false)
-                DaxPrimaryButton(
-                    text = "Primary with a label that wraps",
-                    onClick = {},
-                    modifier = Modifier.width(160.dp),
-                )
             }
         }
 

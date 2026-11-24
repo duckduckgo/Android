@@ -24,10 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import com.duckduckgo.common.ui.compose.button.DaxButtonHeight
-import com.duckduckgo.common.ui.compose.button.DaxButtonSize
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostAltButton
 import com.duckduckgo.common.ui.compose.button.DaxDestructiveGhostButton
 import com.duckduckgo.common.ui.compose.button.DaxGhostButton
@@ -63,7 +59,7 @@ fun DaxDestructiveStackedButtons(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.spacedBy(stackedButtonSpacing()),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2)),
     ) {
         buttons.forEachIndexed { index, button ->
             if (index == 0) {
@@ -94,7 +90,7 @@ fun DaxPrimaryStackedButtons(
     Column(
         modifier = modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.End,
-        verticalArrangement = Arrangement.spacedBy(stackedButtonSpacing()),
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.keyline_2)),
     ) {
         buttons.forEachIndexed { index, button ->
             if (index == 0) {
@@ -105,11 +101,6 @@ fun DaxPrimaryStackedButtons(
         }
     }
 }
-
-// Each button reserves a touch inset outside its pill, so the insets come off the gap to keep the pills close together.
-@Composable
-private fun stackedButtonSpacing(): Dp =
-    (dimensionResource(R.dimen.keyline_2) - DaxButtonHeight.standard(DaxButtonSize.Small).touchInset * 2).coerceAtLeast(0.dp)
 
 @PreviewLightDark
 @Composable

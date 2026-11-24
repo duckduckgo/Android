@@ -146,12 +146,6 @@
             android:enabled="false"
             android:text="Primary Disabled" />
 
-        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-            android:id="@+id/dax_button_primary_wrapped"
-            android:layout_width="160dp"
-            android:layout_height="wrap_content"
-            android:text="Primary with a label that wraps" />
-
         <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

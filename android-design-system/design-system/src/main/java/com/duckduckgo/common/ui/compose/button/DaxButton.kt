@@ -18,6 +18,7 @@
 
 package com.duckduckgo.common.ui.compose.button
 
+import androidx.annotation.DimenRes
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -28,6 +29,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -73,42 +75,41 @@ import com.duckduckgo.mobile.android.R
  * See [DaxSecondaryButton] and [DaxGhostButton] for example usage.
  *
  * @param onClick Called when the button is clicked.
- * @param size The button size — [DaxButtonSize.Small] or [DaxButtonSize.Large].
+ * @param dimensions The button's height, padding, and icon size.
  * @param colors The button color scheme, including content and container colors.
  * @param rippleConfiguration The ripple effect configuration for the button.
  * @param modifier Modifier for this button.
  * @param border Optional border stroke drawn around the button.
  * @param enabled Whether the button is enabled for interaction.
- * @param height The minimum height and vertical content padding; content taller than the minimum grows the button.
  * @param content The content displayed inside the button.
  */
 @Composable
 internal fun DaxButton(
     onClick: () -> Unit,
-    size: DaxButtonSize,
+    dimensions: DaxButtonDimensions,
     colors: DaxButtonColors,
     rippleConfiguration: RippleConfiguration,
     modifier: Modifier = Modifier,
     border: BorderStroke? = null,
     enabled: Boolean = true,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    height: DaxButtonHeight = DaxButtonHeight.standard(size),
     content: @Composable RowScope.() -> Unit,
 ) {
-    val sidePadding = dimensionResource(
-        when (size) {
-            DaxButtonSize.Small -> R.dimen.buttonSmallSidePadding
-            DaxButtonSize.Large -> R.dimen.buttonLargeSidePadding
-        },
-    )
+    val sidePadding = dimensionResource(dimensions.sidePaddingRes)
+    val heightModifier = if (dimensions.hasFlexibleHeight) {
+        Modifier.padding(vertical = dimensions.touchInset)
+    } else {
+        Modifier.height(dimensions.minHeight)
+    }
+    val minimumInteractiveSize = if (dimensions.hasFlexibleHeight) Dp.Unspecified else LocalMinimumInteractiveComponentSize.current
 
     CompositionLocalProvider(
         LocalRippleConfiguration provides null,
-        LocalMinimumInteractiveComponentSize provides Dp.Unspecified,
+        LocalMinimumInteractiveComponentSize provides minimumInteractiveSize,
     ) {
         Surface(
             onClick = onClick,
-            modifier = modifier.padding(vertical = height.touchInset).semantics { role = Role.Button },
+            modifier = modifier.then(heightModifier).semantics { role = Role.Button },
             enabled = enabled,
             shape = DuckDuckGoTheme.shapes.medium,
             color = if (enabled) colors.containerColor else colors.disabledContainerColor,
@@ -117,12 +118,12 @@ internal fun DaxButton(
             interactionSource = interactionSource,
         ) {
             Box(
-                modifier = Modifier.defaultMinSize(minWidth = ButtonDefaults.MinWidth, minHeight = height.min),
+                modifier = Modifier.defaultMinSize(minWidth = ButtonDefaults.MinWidth, minHeight = dimensions.minHeight),
                 contentAlignment = Alignment.Center,
             ) {
                 DaxRippleLayer(interactionSource, rippleConfiguration, Modifier.matchParentSize())
                 Row(
-                    modifier = Modifier.padding(horizontal = sidePadding, vertical = height.verticalPadding),
+                    modifier = Modifier.padding(horizontal = sidePadding, vertical = dimensions.verticalPadding),
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically,
                     content = content,
@@ -140,7 +141,7 @@ internal fun DaxButton(
  *
  * @param text The button label.
  * @param onClick Called when the button is clicked.
- * @param size The button size — [DaxButtonSize.Small] or [DaxButtonSize.Large].
+ * @param dimensions The button's height, padding, and icon size.
  * @param colors The button color scheme, including content and container colors.
  * @param rippleConfiguration The ripple effect configuration for the button.
  * @param modifier Modifier for this button.
@@ -150,20 +151,18 @@ internal fun DaxButton(
  *   Pass `null` (default) for a text-only button.
  * @param border Optional border stroke drawn around the button.
  * @param enabled Whether the button is enabled for interaction.
- * @param height The minimum height and vertical content padding; a wrapped label grows the button.
  */
 @Composable
 internal fun DaxButton(
     text: String,
     onClick: () -> Unit,
+    dimensions: DaxButtonDimensions,
     colors: DaxButtonColors,
     rippleConfiguration: RippleConfiguration,
     modifier: Modifier = Modifier,
-    size: DaxButtonSize = DaxButtonSize.Small,
     leadingIconPainter: Painter? = null,
     border: BorderStroke? = null,
     enabled: Boolean = true,
-    height: DaxButtonHeight = DaxButtonHeight.standard(size),
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
@@ -176,20 +175,19 @@ internal fun DaxButton(
 
     DaxButton(
         onClick = onClick,
-        size = size,
+        dimensions = dimensions,
         colors = colors,
         rippleConfiguration = rippleConfiguration,
         modifier = modifier,
         border = border,
         enabled = enabled,
         interactionSource = interactionSource,
-        height = height,
     ) {
         if (leadingIconPainter != null) {
             DaxButtonIcon(
                 painter = leadingIconPainter,
                 tint = contentColor,
-                modifier = Modifier.size(if (size == DaxButtonSize.Small) SmallIconSize else LargeIconSize),
+                modifier = Modifier.size(dimensions.iconSize),
             )
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.keyline_2)))
         }
@@ -243,23 +241,31 @@ enum class DaxButtonSize {
     Large,
 }
 
-private val SmallIconSize = 16.dp
-private val LargeIconSize = 24.dp
-
 @Immutable
-internal data class DaxButtonHeight(
-    val min: Dp,
-    val verticalPadding: Dp,
+internal data class DaxButtonDimensions(
+    val minHeight: Dp,
+    @param:DimenRes val sidePaddingRes: Int,
+    val iconSize: Dp,
+    val verticalPadding: Dp = 0.dp,
+    val hasFlexibleHeight: Boolean = false,
 ) {
     // A fixed inset rather than a minimum size, so the space around the button stays the same when a wrapped label grows it past 48dp.
-    val touchInset: Dp get() = ((MinTouchTarget - min) / 2).coerceAtLeast(0.dp)
+    val touchInset: Dp get() = ((MinTouchTarget - minHeight) / 2).coerceAtLeast(0.dp)
 
     companion object {
         private val MinTouchTarget = 48.dp
 
-        fun standard(size: DaxButtonSize): DaxButtonHeight = when (size) {
-            DaxButtonSize.Small -> DaxButtonHeight(min = 36.dp, verticalPadding = 2.dp)
-            DaxButtonSize.Large -> DaxButtonHeight(min = 48.dp, verticalPadding = 8.dp)
+        fun standard(size: DaxButtonSize): DaxButtonDimensions = when (size) {
+            DaxButtonSize.Small -> DaxButtonDimensions(
+                minHeight = 36.dp,
+                sidePaddingRes = R.dimen.buttonSmallSidePadding,
+                iconSize = 16.dp,
+            )
+            DaxButtonSize.Large -> DaxButtonDimensions(
+                minHeight = 48.dp,
+                sidePaddingRes = R.dimen.buttonLargeSidePadding,
+                iconSize = 24.dp,
+            )
         }
     }
 }
@@ -277,7 +283,7 @@ private fun DaxButtonSmallPreview() {
     PreviewBox {
         DaxButton(
             text = "Dax Button Small",
-            size = DaxButtonSize.Small,
+            dimensions = DaxButtonDimensions.standard(DaxButtonSize.Small),
             onClick = {},
             colors = previewButtonColors(),
             rippleConfiguration = RippleConfiguration(),
@@ -291,7 +297,7 @@ private fun DaxButtonLargePreview() {
     PreviewBox {
         DaxButton(
             text = "Dax Button Large",
-            size = DaxButtonSize.Large,
+            dimensions = DaxButtonDimensions.standard(DaxButtonSize.Large),
             onClick = {},
             colors = previewButtonColors(),
             rippleConfiguration = RippleConfiguration(),
@@ -305,7 +311,7 @@ private fun DaxButtonWithIconSmallPreview() {
     PreviewBox {
         DaxButton(
             text = "Dax Button Small",
-            size = DaxButtonSize.Small,
+            dimensions = DaxButtonDimensions.standard(DaxButtonSize.Small),
             onClick = {},
             colors = previewButtonColors(),
             rippleConfiguration = RippleConfiguration(),
@@ -320,7 +326,7 @@ private fun DaxButtonWithIconLargePreview() {
     PreviewBox {
         DaxButton(
             text = "Dax Button Large",
-            size = DaxButtonSize.Large,
+            dimensions = DaxButtonDimensions.standard(DaxButtonSize.Large),
             onClick = {},
             colors = previewButtonColors(),
             rippleConfiguration = RippleConfiguration(),
@@ -365,6 +371,3 @@ internal fun DaxRippleLayer(
         Box(modifier.indication(interactionSource, ripple()))
     }
 }
-
-internal const val WrappedPreviewLabel = "A label long enough to wrap onto a second line"
-internal val WrappedPreviewWidth = 160.dp
