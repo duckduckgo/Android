@@ -1,0 +1,17 @@
+[
+  {
+    "op": "replace",
+    "path": "/features/segmentSkip/state",
+    "value": "enabled"
+  },
+  {
+    "op": "replace",
+    "path": "/features/segmentSkip/features/mvpEnabled/state",
+    "value": "enabled"
+  },
+  {
+    "op": "replace",
+    "path": "/features/adBlockingExtension/state",
+    "value": "enabled"
+  }
+]
