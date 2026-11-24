@@ -17,7 +17,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/nativeInputButtonSize"
     android:layout_marginStart="@dimen/keyline_1"
     android:background="@drawable/background_options_chip"
     android:clickable="true"
@@ -25,9 +25,7 @@
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:paddingStart="@dimen/keyline_2"
-    android:paddingEnd="@dimen/keyline_2"
-    android:paddingTop="@dimen/keyline_2"
-    android:paddingBottom="@dimen/keyline_2">
+    android:paddingEnd="@dimen/keyline_2">
 
     <ImageView
         android:id="@+id/optionsChipIcon"
