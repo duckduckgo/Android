@@ -18,19 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="segment_skip_settings_title">Izlaist sponsorēto saturu</string>
-    <string name="segment_skip_settings_description" instruction="Description of the Skip Sponsored Content setting. Learn more opens an explanation of ad blocking.">Izlaiž sponsorētos segmentus, piemēram, apmaksātas reklāmas. Par segmentiem ziņo SponsorBlock kopiena, tāpēc ne visiem videoklipiem ir atzīmēti segmenti. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="segment_skip_mode_always_ask">Jautāt, vai izlaist</string>
     <string name="segment_skip_mode_always_skip">Vienmēr</string>
     <string name="segment_skip_mode_off">Nekad</string>
     <string name="ad_blocking_settings_title">YouTube reklāmu bloķēšana</string>
     <string name="ad_blocking_settings_toggle_title">Bloķēt reklāmas pakalpojumā YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo bloķē videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem. \n\nKad DuckDuckGo ir ieslēgts, tas anonīmi noteiks reklāmu bloķēšanas traucējumus vai YouTube kļūdas, lai uzlabotu pieredzi visiem. DuckDuckGo nekad neredz, kādus videoklipus skaties, vai jebkādu personu identificējamu informāciju. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo bloķē videoreklāmas pakalpojumā YouTube, lai tu varētu skatīties videoklipus bez pārtraukumiem. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Atver videoklipus teātra režīmā bez uzmanības novēršanas, kas neļauj skatītajam ietekmēt tavu YouTube plūsmu.</string>
     <string name="ad_blocking_settings_duck_player_link">Meklē Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Reklāmu bloķēšana</string>
-    <string name="ad_blocking_settings_header_description">Bloķē uzmācīgus izsekotājus, pirms tie tiek ielādēti, tādējādi efektīvi novēršot reklāmas, kas balstās uz izsekošanu.</string>
     <string name="contingencyMessageTitle">YouTube reklāmu bloķēšana nav pieejama</string>
     <string name="contingencyMessageContent">Reklāmu bloķēšanu ir ietekmējušas nesenās izmaiņas pakalpojumā YouTube. Mēs strādājam, lai novērstu šīs problēmas, un novērtējam tavu sapratni.</string>
     <string name="contingencyMessagePrimaryButton">Sapratu</string>

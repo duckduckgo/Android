@@ -306,7 +306,9 @@ class AdBlockingSettingsViewModelTest {
         setSegmentSkipEnabled(false)
 
         createViewModel().viewState.test {
-            assertNull(expectMostRecentItem().segmentSkipMode)
+            val state = expectMostRecentItem()
+            assertNull(state.segmentSkipMode)
+            assertFalse(state.showSegmentSkipConsent)
         }
     }
 
@@ -322,6 +324,57 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
+    fun whenMvpEnabledThenNoticeIsHiddenAcrossModeChanges() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSegmentSkipEnabled(true)
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().viewState.test {
+            assertEquals(false, expectMostRecentItem().showSegmentSkipConsent)
+            segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
+            segmentSkip.mode.value = SegmentSkipMode.OFF
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
+        }
+    }
+
+    @Test
+    fun whenMvpEnabledWithExistingConsentThenNoticeIsShown() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSegmentSkipEnabled(true)
+        segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
+        segmentSkip.consent.value = true
+        createViewModel().viewState.test {
+            assertEquals(true, expectMostRecentItem().showSegmentSkipConsent)
+            segmentSkip.consent.value = false
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
+        }
+    }
+
+    @Test
+    fun whenOnlySoftLaunchEnabledThenShowsSettingAndConsentNoticeInNeverMode() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        setSegmentSkipEnabled(false)
+        segmentSkipFeature.softLaunchEnabled().setRawStoredState(Toggle.State(remoteEnableState = true))
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().viewState.test {
+            val state = expectMostRecentItem()
+            assertEquals(SegmentSkipMode.OFF, state.segmentSkipMode)
+            assertTrue(state.showSegmentSkipConsent)
+            segmentSkip.mode.value = SegmentSkipMode.ALWAYS_ASK
+            assertEquals(false, awaitItem().showSegmentSkipConsent)
+            segmentSkip.consent.value = true
+            assertEquals(true, awaitItem().showSegmentSkipConsent)
+        }
+    }
+
+    @Test
+    fun whenNoticeWasShownThenEnablingFromOffGrantsConsent() = runTest {
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, userConsent = true)
+        assertEquals(true, segmentSkip.consent.value)
+    }
+
+    @Test
     fun whenSegmentSkipModeClickedThenShowsDialogWithCurrentMode() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         segmentSkip.mode.value = SegmentSkipMode.OFF
@@ -333,6 +386,33 @@ class AdBlockingSettingsViewModelTest {
         }
         verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_DAILY, type = Pixel.PixelType.Daily())
         verify(pixel).fire(AdBlockingPixelNames.SEGMENT_SKIP_SETTINGS_CLICKED_COUNT)
+    }
+
+    @Test
+    fun whenDialogIsOpenedWithoutSelectionThenModeAndConsentStayUnchanged() = runTest {
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        val viewModel = createViewModel()
+        viewModel.commands.test {
+            viewModel.onSegmentSkipModeClicked()
+            awaitItem()
+        }
+        assertEquals(SegmentSkipMode.OFF, segmentSkip.mode.value)
+        assertEquals(false, segmentSkip.consent.value)
+    }
+
+    @Test
+    fun whenEnablingFromOffThenModeIsSavedWithoutConsent() = runTest {
+        segmentSkip.mode.value = SegmentSkipMode.OFF
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, userConsent = false)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
+        assertEquals(false, segmentSkip.consent.value)
+    }
+
+    @Test
+    fun whenEnabledModeChangesThenConsentIsUnchanged() = runTest {
+        createViewModel().onSegmentSkipModeDialogSaved(SegmentSkipMode.ALWAYS_SKIP, userConsent = false)
+        assertEquals(SegmentSkipMode.ALWAYS_SKIP, segmentSkip.mode.value)
+        assertEquals(false, segmentSkip.consent.value)
     }
 
     @Test
@@ -380,13 +460,16 @@ class AdBlockingSettingsViewModelTest {
 
     private class FakeSegmentSkip : SegmentSkip {
         val mode = MutableStateFlow(SegmentSkipMode.ALWAYS_ASK)
+        val consent = MutableStateFlow(false)
         var failSave = false
 
         override fun config(): SegmentSkipConfig = throw UnsupportedOperationException()
         override suspend fun getSegments(videoId: String): List<SegmentSkipSegment> = throw UnsupportedOperationException()
         override fun modeFlow(): Flow<SegmentSkipMode> = mode
-        override suspend fun setMode(mode: SegmentSkipMode): Boolean {
+        override fun consentFlow(): Flow<Boolean> = consent
+        override suspend fun setMode(mode: SegmentSkipMode, userConsent: Boolean): Boolean {
             if (failSave) throw java.io.IOException()
+            if (this.mode.value == SegmentSkipMode.OFF && mode != SegmentSkipMode.OFF) consent.value = userConsent
             val changed = this.mode.value != mode
             this.mode.value = mode
             return changed

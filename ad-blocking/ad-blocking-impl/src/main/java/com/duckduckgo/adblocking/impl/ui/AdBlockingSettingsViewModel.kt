@@ -86,6 +86,7 @@ class AdBlockingSettingsViewModel @Inject constructor(
         val isContingencyMode: Boolean = false,
         val duckPlayerSection: DuckPlayerSection = DuckPlayerSection.None,
         val segmentSkipMode: SegmentSkipMode? = null,
+        val showSegmentSkipConsent: Boolean = false,
     )
 
     sealed interface DuckPlayerSection {
@@ -100,10 +101,15 @@ class AdBlockingSettingsViewModel @Inject constructor(
         data class ShowSegmentSkipModeDialog(val mode: SegmentSkipMode) : Command()
     }
 
-    private val segmentSkipModeFlow: Flow<SegmentSkipMode?> = combine(
+    private val segmentSkipModeFlow: Flow<Pair<SegmentSkipMode?, Boolean>> = combine(
         segmentSkipFeature.mvpEnabled().enabled(),
+        segmentSkipFeature.softLaunchEnabled().enabled(),
         segmentSkip.modeFlow(),
-    ) { mvpEnabled, mode -> mode.takeIf { mvpEnabled } }
+        segmentSkip.consentFlow(),
+    ) { mvpEnabled, softLaunchEnabled, mode, consent ->
+        val showConsent = consent || (!mvpEnabled && softLaunchEnabled && mode == SegmentSkipMode.OFF)
+        mode.takeIf { mvpEnabled || softLaunchEnabled } to showConsent
+    }
 
     val viewState: StateFlow<ViewState> = combine(
         statusChecker.observeState(),
@@ -124,7 +130,8 @@ class AdBlockingSettingsViewModel @Inject constructor(
                 DuckPlayerSettingsPlacement.Standalone -> DuckPlayerSection.Link
                 DuckPlayerSettingsPlacement.Hidden -> DuckPlayerSection.None
             },
-            segmentSkipMode = segmentSkipMode,
+            segmentSkipMode = segmentSkipMode.first,
+            showSegmentSkipConsent = segmentSkipMode.second,
         )
     }
         .stateIn(
@@ -173,10 +180,14 @@ class AdBlockingSettingsViewModel @Inject constructor(
         }
     }
 
-    fun onSegmentSkipModeSelected(mode: SegmentSkipMode) {
+    fun onSegmentSkipModeDialogSaved(selectedMode: SegmentSkipMode, userConsent: Boolean) {
+        onSegmentSkipModeSelected(selectedMode, userConsent)
+    }
+
+    fun onSegmentSkipModeSelected(mode: SegmentSkipMode, userConsent: Boolean = false) {
         viewModelScope.launch {
             val changed = try {
-                segmentSkip.setMode(mode)
+                segmentSkip.setMode(mode, userConsent)
             } catch (e: IOException) {
                 return@launch
             }
