@@ -91,8 +91,10 @@ class SegmentSkipDatasetSyncTest {
         val service = Retrofit.Builder().baseUrl("https://duckduckgo.com/").build().create(SegmentSkipDatasetService::class.java)
         val url = service.binaryHashPrefixes(42).request().url
         assertEquals("protection.duckduckgo.com", url.host)
-        assertEquals("/api/protection/segments/v1/android/hashPrefix", url.encodedPath)
-        assertEquals(setOf("revision"), url.queryParameterNames)
+        assertEquals("/api/protection/segmentSkip/v1/android/hashPrefix", url.encodedPath)
+        assertEquals(setOf("revision", "format", "version"), url.queryParameterNames)
+        assertEquals("binary", url.queryParameter("format"))
+        assertEquals("1", url.queryParameter("version"))
         assertEquals("42", url.queryParameter("revision"))
     }
 
