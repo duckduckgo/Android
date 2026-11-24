@@ -17,138 +17,81 @@
 package com.duckduckgo.app.browser.trafficquality
 
 import com.duckduckgo.app.browser.trafficquality.remote.RealAndroidFeaturesHeaderProvider
-import com.duckduckgo.app.browser.trafficquality.remote.TrafficQualityAppVersion
-import com.duckduckgo.autoconsent.api.Autoconsent
-import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.privacy.config.api.Gpc
-import kotlinx.coroutines.test.runTest
-import org.junit.Assert.assertNull
-import org.junit.Assert.assertTrue
-import org.junit.Before
+import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.app.settings.clear.FireClearOption
+import com.duckduckgo.common.test.CoroutineTestRule
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 class AndroidFeaturesHeaderProviderTest {
 
-    private val currentVersion = 5210000
+    @get:Rule
+    val coroutineTestRule = CoroutineTestRule()
 
-    private val mockAutoconsent: Autoconsent = mock()
-    private val mockGpc: Gpc = mock()
-    private val mockAppTrackingProtection: AppTrackingProtection = mock()
-    private val mockNetworkProtectionState: NetworkProtectionState = mock()
+    private val mockFireDataStore: FireDataStore = mock()
 
-    private lateinit var testee: RealAndroidFeaturesHeaderProvider
+    @Test
+    fun whenAutoDeleteHasClearOptionsThenAdelEnabledIsTrue() {
+        val testee = createTestee(automaticClearOptions = MutableStateFlow(setOf(FireClearOption.TABS, FireClearOption.DATA)))
 
-    @Before
-    fun setup() {
-        testee = RealAndroidFeaturesHeaderProvider(
-            mockAutoconsent,
-            mockGpc,
-            mockAppTrackingProtection,
-            mockNetworkProtectionState,
+        assertEquals("adel_enabled=true", testee.provide())
+    }
+
+    @Test
+    fun whenAutoDeleteOnlyClearsTabsThenAdelEnabledIsTrue() {
+        val testee = createTestee(automaticClearOptions = MutableStateFlow(setOf(FireClearOption.TABS)))
+
+        assertEquals("adel_enabled=true", testee.provide())
+    }
+
+    @Test
+    fun whenAutoDeleteHasNoClearOptionsThenAdelEnabledIsFalse() {
+        val testee = createTestee(automaticClearOptions = MutableStateFlow(emptySet()))
+
+        assertEquals("adel_enabled=false", testee.provide())
+    }
+
+    @Test
+    fun whenAutoDeleteSettingChangesThenNextValueReflectsIt() {
+        val options = MutableStateFlow<Set<FireClearOption>>(emptySet())
+        val testee = createTestee(automaticClearOptions = options)
+        assertEquals("adel_enabled=false", testee.provide())
+
+        options.value = setOf(FireClearOption.DATA)
+
+        assertEquals("adel_enabled=true", testee.provide())
+    }
+
+    @Test
+    fun whenAutoDeleteStateNotLoadedYetThenValueReadDirectly() {
+        whenever(mockFireDataStore.getAutomaticClearOptionsFlow()).thenReturn(emptyFlow())
+        val testee = RealAndroidFeaturesHeaderProvider(
+            mockFireDataStore,
+            coroutineTestRule.testScope,
+            coroutineTestRule.testDispatcherProvider,
+        )
+        mockAutomaticClearOptions(setOf(FireClearOption.DATA))
+
+        assertEquals("adel_enabled=true", testee.provide())
+    }
+
+    private fun createTestee(automaticClearOptions: Flow<Set<FireClearOption>>): RealAndroidFeaturesHeaderProvider {
+        whenever(mockFireDataStore.getAutomaticClearOptionsFlow()).thenReturn(automaticClearOptions)
+        return RealAndroidFeaturesHeaderProvider(
+            mockFireDataStore,
+            coroutineTestRule.testScope,
+            coroutineTestRule.testDispatcherProvider,
         )
     }
 
-    @Test
-    fun whenNoFeaturesEnabledThenNoValueProvided() {
-        val noFeaturesEnabled = TrafficQualityAppVersion(currentVersion, 5, 5, noFeaturesEnabled())
-
-        val result = testee.provide(noFeaturesEnabled)
-
-        assertNull(result)
-    }
-
-    @Test
-    fun whenGPCFeatureEnabledAndGPCDisabledThenValueProvided() {
-        whenever(mockGpc.isEnabled()).thenReturn(false)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "gpc_enabled=false")
-    }
-
-    @Test
-    fun whenGPCFeatureEnabledAndGPCEnabledThenValueProvided() {
-        whenever(mockGpc.isEnabled()).thenReturn(true)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "gpc_enabled=true")
-    }
-
-    @Test
-    fun whenCPMFeatureEnabledAndCPMDisabledThenValueProvided() {
-        whenever(mockAutoconsent.isAutoconsentEnabled()).thenReturn(false)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(cpm = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "cpm_enabled=false")
-    }
-
-    @Test
-    fun whenCPMFeatureEnabledAndCPMEnabledThenValueProvided() {
-        whenever(mockAutoconsent.isAutoconsentEnabled()).thenReturn(true)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(cpm = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "cpm_enabled=true")
-    }
-
-    @Test
-    fun whenAppTPFeatureEnabledAndAppTPDisabledThenValueProvided() = runTest {
-        whenever(mockAppTrackingProtection.isEnabled()).thenReturn(false)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(appTP = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "atp_enabled=false")
-    }
-
-    @Test
-    fun whenAppTPFeatureEnabledAndAppTPEnabledThenValueProvided() = runTest {
-        whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(appTP = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "atp_enabled=true")
-    }
-
-    @Test
-    fun whenVPNFeatureEnabledAndVPNDisabledThenValueProvided() = runTest {
-        whenever(mockNetworkProtectionState.isEnabled()).thenReturn(false)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(netP = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "vpn_enabled=false")
-    }
-
-    @Test
-    fun whenVPNFeatureEnabledAndVPNEnabledThenValueProvided() = runTest {
-        whenever(mockNetworkProtectionState.isEnabled()).thenReturn(true)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(netP = true))
-
-        val result = testee.provide(config)
-
-        assertTrue(result == "vpn_enabled=true")
-    }
-
-    @Test
-    fun whenSeveralFeaturesEnabledThenOnlyOneValueProvided() = runTest {
-        whenever(mockNetworkProtectionState.isEnabled()).thenReturn(true)
-        whenever(mockAppTrackingProtection.isEnabled()).thenReturn(true)
-        whenever(mockAutoconsent.isAutoconsentEnabled()).thenReturn(true)
-        whenever(mockGpc.isEnabled()).thenReturn(true)
-        val config = TrafficQualityAppVersion(currentVersion, 5, 5, featuresEnabled(gpc = true, cpm = true, appTP = true, netP = true))
-
-        val result = testee.provide(config)
-        assertTrue(result == "vpn_enabled=true" || result == "cpm_enabled=true" || result == "gpc_enabled=true" || result == "atp_enabled=true")
+    private fun mockAutomaticClearOptions(options: Set<FireClearOption>) {
+        runBlocking { whenever(mockFireDataStore.getAutomaticClearOptions()).thenReturn(options) }
     }
 }

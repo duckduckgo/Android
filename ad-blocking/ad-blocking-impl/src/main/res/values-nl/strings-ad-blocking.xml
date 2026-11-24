@@ -17,15 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Gesponsorde content overslaan</string>
+    <string name="segment_skip_mode_always_ask">Vragen of je wilt overslaan</string>
+    <string name="segment_skip_mode_always_skip">Altijd</string>
+    <string name="segment_skip_mode_off">Nooit</string>
     <string name="ad_blocking_settings_title">Blokkering van YouTube-advertenties</string>
     <string name="ad_blocking_settings_toggle_title">Blokkeer advertenties op YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokkeert videoadvertenties op YouTube, zodat je ongestoord video\'s kunt bekijken. \n\nAls deze optie is ingeschakeld, detecteert DuckDuckGo anoniem verstoring van advertentieblokkeringen of YouTube-fouten, om de ervaring voor iedereen te verbeteren. DuckDuckGo ziet niet welke video\'s je bekijkt en heeft geen toegang tot je persoonlijk identificeerbare informatie. <annotation type="learn_more_link">Meer informatie</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blokkeert videoadvertenties op YouTube, zodat je video\'s zonder onderbreking kunt bekijken. <annotation type="learn_more_link">Meer informatie</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Opent video\'s in een afleidingsvrije theatermodus die voorkomt dat wat je bekijkt je YouTube-feed beïnvloedt.</string>
     <string name="ad_blocking_settings_duck_player_link">Op zoek naar Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Advertentieblokkering</string>
-    <string name="ad_blocking_settings_header_description">We blokkeren invasieve trackers voordat ze worden geladen. Zo elimineren we effectief advertenties die afhankelijk zijn van tracking.</string>
     <string name="contingencyMessageTitle">YouTube-advertentieblokkering niet beschikbaar</string>
     <string name="contingencyMessageContent">De blokkering van advertenties is beïnvloed door recente wijzigingen aan YouTube. We werken aan een oplossing voor deze problemen. Bedankt voor je begrip.</string>
     <string name="contingencyMessagePrimaryButton">Ik snap het</string>

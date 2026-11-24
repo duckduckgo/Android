@@ -16,84 +16,45 @@
 
 package com.duckduckgo.app.browser.trafficquality.remote
 
-import com.duckduckgo.autoconsent.api.Autoconsent
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.fire.store.FireDataStore
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.duckduckgo.privacy.config.api.Gpc
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.plus
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 interface AndroidFeaturesHeaderProvider {
-    fun provide(config: TrafficQualityAppVersion): String?
+    fun provide(): String
 }
 
 @ContributesBinding(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAndroidFeaturesHeaderProvider @Inject constructor(
-    private val autoconsent: Autoconsent,
-    private val gpc: Gpc,
-    private val appTrackingProtection: AppTrackingProtection,
-    private val networkProtectionState: NetworkProtectionState,
+    private val fireDataStore: FireDataStore,
+    @AppCoroutineScope appCoroutineScope: CoroutineScope,
+    dispatcherProvider: DispatcherProvider,
 ) : AndroidFeaturesHeaderProvider {
 
-    override fun provide(config: TrafficQualityAppVersion): String? {
-        return logFeature(config)
-    }
+    // Headers are built on the main thread for every search, so the auto-delete state is kept in memory
+    // and only read synchronously if a search happens before the first value has loaded.
+    private val autoDeleteEnabled: StateFlow<Boolean?> = fireDataStore.getAutomaticClearOptionsFlow()
+        .map { it.isNotEmpty() }
+        .stateIn(appCoroutineScope + dispatcherProvider.io(), SharingStarted.Eagerly, null)
 
-    private fun logFeature(versionConfig: TrafficQualityAppVersion): String? {
-        val listOfFeatures = mutableListOf<String>()
-        if (versionConfig.featuresLogged.cpm) {
-            listOfFeatures.add(CPM_HEADER)
-        }
-        if (versionConfig.featuresLogged.gpc) {
-            listOfFeatures.add(GPC_HEADER)
-        }
-
-        if (versionConfig.featuresLogged.appTP) {
-            listOfFeatures.add(APP_TP_HEADER)
-        }
-
-        if (versionConfig.featuresLogged.netP) {
-            listOfFeatures.add(NET_P_HEADER)
-        }
-
-        return if (listOfFeatures.isEmpty()) {
-            null
-        } else {
-            val randomIndex = (0..<listOfFeatures.size).random()
-            listOfFeatures[randomIndex].plus("=").plus(mapFeature(listOfFeatures[randomIndex]))
-        }
-    }
-
-    private fun mapFeature(feature: String): String? {
-        return runBlocking {
-            when (feature) {
-                CPM_HEADER -> {
-                    autoconsent.isAutoconsentEnabled().toString()
-                }
-
-                GPC_HEADER -> {
-                    gpc.isEnabled().toString()
-                }
-
-                APP_TP_HEADER -> {
-                    appTrackingProtection.isEnabled().toString()
-                }
-
-                NET_P_HEADER -> {
-                    networkProtectionState.isEnabled().toString()
-                }
-
-                else -> null
-            }
-        }
+    override fun provide(): String {
+        val enabled = autoDeleteEnabled.value ?: runBlocking { fireDataStore.getAutomaticClearOptions().isNotEmpty() }
+        return "$AUTO_DELETE_HEADER_KEY=$enabled"
     }
 
     companion object {
-        private const val CPM_HEADER = "cpm_enabled"
-        private const val GPC_HEADER = "gpc_enabled"
-        private const val APP_TP_HEADER = "atp_enabled"
-        private const val NET_P_HEADER = "vpn_enabled"
+        private const val AUTO_DELETE_HEADER_KEY = "adel_enabled"
     }
 }

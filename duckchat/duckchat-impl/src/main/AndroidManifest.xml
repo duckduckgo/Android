@@ -62,6 +62,36 @@
             </intent-filter>
         </activity>
 
+        <!--
+          Adds "Ask Duck.ai" to the system share sheet and to "Open with" for images and files.
+        -->
+        <activity
+            android:name=".ui.nativeinput.share.ShareToDuckAiActivity"
+            android:enabled="false"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:label="@string/duckAiTextSelectionMenuItem">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+            <intent-filter android:label="@string/duck_chat_title">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="content" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="application/pdf" />
+            </intent-filter>
+        </activity>
+
         <service
             android:name=".ui.DuckChatVoiceMicrophoneService"
             android:exported="false"
@@ -70,5 +100,18 @@
             android:name=".responding.DuckAiRespondingService"
             android:exported="false"
             android:foregroundServiceType="shortService" />
+
+        <receiver
+            android:name=".widget.DuckAiWidgetProvider"
+            android:enabled="false"
+            android:exported="false"
+            android:label="@string/duckAiWidgetLabel">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/duck_ai_widget_info" />
+        </receiver>
     </application>
 </manifest>

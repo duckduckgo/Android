@@ -185,6 +185,7 @@ import com.duckduckgo.app.browser.commands.NavigationCommand
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
+import com.duckduckgo.app.browser.duckchat.isEmptyDuckAiChat
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DUCK_PLAYER_PAGE_FEATURE_NAME
 import com.duckduckgo.app.browser.duckplayer.DuckPlayerJSHelper
@@ -405,7 +406,6 @@ import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.PromoRecordObserver
-import com.duckduckgo.duckchat.api.isDuckAiConversation
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.contextual.PageContextJSHelper
 import com.duckduckgo.duckchat.impl.contextual.RealPageContextJSHelper.Companion.PAGE_CONTEXT_FEATURE_NAME
@@ -1774,7 +1774,7 @@ class BrowserTabViewModel @Inject constructor(
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
 
-    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it, browserMode) } ?: emptyMap()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -6175,12 +6175,10 @@ class BrowserTabViewModel @Inject constructor(
         fromDuckAiChat: Boolean,
     ) {
         viewModelScope.launch {
-            val emptyChats = tabRepository.getTabs().filter { tab ->
-                tab.url?.toUri()?.let { duckChat.isDuckChatUrl(it) && !it.isDuckAiConversation(duckChat) } == true
-            }
+            val emptyChats = tabRepository.getTabs().filter { duckChat.isEmptyDuckAiChat(it.url) }
             val emptyChat = emptyChats.firstOrNull { it.tabId == tabId } ?: emptyChats.firstOrNull()
             if (emptyChat != null) {
-                if (emptyChat.tabId != tabId) command.value = Command.SwitchToTab(emptyChat.tabId)
+                command.value = Command.FocusEmptyDuckAiChat(emptyChat.tabId)
                 return@launch
             }
             if (fromDuckAiChat) {

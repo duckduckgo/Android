@@ -488,6 +488,10 @@ sealed class Command {
         val tabId: String,
     ) : Command()
 
+    data class FocusEmptyDuckAiChat(
+        val tabId: String,
+    ) : Command()
+
     data object CloseCustomTab : Command()
 
     /**

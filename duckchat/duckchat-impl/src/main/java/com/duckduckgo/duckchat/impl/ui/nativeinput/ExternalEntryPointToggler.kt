@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.ui.nativeinput.textselection
+package com.duckduckgo.duckchat.impl.ui.nativeinput
 
 import android.content.ComponentName
 import android.content.Context
@@ -26,6 +26,9 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.ui.nativeinput.share.ShareToDuckAiActivity
+import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.SelectedTextDuckAiActivity
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -40,9 +43,10 @@ import javax.inject.Inject
     scope = AppScope::class,
     binding = binding<MainProcessLifecycleObserver>(),
 )
-class TextSelectionToggler @Inject constructor(
+class ExternalEntryPointToggler @Inject constructor(
     private val context: Context,
     private val duckAiFeatureState: DuckAiFeatureState,
+    private val duckChatInternal: DuckChatInternal,
     private val appBuildConfig: AppBuildConfig,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
@@ -50,13 +54,16 @@ class TextSelectionToggler @Inject constructor(
 
     override fun onCreate(owner: LifecycleOwner) {
         duckAiFeatureState.showTextSelectionAction
-            .onEach { enabled -> withContext(dispatchers.io()) { setEnabled(enabled) } }
+            .onEach { enabled -> withContext(dispatchers.io()) { setEnabled(SelectedTextDuckAiActivity::class.java, enabled) } }
+            .launchIn(appCoroutineScope)
+        duckChatInternal.showShareSheetAction
+            .onEach { enabled -> withContext(dispatchers.io()) { setEnabled(ShareToDuckAiActivity::class.java, enabled) } }
             .launchIn(appCoroutineScope)
     }
 
-    private fun setEnabled(enabled: Boolean) {
+    private fun setEnabled(activity: Class<*>, enabled: Boolean) {
         context.packageManager.setComponentEnabledSetting(
-            ComponentName(appBuildConfig.applicationId, SelectedTextDuckAiActivity::class.java.name),
+            ComponentName(appBuildConfig.applicationId, activity.name),
             if (enabled) PackageManager.COMPONENT_ENABLED_STATE_ENABLED else PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
             PackageManager.DONT_KILL_APP,
         )

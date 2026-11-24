@@ -17,15 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Preskoči sponzorirano vsebino</string>
+    <string name="segment_skip_mode_always_ask">Vprašaj pred preskokom</string>
+    <string name="segment_skip_mode_always_skip">Vedno</string>
+    <string name="segment_skip_mode_off">Nikoli</string>
     <string name="ad_blocking_settings_title">Blokiranje oglasov na YouTubu</string>
     <string name="ad_blocking_settings_toggle_title">Blokiraj oglase na YouTubu</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokira video oglase na YouTubu, tako da si lahko videoposnetke ogledate brez prekinitev. \n\nKo je to vklopljeno, DuckDuckGo anonimno zaznava motnje pri blokiranju oglasov ali napake v YouTubu, da izboljša izkušnjo za vse uporabnike. DuckDuckGo nikoli ne vidi, katere videoposnetke si ogledujete, niti nobenih osebnih podatkov. <annotation type="learn_more_link">Več o tem</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blokira video oglase na YouTubu, tako da si lahko videoposnetke ogledate brez prekinitev. <annotation type="learn_more_link">Več o tem</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Videoposnetke odpre v načinu zasebnega kina, ki preprečuje, da bi vsebina, ki jo gledate, vplivala na vaša priporočila v YouTubu.</string>
     <string name="ad_blocking_settings_duck_player_link">Iščete Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Blokiranje oglasov</string>
-    <string name="ad_blocking_settings_header_description">Blokira invazivne sledilnike, še preden se naložijo, s čimer učinkovito odstrani oglase, ki temeljijo na sledenju.</string>
     <string name="contingencyMessageTitle">Blokiranje oglasov na YouTubu ni na voljo</string>
     <string name="contingencyMessageContent">Nedavne spremembe na YouTubu so vplivale na delovanje funkcije blokiranja oglasov. Prizadevamo si za odpravljanje teh težav in cenimo vaše razumevanje.</string>
     <string name="contingencyMessagePrimaryButton">Razumem</string>

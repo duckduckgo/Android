@@ -46,6 +46,18 @@ interface SyncFeature {
     fun aiChatSync(): Toggle
 
     /**
+     * Kill switch for the `sync-setup` wide event. Disabled sends no `sync-setup` event from either writer.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun sendSyncSetupWideEvent(): Toggle
+
+    /**
+     * Gates the unified Sync setup wide event. No effect unless [sendSyncSetupWideEvent] is also enabled.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun sendUnifiedSyncSetupWideEvent(): Toggle
+
+    /**
      * Gates writing `device_info`
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)

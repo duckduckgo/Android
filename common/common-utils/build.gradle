@@ -39,6 +39,7 @@ dependencies {
     ksp project(':codegen-ksp')
     implementation project(path: ':codegen-annotations')
     implementation project(path: ':di')
+    api project(path: ':browser-mode-api')
 
     implementation KotlinX.coroutines.core
     implementation KotlinX.coroutines.android
