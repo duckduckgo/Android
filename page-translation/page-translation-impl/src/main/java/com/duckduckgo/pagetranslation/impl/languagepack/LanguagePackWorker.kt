@@ -87,14 +87,7 @@ internal class LanguagePackWorker(
                 }
                 if (fetchResult != SUCCESS) return@async fetchResult
 
-                // the manifest can drop the pair or move it to a new version while the pack downloads
-                if (store.readManifest()?.models?.get(pair)?.version != model.version) {
-                    ensureActive()
-                    stagingDirectory.deleteRecursively()
-                    return@async FAILURE
-                }
-
-                if (installer.value.install(model, stagingDirectory, getPackDirectory(applicationContext, pair))) SUCCESS else FAILURE
+                if (installer.value.install(pair, model, stagingDirectory, getPackDirectory(applicationContext, pair))) SUCCESS else FAILURE
             }
             val stopWhenDisabled = launch {
                 feature.translation().enabled().firstOrNull { isEnabled -> !isEnabled } ?: return@launch

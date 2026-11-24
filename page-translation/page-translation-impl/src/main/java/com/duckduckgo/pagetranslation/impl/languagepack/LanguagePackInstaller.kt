@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.impl.languagepack.RealLanguagePackFetcher.Companion.COMPRESSED_FILE_SUFFIX
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
 import com.duckduckgo.pagetranslation.impl.translatekit.TranslateKitLibrary
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -40,19 +41,26 @@ import javax.inject.Inject
 interface LanguagePackInstaller {
     /**
      * Checks the files [LanguagePackFetcher] downloaded into [stagingDirectory] against [model], decompresses them and moves
-     * the pack to [packDirectory]. Returns false, and deletes [stagingDirectory], when the pack can't be installed.
+     * the pack to [packDirectory] if the manifest still lists [model]'s version for [pair]. Returns false, and deletes
+     * [stagingDirectory], when the pack isn't installed.
      */
-    suspend fun install(model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean
+    suspend fun install(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean
 }
 
 @ContributesBinding(AppScope::class)
 class RealLanguagePackInstaller @Inject constructor(
     private val library: TranslateKitLibrary,
+    private val store: ModelsManifestStore,
     private val dispatchers: DispatcherProvider,
 ) : LanguagePackInstaller {
-    override suspend fun install(model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean = withContext(dispatchers.io()) {
+    override suspend fun install(
+        pair: String,
+        model: TranslationModel,
+        stagingDirectory: File,
+        packDirectory: File,
+    ): Boolean = withContext(dispatchers.io()) {
         val isInstalled = try {
-            isLibraryInitialized() && installFiles(model, stagingDirectory, packDirectory)
+            isLibraryInitialized() && installFiles(pair, model, stagingDirectory, packDirectory)
         } catch (_: IOException) {
             false
         }
@@ -75,7 +83,7 @@ class RealLanguagePackInstaller @Inject constructor(
         false
     }
 
-    private suspend fun installFiles(model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean {
+    private suspend fun installFiles(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean {
         for ((key, file) in model.files) {
             currentCoroutineContext().ensureActive()
             val compressedFile = stagingDirectory.resolve(key + COMPRESSED_FILE_SUFFIX)
@@ -91,6 +99,9 @@ class RealLanguagePackInstaller @Inject constructor(
 
         currentCoroutineContext().ensureActive()
         stagingDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).writeText(adapter.toJson(model))
+
+        // the manifest can drop the pair or move it to another version while the pack downloads
+        if (store.readManifest()?.models?.get(pair)?.version != model.version) return false
 
         currentCoroutineContext().ensureActive()
         return stagingDirectory.renameTo(packDirectory)

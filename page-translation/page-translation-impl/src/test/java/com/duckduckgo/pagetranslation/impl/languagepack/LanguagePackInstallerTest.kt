@@ -18,8 +18,10 @@ package com.duckduckgo.pagetranslation.impl.languagepack
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pagetranslation.impl.languagepack.RealLanguagePackInstaller.Companion.MANIFEST_ENTRY_FILE_NAME
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.ModelFile
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
 import com.duckduckgo.pagetranslation.impl.translatekit.TranslateKitLibrary
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -47,12 +49,14 @@ class LanguagePackInstallerTest {
     val temporaryFolder = TemporaryFolder()
 
     private val library: TranslateKitLibrary = mock()
-    private val installer = RealLanguagePackInstaller(library, coroutineRule.testDispatcherProvider)
+    private val store: ModelsManifestStore = mock()
+    private val installer = RealLanguagePackInstaller(library, store, coroutineRule.testDispatcherProvider)
     private val stagingDirectory get() = temporaryFolder.root.resolve("$PAIR.tmp")
     private val packDirectory get() = temporaryFolder.root.resolve(PAIR)
 
     @Before
-    fun setUp() {
+    fun setUp() = runTest {
+        whenever(store.readManifest()).thenReturn(manifestOf(MODEL))
         whenever(library.isInitialized()).thenReturn(true)
         doAnswer { it.getArgument<File>(1).writeText(DECOMPRESSED.getValue(it.getArgument<File>(1).name)) }
             .whenever(library).decompressZstd(any(), any())
@@ -63,7 +67,7 @@ class LanguagePackInstallerTest {
 
     @Test
     fun installDecompressedFilesAndManifestEntry() = runTest {
-        assertTrue(installer.install(MODEL, stagingDirectory, packDirectory))
+        assertTrue(installer.install(PAIR, MODEL, stagingDirectory, packDirectory))
 
         assertFalse(stagingDirectory.exists())
         assertEquals(setOf("model", "vocab", MANIFEST_ENTRY_FILE_NAME), packDirectory.list()!!.toSet())
@@ -100,6 +104,20 @@ class LanguagePackInstallerTest {
     }
 
     @Test
+    fun failWhenManifestListsAnotherVersion() = runTest {
+        whenever(store.readManifest()).thenReturn(manifestOf(MODEL.copy(version = "4.0")))
+
+        assertNotInstalled(MODEL)
+    }
+
+    @Test
+    fun failWhenManifestNoLongerListsPair() = runTest {
+        whenever(store.readManifest()).thenReturn(manifestOf())
+
+        assertNotInstalled(MODEL)
+    }
+
+    @Test
     fun failWhenLibraryIsNotInitialized() = runTest {
         whenever(library.isInitialized()).thenReturn(false)
 
@@ -107,11 +125,14 @@ class LanguagePackInstallerTest {
     }
 
     private suspend fun assertNotInstalled(model: TranslationModel) {
-        assertFalse(installer.install(model, stagingDirectory, packDirectory))
+        assertFalse(installer.install(PAIR, model, stagingDirectory, packDirectory))
 
         assertFalse(stagingDirectory.exists())
         assertFalse(packDirectory.exists())
     }
+
+    private fun manifestOf(vararg models: TranslationModel) =
+        ModelsManifest(schemaVersion = 1, baseUrl = "https://models.test/", models = models.associateBy { PAIR })
 
     private fun withModelFile(change: (ModelFile) -> ModelFile) = MODEL.copy(files = MODEL.files + ("model" to change(MODEL_FILE)))
 
