@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Leiskite mums tuo pasirūpinti už jus. Atmesime slapukus, kai tai įmanoma, ir priimsime tuos, kurių atmesti negalima.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Atmesti, jei įmanoma, arba priimti už mane</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Susitvarkysiu</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Atmesk nebūtinus slapukus</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Užtikrina didžiausią privatumą ir uždaro slapukų iškylančiuosius langus</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Priimk kai kuriuos slapukus</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Paslepia daugiau iškylančiųjų langų, nes priima neatmetamus slapukus</string>
 </resources>
