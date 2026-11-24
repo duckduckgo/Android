@@ -27,8 +27,8 @@ import android.view.ViewConfiguration
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
-import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.pagetranslation.impl.R
+import com.duckduckgo.pagetranslation.impl.databinding.ViewTranslationBannerBinding
 import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
 import com.duckduckgo.pagetranslation.impl.offer.ActiveOffer
 import kotlinx.coroutines.CoroutineDispatcher
@@ -50,8 +50,8 @@ class TranslationBannerView @JvmOverloads constructor(
     private var mainDispatcher: CoroutineDispatcher? = null
     private var scope: CoroutineScope? = null
 
-    private val card: View
-    private val languages: DaxTextView
+    private val binding = ViewTranslationBannerBinding.inflate(LayoutInflater.from(context), this)
+    private val card: View = binding.translationBannerCard
     private val slop = ViewConfiguration.get(context).scaledTouchSlop
     private val minFlingVelocity = ViewConfiguration.get(context).scaledMinimumFlingVelocity * FLING_FACTOR
     private var downX = 0f
@@ -60,9 +60,6 @@ class TranslationBannerView @JvmOverloads constructor(
     private var velocityTracker: VelocityTracker? = null
 
     init {
-        LayoutInflater.from(context).inflate(R.layout.view_translation_banner, this, true)
-        card = findViewById(R.id.translationBannerCard)
-        languages = findViewById(R.id.translationBannerLanguages)
         visibility = GONE
         clipChildren = false
         ViewCompat.setAccessibilityLiveRegion(card, ViewCompat.ACCESSIBILITY_LIVE_REGION_POLITE)
@@ -80,7 +77,7 @@ class TranslationBannerView @JvmOverloads constructor(
         this.controller = controller
         this.deviceLanguages = deviceLanguages
         this.mainDispatcher = mainDispatcher
-        findViewById<View>(R.id.translationBannerButton).setOnClickListener { controller.onTranslate() }
+        binding.translationBannerButton.setOnClickListener { controller.onTranslate() }
     }
 
     override fun onAttachedToWindow() {
@@ -132,7 +129,7 @@ class TranslationBannerView @JvmOverloads constructor(
             names.displayName(offer.pair.source),
             names.displayName(offer.pair.target),
         )
-        languages.text = subtitle
+        binding.translationBannerLanguages.text = subtitle
         card.contentDescription = "${context.getString(R.string.pageTranslationPromptTitle)} $subtitle"
         val wasVisible = isVisible
         card.animate().cancel()
