@@ -2133,7 +2133,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenDaxDuckAiEndBrandDesignBubbleCtaCustomAiOnboardingFlowThenDescriptionIsCustomAi() {
+    fun whenDaxDuckAiEndBrandDesignBubbleCtaCustomAiOnboardingFlowThenDescriptionIsAiPath() {
         val cta = DaxDuckAiEndBubbleCta(
             onboardingStore = mockOnboardingStore,
             appInstallStore = mockAppInstallStore,
@@ -2142,7 +2142,7 @@ class CtaViewModelTest {
             isCustomAiOnboardingFlow = true,
             segmentedPath = null,
         )
-        assertEquals(R.string.onboardingEndCustomAiFlowDaxDialogDescription, cta.description)
+        assertEquals(R.string.aiPathWithToggleEnabledContextualEndDescription, cta.description)
     }
 
     @Test

@@ -41,8 +41,7 @@ data class DaxDuckAiEndBubbleCta(
     ctaId = CtaId.DAX_DUCK_AI_END,
     title = R.string.onboardingDuckAiEndCtaTitle,
     description = when {
-        isCustomAiOnboardingFlow -> R.string.onboardingEndCustomAiFlowDaxDialogDescription
-        segmentedPath == DownloadReasonSelection.AI_CHAT -> R.string.aiPathWithToggleEnabledContextualEndDescription
+        isCustomAiOnboardingFlow || segmentedPath == DownloadReasonSelection.AI_CHAT -> R.string.aiPathWithToggleEnabledContextualEndDescription
         else -> R.string.onboardingDuckAiEndCtaDescription
     },
     backgroundRes = CommonR.drawable.bg_onboarding_end,
@@ -73,9 +72,9 @@ data class DaxDuckAiEndBubbleCta(
     override fun decorateDescription(
         context: Context,
         text: CharSequence,
-    ): CharSequence = if (segmentedPath == DownloadReasonSelection.AI_CHAT) {
-        text
-    } else {
+    ): CharSequence = if (description == R.string.onboardingDuckAiEndCtaDescription) {
         context.appendIconToText(text, CommonR.drawable.ic_ai_chat_16)
+    } else {
+        text
     }
 }
