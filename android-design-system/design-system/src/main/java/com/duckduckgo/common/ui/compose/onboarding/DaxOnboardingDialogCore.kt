@@ -180,6 +180,10 @@ internal fun DaxOnboardingDialogCore(
         tailExtended = tailExtended,
         boundsAnimationDuration = boundsAnimationDuration,
     )
+    // The host and resize settings can change while the measured content stays the same size.
+    val onContentSizeChanged = remember(holder, state, animate, boundsAnimationDuration, holder.motionScale, holder.dismissOffsetPx) {
+        holder::onContentSizeChanged
+    }
     DaxOnboardingDialogEffects(
         holder = holder,
         contentKey = contentKey,
@@ -276,7 +280,7 @@ internal fun DaxOnboardingDialogCore(
                             .onFocusedBoundsChanged { holder.focusedChild = it }
                             .onGloballyPositioned { holder.scrollingContent = it }
                             .bringIntoViewRequester(holder.focusedContentRequester)
-                            .onSizeChanged(holder::onContentSizeChanged)
+                            .onSizeChanged(onContentSizeChanged)
                             .padding(
                                 top = topPadding,
                                 bottom = bottomPadding,

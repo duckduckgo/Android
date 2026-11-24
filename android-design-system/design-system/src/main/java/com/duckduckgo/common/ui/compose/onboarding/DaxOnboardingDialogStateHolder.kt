@@ -71,6 +71,7 @@ internal class DaxOnboardingDialogStateHolder(
     var scrollingContent by mutableStateOf<LayoutCoordinates?>(null)
 
     val motionScale: Float get() = inputs.value.motionScale
+    val dismissOffsetPx: Int get() = inputs.value.dismissOffsetPx
     val motionEnabled: Boolean get() = motionScale != 0f
 
     val holdingForMorph: () -> Boolean = { replacingEnteredShell && intro.animate }
