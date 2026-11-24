@@ -45,6 +45,7 @@ import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAdde
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchGetDesktopApp
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncWithDesktopChoice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlowInternal
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -132,7 +133,7 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
     private fun launchSyncWithDesktopChoice() {
         globalActivityStarter.start(
             context,
-            SyncActivityStartSyncFlow(
+            SyncActivityStartSyncFlowInternal(
                 source = "promotion_bookmark_multi_device_added_dialog",
                 offerDesktopApp = true,
             ),

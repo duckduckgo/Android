@@ -110,6 +110,7 @@ import com.duckduckgo.mobile.android.R as CommonR
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
 @ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
+@ContributeToActivityStarter(SyncActivityStartSyncFlowInternal::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncBinding>()
@@ -140,8 +141,11 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var authPromptRenderer: AuthPromptRenderer
 
-    private val startSyncFlowParams
-        get() = intent.getActivityParams(SyncActivityStartSyncFlow::class.java)
+    private val startSyncFlowParams: SyncActivityStartSyncFlowInternal?
+        get() = intent.getActivityParams(SyncActivityStartSyncFlowInternal::class.java)
+            ?: intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.let { params ->
+                SyncActivityStartSyncFlowInternal(source = params.source, joinExistingAccount = params.joinExistingAccount)
+            }
 
     private val launchSource
         get() = startSyncFlowParams?.source ?: LAUNCH_SOURCE_OTHER

@@ -55,10 +55,8 @@ data class SyncActivityFromSetupUrl(
  *
  * @property source optional telemetry tag identifying where the flow was started from.
  * @property joinExistingAccount if the user doesn't sync yet, offers to scan a code from another device instead of creating a new account.
- * @property offerDesktopApp if the user already syncs, first asks whether to sync with a desktop app they have or get one.
  */
 data class SyncActivityStartSyncFlow(
     val source: String?,
     val joinExistingAccount: Boolean = false,
-    val offerDesktopApp: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
