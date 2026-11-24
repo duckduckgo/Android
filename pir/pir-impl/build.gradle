@@ -24,76 +24,69 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(":pir-api")
-
-    implementation project(':codegen-annotations')
     implementation project(':browser-api')
-    implementation project(':design-system')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
-    implementation project(':di')
     implementation project(':data-store-api')
+    implementation project(':design-system')
+    implementation project(':di')
     implementation project(':js-messaging-api')
     implementation project(':macos-api')
     implementation project(':navigation-api')
     implementation project(':network-protection-api')
+    implementation project(":pir-api")
     implementation project(':remote-messaging-api')
     implementation project(':settings-api')
-    implementation project(':subscriptions-api')
+    implementation project(':sqlcipher-loader-api')
     implementation project(':statistics-api')
+    implementation project(':subscriptions-api')
     implementation project(':tracker-detection-api')
     implementation project(':user-agent-api')
     implementation project(':windows-api')
+    implementation "androidx.work:work-multiprocess:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-adapters:_"
     implementation "com.squareup.moshi:moshi-kotlin:_"
-
+    implementation "net.zetetic:sqlcipher-android:_"
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.security.crypto
     implementation AndroidX.webkit
+    implementation AndroidX.work.runtimeKtx
     implementation Google.android.material
     implementation KotlinX.coroutines.android
-
-    // Room
-    implementation AndroidX.room.runtime
-    implementation Square.retrofit2.converter.moshi
     implementation Square.moshi
-    ksp AndroidX.room.compiler
+    implementation Square.retrofit2.converter.moshi
 
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    implementation "androidx.work:work-multiprocess:_"
-
-    // Encryption
-    implementation "net.zetetic:sqlcipher-android:_"
-    implementation project(':sqlcipher-loader-api')
-    implementation AndroidX.security.crypto
-
-    testImplementation Testing.junit4
-    testImplementation AndroidX.room.testing
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-    testImplementation CashApp.turbine
-    testImplementation AndroidX.test.ext.junit
-    testImplementation Testing.robolectric
     testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.work.testing
+    testImplementation CashApp.turbine
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
-    // AndroidTest dependencies (no mockito - use real implementations or manual fakes for Android instrumentation tests)
-    androidTestImplementation Testing.junit4
-    androidTestImplementation AndroidX.test.ext.junit
-    androidTestImplementation AndroidX.test.runner
+    // We don't use Mockito in instrumentation tests; we use real implementations or fakes instead.
     androidTestImplementation project(path: ':common-test')
     androidTestImplementation project(path: ':feature-toggles-test')
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
     androidTestImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    androidTestImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 android {

@@ -23,18 +23,17 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp AndroidX.room.compiler
-
+    implementation project(':voice-search-api')
+    implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation AndroidX.core.ktx
+    implementation AndroidX.room.runtime
     implementation KotlinX.coroutines.core
     implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation "com.squareup.moshi:moshi-adapters:_"
-    implementation AndroidX.room.runtime
-
-    implementation project(':voice-search-api')
 
     testImplementation Testing.junit4
+
+    ksp AndroidX.room.compiler
 }
 android {
     lintOptions {

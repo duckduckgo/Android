@@ -23,53 +23,45 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':di')
+    implementation project(':ad-blocking-api')
+    implementation project(':app-build-config-api')
+    implementation project(':app-store')
+    implementation project(':browser-api')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
     implementation project(':content-scope-scripts-api')
-    implementation project(':app-store')
-    implementation project(':privacy-config-api')
-    implementation project(':app-build-config-api')
-    implementation project(':fingerprint-protection-api')
-    implementation project(':browser-api')
-    implementation project(':feature-toggles-api')
-    implementation project(':js-messaging-api')
-    implementation project(':statistics-api')
-    implementation project(':ad-blocking-api')
     implementation project(':data-store-api')
-    implementation AndroidX.webkit
-
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-
+    implementation project(':di')
+    implementation project(':feature-toggles-api')
+    implementation project(':fingerprint-protection-api')
+    implementation project(':js-messaging-api')
+    implementation project(':privacy-config-api')
+    implementation project(':statistics-api')
     implementation "com.squareup.logcat:logcat:_"
-
-    implementation KotlinX.coroutines.core
-
-    implementation Square.retrofit2.converter.moshi
     implementation AndroidX.core.ktx
-
-    // Room
     implementation AndroidX.room.runtime
-    ksp AndroidX.room.compiler
-
-    // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
-    testImplementation AndroidX.core
-    testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
-    testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
-    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+    implementation AndroidX.webkit
+    implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.converter.moshi
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-
+    testImplementation "androidx.test:runner:_"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation CashApp.turbine
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 android {
