@@ -408,4 +408,13 @@
     <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Analüüsi faile</string>
     <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Küsi fotode kohta</string>
     <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Loo pilt</string>
+
+    <!-- Onboarding choices -->
+    <string name="duckChatModelProviderOpenAi" translatable="false">ChatGPT</string>
+    <string name="duckChatModelProviderAnthropic" translatable="false">Claude</string>
+    <string name="duckChatModelGemma" translatable="false">Gemma</string>
+    <string name="duckChatOnboardingNewTabTogglePositionDuckAi" instruction="Onboarding button. Makes new tabs open in Duck.ai chat mode instead of search">Ava vahekaardid tehisintellekti vestlusega</string>
+    <string name="duckChatOnboardingNewTabTogglePositionLastUsed" instruction="Onboarding button. Declines opening new tabs in Duck.ai chat mode">Mitte praegu</string>
+    <string name="duckChatOnboardingDuckAiStateOn" instruction="Onboarding button. Duck.ai is the name of the AI chat feature">Lülita Duck.ai sisse</string>
+    <string name="duckChatOnboardingDuckAiStateOff" instruction="Onboarding button. Duck.ai is the name of the AI chat feature">Jäta Duck.ai välja lülitatuks</string>
 </resources>
