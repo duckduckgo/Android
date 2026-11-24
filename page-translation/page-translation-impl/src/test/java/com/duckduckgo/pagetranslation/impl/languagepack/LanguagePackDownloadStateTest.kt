@@ -26,6 +26,7 @@ import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadStat
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason.NOT_ENOUGH_STORAGE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Idle
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.InProgress
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Stopped
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.DOWNLOADED_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.FAILURE_REASON_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.TOTAL_BYTES_KEY
@@ -47,8 +48,8 @@ class LanguagePackDownloadStateTest {
     }
 
     @Test
-    fun failWhenSystemStoppedAnEarlierRun() {
-        assertEquals(Failed(DOWNLOAD_ERROR), workInfo(State.ENQUEUED, runAttemptCount = 1).toLanguagePackDownloadState())
+    fun reportStoppedWhileAStoppedRunWaitsToRunAgain() {
+        assertEquals(Stopped, workInfo(State.ENQUEUED, runAttemptCount = 1).toLanguagePackDownloadState())
     }
 
     @Test

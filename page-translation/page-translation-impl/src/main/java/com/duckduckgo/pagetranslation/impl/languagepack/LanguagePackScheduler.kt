@@ -48,6 +48,12 @@ sealed interface LanguagePackDownloadState {
 
     data class InProgress(val downloadedBytes: Long, val totalBytes: Long) : LanguagePackDownloadState
 
+    /**
+     * An earlier run was stopped, by the system or by the process dying, and WorkManager will run it again.
+     * A session that saw this download in progress reports a download error, one that has just joined it keeps waiting.
+     */
+    data object Stopped : LanguagePackDownloadState
+
     data object Completed : LanguagePackDownloadState
 
     data class Failed(val reason: Reason) : LanguagePackDownloadState {
@@ -103,8 +109,7 @@ class RealLanguagePackScheduler @Inject constructor(
 }
 
 internal fun WorkInfo.toLanguagePackDownloadState(): LanguagePackDownloadState = when (state) {
-    // a pending rerun means the system stopped an earlier run, which the session reports as a download error
-    ENQUEUED, BLOCKED -> if (runAttemptCount > 0) LanguagePackDownloadState.Failed(DOWNLOAD_ERROR) else inProgress()
+    ENQUEUED, BLOCKED -> if (runAttemptCount > 0) LanguagePackDownloadState.Stopped else inProgress()
     RUNNING -> inProgress()
     SUCCEEDED -> LanguagePackDownloadState.Completed
     FAILED -> LanguagePackDownloadState.Failed(
