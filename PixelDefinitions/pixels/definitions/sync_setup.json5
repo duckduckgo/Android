@@ -322,7 +322,7 @@
             {
                 "key": "launch_source",
                 "type": "string",
-                "description": "Which promotion opened Sync before the setup flow completed, or other for every other entry point",
+                "description": "The entry point that opened Sync",
                 "enum": [
                     "promotion_bookmarks",
                     "promotion_passwords",
@@ -333,6 +333,8 @@
                     "promotion_bookmarks_multi_device",
                     "promotion_passwords_multi_device",
                     "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
                     "other"
                 ]
             },
@@ -390,7 +392,7 @@
             {
                 "key": "launch_source",
                 "type": "string",
-                "description": "Which promotion opened Sync before the setup flow failed, or other for every other entry point",
+                "description": "The entry point that opened Sync",
                 "enum": [
                     "promotion_bookmarks",
                     "promotion_passwords",
@@ -401,6 +403,8 @@
                     "promotion_bookmarks_multi_device",
                     "promotion_passwords_multi_device",
                     "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
                     "other"
                 ]
             },
@@ -498,7 +502,7 @@
             {
                 "key": "launch_source",
                 "type": "string",
-                "description": "Which promotion opened Sync before the setup flow was cancelled, or other for every other entry point",
+                "description": "The entry point that opened Sync",
                 "enum": [
                     "promotion_bookmarks",
                     "promotion_passwords",
@@ -509,6 +513,8 @@
                     "promotion_bookmarks_multi_device",
                     "promotion_passwords_multi_device",
                     "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
                     "other"
                 ]
             },

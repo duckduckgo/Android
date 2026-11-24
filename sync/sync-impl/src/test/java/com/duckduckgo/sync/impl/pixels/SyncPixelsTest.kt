@@ -169,6 +169,19 @@ class RealSyncPixelsTest {
     }
 
     @Test
+    fun `when signup direct pixel is called with typed pairing url source then fired pixel includes source`() {
+        testee.fireSignupDirectPixel(launchSource = "typed_url_duck_com")
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SIGNUP_DIRECT,
+            mapOf(
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+                SyncPixelParameters.SYNC_SETUP_SCREEN_TYPE to "typed_url_duck_com",
+            ),
+        )
+    }
+
+    @Test
     fun `when signup direct pixel is called with source then fired pixel includes source`() {
         testee.fireSignupDirectPixel(launchSource = "promotion_bookmarks")
 
@@ -1000,12 +1013,26 @@ class RealSyncPixelsTest {
     }
 
     @Test
-    fun `when sync settings shown then the pixel is fired`() {
-        testee.fireSyncSettingsShown()
+    fun `when sync settings shown then the pixel is fired with the launch source`() {
+        testee.fireSyncSettingsShown(launchSource = "typed_url_duck_ai")
 
         verify(pixel).fire(
             SyncPixelName.SYNC_SETTINGS_SCREEN_SHOWN,
             mapOf(
+                SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE to "typed_url_duck_ai",
+                SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
+            ),
+        )
+    }
+
+    @Test
+    fun `when sync settings shown from unknown source then the pixel is fired with other`() {
+        testee.fireSyncSettingsShown(launchSource = "unknown")
+
+        verify(pixel).fire(
+            SyncPixelName.SYNC_SETTINGS_SCREEN_SHOWN,
+            mapOf(
+                SyncPixelParameters.SYNC_FEATURE_PROMOTION_SOURCE to "other",
                 SyncPixelParameters.SYNC_SETUP_UI_VERSION to "v2",
             ),
         )

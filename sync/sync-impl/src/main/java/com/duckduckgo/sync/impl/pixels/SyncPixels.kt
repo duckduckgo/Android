@@ -121,7 +121,10 @@ interface SyncPixels {
         apiError: Error,
     )
 
-    fun fireSyncSettingsShown()
+    /**
+     * @param launchSource the entry point that opened Sync.
+     */
+    fun fireSyncSettingsShown(launchSource: String)
     fun fireBackupThisDeviceTapped()
     fun fireRecoverSyncDataTapped()
     fun fireRecoverSyncDataConfirmed()
@@ -573,10 +576,13 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireSyncSettingsShown() {
+    override fun fireSyncSettingsShown(launchSource: String) {
         pixel.fire(
             SyncPixelName.SYNC_SETTINGS_SCREEN_SHOWN,
-            parameters = setupUiMetadata(),
+            parameters = buildMap {
+                putAll(buildSourceMap(launchSource.toKnownLaunchSource()))
+                putAll(setupUiMetadata())
+            },
         )
     }
 
@@ -1346,6 +1352,8 @@ private val KNOWN_LAUNCH_SOURCES = setOf(
     "promotion_ai_chat",
     "promotion_passwords_import",
     "promotion_bookmarks_import",
+    "typed_url_duck_com",
+    "typed_url_duck_ai",
     LAUNCH_SOURCE_OTHER,
 )
 

@@ -62,7 +62,7 @@
             {
                 "key": "source",
                 "type": "string",
-                "description": "The promotion that opened Sync, or other for every other entry point (Sync settings, deep links)",
+                "description": "The entry point that opened Sync",
                 "enum": [
                     "promotion_bookmarks",
                     "promotion_passwords",
@@ -73,6 +73,8 @@
                     "promotion_bookmarks_multi_device",
                     "promotion_passwords_multi_device",
                     "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
                     "other"
                 ]
             },
@@ -94,7 +96,7 @@
             {
                 "key": "source",
                 "type": "string",
-                "description": "The promotion that opened Sync, or other for every other entry point (Sync settings, deep links)",
+                "description": "The entry point that opened Sync",
                 "enum": [
                     "promotion_bookmarks",
                     "promotion_passwords",
@@ -105,6 +107,8 @@
                     "promotion_bookmarks_multi_device",
                     "promotion_passwords_multi_device",
                     "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
                     "other"
                 ]
             },
