@@ -416,4 +416,12 @@
     <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Analizuoti failus</string>
     <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Klausti apie nuotraukas</string>
     <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Kurti vaizdą</string>
+
+    <!-- Duck.ai home-screen widget -->
+    <string name="duckAiWidgetLabel" instruction="Name of the Duck.ai home-screen widget, shown in the Android widget picker">„Duck.ai“ ir naujausi pokalbiai</string>
+    <string name="duckAiWidgetDescription" instruction="Short description of the Duck.ai home-screen widget, shown in the Android widget picker">Pradėk privatų pokalbį su „Duck.ai“ arba pratęsk naujausius pokalbius.</string>
+    <string name="duckAiWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai home-screen widget">Kalbėkis privačiai</string>
+    <string name="duckAiWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the home-screen widget">Balsas</string>
+    <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Vaizdas</string>
+    <string name="duckAiWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the home-screen widget">Kamera</string>
 </resources>
