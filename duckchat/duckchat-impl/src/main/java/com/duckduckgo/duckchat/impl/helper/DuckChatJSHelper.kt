@@ -586,6 +586,10 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS, supportsHomePageChatSuggestions)
                 put(SUPPORTS_BONUS_OFFER, duckChatFeature.duckAiPromoCampaigns().isEnabled())
                 put(SUPPORTS_PROMO_CARDS, duckChatFeature.duckAiPromoCards().isEnabled())
+                // Omitted rather than false when off, matching iOS.
+                if (duckChatFeature.unifiedToggleInputSimplifiedPromptBox().isEnabled()) {
+                    put(SUPPORTS_CUSTOMIZE_RESPONSES_IN_SETTINGS, true)
+                }
                 put(INSTALL_TYPE, if (appBuildConfig.isAppReinstall()) INSTALL_TYPE_RETURNING else INSTALL_TYPE_NEW)
                 getInstallAgeBucket()?.let { put(INSTALL_AGE, it) }
                 clientToolsExecutor.clientToolsConfig(pageUrl, browserMode)?.let { put(CLIENT_TOOLS, it) }
@@ -943,6 +947,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_SUGGESTIONS = "supportsSuggestions"
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
+        private const val SUPPORTS_CUSTOMIZE_RESPONSES_IN_SETTINGS = "supportsCustomizeResponsesInSettings"
         private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
         private const val SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS = "supportsHomePageChatSuggestions"
