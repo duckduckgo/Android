@@ -365,6 +365,12 @@ interface SubscriptionsFeature {
     fun notificationsPermissionMessaging(): Toggle
 
     /**
+     * Kill switch for the notifications denied dialog JS messaging
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun notificationsDeniedDialogMessaging(): Toggle
+
+    /**
      * When enabled, the Partnerships Hub entry point is shown in Settings.
      * The flag settings carry the hub URL to open.
      */

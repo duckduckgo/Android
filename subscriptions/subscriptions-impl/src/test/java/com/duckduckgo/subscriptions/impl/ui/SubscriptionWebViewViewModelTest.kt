@@ -62,6 +62,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -551,6 +552,40 @@ class SubscriptionWebViewViewModelTest {
             assertEquals("msgId", response.id)
             assertEquals("getUserSettings", response.method)
             assertEquals("granted", response.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogEnabledThenGetUserSettingsResponseReportsDialogSupported() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.onUserSettingsComputed(
+                id = "msgId",
+                notificationsEnabled = false,
+                isAtLeastApi33 = true,
+                runtimePermissionGranted = false,
+                shouldShowRationale = false,
+            )
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertTrue(response.params.getBoolean("notificationsDeniedDialog"))
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogDisabledThenGetUserSettingsResponseReportsDialogNotSupported() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = false))
+
+        viewModel.commands().test {
+            viewModel.onUserSettingsComputed(
+                id = "msgId",
+                notificationsEnabled = false,
+                isAtLeastApi33 = true,
+                runtimePermissionGranted = false,
+                shouldShowRationale = false,
+            )
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertFalse(response.params.getBoolean("notificationsDeniedDialog"))
         }
     }
 

@@ -242,12 +242,15 @@ class SubscriptionWebViewViewModel @Inject constructor(
             shouldShowRationale -> NOTIFICATIONS_PERMISSION_NOT_DETERMINED
             else -> NOTIFICATIONS_PERMISSION_DENIED
         }
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             val response = JsCallbackData(
                 featureName = "useSubscription",
                 method = "getUserSettings",
                 id = id,
-                params = JSONObject().apply { put("notificationsPermission", status) },
+                params = JSONObject().apply {
+                    put("notificationsPermission", status)
+                    put("notificationsDeniedDialog", subscriptionsFeature.notificationsDeniedDialogMessaging().isEnabled())
+                },
             )
             command.send(SendResponseToJs(response))
         }
