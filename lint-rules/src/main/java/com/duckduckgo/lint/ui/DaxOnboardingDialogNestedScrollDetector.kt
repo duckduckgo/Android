@@ -26,8 +26,16 @@ import com.android.tools.lint.detector.api.Scope
 import com.android.tools.lint.detector.api.Severity
 import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.android.tools.lint.detector.api.TextFormat
+import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.uast.UCallExpression
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.ULambdaExpression
+import org.jetbrains.uast.ULocalVariable
+import org.jetbrains.uast.UNamedExpression
+import org.jetbrains.uast.UReferenceExpression
 import org.jetbrains.uast.getParameterForArgument
+import org.jetbrains.uast.skipParenthesizedExprDown
+import org.jetbrains.uast.toUElementOfType
 import org.jetbrains.uast.visitor.AbstractUastVisitor
 import java.util.EnumSet
 
@@ -41,14 +49,31 @@ class DaxOnboardingDialogNestedScrollDetector : Detector(), SourceCodeScanner {
     internal class Handler(private val context: JavaContext) : UElementHandler() {
 
         override fun visitCallExpression(node: UCallExpression) {
-            if (node.methodName !in DIALOG_COMPOSABLES) return
-            val content = node.valueArguments.find { node.getParameterForArgument(it)?.name == "content" } ?: return
-            content.accept(object : AbstractUastVisitor() {
+            if (node.methodName !in DIALOG_COMPOSABLES || node.resolvedPackage() != DIALOG_PACKAGE) return
+            for (argument in node.valueArguments) {
+                if (node.getParameterForArgument(argument)?.name in SCROLLING_SLOTS) checkSlot(argument)
+            }
+        }
+
+        private fun checkSlot(argument: UExpression) {
+            val slot = ((argument as? UNamedExpression)?.expression ?: argument).skipParenthesizedExprDown()
+            val initializer = (slot as? UReferenceExpression)?.localLambdaInitializer()
+            (initializer ?: slot).accept(object : AbstractUastVisitor() {
                 override fun visitCallExpression(node: UCallExpression): Boolean {
-                    if (node.methodName in VERTICAL_SCROLLERS) report(node)
+                    val expectedPackage = VERTICAL_SCROLLERS[node.methodName] ?: return false
+                    if (node.resolvedPackage() == expectedPackage) report(node)
                     return false
                 }
             })
+        }
+
+        private fun UCallExpression.resolvedPackage() = resolve()?.let { context.evaluator.getPackage(it)?.qualifiedName }
+
+        private fun UReferenceExpression.localLambdaInitializer(): ULambdaExpression? {
+            val variable = resolve()?.toUElementOfType<ULocalVariable>() ?: return null
+            val property = variable.sourcePsi as? KtProperty ?: return null
+            if (property.isVar) return null
+            return variable.uastInitializer?.skipParenthesizedExprDown() as? ULambdaExpression
         }
 
         private fun report(node: UCallExpression) {
@@ -61,16 +86,23 @@ class DaxOnboardingDialogNestedScrollDetector : Detector(), SourceCodeScanner {
     }
 
     companion object {
+        private const val DIALOG_PACKAGE = "com.duckduckgo.common.ui.compose.onboarding"
         private val DIALOG_COMPOSABLES = setOf("DaxOnboardingDialog", "DaxContextualOnboardingDialog")
-        private val VERTICAL_SCROLLERS = setOf("LazyColumn", "verticalScroll")
+        private val SCROLLING_SLOTS = setOf("body", "content")
+        private val VERTICAL_SCROLLERS = mapOf(
+            "verticalScroll" to "androidx.compose.foundation",
+            "LazyColumn" to "androidx.compose.foundation.lazy",
+            "LazyVerticalGrid" to "androidx.compose.foundation.lazy.grid",
+            "LazyVerticalStaggeredGrid" to "androidx.compose.foundation.lazy.staggeredgrid",
+        )
 
         val NESTED_SCROLL_IN_DAX_ONBOARDING_DIALOG: Issue = Issue
             .create(
                 id = "NestedScrollInDaxOnboardingDialog",
                 briefDescription = "Onboarding dialog content should not add a vertical scroller",
                 explanation = """
-                    DaxOnboardingDialog and DaxContextualOnboardingDialog already scroll their content vertically.
-                    Remove the LazyColumn or Modifier.verticalScroll from the content slot.
+                    DaxOnboardingDialog and DaxContextualOnboardingDialog already scroll their body and content vertically.
+                    Remove the vertical scroller from the dialog slot.
                 """.trimIndent(),
                 moreInfo = "",
                 category = CUSTOM_LINT_CHECKS,

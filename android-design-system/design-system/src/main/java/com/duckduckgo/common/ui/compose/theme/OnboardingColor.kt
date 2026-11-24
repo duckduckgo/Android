@@ -59,29 +59,35 @@ internal val LocalOnboardingColors = compositionLocalOf<OnboardingColors> {
     error("No OnboardingTheme found — wrap the content in OnboardingTheme { }")
 }
 
+@SuppressLint("ComposeCompositionLocalUsage")
+private val LocalOnboardingTypography = compositionLocalOf<DuckDuckGoTypography?> { null }
+
 /**
- * Provides the onboarding colour overlay inside [DuckDuckGoTheme].
- * Call this provider around every onboarding dialog; the dialog reads its colours from the
- * onboarding composition local, and omitting the provider causes that local to throw.
- *
- * @param content Content rendered with the onboarding colour overlay installed.
+ * Provides the colours and typography for onboarding dialogs inside [DuckDuckGoTheme].
  */
 @Composable
 fun OnboardingTheme(content: @Composable () -> Unit) {
+    val baseTypography = DuckDuckGoTheme.typography
+    if (baseTypography == LocalOnboardingTypography.current) {
+        content()
+        return
+    }
+
     val colors = onboardingColors(DuckDuckGoTheme.colors.isDark)
-    val typography = DuckDuckGoTheme.typography.copy(
-        h4 = nativeOnboardingTextStyle(DuckDuckGoTheme.typography.h4),
-        body1 = nativeOnboardingParagraphScale(DuckDuckGoTheme.typography.body1),
-        body2 = nativeOnboardingParagraphScale(DuckDuckGoTheme.typography.body2),
-        onboardingBodyInContext = nativeOnboardingParagraphScale(DuckDuckGoTheme.typography.onboardingBodyInContext),
-        onboardingTitle = nativeOnboardingTextStyle(DuckDuckGoTheme.typography.onboardingTitle, lineSpacingExtra = (-1).sp),
-        onboardingTitleInContext = nativeOnboardingTextStyle(DuckDuckGoTheme.typography.onboardingTitleInContext, lineSpacingExtra = (-1).sp),
-        onboardingBody = nativeOnboardingTextStyle(DuckDuckGoTheme.typography.onboardingBody),
-        onboardingButton = nativeOnboardingTextStyle(DuckDuckGoTheme.typography.onboardingButton),
+    val typography = baseTypography.copy(
+        h4 = nativeOnboardingTextStyle(baseTypography.h4),
+        body1 = nativeOnboardingParagraphScale(baseTypography.body1),
+        body2 = nativeOnboardingParagraphScale(baseTypography.body2),
+        onboardingBodyInContext = nativeOnboardingParagraphScale(baseTypography.onboardingBodyInContext),
+        onboardingTitle = nativeOnboardingTextStyle(baseTypography.onboardingTitle, lineSpacingExtra = (-1).sp),
+        onboardingTitleInContext = nativeOnboardingTextStyle(baseTypography.onboardingTitleInContext, lineSpacingExtra = (-1).sp),
+        onboardingBody = nativeOnboardingTextStyle(baseTypography.onboardingBody),
+        onboardingButton = nativeOnboardingTextStyle(baseTypography.onboardingButton),
     )
 
     CompositionLocalProvider(
         LocalOnboardingColors provides colors,
+        LocalOnboardingTypography provides typography,
         LocalDuckDuckGoTypography provides typography,
         content = content,
     )

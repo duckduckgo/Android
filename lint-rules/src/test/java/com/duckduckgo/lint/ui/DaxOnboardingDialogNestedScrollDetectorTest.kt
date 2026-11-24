@@ -27,7 +27,9 @@ class DaxOnboardingDialogNestedScrollDetectorTest {
         package com.duckduckgo.common.ui.compose.onboarding
         object DaxOnboardingDialogContentScope
         fun DaxOnboardingDialog(title: String, content: (DaxOnboardingDialogContentScope.() -> Unit)? = null) {}
+        fun DaxOnboardingDialog(title: String, body: () -> Unit, content: (DaxOnboardingDialogContentScope.() -> Unit)? = null) {}
         fun DaxContextualOnboardingDialog(title: String, content: (DaxOnboardingDialogContentScope.() -> Unit)? = null) {}
+        fun DaxContextualOnboardingDialog(title: String, body: () -> Unit, content: (DaxOnboardingDialogContentScope.() -> Unit)? = null) {}
         """,
     ).indented()
 
@@ -38,9 +40,20 @@ class DaxOnboardingDialogNestedScrollDetectorTest {
         object ScrollState
         fun Modifier.verticalScroll(state: ScrollState): Modifier = this
         fun Modifier.horizontalScroll(state: ScrollState): Modifier = this
-        fun LazyColumn(content: () -> Unit) {}
-        fun LazyRow(content: () -> Unit) {}
         fun Column(modifier: Modifier = Modifier, content: () -> Unit) {}
+        """,
+    ).indented()
+
+    private val lazyStubs = listOf(
+        kotlin("package androidx.compose.foundation.lazy\nfun LazyColumn(content: () -> Unit) {}\nfun LazyRow(content: () -> Unit) {}"),
+        kotlin("package androidx.compose.foundation.lazy.grid\nfun LazyVerticalGrid(content: () -> Unit) {}"),
+        kotlin("package androidx.compose.foundation.lazy.staggeredgrid\nfun LazyVerticalStaggeredGrid(content: () -> Unit) {}"),
+    )
+
+    private val otherDialog = kotlin(
+        """
+        package com.other
+        fun DaxOnboardingDialog(title: String, content: () -> Unit) {}
         """,
     ).indented()
 
@@ -49,13 +62,17 @@ class DaxOnboardingDialogNestedScrollDetectorTest {
         package com.test
         import com.duckduckgo.common.ui.compose.onboarding.*
         import androidx.compose.foundation.*
+        import androidx.compose.foundation.lazy.*
+        import androidx.compose.foundation.lazy.grid.*
+        import androidx.compose.foundation.lazy.staggeredgrid.*
         fun ScrollingSection() { LazyColumn {} }
+        object Analytics { fun verticalScroll() {} }
         fun screen() { $body }
         """,
     ).indented()
 
     private fun run(body: String) = lint()
-        .files(stubs, composeStubs, caller(body))
+        .files(stubs, composeStubs, *lazyStubs.toTypedArray(), otherDialog, caller(body))
         .issues(DaxOnboardingDialogNestedScrollDetector.NESTED_SCROLL_IN_DAX_ONBOARDING_DIALOG)
         .run()
 
@@ -93,5 +110,47 @@ class DaxOnboardingDialogNestedScrollDetectorTest {
     @Test
     fun whenScrollerIsHiddenInCustomComposableThenNoWarning() {
         run("""DaxOnboardingDialog(title = "x", content = { ScrollingSection() })""").expectClean()
+    }
+
+    @Test
+    fun whenBodyHasLazyColumnThenWarning() {
+        run("""DaxOnboardingDialog(title = "x", body = { LazyColumn {} })""").expectWarningCount(1)
+    }
+
+    @Test
+    fun whenContextualBodyHasVerticalScrollModifierThenWarning() {
+        run("""DaxContextualOnboardingDialog(title = "x", body = { Column(Modifier.verticalScroll(ScrollState)) {} })""")
+            .expectWarningCount(1)
+    }
+
+    @Test
+    fun whenBodyAndContentHaveVerticalLazyGridsThenWarningForEach() {
+        run("""DaxOnboardingDialog(title = "x", body = { LazyVerticalGrid {} }, content = { LazyVerticalStaggeredGrid {} })""")
+            .expectWarningCount(2)
+    }
+
+    @Test
+    fun whenContentLambdaIsStoredInALocalValThenWarning() {
+        run(
+            """
+            val options: DaxOnboardingDialogContentScope.() -> Unit = { LazyColumn {} }
+            DaxOnboardingDialog(title = "x", content = options)
+            """.trimIndent(),
+        ).expectWarningCount(1)
+    }
+
+    @Test
+    fun whenDialogHasTheSameNameInAnotherPackageThenNoWarning() {
+        run("""com.other.DaxOnboardingDialog(title = "x", content = { LazyColumn {} })""").expectClean()
+    }
+
+    @Test
+    fun whenCallsResolveToUnrelatedFunctionsThenNoWarning() {
+        run(
+            """
+            fun LazyColumn(content: () -> Unit) {}
+            DaxOnboardingDialog(title = "x", content = { LazyColumn {}; Analytics.verticalScroll() })
+            """.trimIndent(),
+        ).expectClean()
     }
 }

@@ -43,11 +43,18 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
@@ -96,6 +103,8 @@ class DaxOnboardingDialogRenderingTest {
     private var shadowOverride: Color? = null
     private var drawingView: View? = null
     private var unboundedParent = false
+    private val parentHeight = mutableStateOf<Dp?>(null)
+    private var layoutDirection = LayoutDirection.Ltr
 
     @Before
     fun pauseAnimationClock() {
@@ -169,6 +178,81 @@ class DaxOnboardingDialogRenderingTest {
         frames()
         compose.runOnIdle { state.availableHeightPx = 2_000 }
 
+        assertMorphGrowsWithoutJumping(small)
+    }
+
+    @Test
+    fun settledCardFollowsParentHeightChanges() {
+        parentHeight.value = 150.dp
+        contentHeight.value = 300.dp
+        showDialog()
+        assertEquals(150f, cardBounds().height, 1f)
+
+        compose.runOnIdle { parentHeight.value = 250.dp }
+        frames()
+        assertEquals(250f, cardBounds().height, 1f)
+
+        compose.runOnIdle { parentHeight.value = 200.dp }
+        frames()
+        assertEquals(200f, cardBounds().height, 1f)
+    }
+
+    @Test
+    fun replacementMorphFollowsParentHeightThatGrowsMidMorphWithoutJumping() {
+        parentHeight.value = 170.dp
+        showDialog()
+        val small = cardBounds().height
+        compose.runOnIdle {
+            animate.value = true
+            contentKey.value = "second"
+            contentHeight.value = 300.dp
+        }
+        frames()
+        compose.runOnIdle { parentHeight.value = 400.dp }
+
+        assertMorphGrowsWithoutJumping(small)
+    }
+
+    @Test
+    fun nestedOnboardingThemeRendersAtNonDefaultFontScale() {
+        compose.setContent {
+            DuckDuckGoTheme(isDarkTheme = false) {
+                CompositionLocalProvider(LocalDensity provides Density(1f, 1.3f)) {
+                    OnboardingTheme {
+                        OnboardingTheme {
+                            DaxOnboardingDialog(contentKey = "first", title = "Title", body = "Body", animate = false)
+                        }
+                    }
+                }
+            }
+        }
+        frames()
+        compose.onNodeWithText("Body").assertExists()
+    }
+
+    @Test
+    fun scrollingMovesTheScrollbarOnTheLeftInRtl() {
+        layoutDirection = LayoutDirection.Rtl
+        parentHeight.value = 150.dp
+        contentHeight.value = 300.dp
+        showDialog()
+        val bounds = cardBounds()
+        val before = capturePixels()
+        compose.onNodeWithTag("dialog").performTouchInput { swipeUp() }
+        frames()
+        val after = capturePixels()
+
+        val left = bounds.left.toInt() + DaxOnboardingDialogDefaults.DismissOffset.value.toInt()
+        val right = bounds.right.toInt()
+        fun changedPixels(columns: IntRange) = columns.sumOf { x ->
+            (bounds.top.toInt() + 16 until bounds.bottom.toInt() - 16).count { y -> before[x, y] != after[x, y] }
+        }
+        val leftChanges = changedPixels(left until left + 6)
+        assertTrue("Expected the left scrollbar to move, found $leftChanges changed pixels", leftChanges > 0)
+        assertEquals("Expected the right edge to stay still", 0, changedPixels(right - 6 until right))
+    }
+
+    private fun assertMorphGrowsWithoutJumping(small: Float) {
         var previous = cardBounds().height
         var largestStep = 0f
         repeat(90) {
@@ -683,6 +767,7 @@ class DaxOnboardingDialogRenderingTest {
                     val onboardingColors = LocalOnboardingColors.current
                     CompositionLocalProvider(
                         LocalOnboardingColors provides (shadowOverride?.let { onboardingColors.copy(bubbleShadow = it) } ?: onboardingColors),
+                        LocalLayoutDirection provides layoutDirection,
                     ) {
                         surface = DaxOnboardingDialogDefaults.SurfaceColor
                         drawingView = LocalView.current
@@ -690,7 +775,10 @@ class DaxOnboardingDialogRenderingTest {
                             Modifier.fillMaxSize().background(Color.Magenta).testTag("canvas")
                                 .then(if (unboundedParent) Modifier.verticalScroll(rememberScrollState()) else Modifier),
                         ) {
-                            Box(Modifier.padding(top = topSpace)) {
+                            Box(
+                                Modifier.padding(top = topSpace)
+                                    .then(parentHeight.value?.let { Modifier.height(it) } ?: Modifier),
+                            ) {
                                 DaxOnboardingDialog(
                                     contentKey = contentKey.value,
                                     title = title.value,

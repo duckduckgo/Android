@@ -111,6 +111,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
@@ -255,9 +256,10 @@ internal fun DaxOnboardingDialogCore(
     }
 
     val dismissOffsetPx = with(LocalDensity.current) { DaxOnboardingDialogDefaults.DismissOffset.roundToPx() }
-    fun updateCardSize(size: IntSize) {
+    fun hostMaximumCardHeight() = state.availableHeightPx?.let { (it - dismissOffsetPx).coerceAtLeast(0) }
+
+    fun updateCardSize(size: IntSize, maximum: Int = hostMaximumCardHeight() ?: cardSizeTracker.measuredMaxHeight) {
         cardSizeTracker.naturalSize = size
-        val maximum = state.availableHeightPx?.let { (it - dismissOffsetPx).coerceAtLeast(0) } ?: cardSizeTracker.maxHeight
         val target = IntSize(size.width, size.height.coerceAtMost(maximum))
         cardSizeTracker.lastSize = target
         val awaitingMorph = replacingEnteredShell && sampledAnimate && !cardSizeTracker.hasMeasured && !intro.settled
@@ -273,8 +275,11 @@ internal fun DaxOnboardingDialogCore(
             }
         }
     }
-    LaunchedEffect(cardSizeTracker, state.availableHeightPx) {
-        cardSizeTracker.naturalSize?.let { updateCardSize(it) }
+    LaunchedEffect(cardSizeTracker, state, dismissOffsetPx, animate, motionScale, boundsAnimationDuration) {
+        snapshotFlow { hostMaximumCardHeight() ?: cardSizeTracker.placedMaxHeight }.filterNotNull().collect { maximum ->
+            val size = cardSizeTracker.naturalSize ?: return@collect
+            if (size.height.coerceAtMost(maximum) != cardSizeTracker.lastSize?.height) updateCardSize(size, maximum)
+        }
     }
 
     val animateTailPosition = if (settled) animate else sampledAnimate
@@ -745,8 +750,9 @@ private class CardSizeTracker {
     var naturalSize: IntSize? = null
     var lastSize by mutableStateOf<IntSize?>(null)
     var hasMeasured = false
-    var maxHeight = Int.MAX_VALUE
-    val bounded: Boolean get() = maxHeight != Int.MAX_VALUE
+    var measuredMaxHeight = Int.MAX_VALUE
+    var placedMaxHeight by mutableStateOf<Int?>(null)
+    val bounded: Boolean get() = measuredMaxHeight != Int.MAX_VALUE
 }
 
 private fun Modifier.shadowAndClip(shape: () -> Shape, color: Color, elevation: Dp): Modifier = then(
@@ -816,7 +822,7 @@ private fun Modifier.animatedCardSize(
     holdingForMorph: () -> Boolean,
     followContent: () -> Boolean,
 ): Modifier = layout { measurable, constraints ->
-    tracker.maxHeight = constraints.maxHeight
+    tracker.measuredMaxHeight = constraints.maxHeight
     // View hosts may probe the natural height with an unspecified spec; the card scroller then takes its content height.
     val scrollConstraints = if (constraints.hasBoundedHeight) {
         constraints
@@ -829,6 +835,8 @@ private fun Modifier.animatedCardSize(
         ((settled() && tracker.hasMeasured) || (holdingForMorph() && tracker.bounded))
     val height = if (useAnimated && !followContent()) animatedSize.height else placeable.height
     layout(placeable.width.coerceIn(constraints.minWidth, constraints.maxWidth), height.coerceIn(constraints.minHeight, constraints.maxHeight)) {
+        // A View host can probe several constraints before placing the card.
+        tracker.placedMaxHeight = constraints.maxHeight
         placeable.place(0, 0)
     }
 }
@@ -860,7 +868,7 @@ private fun Modifier.platformScrollbar(scrollState: ScrollState, scrollbar: Plat
     val thickness = scrollbar.thickness
     val length = maxOf((extent.toFloat() * extent / (extent + scrollRange)).roundToInt(), thickness * 2)
     val top = ((extent - length).toFloat() * scrollState.value / scrollRange).roundToInt()
-    val left = size.width.roundToInt() - thickness
+    val left = if (layoutDirection == LayoutDirection.Rtl) 0 else size.width.roundToInt() - thickness
     scrollbar.thumb.setBounds(left, top, left + thickness, top + length)
     scrollbar.thumb.draw(drawContext.canvas.nativeCanvas)
 }
