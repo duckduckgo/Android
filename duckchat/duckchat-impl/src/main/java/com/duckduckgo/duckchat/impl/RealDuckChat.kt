@@ -729,7 +729,7 @@ class RealDuckChat @Inject constructor(
     override fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?) {
         logcat { "Duck.ai: openDuckChat" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-        openDuckChat(emptyMap(), overrideModelId = overrideModelId)
+        openDuckChat(emptyMap(), launch = DuckChatLaunch.Open(overrideModelId = overrideModelId))
     }
 
     override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {
@@ -840,16 +840,14 @@ class RealDuckChat @Inject constructor(
         parameters: Map<String, String>,
         forceNewSession: Boolean = false,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
-        overrideModelId: String? = null,
     ) {
-        openDuckChatUrl(appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink()), forceNewSession, launch, overrideModelId)
+        openDuckChatUrl(appendParameters(parameters + nativeChatInputParameters(), getDuckChatLink()), forceNewSession, launch)
     }
 
     private fun openDuckChatUrl(
         url: String,
         forceNewSession: Boolean = false,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
-        overrideModelId: String? = null,
     ) {
         appCoroutineScope.launch(dispatchers.io()) {
             val hasSessionActive =
@@ -860,7 +858,7 @@ class RealDuckChat @Inject constructor(
 
             withContext(dispatchers.main()) {
                 logcat { "Duck.ai: restoring Duck.ai session $url hasSessionActive $hasSessionActive" }
-                openDuckChatSession(url, hasSessionActive, launch, overrideModelId)
+                openDuckChatSession(url, hasSessionActive, launch)
             }
         }
     }
@@ -869,12 +867,11 @@ class RealDuckChat @Inject constructor(
         url: String,
         hasSessionActive: Boolean,
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
-        overrideModelId: String? = null,
     ) {
         // if a new query was submitted we force a new session
         // we want to lose the context of the previous one if the user wanted a new query from outside Duck.ai
         browserNav
-            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, launch = launch, overrideModelId = overrideModelId)
+            .openDuckChat(context, duckChatUrl = url, hasSessionActive = hasSessionActive, launch = launch)
             .apply {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 context.startActivity(this)

@@ -80,7 +80,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
@@ -678,7 +677,7 @@ class RealNativeInputManagerTest {
                     if (child !== widgetView) return
                     inspectedBeforeConfiguration = true
                     verify(widgetDelegate).setOmnibarPosition(true)
-                    verify(widgetDelegate, never()).configure(any(), any(), any(), any(), anyOrNull())
+                    verify(widgetDelegate, never()).configure(any(), any(), any(), any())
                 }
 
                 override fun onChildViewRemoved(parent: View, child: View) = Unit
@@ -702,7 +701,7 @@ class RealNativeInputManagerTest {
         )
 
         assertTrue(inspectedBeforeConfiguration)
-        verify(widgetDelegate).configure(tabId = "tab", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.Open(), overrideModelId = null)
+        verify(widgetDelegate).configure(tabId = "tab", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.Open())
     }
 
     @Test

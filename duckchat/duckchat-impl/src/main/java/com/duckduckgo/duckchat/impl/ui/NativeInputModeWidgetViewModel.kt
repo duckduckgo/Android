@@ -729,13 +729,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
     }
 
-    fun configure(
-        tabId: String,
-        isDuckAiMode: Boolean,
-        isBottom: Boolean,
-        launch: DuckChatLaunch = DuckChatLaunch.Open(),
-        overrideModelId: String? = null,
-    ) {
+    fun configure(tabId: String, isDuckAiMode: Boolean, isBottom: Boolean, launch: DuckChatLaunch = DuckChatLaunch.Open()) {
         imageLaunchJob.cancel()
         activeTabId.value = tabId
         val context = if (isDuckAiMode) NativeInputState.InputContext.DUCK_AI else NativeInputState.InputContext.BROWSER
@@ -767,6 +761,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
                 }
             }
         }
+        val overrideModelId = (launch as? DuckChatLaunch.Open)?.overrideModelId
         if (isDuckAiMode && overrideModelId != null) pickNewChatModel(overrideModelId)
     }
 

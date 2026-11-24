@@ -1681,6 +1681,7 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertEquals("image-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        assertEquals(Tool.IMAGE_GENERATION.rawValue, nativeInputStateProvider.stateForTab("tab-A").value.selectedTool)
     }
 
     @Test
@@ -1695,14 +1696,15 @@ class NativeInputModeWidgetViewModelTest {
         advanceUntilIdle()
 
         assertNull(nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        assertEquals(Tool.IMAGE_GENERATION.rawValue, nativeInputStateProvider.stateForTab("tab-A").value.selectedTool)
     }
 
     @Test
-    fun whenConfiguredWithInitialModelThenTabPicksIt() = runTest {
+    fun whenConfiguredWithOverrideModelThenTabPicksIt() = runTest {
         modelStateFlow.value = pickableModels()
         val viewModel = createViewModel()
 
-        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, overrideModelId = "picked-model")
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.Open(overrideModelId = "picked-model"))
 
         assertEquals("picked-model", viewModel.getSelectedModelId())
     }

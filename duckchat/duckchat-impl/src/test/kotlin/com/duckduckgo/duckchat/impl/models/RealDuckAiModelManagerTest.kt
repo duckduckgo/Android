@@ -1982,6 +1982,22 @@ class RealDuckAiModelManagerTest {
         verify(dataStore, never()).setSelectedProvider(anyOrNull())
     }
 
+    @Test
+    fun whenResetModelForNewChatsAndOnlyALockedModelCanGenerateImagesThenEnsureImageCapableReturnsFalseAndLeavesTheSelection() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        givenModels(
+            remoteModel("text"),
+            remoteModel("locked", accessTier = listOf("plus"), supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)),
+        )
+        val selectedBefore = testee.modelState.value.selectedModelId
+        clearInvocations(dataStore)
+
+        assertFalse(testee.ensureImageCapableModelSelected())
+
+        assertEquals(selectedBefore, testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+    }
+
     private suspend fun givenModels(vararg models: RemoteAIChatModel) {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)

@@ -42,7 +42,7 @@ private fun DuckChatLaunch.origin(): DuckChatLaunchOrigin? = when (this) {
 
 /** A [BrowserNav] whose widget launch intents expose arguments as extras, so tests can assert on them. */
 internal fun fakeBrowserNav(): BrowserNav = mock<BrowserNav>().also { nav ->
-    whenever(nav.openDuckChat(any(), any(), anyOrNull(), any(), anyOrNull())).thenAnswer {
+    whenever(nav.openDuckChat(any(), any(), anyOrNull(), any())).thenAnswer {
         val launch = it.getArgument<DuckChatLaunch>(3)
         Intent()
             .putExtra(EXTRA_URL, it.getArgument<String?>(2))

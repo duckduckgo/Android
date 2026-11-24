@@ -166,7 +166,6 @@ interface NativeInputManager {
         launch: DuckChatLaunch = DuckChatLaunch.Open(),
         textSelection: String? = null,
         files: List<Uri> = emptyList(),
-        overrideModelId: String? = null,
     )
 
     /** Applies [launch] to the Duck.ai input already shown, which [showNativeInput] ignores. */
@@ -644,7 +643,6 @@ class RealNativeInputManager @Inject constructor(
         launch: DuckChatLaunch,
         textSelection: String?,
         files: List<Uri>,
-        overrideModelId: String?,
     ) {
         if (!::rootView.isInitialized) return
 
@@ -714,7 +712,7 @@ class RealNativeInputManager @Inject constructor(
             }
         }
         bindUrlCaching(widgetView)
-        attachWidget(widgetView, navBarView, isBottom, tabId, launch, textSelection, files, overrideModelId)
+        attachWidget(widgetView, navBarView, isBottom, tabId, launch, textSelection, files)
         // Bottom omnibar: slide the nav bar in with open. Top omnibar: snap the bar so the enter
         // morph can run from the omnibar while the buttons appear without animating — a concurrent
         // top slide fights that morph (and was only needed for bottom chrome).
@@ -1534,7 +1532,6 @@ class RealNativeInputManager @Inject constructor(
         launch: DuckChatLaunch,
         textSelection: String?,
         files: List<Uri>,
-        overrideModelId: String?,
     ) {
         // Inflated from a ?attr/actionBarSize height, so layoutParams carries the resolved nav bar height.
         val navBarHeightPx = navBarView?.layoutParams?.height?.takeIf { it > 0 } ?: 0
@@ -1568,7 +1565,6 @@ class RealNativeInputManager @Inject constructor(
                 isDuckAiMode = omnibarController.isDuckAiMode(),
                 isBottom = isBottom,
                 launch = launch,
-                overrideModelId = overrideModelId,
             )
             if (textSelection != null || files.isNotEmpty()) addAttachments(tabId, textSelection, files)
         }
