@@ -39,7 +39,6 @@ interface TranslateKitLibrary {
 
     fun isInitialized(): Boolean
 
-    /** Decompresses the zstd [compressedFile] into [outputFile]. Requires [init] first and throws [IOException] on bad input. */
     @Throws(IOException::class)
     fun decompressZstd(compressedFile: File, outputFile: File)
 }

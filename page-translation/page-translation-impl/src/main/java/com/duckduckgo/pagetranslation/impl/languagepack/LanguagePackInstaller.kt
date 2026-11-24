@@ -49,7 +49,7 @@ interface LanguagePackInstaller {
 
 @ContributesBinding(AppScope::class)
 class RealLanguagePackInstaller @Inject constructor(
-    private val library: TranslateKitLibrary,
+    private val translateKit: TranslateKitLibrary,
     private val store: ModelsManifestStore,
     private val dispatchers: DispatcherProvider,
 ) : LanguagePackInstaller {
@@ -60,8 +60,13 @@ class RealLanguagePackInstaller @Inject constructor(
         packDirectory: File,
     ): Boolean = withContext(dispatchers.io()) {
         val isInstalled = try {
-            isLibraryInitialized() && installFiles(pair, model, stagingDirectory, packDirectory)
+            translateKit.init()
+            installFiles(pair, model, stagingDirectory, packDirectory)
         } catch (_: IOException) {
+            false
+        } catch (e: IllegalStateException) {
+            // translate-kit throws it when its native library fails to initialize
+            logcat(ERROR) { "TranslateKit failed to initialize: ${e.asLog()}" }
             false
         }
 
@@ -75,14 +80,6 @@ class RealLanguagePackInstaller @Inject constructor(
         isInstalled
     }
 
-    private fun isLibraryInitialized(): Boolean = try {
-        library.init()
-        library.isInitialized()
-    } catch (e: Exception) {
-        logcat(ERROR) { "TranslateKit failed to initialize: ${e.asLog()}" }
-        false
-    }
-
     private suspend fun installFiles(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean {
         for ((key, file) in model.files) {
             currentCoroutineContext().ensureActive()
@@ -90,7 +87,7 @@ class RealLanguagePackInstaller @Inject constructor(
             val decompressedFile = stagingDirectory.resolve(key)
 
             if (!compressedFile.matches(file.bytes, file.sha256)) return false
-            library.decompressZstd(compressedFile, decompressedFile)
+            translateKit.decompressZstd(compressedFile, decompressedFile)
             if (!decompressedFile.matches(file.decompressedSize, file.decompressedHash)) return false
 
             currentCoroutineContext().ensureActive()

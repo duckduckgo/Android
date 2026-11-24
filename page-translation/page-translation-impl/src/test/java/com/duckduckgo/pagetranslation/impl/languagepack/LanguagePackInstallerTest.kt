@@ -48,18 +48,17 @@ class LanguagePackInstallerTest {
     @get:Rule
     val temporaryFolder = TemporaryFolder()
 
-    private val library: TranslateKitLibrary = mock()
+    private val translateKit: TranslateKitLibrary = mock()
     private val store: ModelsManifestStore = mock()
-    private val installer = RealLanguagePackInstaller(library, store, coroutineRule.testDispatcherProvider)
+    private val installer = RealLanguagePackInstaller(translateKit, store, coroutineRule.testDispatcherProvider)
     private val stagingDirectory get() = temporaryFolder.root.resolve("$PAIR.tmp")
     private val packDirectory get() = temporaryFolder.root.resolve(PAIR)
 
     @Before
     fun setUp() = runTest {
         whenever(store.readManifest()).thenReturn(manifestOf(MODEL))
-        whenever(library.isInitialized()).thenReturn(true)
         doAnswer { it.getArgument<File>(1).writeText(DECOMPRESSED.getValue(it.getArgument<File>(1).name)) }
-            .whenever(library).decompressZstd(any(), any())
+            .whenever(translateKit).decompressZstd(any(), any())
 
         stagingDirectory.mkdirs()
         COMPRESSED.forEach { (key, content) -> stagingDirectory.resolve("$key.zst").writeText(content) }
@@ -98,7 +97,7 @@ class LanguagePackInstallerTest {
 
     @Test
     fun failWhenDecompressionFails() = runTest {
-        doThrow(IOException()).whenever(library).decompressZstd(any(), any())
+        doThrow(IOException()).whenever(translateKit).decompressZstd(any(), any())
 
         assertNotInstalled(MODEL)
     }
@@ -118,8 +117,8 @@ class LanguagePackInstallerTest {
     }
 
     @Test
-    fun failWhenLibraryIsNotInitialized() = runTest {
-        whenever(library.isInitialized()).thenReturn(false)
+    fun failWhenTranslateKitFailsToInitialize() = runTest {
+        doThrow(IllegalStateException()).whenever(translateKit).init()
 
         assertNotInstalled(MODEL)
     }
