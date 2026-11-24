@@ -58,6 +58,45 @@ class NativeInputControlsVisibilityTest {
     }
 
     @Test
+    fun `attach button hidden without upload support when the menu holds no tools`() {
+        assertFalse(
+            shouldShowAttachButton(
+                supportsUpload = false,
+                isContextual = false,
+                isEditMode = false,
+                pluginControlsVisible = true,
+                hasMergedTools = false,
+            ),
+        )
+    }
+
+    @Test
+    fun `attach button shown without upload support when the merged menu holds tools`() {
+        assertTrue(
+            shouldShowAttachButton(
+                supportsUpload = false,
+                isContextual = false,
+                isEditMode = false,
+                pluginControlsVisible = true,
+                hasMergedTools = true,
+            ),
+        )
+    }
+
+    @Test
+    fun `attach button hidden in edit mode even when the merged menu holds tools`() {
+        assertFalse(
+            shouldShowAttachButton(
+                supportsUpload = false,
+                isContextual = false,
+                isEditMode = true,
+                pluginControlsVisible = true,
+                hasMergedTools = true,
+            ),
+        )
+    }
+
+    @Test
     fun `limit errors suppressed in edit mode`() {
         assertNull(effectiveLimitError(imageLimitError = "too many images", isEditMode = true))
     }

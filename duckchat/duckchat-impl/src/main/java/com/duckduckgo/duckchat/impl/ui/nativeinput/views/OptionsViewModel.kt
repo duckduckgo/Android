@@ -21,6 +21,7 @@ import androidx.lifecycle.viewModelScope
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
@@ -42,7 +43,12 @@ class OptionsViewModel @Inject constructor(
     private val duckChatPixels: DuckChatPixels,
     modelManager: DuckAiModelManager,
     effectiveModelProvider: EffectiveModelProvider,
+    duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
+
+    /** The attach button's menu also holds the tools, and the tools button is gone. */
+    val isMergedMenu: StateFlow<Boolean> = duckChatFeature.unifiedToggleInputSimplifiedPromptBox().enabled()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     val selectedTool: StateFlow<Tool?> = nativeInputStateProvider.state
         .map { state -> state.selectedTool?.let { Tool.from(it) } }
@@ -92,6 +98,16 @@ class OptionsViewModel @Inject constructor(
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSelected(surface.value)
             Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSelected(surface.value)
         }
+    }
+
+    /**
+     * The merged menu shows no selection and its rows only turn a tool on; the chip turns it off. Returns
+     * whether [tool] became selected, so picking the active tool again changes nothing.
+     */
+    fun onToolPickedFromMergedMenu(tool: Tool): Boolean {
+        if (tool == selectedTool.value) return false
+        onToolSelectedByUser(tool)
+        return true
     }
 
     fun onToolDeselectedByUser(tool: Tool) {

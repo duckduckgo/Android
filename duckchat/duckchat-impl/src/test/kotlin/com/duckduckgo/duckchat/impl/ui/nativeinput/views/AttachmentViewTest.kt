@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.views
 
 import android.net.Uri
 import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.setViewTreeLifecycleOwner
@@ -33,6 +35,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
@@ -43,6 +46,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -50,6 +54,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -71,6 +76,12 @@ class AttachmentViewTest {
     private val attachments = MutableStateFlow(AttachmentState())
     private val host: NativeInputHost = mock()
     private val viewModel: AttachmentViewModel = mock()
+    private val isMergedMenu = MutableStateFlow(false)
+    private val visibleTools = MutableStateFlow(Tool.entries.toSet())
+    private val toolsViewModel: OptionsViewModel = mock<OptionsViewModel>().also {
+        whenever(it.isMergedMenu).thenReturn(isMergedMenu)
+        whenever(it.visibleTools).thenReturn(visibleTools)
+    }
     private val container = FrameLayout(activity).apply { id = R.id.attachmentsContainer }
     private lateinit var view: AttachmentView
 
@@ -165,13 +176,94 @@ class AttachmentViewTest {
         assertTrue(container.isVisible)
     }
 
+    @Test
+    fun whenMergedMenuOffThenPaperclipHasNoLabelAndHidesWithoutUploadSupport() {
+        attachments.value = AttachmentState(supportsUpload = false)
+        attach()
+
+        assertEquals(R.drawable.ic_attach_16, shadowOf(attachButton().drawable).createdFromResId)
+        assertNull(view.contentDescription)
+        assertFalse(view.isVisible)
+    }
+
+    @Test
+    fun whenMergedMenuOnThenAddButtonIsLabelledAndShowsForToolsWithoutUploadSupport() {
+        isMergedMenu.value = true
+        attachments.value = AttachmentState(supportsUpload = false)
+        attach()
+
+        assertEquals(R.drawable.ic_add_circle_24, shadowOf(attachButton().drawable).createdFromResId)
+        assertEquals(activity.getString(R.string.duckChatAddButtonContentDescription), view.contentDescription)
+        assertTrue(view.isVisible)
+    }
+
+    @Test
+    fun whenMergedMenuOnAndNoToolOrUploadThenAddButtonHides() {
+        isMergedMenu.value = true
+        visibleTools.value = emptySet()
+        attachments.value = AttachmentState(supportsUpload = false)
+        attach()
+
+        assertFalse(view.isVisible)
+    }
+
+    @Test
+    fun whenMergedMenuToolRowTappedThenHostSelectsTheTool() {
+        isMergedMenu.value = true
+        whenever(toolsViewModel.onToolPickedFromMergedMenu(Tool.WEB_SEARCH)).thenReturn(true)
+        attachments.value = AttachmentState(supportsUpload = true, supportsImageUpload = true)
+        attach()
+
+        view.performClick()
+        val menu = shadowOf(activity.application).latestPopupWindow?.contentView as android.view.ViewGroup
+        assertTrue(menu.hasText(activity.getString(R.string.attachmentAddImages)))
+        assertTrue(menu.hasText(activity.getString(R.string.duckChatOptionsMenuCreateImage)))
+        menu.rowWithText(activity.getString(R.string.duckChatOptionsMenuWebSearch)).performClick()
+
+        verify(host).toolSelected(Tool.WEB_SEARCH.rawValue)
+    }
+
+    @Test
+    fun whenMergedMenuOffThenAttachMenuHasNoToolRows() {
+        attachments.value = AttachmentState(supportsUpload = true, supportsImageUpload = true)
+        attach()
+
+        view.performClick()
+        val menu = shadowOf(activity.application).latestPopupWindow?.contentView as android.view.ViewGroup
+        assertTrue(menu.hasText(activity.getString(R.string.attachmentAttachPhoto)))
+        assertFalse(menu.hasText(activity.getString(R.string.duckChatOptionsMenuWebSearch)))
+    }
+
+    private fun attachButton() = view.getChildAt(0) as ImageView
+
+    private fun android.view.View.hasText(text: String): Boolean = runCatching { rowWithText(text) }.isSuccess
+
+    // The clickable menu row that holds [text].
+    private fun android.view.View.rowWithText(text: String): android.view.View {
+        if (this is android.view.ViewGroup) {
+            for (index in 0 until childCount) {
+                val child = getChildAt(index)
+                if (child.isClickable && child.textViews().any { it.text == text }) return child
+                runCatching { return child.rowWithText(text) }
+            }
+        }
+        error("No row with text $text")
+    }
+
+    private fun android.view.View.textViews(): List<TextView> = when (this) {
+        is TextView -> listOf(this)
+        is android.view.ViewGroup -> (0 until childCount).flatMap { getChildAt(it).textViews() }
+        else -> emptyList()
+    }
+
     private fun attach(isEdit: Boolean = false) {
         val provider: NativeInputStateProvider = mock()
         whenever(provider.state).thenReturn(inputState)
         whenever(provider.stateForTab("edit:session")).thenReturn(editState)
         whenever(viewModel.attachmentState).thenReturn(attachments)
         val plugin: ViewModelFactoryPlugin = mock()
-        whenever(plugin.create(any<Class<AttachmentViewModel>>())).thenReturn(viewModel)
+        whenever(plugin.create(eq(AttachmentViewModel::class.java))).thenReturn(viewModel)
+        whenever(plugin.create(eq(OptionsViewModel::class.java))).thenReturn(toolsViewModel)
         val factory = ViewViewModelFactory(ViewViewModelFactoryPluginPoint(setOf(plugin)))
         val root = FrameLayout(activity).apply {
             setViewTreeLifecycleOwner(activity)

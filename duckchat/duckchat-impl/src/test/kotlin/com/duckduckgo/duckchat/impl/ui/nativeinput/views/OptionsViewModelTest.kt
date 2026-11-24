@@ -23,6 +23,7 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -36,6 +37,7 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -85,6 +87,11 @@ class OptionsViewModelTest {
     private val modelManager: DuckAiModelManager = mock<DuckAiModelManager>().also {
         whenever(it.modelState).thenReturn(modelStateFlow)
     }
+    private val simplifiedPromptBox = MutableStateFlow(false)
+    private val duckChatFeature: DuckChatFeature = mock<DuckChatFeature>().also { feature ->
+        val toggle: Toggle = mock<Toggle>().also { whenever(it.enabled()).thenReturn(simplifiedPromptBox) }
+        whenever(feature.unifiedToggleInputSimplifiedPromptBox()).thenReturn(toggle)
+    }
     private val effectiveModel = MutableStateFlow<EffectiveModel>(EffectiveModel.Unresolved)
     private val effectiveModelProvider = object : EffectiveModelProvider {
         override val effectiveModel: Flow<EffectiveModel> = this@OptionsViewModelTest.effectiveModel
@@ -99,7 +106,7 @@ class OptionsViewModelTest {
 
     @Before
     fun setUp() {
-        testee = OptionsViewModel(store, duckChatPixels, modelManager, effectiveModelProvider)
+        testee = OptionsViewModel(store, duckChatPixels, modelManager, effectiveModelProvider, duckChatFeature)
     }
 
     @Test
@@ -249,7 +256,7 @@ class OptionsViewModelTest {
             whenever(it.getChatsFlow()).thenReturn(MutableStateFlow(emptyList()))
         }
         val provider = RealEffectiveModelProvider(modelManager, store, duckAiChatStore)
-        val testee = OptionsViewModel(store, duckChatPixels, modelManager, provider)
+        val testee = OptionsViewModel(store, duckChatPixels, modelManager, provider, duckChatFeature)
         givenModels(
             model("with-web-search", supportedTools = listOf(Tool.WEB_SEARCH)),
             model("no-web-search", supportedTools = listOf(Tool.IMAGE_GENERATION)),
@@ -284,7 +291,7 @@ class OptionsViewModelTest {
             whenever(it.getChatsFlow()).thenReturn(MutableStateFlow(listOf(chatA)))
         }
         val provider = RealEffectiveModelProvider(modelManager, store, duckAiChatStore)
-        val testee = OptionsViewModel(store, duckChatPixels, modelManager, provider)
+        val testee = OptionsViewModel(store, duckChatPixels, modelManager, provider, duckChatFeature)
         givenModels(
             model("with-web-search", supportedTools = listOf(Tool.WEB_SEARCH)),
             model("no-web-search", supportedTools = listOf(Tool.IMAGE_GENERATION)),
@@ -342,6 +349,41 @@ class OptionsViewModelTest {
         store.publish(tabId, state)
         selectedTabFlow.value = tabEntity(tabId)
         advanceUntilIdle()
+    }
+
+    @Test
+    fun whenSimplifiedPromptBoxFlagChangesThenMergedMenuFollows() = runTest {
+        assertFalse(testee.isMergedMenu.value)
+
+        simplifiedPromptBox.value = true
+        advanceUntilIdle()
+        assertTrue(testee.isMergedMenu.value)
+
+        simplifiedPromptBox.value = false
+        advanceUntilIdle()
+        assertFalse(testee.isMergedMenu.value)
+    }
+
+    @Test
+    fun whenToolPickedFromMergedMenuThenItIsSelectedAndPixelFires() = runTest {
+        val tabId = "tab-merged"
+        store.publish(tabId, NativeInputState.zero())
+        selectedTabFlow.value = tabEntity(tabId)
+        advanceUntilIdle()
+
+        assertTrue(testee.onToolPickedFromMergedMenu(Tool.WEB_SEARCH))
+        verify(duckChatPixels).fireWebSearchSelected(any())
+    }
+
+    @Test
+    fun whenActiveToolPickedAgainFromMergedMenuThenNothingChanges() = runTest {
+        val tabId = "tab-merged-active"
+        store.publish(tabId, NativeInputState.zero().copy(selectedTool = Tool.WEB_SEARCH.rawValue))
+        selectedTabFlow.value = tabEntity(tabId)
+        advanceUntilIdle()
+
+        assertFalse(testee.onToolPickedFromMergedMenu(Tool.WEB_SEARCH))
+        verifyNoInteractions(duckChatPixels)
     }
 
     private fun tabEntity(tabId: String): TabEntity = TabEntity(tabId = tabId, position = 0)

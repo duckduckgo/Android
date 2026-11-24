@@ -59,6 +59,7 @@ import com.duckduckgo.duckchat.impl.pixel.AttachMenuItem
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -82,6 +83,7 @@ class AttachmentView(
     var isEditMode: Boolean = false
 
     private var viewModel: AttachmentViewModel? = null
+    private var toolsViewModel: OptionsViewModel? = null
 
     /** The contextual sheet is the only surface that offers page context. */
     private val isContextual: Boolean
@@ -90,6 +92,8 @@ class AttachmentView(
     private var nativeInputStateJob: Job? = null
     private var attachmentStateJob: Job? = null
     private var attachmentRequestJob: Job? = null
+    private var mergedMenuJob: Job? = null
+    private val isMergedMenu: Boolean get() = toolsViewModel?.isMergedMenu?.value == true
     private var lastNativeInputState: NativeInputState? = null
     private var hasAttachmentsOrError: Boolean = false
     private var popupWindow: PopupWindow? = null
@@ -99,9 +103,10 @@ class AttachmentView(
     private var pageContextContainer: PageContextAttachmentView? = null
     private var textSelectionsContainer: TextSelectionAttachmentsContainerView? = null
     private var limitErrorView: TextView? = null
+    private val attachButton: ImageView = buildAttachButton()
 
     init {
-        addView(buildAttachButton())
+        addView(attachButton)
         setOnClickListener { showPopupMenu() }
     }
 
@@ -112,6 +117,8 @@ class AttachmentView(
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         val vm = ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
         viewModel = vm
+        val tools = ViewModelProvider(owner, viewModelFactory)[OptionsViewModel::class.java]
+        toolsViewModel = tools
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
         attachmentRequestJob?.cancel()
@@ -132,6 +139,13 @@ class AttachmentView(
                 updateContainerVisibility(container)
             }
             .launchIn(scope)
+        mergedMenuJob?.cancel()
+        mergedMenuJob = combine(tools.isMergedMenu, tools.visibleTools) { merged, _ -> merged }
+            .onEach { merged ->
+                renderAttachButton(merged)
+                updateButtonVisibility()
+            }
+            .launchIn(scope)
     }
 
     private fun updateButtonVisibility() {
@@ -140,6 +154,7 @@ class AttachmentView(
             isContextual = isContextual,
             isEditMode = isEditMode,
             pluginControlsVisible = lastNativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true,
+            hasMergedTools = isMergedMenu && toolsViewModel?.visibleTools?.value?.isNotEmpty() == true,
         )
         isVisible = show
         (parent as? View)?.isVisible = show
@@ -154,6 +169,11 @@ class AttachmentView(
             scaleType = ImageView.ScaleType.CENTER
             setImageResource(R.drawable.ic_attach_16)
         }
+    }
+
+    private fun renderAttachButton(merged: Boolean) {
+        attachButton.setImageResource(if (merged) R.drawable.ic_add_circle_24 else R.drawable.ic_attach_16)
+        contentDescription = if (merged) context.getString(R.string.duckChatAddButtonContentDescription) else null
     }
 
     private fun setupContainerViews(container: FrameLayout, vm: AttachmentViewModel) {
@@ -337,6 +357,8 @@ class AttachmentView(
         attachmentStateJob = null
         attachmentRequestJob?.cancel()
         attachmentRequestJob = null
+        mergedMenuJob?.cancel()
+        mergedMenuJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -360,8 +382,11 @@ class AttachmentView(
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
         val showAskAboutPage = isContextual && viewModel?.getPageContext() == null
+        val tools = toolsViewModel?.takeIf { isMergedMenu }
+        val visibleToolItems = tools?.let { vm -> toolMenuItems.filter { it.tool in vm.visibleTools.value } }.orEmpty()
+        val hasAttachRows = supportsImages || supportedFileTypes.isNotEmpty() || showAskAboutPage
 
-        if (!supportsImages && supportedFileTypes.isEmpty() && !showAskAboutPage) return
+        if (!hasAttachRows && visibleToolItems.isEmpty()) return
 
         val container = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
@@ -397,7 +422,7 @@ class AttachmentView(
             addMenuItem(
                 container = container,
                 iconRes = com.duckduckgo.mobile.android.R.drawable.ic_image_24,
-                titleRes = R.string.attachmentAttachPhoto,
+                titleRes = if (isMergedMenu) R.string.attachmentAddImages else R.string.attachmentAttachPhoto,
             ) {
                 viewModel?.onAttachMenuItemSelected(AttachMenuItem.PHOTO_LIBRARY)
                 popup.dismiss()
@@ -410,7 +435,7 @@ class AttachmentView(
             addMenuItem(
                 container = container,
                 iconRes = R.drawable.ic_folder_24,
-                titleRes = R.string.attachmentAttachFile,
+                titleRes = if (isMergedMenu) R.string.attachmentAddFiles else R.string.attachmentAttachFile,
             ) {
                 viewModel?.onAttachMenuItemSelected(AttachMenuItem.FILE_PICKER)
                 popup.dismiss()
@@ -428,6 +453,18 @@ class AttachmentView(
                 viewModel?.onAttachMenuItemSelected(AttachMenuItem.PAGE)
                 popup.dismiss()
                 host?.askAboutPage()
+            }
+        }
+
+        if (tools != null && visibleToolItems.isNotEmpty()) {
+            if (hasAttachRows) {
+                container.addView(LayoutInflater.from(context).inflate(R.layout.view_options_menu_divider, container, false))
+            }
+            visibleToolItems.forEach { item ->
+                addMenuItem(container = container, iconRes = item.iconRes, titleRes = item.titleRes) {
+                    popup.dismiss()
+                    if (tools.onToolPickedFromMergedMenu(item.tool)) host?.toolSelected(item.tool.rawValue)
+                }
             }
         }
 
@@ -501,7 +538,8 @@ internal fun shouldShowAttachButton(
     isContextual: Boolean,
     isEditMode: Boolean,
     pluginControlsVisible: Boolean,
-): Boolean = !isEditMode && (supportsUpload || isContextual) && pluginControlsVisible
+    hasMergedTools: Boolean = false,
+): Boolean = !isEditMode && (supportsUpload || isContextual || hasMergedTools) && pluginControlsVisible
 
 /**
  * Adopted attachments are counted against the conversation limits, so an edit of a message already at

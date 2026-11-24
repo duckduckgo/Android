@@ -68,28 +68,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
 
     var isEditMode: Boolean = false
 
-    private data class MenuItem(
-        val iconRes: Int,
-        val titleRes: Int,
-        val subtitleRes: Int,
-        val tool: Tool,
-    )
-
-    private val menuItems = listOf(
-        MenuItem(
-            iconRes = R.drawable.ic_images_24,
-            titleRes = R.string.duckChatOptionsMenuCreateImage,
-            subtitleRes = R.string.duckChatOptionsMenuCreateImageSubtitle,
-            tool = Tool.IMAGE_GENERATION,
-        ),
-        MenuItem(
-            iconRes = com.duckduckgo.mobile.android.R.drawable.ic_globe_24,
-            titleRes = R.string.duckChatOptionsMenuWebSearch,
-            subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
-            tool = Tool.WEB_SEARCH,
-        ),
-    )
-
     private var popupWindow: PopupWindow? = null
     private var optionsButton: ImageView
     private var hintCommandsJob: Job? = null
@@ -154,6 +132,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         visibleToolsJob?.cancel()
         visibleToolsJob = scope.launch {
             launch { viewModel.visibleTools.collect { tools -> refreshOptionsButtonVisibility(tools) } }
+            launch { viewModel.isMergedMenu.collect { applyMergedState() } }
             // The model stopped supporting the selected tool, so drop it. The host owns the write.
             launch { viewModel.toolSelectionCleared.collect { host.toolSelected(null) } }
         }
@@ -181,12 +160,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         lastNativeInputState?.inputContext == NativeInputState.InputContext.DUCK_AI
 
     private fun refreshOptionsButtonVisibility(visibleTools: Set<Tool> = viewModel.visibleTools.value) {
-        optionsButton.isVisible = (visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()) && !isMergedWithChip()
+        optionsButton.isVisible = (visibleTools.isNotEmpty() || isCustomizeResponsesAvailable()) &&
+            !isMergedWithChip() &&
+            !viewModel.isMergedMenu.value
     }
 
     // At the top compact level the active mode's chip stands in for the tools button: tapping it opens the
-    // tools menu, and the mode is turned off from there.
-    private fun isMergedWithChip(): Boolean = compactLevel >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS && childCount > 1
+    // tools menu, and the mode is turned off from there. With the merged menu the tools live in the attach
+    // menu, so the chip only ever turns its mode off.
+    private fun isMergedWithChip(): Boolean =
+        compactLevel >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS && childCount > 1 && !viewModel.isMergedMenu.value
 
     override fun setCompactLevel(level: Int) {
         if (compactLevel == level) return
@@ -195,14 +178,16 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     // The tools button, plus the mode chip when one is active. At the top level the chip alone stands in for both.
+    // The merged menu has no tools button, so only the chip with its close icon takes space.
     override fun worstCaseWidth(level: Int): Int {
-        val button = resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
+        val button = if (viewModel.isMergedMenu.value) 0 else resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
         if (childCount <= 1) return button
         val space = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_1)
         val chipPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_2)
         val chipIcon = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
         val chipClose = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
         val mergedChip = space + chipPadding * 2 + chipIcon
+        if (viewModel.isMergedMenu.value) return mergedChip + space + chipClose
         if (level >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS) return mergedChip
         return button + mergedChip + space + chipClose
     }
@@ -214,7 +199,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 
     private fun renderSelection(tool: Tool?) {
-        val matchingItem = tool?.let { selected -> menuItems.firstOrNull { it.tool == selected } }
+        val matchingItem = tool?.let { selected -> toolMenuItems.firstOrNull { it.tool == selected } }
         removeChip()
         if (matchingItem != null) addView(buildChip(matchingItem), 1)
         applyMergedState()
@@ -273,7 +258,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     private fun populate(container: LinearLayout, popup: PopupWindow) {
         val selectedTool = viewModel.selectedTool.value
         val trailingIcons = mutableMapOf<Tool, ImageView>()
-        for (item in menuItems.filter { it.tool in viewModel.visibleTools.value }) {
+        for (item in toolMenuItems.filter { it.tool in viewModel.visibleTools.value }) {
             val row = LayoutInflater.from(context).inflate(R.layout.view_options_menu_item, container, false)
             val trailingIcon = row.findViewById<ImageView>(R.id.optionsMenuItemTrailingIcon)
 
@@ -293,7 +278,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             container.addView(row)
         }
         if (isCustomizeResponsesAvailable()) {
-            if (menuItems.any { it.tool in viewModel.visibleTools.value }) {
+            if (toolMenuItems.any { it.tool in viewModel.visibleTools.value }) {
                 container.addView(
                     LayoutInflater.from(context).inflate(R.layout.view_options_menu_divider, container, false),
                 )
@@ -316,7 +301,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         return row
     }
 
-    private fun onOptionTapped(item: MenuItem) {
+    private fun onOptionTapped(item: ToolMenuItem) {
         val nowSelected = item.tool != viewModel.selectedTool.value
         if (nowSelected) viewModel.onToolSelectedByUser(item.tool) else viewModel.onToolDeselectedByUser(item.tool)
         host.toolSelected(if (nowSelected) item.tool.rawValue else null)
@@ -326,7 +311,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         if (childCount > 1) removeViewAt(1)
     }
 
-    private fun buildChip(item: MenuItem): View {
+    private fun buildChip(item: ToolMenuItem): View {
         val view = LayoutInflater.from(context).inflate(R.layout.view_options_chip, this, false)
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
@@ -360,6 +345,29 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         private const val MENU_DISMISS_DELAY_MS = 150L
     }
 }
+
+internal data class ToolMenuItem(
+    val iconRes: Int,
+    val titleRes: Int,
+    val subtitleRes: Int,
+    val tool: Tool,
+)
+
+/** The tools in menu order, shared by the tools menu and the merged attach menu. */
+internal val toolMenuItems = listOf(
+    ToolMenuItem(
+        iconRes = R.drawable.ic_images_24,
+        titleRes = R.string.duckChatOptionsMenuCreateImage,
+        subtitleRes = R.string.duckChatOptionsMenuCreateImageSubtitle,
+        tool = Tool.IMAGE_GENERATION,
+    ),
+    ToolMenuItem(
+        iconRes = com.duckduckgo.mobile.android.R.drawable.ic_globe_24,
+        titleRes = R.string.duckChatOptionsMenuWebSearch,
+        subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
+        tool = Tool.WEB_SEARCH,
+    ),
+)
 
 /**
  * The options container follows the same visibility rule as the other plugin controls: derived

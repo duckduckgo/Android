@@ -48,4 +48,10 @@
     <!-- Foreground service notification shown while a response the user left is generating -->
     <string name="duckAiRespondingNotificationTitle">Duck.ai is responding…</string>
     <string name="duckAiRespondingNotificationChannelName">Duck.ai responses in progress</string>
+
+    <!-- Content description for the circled-plus button that opens the merged attach and tools menu -->
+    <string name="duckChatAddButtonContentDescription">Add</string>
+    <!-- Merged attach menu rows; the button takes several images or files at once -->
+    <string name="attachmentAddImages">Add Images</string>
+    <string name="attachmentAddFiles">Add Files</string>
 </resources>
