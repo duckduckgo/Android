@@ -16,27 +16,10 @@
 
 package com.duckduckgo.pagetranslation.impl.offer
 
-import com.duckduckgo.pagetranslation.api.TabContent
-
 enum class TranslationOffer {
     BannerAndMenuRow,
     MenuRowOnly,
-    Nothing,
+    None,
 }
 
-data class Detection(val language: String)
-
-data class OfferInput(
-    /**
-     * What the tab currently shows.
-     */
-    val content: TabContent,
-    /**
-     * Null until the main frame finishes loading, and when the detection isn't reliable.
-     */
-    val detection: Detection?,
-    /**
-     * True on the reload after Show Original or after a failed translation.
-     */
-    val bannerSuppressed: Boolean,
-)
+data class Detection(val language: String, val isReliable: Boolean)

@@ -16,34 +16,39 @@
 
 package com.duckduckgo.pagetranslation.impl.store
 
-import android.content.SharedPreferences
-import com.duckduckgo.data.store.api.SharedPreferencesProvider
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.edit
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 interface TranslationPreferencesStore {
     /**
-     * The "Ask to Translate Pages" setting. It only controls the banner, the menu row stays.
+     * The "Ask to Translate Pages" setting, on by default. It only controls the banner, the menu row stays.
      */
-    var askToTranslatePages: Boolean
+    val askToTranslatePages: Flow<Boolean>
+
+    suspend fun setAskToTranslatePages(enabled: Boolean)
 }
 
 @ContributesBinding(AppScope::class)
 @SingleIn(AppScope::class)
 class RealTranslationPreferencesStore @Inject constructor(
-    private val sharedPreferencesProvider: SharedPreferencesProvider,
+    @TranslationPreferences private val store: DataStore<Preferences>,
 ) : TranslationPreferencesStore {
 
-    private val preferences: SharedPreferences by lazy { sharedPreferencesProvider.getSharedPreferences(FILENAME) }
+    override val askToTranslatePages: Flow<Boolean> = store.data.map { it[KEY_ASK_TO_TRANSLATE_PAGES] ?: true }
 
-    override var askToTranslatePages: Boolean
-        get() = preferences.getBoolean(KEY_ASK_TO_TRANSLATE_PAGES, true)
-        set(value) = preferences.edit().putBoolean(KEY_ASK_TO_TRANSLATE_PAGES, value).apply()
+    override suspend fun setAskToTranslatePages(enabled: Boolean) {
+        store.edit { it[KEY_ASK_TO_TRANSLATE_PAGES] = enabled }
+    }
 
     private companion object {
-        const val FILENAME = "com.duckduckgo.pagetranslation.store"
-        const val KEY_ASK_TO_TRANSLATE_PAGES = "ASK_TO_TRANSLATE_PAGES"
+        val KEY_ASK_TO_TRANSLATE_PAGES = booleanPreferencesKey("ASK_TO_TRANSLATE_PAGES")
     }
 }

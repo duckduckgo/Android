@@ -30,7 +30,6 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':codegen-annotations')
     implementation project(':common-utils')
-    implementation project(':data-store-api')
     implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':page-translation-api')
@@ -43,7 +42,6 @@ dependencies {
     implementation Square.okHttp3.okHttp
 
     testImplementation project(':common-test')
-    testImplementation project(':data-store-test')
     testImplementation project(':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.test.ext.junit
