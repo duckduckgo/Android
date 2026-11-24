@@ -88,21 +88,22 @@ class WideEventRepositoryImpl @Inject constructor(
         step: String,
         metadata: Map<String, String?>,
     ) {
-        val pathStep = step.filterNot { it == ',' }
-        require(pathStep.isNotEmpty()) { "Path step must not be empty: '$step'" }
+        require(step.isNotEmpty()) { "Path step must not be empty" }
+        require(',' !in step) { "Path step must not contain commas: '$step'" }
+        require(step != WideEventRepository.PATH_TRUNCATED) { "Path step must not be '${WideEventRepository.PATH_TRUNCATED}'" }
 
         updateWideEvent(eventId) { event ->
             checkEventIsActive(event)
 
             val path = when {
-                pathStep == event.lastPathStep -> event.path
-                event.path.size < WideEventRepository.MAX_PATH_SIZE -> event.path + pathStep
+                step == event.lastPathStep -> event.path
+                event.path.size < WideEventRepository.MAX_PATH_SIZE -> event.path + step
                 else -> event.path.take(WideEventRepository.MAX_PATH_SIZE - 1) + WideEventRepository.PATH_TRUNCATED
             }
 
             event.copy(
                 path = path,
-                lastPathStep = pathStep,
+                lastPathStep = step,
                 metadata = mergeMetadata(event.metadata, metadata),
             )
         }

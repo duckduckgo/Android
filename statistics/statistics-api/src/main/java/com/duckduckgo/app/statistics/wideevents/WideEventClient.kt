@@ -66,8 +66,8 @@ interface WideEventClient {
      * Append [step] to the path of an active flow. The path is sent as `steps` (comma-separated), and its latest
      * step as `last_step`. Both replace a metadata entry with the same key.
      *
-     * Step names must not contain commas, since commas separate entries in `steps`. Any comma in [step] is
-     * dropped before it is appended.
+     * Step names must not be empty, contain commas, since commas separate entries in `steps`, or be `truncated`,
+     * which marks a path that was cut short. Such a step is rejected with a failure and the flow is left unchanged.
      *
      * A step equal to the last appended one isn't added to the path again, but its [metadata] is still written,
      * so a flow can save what it learned without moving to a new step. When the path would exceed 20 entries,
@@ -76,7 +76,7 @@ interface WideEventClient {
      * Independent of [flowStep]: a flow can record step outcomes, a path, or both.
      *
      * @param wideEventId ID of the wide event.
-     * @param step Step label (e.g., "code_screen"). Must not contain commas.
+     * @param step Step label (e.g., "code_screen"). Must not be empty, contain commas or be `truncated`.
      * @param metadata Optional metadata.
      */
     suspend fun flowAppendToPath(

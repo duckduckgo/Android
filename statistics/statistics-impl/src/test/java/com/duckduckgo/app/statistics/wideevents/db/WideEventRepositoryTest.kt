@@ -1108,22 +1108,31 @@ class WideEventRepositoryTest {
     }
 
     @Test
-    fun `when a step contains commas, they are dropped before it is appended and compared`() = runTest {
-        val eventId = insertEvent(name = "test_event")
-
-        appendToPath(eventId, "code,screen", "codescreen", "code_entry")
-
-        assertEquals(WideEventPath(steps = listOf("codescreen", "code_entry"), lastStep = "code_entry"), readPath(eventId))
+    fun `when a step contains a comma, it is rejected and the path and metadata are unchanged`() = runTest {
+        assertStepRejected("code,screen")
     }
 
     @Test
-    fun `when a step has nothing but commas, it is rejected`() = runTest {
+    fun `when a step is empty, it is rejected and the path and metadata are unchanged`() = runTest {
+        assertStepRejected("")
+    }
+
+    @Test
+    fun `when a step is truncated, it is rejected and the path and metadata are unchanged`() = runTest {
+        assertStepRejected("truncated")
+    }
+
+    private suspend fun assertStepRejected(step: String) {
         val eventId = insertEvent(name = "test_event")
+        appendToPath(eventId, "started")
 
         assertThrows(IllegalArgumentException::class.java) {
-            runBlocking { wideEventRepository.appendToWideEventPath(eventId = eventId, step = ",", metadata = emptyMap()) }
+            runBlocking { wideEventRepository.appendToWideEventPath(eventId = eventId, step = step, metadata = mapOf("method" to "qr")) }
         }
-        assertNull(readPath(eventId))
+
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        assertEquals(WideEventPath(steps = listOf("started"), lastStep = "started"), event.path)
+        assertNull(event.metadata["method"])
     }
 
     @Test

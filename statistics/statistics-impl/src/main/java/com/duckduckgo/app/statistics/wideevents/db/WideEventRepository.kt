@@ -38,8 +38,10 @@ interface WideEventRepository {
     )
 
     /**
-     * Appends [step] with its commas dropped to the event's path, unless it equals the last appended step. A path past
-     * [MAX_PATH_SIZE] entries keeps its first entries and ends with [PATH_TRUNCATED]. [metadata] is merged either way.
+     * Appends [step] to the event's path, unless it equals the last appended step. A path past [MAX_PATH_SIZE] entries
+     * keeps its first entries and ends with [PATH_TRUNCATED]. [metadata] is merged either way.
+     *
+     * @throws IllegalArgumentException if [step] is empty, contains a comma or equals [PATH_TRUNCATED].
      */
     suspend fun appendToWideEventPath(
         eventId: Long,

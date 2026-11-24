@@ -68,7 +68,8 @@ wideEventClient.flowAppendToPath(wideEventId = flowId, step = "code_screen")
 
 It sends `steps` (comma-separated, at most 20 entries, ending with `truncated` when longer) and `last_step`. A step equal
 to the previous one isn't added again, so re-renders and rotations are safe to report. The path is stored with the
-event, so a flow finished by its `CleanupPolicy` still sends it.
+event, so a flow finished by its `CleanupPolicy` still sends it. A step that is empty, contains a comma or equals
+`truncated` is rejected with a failure.
 
 ### FlowStatus
 
