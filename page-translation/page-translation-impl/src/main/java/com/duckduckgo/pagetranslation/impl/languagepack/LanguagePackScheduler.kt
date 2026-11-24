@@ -43,18 +43,14 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 sealed interface LanguagePackDownloadState {
-    /** No download of the pair is running or recently finished. Says nothing about whether the pack is installed. */
+
     data object Idle : LanguagePackDownloadState
 
     data class InProgress(val downloadedBytes: Long, val totalBytes: Long) : LanguagePackDownloadState
 
-    /**
-     * An earlier run was stopped, by the system or by the process dying, and WorkManager will run it again.
-     * A session that saw this download in progress reports a download error, one that has just joined it keeps waiting.
-     */
-    data object Stopped : LanguagePackDownloadState
+    data object Interrupted : LanguagePackDownloadState
 
-    data object Completed : LanguagePackDownloadState
+    data object Downloaded : LanguagePackDownloadState
 
     data class Failed(val reason: Reason) : LanguagePackDownloadState {
         enum class Reason { DOWNLOAD_ERROR, NOT_ENOUGH_STORAGE }
@@ -109,9 +105,9 @@ class RealLanguagePackScheduler @Inject constructor(
 }
 
 internal fun WorkInfo.toLanguagePackDownloadState(): LanguagePackDownloadState = when (state) {
-    ENQUEUED, BLOCKED -> if (runAttemptCount > 0) LanguagePackDownloadState.Stopped else inProgress()
+    ENQUEUED, BLOCKED -> if (runAttemptCount > 0) LanguagePackDownloadState.Interrupted else inProgress()
     RUNNING -> inProgress()
-    SUCCEEDED -> LanguagePackDownloadState.Completed
+    SUCCEEDED -> LanguagePackDownloadState.Downloaded
     FAILED -> LanguagePackDownloadState.Failed(
         Reason.entries.firstOrNull { it.name == outputData.getString(FAILURE_REASON_KEY) } ?: DOWNLOAD_ERROR,
     )

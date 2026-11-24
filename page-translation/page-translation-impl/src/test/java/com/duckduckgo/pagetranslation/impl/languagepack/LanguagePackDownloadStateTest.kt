@@ -20,13 +20,13 @@ import androidx.work.Data
 import androidx.work.WorkInfo
 import androidx.work.WorkInfo.State
 import androidx.work.workDataOf
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Completed
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Downloaded
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason.DOWNLOAD_ERROR
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason.NOT_ENOUGH_STORAGE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Idle
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.InProgress
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Stopped
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Interrupted
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.DOWNLOADED_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.FAILURE_REASON_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.TOTAL_BYTES_KEY
@@ -48,8 +48,8 @@ class LanguagePackDownloadStateTest {
     }
 
     @Test
-    fun reportStoppedWhileAStoppedRunWaitsToRunAgain() {
-        assertEquals(Stopped, workInfo(State.ENQUEUED, runAttemptCount = 1).toLanguagePackDownloadState())
+    fun reportInterruptedWhileWaitingToRunAgain() {
+        assertEquals(Interrupted, workInfo(State.ENQUEUED, runAttemptCount = 1).toLanguagePackDownloadState())
     }
 
     @Test
@@ -61,8 +61,8 @@ class LanguagePackDownloadStateTest {
     }
 
     @Test
-    fun completeOnSuccessAndGoIdleWhenCancelled() {
-        assertEquals(Completed, workInfo(State.SUCCEEDED).toLanguagePackDownloadState())
+    fun reportDownloadedOnSuccessAndIdleWhenCancelled() {
+        assertEquals(Downloaded, workInfo(State.SUCCEEDED).toLanguagePackDownloadState())
         assertEquals(Idle, workInfo(State.CANCELLED).toLanguagePackDownloadState())
     }
 
