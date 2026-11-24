@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 
 /**
  * Outcome of a completed onboarding run, carried on
@@ -27,7 +28,10 @@ sealed interface NewUserOnboardingResult : LinearOnboardingResult {
     data class LaunchSearch(val query: String) : NewUserOnboardingResult
 
     /**
-     * Finish onboarding and submit [prompt] to Duck.ai.
+     * Finish onboarding and submit [prompt] to Duck.ai, on [model] when the run picked one.
      */
-    data class LaunchChat(val prompt: String) : NewUserOnboardingResult
+    data class LaunchChat(
+        val prompt: String,
+        val model: Option? = null,
+    ) : NewUserOnboardingResult
 }

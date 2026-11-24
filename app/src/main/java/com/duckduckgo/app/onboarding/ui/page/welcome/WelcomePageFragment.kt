@@ -321,7 +321,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
             is WelcomePageViewModel.Command.FinishAndSubmitSearchQuery ->
                 (activity as? OnboardingActivity)?.finishAndSubmitSearchQuery(command.query)
             is WelcomePageViewModel.Command.FinishAndSubmitChatPrompt ->
-                (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(command.prompt)
+                (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(command.prompt, command.model)
             WelcomePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
             WelcomePageViewModel.Command.HandOffToBrowserActivity ->
                 (activity as? OnboardingActivity)?.handOffToBrowserActivity()

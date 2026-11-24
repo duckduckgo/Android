@@ -85,12 +85,6 @@ interface DuckAiModelManager {
      */
     suspend fun ensureImageCapableModelSelected(): Boolean
 
-    /**
-     * Pins the user to a provider rather than to one of its models, so they keep following the
-     * server-side default within it. Replaces any earlier [selectModel] pick.
-     */
-    suspend fun selectProvider(provider: ModelProvider)
-
     suspend fun selectReasoningMode(mode: ReasoningMode)
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
@@ -272,7 +266,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     /**
-     * Only an explicit pick in [selectModel] or [selectProvider] is persisted. The default is
+     * Only an explicit pick in [selectModel], or a provider an earlier onboarding stored, is persisted. The default is
      * re-derived from every response so that reordering the list, or promoting a new default,
      * reaches users who never picked a model. A persisted model pick that is gone from the response,
      * or no longer accessible, is dropped rather than replaced, so we don't turn our fallback into a
@@ -330,21 +324,6 @@ class RealDuckAiModelManager @Inject constructor(
             } ?: return@withLock false
             persistModelSelection(imageCapableModel)
             true
-        }
-    }
-
-    override suspend fun selectProvider(provider: ModelProvider) {
-        withContext(dispatcherProvider.io()) {
-            stateMutex.withLock {
-                selectionRevision++
-                dataStore.setSelectedModel(null)
-                dataStore.setSelectedProvider(provider.name)
-
-                val models = _modelState.value.models
-                val selectedModelId = resolveSelection(models)
-                publishSelection(modelId = selectedModelId, model = models.find { it.id == selectedModelId })
-                logcat { "Duck.ai Model Manager: selected provider ${provider.name}, resolved model $selectedModelId" }
-            }
         }
     }
 

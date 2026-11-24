@@ -22,14 +22,14 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 
 /**
- * Carries the provider list the onboarding provider choice falls back to when the models response
+ * Carries the option list the onboarding model choice falls back to when the models response
  * has not landed yet. Remote settings shape:
  *
  * ```json
- * { "providers": ["openai", "anthropic", "mistral"] }
+ * { "providers": ["openai", "anthropic", "gemma"] }
  * ```
  *
- * Providers change rarely, so the shipped default is normally the one in use.
+ * The options change rarely, so the shipped default is normally the one in use.
  */
 @ContributesRemoteFeature(
     scope = AppScope::class,

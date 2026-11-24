@@ -46,7 +46,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
@@ -1777,29 +1776,6 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenProviderSelectedThenItReplacesAnyPersistedModelPick() = runTest {
-        givenProviderStore()
-        whenever(dataStore.getSelectedModel()).thenReturn(null)
-        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
-        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
-            AIChatModelsResponse(
-                listOf(
-                    remoteModel("gpt", provider = "openai"),
-                    remoteModel("claude", provider = "anthropic"),
-                ),
-            ),
-        )
-        testee = createManager()
-        testee.fetchModels()
-
-        testee.selectProvider(ModelProvider.ANTHROPIC)
-
-        verify(dataStore).setSelectedProvider(ModelProvider.ANTHROPIC.name)
-        verify(dataStore, atLeastOnce()).setSelectedModel(null)
-        assertEquals("claude", testee.modelState.value.selectedModelId)
-    }
-
-    @Test
     fun whenModelSelectedThenTheProviderPreferenceIsCleared() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
@@ -1898,17 +1874,5 @@ class RealDuckAiModelManagerTest {
         whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(AIChatModelsResponse(models.toList()))
         testee = createManager()
         testee.fetchModels()
-    }
-
-    /** [DuckChatDataStore] is a mock, so the provider key has to remember what was written to it. */
-    private fun givenProviderStore() {
-        var stored: String? = null
-        dataStore.stub {
-            onBlocking { getSelectedProvider() }.thenAnswer { stored }
-            onBlocking { setSelectedProvider(anyOrNull()) }.thenAnswer {
-                stored = it.arguments[0] as String?
-                Unit
-            }
-        }
     }
 }

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.onboarding
 
+import com.duckduckgo.onboarding.api.OnboardingDuckAiModelChoice
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Id
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
@@ -27,7 +28,7 @@ data class TestOption(
 ) : Option
 
 class FakeOnboardingSingleChoiceDataPlugin(
-    override val id: Id = Id.DuckAiModelProvider,
+    override val id: Id,
     private val options: List<Option> = emptyList(),
 ) : OnboardingSingleChoiceDataPlugin {
 
@@ -45,4 +46,20 @@ class FakeOnboardingSingleChoiceDataPlugin(
     override suspend fun apply(option: Option) {
         applied += option
     }
+}
+
+class FakeOnboardingDuckAiModelChoice(
+    var options: List<Option> = emptyList(),
+) : OnboardingDuckAiModelChoice {
+
+    var prefetchCount = 0
+        private set
+
+    override suspend fun prefetch() {
+        prefetchCount++
+    }
+
+    override suspend fun options(): List<Option> = options
+
+    override suspend fun chatUrl(prompt: String, option: Option?): String = "https://duck.ai/?q=$prompt&model=${option?.id}"
 }
