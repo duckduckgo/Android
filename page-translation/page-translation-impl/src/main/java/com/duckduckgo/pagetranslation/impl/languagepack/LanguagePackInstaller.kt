@@ -32,10 +32,12 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
 import java.io.File
 import java.io.IOException
-import java.security.DigestInputStream
-import java.security.MessageDigest
 import javax.inject.Inject
 
 interface LanguagePackInstaller {
@@ -106,20 +108,13 @@ class RealLanguagePackInstaller @Inject constructor(
 
     private fun File.matches(size: Long, sha256: String): Boolean = length() == size && getSha256().equals(sha256, ignoreCase = true)
 
-    private fun File.getSha256(): String {
-        val digest = MessageDigest.getInstance("SHA-256")
-        DigestInputStream(inputStream(), digest).use { input ->
-            val buffer = ByteArray(BUFFER_SIZE)
-            while (input.read(buffer) != -1) Unit
-        }
-
-        return digest.digest().joinToString("") { "%02x".format(it) }
+    private fun File.getSha256(): String = HashingSink.sha256(blackholeSink()).use { sink ->
+        source().buffer().use { it.readAll(sink) }
+        sink.hash.hex()
     }
 
     companion object {
         const val MANIFEST_ENTRY_FILE_NAME = "manifest-entry.json"
-
-        private const val BUFFER_SIZE = 64 * 1024
 
         private val adapter: JsonAdapter<TranslationModel> = Moshi.Builder()
             .add(KotlinJsonAdapterFactory())
