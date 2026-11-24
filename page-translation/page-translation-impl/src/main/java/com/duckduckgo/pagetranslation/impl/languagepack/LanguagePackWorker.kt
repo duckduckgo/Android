@@ -27,7 +27,6 @@ import androidx.work.workDataOf
 import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.R
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
@@ -55,9 +54,6 @@ internal class LanguagePackWorker(
     lateinit var feature: PageTranslationFeature
 
     @Inject
-    lateinit var deviceSupport: PageTranslationDeviceSupport
-
-    @Inject
     lateinit var store: ModelsManifestStore
 
     @Inject
@@ -68,7 +64,7 @@ internal class LanguagePackWorker(
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
         val pair = inputData.getString(PAIR_KEY)
-        if (pair == null || !feature.translation().isEnabled() || !deviceSupport.isSupported()) return@withContext Result.failure()
+        if (pair == null || !feature.translation().isEnabled()) return@withContext Result.failure()
 
         val manifest = store.readManifest()
         val model = manifest?.models?.get(pair) ?: return@withContext Result.failure()

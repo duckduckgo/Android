@@ -25,7 +25,6 @@ import androidx.work.workDataOf
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult
@@ -60,21 +59,10 @@ class LanguagePackWorkerTest {
     private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val store: ModelsManifestStore = mock()
     private val fetcher: LanguagePackFetcher = mock()
-    private var isDeviceSupported = true
 
     @Test
     fun failWithoutDownloadingWhenTranslationIsOff() = runTest {
         setTranslationEnabled(false)
-
-        assertEquals(Result.failure(), createWorker().doWork())
-
-        verifyNoInteractions(fetcher)
-    }
-
-    @Test
-    fun failWithoutDownloadingOnUnsupportedDevices() = runTest {
-        setTranslationEnabled(true)
-        isDeviceSupported = false
 
         assertEquals(Result.failure(), createWorker().doWork())
 
@@ -142,9 +130,6 @@ class LanguagePackWorkerTest {
         .build()
         .also {
             it.feature = feature
-            it.deviceSupport = object : PageTranslationDeviceSupport {
-                override fun isSupported() = isDeviceSupported
-            }
             it.store = store
             it.fetcher = lazyOf(fetcher)
             it.dispatchers = coroutineRule.testDispatcherProvider
