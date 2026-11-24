@@ -346,29 +346,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
     }
 }
 
-internal data class ToolMenuItem(
-    val iconRes: Int,
-    val titleRes: Int,
-    val subtitleRes: Int,
-    val tool: Tool,
-)
-
-/** The tools in menu order, shared by the tools menu and the merged attach menu. */
-internal val toolMenuItems = listOf(
-    ToolMenuItem(
-        iconRes = R.drawable.ic_images_24,
-        titleRes = R.string.duckChatOptionsMenuCreateImage,
-        subtitleRes = R.string.duckChatOptionsMenuCreateImageSubtitle,
-        tool = Tool.IMAGE_GENERATION,
-    ),
-    ToolMenuItem(
-        iconRes = com.duckduckgo.mobile.android.R.drawable.ic_globe_24,
-        titleRes = R.string.duckChatOptionsMenuWebSearch,
-        subtitleRes = R.string.duckChatOptionsMenuWebSearchSubtitle,
-        tool = Tool.WEB_SEARCH,
-    ),
-)
-
 /**
  * The options container follows the same visibility rule as the other plugin controls: derived
  * purely from [NativeInputState] so it is unit-testable without Robolectric.

@@ -30,13 +30,17 @@ import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.AttachmentLimits
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.FileLimits
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
+import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
 import com.duckduckgo.duckchat.impl.pixel.AttachMenuItem
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -52,8 +56,11 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.AvailableTools
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -136,6 +143,16 @@ class AttachmentViewModelTest {
     private lateinit var viewModel: AttachmentViewModel
 
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
+    private val simplifiedPromptBox = MutableStateFlow(false)
+    private val duckChatFeature: DuckChatFeature = mock<DuckChatFeature>().also { feature ->
+        val toggle: Toggle = mock<Toggle>().also { whenever(it.enabled()).thenReturn(simplifiedPromptBox) }
+        whenever(feature.unifiedToggleInputSimplifiedPromptBox()).thenReturn(toggle)
+    }
+    private val effectiveModelProvider = object : EffectiveModelProvider {
+        override val effectiveModel: Flow<EffectiveModel> = MutableStateFlow(EffectiveModel.Unresolved)
+        override fun onRecoveryModelPicked(chatId: String?, modelId: String) = Unit
+        override fun clearRecoveryModelPick(chatId: String?) = Unit
+    }
     private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
@@ -154,6 +171,8 @@ class AttachmentViewModelTest {
             textSelectionRepository = textSelectionRepository,
             textSelectionPayloadBuilder = textSelectionPayloadBuilder,
             selectionJourney = selectionJourney,
+            duckChatFeature = duckChatFeature,
+            availableTools = AvailableTools(nativeInputStateStore, modelManager, effectiveModelProvider),
         )
     }
 
@@ -163,6 +182,41 @@ class AttachmentViewModelTest {
             NativeInputState.zero().copy(inputContext = NativeInputState.InputContext.DUCK_AI),
         )
         selectedTabFlow.value = TabEntity(tabId = tabId, position = 0)
+    }
+
+    @Test
+    fun whenSimplifiedPromptBoxFlagChangesThenMergedMenuFollows() = runTest {
+        assertFalse(viewModel.isMergedMenu.value)
+
+        simplifiedPromptBox.value = true
+        advanceUntilIdle()
+        assertTrue(viewModel.isMergedMenu.value)
+
+        simplifiedPromptBox.value = false
+        advanceUntilIdle()
+        assertFalse(viewModel.isMergedMenu.value)
+    }
+
+    @Test
+    fun whenToolPickedFromMergedMenuThenItIsReportedAsSelectedAndPixelFires() = runTest {
+        selectDuckAiTab()
+        advanceUntilIdle()
+
+        assertTrue(viewModel.onToolPickedFromMergedMenu(Tool.WEB_SEARCH))
+        verify(duckChatPixels).fireWebSearchSelected(DuckChatPixelSurface.DUCK_AI)
+    }
+
+    @Test
+    fun whenActiveToolPickedAgainFromMergedMenuThenNothingChanges() = runTest {
+        nativeInputStateStore.publish(
+            "tab-active",
+            NativeInputState.zero().copy(inputContext = NativeInputState.InputContext.DUCK_AI, selectedTool = Tool.WEB_SEARCH.rawValue),
+        )
+        selectedTabFlow.value = TabEntity(tabId = "tab-active", position = 0)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.onToolPickedFromMergedMenu(Tool.WEB_SEARCH))
+        verify(duckChatPixels, never()).fireWebSearchSelected(any())
     }
 
     @Test

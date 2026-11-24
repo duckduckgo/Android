@@ -24,7 +24,6 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.Tool
-import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModel
 import com.duckduckgo.duckchat.impl.nativeinput.EffectiveModelProvider
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -44,9 +43,10 @@ class OptionsViewModel @Inject constructor(
     modelManager: DuckAiModelManager,
     effectiveModelProvider: EffectiveModelProvider,
     duckChatFeature: DuckChatFeature,
+    availableTools: AvailableTools,
 ) : ViewModel() {
 
-    /** The attach button's menu also holds the tools, and the tools button is gone. */
+    /** The attach menu holds the tools, so the tools button is gone and the chip only turns its tool off. */
     val isMergedMenu: StateFlow<Boolean> = duckChatFeature.unifiedToggleInputSimplifiedPromptBox().enabled()
         .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
@@ -58,18 +58,8 @@ class OptionsViewModel @Inject constructor(
         .map { DuckChatPixelSurface.from(it.inputContext) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, DuckChatPixelSurface.ADDRESS_BAR)
 
-    /**
-     * Tools the active tab's model supports. Every tool while that model is unknown, which is what the
-     * pre-plugin code fell back to, and what keeps a switch from briefly hiding a supported tool.
-     */
-    val visibleTools: StateFlow<Set<Tool>> = combine(
-        nativeInputStateProvider.state,
-        modelManager.modelState,
-        effectiveModelProvider.effectiveModel,
-    ) { state, modelState, effective ->
-        val model = effective.modelFor(state.chatId)?.let { id -> modelState.models.firstOrNull { it.id == id } }
-        model?.let { Tool.entries.filterTo(mutableSetOf()) { tool -> it.supportsTool(tool) } } ?: Tool.entries.toSet()
-    }.stateIn(viewModelScope, SharingStarted.Eagerly, Tool.entries.toSet())
+    val visibleTools: StateFlow<Set<Tool>> = availableTools.tools
+        .stateIn(viewModelScope, SharingStarted.Eagerly, Tool.entries.toSet())
 
     val shouldShowPickers: Boolean get() = selectedTool.value != Tool.IMAGE_GENERATION
 
@@ -89,25 +79,8 @@ class OptionsViewModel @Inject constructor(
             modelState.models.firstOrNull { it.id == modelId }?.supportsTool(selected) == false
     }.filter { it }.map { }
 
-    /** The model id only when it was resolved for [chatId]; a model resolved for another chat is stale here. */
-    private fun EffectiveModel.modelFor(chatId: String?): String? =
-        (this as? EffectiveModel.Resolved)?.takeIf { it.chatId == chatId }?.modelId
-
     fun onToolSelectedByUser(tool: Tool) {
-        when (tool) {
-            Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSelected(surface.value)
-            Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSelected(surface.value)
-        }
-    }
-
-    /**
-     * The merged menu shows no selection and its rows only turn a tool on; the chip turns it off. Returns
-     * whether [tool] became selected, so picking the active tool again changes nothing.
-     */
-    fun onToolPickedFromMergedMenu(tool: Tool): Boolean {
-        if (tool == selectedTool.value) return false
-        onToolSelectedByUser(tool)
-        return true
+        duckChatPixels.fireToolSelected(tool, surface.value)
     }
 
     fun onToolDeselectedByUser(tool: Tool) {

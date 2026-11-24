@@ -54,7 +54,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.clearInvocations
-import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -75,10 +74,9 @@ class AttachmentViewTest {
     private val editState = MutableStateFlow(inputState.value)
     private val attachments = MutableStateFlow(AttachmentState())
     private val host: NativeInputHost = mock()
-    private val viewModel: AttachmentViewModel = mock()
     private val isMergedMenu = MutableStateFlow(false)
     private val visibleTools = MutableStateFlow(Tool.entries.toSet())
-    private val toolsViewModel: OptionsViewModel = mock<OptionsViewModel>().also {
+    private val viewModel: AttachmentViewModel = mock<AttachmentViewModel>().also {
         whenever(it.isMergedMenu).thenReturn(isMergedMenu)
         whenever(it.visibleTools).thenReturn(visibleTools)
     }
@@ -210,7 +208,7 @@ class AttachmentViewTest {
     @Test
     fun whenMergedMenuToolRowTappedThenHostSelectsTheTool() {
         isMergedMenu.value = true
-        whenever(toolsViewModel.onToolPickedFromMergedMenu(Tool.WEB_SEARCH)).thenReturn(true)
+        whenever(viewModel.onToolPickedFromMergedMenu(Tool.WEB_SEARCH)).thenReturn(true)
         attachments.value = AttachmentState(supportsUpload = true, supportsImageUpload = true)
         attach()
 
@@ -221,6 +219,31 @@ class AttachmentViewTest {
         menu.rowWithText(activity.getString(R.string.duckChatOptionsMenuWebSearch)).performClick()
 
         verify(host).toolSelected(Tool.WEB_SEARCH.rawValue)
+    }
+
+    @Test
+    fun whenFlagTurnsOnAfterAttachThenButtonBecomesTheLabelledAddButton() {
+        attachments.value = AttachmentState(supportsUpload = false)
+        attach()
+        assertFalse(view.isVisible)
+
+        isMergedMenu.value = true
+
+        assertTrue(view.isVisible)
+        assertEquals(R.drawable.ic_add_circle_24, shadowOf(attachButton().drawable).createdFromResId)
+        assertEquals(activity.getString(R.string.duckChatAddButtonContentDescription), view.contentDescription)
+    }
+
+    @Test
+    fun whenModelLosesAllToolsAfterAttachThenAddButtonWithoutUploadsHides() {
+        isMergedMenu.value = true
+        attachments.value = AttachmentState(supportsUpload = false)
+        attach()
+        assertTrue(view.isVisible)
+
+        visibleTools.value = emptySet()
+
+        assertFalse(view.isVisible)
     }
 
     @Test
@@ -262,8 +285,7 @@ class AttachmentViewTest {
         whenever(provider.stateForTab("edit:session")).thenReturn(editState)
         whenever(viewModel.attachmentState).thenReturn(attachments)
         val plugin: ViewModelFactoryPlugin = mock()
-        whenever(plugin.create(eq(AttachmentViewModel::class.java))).thenReturn(viewModel)
-        whenever(plugin.create(eq(OptionsViewModel::class.java))).thenReturn(toolsViewModel)
+        whenever(plugin.create(any<Class<AttachmentViewModel>>())).thenReturn(viewModel)
         val factory = ViewViewModelFactory(ViewViewModelFactoryPluginPoint(setOf(plugin)))
         val root = FrameLayout(activity).apply {
             setViewTreeLifecycleOwner(activity)

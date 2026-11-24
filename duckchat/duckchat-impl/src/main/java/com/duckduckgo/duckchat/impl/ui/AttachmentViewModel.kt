@@ -34,8 +34,10 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.pixel.AttachMenuItem
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -49,6 +51,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentProcessor
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.AvailableTools
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.fireToolSelected
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -82,6 +86,8 @@ class AttachmentViewModel @Inject constructor(
     private val textSelectionRepository: TextSelectionRepository,
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
+    duckChatFeature: DuckChatFeature,
+    availableTools: AvailableTools,
 ) : ViewModel() {
 
     var textSelectionsTabId: String? = null
@@ -134,6 +140,17 @@ class AttachmentViewModel @Inject constructor(
         .map { DuckChatPixelSurface.from(it.inputContext) }
         .stateIn(viewModelScope, SharingStarted.Eagerly, DuckChatPixelSurface.ADDRESS_BAR)
 
+    /** The attach menu also holds the tools, behind the button's add icon. */
+    val isMergedMenu: StateFlow<Boolean> = duckChatFeature.unifiedToggleInputSimplifiedPromptBox().enabled()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
+    val visibleTools: StateFlow<Set<Tool>> = availableTools.tools
+        .stateIn(viewModelScope, SharingStarted.Eagerly, Tool.entries.toSet())
+
+    private val selectedTool: StateFlow<Tool?> = nativeInputStateProvider.state
+        .map { state -> state.selectedTool?.let { Tool.from(it) } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, null)
+
     val attachmentState: StateFlow<AttachmentState> = combine(
         combine(
             imageAttachments,
@@ -177,6 +194,16 @@ class AttachmentViewModel @Inject constructor(
             supportedFileTypes = supportedFileTypes,
         )
     }.stateIn(scope = viewModelScope, started = SharingStarted.Eagerly, initialValue = AttachmentState())
+
+    /**
+     * The merged menu shows no selection and its rows only turn a tool on; the chip turns it off. Returns
+     * whether [tool] became selected, so picking the active tool again changes nothing.
+     */
+    fun onToolPickedFromMergedMenu(tool: Tool): Boolean {
+        if (tool == selectedTool.value) return false
+        duckChatPixels.fireToolSelected(tool, surface.value)
+        return true
+    }
 
     fun onAttachMenuShown() {
         duckChatPixels.fireAttachMenuShown(surface.value)

@@ -52,6 +52,7 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
@@ -83,7 +84,6 @@ class AttachmentView(
     var isEditMode: Boolean = false
 
     private var viewModel: AttachmentViewModel? = null
-    private var toolsViewModel: OptionsViewModel? = null
 
     /** The contextual sheet is the only surface that offers page context. */
     private val isContextual: Boolean
@@ -93,7 +93,8 @@ class AttachmentView(
     private var attachmentStateJob: Job? = null
     private var attachmentRequestJob: Job? = null
     private var mergedMenuJob: Job? = null
-    private val isMergedMenu: Boolean get() = toolsViewModel?.isMergedMenu?.value == true
+    private var isMergedMenu: Boolean = false
+    private var visibleTools: Set<Tool> = emptySet()
     private var lastNativeInputState: NativeInputState? = null
     private var hasAttachmentsOrError: Boolean = false
     private var popupWindow: PopupWindow? = null
@@ -117,8 +118,6 @@ class AttachmentView(
         val scope = findViewTreeLifecycleOwner()?.lifecycleScope ?: return
         val vm = ViewModelProvider(owner, viewModelFactory)[AttachmentViewModel::class.java]
         viewModel = vm
-        val tools = ViewModelProvider(owner, viewModelFactory)[OptionsViewModel::class.java]
-        toolsViewModel = tools
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
         attachmentRequestJob?.cancel()
@@ -140,8 +139,10 @@ class AttachmentView(
             }
             .launchIn(scope)
         mergedMenuJob?.cancel()
-        mergedMenuJob = combine(tools.isMergedMenu, tools.visibleTools) { merged, _ -> merged }
-            .onEach { merged ->
+        mergedMenuJob = combine(vm.isMergedMenu, vm.visibleTools) { merged, tools -> merged to tools }
+            .onEach { (merged, tools) ->
+                isMergedMenu = merged
+                visibleTools = tools
                 renderAttachButton(merged)
                 updateButtonVisibility()
             }
@@ -154,7 +155,7 @@ class AttachmentView(
             isContextual = isContextual,
             isEditMode = isEditMode,
             pluginControlsVisible = lastNativeInputState?.shouldShowPluginControls(isEditing = isEditMode) == true,
-            hasMergedTools = isMergedMenu && toolsViewModel?.visibleTools?.value?.isNotEmpty() == true,
+            hasMergedTools = isMergedMenu && visibleTools.isNotEmpty(),
         )
         isVisible = show
         (parent as? View)?.isVisible = show
@@ -382,8 +383,7 @@ class AttachmentView(
         val supportedFileTypes = state?.supportedFileTypes.orEmpty()
         val supportsImages = state?.supportsImageUpload == true
         val showAskAboutPage = isContextual && viewModel?.getPageContext() == null
-        val tools = toolsViewModel?.takeIf { isMergedMenu }
-        val visibleToolItems = tools?.let { vm -> toolMenuItems.filter { it.tool in vm.visibleTools.value } }.orEmpty()
+        val visibleToolItems = if (isMergedMenu) toolMenuItems.filter { it.tool in visibleTools } else emptyList()
         val hasAttachRows = supportsImages || supportedFileTypes.isNotEmpty() || showAskAboutPage
 
         if (!hasAttachRows && visibleToolItems.isEmpty()) return
@@ -456,14 +456,14 @@ class AttachmentView(
             }
         }
 
-        if (tools != null && visibleToolItems.isNotEmpty()) {
+        if (visibleToolItems.isNotEmpty()) {
             if (hasAttachRows) {
                 container.addView(LayoutInflater.from(context).inflate(R.layout.view_options_menu_divider, container, false))
             }
             visibleToolItems.forEach { item ->
                 addMenuItem(container = container, iconRes = item.iconRes, titleRes = item.titleRes) {
                     popup.dismiss()
-                    if (tools.onToolPickedFromMergedMenu(item.tool)) host?.toolSelected(item.tool.rawValue)
+                    if (viewModel?.onToolPickedFromMergedMenu(item.tool) == true) host?.toolSelected(item.tool.rawValue)
                 }
             }
         }
