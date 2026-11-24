@@ -26,7 +26,10 @@ import androidx.fragment.app.activityViewModels
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeManualBinding
+import com.duckduckgo.sync.impl.setup.SyncPairingUrl
+import com.duckduckgo.sync.impl.setup.SyncPairingUrlFeature
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import javax.inject.Inject
 
@@ -51,6 +54,9 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
     @Inject
     lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
 
+    @Inject
+    lateinit var syncPairingUrlFeature: SyncPairingUrlFeature
+
     private val viewModel by activityViewModels<ReadSyncCodeViewModel> {
         ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint, launchSource)
     }
@@ -70,7 +76,17 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        configureInstructions()
         configurePasteButton()
+    }
+
+    private fun configureInstructions() {
+        if (syncPairingUrlFeature.isEnabled) {
+            binding.pairingHeader.setBody(
+                R.string.sync_simplified_scanner_manual_entry_header_body_pairing_url,
+                SyncPairingUrl.INSTRUCTIONS_URL,
+            )
+        }
     }
 
     private fun configurePasteButton() {
