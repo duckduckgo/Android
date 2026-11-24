@@ -4,7 +4,7 @@
         "owners": ["karlenDimla", "landomen"],
         "meta": {
             "type": "android-pir-time-to-first-scan-complete",
-            "version": "0.0"
+            "version": "0.1"
         },
         "feature": {
             "name": "pir-time-to-first-scan-complete",
@@ -55,6 +55,11 @@
                         "type": "string",
                         "description": "Whether tracker blocking was enabled or disabled at the moment the flow started",
                         "enum": ["enabled", "disabled"]
+                    },
+                    "free_scan": {
+                        "type": "string",
+                        "description": "Whether the journey started as a free (freemium) scan: scan-only mode for a user without a PIR subscription, recorded at the moment the flow started (first MANUAL_INITIAL run). Stays true if the user subscribes before the journey completes.",
+                        "enum": ["true", "false"]
                     },
                     "total_scan_jobs_at_finish": {
                         "type": "string",

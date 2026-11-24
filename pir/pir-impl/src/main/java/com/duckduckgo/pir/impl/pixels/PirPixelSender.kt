@@ -127,6 +127,7 @@ interface PirPixelSender {
      * @param brokerCount - the number of active brokers at the start of the scan
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
      * @param notificationsPermissionGranted - whether notifications are enabled for the app
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
@@ -134,6 +135,7 @@ interface PirPixelSender {
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -148,6 +150,7 @@ interface PirPixelSender {
      * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
      * @param notificationsPermissionGranted - whether notifications are enabled for the app
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     suspend fun reportManualScanCompleted(
         totalTimeInMillis: Long,
@@ -159,6 +162,7 @@ interface PirPixelSender {
         isPowerSavingEnabled: Boolean,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -181,10 +185,12 @@ interface PirPixelSender {
      *
      * @param profileQueryCount - the number of profile queries used in the scan
      * @param brokerCount - the number of active brokers at the start of the scan
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     fun reportScheduledScanStarted(
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -195,6 +201,7 @@ interface PirPixelSender {
      * @param totalOptOutJobs - the number of opt-out jobs executed during the run
      * @param profileQueryCount - the number of profile queries used in the scan
      * @param brokerCount - the number of active brokers at the start of the scan
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
@@ -202,6 +209,7 @@ interface PirPixelSender {
         totalOptOutJobs: Int,
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -525,6 +533,7 @@ interface PirPixelSender {
 
     fun reportScanStarted(
         brokerUrl: String,
+        isFreeScan: Boolean,
     )
 
     fun reportScanStage(
@@ -806,6 +815,7 @@ class RealPirPixelSender @Inject constructor(
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
@@ -814,6 +824,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
             PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
@@ -828,6 +839,7 @@ class RealPirPixelSender @Inject constructor(
         isPowerSavingEnabled: Boolean,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
@@ -840,6 +852,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
             PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -859,10 +872,12 @@ class RealPirPixelSender @Inject constructor(
     override fun reportScheduledScanStarted(
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_SCHEDULED_RUN_STARTED, params)
     }
@@ -873,6 +888,7 @@ class RealPirPixelSender @Inject constructor(
         totalOptOutJobs: Int,
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
@@ -880,6 +896,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_TOTAL_OPTOUT to totalOptOutJobs.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }
@@ -1225,9 +1242,13 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS, params)
     }
 
-    override fun reportScanStarted(brokerUrl: String) {
+    override fun reportScanStarted(
+        brokerUrl: String,
+        isFreeScan: Boolean,
+    ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_SCAN_STARTED, params)

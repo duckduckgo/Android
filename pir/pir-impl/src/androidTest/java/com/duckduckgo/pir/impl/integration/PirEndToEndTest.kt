@@ -1069,6 +1069,7 @@ class PirEndToEndTest {
             batteryOptimizationsEnabled: Boolean,
             notificationsPermissionGranted: Boolean,
             isTrackerBlockingEnabled: Boolean,
+            isFreeScan: Boolean,
         ) = Unit
 
         override suspend fun onScanCompleted() = Unit

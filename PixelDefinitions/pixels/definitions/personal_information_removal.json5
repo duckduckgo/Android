@@ -400,7 +400,8 @@
                 "key": "data_broker",
                 "description": "The URL of the broker the stage was for",
                 "type": "string"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_scan_stage": {
@@ -1513,7 +1514,8 @@
                 "key": "notifications_permission_granted",
                 "description": "Whether the user has granted the POST_NOTIFICATIONS runtime permission",
                 "type": "boolean"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_foreground-run_completed": {
@@ -1597,7 +1599,8 @@
                 "key": "notifications_permission_granted",
                 "description": "Whether the user has granted the POST_NOTIFICATIONS runtime permission",
                 "type": "boolean"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_foreground-run_start-failed": {
@@ -1753,7 +1756,8 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_scheduled-run_completed": {
@@ -1810,7 +1814,8 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_cpu-usage": {
@@ -3079,6 +3084,11 @@
                 "key": "feature.data.ext.tracker_blocking_state",
                 "description": "Whether tracker blocking was enabled or disabled at the moment the flow started",
                 "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.free_scan",
+                "description": "Whether the journey started as a free (freemium) scan: scan-only mode for a user without a PIR subscription, recorded at the moment the flow started (first MANUAL_INITIAL run). Stays true if the user subscribes before the journey completes.",
+                "enum": ["true", "false"]
             },
             {
                 "key": "feature.data.ext.total_scan_jobs_at_finish",

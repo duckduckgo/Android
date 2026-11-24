@@ -81,6 +81,7 @@ interface PirRunStateHandler {
         data class BrokerScanStarted(
             override val broker: Broker,
             val eventTimeInMillis: Long,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanSuccess(
@@ -478,7 +479,7 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerScanStarted(state: BrokerScanStarted) {
-        pixelSender.reportScanStarted(brokerUrl = state.broker.url)
+        pixelSender.reportScanStarted(brokerUrl = state.broker.url, isFreeScan = state.isFreeScan)
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,

@@ -20,6 +20,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
+import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.PirJob.RunType.EMAIL_CONFIRMATION
 import com.duckduckgo.pir.impl.common.PirJob.RunType.MANUAL
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
@@ -109,7 +110,8 @@ class ExecuteBrokerStepEventHandler @Inject constructor(
                 pirRunStateHandler.handleState(
                     BrokerScanStarted(
                         broker = currentBrokerStep.broker,
-                        currentTimeProvider.currentTimeMillis(),
+                        eventTimeInMillis = currentTimeProvider.currentTimeMillis(),
+                        isFreeScan = (currentBrokerStep as? ScanStep)?.isFreeScan == true,
                     ),
                 )
             }
