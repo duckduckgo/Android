@@ -15,6 +15,11 @@
   -->
 
 <resources>
+    <!-- Pairing instructions that point to the typeable pairing URL -->
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Open <annotation type="icon">&#65532;</annotation>&#160;<b><annotation type="highlight">DuckDuckGo&#160;for&#160;Desktop</annotation></b>\n<annotation type="gap">\n</annotation>go to <b><annotation type="url">%1$s</annotation></b></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Open another <annotation type="icon">&#65532;</annotation>&#160;<b><annotation type="highlight">DuckDuckGo&#160;App</annotation></b>\n<annotation type="gap">\n</annotation>go to <b><annotation type="url">%1$s</annotation></b> and Copy Text Code.</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Open another <annotation type="icon">&#65532;</annotation>&#160;<b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>go to <b><annotation type="url">%1$s</annotation></b> and scan this code:</string>
+
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
 

@@ -30,6 +30,8 @@ internal enum class SyncPairingUrl(
     ;
 
     companion object {
+        const val INSTRUCTIONS_URL = "duck.com/pair"
+
         private val SCHEMES = setOf("http", "https")
         private val PATHS = setOf("/pair", "/pair/")
 
