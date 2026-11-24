@@ -41,7 +41,6 @@ import com.duckduckgo.app.survey.db.SurveyDao
 import com.duckduckgo.app.tabs.db.DuckAiTabSessionDao
 import com.duckduckgo.app.tabs.db.TabPageContextDao
 import com.duckduckgo.app.tabs.db.TabsDao
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.search.SearchCountDao
 import com.duckduckgo.browsermode.api.FireMode
@@ -116,9 +115,6 @@ object DaoModule {
 
     @Provides
     fun locationPermissionsDao(database: AppDatabase): LocationPermissionsDao = database.locationPermissionsDao()
-
-    @Provides
-    fun webTrackersBlockedDao(database: AppDatabase): WebTrackersBlockedDao = database.webTrackersBlockedDao()
 
     @Provides
     fun allowedDomainsDao(database: AppDatabase): AuthCookiesAllowedDomainsDao = database.authCookiesAllowedDomainsDao()

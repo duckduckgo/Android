@@ -39,7 +39,6 @@ dependencies {
     implementation project(path: ':common-utils')
     implementation project(path: ':browser-api')
     implementation project(path: ':browser-mode-api')
-    implementation project(path: ':app-store')
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':saved-sites-store')
     implementation project(path: ':app-build-config-api')

@@ -20,22 +20,38 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 
 @Dao
-interface WebTrackersBlockedDao {
+abstract class WebTrackersBlockedDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertAll(trackers: List<WebTrackerBlocked>)
+    abstract fun insertAll(trackers: List<WebTrackerBlocked>)
+
+    /**
+     * Also marks the legacy import done, so a later import can't bring back the rows the user just cleared.
+     */
+    @Transaction
+    open suspend fun deleteAll() {
+        deleteAllRows()
+        markLegacyImportDone()
+    }
 
     @Query("DELETE FROM web_trackers_blocked")
-    suspend fun deleteAll()
+    protected abstract fun deleteAllRows()
 
     @Query("DELETE FROM web_trackers_blocked WHERE timestamp < :startTime")
-    fun deleteOldDataUntil(startTime: String)
+    abstract fun deleteOldDataUntil(startTime: String)
 
     @Query("SELECT COUNT(*) FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime")
-    suspend fun getTrackersCountBetween(
+    abstract suspend fun getTrackersCountBetween(
         startTime: String,
         endTime: String,
     ): Int
+
+    @Query("SELECT EXISTS(SELECT 1 FROM legacy_app_db_imports WHERE name = 'web_trackers_blocked')")
+    abstract fun isLegacyImportDone(): Boolean
+
+    @Query("INSERT OR IGNORE INTO legacy_app_db_imports (name) VALUES ('web_trackers_blocked')")
+    abstract fun markLegacyImportDone()
 }
