@@ -102,6 +102,14 @@ class TranslationBannerView @JvmOverloads constructor(
         super.onDetachedFromWindow()
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        val params = card.layoutParams as MarginLayoutParams
+        val available = MeasureSpec.getSize(widthMeasureSpec) - params.marginStart - params.marginEnd
+        val maxWidth = resources.getDimensionPixelSize(R.dimen.translationBannerMaxWidth)
+        params.width = if (available > maxWidth) maxWidth else LayoutParams.MATCH_PARENT
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
     override fun onVisibilityAggregated(isVisible: Boolean) {
         super.onVisibilityAggregated(isVisible)
         updateOnScreen()
@@ -178,6 +186,7 @@ class TranslationBannerView @JvmOverloads constructor(
                 downX = ev.rawX
                 downY = ev.rawY
                 dragging = false
+                if (isOnCard(ev)) controller?.setInteracting(true)
                 velocityTracker?.recycle()
                 velocityTracker = VelocityTracker.obtain()
             }
@@ -186,7 +195,6 @@ class TranslationBannerView @JvmOverloads constructor(
                 if (!dragging) {
                     val dx = ev.rawX - downX
                     val dy = ev.rawY - downY
-                if (isOnCard(ev)) controller?.setInteracting(true)
                     if (abs(dx) > slop && abs(dx) > abs(dy)) {
                         dragging = true
                         card.translationX = dx
@@ -195,6 +203,7 @@ class TranslationBannerView @JvmOverloads constructor(
                 }
             }
         }
+        if (ev.actionMasked == MotionEvent.ACTION_UP || ev.actionMasked == MotionEvent.ACTION_CANCEL) controller?.setInteracting(false)
         velocityTracker?.addMovement(ev)
     }
 
@@ -203,7 +212,6 @@ class TranslationBannerView @JvmOverloads constructor(
         val tracker = velocityTracker
         tracker?.computeCurrentVelocity(1000)
         val velocityX = tracker?.xVelocity ?: 0f
-        if (ev.actionMasked == MotionEvent.ACTION_UP || ev.actionMasked == MotionEvent.ACTION_CANCEL) controller?.setInteracting(false)
         tracker?.recycle()
         velocityTracker = null
 

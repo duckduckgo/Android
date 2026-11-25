@@ -27,6 +27,7 @@
         android:elevation="@dimen/keyline_1"
         android:focusable="true"
         android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
         android:orientation="horizontal"
         android:paddingStart="@dimen/keyline_3"
         android:paddingTop="@dimen/keyline_2"
