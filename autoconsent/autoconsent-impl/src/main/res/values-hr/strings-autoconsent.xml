@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Pobrinut ćemo se za njih umjesto tebe. Odbit ćemo kolačiće kada je to moguće, a prihvatiti one koji se ne mogu odbiti.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Odbij ako je moguće ili prihvati umjesto mene</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Sam ću se njima pozabaviti</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Odbij neobavezne kolačiće</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maksimalno štiti privatnost i zatvara skočne prozore s kolačićima</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Prihvati neke kolačiće</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Skriva više skočnih prozora prihvaćanjem kolačića koji se ne mogu odbiti</string>
 </resources>
