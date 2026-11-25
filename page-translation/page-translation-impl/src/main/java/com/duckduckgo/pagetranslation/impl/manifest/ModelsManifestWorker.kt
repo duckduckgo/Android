@@ -51,7 +51,7 @@ internal class ModelsManifestWorker(
         if (!feature.translation().isEnabled()) return@withContext Result.success()
 
         val result = fetcher.value.fetch()
-        if (result is Result.Success) {
+        if (result == Result.success()) {
             store.readManifest()?.let { manifest -> scheduler.removeUnlisted(manifest.models.keys) }
         }
 

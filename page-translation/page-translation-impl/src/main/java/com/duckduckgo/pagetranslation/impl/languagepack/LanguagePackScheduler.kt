@@ -45,7 +45,7 @@ import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Compa
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.TOTAL_BYTES_KEY
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
@@ -100,7 +100,7 @@ class RealLanguagePackScheduler @Inject constructor(
     override suspend fun download(pair: String) {
         if (!canDownload()) return
 
-        val infos = workManager.getWorkInfosForUniqueWorkFlow(getWorkName(pair)).first()
+        val infos = workManager.getWorkInfosForUniqueWorkFlow(getWorkName(pair)).firstOrNull().orEmpty()
         if (infos.any { it.isDownload() && !it.state.isFinished }) return
 
         enqueue(pair, createDownloadRequest(pair))
