@@ -60,6 +60,9 @@ internal class LanguagePackWorker(
     lateinit var fetcher: Lazy<LanguagePackFetcher>
 
     @Inject
+    lateinit var installer: Lazy<LanguagePackInstaller>
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
@@ -74,13 +77,17 @@ internal class LanguagePackWorker(
 
         val result = coroutineScope {
             val fetch = async {
-                fetcher.value.fetch(
+                val stagingDirectory = getStagingDirectory(applicationContext, pair)
+                val fetchResult = fetcher.value.fetch(
                     baseUrl = manifest.baseUrl,
                     model = model,
-                    stagingDirectory = getStagingDirectory(applicationContext, pair),
+                    stagingDirectory = stagingDirectory,
                 ) { downloadedBytes ->
                     setProgress(workDataOf(DOWNLOADED_BYTES_KEY to downloadedBytes, TOTAL_BYTES_KEY to model.totalBytes))
                 }
+                if (fetchResult != SUCCESS) return@async fetchResult
+
+                if (installer.value.install(pair, model, stagingDirectory, getPackDirectory(applicationContext, pair))) SUCCESS else FAILURE
             }
             val stopWhenDisabled = launch {
                 feature.translation().enabled().firstOrNull { isEnabled -> !isEnabled } ?: return@launch
@@ -137,5 +144,7 @@ internal class LanguagePackWorker(
         private const val NOTIFICATION_ID = 7_341
 
         fun getStagingDirectory(context: Context, pair: String): File = context.filesDir.resolve(PACKS_DIRECTORY).resolve(pair + STAGING_SUFFIX)
+
+        fun getPackDirectory(context: Context, pair: String): File = context.filesDir.resolve(PACKS_DIRECTORY).resolve(pair)
     }
 }

@@ -16,6 +16,11 @@
 
 package com.duckduckgo.common.utils
 
+import okio.HashingSink
+import okio.blackholeSink
+import okio.buffer
+import okio.source
+import java.io.File
 import java.math.BigInteger
 import java.security.MessageDigest
 
@@ -24,6 +29,12 @@ val ByteArray.sha256: String
 
 fun ByteArray.verifySha256(sha256: String): Boolean {
     return this.sha256 == sha256
+}
+
+/** Streams the file instead of loading it into memory, so it suits large files. */
+fun File.sha256(): String = HashingSink.sha256(blackholeSink()).use { sink ->
+    source().buffer().use { it.readAll(sink) }
+    sink.hash.hex()
 }
 
 val String.sha256: String

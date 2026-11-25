@@ -25,6 +25,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.io.File
 
 class TranslateKitLoaderTest {
 
@@ -111,6 +112,8 @@ class TranslateKitLoaderTest {
         }
 
         override fun isInitialized(): Boolean = isLibraryInitialized
+
+        override fun decompressZstd(compressedFile: File, outputFile: File) = Unit
     }
 
     private companion object {
