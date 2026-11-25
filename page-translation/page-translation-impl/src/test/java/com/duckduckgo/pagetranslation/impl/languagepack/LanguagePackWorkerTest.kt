@@ -17,8 +17,10 @@
 package com.duckduckgo.pagetranslation.impl.languagepack
 
 import android.content.Context
+import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.Data
 import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
@@ -28,8 +30,10 @@ import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.DOWNLOADED_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.FAILURE_REASON_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.PAIR_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.TOTAL_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.ModelFile
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
@@ -104,6 +108,17 @@ class LanguagePackWorkerTest {
     }
 
     @Test
+    fun resetProgressOfAPreviousAttemptBeforeDownloading() = runTest {
+        setTranslationEnabled(true)
+        whenever(store.readManifest()).thenReturn(MANIFEST)
+        whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.FAILURE)
+
+        createWorker().doWork()
+
+        assertEquals(listOf(workDataOf(DOWNLOADED_BYTES_KEY to 0L, TOTAL_BYTES_KEY to MODEL.totalBytes)), progressUpdates)
+    }
+
+    @Test
     fun reportNotEnoughStorageReasonInOutput() = runTest {
         setTranslationEnabled(true)
         whenever(store.readManifest()).thenReturn(MANIFEST)
@@ -125,8 +140,14 @@ class LanguagePackWorkerTest {
         feature.translation().setRawStoredState(State(enable = isEnabled))
     }
 
+    private val progressUpdates = mutableListOf<Data>()
+
     private fun createWorker() = TestListenableWorkerBuilder<LanguagePackWorker>(context)
         .setInputData(workDataOf(PAIR_KEY to PAIR))
+        .setProgressUpdater { _, _, data ->
+            progressUpdates += data
+            CallbackToFutureAdapter.getFuture { it.set(null) }
+        }
         .build()
         .also {
             it.feature = feature

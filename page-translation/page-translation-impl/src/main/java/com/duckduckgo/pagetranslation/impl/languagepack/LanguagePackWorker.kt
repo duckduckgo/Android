@@ -69,6 +69,9 @@ internal class LanguagePackWorker(
         val manifest = store.readManifest()
         val model = manifest?.models?.get(pair) ?: return@withContext Result.failure()
 
+        // WorkManager keeps the progress of a stopped attempt, but the fetcher starts over
+        setProgress(workDataOf(DOWNLOADED_BYTES_KEY to 0L, TOTAL_BYTES_KEY to model.totalBytes))
+
         val result = coroutineScope {
             val fetch = async {
                 fetcher.value.fetch(
