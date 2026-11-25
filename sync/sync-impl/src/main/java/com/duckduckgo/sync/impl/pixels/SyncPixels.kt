@@ -268,7 +268,6 @@ interface SyncPixels {
         ACCOUNT_SWITCH_DECLINED("account_switch_declined"),
         ACCOUNT_SWITCH_BLOCKED("account_switch_blocked"),
         PEER_LEFT("peer_left"),
-        SESSION_TIMEOUT("session_timeout"),
         ALREADY_PAIRED("already_paired"),
         ALREADY_UPGRADED("already_upgraded"),
     }

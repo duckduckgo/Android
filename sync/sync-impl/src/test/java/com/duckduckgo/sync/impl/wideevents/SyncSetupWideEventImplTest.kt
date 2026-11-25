@@ -33,6 +33,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.store.SyncStore
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
@@ -557,6 +558,82 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
+    fun `onFailed finishes the unified attempt as cancelled when the code was rejected`(
+        @TestParameter(valuesProvider = CodeRejectingFailureReasonsProvider::class) reason: SetupFailureReason,
+    ) = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFailed(reason)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("status_reason" to "code_rejected"),
+        )
+    }
+
+    @Test
+    fun `session timeout while waiting for a person finishes the unified attempt as cancelled`(
+        @TestParameter(valuesProvider = PersonTimeoutStagesProvider::class) stage: TimeoutStage,
+    ) = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT, stage)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("status_reason" to "session_timeout", "timeout_stage" to stage.value),
+        )
+    }
+
+    @Test
+    fun `session timeout while waiting for software finishes the unified attempt as failure`(
+        @TestParameter(valuesProvider = SoftwareTimeoutStagesProvider::class) stage: TimeoutStage,
+    ) = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT, stage)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Failure(reason = "session_timeout"),
+            metadata = mapOf("status_reason" to "session_timeout", "timeout_stage" to stage.value),
+        )
+    }
+
+    @Test
+    fun `session timeout without a stage finishes the unified attempt as failure at an unknown stage`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Failure(reason = "session_timeout"),
+            metadata = mapOf("status_reason" to "session_timeout", "timeout_stage" to "unknown"),
+        )
+    }
+
+    @Test
+    fun `onFailed ignores the timeout stage for other reasons`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE, TimeoutStage.WAITING_FOR_PEER_HELLO)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Failure(reason = "transport_failure"),
+            metadata = mapOf("status_reason" to "transport_failure"),
+        )
+    }
+
+    @Test
     fun `onCancelled finishes the unified attempt as cancelled with the reason`(
         @TestParameter reason: SetupCancellationReason,
     ) = runTest {
@@ -634,7 +711,20 @@ class SyncSetupWideEventImplTest {
     }
 
     private class FailureReasonsProvider : TestParameterValuesProvider() {
-        override fun provideValues(context: Context) = SetupFailureReason.entries - CANCELLING_FAILURE_REASONS
+        override fun provideValues(context: Context) =
+            SetupFailureReason.entries - CANCELLING_FAILURE_REASONS - CODE_REJECTING_FAILURE_REASONS - SetupFailureReason.SESSION_TIMEOUT
+    }
+
+    private class CodeRejectingFailureReasonsProvider : TestParameterValuesProvider() {
+        override fun provideValues(context: Context) = CODE_REJECTING_FAILURE_REASONS.toList()
+    }
+
+    private class PersonTimeoutStagesProvider : TestParameterValuesProvider() {
+        override fun provideValues(context: Context) = PERSON_TIMEOUT_STAGES.toList()
+    }
+
+    private class SoftwareTimeoutStagesProvider : TestParameterValuesProvider() {
+        override fun provideValues(context: Context) = TimeoutStage.entries - PERSON_TIMEOUT_STAGES
     }
 
     private class CancellingFailureReasonsProvider : TestParameterValuesProvider() {
@@ -643,5 +733,7 @@ class SyncSetupWideEventImplTest {
 
     private companion object {
         val CANCELLING_FAILURE_REASONS = setOf(SetupFailureReason.ALREADY_PAIRED, SetupFailureReason.ALREADY_UPGRADED)
+        val CODE_REJECTING_FAILURE_REASONS = setOf(SetupFailureReason.UNRECOGNIZED_CODE, SetupFailureReason.INCOMPATIBLE_CODE)
+        val PERSON_TIMEOUT_STAGES = setOf(TimeoutStage.WAITING_FOR_PEER_HELLO, TimeoutStage.WAITING_FOR_CONFIRMATION)
     }
 }
