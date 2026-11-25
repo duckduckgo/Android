@@ -47,6 +47,9 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 interface SyncSetupWideEvent {
     suspend fun onFlowStarted(
@@ -76,6 +79,20 @@ interface SyncSetupWideEvent {
     suspend fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage? = null)
     suspend fun onCancelled(reason: SetupCancellationReason)
 }
+
+internal val SHARED_LATENCY_BUCKETS = setOf(
+    1.seconds,
+    2.seconds,
+    3.seconds,
+    5.seconds,
+    10.seconds,
+    30.seconds,
+    1.minutes,
+    2.minutes,
+    3.minutes,
+    5.minutes,
+    10.minutes,
+)
 
 data class SetupFields(
     val setupMode: SetupMode,
@@ -110,7 +127,11 @@ class SyncSetupWideEventImpl @Inject constructor(
         val flowId = startFlow(launchSource) ?: return@withLock
         val unified = if (isUnified) createUnifiedData(setupMode) else null
         currentData = EventData(flowId = flowId, unified = unified)
-        unified?.appendLastStep(flowId)
+        if (unified != null) {
+            startInterval(flowId, SetupInterval.Total)
+            startInterval(flowId, SetupInterval.LastStep)
+            unified.appendLastStep(flowId)
+        }
     }
 
     /**
@@ -176,8 +197,12 @@ class SyncSetupWideEventImpl @Inject constructor(
 
     private suspend fun finishOpenEvent() {
         val openAttempt = currentData ?: return
-        val metadata = if (openAttempt.unified != null) mapOf(KEY_STATUS_REASON to STATUS_REASON_DUPLICATED) else emptyMap()
-        wideEventClient.flowFinish(wideEventId = openAttempt.flowId, status = FlowStatus.Unknown, metadata = metadata)
+        val unified = openAttempt.unified
+        if (unified != null) {
+            finishUnifiedAttempt(openAttempt.flowId, unified, FlowStatus.Unknown, mapOf(KEY_STATUS_REASON to STATUS_REASON_DUPLICATED))
+        } else {
+            wideEventClient.flowFinish(wideEventId = openAttempt.flowId, status = FlowStatus.Unknown)
+        }
         currentData = null
     }
 
@@ -194,9 +219,28 @@ class SyncSetupWideEventImpl @Inject constructor(
 
     override suspend fun onStep(step: SetupStep) = mutex.withLock {
         val openAttempt = currentData ?: return@withLock
-        val unified = openAttempt.unified?.copy(lastStep = step) ?: return@withLock
+        val previous = openAttempt.unified ?: return@withLock
+        val unified = if (step == previous.lastStep) previous else previous.moveToStep(openAttempt.flowId, step)
         currentData = openAttempt.copy(unified = unified)
         unified.appendLastStep(openAttempt.flowId)
+    }
+
+    private suspend fun UnifiedData.moveToStep(flowId: Long, step: SetupStep): UnifiedData {
+        endInterval(flowId, SetupInterval.LastStep)
+        startInterval(flowId, SetupInterval.LastStep)
+        val preparingSyncRunning = when (step) {
+            SetupStep.PREPARING_SYNC -> {
+                if (!isPreparingSyncRunning) startInterval(flowId, SetupInterval.PreparingSync)
+                true
+            }
+            // Account creation is recorded while Preparing sync is still on screen, so it doesn't stop the Preparing sync latency.
+            SetupStep.ACCOUNT_CREATED -> isPreparingSyncRunning
+            else -> {
+                if (isPreparingSyncRunning) endInterval(flowId, SetupInterval.PreparingSync)
+                false
+            }
+        }
+        return copy(lastStep = step, isPreparingSyncRunning = preparingSyncRunning)
     }
 
     override suspend fun onUpdate(change: (SetupFields) -> SetupFields) = mutex.withLock {
@@ -240,9 +284,25 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     private suspend fun finishUnifiedAttempt(status: FlowStatus, metadata: Map<String, String>) = mutex.withLock {
-        val unifiedAttempt = currentData?.takeIf { it.unified != null } ?: return@withLock
-        wideEventClient.flowFinish(wideEventId = unifiedAttempt.flowId, status = status, metadata = metadata)
+        val openAttempt = currentData ?: return@withLock
+        val unified = openAttempt.unified ?: return@withLock
+        finishUnifiedAttempt(openAttempt.flowId, unified, status, metadata)
         currentData = null
+    }
+
+    private suspend fun finishUnifiedAttempt(flowId: Long, unified: UnifiedData, status: FlowStatus, metadata: Map<String, String>) {
+        endInterval(flowId, SetupInterval.Total)
+        endInterval(flowId, SetupInterval.LastStep)
+        if (unified.isPreparingSyncRunning) endInterval(flowId, SetupInterval.PreparingSync)
+        wideEventClient.flowFinish(wideEventId = flowId, status = status, metadata = metadata)
+    }
+
+    private suspend fun startInterval(flowId: Long, interval: SetupInterval) {
+        wideEventClient.intervalStart(wideEventId = flowId, key = interval.key, buckets = interval.buckets)
+    }
+
+    private suspend fun endInterval(flowId: Long, interval: SetupInterval) {
+        wideEventClient.intervalEnd(wideEventId = flowId, key = interval.key)
     }
 
     private suspend fun createUnifiedData(setupMode: SetupMode) = UnifiedData(
@@ -293,7 +353,14 @@ class SyncSetupWideEventImpl @Inject constructor(
         val initialSetupMode: SetupMode,
         val existingAccount: Boolean,
         val lastStep: SetupStep,
+        val isPreparingSyncRunning: Boolean = false,
     )
+
+    private enum class SetupInterval(val key: String, val buckets: Set<Duration>) {
+        Total(key = "total_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS),
+        LastStep(key = "last_step_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS),
+        PreparingSync(key = "preparing_sync_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS),
+    }
 
     private companion object {
         const val FLOW_NAME = "sync-setup"

@@ -49,6 +49,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
@@ -684,6 +685,130 @@ class SyncSetupWideEventImplTest {
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
 
         verifyNoInteractions(wideEventClient)
+    }
+
+    @Test
+    fun `unified attempt starts total and last step latencies`() = runTest {
+        enableUnifiedEvent()
+
+        wideEvent.onFlowStarted()
+
+        verify(wideEventClient).intervalStart(wideEventId = 1L, key = "total_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
+        verify(wideEventClient).intervalStart(wideEventId = 1L, key = "last_step_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
+    }
+
+    @Test
+    fun `back up attempt without the unified event starts no shared latencies`() = runTest {
+        startFlow(flowId = 1L)
+
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any(), any())
+    }
+
+    @Test
+    fun `new step restarts the last step latency`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "last_step_latency_ms_bucketed")
+        order.verify(wideEventClient).intervalStart(wideEventId = 1L, key = "last_step_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
+    }
+
+    @Test
+    fun `repeating the last step keeps its latency running`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+
+        wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+
+        verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "last_step_latency_ms_bucketed")
+    }
+
+    @Test
+    fun `finished attempt ends its latencies before it finishes`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onSucceeded()
+
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "total_latency_ms_bucketed")
+        order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "last_step_latency_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success, metadata = emptyMap())
+    }
+
+    @Test
+    fun `duplicated attempt ends its latencies before it finishes`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFlowStarted()
+
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "total_latency_ms_bucketed")
+        order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "last_step_latency_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Unknown,
+            metadata = mapOf("status_reason" to "duplicated"),
+        )
+    }
+
+    @Test
+    fun `preparing sync latency runs through account created and stops on the next step`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onStep(SetupStep.PREPARING_SYNC)
+        wideEvent.onStep(SetupStep.ACCOUNT_CREATED)
+        verify(wideEventClient, never()).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
+
+        wideEvent.onStep(SetupStep.RECOVERY_CODE_SHOWN)
+        wideEvent.onSucceeded()
+
+        verify(wideEventClient).intervalStart(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
+        verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
+    }
+
+    @Test
+    fun `preparing sync latency ends when the attempt ends on preparing sync`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onStep(SetupStep.PREPARING_SYNC)
+
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+
+        val order = inOrder(wideEventClient)
+        order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
+        order.verify(wideEventClient).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `returning to preparing sync restarts its latency`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onStep(SetupStep.PREPARING_SYNC)
+        wideEvent.onStep(SetupStep.ERROR_SCREEN)
+
+        wideEvent.onStep(SetupStep.PREPARING_SYNC)
+
+        verify(
+            wideEventClient,
+            times(2),
+        ).intervalStart(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
+    }
+
+    @Test
+    fun `attempt that never reached preparing sync doesn't end its latency`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+
+        wideEvent.onSucceeded()
+
+        verify(wideEventClient, never()).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
     }
 
     private suspend fun enableUnifiedEvent() {
