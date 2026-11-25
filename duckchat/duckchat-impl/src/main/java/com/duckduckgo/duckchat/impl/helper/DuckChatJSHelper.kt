@@ -249,7 +249,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 if (tabId.isNotEmpty()) {
                     ChatState
                         .fromValue(data?.optString("status"))
-                        ?.let { status -> chatStateStore.update(tabId, status) }
+                        ?.let { status -> chatStateStore.update(chatStateKey(tabId, mode), status) }
                 }
                 if (mode == Mode.FULL && tabId.isNotEmpty()) {
                     val status = data?.optString("status").orEmpty()
@@ -269,12 +269,12 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_HIDE_CHAT_INPUT -> {
-                if (tabId.isNotEmpty()) chatStateStore.update(tabId, HIDE)
+                if (tabId.isNotEmpty()) chatStateStore.update(chatStateKey(tabId, mode), HIDE)
                 null
             }
 
             METHOD_SHOW_CHAT_INPUT -> {
-                if (tabId.isNotEmpty()) chatStateStore.update(tabId, SHOW)
+                if (tabId.isNotEmpty()) chatStateStore.update(chatStateKey(tabId, mode), SHOW)
                 null
             }
             METHOD_DISABLE_CHAT_INPUT -> {
@@ -862,6 +862,9 @@ class RealDuckChatJSHelper @Inject constructor(
             }
         return JsCallbackData(jsonPayload, featureName, method, id)
     }
+
+    private fun chatStateKey(tabId: String, mode: Mode): String =
+        if (mode == Mode.CONTEXTUAL) ChatStateStore.contextualKey(tabId) else tabId
 
     private fun extractPayload(data: JSONObject?): String? =
         data
