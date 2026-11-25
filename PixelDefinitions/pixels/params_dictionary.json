@@ -97,6 +97,12 @@
         "description": "What the user was looking at when the prompt was submitted.",
         "enum": ["ntp", "serp", "website", "duck_ai", "contextual"]
     },
+    "duckAiModelSource": {
+        "key": "model_source",
+        "type": "string",
+        "description": "Where the model and effort of a new chat's first prompt came from. Sent only with resetModelForNewChats on, on the first prompt of a New Chat on the Duck.ai page or from the contextual sheet's entry input; omitted otherwise. Covers model and effort together; the effort itself is in reasoning_effort. user_default and user_default_unavailable aren't sent yet.",
+        "enum": ["default", "user_default", "picked", "onboarding", "fallback", "user_default_unavailable"]
+    },
     "duckAiAddressBarMenuPageType": {
         "key": "page_type",
         "type": "string",

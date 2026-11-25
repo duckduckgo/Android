@@ -407,6 +407,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // with inputContext=BROWSER and toggleVisible=true/false that would otherwise show the
     // toggle row and reset the parent card's corners.
     private var isContextualWidget: Boolean = false
+    private var isContextualEntry: Boolean = false
 
     // True when this widget instance is hosting the fullscreen edit-message surface, configured
     // via configureForEdit() against a synthetic per-tab state key rather than a real tab.
@@ -1250,6 +1251,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             hasFileAttachment = hasFileAttachment,
             addressBarEntryPoint = nextDuckAiEntryPoint,
             submitMethod = submitMethod,
+            isContextualEntry = isContextualEntry,
         )
         // Fires alongside prompt_submitted, but only when the input is in a Duck.ai chat context
         // (a prompt sent from within an active chat) — not omnibar submissions that start a new chat.
@@ -1576,6 +1578,11 @@ class NativeInputModeWidget @JvmOverloads constructor(
             val images = uris?.toList().orEmpty()
             if (images.isNotEmpty()) attachmentViewModel?.onImagesPicked(images, AttachmentViewModel.ImageSource.CAMERA)
         }
+    }
+
+    /** Whether the contextual sheet shows its entry input, where a prompt starts a new chat, rather than a running chat. */
+    fun setContextualEntry(isEntry: Boolean) {
+        isContextualEntry = isEntry
     }
 
     override fun configureContextual(tabId: String) {

@@ -63,6 +63,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.models.ReasoningResolver
 import com.duckduckgo.duckchat.impl.models.Tool
 import com.duckduckgo.duckchat.impl.models.forTab
+import com.duckduckgo.duckchat.impl.models.modelSourceFor
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
@@ -194,6 +195,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     // Kept in sync via bindCurrentUrlSource so submission pixels can read the tab's URL
     // synchronously — a suspend re-read at fire time would race the navigation the submission triggers.
     private var latestTabUrl: String? = null
+
+    // The model subscription onboarding opened this tab's new chat on, so its first prompt is judged against it. Other picks
+    // keep it as the starting point; it stops counting once the tab's pick is dropped, as the contextual sheet does.
+    private var onboardingModelId: String? = null
 
     // Defensive buffer for the (rare) case where setActiveChatId fires before configure has set
     // activeTabId. Replayed inside configure / configureContextual when activeTabId becomes known.
@@ -335,6 +340,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
      * Fires the unified prompt-submitted pixel plus, when a tool is selected, the matching per-tool
      * submitted pixel. Called exactly once per Duck.ai (AI-chat) submission by the widget. Attachment
      * presence is passed in because the attachment lists live in the widget's AttachmentView, not here.
+     * [isContextualEntry] is whether the contextual sheet is still on its entry input, where every prompt
+     * starts a new chat.
      */
     fun fireSubmissionPixels(
         hasText: Boolean,
@@ -342,6 +349,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         hasFileAttachment: Boolean,
         addressBarEntryPoint: DuckChatEntryPoint,
         submitMethod: InputSubmitMethod,
+        isContextualEntry: Boolean,
     ) {
         val rawTool = getSelectedTool()
         val tool = rawTool?.let { Tool.from(it) }
@@ -352,10 +360,30 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         val inputState = currentInputState()
         val surface = currentSurface(inputState)
+        val modelId = getSelectedModelId()
         val reasoningEffort = getResolvedReasoningEffort()
+        val modelSource = modelSourceFor(
+            isResetEnabled = duckChatFeature.resetModelForNewChats().isEnabled(),
+            global = modelManager.modelState.value,
+            onboardingModelId = onboardingModelId?.takeIf { inputState != null && inputState.chatId == null && inputState.newChatModelId != null },
+            sentModelId = modelId,
+            sentReasoningEffort = reasoningEffort,
+        )
+        // Decided before the unified pixel fires, so both pixels of a New Chat's first prompt carry the same source.
+        val isFirstPromptSent = activeTabId.value?.let { tabId ->
+            newChatHintsPixels.onPromptSubmitted(
+                tabId = tabId,
+                isNewChat = isNewDuckAiChat(tabId),
+                hasImageAttachment = hasImageAttachment,
+                hasFileAttachment = hasFileAttachment,
+                selectedTool = selectedToolParam,
+                modelSource = modelSource,
+            )
+        } == true
+        val isNewChatFirstPrompt = if (isContextualSurface()) isContextualEntry else isFirstPromptSent
         duckChatPixels.firePromptSubmitted(
             selectedTool = selectedToolParam,
-            modelId = getSelectedModelId(),
+            modelId = modelId,
             reasoningEffort = reasoningEffort,
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
@@ -365,20 +393,12 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             tabId = activeTabId.value,
             pageType = resolvePageType(surface, latestTabUrl),
             addressBarEntryPoint = addressBarEntryPoint,
+            modelSource = modelSource?.takeIf { isNewChatFirstPrompt },
         )
         when (tool) {
             Tool.IMAGE_GENERATION -> duckChatPixels.fireImageGenerationSubmitted(surface)
             Tool.WEB_SEARCH -> duckChatPixels.fireWebSearchSubmitted(surface)
             null -> {}
-        }
-        activeTabId.value?.let { tabId ->
-            newChatHintsPixels.onPromptSubmitted(
-                tabId = tabId,
-                isNewChat = isNewDuckAiChat(tabId),
-                hasImageAttachment = hasImageAttachment,
-                hasFileAttachment = hasFileAttachment,
-                selectedTool = selectedToolParam,
-            )
         }
         inputOutcomeTracker.promptSubmitted(submitMethod)
         activeDuckAiTabId(surface)?.let {
@@ -687,6 +707,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         // Ends the FE recovery model-change window for the active tab.
         endModelChangeMode()
+        onboardingModelId = null
     }
 
     // Read from this widget's own config so the contextual sheet, which shares the browser tab's id, never passes as the full-screen chat.
@@ -755,7 +776,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             null
         }
         val overrideModelId = (launch as? DuckChatLaunch.Open)?.overrideModelId
-        if (isDuckAiMode && overrideModelId != null) pickNewChatModel(overrideModelId)
+        if (isDuckAiMode && overrideModelId != null) {
+            pickNewChatModel(overrideModelId)
+            onboardingModelId = overrideModelId
+        }
         // The selected model can change after a launch (a widget tap) was built, so the tool is only preselected
         // once an image-capable model is selected; otherwise the options clear it again. When new chats start on
         // the default model, the global selection stays put and the tab picks the image-capable model instead.

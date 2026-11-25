@@ -46,6 +46,7 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -174,6 +175,29 @@ class RealContextualNativeInputManagerTest {
             assertTrue(awaitItem())
 
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when the sheet switches between entry input and running chat then the widget is told which`() {
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChatInternal.isContextualNativeInputEnabled()).thenReturn(true)
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            inputLayout = mockCard().withWidget(widget),
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        testee.onInputMode()
+        testee.onWebViewMode()
+
+        inOrder(widget) {
+            verify(widget).setContextualEntry(true)
+            verify(widget).setContextualEntry(false)
         }
     }
 

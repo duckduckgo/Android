@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.impl.nativeinput
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.ModelSource
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
@@ -70,18 +71,20 @@ class NewChatHintsPixels @Inject constructor(
         duckChatPixels.fireNewChatHintTapped(hint, position)
     }
 
+    /** Returns whether this was the counted New Chat's first prompt, the one `first_prompt_sent` reports. */
     fun onPromptSubmitted(
         tabId: String,
         isNewChat: Boolean,
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         selectedTool: String,
-    ) {
+        modelSource: ModelSource?,
+    ): Boolean {
         if (!isNewChat) {
             newChats.remove(tabId)
-            return
+            return false
         }
-        val newChat = newChats[tabId]?.takeUnless { it.isPrompted } ?: return
+        val newChat = newChats[tabId]?.takeUnless { it.isPrompted } ?: return false
         newChat.isPrompted = true
         duckChatPixels.fireNewChatFirstPromptSent(
             hasNewChatHints = newChat.hasNewChatHints,
@@ -90,7 +93,9 @@ class NewChatHintsPixels @Inject constructor(
             hasImageAttachment = hasImageAttachment,
             hasFileAttachment = hasFileAttachment,
             selectedTool = selectedTool,
+            modelSource = modelSource,
         )
+        return true
     }
 
     private fun newChat(tabId: String, hasNewChatHints: Boolean): CountedNewChat {
