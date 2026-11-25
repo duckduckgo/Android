@@ -25,11 +25,12 @@ import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.api.TranslationProgress
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-@ContributesBinding(FragmentScope::class)
+@ContributesBinding(FragmentScope::class, binding = binding<PageTranslation>())
 @SingleIn(FragmentScope::class)
 class RealPageTranslation @Inject constructor() : PageTranslation {
 
