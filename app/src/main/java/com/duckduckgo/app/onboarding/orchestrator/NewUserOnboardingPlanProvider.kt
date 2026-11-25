@@ -36,7 +36,6 @@ import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.orchestrator.DeviceMigrationPlanProvider.Companion.MIGRATION_FLOW_ENDED_KEY
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -163,7 +162,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
             buildCustomAiPlan(ctx, onCompleted, onSkipped)
         } else {
-            if (segmentedOnboardingExperimentManager.enroll() == SegmentedOnboardingExperimentVariant.TREATMENT) {
+            if (segmentedOnboardingExperimentManager.isEnabled()) {
                 buildSegmentedPlan(ctx, onCompleted, onSkipped)
             } else {
                 buildDefaultPlan(ctx, onCompleted, onSkipped)
@@ -280,7 +279,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         onSkipped: suspend () -> Unit,
     ): LinearOnboardingPlan {
         onboardingPixelSender.segmentedFlowStarted()
-        val firstDialog = SuspendMemo { FirstDialog.INITIAL }
+        val firstDialog = SuspendMemo { resolveFirstDialog(ctx.isReinstall) }
+        val quickSetupPlan = quickSetupPlan(ctx)
         val togglePositionChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
         val duckAiStateChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiState)
 
@@ -295,6 +295,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             steps = buildList {
                 add(introAnimationStep())
                 add(notificationPermissionStep())
+                add(syncRestoreStep(firstDialog, quickSetupPlan))
+                add(initialReinstallUserStep(firstDialog, quickSetupPlan))
                 add(initialStep(firstDialog))
                 add(downloadReasonStep(ctx, togglePositionChoice, duckAiStateChoice))
             },

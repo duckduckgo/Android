@@ -34,7 +34,6 @@ import com.duckduckgo.app.onboarding.OnboardingPreference
 import com.duckduckgo.app.onboarding.OnboardingPreferenceCatalog
 import com.duckduckgo.app.onboarding.OnboardingPrivacyConfigPersistedGate
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager
-import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
 import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentMetrics
 import com.duckduckgo.app.onboarding.TestOption
 import com.duckduckgo.app.onboarding.store.OnboardingStore
@@ -184,7 +183,7 @@ class NewUserOnboardingPlanProviderTest {
             whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
             whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(false)
             whenever(customAiOnboardingResolver.resolve()).thenReturn(false)
-            whenever(segmentedOnboardingExperiment.enroll()).thenReturn(null)
+            whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(false)
             whenever(passwordImportExperiment.enroll()).thenReturn(null)
             whenever(privacyConfigPersistedGate.awaitPersisted()).thenReturn(true)
         }
@@ -350,7 +349,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when enrolled in the segmented treatment then reaches the download reason step`() = runTest {
-        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(true)
         start()
         assertStep(NewUserOnboardingStepIds.INTRO_ANIMATION)
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
@@ -409,7 +408,7 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     private suspend fun startSegmentedAtDownloadReason() {
-        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(true)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
@@ -510,7 +509,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when the segmented plan is built then the single choice options are prefetched`() = runTest {
-        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(true)
 
         start()
 
@@ -564,7 +563,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the model choice is turned off remotely then its options are not prefetched`() = runTest {
         extendedOnboardingFeatureToggles.duckAiModelChoice().setRawStoredState(State(enable = false))
-        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(true)
 
         start()
 
@@ -952,8 +951,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when the segmented control variant then builds the default plan`() = runTest {
-        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.CONTROL)
+    fun `when segmented onboarding is disabled then builds the default plan`() = runTest {
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(false)
         start()
         orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
         orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
@@ -962,11 +961,54 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when custom ai path wins then the segmented experiment is never enrolled`() = runTest {
+    fun `when custom ai path wins then segmented onboarding is never checked`() = runTest {
         whenever(customAiOnboardingResolver.resolve()).thenReturn(true)
         start()
 
-        verify(segmentedOnboardingExperiment, never()).enroll()
+        verify(segmentedOnboardingExperiment, never()).isEnabled()
+    }
+
+    @Test
+    fun `when segmented onboarding and can restore then restoring advances to the download reason step`() = runTest {
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(true)
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.SYNC_RESTORE)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.RestoreRequested)
+
+        verify(syncAutoRestore).restoreSyncAccount()
+        assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
+    }
+
+    @Test
+    fun `when segmented onboarding and sync restore is skipped then switches to quick setup`() = runTest {
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(true)
+        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.SYNC_RESTORE)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.SkipRequested)
+
+        assertStep(NewUserOnboardingStepIds.QUICK_SETUP)
+    }
+
+    @Test
+    fun `when segmented onboarding and reinstall user then continuing advances to the download reason step`() = runTest {
+        whenever(segmentedOnboardingExperiment.isEnabled()).thenReturn(true)
+        whenever(appBuildConfig.isAppReinstall()).thenReturn(true)
+        start()
+        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
+        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
+        assertStep(NewUserOnboardingStepIds.INITIAL_REINSTALL_USER)
+
+        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
+
+        assertStep(NewUserOnboardingStepIds.DOWNLOAD_REASON)
     }
 
     @Test
