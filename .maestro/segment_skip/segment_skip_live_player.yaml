@@ -24,18 +24,9 @@ tags:
 - tapOn:
     text: "No Thanks"
     optional: true
-# Polls in 5s slices so the YouTube app promo dialog is dismissed whenever it shows; ~90s in total.
-- repeat:
-    times: 18
-    while:
-      notVisible: "Skip Content"
-    commands:
-      - runFlow: ../duckplayer/common/dismiss_youtube_app_promo.yaml
-      - extendedWaitUntil:
-          visible: "Skip Content"
-          timeout: 5000
-          optional: true
-- assertVisible: "Skip Content"
+- extendedWaitUntil:
+    visible: "Skip Content"
+    timeout: 90000
 - tapOn:
     text: "Skip Content"
     waitToSettleTimeoutMs: 500

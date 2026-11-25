@@ -25,4 +25,27 @@ appId: com.duckduckgo.mobile.android
     visible: "Get the best experience"
     timeout: 3000
     optional: true
-- runFlow: dismiss_youtube_app_promo.yaml
+- runFlow:
+    when:
+      visible: "Get the best experience"
+    commands:
+      - tapOn:
+          text: "Close"
+      - extendedWaitUntil:
+          notVisible: "Get the best experience"
+          timeout: 3000
+
+# Cookies consent can also show after the app promo dialog
+- runFlow:
+    when:
+      visible: "Before you continue to YouTube"
+    commands:
+      - scrollUntilVisible:
+          element:
+            text: "More options"
+            optional: true
+          direction: DOWN
+
+      - tapOn:
+          text: "Reject.*"
+          optional: true
