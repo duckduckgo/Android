@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Onlarla sizin yerinize biz ilgilenelim. Mümkün olduğunda çerezleri reddedecek, reddedilemeyenleri ise kabul edeceğiz.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Mümkünse reddet veya benim adıma kabul et</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Bunlarla kendim ilgileneceğim</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">İsteğe bağlı çerezleri reddet</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Gizliliği en üst düzeye çıkarır ve çerez açılır pencerelerini kapatır</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Bazı çerezleri kabul et</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Reddedilemeyen çerezleri kabul ederek daha fazla açılır pencereyi gizler</string>
 </resources>
