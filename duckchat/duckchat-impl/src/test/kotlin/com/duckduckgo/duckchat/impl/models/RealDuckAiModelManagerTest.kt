@@ -1968,6 +1968,19 @@ class RealDuckAiModelManagerTest {
         assertEquals("text", testee.modelState.value.selectedModelId)
     }
 
+    @Test
+    fun whenResetModelForNewChatsThenEnsureImageCapablePublishesImageModelWithoutPersisting() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        givenModels(remoteModel("text"), remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)))
+        clearInvocations(dataStore)
+
+        assertTrue(testee.ensureImageCapableModelSelected())
+
+        assertEquals("image", testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        verify(dataStore, never()).setSelectedProvider(anyOrNull())
+    }
+
     private suspend fun givenModels(vararg models: RemoteAIChatModel) {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)

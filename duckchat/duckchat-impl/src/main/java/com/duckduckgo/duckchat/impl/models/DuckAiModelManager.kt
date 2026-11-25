@@ -337,6 +337,7 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun ensureImageCapableModelSelected(): Boolean = withContext(dispatcherProvider.io()) {
         val revision = stateMutex.withLock { selectionRevision }
         if (_modelState.value.models.isEmpty()) fetchModels()
+        val resetForNewChats = resetsModelForNewChats()
         stateMutex.withLock {
             if (selectionRevision != revision) return@withLock false
             val state = _modelState.value
@@ -345,7 +346,11 @@ class RealDuckAiModelManager @Inject constructor(
             val imageCapableModel = state.models.firstOrNull {
                 it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
             } ?: return@withLock false
-            persistModelSelection(imageCapableModel)
+            if (resetForNewChats) {
+                publishSelection(modelId = imageCapableModel.id, model = imageCapableModel)
+            } else {
+                persistModelSelection(imageCapableModel)
+            }
             true
         }
     }
