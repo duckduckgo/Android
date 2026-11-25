@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Postaráme se o ně za tebe. Cookies budeme odmítat, kdykoli to půjde, a když to nepůjde, přijmeme je.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Pokud možno odmítat, případně odsouhlasovat za mě</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Budu je řešit já</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Odmítnout nepovinné cookies</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maximalizuje soukromí a zavírá vyskakovací okna s cookies</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Přijmout některé cookies</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Skryje více vyskakovacích oken přijetím cookies, které nelze odmítnout</string>
 </resources>
