@@ -121,7 +121,12 @@ class WebViewRequestInterceptorTest {
 
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
-            httpsUpgradeStep = HttpsUpgradeStep(mockHttpsUpgrader, coroutineTestRule.testScope, coroutineTestRule.testDispatcherProvider),
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutineTestRule.testScope,
+                coroutineTestRule.testDispatcherProvider,
+            ),
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
@@ -162,7 +167,7 @@ class WebViewRequestInterceptorTest {
         )
 
         advanceUntilIdle()
-        verify(mockHttpsUpgrader).recordUpgrade()
+        verify(mockPrivacyProtectionCountDao).incrementUpgradeCount()
     }
 
     @Test
@@ -273,7 +278,12 @@ class WebViewRequestInterceptorTest {
         fakeAndroidBrowserConfigFeature.checkMaliciousAfterHttpsUpgrade().setRawStoredState(State(false))
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
-            httpsUpgradeStep = HttpsUpgradeStep(mockHttpsUpgrader, coroutineTestRule.testScope, coroutineTestRule.testDispatcherProvider),
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutineTestRule.testScope,
+                coroutineTestRule.testDispatcherProvider,
+            ),
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
@@ -571,11 +581,11 @@ class WebViewRequestInterceptorTest {
         testee.shouldIntercept(request = mockRequest, documentUri = null, webView = webView, webViewClientListener = listener)
 
         advanceUntilIdle()
-        inOrder(listener, mockGpc, webView, mockHttpsUpgrader) {
+        inOrder(listener, mockGpc, webView, mockPrivacyProtectionCountDao) {
             verify(listener).upgradedToHttps()
             verify(mockGpc).getHeaders(validUri().toString())
             verify(webView).loadUrl(validHttpsUri().toString(), headers)
-            verify(mockHttpsUpgrader).recordUpgrade()
+            verify(mockPrivacyProtectionCountDao).incrementUpgradeCount()
         }
         assertEquals("1", headers["Sec-GPC"])
     }
@@ -589,7 +599,12 @@ class WebViewRequestInterceptorTest {
         whenever(controlledDispatchers.io()).thenReturn(mainDispatcher)
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
-            httpsUpgradeStep = HttpsUpgradeStep(mockHttpsUpgrader, coroutineTestRule.testScope, controlledDispatchers),
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutineTestRule.testScope,
+                controlledDispatchers,
+            ),
             resourceSurrogates = mockResourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
@@ -619,7 +634,7 @@ class WebViewRequestInterceptorTest {
         caller.cancelAndJoin()
         advanceUntilIdle()
         verify(webView, never()).loadUrl(eq(validHttpsUri().toString()), any())
-        verify(mockHttpsUpgrader, never()).recordUpgrade()
+        verify(mockPrivacyProtectionCountDao, never()).incrementUpgradeCount()
     }
 
     @Test
@@ -634,7 +649,7 @@ class WebViewRequestInterceptorTest {
             assertEquals(failure, caught)
         }
         advanceUntilIdle()
-        verify(mockHttpsUpgrader, never()).recordUpgrade()
+        verify(mockPrivacyProtectionCountDao, never()).incrementUpgradeCount()
     }
 
     @Test

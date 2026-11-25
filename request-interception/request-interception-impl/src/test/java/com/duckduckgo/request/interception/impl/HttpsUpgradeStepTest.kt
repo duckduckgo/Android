@@ -19,6 +19,7 @@ package com.duckduckgo.request.interception.impl
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import kotlinx.coroutines.CoroutineScope
@@ -36,6 +37,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -43,17 +45,19 @@ import org.mockito.kotlin.whenever
 @RunWith(AndroidJUnit4::class)
 class HttpsUpgradeStepTest {
     private val upgrader: HttpsUpgrader = mock()
+    private val countDao: PrivacyProtectionCountDao = mock()
     private val request: WebResourceRequest = mock()
     private val dispatchers: DispatcherProvider = mock()
 
     @Test
     fun whenSubframeOrUrlIsNullThenDomainCallsAreSkipped() = runTest {
-        val step = HttpsUpgradeStep(upgrader, this, dispatchers)
+        val step = HttpsUpgradeStep(upgrader, countDao, this, dispatchers)
         whenever(request.isForMainFrame).thenReturn(false, true)
         whenever(request.url).thenReturn(null)
         assertNull(step.upgradeOrNull(request))
         assertNull(step.upgradeOrNull(request))
         verifyNoInteractions(upgrader)
+        verifyNoInteractions(countDao)
     }
 
     @Test
@@ -62,9 +66,9 @@ class HttpsUpgradeStepTest {
         whenever(request.isForMainFrame).thenReturn(true)
         whenever(request.url).thenReturn(uri)
         whenever(upgrader.shouldUpgrade(uri)).thenReturn(false)
-        assertNull(HttpsUpgradeStep(upgrader, this, dispatchers).upgradeOrNull(request))
+        assertNull(HttpsUpgradeStep(upgrader, countDao, this, dispatchers).upgradeOrNull(request))
         verify(upgrader, never()).upgrade(any())
-        verify(upgrader, never()).recordUpgrade()
+        verify(countDao, never()).incrementUpgradeCount()
     }
 
     @Test
@@ -76,10 +80,24 @@ class HttpsUpgradeStepTest {
         whenever(request.method).thenReturn("POST")
         whenever(upgrader.shouldUpgrade(uri)).thenReturn(true)
         whenever(upgrader.upgrade(uri)).thenReturn(upgraded)
-        assertEquals(upgraded, HttpsUpgradeStep(upgrader, this, dispatchers).upgradeOrNull(request))
+        assertEquals(upgraded, HttpsUpgradeStep(upgrader, countDao, this, dispatchers).upgradeOrNull(request))
         verify(upgrader).shouldUpgrade(uri)
         verify(upgrader).upgrade(uri)
-        verify(upgrader, never()).recordUpgrade()
+        verify(countDao, never()).incrementUpgradeCount()
+    }
+
+    @Test
+    fun whenUpgradeIsRecordedThenCountIsIncrementedOnceThroughIoDispatcher() = runTest {
+        val appDispatcher = StandardTestDispatcher(testScheduler)
+        val ioDispatcher = StandardTestDispatcher(testScheduler)
+        val appScope = CoroutineScope(Job() + appDispatcher)
+        whenever(dispatchers.io()).thenReturn(ioDispatcher)
+        HttpsUpgradeStep(upgrader, countDao, appScope, dispatchers).recordUpgrade()
+        verify(countDao, never()).incrementUpgradeCount()
+        testScheduler.advanceUntilIdle()
+        verify(dispatchers).io()
+        verify(countDao, times(1)).incrementUpgradeCount()
+        appScope.cancel()
     }
 
     @Test
@@ -88,15 +106,15 @@ class HttpsUpgradeStepTest {
         val appJob = Job()
         val appScope = CoroutineScope(appJob + dispatcher)
         whenever(dispatchers.io()).thenReturn(dispatcher)
-        val step = HttpsUpgradeStep(upgrader, appScope, dispatchers)
+        val step = HttpsUpgradeStep(upgrader, countDao, appScope, dispatchers)
         val caller = launch(start = CoroutineStart.UNDISPATCHED) {
             step.recordUpgrade()
             awaitCancellation()
         }
-        verify(upgrader, never()).recordUpgrade()
+        verify(countDao, never()).incrementUpgradeCount()
         caller.cancel()
         testScheduler.advanceUntilIdle()
-        verify(upgrader).recordUpgrade()
+        verify(countDao).incrementUpgradeCount()
         appScope.cancel()
     }
 
@@ -106,8 +124,8 @@ class HttpsUpgradeStepTest {
         val appScope = CoroutineScope(Job() + dispatcher)
         whenever(dispatchers.io()).thenReturn(dispatcher)
         appScope.cancel()
-        HttpsUpgradeStep(upgrader, appScope, dispatchers).recordUpgrade()
+        HttpsUpgradeStep(upgrader, countDao, appScope, dispatchers).recordUpgrade()
         testScheduler.advanceUntilIdle()
-        verify(upgrader, never()).recordUpgrade()
+        verify(countDao, never()).incrementUpgradeCount()
     }
 }

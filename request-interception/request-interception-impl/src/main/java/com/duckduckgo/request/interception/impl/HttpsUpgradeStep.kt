@@ -19,6 +19,7 @@ package com.duckduckgo.request.interception.impl
 import android.net.Uri
 import android.webkit.WebResourceRequest
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import kotlinx.coroutines.CoroutineScope
@@ -27,6 +28,7 @@ import javax.inject.Inject
 
 class HttpsUpgradeStep @Inject constructor(
     private val httpsUpgrader: HttpsUpgrader,
+    private val privacyProtectionCountDao: PrivacyProtectionCountDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) {
@@ -41,6 +43,6 @@ class HttpsUpgradeStep @Inject constructor(
     }
 
     fun recordUpgrade() {
-        appCoroutineScope.launch(dispatchers.io()) { httpsUpgrader.recordUpgrade() }
+        appCoroutineScope.launch(dispatchers.io()) { privacyProtectionCountDao.incrementUpgradeCount() }
     }
 }

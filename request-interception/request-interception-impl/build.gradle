@@ -23,6 +23,7 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    implementation project(':app-database')
     implementation project(':browser-api')
     implementation project(':codegen-annotations')
     implementation project(':common-utils')

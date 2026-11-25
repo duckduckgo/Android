@@ -219,7 +219,12 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
 
         testee = WebViewRequestInterceptor(
             trackerDetector = trackerDetector,
-            httpsUpgradeStep = HttpsUpgradeStep(mockHttpsUpgrader, coroutinesTestRule.testScope, coroutinesTestRule.testDispatcherProvider),
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutinesTestRule.testScope,
+                coroutinesTestRule.testDispatcherProvider,
+            ),
             resourceSurrogates = resourceSurrogates,
             privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(

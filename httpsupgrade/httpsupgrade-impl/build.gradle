@@ -24,7 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
     implementation project(':app-build-config-api')
-    implementation project(':app-database')
     implementation project(':codegen-annotations')
     implementation project(':common-utils')
     implementation project(path: ':data-store-api')
@@ -44,7 +43,6 @@ dependencies {
     implementation Square.retrofit2.retrofit
 
     testImplementation project(':common-test')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.work.testing
     testImplementation Testing.junit4
 

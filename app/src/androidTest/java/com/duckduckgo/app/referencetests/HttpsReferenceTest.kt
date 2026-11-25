@@ -135,10 +135,7 @@ class HttpsReferenceTest(private val testCase: TestCase) {
         initialiseBloomFilter()
         initialiseRemoteConfig()
 
-        testee = HttpsUpgraderImpl(
-            bloomFilterFactory, bloomFalsePositiveDao, toggle = mockFeatureToggle, https = https,
-            privacyProtectionCountDao = mock(), dispatchers = mock(),
-        )
+        testee = HttpsUpgraderImpl(bloomFilterFactory, bloomFalsePositiveDao, toggle = mockFeatureToggle, https = https)
         testee.reloadData()
     }
 
