@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.importing
 
 import android.content.Context
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
 import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleScreen
 import com.duckduckgo.di.scopes.AppScope
@@ -31,11 +31,11 @@ import kotlinx.coroutines.flow.transformWhile
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealImportPasswordsFromGoogle @Inject constructor(
+class RealImportPasswords @Inject constructor(
     private val passwordImportAvailability: PasswordImportAvailability,
     private val passwordImportEvents: PasswordImportEvents,
     private val globalActivityStarter: GlobalActivityStarter,
-) : ImportPasswordsFromGoogle {
+) : ImportPasswords {
 
     override suspend fun isSupported(): Boolean = passwordImportAvailability.canImport()
 

@@ -60,7 +60,7 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
+import com.duckduckgo.autofill.api.ImportPasswords
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
@@ -103,7 +103,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
     lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
-    lateinit var importPasswordsFromGoogle: ImportPasswordsFromGoogle
+    lateinit var importPasswords: ImportPasswords
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -344,7 +344,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
 
     private fun launchPasswordImport() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.onPasswordImportLaunched(importPasswordsFromGoogle.launchImport(requireActivity(), Onboarding))
+            viewModel.onPasswordImportLaunched(importPasswords.launchImport(requireActivity(), Onboarding))
         }
     }
 

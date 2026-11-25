@@ -19,7 +19,7 @@ package com.duckduckgo.autofill.impl.importing.gpm
 import android.app.Activity
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
 import com.duckduckgo.autofill.impl.importing.PasswordImportEvents
 import com.duckduckgo.autofill.impl.importing.PasswordImportExperimentMetrics
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportHandler

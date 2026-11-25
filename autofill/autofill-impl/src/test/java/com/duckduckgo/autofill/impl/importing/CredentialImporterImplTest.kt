@@ -2,7 +2,7 @@ package com.duckduckgo.autofill.impl.importing
 
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementEmptyState
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore

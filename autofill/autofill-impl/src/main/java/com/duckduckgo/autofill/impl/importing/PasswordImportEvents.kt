@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl.importing
 
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
