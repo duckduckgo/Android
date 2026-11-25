@@ -46,10 +46,6 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SyncSetupWideEvent {
-    /**
-     * Starts a new attempt in [setupMode]. An attempt that is still open ends as unknown.
-     * Without the unified event, only [SetupMode.SINGLE_DEVICE] attempts are sent.
-     */
     suspend fun onFlowStarted(
         launchSource: String = LAUNCH_SOURCE_OTHER,
         setupMode: SetupMode = SetupMode.SINGLE_DEVICE,
@@ -69,15 +65,7 @@ interface SyncSetupWideEvent {
     suspend fun onRecoveryCodeGenerationFailed()
     suspend fun onFlowCancelled()
     suspend fun onSyncRestoreStarted()
-
-    /**
-     * Records that the attempt reached [step]. Does nothing unless the attempt sends the unified event.
-     */
     suspend fun onStep(step: SetupStep)
-
-    /**
-     * Applies [change] to the attempt's fields. Does nothing unless the attempt sends the unified event.
-     */
     suspend fun onUpdate(change: (SetupFields) -> SetupFields)
 }
 
