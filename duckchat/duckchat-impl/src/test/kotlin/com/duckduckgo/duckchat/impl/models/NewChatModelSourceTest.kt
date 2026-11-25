@@ -158,6 +158,81 @@ class NewChatModelSourceTest {
     }
 
     @Test
+    fun whenServerDefaultSentUnchangedThenDefault() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), server = RemoteNewChatDefault("gpt-5.6-terra", "high"))
+
+        assertEquals("gpt-5.6-terra", global.selectedModelId)
+        assertEquals(EXTENDED_REASONING, global.selectedReasoningMode)
+        assertEquals(ModelSource.DEFAULT, sourceFor(global))
+    }
+
+    @Test
+    fun whenServerDefaultChangedThenPicked() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), server = RemoteNewChatDefault("gpt-5.6-terra", "high"))
+
+        assertEquals(ModelSource.PICKED, sourceFor(global, pickedMode = FAST))
+        assertEquals(ModelSource.PICKED, sourceFor(global, pickedModelId = luna.id))
+    }
+
+    @Test
+    fun whenServerDefaultChangedAndChangedBackThenDefault() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), server = RemoteNewChatDefault("gpt-5.6-terra", "high"))
+
+        assertEquals(ModelSource.DEFAULT, sourceFor(global, pickedModelId = terra.id, pickedMode = EXTENDED_REASONING))
+    }
+
+    @Test
+    fun whenServerModelMissingThenHardcodedDefaultIsFallback() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), server = RemoteNewChatDefault("gone", "none"))
+
+        assertEquals("gpt-6-luna", global.selectedModelId)
+        assertEquals(ModelSource.FALLBACK, sourceFor(global))
+    }
+
+    @Test
+    fun whenServerModelLockedThenHardcodedDefaultIsFallback() {
+        val global = globalSelection(
+            UserTier.FREE,
+            listOf(luna, terra.copy(isAccessible = false)),
+            server = RemoteNewChatDefault("gpt-5.6-terra", "none"),
+        )
+
+        assertEquals("gpt-6-luna", global.selectedModelId)
+        assertEquals(ModelSource.FALLBACK, sourceFor(global))
+    }
+
+    @Test
+    fun whenServerModelAndHardcodedDefaultUnusableThenFirstAccessibleIsFallback() {
+        val global = globalSelection(UserTier.FREE, listOf(imageModel, terra), server = RemoteNewChatDefault("gone", "none"))
+
+        assertEquals("image-model", global.selectedModelId)
+        assertEquals(ModelSource.FALLBACK, sourceFor(global))
+    }
+
+    @Test
+    fun whenServerModeNotOfferedByServerModelThenFallback() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, imageModel), server = RemoteNewChatDefault("image-model", "low"))
+
+        assertEquals("image-model", global.selectedModelId)
+        assertEquals(FAST, global.selectedReasoningMode)
+        assertEquals(ModelSource.FALLBACK, sourceFor(global))
+    }
+
+    @Test
+    fun whenServerDefaultLoadedThenColdStartHardcodedDefaultIsNoLongerDefault() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), server = RemoteNewChatDefault("gpt-5.6-terra", "none"))
+
+        assertEquals(ModelSource.PICKED, sourceFor(global, pickedModelId = luna.id))
+    }
+
+    @Test
+    fun whenNoNewChatDefaultInStateThenJudgedAgainstTheHardcodedDefault() {
+        val global = freeGlobal.copy(newChatDefault = null)
+
+        assertEquals(ModelSource.DEFAULT, sourceFor(global))
+    }
+
+    @Test
     fun whenResetOffThenNull() {
         assertNull(
             modelSourceFor(
@@ -201,15 +276,18 @@ class NewChatModelSourceTest {
     }
 
     /** The global selection the model manager publishes with `resetModelForNewChats` on. */
-    private fun globalSelection(tier: UserTier, models: List<AIChatModel>): ModelState {
-        val selected = models.firstOrNull { it.id == NewChatDefaults.modelId(tier, NewChatDefaults.preferred(tier, null), models) }
+    private fun globalSelection(tier: UserTier, models: List<AIChatModel>, server: RemoteNewChatDefault? = null): ModelState {
+        val default = NewChatDefaults.preferred(tier, server)
+        val selectedId = NewChatDefaults.modelId(tier, default, models)
+        val selected = models.firstOrNull { it.id == selectedId }
         val available = ReasoningResolver.availableModes(selected?.supportedReasoningEfforts.orEmpty())
         return ModelState(
             models = models,
-            selectedModelId = selected?.id,
+            selectedModelId = selectedId,
             userTier = tier,
-            selectedReasoningMode = NewChatDefaults.reasoningMode(null, available),
+            selectedReasoningMode = NewChatDefaults.reasoningMode(default, selectedId, available),
             availableReasoningModes = available,
+            newChatDefault = default,
         )
     }
 

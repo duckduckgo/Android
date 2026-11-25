@@ -58,8 +58,7 @@ internal object NewChatDefaults {
             ?: accessible.firstOrNull()
     }
 
-    /** The tier's default model id, unchecked against the models endpoint. */
-    fun tierDefaultModelId(tier: UserTier): String = when (tier) {
+    private fun tierDefaultModelId(tier: UserTier): String = when (tier) {
         UserTier.FREE -> FREE_DEFAULT_MODEL_ID
         UserTier.PLUS, UserTier.PRO -> PAID_DEFAULT_MODEL_ID
     }
