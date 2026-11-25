@@ -20,7 +20,7 @@ import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 
 interface TranslateAction {
     /**
-     * Translates the current page. Call it only when the language pack for [pair] is installed.
+     * Translates the current page. When the language pack for [pair] is missing, downloads it first.
      */
     fun translate(pair: LanguagePair)
 }

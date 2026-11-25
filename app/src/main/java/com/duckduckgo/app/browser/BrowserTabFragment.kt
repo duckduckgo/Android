@@ -4375,6 +4375,8 @@ class BrowserTabFragment :
                     true,
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
+        webView?.let { pageTranslation.attach(it) }
+
         webView?.let {
             val bindResult = webViewModeInitializer.bind(it, browserMode)
             if (bindResult.isFailure) {
@@ -5474,6 +5476,7 @@ class BrowserTabFragment :
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
+            pageTranslation.detach(it)
             it.removeSystemAutofillCallback()
             it.destroy()
         }

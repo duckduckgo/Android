@@ -22,7 +22,6 @@ import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.offer.ActiveOffer
 import com.duckduckgo.pagetranslation.impl.offer.TranslationOfferSource
-import com.duckduckgo.pagetranslation.impl.translate.LanguagePackDownloadPrompt
 import com.duckduckgo.pagetranslation.impl.translate.TranslateAction
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -52,12 +51,6 @@ class TemporarySessionSeams @Inject constructor() : TranslationOfferSource, Tran
 @ContributesBinding(AppScope::class)
 class TemporaryLanguagePacks @Inject constructor() : LanguagePacks {
     override fun isInstalled(pair: LanguagePair): Boolean = false
-}
 
-/**
- * Temporary binding until the language pack sheet lands. The sheet change deletes this class.
- */
-@ContributesBinding(FragmentScope::class)
-class TemporaryLanguagePackDownloadPrompt @Inject constructor() : LanguagePackDownloadPrompt {
-    override fun requestDownload(pair: LanguagePair) = Unit
+    override fun sizeBytes(pair: LanguagePair): Long? = null
 }

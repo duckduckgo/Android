@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="40dp"
+            android:paddingVertical="@dimen/keyline_5">
+
+            <ImageView
+                android:layout_width="96dp"
+                android:layout_height="96dp"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_translate_feature_96" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/languagePackSheetTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:gravity="center"
+                app:typography="h2" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/languagePackSheetDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_1"
+                android:gravity="center"
+                app:textType="secondary"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/languagePackSheetSize"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_2"
+                android:gravity="center"
+                app:textType="secondary"
+                app:typography="body1" />
+
+            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                android:id="@+id/languagePackSheetButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:text="@string/pageTranslationDownloadSheetButton"
+                app:daxButtonSize="large" />
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/languagePackSheetClose"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="@dimen/keyline_2"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/closeButtonContentDescription"
+            android:scaleType="center"
+            android:src="@drawable/ic_close_24" />
+    </FrameLayout>
+</androidx.core.widget.NestedScrollView>

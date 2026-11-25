@@ -17,7 +17,7 @@
 package com.duckduckgo.pagetranslation.impl.language
 
 /**
- * A translation direction, as language codes. One of the two is always English.
+ * A translation direction, as language codes.
  */
 data class LanguagePair(
     val source: String,
