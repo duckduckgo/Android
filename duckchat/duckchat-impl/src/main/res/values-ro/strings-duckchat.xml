@@ -412,4 +412,13 @@
     <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Analizează fișiere</string>
     <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Întreabă despre fotografii</string>
     <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Creează o imagine</string>
+
+    <!-- Onboarding choices -->
+    <string name="duckChatModelProviderOpenAi" translatable="false">ChatGPT</string>
+    <string name="duckChatModelProviderAnthropic" translatable="false">Claude</string>
+    <string name="duckChatModelGemma" translatable="false">Gemma</string>
+    <string name="duckChatOnboardingNewTabTogglePositionDuckAi" instruction="Onboarding button. Makes new tabs open in Duck.ai chat mode instead of search">Deschide file pentru chat cu IA</string>
+    <string name="duckChatOnboardingNewTabTogglePositionLastUsed" instruction="Onboarding button. Declines opening new tabs in Duck.ai chat mode">Nu acum</string>
+    <string name="duckChatOnboardingDuckAiStateOn" instruction="Onboarding button. Duck.ai is the name of the AI chat feature">Activează Duck.ai</string>
+    <string name="duckChatOnboardingDuckAiStateOff" instruction="Onboarding button. Duck.ai is the name of the AI chat feature">Lasă Duck.ai dezactivat</string>
 </resources>
