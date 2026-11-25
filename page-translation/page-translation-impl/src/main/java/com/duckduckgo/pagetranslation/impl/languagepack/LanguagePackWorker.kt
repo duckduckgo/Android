@@ -68,13 +68,13 @@ internal class LanguagePackWorker(
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        val pair = inputData.getString(PAIR_KEY) ?: return@withContext Result.failure()
+        val pair = inputData.getString(PAIR_KEY) ?: return@withContext failure(Reason.DOWNLOAD_ERROR)
         // a deleted pack can only be restored until the pair's next operation starts
         directories.getOldDirectory(pair).deleteRecursively()
-        if (!feature.translation().isEnabled()) return@withContext Result.failure()
+        if (!feature.translation().isEnabled()) return@withContext failure(Reason.DOWNLOAD_ERROR)
 
         val manifest = store.readManifest()
-        val model = manifest?.models?.get(pair) ?: return@withContext Result.failure()
+        val model = manifest?.models?.get(pair) ?: return@withContext failure(Reason.DOWNLOAD_ERROR)
 
         // WorkManager keeps the progress of a stopped attempt, but the fetcher starts over
         setProgress(workDataOf(DOWNLOADED_BYTES_KEY to 0L, TOTAL_BYTES_KEY to model.totalBytes))
@@ -111,10 +111,13 @@ internal class LanguagePackWorker(
 
         when (result) {
             SUCCESS -> Result.success()
-            NOT_ENOUGH_STORAGE -> Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.NOT_ENOUGH_STORAGE.name))
-            FAILURE -> Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name))
+            NOT_ENOUGH_STORAGE -> failure(Reason.NOT_ENOUGH_STORAGE)
+            FAILURE -> failure(Reason.DOWNLOAD_ERROR)
         }
     }
+
+    // WorkManager fails every operation queued after a failed work, so a failed download still succeeds
+    private fun failure(reason: Reason) = Result.success(workDataOf(FAILURE_REASON_KEY to reason.name))
 
     // only called before Android 12, where expedited work runs as a foreground service
     override suspend fun getForegroundInfo(): ForegroundInfo {

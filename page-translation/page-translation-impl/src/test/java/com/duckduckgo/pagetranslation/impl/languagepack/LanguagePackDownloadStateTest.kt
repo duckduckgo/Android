@@ -53,11 +53,18 @@ class LanguagePackDownloadStateTest {
     }
 
     @Test
-    fun reportFailureReasonFromOutput() {
+    fun reportFailureReasonOfACrashedDownload() {
         val output = workDataOf(FAILURE_REASON_KEY to NOT_ENOUGH_STORAGE.name)
 
         assertEquals(Failed(NOT_ENOUGH_STORAGE), workInfo(State.FAILED, output = output).toLanguagePackDownloadState())
         assertEquals(Failed(DOWNLOAD_ERROR), workInfo(State.FAILED).toLanguagePackDownloadState())
+    }
+
+    @Test
+    fun reportTheFailureReasonOfADownloadThatSucceededSoItsChainKeepsRunning() {
+        val output = workDataOf(FAILURE_REASON_KEY to NOT_ENOUGH_STORAGE.name)
+
+        assertEquals(Failed(NOT_ENOUGH_STORAGE), workInfo(State.SUCCEEDED, output = output).toLanguagePackDownloadState())
     }
 
     @Test

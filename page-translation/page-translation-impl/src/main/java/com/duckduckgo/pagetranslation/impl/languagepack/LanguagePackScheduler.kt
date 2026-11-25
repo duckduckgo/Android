@@ -173,12 +173,12 @@ class RealLanguagePackScheduler @Inject constructor(
 internal fun WorkInfo.toLanguagePackDownloadState(): LanguagePackDownloadState = when (state) {
     ENQUEUED, BLOCKED -> if (runAttemptCount > 0) LanguagePackDownloadState.Interrupted else inProgress()
     RUNNING -> inProgress()
-    SUCCEEDED -> LanguagePackDownloadState.Downloaded
-    FAILED -> LanguagePackDownloadState.Failed(
-        Reason.entries.firstOrNull { it.name == outputData.getString(FAILURE_REASON_KEY) } ?: DOWNLOAD_ERROR,
-    )
+    SUCCEEDED -> getFailureReason()?.let { LanguagePackDownloadState.Failed(it) } ?: LanguagePackDownloadState.Downloaded
+    FAILED -> LanguagePackDownloadState.Failed(getFailureReason() ?: DOWNLOAD_ERROR)
     CANCELLED -> LanguagePackDownloadState.Idle
 }
+
+private fun WorkInfo.getFailureReason() = Reason.entries.firstOrNull { it.name == outputData.getString(FAILURE_REASON_KEY) }
 
 private fun WorkInfo.inProgress() = LanguagePackDownloadState.InProgress(
     downloadedBytes = progress.getLong(DOWNLOADED_BYTES_KEY, 0),

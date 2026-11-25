@@ -70,7 +70,7 @@ class LanguagePackWorkerTest {
     fun failWithoutDownloadingWhenTranslationIsOff() = runTest {
         setTranslationEnabled(false)
 
-        assertEquals(Result.failure(), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
 
         verifyNoInteractions(fetcher)
     }
@@ -97,7 +97,7 @@ class LanguagePackWorkerTest {
         runCurrent()
         setTranslationEnabled(false)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), work.await())
+        assertEquals(DOWNLOAD_ERROR_RESULT, work.await())
     }
 
     @Test
@@ -105,7 +105,7 @@ class LanguagePackWorkerTest {
         setTranslationEnabled(true)
         whenever(store.readManifest()).thenReturn(MANIFEST.copy(models = emptyMap()))
 
-        assertEquals(Result.failure(), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
 
         verifyNoInteractions(fetcher)
     }
@@ -130,7 +130,7 @@ class LanguagePackWorkerTest {
         whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.SUCCESS)
         whenever(installer.install(any(), any(), any(), any())).thenReturn(false)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
     }
 
     @Test
@@ -150,7 +150,7 @@ class LanguagePackWorkerTest {
         whenever(store.readManifest()).thenReturn(MANIFEST)
         whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.NOT_ENOUGH_STORAGE)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.NOT_ENOUGH_STORAGE.name)), createWorker().doWork())
+        assertEquals(Result.success(workDataOf(FAILURE_REASON_KEY to Reason.NOT_ENOUGH_STORAGE.name)), createWorker().doWork())
     }
 
     @Test
@@ -159,7 +159,7 @@ class LanguagePackWorkerTest {
         whenever(store.readManifest()).thenReturn(MANIFEST)
         whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.FAILURE)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
     }
 
     private fun setTranslationEnabled(isEnabled: Boolean) {
@@ -199,6 +199,8 @@ class LanguagePackWorkerTest {
             totalBytes = 11,
             files = mapOf("model" to ModelFile("model.zst", bytes = 11, sha256 = "a", decompressedSize = 20, decompressedHash = "b")),
         )
+
+        val DOWNLOAD_ERROR_RESULT = Result.success(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name))
 
         val MANIFEST = ModelsManifest(schemaVersion = 1, baseUrl = BASE_URL, models = mapOf(PAIR to MODEL))
     }
