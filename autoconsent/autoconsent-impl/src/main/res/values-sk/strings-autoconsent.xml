@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Dovoľ nám vyriešiť ich za teba. Súbory cookie odmietneme, keď to bude možné, a prijmeme tie, ktoré nemožno odmietnuť.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Odmietni, ak je to možné, alebo prijmi za mňa</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Budem ich riešiť sám/sama</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Odmietnuť voliteľné súbory cookie</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maximalizuje súkromie a zatvára vyskakovacie okná so súbormi cookie</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Prijať niektoré súbory cookie</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Skryje viac vyskakovacích okien prijatím súborov cookie, ktoré nemožno odmietnuť</string>
 </resources>
