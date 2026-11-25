@@ -30,6 +30,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarkAddedMultiDevicePromotionBinding
@@ -44,9 +45,7 @@ import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAdde
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchGetDesktopApp
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SyncBookmarkAddedMultiDevicePromotionInteractor.Command.LaunchSyncWithDesktopChoice
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
-import com.duckduckgo.sync.impl.ui.dashboard.SyncFlowStart
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlowInternal
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -134,9 +133,9 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
     private fun launchSyncWithDesktopChoice() {
         globalActivityStarter.start(
             context,
-            SyncActivityStartSyncFlow(
-                source = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice,
-                start = SyncFlowStart.AskSyncWithDesktop,
+            SyncActivityStartSyncFlowInternal(
+                source = "promotion_bookmark_multi_device_added_dialog",
+                offerDesktopApp = true,
             ),
         )
     }
@@ -144,7 +143,9 @@ class SyncBookmarkAddedMultiDevicePromotionView @JvmOverloads constructor(
     private fun launchSyncSettings() {
         globalActivityStarter.start(
             context,
-            SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice),
+            SyncActivityStartSyncFlow(
+                source = "promotion_bookmark_multi_device_added_dialog",
+            ),
         )
     }
 

@@ -28,7 +28,6 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import com.squareup.moshi.Types
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
@@ -48,8 +47,8 @@ class BlockListInterceptorApiPlugin @Inject constructor(
     private val pixel: Pixel,
 ) : Interceptor, ApiInterceptorPlugin {
 
-    private val jsonAdapter: JsonAdapter<Map<String, String>> by lazy {
-        moshi.adapter(Types.newParameterizedType(Map::class.java, String::class.java, String::class.java))
+    private val jsonAdapter: JsonAdapter<TdsExperimentSettings> by lazy {
+        moshi.adapter(TdsExperimentSettings::class.java)
     }
     override fun intercept(chain: Chain): Response {
         val originalRequest = chain.request()
@@ -73,13 +72,13 @@ class BlockListInterceptorApiPlugin @Inject constructor(
         val config = activeExperiment.getSettings()?.let {
             runCatching {
                 jsonAdapter.fromJson(it)
-            }.getOrDefault(emptyMap())
-        } ?: emptyMap()
+            }.getOrNull()
+        }
 
         val path = when {
-            runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config["treatmentUrl"]
-            runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config["controlUrl"]
-            else -> config["nextUrl"]
+            runBlocking { activeExperiment.isEnrolledAndEnabled(TREATMENT) } -> config?.treatmentUrl
+            runBlocking { activeExperiment.isEnrolledAndEnabled(CONTROL) } -> config?.controlUrl
+            else -> config?.nextUrl
         } ?: return chain.proceed(originalRequest)
 
         return chain.proceed(originalRequest.newBuilder().url("$TDS_BASE_URL$path").build()).also { response ->
@@ -92,4 +91,10 @@ class BlockListInterceptorApiPlugin @Inject constructor(
     override fun getInterceptor(): Interceptor {
         return this
     }
+
+    private data class TdsExperimentSettings(
+        val treatmentUrl: String?,
+        val controlUrl: String?,
+        val nextUrl: String?,
+    )
 }

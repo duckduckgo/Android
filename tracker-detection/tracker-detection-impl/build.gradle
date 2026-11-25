@@ -24,25 +24,26 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-    implementation project(':di')
-    ksp AndroidX.room.compiler
-
+    api(project(':browser-api')) {
+        because "TdsTracker's primary key is a Domain"
+    }
     api project(':tracker-detection-api')
-    // TdsTracker's primary key is a Domain
-    api project(':browser-api')
-    implementation project(':data-store-api')
 
+    implementation project(':codegen-annotations')
+    implementation project(':data-store-api')
+    implementation project(':di')
     implementation AndroidX.room.runtime
     implementation Square.moshi
 
+    testImplementation project(':common-test')
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.room.testing
-    testImplementation AndroidX.archCore.testing
-    testImplementation project(':common-test')
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 android {

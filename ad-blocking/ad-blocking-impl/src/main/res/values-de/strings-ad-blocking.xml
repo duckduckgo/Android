@@ -18,19 +18,15 @@
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
     <string name="segment_skip_settings_title">Gesponserte Inhalte überspringen</string>
-    <string name="segment_skip_settings_description" instruction="Description of the Skip Sponsored Content setting. Learn more opens an explanation of ad blocking.">Überspringt gesponserte Segmente wie bezahlte Werbeaktionen. Segmente werden von der SponsorBlock-Community gemeldet, daher sind nicht alle Videos abgedeckt. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="segment_skip_mode_always_ask">Zum Überspringen auffordern</string>
     <string name="segment_skip_mode_always_skip">Immer</string>
     <string name="segment_skip_mode_off">Nie</string>
     <string name="ad_blocking_settings_title">YouTube-Werbung blockieren</string>
     <string name="ad_blocking_settings_toggle_title">Werbung auf YouTube blockieren</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blockiert Video-Werbung auf YouTube, sodass du Videos ohne Unterbrechungen ansehen kannst. \n\nWenn diese Funktion aktiviert ist, erkennt DuckDuckGo anonym, ob Werbeblocker stören oder YouTube-Fehler auftreten, um das Erlebnis für alle zu verbessern. DuckDuckGo sieht niemals, welche Videos du dir ansiehst, und erhält auch keine personenbezogenen Daten. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blockiert Video-Werbung auf YouTube, sodass du Videos ohne Unterbrechungen ansehen kannst. <annotation type="learn_more_link">Mehr erfahren</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Öffnet Videos in einem ablenkungsfreien Kino-Modus, der verhindert, dass das, was du ansiehst, deinen YouTube-Feed beeinflusst.</string>
     <string name="ad_blocking_settings_duck_player_link">Suchst du nach Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Werbeblockierung</string>
-    <string name="ad_blocking_settings_header_description">Blockiert invasive Tracker, bevor sie geladen werden, und eliminiert so effektiv Werbung, die auf Tracking basiert.</string>
     <string name="contingencyMessageTitle">YouTube-Werbeblocker nicht verfügbar</string>
     <string name="contingencyMessageContent">Die Werbeblockierung wurde durch die jüngsten Änderungen bei YouTube beeinträchtigt. Vielen Dank für dein Verständnis, während wir daran arbeiten, diese Probleme zu beheben.</string>
     <string name="contingencyMessagePrimaryButton">Verstanden</string>

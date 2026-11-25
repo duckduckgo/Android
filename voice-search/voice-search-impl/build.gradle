@@ -30,45 +30,43 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':browser-ui')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
     implementation project(path: ':di')
     implementation project(path: ':duckchat-api')
     implementation project(path: ':feature-toggles-api')
     implementation project(path: ':privacy-config-api')
+    implementation project(path: ':remote-messaging-api')
     implementation project(path: ':statistics-api')
     implementation project(path: ':voice-search-api')
     implementation project(path: ':voice-search-store')
-    implementation project(path: ':remote-messaging-api')
-    implementation project(path: ':browser-ui')
-
-    implementation project(path: ':codegen-annotations')
-
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation AndroidX.appCompat
-    implementation AndroidX.room.runtime
-    implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.room.runtime
+    implementation Google.android.material
     implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation "com.squareup.moshi:moshi-adapters:_"
-
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-    testImplementation CashApp.turbine
-    testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation CashApp.turbine
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
 }
 
 android {

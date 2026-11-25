@@ -27,11 +27,33 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
+    implementation project(':browser-api')
     implementation project(':codegen-annotations')
+    implementation project(':common-utils')
     implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':page-translation-api')
-
+    implementation "com.duckduckgo.translatekit:translate-kit-android:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation AndroidX.dataStore.preferences
+    implementation AndroidX.work.runtimeKtx
     implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
+
+    testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.work.testing
+    testImplementation(KotlinX.coroutines.test) {
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        // conflicts with mockito due to direct inclusion of byte buddy
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation Square.okHttp3.mockWebServer
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }

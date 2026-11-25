@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 DuckDuckGo
+ * Copyright (c) 2026 DuckDuckGo
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,17 @@ import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-class RealSyncUrlIdentifier @Inject constructor() : SyncUrlIdentifier {
+class RealSyncUrlIdentifier @Inject constructor(
+    private val syncPairingUrlFeature: SyncPairingUrlFeature,
+) : SyncUrlIdentifier {
 
     override fun shouldDelegateToSyncSetup(intentText: String?): Boolean {
         if (intentText == null) return false
         return intentText.isValidSyncUrl()
+    }
+
+    override fun shouldOpenSyncPairing(url: String): Boolean {
+        return syncPairingUrlFeature.isEnabled && SyncPairingUrl.fromUrl(url) != null
     }
 
     private fun String.isValidSyncUrl(): Boolean {

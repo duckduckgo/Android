@@ -21,8 +21,8 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':data-store-api')
     implementation project(':common-test')
+    implementation project(':data-store-api')
     implementation KotlinX.coroutines.core
 }
 android {

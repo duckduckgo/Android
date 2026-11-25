@@ -134,6 +134,12 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
                 "Genuine mode-transition observers may @Suppress(\"DenyListedApi\") with a justification comment.",
             allowInTests = true,
         ),
+        DenyListedEntry(
+            className = "com.duckduckgo.translatekit.TranslateKit",
+            functionName = MATCH_ALL,
+            errorMessage = "Go through TranslateKitLoader. translate-kit has no native library on 32-bit devices, " +
+                "so every call must be gated on TranslateKitLoader.isAvailable().",
+        ),
     )
 
     override fun getApplicableUastTypes() = config.applicableTypes()

@@ -387,7 +387,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.sync.api.SyncActivityStartSetupFlow
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -1903,7 +1903,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(vpnMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_VPN)
-                viewModel.onVpnMenuClicked()
+                viewModel.onVpnMenuClicked(omnibar.viewMode)
             }
             onMenuItemClicked(newDuckChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
@@ -2924,7 +2924,14 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchSyncSetup -> {
-                globalActivityStarter.start(requireContext(), SyncActivityStartSetupFlow(source = null))
+                globalActivityStarter.start(requireContext(), SyncActivityStartSyncFlow(source = null))
+            }
+
+            is Command.LaunchSyncPairing -> {
+                globalActivityStarter.start(
+                    requireContext(),
+                    SyncActivityStartSyncFlow(source = it.launchSource, joinExistingAccount = true),
+                )
             }
 
             is Command.DialNumber -> {

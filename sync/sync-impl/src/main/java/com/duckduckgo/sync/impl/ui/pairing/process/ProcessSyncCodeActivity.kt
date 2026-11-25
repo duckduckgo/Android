@@ -40,7 +40,6 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityProcessSyncCodeBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command
@@ -79,7 +78,7 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
         }
 
     private val launchSource
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
             "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
         }
 
@@ -306,7 +305,7 @@ class ProcessSyncCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             codeSource: SyncCodeSource,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ): Intent {
             return Intent(context, ProcessSyncCodeActivity::class.java).apply {
                 putExtra(SYNC_CODE_SOURCE_EXTRA_KEY, codeSource)

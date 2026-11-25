@@ -23,38 +23,37 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
     implementation project(':app-build-config-api')
-    implementation project(':library-loader-api')
-    implementation project(':privacy-config-api')
-    implementation project(':feature-toggles-api')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
+    implementation project(path: ':data-store-api')
     implementation project(':di')
-    implementation project(':statistics-api')
+    implementation project(':feature-toggles-api')
     implementation project(':httpsupgrade-api')
     implementation project(':httpsupgrade-store')
-    implementation project(path: ':data-store-api')
-
-    implementation AndroidX.room.runtime
+    implementation project(':library-loader-api')
+    implementation project(':privacy-config-api')
+    implementation project(':statistics-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation AndroidX.room.runtime
+    implementation AndroidX.work.runtimeKtx
     implementation KotlinX.coroutines.core
-    implementation Square.retrofit2.retrofit
     implementation Square.retrofit2.converter.moshi
+    implementation Square.retrofit2.retrofit
 
-   // Testing dependencies
     testImplementation project(':common-test')
+    testImplementation AndroidX.work.testing
     testImplementation Testing.junit4
-    androidTestUtil AndroidX.test.orchestrator
-    androidTestImplementation AndroidX.test.runner
+
     androidTestImplementation "org.mockito:mockito-android:_"
     androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
 
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
+    androidTestUtil AndroidX.test.orchestrator
+
+    ksp project(':codegen-ksp')
 }
 
 android {

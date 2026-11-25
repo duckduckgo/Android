@@ -20,7 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -33,7 +32,6 @@ import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.auth.AuthPromptRenderer
 import com.duckduckgo.sync.impl.databinding.ActivityRecoverSyncedDataBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeContract
 import com.duckduckgo.sync.impl.ui.pairing.recover.RecoverSyncedDataViewModel.Command
@@ -57,7 +55,7 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
     lateinit var vmFactory: RecoverSyncedDataViewModel.Factory
 
     private val launchSource
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
             "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
         }
 
@@ -141,7 +139,7 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
             isAuthRequired: Boolean,
         ): Intent {
             return Intent(context, RecoverSyncedDataActivity::class.java).apply {

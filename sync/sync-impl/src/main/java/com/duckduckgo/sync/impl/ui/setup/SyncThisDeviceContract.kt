@@ -21,7 +21,6 @@ import android.content.Intent
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.core.content.IntentCompat
 import com.duckduckgo.sync.impl.ConnectedDevice
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceContract.Input
@@ -62,7 +61,7 @@ class SyncThisDeviceContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val launchSource: SyncLaunchSource,
+        val launchSource: String,
         val isAuthRequired: Boolean,
     )
 

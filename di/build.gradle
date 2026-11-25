@@ -26,7 +26,8 @@ android {
 }
 
 dependencies {
-    implementation AndroidX.fragment.ktx
-    implementation AndroidX.appCompat
     api "dev.zacsweers.metro:runtime:_"
+
+    implementation AndroidX.appCompat
+    implementation AndroidX.fragment.ktx
 }

@@ -7,16 +7,15 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':content-scope-privacy-features-api')
-    ksp project(':content-scope-privacy-features-ksp')
-
-    implementation project(':di')
     implementation project(':common-utils')
-    implementation project(':privacy-config-api')
+    implementation project(':content-scope-privacy-features-api')
     implementation project(':content-scope-scripts-api')
     implementation project(':data-store-api')
-
+    implementation project(':di')
+    implementation project(':privacy-config-api')
     implementation KotlinX.coroutines.core
+
+    ksp project(':content-scope-privacy-features-ksp')
 }
 
 android {

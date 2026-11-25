@@ -109,10 +109,10 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.withIndex
 import kotlinx.coroutines.launch
 import logcat.logcat
 import org.json.JSONArray
@@ -786,9 +786,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
         chatStateJob?.cancel()
         chatStateJob = viewModel.chatState
-            .drop(1)
-            .onEach { state ->
+            .withIndex()
+            .onEach { (index, state) ->
                 setChatStreaming(state == ChatState.STREAMING || state == ChatState.LOADING)
+                // The state current at (re)subscription can have changed while the widget was off screen, so it
+                // still resyncs streaming. Only later changes hide or show the input.
+                if (index == 0) return@onEach
                 when (state) {
                     ChatState.HIDE -> {
                         isFocussed = hasInputFocus()

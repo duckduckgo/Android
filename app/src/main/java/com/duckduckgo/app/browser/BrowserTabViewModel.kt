@@ -123,6 +123,7 @@ import com.duckduckgo.app.browser.commands.Command.LaunchFireDialogFromOnboardin
 import com.duckduckgo.app.browser.commands.Command.LaunchNewTab
 import com.duckduckgo.app.browser.commands.Command.LaunchPopupMenu
 import com.duckduckgo.app.browser.commands.Command.LaunchSubscription
+import com.duckduckgo.app.browser.commands.Command.LaunchSyncPairing
 import com.duckduckgo.app.browser.commands.Command.LaunchSyncSetup
 import com.duckduckgo.app.browser.commands.Command.LaunchTabSwitcher
 import com.duckduckgo.app.browser.commands.Command.LaunchVpnManagement
@@ -453,6 +454,7 @@ import com.duckduckgo.subscriptions.api.SUBSCRIPTIONS_FEATURE_NAME
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -570,6 +572,7 @@ class BrowserTabViewModel @Inject constructor(
     private val duckPlayer: DuckPlayer,
     private val duckChat: DuckChat,
     private val duckAiHostProvider: DuckAiHostProvider,
+    private val syncUrlIdentifier: SyncUrlIdentifier,
     private val duckAiFeatureState: DuckAiFeatureState,
     private val duckChatInputModeState: DuckChatInputModeState,
     private val duckPlayerJSHelper: DuckPlayerJSHelper,
@@ -1625,8 +1628,14 @@ class BrowserTabViewModel @Inject constructor(
         val verticalParameter = extractVerticalParameter(url)
         var urlToNavigate = queryUrlConverter.convertQueryToUrl(trimmedInput, verticalParameter, queryOrigin)
 
-        val isDuckAiDirectNavigation =
-            submissionSource == QuerySubmissionSource.USER && queryOrigin is QueryOrigin.FromUser && isTypedDuckAiUrl(urlToNavigate)
+        val isTyped = submissionSource == QuerySubmissionSource.USER && queryOrigin is QueryOrigin.FromUser
+        // We check before determineType(), which would otherwise route a typed duck.ai/pair into Duck.ai.
+        if (isTyped && syncUrlIdentifier.shouldOpenSyncPairing(urlToNavigate)) {
+            command.value = LaunchSyncPairing(syncPairingLaunchSource(urlToNavigate))
+            return
+        }
+
+        val isDuckAiDirectNavigation = isTyped && isTypedDuckAiUrl(urlToNavigate)
         if (isDuckAiDirectNavigation) {
             fireDuckAiDirectNavigationPixel()
         }
@@ -1759,6 +1768,14 @@ class BrowserTabViewModel @Inject constructor(
         return host == duckAiHost || host == "www.$duckAiHost"
     }
 
+    private fun syncPairingLaunchSource(pairingUrl: String): String? {
+        return when (pairingUrl.toUri().host?.lowercase()?.removePrefix("www.")) {
+            "duck.com" -> "typed_url_duck_com"
+            "duck.ai" -> "typed_url_duck_ai"
+            else -> null
+        }
+    }
+
     private fun hasAutoSubmittedPrompt(url: String): Boolean = runCatching {
         val uri = url.toUri()
         uri.getQueryParameter("prompt") == "1" && !uri.getQueryParameter(QUERY).isNullOrBlank()
@@ -1774,7 +1791,7 @@ class BrowserTabViewModel @Inject constructor(
         pixel.fire(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_DAILY, parameters = params, type = Daily())
     }
 
-    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it) } ?: emptyMap()
+    private fun getUrlHeaders(url: String?): Map<String, String> = url?.let { customHeadersProvider.getCustomHeaders(it, browserMode) } ?: emptyMap()
 
     private fun extractVerticalParameter(currentUrl: String?): String? {
         val url = currentUrl ?: return null
@@ -6322,11 +6339,13 @@ class BrowserTabViewModel @Inject constructor(
         submitQuery(duckChat.getDuckChatUrl(query ?: "", false), QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
     }
 
-    fun onVpnMenuClicked() {
+    fun onVpnMenuClicked(omnibarViewMode: ViewMode) {
         val state = currentBrowserViewState().vpnMenuState
         when (state) {
-            VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill ->
-                command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+            VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill -> {
+                val origin = if (omnibarViewMode is ViewMode.DuckAI) "funnel_appmenu_android__chat" else "funnel_appmenu_android"
+                command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+            }
             is VpnMenuState.Subscribed -> command.value = LaunchVpnManagement
             VpnMenuState.Hidden -> {} // Menu item not visible
         }

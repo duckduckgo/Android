@@ -38,15 +38,16 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':common-utils')
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.core.ktx
     implementation AndroidX.room.runtime
-    ksp AndroidX.room.compiler
-    implementation "com.squareup.logcat:logcat:_"
-    implementation project(path: ':common-utils')
 
     testImplementation project(path: ':common-test')
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.room.testing
+
+    ksp AndroidX.room.compiler
 }

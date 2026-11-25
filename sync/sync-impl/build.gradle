@@ -32,95 +32,81 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(path: ':di')
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':attributed-metrics-api')
+    implementation project(path: ':autofill-api')
     implementation project(':browser-api')
+    implementation project(':browser-mode-api')
     implementation project(':browser-ui')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
+    implementation project(':content-scope-scripts-api')
     implementation project(':data-store-api')
     implementation project(path: ':design-system')
-    implementation project(path: ':sync-api')
+    implementation project(':desktop-app-promotion-api')
     implementation project(':device-migration-api')
-    implementation project(path: ':sync-store')
-    implementation project(path: ':sync-lib')
-    implementation project(path: ':saved-sites-api')
+    implementation project(path: ':di')
+    implementation project(':duckchat-api')
     implementation project(':feature-toggles-api')
+    implementation project(':js-messaging-api')
     implementation project(':navigation-api')
     implementation project(':next-steps-api')
-    implementation project(':desktop-app-promotion-api')
-    implementation project(':remote-messaging-api')
-    implementation project(path: ':autofill-api')
-    implementation project(path: ':settings-api') // temporary until we release new settings
-    implementation project(path: ':attributed-metrics-api')
-
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(':statistics-api')
-    implementation project(':content-scope-scripts-api')
-    implementation project(':js-messaging-api')
-    implementation project(':duckchat-api')
     implementation project(':persistent-storage-api')
-    implementation project(':browser-mode-api')
-
-    implementation project(path: ':codegen-annotations')
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation "com.squareup.logcat:logcat:_"
-
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.fragment.ktx
-    implementation AndroidX.biometric
-
-    implementation Square.retrofit2.converter.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
-    implementation AndroidX.core.ktx
-    implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
-    implementation 'com.google.zxing:core:_'
+    implementation project(path: ':privacy-config-api')
+    implementation project(':remote-messaging-api')
+    implementation project(path: ':saved-sites-api')
+    implementation(project(path: ':settings-api')) {
+        because 'temporary until we release new settings'
+    }
+    implementation project(':statistics-api')
+    implementation project(path: ':sync-api')
+    implementation project(path: ':sync-lib')
+    implementation project(path: ':sync-store')
     implementation "androidx.datastore:datastore-preferences:_"
-
-    // JWE crypto (for scoped access credentials)
+    implementation "com.airbnb.android:lottie:_"
+    implementation "com.facebook.shimmer:shimmer:_"
+    implementation 'com.google.zxing:core:_'
+    implementation('com.journeyapps:zxing-android-embedded:_') { transitive = false }
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation "io.jsonwebtoken:jjwt-api:_"
+    implementation AndroidX.appCompat
+    implementation AndroidX.biometric
+    implementation AndroidX.core.ktx
+    implementation AndroidX.fragment.ktx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
+    implementation KotlinX.coroutines.core
+    implementation Square.retrofit2.converter.moshi
+
     runtimeOnly "io.jsonwebtoken:jjwt-impl:_"
     runtimeOnly("io.jsonwebtoken:jjwt-orgjson:_") {
         exclude(group: 'org.json', module: 'json') // provided by Android natively
     }
 
-    // Shimmer
-    implementation "com.facebook.shimmer:shimmer:_"
-
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
-
-    // Room
-    implementation AndroidX.room.runtime
-
-    // Lottie
-    implementation "com.airbnb.android:lottie:_"
-
-    // Testing dependencies
+    testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
+    testImplementation "androidx.test:runner:_"
+    testImplementation "com.google.testparameterinjector:test-parameter-injector:_"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
+    testImplementation 'org.json:json:_'
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
+    testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.test.rules
-    testImplementation "androidx.test:runner:_"
-    testImplementation Testing.robolectric
+    testImplementation AndroidX.work.testing
     testImplementation CashApp.turbine
-    testImplementation AndroidX.archCore.testing
-    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
-    testImplementation 'org.json:json:_'
-    testImplementation "com.google.testparameterinjector:test-parameter-injector:_"
-
-    testImplementation project(path: ':common-test')
-    testImplementation project(path: ':feature-toggles-test')
-
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }
 
 android {

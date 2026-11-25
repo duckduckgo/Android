@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Settings -->
+    <string name="pageTranslationSettingsTitle" instruction="Title of the settings screen and its entry in the main Settings list, for the feature that translates web pages">Preklady</string>
+    <string name="pageTranslationSettingsDescription">DuckDuckGo súkromne prekladá stránky priamo v tvojom zariadení do niekoľkých jazykov.</string>
+    <string name="pageTranslationSettingsAskToTranslateToggle" instruction="Toggle: when on, the browser offers to translate pages written in a foreign language">Pýtať sa na preklad stránok</string>
+    <string name="pageTranslationSettingsLanguagePacksHeader" instruction="Section header for the list of downloaded language packs (offline translation models)">Jazykové balíky</string>
+    <string name="pageTranslationSettingsLanguagePacksEmpty">Zatiaľ neboli stiahnuté žiadne jazykové balíky</string>
+    <string name="pageTranslationDeleteLanguagePackDialogTitle" instruction="Confirmation dialog title. Placeholder is a language name, e.g. Spanish">Odstrániť jazykový balík %1$s?</string>
+
+    <!-- Translate prompt -->
+    <string name="pageTranslationPromptTitle">Preložiť túto stránku?</string>
+    <string name="pageTranslationPromptLanguages" instruction="Subtitle of the translate prompt. First placeholder is the page language, second is the target language, e.g. Spanish to English">Z jazyka %1$s do jazyka %2$s</string>
+    <string name="pageTranslationPromptTranslateButton" instruction="Button that translates the current web page">Preložiť</string>
+
+    <!-- Language pack download sheet -->
+    <string name="pageTranslationDownloadSheetTitle" instruction="Placeholder is a language name, e.g. Spanish">Stiahnuť jazykový balík pre jazyk %1$s?</string>
+    <string name="pageTranslationDownloadSheetDescription" instruction="Placeholder is a language name, e.g. Spanish">Toto jednorazové stiahnutie ti umožní súkromne prekladať stránky v jazyku %1$s priamo v tvojom zariadení.</string>
+    <string name="pageTranslationDownloadSheetSize" instruction="Placeholder is a file size with its unit, e.g. 23 MB">Veľkosť sťahovania: %1$s</string>
+    <string name="pageTranslationDownloadSheetButton" instruction="Button that downloads the language pack and then translates the current page">Stiahnuť a preložiť</string>
+
+    <!-- Browser menu -->
+    <string name="pageTranslationMenuTranslatePage" instruction="Browser menu item. Placeholder is the target language name, e.g. English">Preložiť stránku do jazyka %1$s</string>
+    <string name="pageTranslationMenuShowOriginalPage" instruction="Browser menu item shown on a translated page; reverts it to its original language">Zobraziť pôvodnú stránku</string>
+
+    <!-- Snackbars -->
+    <string name="pageTranslationLanguagePackDeleted">Jazykový balík bol odstránený</string>
+    <string name="pageTranslationLanguagePackDownloadFailed">Jazykový balík sa nepodarilo stiahnuť</string>
+    <string name="pageTranslationLanguagePackDownloadRetry" instruction="Snackbar action that retries a failed language pack download">Opakovanie</string>
+    <string name="pageTranslationLanguagePackNotEnoughStorage">Nedostatok úložného priestoru. Uvoľni miesto a skús to znova.</string>
+    <string name="pageTranslationLanguagePackOffline">Pripoj sa na internet a stiahni jazykový balík</string>
+</resources>

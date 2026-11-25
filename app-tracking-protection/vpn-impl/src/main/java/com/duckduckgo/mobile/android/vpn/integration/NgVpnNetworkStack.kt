@@ -96,32 +96,6 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
-        fun getDns(): Set<InetAddress> {
-            val privateDns = dnsProvider.getPrivateDns()
-            if (privateDns.isNotEmpty()) {
-                // when private DNS is defined we don't want to define any DNS
-                return emptySet()
-            }
-
-            val targetModels = listOf(
-                "moto g play",
-                "moto g stylus 5G",
-                "moto g(60)",
-                "moto g(7) power",
-                "FIG-LX1",
-                "moto g 5G",
-                "moto g pure",
-                "moto g power",
-            )
-            val model = appBuildConfig.model
-            if (targetModels.any { model.lowercase().contains(it.lowercase()) }) {
-                // else return default system dns
-                return dnsProvider.getSystemDns().toSet()
-            }
-
-            return emptySet()
-        }
-
         return Result.success(
             VpnTunnelConfig(
                 mtu = vpnNetwork.value.mtu(),
@@ -129,7 +103,7 @@ class NgVpnNetworkStack @Inject constructor(
                     InetAddress.getByName("10.0.0.2") to 32,
                     InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
                 ),
-                dns = getDns(),
+                dns = emptySet(),
                 searchDomains = dnsProvider.getSearchDomains(),
                 customDns = emptySet(),
                 routes = emptyMap(),

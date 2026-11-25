@@ -28,10 +28,10 @@ import retrofit2.http.Streaming
 import retrofit2.http.Query as HttpQuery
 
 interface SegmentSkipDatasetService {
-    @GET("https://protection.duckduckgo.com/api/protection/segments/v1/android" + "/revision")
+    @GET("https://protection.duckduckgo.com/api/protection/segmentSkip/v1/android" + "/revision")
     suspend fun revision(): SegmentSkipRevisionResponse
 
-    @GET("https://protection.duckduckgo.com/api/protection/segments/v1/android" + "/hashPrefix")
+    @GET("https://protection.duckduckgo.com/api/protection/segmentSkip/v1/android" + "/hashPrefix?format=binary&version=1")
     @Streaming
     fun binaryHashPrefixes(@HttpQuery("revision") revision: Long): Call<ResponseBody>
 }

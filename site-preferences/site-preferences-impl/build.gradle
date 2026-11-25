@@ -36,34 +36,31 @@ android {
 }
 
 dependencies {
-    ksp project(':codegen-ksp')
-    implementation project(path: ':codegen-annotations')
-    implementation project(path: ':site-preferences-api')
-    implementation project(path: ':di')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
-
-    implementation AndroidX.core.ktx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.commonJava8
-
-    // Room
-    implementation AndroidX.room.runtime
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-
-    implementation KotlinX.coroutines.core
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':di')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':site-preferences-api')
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.room.runtime
+    implementation KotlinX.coroutines.core
 
+    testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
     testImplementation Testing.robolectric
-    testImplementation project(path: ':common-test')
-    testImplementation project(path: ':feature-toggles-test')
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }

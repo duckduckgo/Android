@@ -29,9 +29,8 @@ import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItem
 import com.duckduckgo.duckchat.api.inputscreen.NativeInputChatTabItemPlugin
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.databinding.DialogChatSyncPromoBinding
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.CoroutineScope
@@ -110,7 +109,10 @@ private class ChatTabPluginAdapterListener(
             val dialog = ChatSyncPromoBottomSheetDialog(
                 context = context,
                 onScanQrCodeClicked = {
-                    activityStarter.start(context, SyncActivityWithAnotherDevice(source = SyncLaunchSource.PromotionAiChat.value))
+                    activityStarter.start(
+                        context,
+                        SyncActivityStartSyncFlow(source = "promotion_ai_chat", joinExistingAccount = true),
+                    )
                 },
             )
             dialog.setOnDismissListener { isDialogShowing = false }

@@ -116,6 +116,7 @@ object SubscriptionsConstants {
         "funnel_addressbar_android__modelpicker",
         "funnel_addressbar_android__reasoningdropdown",
         "funnel_appmenu_android",
+        "funnel_appmenu_android__chat",
         "funnel_appsettings_android",
         "funnel_duckai_android__freelabel",
         "funnel_duckai_android__modelpicker",

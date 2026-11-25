@@ -38,14 +38,13 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin.Callback
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ViewSyncPromoBinding
 import com.duckduckgo.sync.impl.promotion.SyncPromotions
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.LaunchSyncSettings
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksPromotionViewModel.Command.ReevalutePromo
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -123,7 +122,10 @@ class SyncBookmarksPromotionView @JvmOverloads constructor(
 
     private fun launchSyncSettings() {
         context?.let {
-            val intent = globalActivityStarter.startIntent(it, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarks))
+            val intent = globalActivityStarter.startIntent(
+                it,
+                SyncActivityStartSyncFlow(source = "promotion_bookmarks"),
+            )
             context.startActivity(intent)
         }
     }

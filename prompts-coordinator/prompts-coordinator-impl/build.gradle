@@ -35,32 +35,29 @@ android {
 }
 
 dependencies {
-    implementation project(':prompts-coordinator-api')
-
-    implementation project(':common-utils')
-    implementation project(':feature-toggles-api')
-    implementation project(':statistics-api')
-    implementation project(':browser-api')
-    implementation project(':custom-tabs-api')
-
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-    implementation project(':di')
     api AndroidX.dataStore.preferences
 
+    implementation project(':browser-api')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':custom-tabs-api')
+    implementation project(':di')
+    implementation project(':feature-toggles-api')
+    implementation project(':prompts-coordinator-api')
+    implementation project(':statistics-api')
     implementation AndroidX.lifecycle.common
     implementation AndroidX.lifecycle.process
-
     implementation Square.logcat
 
-    // Testing
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
+    testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.robolectric
+    testImplementation AndroidX.test.ext.junit
     testImplementation (KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation project(path: ':common-test')
-    testImplementation project(path: ':feature-toggles-test')
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }

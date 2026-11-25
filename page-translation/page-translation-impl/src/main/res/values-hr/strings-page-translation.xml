@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<!-- smartling.entity_escaping = false -->
+<!-- smartling.instruction_attributes = instruction -->
+<resources>
+    <!-- Settings -->
+    <string name="pageTranslationSettingsTitle" instruction="Title of the settings screen and its entry in the main Settings list, for the feature that translates web pages">Prijevodi</string>
+    <string name="pageTranslationSettingsDescription">DuckDuckGo privatno prevodi stranice na tvom uređaju na nekoliko jezika.</string>
+    <string name="pageTranslationSettingsAskToTranslateToggle" instruction="Toggle: when on, the browser offers to translate pages written in a foreign language">Pitaj za prevođenje stranica</string>
+    <string name="pageTranslationSettingsLanguagePacksHeader" instruction="Section header for the list of downloaded language packs (offline translation models)">Jezični paketi</string>
+    <string name="pageTranslationSettingsLanguagePacksEmpty">Još nema preuzetih jezičnih paketa</string>
+    <string name="pageTranslationDeleteLanguagePackDialogTitle" instruction="Confirmation dialog title. Placeholder is a language name, e.g. Spanish">Izbrisati jezični paket %1$s?</string>
+
+    <!-- Translate prompt -->
+    <string name="pageTranslationPromptTitle">Prevesti ovu stranicu?</string>
+    <string name="pageTranslationPromptLanguages" instruction="Subtitle of the translate prompt. First placeholder is the page language, second is the target language, e.g. Spanish to English">S jezika %1$s na jezik %2$s</string>
+    <string name="pageTranslationPromptTranslateButton" instruction="Button that translates the current web page">Prevedi</string>
+
+    <!-- Language pack download sheet -->
+    <string name="pageTranslationDownloadSheetTitle" instruction="Placeholder is a language name, e.g. Spanish">Preuzeti jezični paket za %1$s?</string>
+    <string name="pageTranslationDownloadSheetDescription" instruction="Placeholder is a language name, e.g. Spanish">Ovo jednokratno preuzimanje omogućuje ti da privatno prevodiš stranice na jeziku %1$s na svom uređaju.</string>
+    <string name="pageTranslationDownloadSheetSize" instruction="Placeholder is a file size with its unit, e.g. 23 MB">Veličina preuzimanja: %1$s</string>
+    <string name="pageTranslationDownloadSheetButton" instruction="Button that downloads the language pack and then translates the current page">Preuzmi i prevedi</string>
+
+    <!-- Browser menu -->
+    <string name="pageTranslationMenuTranslatePage" instruction="Browser menu item. Placeholder is the target language name, e.g. English">Prevedi stranicu na %1$s</string>
+    <string name="pageTranslationMenuShowOriginalPage" instruction="Browser menu item shown on a translated page; reverts it to its original language">Prikaži izvornu stranicu</string>
+
+    <!-- Snackbars -->
+    <string name="pageTranslationLanguagePackDeleted">Jezični paket izbrisan</string>
+    <string name="pageTranslationLanguagePackDownloadFailed">Jezični paket nije moguće preuzeti</string>
+    <string name="pageTranslationLanguagePackDownloadRetry" instruction="Snackbar action that retries a failed language pack download">Pokušaj ponovno</string>
+    <string name="pageTranslationLanguagePackNotEnoughStorage">Nema dovoljno prostora za pohranu. Oslobodi prostor i pokušaj ponovno.</string>
+    <string name="pageTranslationLanguagePackOffline">Poveži se s internetom da preuzmeš jezični paket</string>
+</resources>

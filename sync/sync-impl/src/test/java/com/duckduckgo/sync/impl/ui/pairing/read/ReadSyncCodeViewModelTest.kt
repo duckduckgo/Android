@@ -27,7 +27,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel.Command.StartSyncProcess
@@ -56,7 +55,7 @@ class ReadSyncCodeViewModelTest {
 
     private val testee = ReadSyncCodeViewModel(
         entryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
-        launchSource = SyncLaunchSource.PromotionPasswords,
+        launchSource = "promotion_passwords",
         clipboard = clipboard,
         syncPixels = syncPixels,
         codeDispatcher = codeDispatcher,
@@ -129,7 +128,7 @@ class ReadSyncCodeViewModelTest {
 
         testee.onUserCanceled()
 
-        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, SyncLaunchSource.PromotionPasswords, CancellationReason.SCANNING_CANCELLED)
+        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, "promotion_passwords", CancellationReason.SCANNING_CANCELLED)
     }
 
     @Test
@@ -138,7 +137,7 @@ class ReadSyncCodeViewModelTest {
 
         testee.onUserCanceled()
 
-        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, SyncLaunchSource.PromotionPasswords, CancellationReason.CANCELLED_BEFORE_FINISHED)
+        verify(syncPixels).fireSyncSetupAbandoned(SYNC_CONNECT, "promotion_passwords", CancellationReason.CANCELLED_BEFORE_FINISHED)
     }
 }
 
