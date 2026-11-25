@@ -21,7 +21,7 @@ import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
 import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
 import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleScreen
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -42,7 +42,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class RealImportPasswordsFromGoogleTest {
+class RealImportPasswordsTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
@@ -53,7 +53,7 @@ class RealImportPasswordsFromGoogleTest {
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val launchIntent = Intent()
 
-    private val testee = RealImportPasswordsFromGoogle(
+    private val testee = RealImportPasswords(
         passwordImportAvailability = passwordImportAvailability,
         passwordImportEvents = passwordImportEvents,
         globalActivityStarter = globalActivityStarter,

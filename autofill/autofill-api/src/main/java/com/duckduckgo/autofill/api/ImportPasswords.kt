@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.Flow
  * The flow imports through the FIDO Credential Exchange when the device supports it, and through the Google web flow
  * otherwise or when the exchange fails.
  */
-interface ImportPasswordsFromGoogle {
+interface ImportPasswords {
 
     /** Whether this device can import by either method. */
     suspend fun isSupported(): Boolean
