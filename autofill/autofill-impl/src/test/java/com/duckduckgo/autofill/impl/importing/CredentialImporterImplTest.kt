@@ -2,6 +2,7 @@ package com.duckduckgo.autofill.impl.importing
 
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.PasswordManagementEmptyState
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
@@ -25,6 +26,7 @@ class CredentialImporterImplTest {
 
     private val autofillStore: InternalAutofillStore = mock()
     private val credentialImportTimestamp: CredentialImportTimestamp = mock()
+    private val passwordImportEvents = PasswordImportEvents()
     private val dispatchers = coroutinesTestRule.testDispatcherProvider
     private val appCoroutineScope: CoroutineScope = coroutinesTestRule.testScope
 
@@ -35,6 +37,7 @@ class CredentialImporterImplTest {
         dispatchers = dispatchers,
         appCoroutineScope = appCoroutineScope,
         credentialImportTimestamp = credentialImportTimestamp,
+        passwordImportEvents = passwordImportEvents,
     )
 
     @Before
@@ -153,6 +156,19 @@ class CredentialImporterImplTest {
         duplicatedLogin.treatAsDuplicate()
         listOf(duplicatedLogin).import()
         verify(credentialImportTimestamp, never()).onPasswordsImported()
+    }
+
+    @Test
+    fun whenImportingThenProgressAndCountsAreEmittedAsImportEvents() = runTest {
+        val duplicatedLogin = creds(username = "username1")
+        duplicatedLogin.treatAsDuplicate()
+
+        passwordImportEvents.events.test {
+            listOf(duplicatedLogin, creds(username = "username2")).import()
+
+            assertEquals(ImportPasswordsEvent.InProgress, awaitItem())
+            assertEquals(ImportPasswordsEvent.Finished(imported = 1, skipped = 1), awaitItem())
+        }
     }
 
     private suspend fun List<LoginCredentials>.import(originalListSize: Int = this.size) {

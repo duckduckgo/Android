@@ -6,14 +6,13 @@ import app.cash.turbine.TurbineTestContext
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.InBrowserPromo
-import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.InProgress
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
-import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportHandler
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportOutcome
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.importing.wideevents.CredentialImportWideEvent
@@ -50,10 +49,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
@@ -72,7 +68,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     private val autofillStore: InternalAutofillStore = mock()
     private val promptExposureReporter: PromptExposureReporter = mock()
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter = mock()
-    private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker = mock()
+    private val credentialExchangeImportHandler: CredentialExchangeImportHandler = mock()
     private val credentialImportWideEvent: CredentialImportWideEvent = mock()
     private val importRedesignFeature = FakeFeatureToggleFactory.create(AutofillImportRedesignFeature::class.java)
     private val appBrandDesignUpdateToggles = FakeFeatureToggleFactory.create(AppBrandDesignUpdateToggles::class.java)
@@ -84,7 +80,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         autofillStore = autofillStore,
         promptExposureReporter = promptExposureReporter,
         credentialExchangePasswordImporter = credentialExchangePasswordImporter,
-        webViewCapabilityChecker = webViewCapabilityChecker,
+        credentialExchangeImportHandler = credentialExchangeImportHandler,
         credentialImportWideEvent = credentialImportWideEvent,
         importRedesignFeature = importRedesignFeature,
         appBrandDesignUpdateToggles = appBrandDesignUpdateToggles,
@@ -97,7 +93,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     fun setup() = runTest {
         whenever(credentialImporter.getImportStatus()).thenReturn(emptyFlow())
         whenever(credentialExchangePasswordImporter.isSupported()).thenReturn(false)
-        whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(true)
     }
 
     @Test
@@ -247,8 +242,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     @Test
     fun whenCredentialExchangeFinishedThenImportCanStartAgain() = runTest {
         whenever(credentialExchangePasswordImporter.isSupported()).thenReturn(true)
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(CredentialExchangeResult.Cancelled))
-            .thenReturn(CredentialExchangeImportResult.Cancelled)
+        givenExchangeHandledAs(CredentialExchangeImportOutcome.UserCancelled)
         showPreImportPrompt()
 
         testee.commands().test {
@@ -454,21 +448,8 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     }
 
     @Test
-    fun whenCredentialExchangeSucceedsThenCredentialsImported() = runTest {
-        val credentials = listOf(LoginCredentials(domain = "example.com", username = "u", password = "p"))
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(EXCHANGE_SUCCESS))
-            .thenReturn(CredentialExchangeImportResult.Success(credentials, originalCount = 3, exporterPackageName = EXPORTER))
-
-        testee.onCredentialExchangeFinished(EXCHANGE_SUCCESS, TEST_SOURCE, canShowPreImportDialog = true)
-        advanceUntilIdle()
-
-        verify(credentialImporter).import(credentials, 3, TEST_SOURCE)
-    }
-
-    @Test
     fun whenCredentialExchangeCancelledWithPreImportDialogThenDialogStays() = runTest {
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(CredentialExchangeResult.Cancelled))
-            .thenReturn(CredentialExchangeImportResult.Cancelled)
+        givenExchangeHandledAs(CredentialExchangeImportOutcome.UserCancelled)
         showPreImportPrompt()
 
         testee.onCredentialExchangeFinished(CredentialExchangeResult.Cancelled, TEST_SOURCE, canShowPreImportDialog = true)
@@ -479,8 +460,7 @@ class ImportFromGooglePasswordsDialogViewModelTest {
 
     @Test
     fun whenCredentialExchangeCancelledWithoutPreImportDialogThenFlowTerminated() = runTest {
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(CredentialExchangeResult.Cancelled))
-            .thenReturn(CredentialExchangeImportResult.Cancelled)
+        givenExchangeHandledAs(CredentialExchangeImportOutcome.UserCancelled)
 
         testee.onCredentialExchangeFinished(CredentialExchangeResult.Cancelled, TEST_SOURCE, canShowPreImportDialog = false)
         advanceUntilIdle()
@@ -489,33 +469,46 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     }
 
     @Test
-    fun whenCredentialExchangeFailsThenWebFlowStartedAndNothingImported() = runTest {
-        val failure = CredentialExchangeResult.Failure(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE)
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(failure))
-            .thenReturn(CredentialExchangeImportResult.Failure(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE))
+    fun whenCredentialExchangeImportedThenImportProgressShown() = runTest {
+        givenExchangeHandledAs(CredentialExchangeImportOutcome.Imported)
+        whenever(credentialImporter.getImportStatus()).thenReturn(listOf(InProgress).asFlow())
 
-        testee.commands().test {
-            testee.onCredentialExchangeFinished(failure, TEST_SOURCE, canShowPreImportDialog = true)
-            assertEquals(Command.StartWebFlow, awaitItem())
-        }
-        verify(credentialImporter, never()).import(any(), any(), any())
+        testee.onCredentialExchangeFinished(EXCHANGE_SUCCESS, TEST_SOURCE, canShowPreImportDialog = true)
+        advanceUntilIdle()
+
+        assertTrue(testee.viewState.value.viewMode is Importing)
     }
 
     @Test
-    fun whenCredentialExchangeFailsAndWebViewCannotImportThenErrorShownAndNoWebFlow() = runTest {
-        whenever(webViewCapabilityChecker.webViewCapableOfImporting()).thenReturn(false)
-        val failure = CredentialExchangeResult.Failure(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE)
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(failure))
-            .thenReturn(CredentialExchangeImportResult.Failure(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE))
+    fun whenCredentialExchangeImportedThenResultPassedToHandlerWithSource() = runTest {
+        givenExchangeHandledAs(CredentialExchangeImportOutcome.Imported)
+
+        testee.onCredentialExchangeFinished(EXCHANGE_SUCCESS, TEST_SOURCE, canShowPreImportDialog = true)
+        advanceUntilIdle()
+
+        verify(credentialExchangeImportHandler).handle(EXCHANGE_SUCCESS, TEST_SOURCE)
+    }
+
+    @Test
+    fun whenCredentialExchangeFallsBackToWebFlowThenWebFlowStarted() = runTest {
+        givenExchangeHandledAs(CredentialExchangeImportOutcome.FallBackToWebFlow)
 
         testee.commands().test {
-            testee.onCredentialExchangeFinished(failure, TEST_SOURCE, canShowPreImportDialog = true)
+            testee.onCredentialExchangeFinished(EXCHANGE_FAILURE, TEST_SOURCE, canShowPreImportDialog = true)
+            assertEquals(Command.StartWebFlow, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenCredentialExchangeFailsWithoutFallbackThenErrorShownAndNoWebFlow() = runTest {
+        givenExchangeHandledAs(CredentialExchangeImportOutcome.Failed)
+
+        testee.commands().test {
+            testee.onCredentialExchangeFinished(EXCHANGE_FAILURE, TEST_SOURCE, canShowPreImportDialog = true)
             advanceUntilIdle()
             expectNoEvents()
         }
         assertTrue(testee.viewState.value.viewMode is ViewMode.ImportError)
-        verify(credentialImportWideEvent).onCredentialExchangeFailed(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE, null)
-        verify(credentialImportWideEvent, never()).onCredentialExchangeFellBackToWebFlow(any(), anyOrNull())
     }
 
     @Test
@@ -559,43 +552,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         advanceUntilIdle()
 
         verify(credentialImportWideEvent).onImportStarted(TEST_SOURCE, usesCredentialExchange = true)
-    }
-
-    @Test
-    fun whenCredentialExchangeSucceedsThenWideEventGetsExporterAfterImportStarts() = runTest {
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(EXCHANGE_SUCCESS))
-            .thenReturn(CredentialExchangeImportResult.Success(emptyList(), originalCount = 0, exporterPackageName = EXPORTER))
-
-        testee.onCredentialExchangeFinished(EXCHANGE_SUCCESS, TEST_SOURCE, canShowPreImportDialog = true)
-        advanceUntilIdle()
-
-        inOrder(credentialImporter, credentialImportWideEvent) {
-            verify(credentialImporter).import(emptyList(), 0, TEST_SOURCE)
-            verify(credentialImportWideEvent).onCredentialExchangeSucceeded(EXPORTER)
-        }
-    }
-
-    @Test
-    fun whenCredentialExchangeCancelledThenWideEventCancelled() = runTest {
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(CredentialExchangeResult.Cancelled))
-            .thenReturn(CredentialExchangeImportResult.Cancelled)
-
-        testee.onCredentialExchangeFinished(CredentialExchangeResult.Cancelled, TEST_SOURCE, canShowPreImportDialog = true)
-        advanceUntilIdle()
-
-        verify(credentialImportWideEvent).onCredentialExchangeCancelled()
-    }
-
-    @Test
-    fun whenCredentialExchangeFailsThenWideEventRecordsFallback() = runTest {
-        val failure = CredentialExchangeResult.Failure(CredentialExchangeFailure.MALFORMED_PAYLOAD)
-        whenever(credentialExchangePasswordImporter.convertAndDeduplicate(failure))
-            .thenReturn(CredentialExchangeImportResult.Failure(CredentialExchangeFailure.MALFORMED_PAYLOAD, EXPORTER))
-
-        testee.onCredentialExchangeFinished(failure, TEST_SOURCE, canShowPreImportDialog = true)
-        advanceUntilIdle()
-
-        verify(credentialImportWideEvent).onCredentialExchangeFellBackToWebFlow(CredentialExchangeFailure.MALFORMED_PAYLOAD, EXPORTER)
     }
 
     @Test
@@ -689,6 +645,10 @@ class ImportFromGooglePasswordsDialogViewModelTest {
         assertTrue(viewMode is Importing)
     }
 
+    private suspend fun givenExchangeHandledAs(outcome: CredentialExchangeImportOutcome) {
+        whenever(credentialExchangeImportHandler.handle(any(), any())).thenReturn(outcome)
+    }
+
     private fun ViewState.assertIsDeterminingFirstViewToShow() {
         assertTrue(viewMode is DeterminingFirstView)
     }
@@ -696,6 +656,6 @@ class ImportFromGooglePasswordsDialogViewModelTest {
     companion object {
         private val TEST_SOURCE = AutofillImportLaunchSource.PasswordManagementEmptyState
         private val EXCHANGE_SUCCESS = CredentialExchangeResult.Success(emptyList(), exporterPackageName = null)
-        private const val EXPORTER = "com.example.exporter"
+        private val EXCHANGE_FAILURE = CredentialExchangeResult.Failure(CredentialExchangeFailure.NO_EXPORTER_AVAILABLE)
     }
 }

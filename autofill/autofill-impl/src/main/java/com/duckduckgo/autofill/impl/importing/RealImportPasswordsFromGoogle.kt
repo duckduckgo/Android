@@ -16,49 +16,46 @@
 
 package com.duckduckgo.autofill.impl.importing
 
-import android.content.Intent
-import androidx.core.content.IntentCompat
+import android.content.Context
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
-import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
+import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleScreen
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.transformWhile
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealImportPasswordsFromGoogle @Inject constructor(
-    private val capabilityChecker: ImportGooglePasswordsCapabilityChecker,
-    private val credentialImporter: CredentialImporter,
+    private val passwordImportAvailability: PasswordImportAvailability,
+    private val passwordImportEvents: PasswordImportEvents,
+    private val globalActivityStarter: GlobalActivityStarter,
 ) : ImportPasswordsFromGoogle {
 
-    override suspend fun isSupported(): Boolean = capabilityChecker.webViewCapableOfImporting()
+    override suspend fun isSupported(): Boolean = passwordImportAvailability.canImport()
 
-    override fun parseResult(data: Intent?): ImportPasswordsResult {
-        val result = data?.let {
-            IntentCompat.getParcelableExtra(it, ImportGooglePasswordResult.RESULT_KEY_DETAILS, ImportGooglePasswordResult::class.java)
+    override suspend fun launchImport(
+        context: Context,
+        launchSource: AutofillImportLaunchSource,
+    ): Flow<ImportPasswordsEvent> {
+        val intent = if (isSupported()) {
+            globalActivityStarter.startIntent(context, ImportPasswordsFromGoogleScreen(launchSource))
+        } else {
+            null
         }
-        return when (result) {
-            is ImportGooglePasswordResult.Success -> ImportPasswordsResult.Success
-            is ImportGooglePasswordResult.UserCancelled -> ImportPasswordsResult.UserCancelled
-            is ImportGooglePasswordResult.Error -> when (result.reason) {
-                is ErrorParsingCsv -> ImportPasswordsResult.Error.Permanent
-                is WebViewCrash -> ImportPasswordsResult.Error.Transient
-            }
-            null -> ImportPasswordsResult.Error.Transient
+        if (intent == null) {
+            return flowOf(ImportPasswordsEvent.Error.Permanent)
         }
-    }
 
-    override fun importStatus(): Flow<ImportPasswordsStatus> = credentialImporter.getImportStatus().map {
-        when (it) {
-            is ImportResult.InProgress -> ImportPasswordsStatus.InProgress
-            is ImportResult.Finished -> ImportPasswordsStatus.Finished(imported = it.savedCredentials, skipped = it.numberSkipped)
+        context.startActivity(intent)
+        return passwordImportEvents.events.transformWhile { event ->
+            emit(event)
+            event is ImportPasswordsEvent.InProgress
         }
     }
 }

@@ -54,6 +54,7 @@ object Theming {
             "com.duckduckgo.autofill.impl.service.AutofillProviderFillSuggestionActivity",
             "com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeActivity",
             "com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeActivity",
+            "com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleActivity",
         )
     }
 }

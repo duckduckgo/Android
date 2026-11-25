@@ -60,7 +60,7 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
@@ -72,9 +72,9 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -103,7 +103,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
     lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
+    lateinit var importPasswordsFromGoogle: ImportPasswordsFromGoogle
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -141,10 +141,6 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
     // back, whatever they chose there.
     private val migrationDefaultBrowserPrompt = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         viewModel.onMigrationDefaultBrowserPromptFinished()
-    }
-
-    private val passwordImportFlow = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        viewModel.onPasswordImportResult(result.resultCode, result.data)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -338,13 +334,17 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
                 QuickSetupSearchOptionsBottomSheet
                     .newInstance(initialWithAi = command.initialWithAi)
                     .show(childFragmentManager, QuickSetupSearchOptionsBottomSheet.TAG)
-            WelcomePageViewModel.Command.LaunchPasswordImport -> passwordImportFlow.launch(
-                globalActivityStarter.startIntent(requireContext(), AutofillImportPasswordsScreen(Onboarding)),
-            )
+            WelcomePageViewModel.Command.LaunchPasswordImport -> launchPasswordImport()
             is WelcomePageViewModel.Command.ShowMigrationDefaultBrowserDialog -> launchMigrationDefaultBrowserPrompt(command.intent)
             WelcomePageViewModel.Command.OpenMigrationDefaultBrowserSettings ->
                 launchMigrationDefaultBrowserPrompt(DefaultBrowserSystemSettings.intent())
             WelcomePageViewModel.Command.FinishToBrowser -> (activity as? OnboardingActivity)?.handOffToBrowserActivity()
+        }
+    }
+
+    private fun launchPasswordImport() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.onPasswordImportLaunched(importPasswordsFromGoogle.launchImport(requireActivity(), Onboarding))
         }
     }
 
