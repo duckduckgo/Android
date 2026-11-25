@@ -66,8 +66,12 @@ internal class LanguagePackFileWorker(
 
     private fun moveToOld(pair: String) {
         directories.getStagingDirectory(pair).deleteRecursively()
+        // a rerun after the process died must keep the pack the first run moved aside
+        val packDirectory = directories.getPackDirectory(pair)
+        if (!packDirectory.exists()) return
+
         directories.getOldDirectory(pair).deleteRecursively()
-        directories.getPackDirectory(pair).renameTo(directories.getOldDirectory(pair))
+        packDirectory.renameTo(directories.getOldDirectory(pair))
     }
 
     companion object {

@@ -33,7 +33,6 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -65,6 +64,16 @@ class LanguagePackFileWorkerTest {
 
         assertFalse(packDirectory.exists())
         assertFalse(stagingDirectory.exists())
+        assertEquals("current", oldDirectory.readFile())
+    }
+
+    @Test
+    fun keepThePackMovedAsideWhenDeleteRunsAgain() = runTest {
+        packDirectory.createWithFile("current")
+        run(DELETE)
+
+        assertEquals(Result.success(), run(DELETE))
+
         assertEquals("current", oldDirectory.readFile())
     }
 
@@ -112,10 +121,21 @@ class LanguagePackFileWorkerTest {
         packDirectory.createWithFile("current")
         oldDirectory.createWithFile("leftover")
         stagingDirectory.createWithFile("partial")
+        directories.getPackDirectory(OTHER_PAIR).createWithFile("other")
 
         assertEquals(Result.success(), run(REMOVE))
 
-        assertTrue(context.filesDir.resolve("page-translation/packs").list().isNullOrEmpty())
+        assertEquals(setOf(OTHER_PAIR), context.filesDir.resolve("page-translation/packs").list()!!.toSet())
+        assertEquals("other", directories.getPackDirectory(OTHER_PAIR).readFile())
+    }
+
+    @Test
+    fun removeADeletedPackOnRemove() = runTest {
+        oldDirectory.createWithFile("deleted")
+
+        assertEquals(Result.success(), run(REMOVE))
+
+        assertFalse(oldDirectory.exists())
     }
 
     private suspend fun run(operation: LanguagePackFileOperation) = TestListenableWorkerBuilder<LanguagePackFileWorker>(context)
@@ -136,6 +156,7 @@ class LanguagePackFileWorkerTest {
 
     private companion object {
         const val PAIR = "fr-en"
+        const val OTHER_PAIR = "de-en"
         const val FILE_NAME = "model"
     }
 }
