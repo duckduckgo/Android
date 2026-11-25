@@ -31,6 +31,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSI
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
@@ -65,8 +67,13 @@ interface SyncSetupWideEvent {
     suspend fun onRecoveryCodeGenerationFailed()
     suspend fun onFlowCancelled()
     suspend fun onSyncRestoreStarted()
+
+    // Unified wide event API
     suspend fun onStep(step: SetupStep)
     suspend fun onUpdate(change: (SetupFields) -> SetupFields)
+    suspend fun onSucceeded()
+    suspend fun onFailed(reason: SetupFailureReason)
+    suspend fun onCancelled(reason: SetupCancellationReason)
 }
 
 data class SetupFields(
@@ -196,6 +203,23 @@ class SyncSetupWideEventImpl @Inject constructor(
         val unified = openAttempt.unified?.let { it.copy(fields = change(it.fields)) } ?: return@withLock
         currentData = openAttempt.copy(unified = unified)
         unified.appendLastStep(openAttempt.flowId)
+    }
+
+    override suspend fun onSucceeded() = finishUnifiedAttempt(FlowStatus.Success, statusReason = null)
+
+    override suspend fun onFailed(reason: SetupFailureReason) = when (reason) {
+        SetupFailureReason.ALREADY_PAIRED -> onCancelled(SetupCancellationReason.ALREADY_PAIRED)
+        SetupFailureReason.ALREADY_UPGRADED -> onCancelled(SetupCancellationReason.ALREADY_UPGRADED)
+        else -> finishUnifiedAttempt(FlowStatus.Failure(reason = reason.value), statusReason = reason.value)
+    }
+
+    override suspend fun onCancelled(reason: SetupCancellationReason) = finishUnifiedAttempt(FlowStatus.Cancelled, statusReason = reason.value)
+
+    private suspend fun finishUnifiedAttempt(status: FlowStatus, statusReason: String?) = mutex.withLock {
+        val unifiedAttempt = currentData?.takeIf { it.unified != null } ?: return@withLock
+        val metadata = if (statusReason != null) mapOf(KEY_STATUS_REASON to statusReason) else emptyMap()
+        wideEventClient.flowFinish(wideEventId = unifiedAttempt.flowId, status = status, metadata = metadata)
+        currentData = null
     }
 
     private suspend fun createUnifiedData(setupMode: SetupMode) = UnifiedData(

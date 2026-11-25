@@ -28,11 +28,15 @@ import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.AdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.store.SyncStore
+import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
+import com.google.testing.junit.testparameterinjector.TestParameterValuesProvider
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -510,6 +514,101 @@ class SyncSetupWideEventImplTest {
         verify(wideEventClient).flowAppendToPath(wideEventId = 2L, step = "started", metadata = unifiedMetadata())
     }
 
+    @Test
+    fun `onSucceeded finishes the unified attempt as success without a reason`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onSucceeded()
+
+        verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success, metadata = emptyMap())
+    }
+
+    @Test
+    fun `onFailed finishes the unified attempt as failure with the reason`(
+        @TestParameter(valuesProvider = FailureReasonsProvider::class) reason: SetupFailureReason,
+    ) = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFailed(reason)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Failure(reason = reason.value),
+            metadata = mapOf("status_reason" to reason.value),
+        )
+    }
+
+    @Test
+    fun `onFailed finishes the unified attempt as cancelled when the failure is caused by the account state`(
+        @TestParameter(valuesProvider = CancellingFailureReasonsProvider::class) reason: SetupFailureReason,
+    ) = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onFailed(reason)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("status_reason" to reason.value),
+        )
+    }
+
+    @Test
+    fun `onCancelled finishes the unified attempt as cancelled with the reason`(
+        @TestParameter reason: SetupCancellationReason,
+    ) = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+
+        wideEvent.onCancelled(reason)
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("status_reason" to reason.value),
+        )
+    }
+
+    @Test
+    fun `finished unified attempt is not finished again`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onSucceeded()
+
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        wideEvent.onFlowStarted()
+
+        verify(wideEventClient).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `unified outcomes leave the back up attempt open`() = runTest {
+        startFlow(flowId = 1L)
+
+        wideEvent.onSucceeded()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        wideEvent.onFlowCancelled()
+
+        verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Cancelled)
+        verify(wideEventClient).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `unified outcomes without an attempt are no-ops`() = runTest {
+        enableUnifiedEvent()
+
+        wideEvent.onSucceeded()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+
+        verifyNoInteractions(wideEventClient)
+    }
+
     private suspend fun enableUnifiedEvent() {
         syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(true))
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(1L), Result.success(2L))
@@ -532,5 +631,17 @@ class SyncSetupWideEventImplTest {
     private suspend fun startFlow(flowId: Long) {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(flowId))
         wideEvent.onFlowStarted()
+    }
+
+    private class FailureReasonsProvider : TestParameterValuesProvider() {
+        override fun provideValues(context: Context) = SetupFailureReason.entries - CANCELLING_FAILURE_REASONS
+    }
+
+    private class CancellingFailureReasonsProvider : TestParameterValuesProvider() {
+        override fun provideValues(context: Context) = CANCELLING_FAILURE_REASONS.toList()
+    }
+
+    private companion object {
+        val CANCELLING_FAILURE_REASONS = setOf(SetupFailureReason.ALREADY_PAIRED, SetupFailureReason.ALREADY_UPGRADED)
     }
 }
