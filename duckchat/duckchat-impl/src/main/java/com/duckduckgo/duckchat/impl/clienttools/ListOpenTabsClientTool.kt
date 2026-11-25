@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -61,11 +62,18 @@ class ListOpenTabsClientTool @Inject constructor(
     ): ClientToolResult {
         val limit = parseLimit(input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
 
-        val tabs = JSONArray()
-        tabRepositoryProvider.value.forMode(context.browserMode).getTabs()
-            .asSequence()
+        val visibleTabs = tabRepositoryProvider.value.forMode(context.browserMode).getTabs()
             .filter { duckChat.isToolVisible(it) }
+        // Over the limit, keep the chat's tab and the most recently used ones (a tab the user or openTab just opened),
+        // but list them in tab order.
+        val keptTabIds = visibleTabs
+            .sortedWith(compareByDescending<TabEntity> { it.tabId == context.chatTabId }.thenByDescending { it.lastAccessTime })
             .take(limit)
+            .mapTo(HashSet()) { it.tabId }
+
+        val tabs = JSONArray()
+        visibleTabs
+            .filter { it.tabId in keptTabIds }
             .forEach { tab ->
                 tabs.put(
                     JSONObject()
