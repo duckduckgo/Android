@@ -746,6 +746,17 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
+    fun `getLatestPurchase queries purchases when connected but loading products throws and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.getSubscriptionsException = IllegalStateException()
+        billingClientAdapter.activePurchases = emptyList()
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Absent, result)
+    }
+
+    @Test
     fun `getLatestPurchase returns Unknown without connecting outside the main process when flag is on`() = runTest {
         givenConnectBeforeQueryingEnabled(enabled = true)
 
@@ -801,6 +812,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     var connectDuration: Duration = Duration.ZERO
     var connectException: Exception? = null
     var getSubscriptionsDuration: Duration = Duration.ZERO
+    var getSubscriptionsException: Exception? = null
 
     var purchasesListener: ((PurchasesUpdateResult) -> Unit)? = null
     var disconnectionListener: (() -> Unit)? = null
@@ -835,6 +847,7 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     override suspend fun getSubscriptions(productIds: List<String>): SubscriptionsResult {
         delay(getSubscriptionsDuration)
         methodInvocations.add(GetSubscriptions(productIds))
+        getSubscriptionsException?.let { throw it }
         return if (ready) {
             SubscriptionsResult.Success(subscriptions)
         } else {

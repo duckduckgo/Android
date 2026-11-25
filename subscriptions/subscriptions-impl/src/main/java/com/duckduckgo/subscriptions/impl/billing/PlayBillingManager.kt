@@ -539,22 +539,18 @@ class RealPlayBillingManager @Inject constructor(
 
     private suspend fun connectWithTimeout(): String? {
         val connecting = coroutineScope.async(dispatcherProvider.io()) { connect() }
-        val finishedInTime = try {
+        val failureCause = try {
             withTimeoutOrNull(timeout = CONNECT_BEFORE_QUERY_TIMEOUT) {
                 connecting.await()
-                true
-            } ?: false
+                "billing_connect_failed"
+            } ?: "billing_connect_timeout"
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
             logcat { "Billing: connect before query failed: ${e.javaClass.simpleName}" }
-            return "billing_connect_error"
+            "billing_connect_error"
         }
-        return when {
-            billingClient.ready -> null
-            finishedInTime -> "billing_connect_failed"
-            else -> "billing_connect_timeout"
-        }
+        return if (billingClient.ready) null else failureCause
     }
 
     private companion object {
