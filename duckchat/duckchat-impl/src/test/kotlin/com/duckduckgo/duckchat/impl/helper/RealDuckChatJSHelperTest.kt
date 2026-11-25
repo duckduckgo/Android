@@ -1936,6 +1936,45 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenContextualHideChatInputThenOnlyContextualChatStateHidden() = runTest {
+        chatStateStore.update("tab-1", ChatState.SHOW)
+        chatStateStore.update(ChatStateStore.contextualKey("tab-1"), ChatState.SHOW)
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "hideChatInput",
+                "123",
+                null,
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
+            ),
+        )
+
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-1")).value)
+        assertEquals(ChatState.SHOW, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
+    fun whenContextualShowChatInputThenOnlyContextualChatStateShown() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "showChatInput",
+                "123",
+                null,
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
+            ),
+        )
+
+        assertEquals(ChatState.SHOW, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-1")).value)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
     fun whenResponseStateReceivedThenOtherTabsAreUnaffected() = runTest {
         val data = JSONObject(mapOf("status" to "streaming"))
 
