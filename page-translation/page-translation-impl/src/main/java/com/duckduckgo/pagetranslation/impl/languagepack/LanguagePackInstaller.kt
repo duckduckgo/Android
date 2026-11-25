@@ -86,6 +86,7 @@ class RealLanguagePackInstaller @Inject constructor(
             val decompressedFile = stagingDirectory.resolve(key)
 
             if (!compressedFile.matches(file.bytes, file.sha256)) return false
+            currentCoroutineContext().ensureActive()
             translateKit.decompressZstd(compressedFile, decompressedFile)
             if (!decompressedFile.matches(file.decompressedSize, file.decompressedHash)) return false
 
