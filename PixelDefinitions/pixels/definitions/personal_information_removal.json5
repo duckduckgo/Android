@@ -2226,9 +2226,9 @@
         "parameters": ["appVersion"]
     },
     "m_dbp_freemium_settings_entry_point_impression": {
-        "description": "Fired when the Freemium PIR entry point is shown in Settings, once per call-to-action state per Settings visit. Denominator for the Freemium PIR settings funnel.",
+        "description": "Fired when the Freemium PIR entry point is shown in Settings, and again in the same Settings visit when its call to action changes. Denominator for the Freemium PIR settings funnel.",
         "owners": ["landomen"],
-        "triggers": ["other"],
+        "triggers": ["impression"],
         "suffixes": ["count_short", "form_factor"],
         "parameters": [
             "appVersion",
