@@ -20,7 +20,7 @@ import android.content.Context
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Importing passwords from Google Password Manager.
+ * Importing passwords from another password manager.
  *
  * The flow imports through the FIDO Credential Exchange when the device supports it, and through the Google web flow
  * otherwise or when the exchange fails.
@@ -47,16 +47,20 @@ interface ImportPasswords {
         launchSource: AutofillImportLaunchSource,
     ): Flow<ImportPasswordsEvent>
 
+    /** A state of the import flow started by [launchImport]. */
     sealed interface ImportPasswordsEvent {
         /** The passwords were received and are being saved. */
         data object InProgress : ImportPasswordsEvent
 
         /** The passwords were saved. */
         data class Finished(
+            /** How many passwords were saved. */
             val imported: Int,
+            /** How many passwords were not saved, for example because they were already saved. */
             val skipped: Int,
         ) : ImportPasswordsEvent
 
+        /** The user left the flow before any passwords were received. */
         data object UserCancelled : ImportPasswordsEvent
 
         sealed interface Error : ImportPasswordsEvent {
