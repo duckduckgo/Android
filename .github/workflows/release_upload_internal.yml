@@ -119,7 +119,7 @@ jobs:
           DUCKSANS_PACKAGE_AUTH_USER: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION_USER }}
           DUCKSANS_PACKAGE_AUTH_TOKEN: ${{ secrets.DAXMOBILE_GITHUB_PACKAGES_AUTOMATION }}
         if: steps.check_for_changes.outputs.has_changes == 'true'
-        run: ./gradlew bundleInternalRelease -PversionNameSuffix=-internal -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
+        run: ./gradlew bundleInternalRelease writeInternalReleaseVersionName -PversionNameSuffix=-internal -PuseUploadSigning -PlatestTag=${{ steps.get_latest_tag.outputs.latest_tag }} -Pbuild-date-time
 
       - name: Generate internal version name
         if: steps.check_for_changes.outputs.has_changes == 'true'
@@ -135,11 +135,33 @@ jobs:
           output=$(find app/build/outputs/bundle/internalRelease -name "*.aab")
           echo "bundle_path=$output" >> "$GITHUB_OUTPUT"
 
+      - name: Prepare R8 mapping file
+        if: steps.check_for_changes.outputs.has_changes == 'true'
+        id: r8_mapping
+        uses: ./.github/actions/prepare-r8-mapping
+        with:
+          flavor: internal
+
       - name: Upload bundle to Play Store Internal track
         if: steps.check_for_changes.outputs.has_changes == 'true'
         id: create_app_bundle
         run: |
           bundle exec fastlane deploy_dogfood aab_path:${{ steps.capture_output.outputs.bundle_path }}
+
+      # Failure is reported by "Fail if R8 mapping upload failed", after the release is tagged.
+      - name: Upload R8 mapping file
+        if: steps.check_for_changes.outputs.has_changes == 'true'
+        id: upload_r8_mapping
+        continue-on-error: true
+        uses: ./.github/actions/upload-r8-mapping
+        with:
+          mapping_path: ${{ steps.r8_mapping.outputs.mapping_path }}
+          version_name: ${{ steps.r8_mapping.outputs.version_name }}
+          aws_access_key_id: ${{ secrets.MAPPINGS_AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.MAPPINGS_AWS_SECRET_ACCESS_KEY }}
+          aws_region: ${{ vars.MAPPINGS_AWS_REGION }}
+          bucket: ${{ vars.MAPPINGS_BUCKET_NAME }}
+          prefix: ${{ vars.MAPPINGS_BUCKET_PREFIX }}
 
       - name: Upload AAB as artifact
         if: failure() && steps.create_app_bundle.outcome == 'failure'
@@ -164,6 +186,12 @@ jobs:
         with:
           name: duckduckgo-${{ steps.generate_version_name.outputs.version }}.apk
           path: duckduckgo.apk
+
+      - name: Fail if R8 mapping upload failed
+        if: steps.upload_r8_mapping.outcome == 'failure'
+        run: |
+          echo "::error::R8 mapping upload failed; see the Upload R8 mapping file step."
+          exit 1
 
       - name: Set successful summary
         if: steps.check_for_changes.outputs.has_changes == 'true'
