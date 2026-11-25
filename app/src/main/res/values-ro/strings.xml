@@ -984,8 +984,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Începe o conversație privată cu IA cu Duck.ai sau comută la Căutare pentru navigare protejată.<br/><br/>Poți folosi Duck.ai de oriunde vezi pictograma de chat]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">De asemenea, oferim un abonament plătit care include modele avansate de IA, cu limite de chat mai mari de la GPT și Claude, un VPN securizat și multe altele.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Poți oricând să modifici ulterior din Setări.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Configurează totul așa cum vrei</string>
+    <string name="downloadReasonBody">Alege opțiunea care te interesează cel mai mult și te vom ajuta să începi rapid.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Caută și navighează în mod privat</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Fă chat în privat cu IA</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Dezactivează funcțiile de IA</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Blochează reclamele și ferestrele pop-up</string>
+    <string name="downloadReasonPrimaryCta">Următorul</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Te afli în locul potrivit!<br/>Mecanismele de protecție au fost activate.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Căutarea ta, așa cum vrei.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Istoricul căutărilor</string>
+    <string name="searchPathPreferenceHistorySecondary">Afișează site-urile accesate recent în sugestiile de căutare. Privat, doar pe dispozitivul tău.</string>
+    <string name="searchPathPreferenceSafePrimary">Căutare sigură</string>
+    <string name="searchPathPreferenceSafeSecondary">Omite conținutul discutabil (în mare parte pentru adulți) din rezultate.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Acum, încearcă o căutare privată!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Discută în privat cu sisteme de IA populare pe Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Chaturile sunt anonimizate, nu este nevoie să ai un cont. Și e gratuit!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Încearcă Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Omite</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Te afli în locul potrivit!<br/>Mecanismele de protecție au fost activate.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Caută pe web în mod privat, cu tehnologiile de urmărire blocate</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Alege un model de IA pe care să-l încerci mai întâi</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">Cu Duck.ai, poți schimba oricând.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Vrei ca filele noi să se deschidă cu chatul IA?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Poți comuta la „Caută” cu o singură atingere</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Începe un chat privat cu IA folosind Duck.ai sau comută la „Caută” pentru navigare protejată.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Te afli în locul potrivit!<br/>Funcțiile de IA sunt dezactivate.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Fără răspunsuri asistate de IA în căutare</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Ascunde imaginile generate de IA în căutare</string>
+    <string name="noAiPathPreferenceSelectorTitle">Caută fără IA</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Include răspunsurile generate de IA în rezultatele căutării</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Ascunde imaginile generate de IA</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filtrează site-urile spam cunoscute, bazate pe IA, din rezultatele căutării de imagini</string>
+    <string name="noAiPathDuckAiStateTitle">Dorești opțiunea de a face chat în privat cu modele populare de IA?</string>
+    <string name="noAiPathDuckAiStateBody">În Duck.ai, chaturile tale sunt anonimizate de noi și nu sunt folosite niciodată pentru a antrena IA.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Internetul, însă fără distrageri.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Te afli în locul potrivit!<br/>Blocarea reclamelor a fost activată.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Doar căutare</string>
     <string name="input_screen_user_pref_with_ai_updated">Comută între Căutare și Duck.ai</string>
