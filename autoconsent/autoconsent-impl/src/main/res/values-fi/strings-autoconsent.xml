@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Hoidamme ne puolestasi. Hylkäämme evästeet mahdollisuuksien mukaan ja hyväksymme ne, joita ei voi hylätä.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Hylkää, jos mahdollista, tai hyväksy puolestani</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Hoidan ne itse</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Hylkää valinnaiset evästeet</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maksimoi yksityisyyden suojan ja sulkee evästeitä koskevat ponnahdusikkunat</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Hyväksy osa evästeistä</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Piilottaa enemmän ponnahdusikkunoita hyväksymällä evästeet, joita ei voi hylätä</string>
 </resources>
