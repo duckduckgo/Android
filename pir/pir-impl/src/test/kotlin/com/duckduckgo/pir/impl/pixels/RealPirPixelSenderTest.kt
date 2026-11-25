@@ -33,6 +33,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.atLeast
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -44,11 +45,14 @@ class RealPirPixelSenderTest {
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
     private val mockToggle: Toggle = mock()
+    private val mockScanWebViewSizeToggle: Toggle = mock()
 
     @Before
     fun setUp() {
         whenever(mockPirRemoteFeatures.trackerBlocking()).thenReturn(mockToggle)
         whenever(mockToggle.isEnabled()).thenReturn(false)
+        whenever(mockPirRemoteFeatures.scanWebViewSize()).thenReturn(mockScanWebViewSizeToggle)
+        whenever(mockScanWebViewSizeToggle.isEnabled()).thenReturn(false)
         testee = RealPirPixelSender(mockPixelSender, mockNetworkProtectionState, mockPirRemoteFeatures)
     }
 
@@ -216,7 +220,7 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals(mapOf("scan_webview_size_state" to "disabled"), paramsCaptor.firstValue)
     }
 
     @Test
@@ -600,7 +604,7 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assert(paramsCaptor.firstValue.isEmpty())
+        assertEquals(mapOf("scan_webview_size_state" to "disabled"), paramsCaptor.firstValue)
     }
 
     @Test
@@ -686,6 +690,7 @@ class RealPirPixelSenderTest {
                 "data_broker" to "https://broker.com",
                 "changed_field" to "name_and_profile_url",
                 "optout_status" to "pending_email_confirmation",
+                "scan_webview_size_state" to "disabled",
             ),
             paramsCaptor.firstValue,
         )
@@ -1489,7 +1494,10 @@ class RealPirPixelSenderTest {
             type = any(),
         )
 
-        assertEquals(mapOf("is_authenticated" to "false", "free_scan" to "true"), paramsCaptor.firstValue)
+        assertEquals(
+            mapOf("is_authenticated" to "false", "free_scan" to "true", "scan_webview_size_state" to "disabled"),
+            paramsCaptor.firstValue,
+        )
     }
 
     @Test
@@ -1556,5 +1564,57 @@ class RealPirPixelSenderTest {
             type = Count,
             parameters = mapOf("cta_state" to "view_scan_results"),
         )
+    }
+
+    @Test
+    fun whenScanWebViewSizeEnabledThenRunPixelReportsEnabledState() = runTest {
+        whenever(mockScanWebViewSizeToggle.isEnabled()).thenReturn(true)
+
+        testee.reportScanStarted(brokerUrl = "https://broker.com", isFreeScan = false)
+
+        assertEquals("enabled", firedParams().single()["scan_webview_size_state"])
+    }
+
+    @Test
+    fun whenScanWebViewSizeDisabledThenRunPixelReportsDisabledState() = runTest {
+        testee.reportScanStarted(brokerUrl = "https://broker.com", isFreeScan = false)
+
+        assertEquals("disabled", firedParams().single()["scan_webview_size_state"])
+    }
+
+    @Test
+    fun whenScanWebViewSizeEnabledThenEnqueuedRunPixelReportsEnabledState() = runTest {
+        whenever(mockScanWebViewSizeToggle.isEnabled()).thenReturn(true)
+
+        testee.reportManualScanLowMemory()
+
+        assertEquals("enabled", firedParams().single()["scan_webview_size_state"])
+    }
+
+    @Test
+    fun whenScanWebViewSizeEnabledThenPixelOutsideRunsHasNoScanWebViewSizeState() = runTest {
+        whenever(mockScanWebViewSizeToggle.isEnabled()).thenReturn(true)
+
+        testee.reportDashboardOpened(isAuthenticated = false)
+
+        firedParams().forEach { assertFalse(it.containsKey("scan_webview_size_state")) }
+    }
+
+    private fun firedParams(): List<Map<String, String>> {
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        val enqueuedCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender, atLeast(0)).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        verify(mockPixelSender, atLeast(0)).enqueueFire(
+            pixelName = any(),
+            parameters = enqueuedCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+        return paramsCaptor.allValues + enqueuedCaptor.allValues
     }
 }

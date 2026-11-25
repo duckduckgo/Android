@@ -135,6 +135,7 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
                             KEY_NOTIFICATIONS_PERMISSION_GRANTED to notificationsPermissionGranted.toString(),
                             KEY_TRACKER_BLOCKING_STATE to isTrackerBlockingEnabled.toTrackerBlockingState(),
                             KEY_FREE_SCAN to isFreeScan.toString(),
+                            KEY_SCAN_WEBVIEW_SIZE_STATE to scanWebViewSizeState(),
                         ),
                         cleanupPolicy = CleanupPolicy.OnTimeout(
                             duration = COMPLETION_FLOW_TIMEOUT,
@@ -226,12 +227,14 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
 
     private fun Boolean.toTrackerBlockingState(): String = if (this) "enabled" else "disabled"
 
+    private fun scanWebViewSizeState(): String = if (pirRemoteFeatures.scanWebViewSize().isEnabled()) "enabled" else "disabled"
+
     companion object {
         const val WIDE_EVENT_NAME = "pir-time-to-first-scan-complete"
         const val ENTRY_POINT = "funnel_pir_time_to_first_scan_complete_android"
 
         val COMPLETION_FLOW_TIMEOUT = 14.days
-        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 1)
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 2)
 
         const val INTERVAL_TOTAL_DURATION = "total_duration_ms_bucketed"
 
@@ -263,6 +266,7 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
         const val KEY_NOTIFICATIONS_PERMISSION_GRANTED = "notifications_permission_granted"
         const val KEY_TRACKER_BLOCKING_STATE = "tracker_blocking_state"
         const val KEY_FREE_SCAN = "free_scan"
+        const val KEY_SCAN_WEBVIEW_SIZE_STATE = "scan_webview_size_state"
 
         const val KEY_TOTAL_SCAN_JOBS_AT_FINISH = "total_scan_jobs_at_finish"
         const val KEY_FOREGROUND_RUN_COUNT = "foreground_run_count"

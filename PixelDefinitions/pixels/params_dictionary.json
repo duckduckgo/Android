@@ -341,6 +341,12 @@
         "type": "boolean",
         "description": "Whether the user is a free (freemium) PIR user."
     },
+    "pirScanWebViewSizeState": {
+        "key": "scan_webview_size_state",
+        "type": "string",
+        "description": "Whether the scanWebViewSize remote flag was on, laying out PIR scan WebViews at a desktop-width viewport instead of 0x0.",
+        "enum": ["enabled", "disabled"]
+    },
     "pirNotificationPromptType": {
         "key": "prompt_type",
         "type": "string",

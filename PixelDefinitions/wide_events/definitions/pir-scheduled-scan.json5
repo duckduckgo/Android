@@ -4,7 +4,7 @@
         "owners": ["karlenDimla", "landomen"],
         "meta": {
             "type": "android-pir-scheduled-scan",
-            "version": "0.1"
+            "version": "0.2"
         },
         "feature": {
             "name": "pir-scheduled-scan",
@@ -69,6 +69,11 @@
                     "tracker_blocking_state": {
                         "type": "string",
                         "description": "Whether tracker blocking was enabled or disabled during the run",
+                        "enum": ["enabled", "disabled"]
+                    },
+                    "scan_webview_size_state": {
+                        "type": "string",
+                        "description": "Whether the scanWebViewSize remote flag was on at the start of the run, laying out scan WebViews at a desktop-width viewport instead of 0x0",
                         "enum": ["enabled", "disabled"]
                     },
                     "free_scan": {
