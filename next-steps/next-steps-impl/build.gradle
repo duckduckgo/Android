@@ -50,21 +50,16 @@ dependencies {
     testImplementation project(path: ':data-store-test')
     testImplementation project(path: ':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation AndroidX.test.ext.junit
     testImplementation (KotlinX.coroutines.test) {
         // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
     testImplementation Testing.junit4
-    testImplementation Testing.robolectric
 
     ksp project(':codegen-ksp')
 }
 
 android {
-    testOptions {
-        unitTests.includeAndroidResources = true
-    }
     namespace "com.duckduckgo.nextsteps.impl"
 }
