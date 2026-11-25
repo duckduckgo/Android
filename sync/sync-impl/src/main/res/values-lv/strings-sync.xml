@@ -214,6 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Skenē kvadrātkodu, lai sinhronizētu</string>
     <string name="sync_simplified_scanner_camera_header_body">Atver <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>un dodies uz <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinhronizēt ar citu ierīci</annotation></string>
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Atver <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo datoriem</annotation></b>\n<annotation type="gap">\n</annotation>Dodies uz <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Sapratu</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo ir nepieciešama piekļuve tavai kamerai.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Lai skenētu kvadrātkodu, nepieciešama atļauja piekļūt kamerai.</string>
@@ -223,6 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Ievadi sinhronizācijas kodu</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Atver savu citu <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo lietotni</annotation></b>\n<annotation type="gap">\n</annotation>Dodies uz <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinhronizēt ar citu ierīci</annotation> › <annotation type="highlight">Kopēt teksta kodu</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Citā ierīcē atver <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo lietotni</annotation></b>\n<annotation type="gap">\n</annotation>Dodies uz <b><annotation type="url">%1$s</annotation></b> un izvēlies „Kopēt teksta kodu”.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Koda piemērs:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Ielīmēt sinhronizācijas kodu</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Atvaino, ielīmētais kods nav derīgs.</string>
@@ -231,6 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">Kvadrātkods</string>
     <string name="sync_simplified_qr_code_header_headline">Skenē no citas ierīces</string>
     <string name="sync_simplified_qr_code_header_body">Citā ierīcē atver <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>un dodies uz <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinhronizēt ar citu ierīci</annotation> un skenē šo kodu:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Citā ierīcē atver <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Dodies uz <b><annotation type="url">%1$s</annotation></b> un skenē šo kodu:</string>
     <string name="sync_simplified_qr_code_copy_button">Kopēt teksta kodu</string>
     <string name="sync_simplified_qr_code_share_button">Kopīgot</string>
     <string name="sync_simplified_qr_code_copied_message">Atgūšanas kods nokopēts</string>
