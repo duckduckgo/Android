@@ -30,7 +30,8 @@ tags:
 - tapOn:
     text: "Skip Content"
     waitToSettleTimeoutMs: 500
-# Only a prompt disappearance proves the skip; the button would also hide on its own after 8s.
+# Tapping hides the button immediately; left alone it hides after 8s of playback,
+# so disappearing within 2s of the tap is what proves the skip ran.
 - extendedWaitUntil:
     notVisible: "Skip Content"
     timeout: 2000
