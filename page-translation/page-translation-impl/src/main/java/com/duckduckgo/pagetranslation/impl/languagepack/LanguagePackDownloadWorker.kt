@@ -41,6 +41,9 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -71,10 +74,24 @@ internal class LanguagePackDownloadWorker(
         val pair = inputData.getString(PAIR_KEY) ?: return@withContext failure(Reason.DOWNLOAD_ERROR)
         // a deleted pack can only be restored until the pair's next operation starts
         directories.getOldDirectory(pair).deleteRecursively()
-        if (!feature.translation().isEnabled()) return@withContext failure(Reason.DOWNLOAD_ERROR)
+        directories.getStagingDirectory(pair).deleteRecursively()
+        if (directories.getPackDirectory(pair).exists()) return@withContext Result.success()
+
+        try {
+            download(pair)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "Page translation language pack download failed: ${e.asLog()}" }
+            failure(Reason.DOWNLOAD_ERROR)
+        }
+    }
+
+    private suspend fun download(pair: String): Result {
+        if (!feature.translation().isEnabled()) return failure(Reason.DOWNLOAD_ERROR)
 
         val manifest = store.readManifest()
-        val model = manifest?.models?.get(pair) ?: return@withContext failure(Reason.DOWNLOAD_ERROR)
+        val model = manifest?.models?.get(pair) ?: return failure(Reason.DOWNLOAD_ERROR)
 
         // WorkManager keeps the progress of a stopped attempt, but the fetcher starts over
         setProgress(workDataOf(DOWNLOADED_BYTES_KEY to 0L, TOTAL_BYTES_KEY to model.totalBytes))
@@ -109,7 +126,7 @@ internal class LanguagePackDownloadWorker(
             }
         }
 
-        when (result) {
+        return when (result) {
             SUCCESS -> Result.success()
             NOT_ENOUGH_STORAGE -> failure(Reason.NOT_ENOUGH_STORAGE)
             FAILURE -> failure(Reason.DOWNLOAD_ERROR)

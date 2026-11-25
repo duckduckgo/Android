@@ -42,6 +42,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Rule
@@ -66,6 +67,11 @@ class LanguagePackDownloadWorkerTest {
     private val fetcher: LanguagePackFetcher = mock()
     private val installer: LanguagePackInstaller = mock()
 
+    @After
+    fun tearDown() {
+        context.filesDir.resolve("page-translation").deleteRecursively()
+    }
+
     @Test
     fun failWithoutDownloadingWhenTranslationIsOff() = runTest {
         setTranslationEnabled(false)
@@ -85,6 +91,36 @@ class LanguagePackDownloadWorkerTest {
         createWorker().doWork()
 
         assertFalse(context.filesDir.resolve(OLD_PATH).exists())
+    }
+
+    @Test
+    fun removeAPartialDownloadOfThePairBeforeDownloading() = runTest {
+        setTranslationEnabled(true)
+        context.filesDir.resolve(STAGING_PATH).mkdirs()
+        whenever(store.readManifest()).thenReturn(MANIFEST.copy(models = emptyMap()))
+
+        createWorker().doWork()
+
+        assertFalse(context.filesDir.resolve(STAGING_PATH).exists())
+    }
+
+    @Test
+    fun succeedWithoutDownloadingWhenThePackIsInstalled() = runTest {
+        setTranslationEnabled(true)
+        context.filesDir.resolve(PACK_PATH).mkdirs()
+
+        assertEquals(Result.success(), createWorker().doWork())
+
+        verifyNoInteractions(fetcher)
+    }
+
+    @Test
+    fun reportDownloadErrorReasonWhenDownloadThrows() = runTest {
+        setTranslationEnabled(true)
+        whenever(store.readManifest()).thenReturn(MANIFEST)
+        whenever(fetcher.fetch(any(), any(), any(), any())).thenThrow(IllegalStateException())
+
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
     }
 
     @Test
