@@ -68,8 +68,10 @@ internal class LanguagePackWorker(
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        val pair = inputData.getString(PAIR_KEY)
-        if (pair == null || !feature.translation().isEnabled()) return@withContext Result.failure()
+        val pair = inputData.getString(PAIR_KEY) ?: return@withContext Result.failure()
+        // a deleted pack can only be restored until the pair's next operation starts
+        directories.getOldDirectory(pair).deleteRecursively()
+        if (!feature.translation().isEnabled()) return@withContext Result.failure()
 
         val manifest = store.readManifest()
         val model = manifest?.models?.get(pair) ?: return@withContext Result.failure()

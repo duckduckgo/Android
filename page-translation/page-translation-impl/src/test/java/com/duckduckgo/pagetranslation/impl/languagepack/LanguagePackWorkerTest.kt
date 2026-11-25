@@ -43,6 +43,7 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -72,6 +73,18 @@ class LanguagePackWorkerTest {
         assertEquals(Result.failure(), createWorker().doWork())
 
         verifyNoInteractions(fetcher)
+    }
+
+    @Test
+    fun removeTheDeletedPackOfThePairBeforeDownloading() = runTest {
+        setTranslationEnabled(true)
+        context.filesDir.resolve(OLD_PATH).mkdirs()
+        whenever(store.readManifest()).thenReturn(MANIFEST)
+        whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.FAILURE)
+
+        createWorker().doWork()
+
+        assertFalse(context.filesDir.resolve(OLD_PATH).exists())
     }
 
     @Test
@@ -176,6 +189,7 @@ class LanguagePackWorkerTest {
         const val BASE_URL = "https://models.test/"
         const val STAGING_PATH = "page-translation/packs/fr-en.tmp"
         const val PACK_PATH = "page-translation/packs/fr-en"
+        const val OLD_PATH = "page-translation/packs/fr-en.old"
 
         val MODEL = TranslationModel(
             sourceLanguage = "fr",
