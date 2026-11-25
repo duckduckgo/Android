@@ -167,6 +167,46 @@ class BlockListInterceptorApiPluginTest {
     }
 
     @Test
+    fun `EH-M-SET-1 treatment cohort uses treatment URL when settings include metrics`() {
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                settings = SETTINGS_WITH_METRICS,
+                cohorts = listOf(
+                    State.Cohort(name = CONTROL.cohortName, weight = 0),
+                    State.Cohort(name = TREATMENT.cohortName, weight = 1),
+                ),
+            ),
+        )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
+        val url = getUrl(TDS_PATH)
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
+
+        assertEquals(getUrl("anotherTreatmentUrl"), result.request.url.toString())
+    }
+
+    @Test
+    fun `EH-M-SET-1 control cohort uses control URL when settings include metrics`() {
+        testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
+            State(
+                remoteEnableState = true,
+                enable = true,
+                settings = SETTINGS_WITH_METRICS,
+                cohorts = listOf(
+                    State.Cohort(name = CONTROL.cohortName, weight = 1),
+                    State.Cohort(name = TREATMENT.cohortName, weight = 0),
+                ),
+            ),
+        )
+        val annotatedMethod = FakeApiService::class.java.getMethod("endpointRequiringTds")
+        val url = getUrl(TDS_PATH)
+        val result = interceptor.intercept(FakeChain(url = url, serviceMethod = annotatedMethod))
+
+        assertEquals(getUrl("anotherControlUrl"), result.request.url.toString())
+    }
+
+    @Test
     fun `when feature is for next URL rollout then use next url`() {
         testBlockListFeature.tdsNextExperimentAnotherTest().setRawStoredState(
             State(
@@ -255,6 +295,18 @@ class BlockListInterceptorApiPluginTest {
     }
 
     private fun getUrl(path: String): String = "$TDS_BASE_URL$path"
+
+    companion object {
+        private val SETTINGS_WITH_METRICS = """
+            {
+              "treatmentUrl": "anotherTreatmentUrl",
+              "controlUrl": "anotherControlUrl",
+              "metrics": {
+                "adwall": {"event": "adwall", "conversions": [{"windows": [[0, 0], [1, 1]], "thresholds": [1, 2]}]}
+              }
+            }
+        """.trimIndent()
+    }
 }
 
 class FakeFeatureTogglesInventory(private val features: List<Toggle>) : FeatureTogglesInventory {
