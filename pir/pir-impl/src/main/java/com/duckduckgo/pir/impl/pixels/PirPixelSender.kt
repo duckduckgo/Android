@@ -773,7 +773,7 @@ interface PirPixelSender {
         didCrash: Boolean,
     )
 
-    fun reportFreemiumSettingsEntryPointImpression()
+    fun reportFreemiumSettingsEntryPointImpression(ctaState: PirFreemiumCtaState)
 
     fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState)
 
@@ -1771,8 +1771,8 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_SCAN_RENDERER_GONE, params)
     }
 
-    override fun reportFreemiumSettingsEntryPointImpression() {
-        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION)
+    override fun reportFreemiumSettingsEntryPointImpression(ctaState: PirFreemiumCtaState) {
+        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION, mapOf(PARAM_KEY_CTA_STATE to ctaState.paramValue))
     }
 
     override fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState) {
