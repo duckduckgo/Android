@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Overlat det til oss. Vi avviser informasjonskapsler når det er mulig, og godtar dem som ikke kan avvises.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Avvis om mulig eller godta for meg</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Jeg tar meg av dem selv</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Avvis valgfrie informasjonskapsler</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maksimerer personvernet og lukker popup-vinduer for informasjonskapsler</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Godta noen informasjonskapsler</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Skjuler flere popup-vinduer ved å godta informasjonskapsler som ikke kan avvises</string>
 </resources>
