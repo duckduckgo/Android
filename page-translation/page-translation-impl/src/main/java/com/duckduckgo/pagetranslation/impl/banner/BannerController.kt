@@ -48,8 +48,17 @@ class BannerController(
 
     private val onScreen = MutableStateFlow(false)
 
+    private val interacting = MutableStateFlow(false)
+
     fun setOnScreen(value: Boolean) {
         onScreen.value = value
+    }
+
+    /**
+     * While the user touches or drags the banner the timer is paused, and it restarts in full on release.
+     */
+    fun setInteracting(value: Boolean) {
+        interacting.value = value
     }
 
     suspend fun run() = coroutineScope {
@@ -57,7 +66,9 @@ class BannerController(
             offerSource.offer.collect { offer -> reduce(BannerEvent.OfferChanged(offer)) }
         }
         launch {
-            combine(state.map { (it as? BannerState.Showing)?.offer }, onScreen) { offer, visible -> offer.takeIf { visible } }
+            combine(state.map { (it as? BannerState.Showing)?.offer }, onScreen, interacting) { offer, visible, touched ->
+                offer.takeIf { visible && !touched }
+            }
                 .distinctUntilChanged()
                 .collectLatest { offer ->
                     if (offer != null) {

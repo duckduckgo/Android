@@ -93,6 +93,7 @@ class TranslationBannerView @JvmOverloads constructor(
 
     override fun onDetachedFromWindow() {
         controller?.setOnScreen(false)
+        controller?.setInteracting(false)
         scope?.cancel()
         scope = null
         card.animate().cancel()
@@ -185,6 +186,7 @@ class TranslationBannerView @JvmOverloads constructor(
                 if (!dragging) {
                     val dx = ev.rawX - downX
                     val dy = ev.rawY - downY
+                if (isOnCard(ev)) controller?.setInteracting(true)
                     if (abs(dx) > slop && abs(dx) > abs(dy)) {
                         dragging = true
                         card.translationX = dx
@@ -201,6 +203,7 @@ class TranslationBannerView @JvmOverloads constructor(
         val tracker = velocityTracker
         tracker?.computeCurrentVelocity(1000)
         val velocityX = tracker?.xVelocity ?: 0f
+        if (ev.actionMasked == MotionEvent.ACTION_UP || ev.actionMasked == MotionEvent.ACTION_CANCEL) controller?.setInteracting(false)
         tracker?.recycle()
         velocityTracker = null
 

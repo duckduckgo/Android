@@ -51,6 +51,12 @@ class BannerControllerTest {
     private val downloadPrompt: LanguagePackDownloadPrompt = mock()
     private val testee = BannerController(offerSource, languagePacks, translateAction, downloadPrompt, TIMEOUT)
 
+    private fun TestScope.showFirst() {
+        start()
+        offers.value = first
+        runCurrent()
+    }
+
     private fun TestScope.start(onScreen: Boolean = true) {
         backgroundScope.launch { testee.run() }
         testee.setOnScreen(onScreen)
@@ -110,6 +116,34 @@ class BannerControllerTest {
         advanceTimeBy(TIMEOUT * 2)
 
         testee.setOnScreen(true)
+        runCurrent()
+        advanceTimeBy(TIMEOUT - 1)
+        assertEquals(true, showing)
+        advanceTimeBy(2)
+
+        assertEquals(false, showing)
+    }
+
+    @Test
+    fun whenInteractingThenTimerDoesNotDismiss() = runTest {
+        showFirst()
+
+        testee.setInteracting(true)
+        runCurrent()
+        advanceTimeBy(TIMEOUT * 3)
+
+        assertEquals(true, showing)
+    }
+
+    @Test
+    fun whenInteractionEndsThenFullTimeoutRestarts() = runTest {
+        showFirst()
+        advanceTimeBy(TIMEOUT - 1_000)
+        testee.setInteracting(true)
+        runCurrent()
+        advanceTimeBy(TIMEOUT * 2)
+
+        testee.setInteracting(false)
         runCurrent()
         advanceTimeBy(TIMEOUT - 1)
         assertEquals(true, showing)
