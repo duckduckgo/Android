@@ -214,6 +214,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
             "getUserSettings" -> id?.let { getUserSettings(it) }
             "requestNotificationsPermission" -> id?.let { requestNotificationsPermission(it) }
+            "showNotificationsDeniedDialog" -> id?.let { showNotificationsDeniedDialog(it, data) }
             "completeStripePayment" -> completeStripePayment(featureName, method, id)
             else -> {
                 // NOOP
@@ -273,6 +274,40 @@ class SubscriptionWebViewViewModel @Inject constructor(
             )
             command.send(SendResponseToJs(response))
         }
+    }
+
+    private fun showNotificationsDeniedDialog(id: String, data: JSONObject?) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (!subscriptionsFeature.notificationsDeniedDialogMessaging().isEnabled()) return@launch
+            val days = runCatching { data?.getInt("days") }.getOrNull()
+            if (days == null || days <= 0) {
+                sendNotificationsDeniedDialogResponse(id, NOTIFICATIONS_DENIED_DIALOG_NOT_NOW)
+            } else {
+                command.send(ShowNotificationsDeniedDialog(id, days))
+            }
+        }
+    }
+
+    fun onNotificationsDeniedDialogOpenSettings(id: String) {
+        viewModelScope.launch {
+            sendNotificationsDeniedDialogResponse(id, NOTIFICATIONS_DENIED_DIALOG_OPEN_SETTINGS)
+        }
+    }
+
+    fun onNotificationsDeniedDialogNotNow(id: String) {
+        viewModelScope.launch {
+            sendNotificationsDeniedDialogResponse(id, NOTIFICATIONS_DENIED_DIALOG_NOT_NOW)
+        }
+    }
+
+    private suspend fun sendNotificationsDeniedDialogResponse(id: String, action: String) {
+        val response = JsCallbackData(
+            featureName = "useSubscription",
+            method = "showNotificationsDeniedDialog",
+            id = id,
+            params = JSONObject().apply { put("action", action) },
+        )
+        command.send(SendResponseToJs(response))
     }
 
     fun onSubscriptionRestored() = viewModelScope.launch {
@@ -905,6 +940,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object RestoreSubscription : Command()
         data class ComputeUserSettings(val id: String) : Command()
         data class RequestNotificationsPermission(val id: String) : Command()
+        data class ShowNotificationsDeniedDialog(val id: String, val days: Int) : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data object GoToPIRDashboard : Command()
@@ -921,5 +957,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         private const val NOTIFICATIONS_PERMISSION_GRANTED = "granted"
         private const val NOTIFICATIONS_PERMISSION_DENIED = "denied"
         private const val NOTIFICATIONS_PERMISSION_NOT_DETERMINED = "notDetermined"
+        private const val NOTIFICATIONS_DENIED_DIALOG_OPEN_SETTINGS = "openSettings"
+        private const val NOTIFICATIONS_DENIED_DIALOG_NOT_NOW = "notNow"
     }
 }
