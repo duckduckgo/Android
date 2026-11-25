@@ -224,6 +224,40 @@ interface SyncPixels {
         THIRD_PARTY("3party"),
     }
 
+    enum class SetupMode(val value: String) {
+        SINGLE_DEVICE("single_device"),
+        MULTI_DEVICE("multi_device"),
+        RECOVERY("recovery"),
+    }
+
+    enum class ConnectMethod(val value: String) {
+        SHOW_CODE("show_code"),
+        SCAN_CODE("scan_code"),
+        PASTE_CODE("paste_code"),
+        LINK("link"),
+    }
+
+    enum class SetupStep(val value: String) {
+        STARTED("started"),
+        CHOICE_SCREEN("choice_screen"),
+        DEVICE_AUTH("device_auth"),
+        PREPARING_CODE("preparing_code"),
+        CODE_SCREEN("code_screen"),
+        CODE_ENTRY("code_entry"),
+        CODE_ACCEPTED_BY_OTHER_DEVICE("code_accepted_by_other_device"),
+        CONFIRMATION_SCREEN("confirmation_screen"),
+        WAITING_FOR_CONFIRMATION("waiting_for_confirmation"),
+        SYNC_CONFIRMATION("sync_confirmation"),
+        PREPARING_SYNC("preparing_sync"),
+        HOST_AWAITING_JOINER("host_awaiting_joiner"),
+        ACCOUNT_CREATED("account_created"),
+        SYNC_THIS_DEVICE_OFFER("sync_this_device_offer"),
+        RESTORE_OFFER("restore_offer"),
+        ERROR_SCREEN("error_screen"),
+        RECOVERY_CODE_SHOWN("recovery_code_shown"),
+        SUCCESS_SCREEN_SHOWN("success_screen_shown"),
+    }
+
     /**
      * Why a setup was cancelled, per the "Cancellation" telemetry. Based on the v2 protocol state at
      * the moment of cancellation: [SCANNING_CANCELLED] before the exchange engages a peer,
