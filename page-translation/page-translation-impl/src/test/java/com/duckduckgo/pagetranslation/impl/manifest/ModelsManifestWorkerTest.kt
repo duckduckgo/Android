@@ -43,7 +43,7 @@ class ModelsManifestWorkerTest {
     private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java)
     private val fetcher: ModelsManifestFetcher = mock()
     private val store: ModelsManifestStore = mock()
-    private val scheduler: LanguagePackScheduler = mock()
+    private val languagePackScheduler: LanguagePackScheduler = mock()
 
     @Test
     fun succeedWithoutFetchingWhenTranslationIsOff() = runTest {
@@ -70,7 +70,7 @@ class ModelsManifestWorkerTest {
 
         assertEquals(Result.success(), createWorker().doWork())
 
-        verify(scheduler).removeUnlisted(setOf("fr-en"))
+        verify(languagePackScheduler).removeUnlisted(setOf("fr-en"))
     }
 
     @Test
@@ -81,7 +81,7 @@ class ModelsManifestWorkerTest {
 
         createWorker().doWork()
 
-        verifyNoInteractions(scheduler)
+        verifyNoInteractions(languagePackScheduler)
     }
 
     @Test
@@ -91,14 +91,14 @@ class ModelsManifestWorkerTest {
 
         createWorker().doWork()
 
-        verifyNoInteractions(scheduler)
+        verifyNoInteractions(languagePackScheduler)
     }
 
     private fun createWorker() = TestListenableWorkerBuilder<ModelsManifestWorker>(ApplicationProvider.getApplicationContext()).build().also {
         it.feature = feature
         it.fetcher = lazyOf(fetcher)
         it.store = store
-        it.scheduler = scheduler
+        it.languagePackScheduler = languagePackScheduler
         it.dispatchers = coroutineRule.testDispatcherProvider
     }
 
