@@ -20,6 +20,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.ActivityNotFoundException
+import android.content.Intent
 import android.os.Bundle
 import android.view.ContextThemeWrapper
 import android.view.LayoutInflater
@@ -124,6 +125,10 @@ class ComposeWelcomePageFragment : OnboardingPageFragment(R.layout.content_onboa
         } else {
             viewModel.onQuickSetupDefaultBrowserNotSet()
         }
+    }
+
+    private val migrationDefaultBrowserPrompt = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        viewModel.onMigrationDefaultBrowserPromptFinished()
     }
 
     private val passwordImportFlow = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -271,11 +276,16 @@ class ComposeWelcomePageFragment : OnboardingPageFragment(R.layout.content_onboa
             is WelcomePageViewModel.Command.FinishAndSubmitChatPrompt ->
                 (activity as? OnboardingActivity)?.finishAndSubmitChatPrompt(command.prompt)
             WelcomePageViewModel.Command.OnboardingSkipped -> onSkipPressed()
-            WelcomePageViewModel.Command.HandOffToBrowserActivity ->
+            WelcomePageViewModel.Command.HandOffToBrowserActivity,
+            WelcomePageViewModel.Command.FinishToBrowser,
+            ->
                 (activity as? OnboardingActivity)?.handOffToBrowserActivity()
             is WelcomePageViewModel.Command.ShowQuickSetupDefaultBrowserDialog ->
                 quickSetupDefaultBrowserRoleManagerDialog.launch(command.intent)
             WelcomePageViewModel.Command.OpenDefaultBrowserSystemSettings -> openDefaultBrowserSystemSettings()
+            is WelcomePageViewModel.Command.ShowMigrationDefaultBrowserDialog -> launchMigrationDefaultBrowserPrompt(command.intent)
+            WelcomePageViewModel.Command.OpenMigrationDefaultBrowserSettings ->
+                launchMigrationDefaultBrowserPrompt(DefaultBrowserSystemSettings.intent())
             WelcomePageViewModel.Command.ShowRemoveWidgetBottomSheet ->
                 RemoveWidgetInstructionsBottomSheet().show(childFragmentManager, RemoveWidgetInstructionsBottomSheet.TAG)
             is WelcomePageViewModel.Command.ShowQuickSetupAddressBarPositionBottomSheet ->
@@ -331,6 +341,16 @@ class ComposeWelcomePageFragment : OnboardingPageFragment(R.layout.content_onboa
             Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
             // No activity launches, so the resume-driven resync never arrives for this attempt.
             viewModel.syncQuickSetupSwitches()
+        }
+    }
+
+    private fun launchMigrationDefaultBrowserPrompt(intent: Intent) {
+        try {
+            migrationDefaultBrowserPrompt.launch(intent)
+        } catch (_: ActivityNotFoundException) {
+            viewModel.onMigrationDefaultBrowserPromptFinished()
+        } catch (_: SecurityException) {
+            viewModel.onMigrationDefaultBrowserPromptFinished()
         }
     }
 
