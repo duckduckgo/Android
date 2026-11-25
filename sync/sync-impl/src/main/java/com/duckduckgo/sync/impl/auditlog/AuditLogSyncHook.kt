@@ -30,10 +30,13 @@ import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
 interface AuditLogSyncHook {
-    /** Starts an audit log check in the background and returns at once. Skips it if a check is already running. */
+    /**
+     * Starts an audit log check in the background and returns at once. The same job then posts the new login notification.
+     * Skips it if a check is already running.
+     */
     fun onSyncSucceeded()
 
-    /** Suspends until the check started by [onSyncSucceeded] ends. Returns at once if none is running. */
+    /** Suspends until the check started by [onSyncSucceeded] and its notification end. Returns at once if none is running. */
     suspend fun awaitRunningCheck()
 }
 
@@ -41,6 +44,7 @@ interface AuditLogSyncHook {
 @ContributesBinding(AppScope::class)
 class RealAuditLogSyncHook @Inject constructor(
     private val checker: AuditLogChecker,
+    private val newLoginNotifier: NewLoginNotifier,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : AuditLogSyncHook {
@@ -54,7 +58,7 @@ class RealAuditLogSyncHook @Inject constructor(
 
             runningCheck = appCoroutineScope.launch(dispatchers.io()) {
                 try {
-                    checker.check()
+                    newLoginNotifier.onCheckFinished(checker.check())
                 } catch (e: CancellationException) {
                     throw e
                 } catch (e: Exception) {

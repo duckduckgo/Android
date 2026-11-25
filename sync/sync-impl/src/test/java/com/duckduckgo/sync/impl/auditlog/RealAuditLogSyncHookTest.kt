@@ -33,9 +33,11 @@ class RealAuditLogSyncHookTest {
     val coroutineTestRule = CoroutineTestRule()
 
     private val checker = FakeAuditLogChecker()
+    private val notifier = FakeNewLoginNotifier()
 
     private val hook = RealAuditLogSyncHook(
         checker = checker,
+        newLoginNotifier = notifier,
         appCoroutineScope = coroutineTestRule.testScope,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
@@ -45,6 +47,40 @@ class RealAuditLogSyncHookTest {
         hook.onSyncSucceeded()
 
         assertEquals(1, checker.checkCount)
+    }
+
+    @Test
+    fun whenCheckEndsThenNotifierGetsItsResult() = runTest {
+        checker.result = AuditLogCheckResult.Checked(newLogins = 2, renamedLogins = 0)
+
+        hook.onSyncSucceeded()
+
+        assertEquals(listOf(AuditLogCheckResult.Checked(newLogins = 2, renamedLogins = 0)), notifier.results)
+    }
+
+    @Test
+    fun whenNotifierIsRunningThenAwaitReturnsOnlyAfterItEnds() = runTest {
+        val release = CompletableDeferred<Unit>()
+        notifier.release = release
+        hook.onSyncSucceeded()
+
+        val waiting = async { hook.awaitRunningCheck() }
+        runCurrent()
+        assertFalse(waiting.isCompleted)
+
+        release.complete(Unit)
+        runCurrent()
+        assertTrue(waiting.isCompleted)
+    }
+
+    @Test
+    fun whenNotifierThrowsThenHookDoesNotThrowAndNextSyncChecksAgain() = runTest {
+        notifier.throwOnNext = IllegalStateException()
+        hook.onSyncSucceeded()
+
+        hook.onSyncSucceeded()
+
+        assertEquals(2, checker.checkCount)
     }
 
     @Test
@@ -111,6 +147,7 @@ class RealAuditLogSyncHookTest {
             private set
         var throwOnNextCheck: Exception? = null
         var release: CompletableDeferred<Unit>? = null
+        var result: AuditLogCheckResult = AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0)
 
         override suspend fun check(): AuditLogCheckResult {
             checkCount++
@@ -119,7 +156,24 @@ class RealAuditLogSyncHookTest {
                 throwOnNextCheck = null
                 throw it
             }
-            return AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0)
+            return result
         }
+    }
+
+    private class FakeNewLoginNotifier : NewLoginNotifier {
+        val results = mutableListOf<AuditLogCheckResult>()
+        var release: CompletableDeferred<Unit>? = null
+        var throwOnNext: Exception? = null
+
+        override suspend fun onCheckFinished(result: AuditLogCheckResult) {
+            results += result
+            release?.await()
+            throwOnNext?.let {
+                throwOnNext = null
+                throw it
+            }
+        }
+
+        override suspend fun cancel() = Unit
     }
 }

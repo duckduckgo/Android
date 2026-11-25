@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntrySkipReason
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogAction.SYNCED
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Content
@@ -38,6 +39,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Duration
 import java.time.Instant
@@ -49,6 +52,7 @@ class SyncAuditLogViewModelTest {
 
     private val loader = FakeLoader()
     private val stateStore = FakeStateStore()
+    private val newLoginNotifier: NewLoginNotifier = mock()
     private val timeProvider: CurrentTimeProvider = mock<CurrentTimeProvider>().also {
         whenever(it.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
     }
@@ -306,6 +310,22 @@ class SyncAuditLogViewModelTest {
     }
 
     @Test
+    fun whenLoadedThenNotificationIsCancelled() = runTest {
+        loadedViewModel(loaded(ITEM_1))
+
+        verify(newLoginNotifier).cancel()
+    }
+
+    @Test
+    fun whenLoadFailsThenNotificationIsKept() = runTest {
+        viewModel()
+
+        loader.result.complete(SyncAuditLogLoadResult.Failed)
+
+        verify(newLoginNotifier, never()).cancel()
+    }
+
+    @Test
     fun whenPendingLoginIsLoadedThenItsRowIsHighlighted() = runTest {
         stateStore.state = AuditLogCheckState(pendingLogins = listOf(pending("e2")))
         val testee = viewModel()
@@ -400,7 +420,7 @@ class SyncAuditLogViewModelTest {
     }
 
     private fun viewModel(entriesPerPage: Int? = null) =
-        SyncAuditLogViewModel(SyncAuditLogScreenParams(entriesPerPage), loader, timeProvider, stateStore)
+        SyncAuditLogViewModel(SyncAuditLogScreenParams(entriesPerPage), loader, timeProvider, stateStore, newLoginNotifier)
 
     private fun loadedViewModel(first: SyncAuditLogLoadResult.Loaded, entriesPerPage: Int? = null) =
         viewModel(entriesPerPage).also { loader.result.complete(first) }

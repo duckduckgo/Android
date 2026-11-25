@@ -48,6 +48,7 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.impl.auditlog.RealLoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
@@ -130,6 +131,7 @@ class SyncActivityViewModelTest {
     private val stateFlow = MutableStateFlow(SyncState.READY)
 
     private val auditLogStateStore = FakeStateStore()
+    private val newLoginNotifier: NewLoginNotifier = mock()
 
     private lateinit var testee: SyncActivityViewModel
 
@@ -152,6 +154,7 @@ class SyncActivityViewModelTest {
             appCoroutineScope = coroutineTestRule.testScope,
             loginAuditLogFeature = RealLoginAuditLogFeature(fakeSyncFeature, coroutineTestRule.testDispatcherProvider),
             auditLogStateStore = auditLogStateStore,
+            newLoginNotifier = newLoginNotifier,
         )
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
@@ -1587,10 +1590,27 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenNewDeviceBannerClosedThenNotificationIsCancelled() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNotNull(expectMostRecentItem().newDeviceBanner)
+
+            testee.onNewDeviceBannerCloseClicked()
+
+            verify(newLoginNotifier).cancel()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenNewDeviceBannerClosedWithNoBannerThenStoreUntouched() = runViewModelTest {
         testee.onNewDeviceBannerCloseClicked()
 
         assertEquals(0, auditLogStateStore.updateCount)
+        verify(newLoginNotifier, never()).cancel()
     }
 
     @Test

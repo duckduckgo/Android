@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -43,6 +44,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     private val loader: SyncAuditLogLoader,
     private val currentTimeProvider: CurrentTimeProvider,
     private val stateStore: AuditLogCheckStateStore,
+    private val newLoginNotifier: NewLoginNotifier,
 ) : ViewModel() {
 
     data class ViewState(
@@ -170,6 +172,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
             )
             updated.takeIf { it != state }
         }
+        newLoginNotifier.cancel()
     }
 
     // Times are fixed when a page loads: the screen does not refresh while it is open.

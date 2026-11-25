@@ -23,6 +23,8 @@ import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.sync.api.engine.SyncEngine
+import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger
 import com.duckduckgo.sync.impl.ConnectedDevice
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.store.SyncStore
@@ -41,6 +43,7 @@ class SyncAuditLogDebugViewModel @Inject constructor(
     private val auditLogDebugReport: AuditLogDebugReport,
     private val auditLogCheckDebugControls: AuditLogCheckDebugControls,
     private val otherDevicesDebugTool: OtherDevicesDebugTool,
+    private val syncEngine: SyncEngine,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
 
@@ -87,6 +90,13 @@ class SyncAuditLogDebugViewModel @Inject constructor(
     fun onMarkAllAuditLoginsSeenClicked() = runUnseenLoginsAction { auditLogCheckDebugControls.markAllAsSeen() }
 
     fun onSimulateLoginClicked() = runOtherDevicesAction { otherDevicesDebugTool.simulateLogin() }
+
+    // A real sync, so the post-sync audit log check runs and posts the new login notification ("Find unseen" does not post it).
+    fun onSyncNowClicked() = runOtherDevicesAction {
+        if (!syncStore.isSignedIn() || !syncStore.syncingDataEnabled) return@runOtherDevicesAction "Sync is off, so nothing was synced"
+        syncEngine.triggerSync(SyncTrigger.APP_OPEN)
+        "Sync started. The audit log check runs after it and posts the notification for new logins."
+    }
 
     fun onLogOutOtherDeviceClicked(device: ConnectedDevice) = runOtherDevicesAction { otherDevicesDebugTool.logOut(device) }
 
