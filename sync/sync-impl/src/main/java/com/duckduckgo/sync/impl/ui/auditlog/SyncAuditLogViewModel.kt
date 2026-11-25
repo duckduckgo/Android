@@ -20,14 +20,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -45,6 +49,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     private val currentTimeProvider: CurrentTimeProvider,
     private val stateStore: AuditLogCheckStateStore,
     private val newLoginNotifier: NewLoginNotifier,
+    private val loginAuditLogFeature: LoginAuditLogFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -76,8 +81,15 @@ class SyncAuditLogViewModel @AssistedInject constructor(
 
     enum class Footer { NONE, LOADING, ERROR }
 
+    sealed interface Command {
+        data object Close : Command
+    }
+
     private val _viewState = MutableStateFlow(ViewState())
     val viewState: StateFlow<ViewState> = _viewState.asStateFlow()
+
+    private val _commands = Channel<Command>(Channel.BUFFERED)
+    val commands: Flow<Command> = _commands.receiveAsFlow()
 
     private class Session(
         val monitor: SyncAuditLogUnseenMonitor,
@@ -88,7 +100,17 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     private var retryAllowed = false
 
     init {
-        load()
+        if (params.openedFromNotification) {
+            viewModelScope.launch {
+                if (loginAuditLogFeature.isAuditLogEnabled()) {
+                    load()
+                } else {
+                    _commands.send(Command.Close)
+                }
+            }
+        } else {
+            load()
+        }
     }
 
     fun onNearListEnd() {

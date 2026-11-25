@@ -20,13 +20,17 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Application
 import android.app.Notification
 import android.app.NotificationManager
+import android.content.Intent
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.auditlog.RealNewLoginNotifier.Companion.NEW_LOGIN_NOTIFICATION_ID
 import com.duckduckgo.sync.impl.auditlog.RealNewLoginNotifier.Companion.SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogActivity
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogScreenParams
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -40,6 +44,10 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
 import java.time.Instant
 
@@ -53,12 +61,17 @@ class RealNewLoginNotifierTest {
     private val notificationManager = NotificationManagerCompat.from(context)
     private val stateStore = FakeStateStore()
     private val feature = FakeLoginAuditLogFeature()
+    private val deviceActivityIntent = Intent(context, SyncAuditLogActivity::class.java)
+    private val globalActivityStarter: GlobalActivityStarter = mock<GlobalActivityStarter>().also {
+        whenever(it.startIntent(any(), eq(SyncAuditLogScreenParams(openedFromNotification = true)))).thenReturn(deviceActivityIntent)
+    }
 
     private val notifier = RealNewLoginNotifier(
         context = context,
         notificationManager = notificationManager,
         stateStore = stateStore,
         loginAuditLogFeature = feature,
+        globalActivityStarter = globalActivityStarter,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -78,6 +91,26 @@ class RealNewLoginNotifierTest {
         assertEquals("New synced device", notification!!.extras.getString(Notification.EXTRA_TITLE))
         assertEquals("This phone has synced with another device", notification.extras.getString(Notification.EXTRA_TEXT))
         assertEquals(SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID, notification.channelId)
+    }
+
+    @Test
+    fun whenNotificationIsTappedThenOnlyDeviceActivityOpensOnTopOfTheCurrentScreen() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0))
+
+        val openedIntents = shadowOf(postedNotification()!!.contentIntent).savedIntents.toList()
+        assertEquals(1, openedIntents.size)
+        assertTrue(openedIntents.single().filterEquals(deviceActivityIntent))
+    }
+
+    @Test
+    fun whenNotificationIsTappedThenItIsRemoved() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0))
+
+        assertTrue(postedNotification()!!.flags and Notification.FLAG_AUTO_CANCEL != 0)
     }
 
     @Test
