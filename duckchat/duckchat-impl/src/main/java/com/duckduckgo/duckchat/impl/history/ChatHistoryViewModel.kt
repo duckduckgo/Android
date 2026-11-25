@@ -207,9 +207,19 @@ class ChatHistoryViewModel @Inject constructor(
         }
     }
 
-    /** Per-row overflow Delete — fires immediately, no confirmation. */
+    /** Per-row Fire Button or overflow Delete — asks for confirmation before deleting. */
     fun onDeleteSingleChat(chatId: String) {
-        dispatchSelectedClear(setOf(chatId))
+        if (!duckAiFeatureState.showClearDuckAIChatHistory.value) return
+        // A second tap before the first sheet shows would retarget state while the sheet still deletes the first chat.
+        if (controls.value.confirmation != null) return
+        controls.update { it.copy(confirmation = PendingConfirmation.DeleteSingle(chatId = chatId)) }
+    }
+
+    /** The dialog drives the actual deletion of the single chat surfaced by [chatUrlsForDialog]. */
+    fun onDeleteSingleConfirmed() {
+        if (controls.value.confirmation !is PendingConfirmation.DeleteSingle) return
+        pixel.fireCountAndDaily(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_DELETED_COUNT, DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_DELETED_DAILY)
+        controls.update { it.copy(confirmation = null) }
     }
 
     fun onRenameRequested(chatId: String, currentTitle: String) {

@@ -20,5 +20,9 @@ import androidx.annotation.StringRes
 
 sealed interface ChatHistoryListEntry {
     data class Header(@StringRes val labelRes: Int) : ChatHistoryListEntry
-    data class Row(val item: ChatHistoryItem, val selected: Boolean = false) : ChatHistoryListEntry
+    data class Row(
+        val item: ChatHistoryItem,
+        val selected: Boolean = false,
+        val selectMode: Boolean = false,
+    ) : ChatHistoryListEntry
 }

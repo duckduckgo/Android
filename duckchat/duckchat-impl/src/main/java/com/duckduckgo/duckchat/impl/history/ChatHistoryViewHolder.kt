@@ -23,6 +23,7 @@ import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.impl.R
@@ -35,12 +36,16 @@ class ChatHistoryViewHolder(
     private val iconContainer: FrameLayout = itemView.findViewById(R.id.chatHistoryIconContainer)
     private val typeIcon: ImageView = itemView.findViewById(R.id.chatHistoryTypeIcon)
     private val title: DaxTextView = itemView.findViewById(R.id.chatHistoryTitle)
+    private val fireContainer: View = itemView.findViewById(R.id.chatHistoryFireContainer)
+    private val fireButton: ImageView = itemView.findViewById(R.id.chatHistoryFire)
     private val moreButton: ImageView = itemView.findViewById(R.id.chatHistoryMore)
 
     fun bind(
         item: ChatHistoryItem,
         selected: Boolean,
+        showFireButton: Boolean,
         onClick: (ChatHistoryItem) -> Unit,
+        onFireClick: (ChatHistoryItem) -> Unit,
         onMoreClick: (ChatHistoryItem, View) -> Unit,
         onLongClick: (ChatHistoryItem) -> Boolean = { false },
     ) {
@@ -48,9 +53,16 @@ class ChatHistoryViewHolder(
         iconContainer.rotationY = 0f
         title.text = item.displayTitle
         applySelectionState(item, selected)
+        setFireButtonVisible(showFireButton)
         itemView.setOnClickListener { onClick(item) }
         itemView.setOnLongClickListener { onLongClick(item) }
+        fireButton.setOnClickListener { onFireClick(item) }
         moreButton.setOnClickListener { anchor -> onMoreClick(item, anchor) }
+    }
+
+    /** Hidden in multi-select: deleting there goes through the toolbar Fire for the whole selection. */
+    fun setFireButtonVisible(visible: Boolean) {
+        fireContainer.isVisible = visible
     }
 
     fun animateSelectionChange(item: ChatHistoryItem, selected: Boolean) {

@@ -42,5 +42,10 @@ sealed interface ChatHistoryUiState {
 
         /** Delete-selected confirmation — captured selection snapshot. */
         data class DeleteSelected(override val chatIds: Set<String>) : PendingConfirmation
+
+        /** Single-chat confirmation — from a row's Fire Button or its overflow Delete. */
+        data class DeleteSingle(val chatId: String) : PendingConfirmation {
+            override val chatIds: Set<String> get() = setOf(chatId)
+        }
     }
 }

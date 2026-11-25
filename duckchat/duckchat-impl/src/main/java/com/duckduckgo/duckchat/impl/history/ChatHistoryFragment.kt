@@ -89,6 +89,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
 
     private val adapter = ChatHistoryAdapter(
         onChatClicked = { item -> viewModel.onChatRowClicked(item.chatId) },
+        onChatFireClicked = { item -> viewModel.onDeleteSingleChat(item.chatId) },
         onChatMoreClicked = { item, anchor -> showRowPopup(item, anchor) },
         onChatLongClicked = { item -> viewModel.onChatRowLongClicked(item.chatId) },
     )
@@ -150,6 +151,7 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
                 -> when (confirmation) {
                     is ChatHistoryUiState.PendingConfirmation.FireAll -> viewModel.onFireAllConfirmed()
                     is ChatHistoryUiState.PendingConfirmation.DeleteSelected -> viewModel.onDeleteSelectedConfirmed()
+                    is ChatHistoryUiState.PendingConfirmation.DeleteSingle -> viewModel.onDeleteSingleConfirmed()
                     null -> Unit
                 }
                 FireDialog.EVENT_ON_CANCEL -> viewModel.onConfirmationCancelled()
@@ -322,14 +324,14 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_pinned))
             state.pinned.forEach { item ->
                 val selected = selectMode != null && item.chatId in selectMode.selectedChatIds
-                add(ChatHistoryListEntry.Row(item = item, selected = selected))
+                add(ChatHistoryListEntry.Row(item = item, selected = selected, selectMode = selectMode != null))
             }
         }
         if (state.recent.isNotEmpty()) {
             if (!state.searchActive) add(ChatHistoryListEntry.Header(R.string.duck_ai_chat_history_section_recent))
             state.recent.forEach { item ->
                 val selected = selectMode != null && item.chatId in selectMode.selectedChatIds
-                add(ChatHistoryListEntry.Row(item = item, selected = selected))
+                add(ChatHistoryListEntry.Row(item = item, selected = selected, selectMode = selectMode != null))
             }
         }
     }
@@ -339,10 +341,14 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return
 
         val selectedChatUrls = viewModel.chatUrlsForDialog().orEmpty()
+        // A single chat reuses the "Delete this chat?" dialog shown when burning a recent-chat suggestion.
+        val origin = if (confirmation is ChatHistoryUiState.PendingConfirmation.DeleteSingle && selectedChatUrls.size == 1) {
+            FireDialogProvider.FireDialogOrigin.ChatAutocomplete(chatUrl = selectedChatUrls.single())
+        } else {
+            FireDialogProvider.FireDialogOrigin.ChatHistory(selectedChatUrls = selectedChatUrls)
+        }
         viewLifecycleOwner.lifecycleScope.launch {
-            val dialog = fireDialogProvider.createFireDialog(
-                FireDialogProvider.FireDialogOrigin.ChatHistory(selectedChatUrls = selectedChatUrls),
-            )
+            val dialog = fireDialogProvider.createFireDialog(origin)
             if (childFragmentManager.findFragmentByTag(FIRE_DIALOG_TAG) != null) return@launch
             dialog.show(childFragmentManager, FIRE_DIALOG_TAG)
         }
