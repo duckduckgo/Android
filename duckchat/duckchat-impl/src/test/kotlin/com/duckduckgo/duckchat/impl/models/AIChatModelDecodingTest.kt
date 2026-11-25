@@ -22,6 +22,8 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 class AIChatModelDecodingTest {
 
@@ -155,6 +157,89 @@ class AIChatModelDecodingTest {
         assertEquals(
             listOf(RemoteReasoningEffortAccess(id = "low", accessTier = listOf("free"), entityHasAccess = true)),
             parsed.reasoningEffortAccess,
+        )
+    }
+}
+
+/** Runs against the app's production Moshi (no Kotlin reflection) and the reflective one the tests above use. */
+@RunWith(Parameterized::class)
+class AIChatModelsResponseDecodingTest(
+    @Suppress("unused") private val config: String,
+    moshi: Moshi,
+) {
+
+    private val adapter: JsonAdapter<AIChatModelsResponse> = moshi.adapter(AIChatModelsResponse::class.java)
+
+    @Test
+    fun whenNewChatDefaultPresentThenDecoded() {
+        val parsed = decode("""{"modelId":"gpt-6-luna","reasoningEffort":"none"}""")
+
+        assertEquals(RemoteNewChatDefault(modelId = "gpt-6-luna", reasoningEffort = "none"), parsed.newChatDefault)
+        assertRestDecoded(parsed)
+    }
+
+    @Test
+    fun whenNewChatDefaultAbsentThenNull() {
+        val parsed = adapter.fromJson("""{"models":[$MODEL],"attachmentLimits":$LIMITS}""")!!
+
+        assertNull(parsed.newChatDefault)
+        assertRestDecoded(parsed)
+    }
+
+    @Test
+    fun whenNewChatDefaultNullThenNull() {
+        val parsed = decode("null")
+
+        assertNull(parsed.newChatDefault)
+        assertRestDecoded(parsed)
+    }
+
+    @Test
+    fun whenReasoningEffortNullThenOnlyEffortIsNull() {
+        val parsed = decode("""{"modelId":"gpt-6-luna","reasoningEffort":null}""")
+
+        assertEquals(RemoteNewChatDefault(modelId = "gpt-6-luna", reasoningEffort = null), parsed.newChatDefault)
+    }
+
+    @Test
+    fun whenNewChatDefaultFieldsMissingThenNullAndRestDecoded() {
+        val parsed = decode("{}")
+
+        assertEquals(RemoteNewChatDefault(modelId = null, reasoningEffort = null), parsed.newChatDefault)
+        assertRestDecoded(parsed)
+    }
+
+    @Test
+    fun whenReasoningEffortUnknownThenKeptAsRawString() {
+        val parsed = decode("""{"modelId":"gpt-6-luna","reasoningEffort":"ultra"}""")
+
+        assertEquals(RemoteNewChatDefault(modelId = "gpt-6-luna", reasoningEffort = "ultra"), parsed.newChatDefault)
+    }
+
+    @Test
+    fun whenNewChatDefaultHasUnknownFieldsThenIgnored() {
+        val parsed = decode("""{"modelId":"gpt-6-luna","future":{"a":[1,2]},"reasoningEffort":"low"}""")
+
+        assertEquals(RemoteNewChatDefault(modelId = "gpt-6-luna", reasoningEffort = "low"), parsed.newChatDefault)
+    }
+
+    private fun decode(newChatDefault: String): AIChatModelsResponse =
+        adapter.fromJson("""{"newChatDefault":$newChatDefault,"models":[$MODEL],"attachmentLimits":$LIMITS}""")!!
+
+    private fun assertRestDecoded(parsed: AIChatModelsResponse) {
+        assertEquals(listOf("gpt-6-luna"), parsed.models.map { it.id })
+        assertEquals(3, parsed.attachmentLimits?.get("free")?.images?.maxPerTurn)
+    }
+
+    companion object {
+        private const val MODEL = """{"id":"gpt-6-luna","name":"Luna","supportedReasoningEffort":["none","low"]}"""
+        private const val LIMITS = """{"free":{"images":{"maxPerTurn":3}}}"""
+
+        @JvmStatic
+        @Parameterized.Parameters(name = "{0}")
+        fun moshiConfigs(): List<Array<Any>> = listOf(
+            arrayOf("production", Moshi.Builder().build()),
+            arrayOf("kotlinReflect", Moshi.Builder().add(KotlinJsonAdapterFactory()).build()),
         )
     }
 }
