@@ -19,3 +19,18 @@ appId: com.duckduckgo.mobile.android
       - tapOn:
           text: "Reject.*"
           optional: true
+
+# Handle YouTube "Get the best experience" app promo dialog if visible
+- extendedWaitUntil:
+    visible: "Get the best experience"
+    timeout: 3000
+    optional: true
+- runFlow:
+    when:
+      visible: "Get the best experience"
+    commands:
+      - tapOn:
+          text: "Close"
+      - extendedWaitUntil:
+          notVisible: "Get the best experience"
+          timeout: 3000
