@@ -341,9 +341,8 @@ layout_json() {
   out="$(android layout --device "$(serial)" 2>/dev/null)" || rc=$?
   uilog "android layout" "$rc"
   if [[ -z "$out" || "${out:0:1}" != "[" ]]; then
-    # A view that never stops laying out (the contextual sheet's entry prompts) keeps the CLI from reaching idle.
-    sleep 1; rc=0; out="$(android layout --device "$(serial)" --no-idle 2>/dev/null)" || rc=$?
-    uilog "android layout --no-idle (retry)" "$rc"
+    sleep 1; rc=0; out="$(android layout --device "$(serial)" 2>/dev/null)" || rc=$?
+    uilog "android layout (retry)" "$rc"
   fi
   [[ -n "$out" && "${out:0:1}" == "[" ]] \
     || die "android layout returned nothing (an animation or a WebView can block it); take a shot or use 'android screen capture --annotate'"
