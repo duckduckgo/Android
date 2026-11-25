@@ -61,10 +61,10 @@ data class NativeInputState(
     /** Show pulse animation around the Duck.ai fire button. */
     val duckAiFireButtonHighlighted: Boolean = false,
 
-    /** Model picked for the next new chat in this tab; null = tier default. Cleared when that chat is sent. */
+    /** Model picked for the next new chat in this tab; null = tier default. Cleared when the tab enters a chat. */
     val newChatModelId: String? = null,
 
-    /** Reasoning effort picked for the next new chat in this tab; null = default effort. Cleared when that chat is sent. */
+    /** Reasoning effort picked for the next new chat in this tab; null = default effort. Cleared when the tab enters a chat. */
     val newChatReasoningMode: String? = null,
 ) {
     enum class InputMode {

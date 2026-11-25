@@ -346,6 +346,29 @@ class ReasoningModePickerViewModelTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndModeOnlyThePickedModelSupportsIsTappedThenItIsPicked() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val global = aiModel("global", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW))
+        val picked = aiModel("picked", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW, ReasoningEffort.HIGH))
+        modelState.value = ModelState(
+            models = listOf(global, picked),
+            selectedModelId = "global",
+            selectedReasoningMode = ReasoningMode.FAST,
+            availableReasoningModes = ReasoningResolver.availableModes(global.supportedReasoningEfforts),
+        )
+        nativeInputState.value = nativeInputState.value.copy(newChatModelId = "picked")
+        runCurrent()
+
+        testee.newChatModePicks.test {
+            testee.onModeTapped(ReasoningMode.EXTENDED_REASONING, PickerSurface.REASONING_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            assertEquals(ReasoningMode.EXTENDED_REASONING, awaitItem())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenAccessibleModeTappedThenReasoningEffortSelectedPixelFired() = runTest {
         modelState.value = ModelState(
             availableReasoningModes = listOf(

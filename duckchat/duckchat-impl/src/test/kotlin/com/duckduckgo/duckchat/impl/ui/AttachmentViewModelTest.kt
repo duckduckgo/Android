@@ -227,6 +227,24 @@ class AttachmentViewModelTest {
     }
 
     @Test
+    fun whenNewChatPickDoesNotSupportImageUploadThenImageUploadFollowsThePickNotTheGlobalModel() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        val global = aModel(id = "global", supportsImageUpload = true)
+        val picked = aModel(id = "picked", supportsImageUpload = false)
+        modelStateFlow.value = ModelState(models = listOf(global, picked), selectedModelId = "global")
+        assertTrue(viewModel.attachmentState.value.supportsImageUpload)
+
+        nativeInputStateStore.publish(
+            "tab-duckai",
+            NativeInputState.zero().copy(inputContext = NativeInputState.InputContext.DUCK_AI, newChatModelId = "picked"),
+        )
+        selectedTabFlow.value = TabEntity(tabId = "tab-duckai", position = 0)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.attachmentState.value.supportsImageUpload)
+    }
+
+    @Test
     fun whenModelSupportsImageUploadThenAcceptedMimeTypesContainsImageWildcard() = runTest {
         whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
         val model = aModel(id = "m1", supportsImageUpload = true)

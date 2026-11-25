@@ -1622,7 +1622,7 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
-    fun whenPromptSubmittedThenNewChatPickIsCleared() = runTest {
+    fun whenPromptSubmittedThenNewChatPickIsKeptUntilTheTabEntersAChat() = runTest {
         modelStateFlow.value = pickableModels()
         val viewModel = createViewModel()
         viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
@@ -1630,6 +1630,25 @@ class NativeInputModeWidgetViewModelTest {
         viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
 
         viewModel.onPromptSubmitted()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+
+        viewModel.setActiveChatId("chat-1")
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertNull(state.newChatModelId)
+        assertNull(state.newChatReasoningMode)
+    }
+
+    @Test
+    fun whenPromptIsHandedOffThenNewChatPickIsCleared() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = true)
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
+
+        viewModel.storePendingPrompt("hello", modelId = "picked-model", reasoningEffort = "low")
 
         val state = nativeInputStateProvider.stateForTab("tab-A").value
         assertNull(state.newChatModelId)

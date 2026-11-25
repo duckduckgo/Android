@@ -125,6 +125,28 @@ class NewChatDefaultsTest {
     }
 
     @Test
+    fun whenOnlyEffortPickedThenNewChatKeepsGlobalModelAndResolvesEffortAgainstIt() {
+        val global = modelState(selected = luna)
+
+        val result = global.forNewChat(pickedModelId = null, pickedReasoningMode = "reasoning")
+
+        assertEquals("gpt-6-luna", result.selectedModelId)
+        assertEquals(REASONING, result.selectedReasoningMode)
+        assertEquals(global.availableReasoningModes, result.availableReasoningModes)
+    }
+
+    @Test
+    fun whenPickedModelInaccessibleThenPickedEffortResolvesAgainstGlobalModel() {
+        val global = modelState(selected = luna, extra = terra.copy(isAccessible = false))
+
+        val result = global.forNewChat(pickedModelId = "gpt-5.6-terra", pickedReasoningMode = "extended_reasoning")
+
+        assertEquals("gpt-6-luna", result.selectedModelId)
+        assertEquals(FAST, result.selectedReasoningMode)
+        assertEquals(global.availableReasoningModes, result.availableReasoningModes)
+    }
+
+    @Test
     fun whenTabHasChatThenItsPickIsIgnored() {
         val state = modelState(selected = luna)
         val tab = NativeInputState.zero().copy(chatId = "chat", newChatModelId = "gpt-5.6-terra")

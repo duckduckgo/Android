@@ -682,8 +682,6 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         }
         // Ends the FE recovery model-change window for the active tab.
         endModelChangeMode()
-        // Read for the prompt by now, so the tab's next new chat starts on the default again.
-        if (tabId != null) nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = null, newChatReasoningMode = null) }
     }
 
     // Read from this widget's own config so the contextual sheet, which shares the browser tab's id, never passes as the full-screen chat.
@@ -719,7 +717,9 @@ class NativeInputModeWidgetViewModel @Inject constructor(
             // Reset submitEnabled to true if we changed chats.
             // Always end the model-change window since it's per-visit.
             val submitEnabled = if (current.chatId != chatId) true else current.submitEnabled
-            current.copy(chatId = chatId, submitEnabled = submitEnabled, modelChangeMode = false)
+            // Cleared on entering a chat rather than on send: clearing on send reads to the usage footers as a manual model switch.
+            val entered = current.copy(chatId = chatId, submitEnabled = submitEnabled, modelChangeMode = false)
+            if (chatId != null) entered.withoutNewChatPick() else entered
         }
         currentChatJob?.cancel()
         currentChat.value = null
@@ -809,7 +809,11 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         carriesTermsConsent: Boolean = true,
     ) {
         pendingNativePromptStore.store(query, modelId, reasoningEffort, selectedTool, images, files, carriesTermsConsent)
+        // The handed-off chat can open in another tab, so this tab never enters a chat to clear its pick.
+        activeTabId.value?.let { tabId -> nativeInputStatePublisher.update(tabId) { it.withoutNewChatPick() } }
     }
+
+    private fun NativeInputState.withoutNewChatPick() = copy(newChatModelId = null, newChatReasoningMode = null)
 
     fun configureContextual(tabId: String) {
         imageLaunchJob.cancel()

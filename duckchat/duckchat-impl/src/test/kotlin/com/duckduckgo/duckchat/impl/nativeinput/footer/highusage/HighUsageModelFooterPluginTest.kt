@@ -347,6 +347,26 @@ class HighUsageModelFooterPluginTest {
         }
     }
 
+    @Test
+    fun whenPromptIsSentOnAPickedHighUsageModelThenEnteringTheChatIsNotReportedAsASwitch() = runTest {
+        val opus = AIChatModel("claude-opus-4-8", "opus", "Opus", "Opus 4.8", listOf("free"), isAccessible = true)
+        modelState.value = ModelState(models = listOf(opus), selectedModelId = "other", selectedModelShortName = "Other")
+        inputState.value = inputState.value.copy(newChatModelId = opus.id)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            hostContext.value = duckAiContext(promptSubmissions = 1)
+            hostContext.value = duckAiContext(isInputFocused = false, promptSubmissions = 1)
+            inputState.value = inputState.value.copy(chatId = "chat-1", newChatModelId = null)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
     private fun plugin(dismissalStore: HighUsageModelNoticeDismissalStore) = HighUsageModelFooterPlugin(
         modelManager = modelManager,
         nativeInputStateProvider = nativeInputStateProvider,

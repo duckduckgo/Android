@@ -638,6 +638,26 @@ class UsageLimitFooterPluginTest {
         )
     }
 
+    @Test
+    fun whenPromptIsSentOnAPickedModelThenEnteringTheChatDoesNotActOnTheSwitchCta() = runTest {
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id)
+        inputState.value = inputState.value.copy(newChatModelId = SONNET.id)
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            hostContext.value = duckAiContext(promptSubmissions = 1)
+            hostContext.value = duckAiContext(isInputFocused = false, promptSubmissions = 1)
+            inputState.value = inputState.value.copy(chatId = "chat-1", newChatModelId = null)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
+    }
+
     private fun switchCta(vararg modelIds: String) =
         UsageCta(UsageCtaId.SWITCH_TO_CHEAPER, modelId = null, modelIds = modelIds.toList(), byModelId = emptyMap(), putEntries = emptyList())
 
