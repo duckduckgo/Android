@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Package visibility: without this, the query for credential exporters returns nothing on Android 11+. -->
     <queries>
@@ -12,5 +13,12 @@
             <data android:scheme="content" />
         </intent>
     </queries>
+
+    <application>
+        <activity
+            android:name="androidx.credentials.providerevents.playservices.HiddenActivity"
+            android:theme="@style/Theme.CredentialExchange.Hidden"
+            tools:replace="android:theme" />
+    </application>
 
 </manifest>

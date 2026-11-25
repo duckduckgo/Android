@@ -16,62 +16,175 @@
 
 package com.duckduckgo.autofill.impl.importing
 
+import android.content.Context
 import android.content.Intent
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult.Companion.RESULT_KEY_DETAILS
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
-import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
+import app.cash.turbine.test
+import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsEvent
+import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
+import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleScreen
+import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.navigation.api.GlobalActivityStarter
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealImportPasswordsFromGoogleTest {
 
+    @get:Rule
+    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
+
+    private val context: Context = mock()
+    private val passwordImportAvailability: PasswordImportAvailability = mock()
+    private val passwordImportEvents = PasswordImportEvents()
+    private val globalActivityStarter: GlobalActivityStarter = mock()
+    private val launchIntent = Intent()
+
     private val testee = RealImportPasswordsFromGoogle(
-        capabilityChecker = mock(),
-        credentialImporter = mock(),
+        passwordImportAvailability = passwordImportAvailability,
+        passwordImportEvents = passwordImportEvents,
+        globalActivityStarter = globalActivityStarter,
     )
 
-    @Test
-    fun whenResultIsSuccessThenSuccessIsReturned() {
-        assertEquals(ImportPasswordsResult.Success, testee.parseResult(intentWith(ImportGooglePasswordResult.Success)))
+    @Before
+    fun setUp() = runTest {
+        whenever(passwordImportAvailability.canImport()).thenReturn(true)
+        whenever(globalActivityStarter.startIntent(any(), any<ImportPasswordsFromGoogleScreen>())).thenReturn(launchIntent)
     }
 
     @Test
-    fun whenResultIsUserCancelledThenUserCancelledIsReturned() {
-        val result = testee.parseResult(intentWith(ImportGooglePasswordResult.UserCancelled(stage = "stage")))
-
-        assertEquals(ImportPasswordsResult.UserCancelled, result)
+    fun whenEitherImportMethodAvailableThenSupported() = runTest {
+        assertTrue(testee.isSupported())
     }
 
     @Test
-    fun whenWebViewCrashedThenErrorIsTransient() {
-        val result = testee.parseResult(intentWith(ImportGooglePasswordResult.Error(WebViewCrash)))
+    fun whenNoImportMethodAvailableThenNotSupported() = runTest {
+        whenever(passwordImportAvailability.canImport()).thenReturn(false)
 
-        assertEquals(ImportPasswordsResult.Error.Transient, result)
+        assertFalse(testee.isSupported())
     }
 
     @Test
-    fun whenCsvCouldNotBeParsedThenErrorIsPermanent() {
-        val result = testee.parseResult(intentWith(ImportGooglePasswordResult.Error(ErrorParsingCsv)))
+    fun whenSupportedThenLaunchStartsTheImportScreenWithTheLaunchSource() = runTest {
+        launch()
 
-        assertEquals(ImportPasswordsResult.Error.Permanent, result)
+        verify(globalActivityStarter).startIntent(context, ImportPasswordsFromGoogleScreen(SOURCE))
+        verify(context).startActivity(launchIntent)
     }
 
     @Test
-    fun whenNoResultDetailsThenErrorIsTransient() {
-        assertEquals(ImportPasswordsResult.Error.Transient, testee.parseResult(Intent()))
+    fun whenNotSupportedThenLaunchStartsNothingAndEmitsPermanentError() = runTest {
+        whenever(passwordImportAvailability.canImport()).thenReturn(false)
+
+        launch().test {
+            assertEquals(ImportPasswordsEvent.Error.Permanent, awaitItem())
+            awaitComplete()
+        }
+        verify(context, never()).startActivity(any())
     }
 
     @Test
-    fun whenNoIntentThenErrorIsTransient() {
-        assertEquals(ImportPasswordsResult.Error.Transient, testee.parseResult(null))
+    fun whenThereIsNoScreenToStartThenLaunchEmitsPermanentError() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<ImportPasswordsFromGoogleScreen>())).thenReturn(null)
+
+        launch().test {
+            assertEquals(ImportPasswordsEvent.Error.Permanent, awaitItem())
+            awaitComplete()
+        }
+        verify(context, never()).startActivity(any())
     }
 
-    private fun intentWith(result: ImportGooglePasswordResult): Intent =
-        Intent().putExtra(RESULT_KEY_DETAILS, result)
+    @Test
+    fun whenPasswordsAreSavedAfterLaunchThenEmitsProgressThenTheCountsAndCompletes() = runTest {
+        launch().test {
+            passwordImportEvents.emit(ImportPasswordsEvent.InProgress)
+            passwordImportEvents.emit(FINISHED)
+
+            assertEquals(ImportPasswordsEvent.InProgress, awaitItem())
+            assertEquals(FINISHED, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenFinishedWithoutProgressThenEmitsTheCountsAndCompletes() = runTest {
+        launch().test {
+            passwordImportEvents.emit(FINISHED)
+
+            assertEquals(FINISHED, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenTheFlowEndsWithoutImportingThenEmitsThatOutcomeAndCompletes() = runTest {
+        launch().test {
+            passwordImportEvents.emit(ImportPasswordsEvent.UserCancelled)
+
+            assertEquals(ImportPasswordsEvent.UserCancelled, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenSavingFailsAfterProgressThenEmitsProgressThenTheErrorAndCompletes() = runTest {
+        launch().test {
+            passwordImportEvents.emit(ImportPasswordsEvent.InProgress)
+            passwordImportEvents.emit(ImportPasswordsEvent.Error.Transient)
+
+            assertEquals(ImportPasswordsEvent.InProgress, awaitItem())
+            assertEquals(ImportPasswordsEvent.Error.Transient, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenAnEarlierImportFinishedBeforeLaunchThenItsResultIsNotEmitted() = runTest {
+        passwordImportEvents.emit(ImportPasswordsEvent.Finished(imported = 9, skipped = 9))
+
+        launch().test {
+            expectNoEvents()
+
+            passwordImportEvents.emit(FINISHED)
+
+            assertEquals(FINISHED, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    @Test
+    fun whenALaunchEndedThenTheNextLaunchReportsOnlyItsOwnOutcome() = runTest {
+        launch().test {
+            passwordImportEvents.emit(ImportPasswordsEvent.UserCancelled)
+            assertEquals(ImportPasswordsEvent.UserCancelled, awaitItem())
+            awaitComplete()
+        }
+
+        launch().test {
+            passwordImportEvents.emit(FINISHED)
+
+            assertEquals(FINISHED, awaitItem())
+            awaitComplete()
+        }
+    }
+
+    private suspend fun launch(): Flow<ImportPasswordsEvent> = testee.launchImport(context, SOURCE)
+
+    private companion object {
+        val SOURCE = AutofillImportLaunchSource.Onboarding
+        val FINISHED = ImportPasswordsEvent.Finished(imported = 3, skipped = 1)
+    }
 }

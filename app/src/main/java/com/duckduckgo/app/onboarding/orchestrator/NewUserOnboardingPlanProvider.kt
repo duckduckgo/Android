@@ -193,11 +193,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
                 addAll(widgetSteps(ctx))
-                if (showPasswordImport) {
-                    add(passwordImportStep(ctx))
-                    add(passwordImportLaunchStep(ctx))
-                    add(passwordImportCompleteStep(ctx))
-                }
+                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(inputScreenStep(ctx))
                 add(
@@ -277,6 +273,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     ): LinearOnboardingPlan {
         onboardingPixelSender.segmentedFlowStarted()
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
+        val showPasswordImport = onboardingPasswordImportExperimentManager.enroll() == OnboardingPasswordImportVariant.TREATMENT
         val modelProviderChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider)
         val togglePositionChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
         val duckAiStateChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiState)
@@ -293,7 +290,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(introAnimationStep())
                 add(notificationPermissionStep())
                 add(initialStep(firstDialog))
-                add(downloadReasonStep(ctx, modelProviderChoice, togglePositionChoice, duckAiStateChoice))
+                add(downloadReasonStep(ctx, modelProviderChoice, togglePositionChoice, duckAiStateChoice, showPasswordImport))
             },
         )
     }
@@ -540,6 +537,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
+        showPasswordImport: Boolean,
     ): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
         return NewUserOnboardingActivityStep(
@@ -565,10 +563,12 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         segmentedOnboardingExperimentMetrics.fireDownloadReasonSelectedMetric(selection)
 
                         when (selection) {
-                            DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
-                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
-                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
-                            DownloadReasonSelection.BLOCK_ADS -> SwitchTo(segmentedBlockAdsPlan(ctx))
+                            DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx, showPasswordImport))
+                            DownloadReasonSelection.AI_CHAT -> SwitchTo(
+                                segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice, showPasswordImport),
+                            )
+                            DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice, showPasswordImport))
+                            DownloadReasonSelection.BLOCK_ADS -> SwitchTo(segmentedBlockAdsPlan(ctx, showPasswordImport))
                         }
                     }
                     else -> Stay
@@ -577,7 +577,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
-    private suspend fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+    private suspend fun segmentedSearchPlan(ctx: NewUserOnboardingPlanContext, showPasswordImport: Boolean): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
         return sidePlan(
             id = SEGMENTED_SEARCH_PLAN_ID,
@@ -603,6 +603,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         background = OnboardingBackground.Horizon,
                     ),
                 )
+                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(
                     inputScreenPreviewStep(
@@ -619,6 +620,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         ctx: NewUserOnboardingPlanContext,
         modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
+        showPasswordImport: Boolean,
     ): LinearOnboardingPlan {
         applyInputModeSelection(ctx, withAi = true, fireTelemetry = false)
         ctx.onFinish { onboardingInputScreenLaunchTarget.setOpenOnDuckAi() }
@@ -630,6 +632,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(modelProviderStep(modelProviderChoice))
                 add(togglePositionStep(togglePositionChoice))
                 addAll(widgetSteps(ctx))
+                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(inputScreenPreviewStep(ctx = ctx, isSearchDefault = false))
             },
@@ -639,6 +642,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private suspend fun segmentedNoAiPlan(
         ctx: NewUserOnboardingPlanContext,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
+        showPasswordImport: Boolean,
     ): LinearOnboardingPlan {
         applyInputModeSelection(ctx, withAi = false, fireTelemetry = false)
         return sidePlan(
@@ -659,13 +663,14 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 )
                 addAll(widgetSteps(ctx))
                 add(duckAiStateStep(ctx, duckAiStateChoice))
+                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(inputScreenPreviewStep(ctx = ctx, isSearchDefault = true))
             },
         )
     }
 
-    private suspend fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext): LinearOnboardingPlan {
+    private suspend fun segmentedBlockAdsPlan(ctx: NewUserOnboardingPlanContext, showPasswordImport: Boolean): LinearOnboardingPlan {
         val duckAiEnabled = SuspendMemo { duckAiOnboardingAvailability.isDuckAiOnboardingEnabled() }
         return sidePlan(
             id = SEGMENTED_BLOCK_ADS_PLAN_ID,
@@ -693,6 +698,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         background = OnboardingBackground.Horizon,
                     ),
                 )
+                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(
                     inputScreenPreviewStep(
@@ -936,6 +942,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
         )
     }
 
+    private fun passwordImportSteps(ctx: NewUserOnboardingPlanContext, showPasswordImport: Boolean): List<LinearOnboardingStep> =
+        if (showPasswordImport) {
+            listOf(passwordImportStep(ctx), passwordImportLaunchStep(ctx), passwordImportCompleteStep(ctx))
+        } else {
+            emptyList()
+        }
+
     private fun passwordImportStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT
         return NewUserOnboardingActivityStep(
@@ -987,7 +1000,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             resolveDialog = { NewUserOnboardingActivityDialog.ImportPasswordsLaunch },
             transition = { event ->
                 when (event) {
-                    is NewUserOnboardingEvent.PasswordImportWebFlowFinished -> when (event.outcome) {
+                    is NewUserOnboardingEvent.PasswordImportFinished -> when (event.outcome) {
                         PasswordImportOutcome.SUCCESS -> {
                             ctx.passwordImportResult = PasswordImportResult.InProgress
                             Advance

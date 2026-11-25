@@ -18,6 +18,10 @@
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false" />
         <activity
+            android:name=".importing.gpm.ImportPasswordsFromGoogleActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Transparent.NoActionBar" />
+        <activity
             android:name=".importing.takeout.webflow.ImportGoogleBookmarksWebFlowActivity"
             android:configChanges="keyboardHidden|orientation|screenSize|smallestScreenSize|screenLayout|navigation|keyboard"
             android:exported="false" />

@@ -24,9 +24,8 @@ import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugi
 import com.duckduckgo.autofill.impl.importing.AutofillImportRedesignFeature
 import com.duckduckgo.autofill.impl.importing.CredentialImporter
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
-import com.duckduckgo.autofill.impl.importing.capability.ImportGooglePasswordsCapabilityChecker
-import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult
-import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportResult.Failure
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportHandler
+import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportOutcome
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason
 import com.duckduckgo.autofill.impl.importing.wideevents.CredentialImportWideEvent
@@ -55,7 +54,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
-import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
@@ -68,7 +66,7 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val promptExposureReporter: PromptExposureReporter,
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
-    private val webViewCapabilityChecker: ImportGooglePasswordsCapabilityChecker,
+    private val credentialExchangeImportHandler: CredentialExchangeImportHandler,
     private val credentialImportWideEvent: CredentialImportWideEvent,
     private val importRedesignFeature: AutofillImportRedesignFeature,
     private val appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
@@ -168,33 +166,12 @@ class ImportFromGooglePasswordsDialogViewModel @Inject constructor(
     ) {
         credentialExchangeInProgress = false
         viewModelScope.launch {
-            when (val converted = credentialExchangePasswordImporter.convertAndDeduplicate(result)) {
-                is CredentialExchangeImportResult.Success -> {
-                    credentialImporter.import(converted.credentials, converted.originalCount, importSource)
-                    credentialImportWideEvent.onCredentialExchangeSucceeded(converted.exporterPackageName)
-                    onImportFlowFinishedSuccessfully()
-                }
-                is CredentialExchangeImportResult.Cancelled -> {
-                    credentialImportWideEvent.onCredentialExchangeCancelled()
-                    onImportFlowCancelledByUser(canShowPreImportDialog)
-                }
-                is Failure -> onExchangeCredentialsFailure(converted)
+            when (credentialExchangeImportHandler.handle(result, importSource)) {
+                CredentialExchangeImportOutcome.Imported -> onImportFlowFinishedSuccessfully()
+                CredentialExchangeImportOutcome.UserCancelled -> onImportFlowCancelledByUser(canShowPreImportDialog)
+                CredentialExchangeImportOutcome.FallBackToWebFlow -> command.trySend(StartWebFlow)
+                CredentialExchangeImportOutcome.Failed -> _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportError)
             }
-        }
-    }
-
-    /**
-     * When there's a failure in the exchange credentials flow, we fallback to the web-based flow if that's supported
-     */
-    private suspend fun onExchangeCredentialsFailure(failure: Failure) {
-        if (webViewCapabilityChecker.webViewCapableOfImporting()) {
-            logcat(WARN) { "Credential exchange failed (${failure.reason}), falling back to web flow" }
-            credentialImportWideEvent.onCredentialExchangeFellBackToWebFlow(failure.reason, failure.exporterPackageName)
-            command.trySend(StartWebFlow)
-        } else {
-            logcat(WARN) { "Credential exchange failed (${failure.reason}), web flow not supported" }
-            credentialImportWideEvent.onCredentialExchangeFailed(failure.reason, failure.exporterPackageName)
-            _viewState.value = viewState.value.copy(viewMode = ViewMode.ImportError)
         }
     }
 

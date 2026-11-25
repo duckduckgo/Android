@@ -16,46 +16,55 @@
 
 package com.duckduckgo.autofill.api
 
-import android.content.Intent
+import android.content.Context
 import kotlinx.coroutines.flow.Flow
 
 /**
  * Importing passwords from Google Password Manager.
  *
- * The web flow itself is a screen, not a method here: start
- * [AutofillScreens.AutofillImportPasswordsScreen] for result and read what comes back with
- * [parseResult].
+ * The flow imports through the FIDO Credential Exchange when the device supports it, and through the Google web flow
+ * otherwise or when the exchange fails.
  */
 interface ImportPasswordsFromGoogle {
 
-    /** Whether this device can run the import web flow at all. */
+    /** Whether this device can import by either method. */
     suspend fun isSupported(): Boolean
 
-    /** Reads the outcome out of the intent the import screen returns. */
-    fun parseResult(data: Intent?): ImportPasswordsResult
-
     /**
-     * Progress of the import itself, which continues after the web flow returns [ImportPasswordsResult.Success].
-     * Replays its most recent value, so a collector that starts late still sees a finished import.
+     * Start the password import flow.
+     *
+     * The returned flow may emit [ImportPasswordsEvent.InProgress] while the passwords are being saved, then emits this
+     * import's outcome once and completes. It is backed by app-wide state, so collecting
+     * it from a scope that survives configuration changes, such as a ViewModel's, keeps the outcome across them. Nothing is
+     * replayed: an outcome emitted while nobody collects is lost, as it is on process death. If the flow is unsupported,
+     * nothing is started and the returned flow emits [ImportPasswordsEvent.Error.Permanent].
+     *
+     * @param context Used to start the flow's screens; pass an Activity.
+     * @param launchSource Where the flow is started from.
      */
-    fun importStatus(): Flow<ImportPasswordsStatus>
+    suspend fun launchImport(
+        context: Context,
+        launchSource: AutofillImportLaunchSource,
+    ): Flow<ImportPasswordsEvent>
 
-    sealed interface ImportPasswordsResult {
-        data object Success : ImportPasswordsResult
+    sealed interface ImportPasswordsEvent {
+        /** The passwords were received and are being saved. */
+        data object InProgress : ImportPasswordsEvent
 
-        data object UserCancelled : ImportPasswordsResult
-
-        sealed interface Error : ImportPasswordsResult {
-            data object Transient : Error
-            data object Permanent : Error
-        }
-    }
-
-    sealed interface ImportPasswordsStatus {
-        data object InProgress : ImportPasswordsStatus
+        /** The passwords were saved. */
         data class Finished(
             val imported: Int,
             val skipped: Int,
-        ) : ImportPasswordsStatus
+        ) : ImportPasswordsEvent
+
+        data object UserCancelled : ImportPasswordsEvent
+
+        sealed interface Error : ImportPasswordsEvent {
+            /** Trying again may succeed. */
+            data object Transient : Error
+
+            /** Trying again will fail the same way. */
+            data object Permanent : Error
+        }
     }
 }

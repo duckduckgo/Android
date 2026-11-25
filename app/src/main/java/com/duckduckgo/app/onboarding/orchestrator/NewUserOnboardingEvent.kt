@@ -64,7 +64,7 @@ sealed interface NewUserOnboardingEvent : LinearOnboardingEvent {
 
     data object PasswordImportSkipped : NewUserOnboardingEvent
 
-    data class PasswordImportWebFlowFinished(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
+    data class PasswordImportFinished(val outcome: PasswordImportOutcome) : NewUserOnboardingEvent
 
     data class PasswordImportParsed(val result: PasswordImportResult.Terminal) : NewUserOnboardingEvent
 
