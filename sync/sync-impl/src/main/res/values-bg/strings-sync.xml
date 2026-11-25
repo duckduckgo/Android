@@ -214,6 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Сканиране на QR код за синхронизиране</string>
     <string name="sync_simplified_scanner_camera_header_body">Отворете <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo за настолен компютър</annotation></b>\n<annotation type="gap">\n</annotation>и отворете <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Синхронизиране с друго устройство</annotation></string>
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Отворете <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo за настолен компютър</annotation></b>\n<annotation type="gap">\n</annotation>и отворете <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Разбрах</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo има нужда от достъп до камерата ти.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">За сканиране на QR кода са необходими разрешения за достъп до камерата.</string>
@@ -223,6 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Въвеждане на код за синхронизация</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Отворете другото <annotation type="icon">￼</annotation> <b><annotation type="highlight">приложение DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Влезте в <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Синхронизиране с друго устройство</annotation> › <annotation type="highlight">Копиране на текстов код</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Отвори друго <annotation type="icon">￼</annotation> <b><annotation type="highlight">приложение DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>и отиди на <b><annotation type="url">%1$s</annotation></b> и копирай текстовия код.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Примерен код:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Поставяне на код за синхронизация</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Съжаляваме, поставеният код е невалиден.</string>
@@ -231,6 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">QR код</string>
     <string name="sync_simplified_qr_code_header_headline">Сканиране от друго устройство</string>
     <string name="sync_simplified_qr_code_header_body">На друго устройство отворете <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>и влезте в <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Синхронизиране с друго устройство</annotation> и сканирайте този код:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Отворете друг <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>, отворете <b><annotation type="url">%1$s</annotation></b> и сканирате този код:</string>
     <string name="sync_simplified_qr_code_copy_button">Копиране на текстов код</string>
     <string name="sync_simplified_qr_code_share_button">Споделяне</string>
     <string name="sync_simplified_qr_code_copied_message">Кодът за възстановяване е копиран</string>
