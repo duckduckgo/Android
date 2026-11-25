@@ -36,18 +36,24 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.impl.utils.SynchronousExecutor
 import androidx.work.testing.WorkManagerTestInitHelper
+import androidx.work.workDataOf
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason.DOWNLOAD_ERROR
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_OLD
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.UNDO_DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileWorker.Companion.OPERATION_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.FAILURE_REASON_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.PAIR_KEY
-import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -58,8 +64,10 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.atLeast
+import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class LanguagePackSchedulerTest {
@@ -68,6 +76,9 @@ class LanguagePackSchedulerTest {
     private val directories = RealLanguagePackDirectories(context)
     private var isDeviceSupported = true
     private var isWorkFinishing = false
+
+    // the test holds it because WorkManager fails a worker whose suspended coroutine nothing references once it's garbage collected
+    private val runningWorkResult = CompletableDeferred<ListenableWorker.Result>()
     private lateinit var workManager: WorkManager
     private lateinit var scheduler: RealLanguagePackScheduler
 
@@ -109,6 +120,39 @@ class LanguagePackSchedulerTest {
         scheduler.download(PAIR)
 
         assertEquals(2, getActiveWork(PAIR).size)
+    }
+
+    @Test
+    fun downloadAgainWhenADeleteIsQueuedAfterAnUnfinishedDownload() = runTest {
+        scheduler.download(PAIR)
+        scheduler.delete(PAIR)
+
+        scheduler.download(PAIR)
+
+        assertEquals(2, getActiveWork(PAIR).count { it.isDownload() })
+    }
+
+    @Test
+    fun joinAnUnfinishedDownloadWhenAConfirmedDeleteIsQueuedAfterIt() = runTest {
+        scheduler.download(PAIR)
+        scheduler.confirmDelete(PAIR)
+
+        scheduler.download(PAIR)
+
+        assertEquals(1, getActiveWork(PAIR).count { it.isDownload() })
+    }
+
+    @Test
+    fun runOperationsQueuedAfterADownloadThatReportsAFailure() = runTest {
+        scheduler.download(PAIR)
+        scheduler.delete(PAIR)
+        isWorkFinishing = true
+
+        runningWorkResult.complete(ListenableWorker.Result.success(workDataOf(FAILURE_REASON_KEY to DOWNLOAD_ERROR.name)))
+
+        val work = workManager.getWorkInfosForUniqueWorkFlow("$WORK_NAME_PREFIX$PAIR").first { infos -> infos.all { it.state.isFinished } }
+        assertEquals(listOf(SUCCEEDED, SUCCEEDED), work.map { it.state })
+        assertEquals(LanguagePackDownloadState.Failed(DOWNLOAD_ERROR), scheduler.getDownloadStateFlow(PAIR).first())
     }
 
     @Test
@@ -201,7 +245,17 @@ class LanguagePackSchedulerTest {
         scheduler.download(PAIR)
 
         assertEquals(listOf(RUNNING, SUCCEEDED), getAllWork(PAIR).filter { it.isDownload() }.map { it.state }.sorted())
-        assertEquals(LanguagePackDownloadState.InProgress(0, 0), scheduler.getDownloadStateFlow(PAIR).first())
+        val enqueuedIds = getEnqueuedRequests().map { it.id }
+        listOf(false, true).forEach { isNewestFirst ->
+            doAnswer { invocation ->
+                @Suppress("UNCHECKED_CAST")
+                (invocation.callRealMethod() as Flow<List<WorkInfo>>).map { infos ->
+                    infos.sortedBy { enqueuedIds.indexOf(it.id) }.let { if (isNewestFirst) it.reversed() else it }
+                }
+            }.whenever(workManager).getWorkInfosForUniqueWorkFlow(any())
+
+            assertEquals(LanguagePackDownloadState.InProgress(0, 0), scheduler.getDownloadStateFlow(PAIR).first())
+        }
     }
 
     @Test
@@ -232,17 +286,19 @@ class LanguagePackSchedulerTest {
 
     private fun WorkInfo.isDownload() = LanguagePackWorker::class.java.name in tags
 
-    private fun getQueuedOperations(): List<Pair<String?, LanguagePackFileOperation>> {
-        val requests = argumentCaptor<OneTimeWorkRequest>()
-        verify(workManager, atLeast(0)).enqueueUniqueWork(any<String>(), any<ExistingWorkPolicy>(), requests.capture())
-
-        return requests.allValues
+    private fun getQueuedOperations(): List<Pair<String?, LanguagePackFileOperation>> =
+        getEnqueuedRequests()
             .filter { it.workSpec.workerClassName == LanguagePackFileWorker::class.java.name }
             .map { it.workSpec.input.getString(PAIR_KEY) to LanguagePackFileOperation.valueOf(it.workSpec.input.getString(OPERATION_KEY)!!) }
+
+    private fun getEnqueuedRequests(): List<OneTimeWorkRequest> {
+        val requests = argumentCaptor<OneTimeWorkRequest>()
+        verify(workManager, atLeast(0)).enqueueUniqueWork(any<String>(), any<ExistingWorkPolicy>(), requests.capture())
+        return requests.allValues
     }
 
-    private class RunningWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
-        override suspend fun doWork(): Result = awaitCancellation()
+    private class RunningWorker(context: Context, params: WorkerParameters, private val result: Deferred<Result>) : CoroutineWorker(context, params) {
+        override suspend fun doWork(): Result = result.await()
 
         // below Android 12 an expedited job asks for its notification before it starts
         override suspend fun getForegroundInfo() = ForegroundInfo(1, Notification())
@@ -256,7 +312,7 @@ class LanguagePackSchedulerTest {
 
     private val workerFactory = object : WorkerFactory() {
         override fun createWorker(appContext: Context, workerClassName: String, workerParameters: WorkerParameters): ListenableWorker =
-            if (isWorkFinishing) FinishingWorker(appContext, workerParameters) else RunningWorker(appContext, workerParameters)
+            if (isWorkFinishing) FinishingWorker(appContext, workerParameters) else RunningWorker(appContext, workerParameters, runningWorkResult)
     }
 
     private companion object {
