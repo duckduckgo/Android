@@ -237,6 +237,23 @@ class NativeInputLayoutCoordinatorTest {
     }
 
     @Test
+    fun whenBottomWidgetIsRemovedThenBrowserContentKeepsOmnibarPadding() {
+        val pager = givenTabPager()
+        val tab = BottomWidgetTab(pager.context)
+        pager.addView(tab.root)
+        tab.browserLayout.setPadding(0, 0, 0, OMNIBAR_HEIGHT_PX)
+        val coordinator = NativeInputLayoutCoordinator(tab.root, mock(), recalculateContentPaddingOnTabSwitch = true)
+        coordinator.configureContentOffset(tab.widget, isBottom = true)
+        idle()
+
+        tab.root.removeView(tab.widget)
+        coordinator.onWidgetRemoved()
+        idle()
+
+        assertEquals(OMNIBAR_HEIGHT_PX, tab.browserLayout.paddingBottom)
+    }
+
+    @Test
     fun whenWidgetConfiguredWhileTabWasDetachedIsRemovedThenItNoLongerDrivesBrowserContent() {
         val pager = givenTabPager()
         val tab = BottomWidgetTab(pager.context)
@@ -404,5 +421,6 @@ class NativeInputLayoutCoordinatorTest {
         private const val WIDGET_HEIGHT_PX = 80
         private const val RESIZED_WIDGET_HEIGHT_PX = 120
         private const val OTHER_SESSION_PADDING_PX = 123
+        private const val OMNIBAR_HEIGHT_PX = 168
     }
 }
