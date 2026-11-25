@@ -33,4 +33,8 @@ interface DuckAiToggleMigrationFeature {
     /** Kill switch: confirming Search only on the address bar picker records the input screen setting as off. */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun pickerSearchOnlyWritesSetting(): Toggle
+
+    /** Turns Search & Duck.ai on, once, for existing Duck.ai users who were never asked. */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun migration(): Toggle
 }

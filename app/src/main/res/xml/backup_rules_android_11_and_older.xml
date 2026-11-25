@@ -49,6 +49,8 @@
     <include domain="file" path="datastore/show_on_app_launch.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
     <include domain="file" path="datastore/tab_switcher.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
     <include domain="file" path="datastore/new_address_bar_picker.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/new_address_bar_option.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
+    <include domain="file" path="datastore/duck_ai_toggle_migration.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
     <include domain="file" path="datastore/default_browser_prompts_datastore.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
     <include domain="file" path="datastore/com.duckduckgo.sync.auto_restore.preferences_pb" requireFlags="deviceToDeviceTransfer"/>
     <include domain="file" path="duck_ai_bridge_files" requireFlags="deviceToDeviceTransfer"/>

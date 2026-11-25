@@ -40,6 +40,7 @@ import kotlinx.coroutines.withContext
 import logcat.LogPriority.DEBUG
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.seconds
 
 interface NewAddressBarPickerManager {
     suspend fun showChoiceScreen(activity: DuckDuckGoActivity)
@@ -56,6 +57,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
     private val appTheme: AppTheme,
     private val promptExposureReporter: PromptExposureReporter,
     private val duckAiToggleMigrationFeature: DuckAiToggleMigrationFeature,
+    private val duckAiToggleMigrationGate: DuckAiToggleMigrationGate,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarPickerManager {
@@ -77,12 +79,21 @@ class RealNewAddressBarPickerManager @Inject constructor(
         }
     }
 
+    // The gate comes after the checks the migration can't change, so users who can never see the picker don't wait, and
+    // before the ones it can, so they read its outcome. The activity is checked last because the wait can outlive it.
     private suspend fun validate(activity: Activity): Boolean =
         isDuckAiEnabled() &&
             isOnboardingCompleted() &&
+            hasMigrationDecided() &&
             isInputScreenNeverEnabled() &&
             hasNotShownBefore() &&
             isActivityValid(activity)
+
+    // The migration may be about to flip this user, so let it decide first. If it hasn't by the timeout, ask another time.
+    private suspend fun hasMigrationDecided(): Boolean =
+        duckAiToggleMigrationGate.awaitOpen(MIGRATION_GATE_TIMEOUT).also {
+            logcat(DEBUG) { "NewAddressBarPickerManager: $it hasMigrationDecided" }
+        }
 
     private fun isDuckAiEnabled(): Boolean =
         duckChat.isEnabled().also {
@@ -150,11 +161,12 @@ class RealNewAddressBarPickerManager @Inject constructor(
     }
 
     private suspend fun isSearchOnlyWriteEnabled(): Boolean = withContext(dispatchers.io()) {
-        duckAiToggleMigrationFeature.self().isEnabled() && duckAiToggleMigrationFeature.pickerSearchOnlyWritesSetting().isEnabled()
+        duckAiToggleMigrationFeature.pickerSearchOnlyWritesSetting().isEnabled()
     }
 
     private companion object {
         private const val MAX_DISPLAY_COUNT = 2
+        private val MIGRATION_GATE_TIMEOUT = 2.seconds
         private const val SELECTION_PARAM = "selection"
         private const val SELECTION_SEARCH_AND_AI = "search_and_ai"
         private const val SELECTION_SEARCH_ONLY = "search_only"
