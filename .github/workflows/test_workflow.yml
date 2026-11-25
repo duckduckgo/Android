@@ -129,6 +129,54 @@ jobs:
           asana_section_id: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
           test_suite_name: Segment Skip
 
+      - name: Diagnose Segment Skip failure
+        # Reports whether a live dependency, rather than the app, broke the Segment Skip suite.
+        if: ${{ !cancelled() && steps.maestro-segment-skip.outcome == 'failure' }}
+        env:
+          # Must match the video and segment used in .maestro/segment_skip/segment_skip_live_player.yaml.
+          VIDEO_ID: wHAT_JDwFOY
+          SEGMENT_START: 48
+          BASE_URL: https://protection.duckduckgo.com/api/protection/segmentSkip/v1/android
+        run: |
+          fetch() { curl -sS --compressed -o "$2" -w '%{http_code}' "$1" || echo 000; }
+
+          status=$(fetch "$BASE_URL/revision" revision.json)
+          if [ "$status" != 200 ]; then
+            echo "::error title=Segment Skip::DATASET SERVICE FAILURE: revision endpoint returned HTTP $status"
+            exit 0
+          fi
+          revision=$(jq -r '.revision' revision.json)
+
+          status=$(fetch "$BASE_URL/hashPrefix?revision=$revision&format=binary&version=1" prefixes.bin)
+          if [ "$status" != 200 ]; then
+            echo "::error title=Segment Skip::DATASET SERVICE FAILURE: hashPrefix endpoint returned HTTP $status"
+            exit 0
+          fi
+          # The app's binary store rejects any dataset file without this magic.
+          if [ "$(head -c 4 prefixes.bin)" != SBPL ]; then
+            echo "::error title=Segment Skip::DATASET FORMAT FAILURE: hashPrefix did not return the binary format the app expects"
+            exit 0
+          fi
+
+          hash_prefix=$(printf '%s' "$VIDEO_ID" | sha256sum | cut -c1-4)
+          status=$(fetch "$BASE_URL/matches?hashPrefix=$hash_prefix" matches.json)
+          if [ "$status" != 200 ]; then
+            echo "::error title=Segment Skip::SEGMENT LOOKUP SERVICE FAILURE: matches endpoint returned HTTP $status"
+            exit 0
+          fi
+          has_segment=$(jq --arg id "$VIDEO_ID" --argjson start "$SEGMENT_START" '
+            [.[] | select(.videoID == $id) | .segments[]?
+              | select(.category == "sponsor" and .actionType == "skip"
+                  and ((.segment[0] - $start) | fabs) <= 2
+                  and (.segment[1] - .segment[0]) >= 30)]
+            | length > 0' matches.json)
+          if [ "$has_segment" != true ]; then
+            echo "::error title=Segment Skip::MISSING SEGMENT DATA: $VIDEO_ID no longer has a sponsor segment starting near ${SEGMENT_START}s and lasting 30s or more"
+            exit 0
+          fi
+
+          echo "::notice title=Segment Skip::Live services and segment data look fine; the failure is likely in the app or the YouTube player"
+
       - name: Android Design System
         id: maestro-ads
         # Run regardless of earlier suite failures, but only if the internal binary uploaded.

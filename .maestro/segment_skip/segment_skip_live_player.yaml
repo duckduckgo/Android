@@ -10,12 +10,6 @@ tags:
 # well into the video matters: the button hides itself after 8s of playback, and with a playing
 # video every Maestro step waits for a settle that never comes, so a segment at 0s can expire
 # before the assertion starts.
-- runScript:
-    file: steps/check_live_services.js
-    env:
-      VIDEO_ID: "wHAT_JDwFOY"
-      HASH_PREFIX: "1b50"
-      SEGMENT_START: "48"
 - launchApp:
     clearState: true
 - runFlow: ../shared/pre_onboarding.yaml
