@@ -22,25 +22,27 @@ import com.duckduckgo.pagetranslation.impl.ModelsHttpClient
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
 import dev.zacsweers.metro.ContributesBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.job
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import java.io.File
 import java.io.IOException
 import java.io.InputStream
 import java.io.OutputStream
 import java.net.HttpURLConnection.HTTP_OK
 import javax.inject.Inject
-import kotlin.coroutines.resumeWithException
 
 interface LanguagePackFetcher {
     enum class FetchResult { SUCCESS, NOT_ENOUGH_STORAGE, FAILURE }
@@ -100,22 +102,28 @@ class RealLanguagePackFetcher internal constructor(
             for ((key, file) in model.files) {
                 val url = (baseUrl + file.path).toHttpUrlOrNull() ?: return FetchResult.FAILURE
 
-                client.value.newCall(Request.Builder().url(url).build()).await().use { response ->
-                    if (response.code != HTTP_OK) {
-                        logcat(ERROR) { "Page translation language pack request failed" }
-                        return FetchResult.FAILURE
-                    }
+                val call = client.value.newCall(Request.Builder().url(url).build())
+                val cancelWhenStopped = cancelWhenStopped(call)
+                try {
+                    call.execute().use { response ->
+                        if (response.code != HTTP_OK) {
+                            logcat(ERROR) { "Page translation language pack request failed" }
+                            return FetchResult.FAILURE
+                        }
 
-                    currentCoroutineContext().ensureActive()
-                    stagingDirectory.resolve(key + COMPRESSED_FILE_SUFFIX).outputStream().use { output ->
-                        copyWithProgress(response.body!!.byteStream(), output) { copiedBytes ->
-                            downloadedBytes += copiedBytes
-                            if (downloadedBytes - reportedBytes >= PROGRESS_STEP_BYTES) {
-                                reportedBytes = downloadedBytes
-                                onProgress(downloadedBytes)
+                        currentCoroutineContext().ensureActive()
+                        stagingDirectory.resolve(key + COMPRESSED_FILE_SUFFIX).outputStream().use { output ->
+                            copyWithProgress(response.body!!.byteStream(), output) { copiedBytes ->
+                                downloadedBytes += copiedBytes
+                                if (downloadedBytes - reportedBytes >= PROGRESS_STEP_BYTES) {
+                                    reportedBytes = downloadedBytes
+                                    onProgress(downloadedBytes)
+                                }
                             }
                         }
                     }
+                } finally {
+                    cancelWhenStopped.cancel()
                 }
                 reportedBytes = downloadedBytes
                 onProgress(downloadedBytes)
@@ -147,16 +155,16 @@ class RealLanguagePackFetcher internal constructor(
         }
     }
 
-    // a blocking execute() would keep waiting for the server after the job is stopped
-    private suspend fun Call.await(): Response = suspendCancellableCoroutine { continuation ->
-        continuation.invokeOnCancellation { cancel() }
-        enqueue(
-            object : Callback {
-                override fun onResponse(call: Call, response: Response) = continuation.resume(response) { response.close() }
-
-                override fun onFailure(call: Call, e: IOException) = continuation.resumeWithException(e)
-            },
-        )
+    // the request and the body are read with blocking calls that don't see cancellation, so a stopped job cancels the call to end them
+    private suspend fun cancelWhenStopped(call: Call): Job {
+        val job = currentCoroutineContext().job
+        return CoroutineScope(currentCoroutineContext()).launch(start = UNDISPATCHED) {
+            try {
+                awaitCancellation()
+            } finally {
+                if (job.isCancelled) call.cancel()
+            }
+        }
     }
 
     companion object {

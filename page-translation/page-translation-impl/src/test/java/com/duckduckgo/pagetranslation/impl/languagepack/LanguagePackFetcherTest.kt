@@ -17,15 +17,17 @@
 package com.duckduckgo.pagetranslation.impl.languagepack
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.ModelFile
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withTimeout
 import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.MediaType
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
@@ -52,6 +54,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.io.IOException
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit.SECONDS
 
 class LanguagePackFetcherTest {
     @get:Rule
@@ -113,7 +117,7 @@ class LanguagePackFetcherTest {
     @Test
     fun failWhenRequestFails() = runTest {
         val call: Call = mock()
-        whenever(call.enqueue(any())).thenAnswer { it.getArgument<Callback>(0).onFailure(call, IOException()) }
+        whenever(call.execute()).thenThrow(IOException())
         whenever(client.newCall(any())).thenReturn(call)
 
         assertEquals(FetchResult.FAILURE, fetch())
@@ -146,17 +150,48 @@ class LanguagePackFetcherTest {
     }
 
     @Test
-    fun cancelRequestAndKeepStagingDirectoryWhenJobIsStopped() = runTest {
-        val call: Call = mock()
-        whenever(client.newCall(any())).thenReturn(call)
+    fun cancelRequestAndKeepStagingDirectoryWhenJobIsStoppedWhileWaitingForResponse() = runBlocking {
+        val isStarted = blockingCall { cancelled ->
+            cancelled.awaitUnlessStuck()
+            null
+        }
 
-        val fetching = launch { fetch() }
-        runCurrent()
-        fetching.cancelAndJoin()
+        stopWhile(isStarted)
 
-        verify(call).cancel()
         assertTrue(stagingDirectory.exists())
         assertEquals(emptyList<String>(), stagingDirectory.list()!!.toList())
+    }
+
+    @Test
+    fun cancelRequestAndKeepStagingDirectoryWhenJobIsStoppedWhileReadingBody() = runBlocking {
+        val isStarted = blockingCall { cancelled -> response(MODEL_URL, OK, BlockingBody(cancelled)) }
+
+        stopWhile(isStarted)
+
+        assertTrue(stagingDirectory.exists())
+    }
+
+    private suspend fun stopWhile(isStarted: CountDownLatch) = coroutineScope {
+        val dispatchers = DefaultDispatcherProvider()
+        val fetcher = RealLanguagePackFetcher(lazyOf(client), dispatchers) { Long.MAX_VALUE }
+        val fetching = launch(dispatchers.io()) { fetcher.fetch(BASE_URL, MODEL, stagingDirectory) {} }
+        assertTrue(isStarted.await(TIMEOUT_SECONDS, SECONDS))
+
+        // ends only once the stopped job has cancelled the call
+        withTimeout(SECONDS.toMillis(TIMEOUT_SECONDS)) { fetching.cancelAndJoin() }
+    }
+
+    private fun blockingCall(execute: (cancelled: CountDownLatch) -> Response?): CountDownLatch {
+        val isStarted = CountDownLatch(1)
+        val cancelled = CountDownLatch(1)
+        val call: Call = mock()
+        whenever(call.cancel()).then { cancelled.countDown() }
+        whenever(call.execute()).thenAnswer {
+            isStarted.countDown()
+            execute(cancelled) ?: throw IOException("Canceled")
+        }
+        whenever(client.newCall(any())).thenReturn(call)
+        return isStarted
     }
 
     private suspend fun fetch(model: TranslationModel = MODEL) =
@@ -166,14 +201,12 @@ class LanguagePackFetcherTest {
         whenever(client.newCall(any())).thenAnswer { invocation ->
             val request = invocation.getArgument<Request>(0)
             val (code, body) = responses.toMap().getValue(request.url.toString())
-            mock<Call>().also { call ->
-                whenever(call.enqueue(any())).thenAnswer {
-                    val response = Response.Builder().request(request).protocol(Protocol.HTTP_1_1).code(code).message("").body(body).build()
-                    it.getArgument<Callback>(0).onResponse(call, response)
-                }
-            }
+            mock<Call>().also { call -> whenever(call.execute()).thenReturn(response(request.url.toString(), code, body)) }
         }
     }
+
+    private fun response(url: String, code: Int, body: ResponseBody) =
+        Response.Builder().request(Request.Builder().url(url).build()).protocol(Protocol.HTTP_1_1).code(code).message("").body(body).build()
 
     private fun ok(body: String) = OK to body.toResponseBody()
 
@@ -191,7 +224,26 @@ class LanguagePackFetcherTest {
         }.buffer()
     }
 
+    private class BlockingBody(private val cancelled: CountDownLatch) : ResponseBody() {
+        override fun contentType(): MediaType? = null
+
+        override fun contentLength(): Long = -1
+
+        override fun source(): BufferedSource = object : Source {
+            override fun read(sink: Buffer, byteCount: Long): Long {
+                cancelled.awaitUnlessStuck()
+                throw IOException("Canceled")
+            }
+
+            override fun timeout(): Timeout = Timeout.NONE
+
+            override fun close() = Unit
+        }.buffer()
+    }
+
     private companion object {
+        const val TIMEOUT_SECONDS = 5L
+
         const val OK = 200
         const val NOT_FOUND = 404
 
@@ -217,5 +269,8 @@ class LanguagePackFetcherTest {
                 "vocab" to ModelFile(VOCAB_PATH, bytes = 5, sha256 = "c", decompressedSize = 9, decompressedHash = "d"),
             ),
         )
+
+        // a call that's never cancelled gives up later than the stop does, so the test fails instead of hanging
+        fun CountDownLatch.awaitUnlessStuck() = await(TIMEOUT_SECONDS * 2, SECONDS)
     }
 }
