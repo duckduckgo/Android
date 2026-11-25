@@ -35,9 +35,7 @@ import javax.inject.Inject
  * Copies the blocked-tracker log that app.db kept before it moved to tracker_detection.db, then drops the app.db table.
  *
  * The copy and the import marker commit in one tracker_detection.db transaction, and clearing the log writes the marker too,
- * so a crash or a retry never duplicates rows and never brings back rows the user cleared.
- * Remove this class and the DAO's legacy-import methods once most installs have run it, and drop any leftover table in an
- * app.db migration.
+ * so a crash or a retry never duplicates rows, and old rows are never copied in after the user cleared the log.
  */
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class WebTrackersBlockedLegacyImporter @Inject constructor(
