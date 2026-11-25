@@ -167,6 +167,7 @@ class LanguagePackWorkerTest {
             it.store = store
             it.fetcher = lazyOf(fetcher)
             it.installer = lazyOf(installer)
+            it.directories = RealLanguagePackDirectories(context)
             it.dispatchers = coroutineRule.testDispatcherProvider
         }
 

@@ -41,7 +41,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -63,6 +62,9 @@ internal class LanguagePackWorker(
     lateinit var installer: Lazy<LanguagePackInstaller>
 
     @Inject
+    lateinit var directories: LanguagePackDirectories
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
@@ -77,7 +79,7 @@ internal class LanguagePackWorker(
 
         val result = coroutineScope {
             val fetch = async {
-                val stagingDirectory = getStagingDirectory(applicationContext, pair)
+                val stagingDirectory = directories.getStagingDirectory(pair)
                 val fetchResult = fetcher.value.fetch(
                     baseUrl = manifest.baseUrl,
                     model = model,
@@ -87,7 +89,7 @@ internal class LanguagePackWorker(
                 }
                 if (fetchResult != SUCCESS) return@async fetchResult
 
-                if (installer.value.install(pair, model, stagingDirectory, getPackDirectory(applicationContext, pair))) SUCCESS else FAILURE
+                if (installer.value.install(pair, model, stagingDirectory, directories.getPackDirectory(pair))) SUCCESS else FAILURE
             }
             val stopWhenDisabled = launch {
                 feature.translation().enabled().firstOrNull { isEnabled -> !isEnabled } ?: return@launch
@@ -138,13 +140,7 @@ internal class LanguagePackWorker(
         const val TOTAL_BYTES_KEY = "totalBytes"
         const val FAILURE_REASON_KEY = "failureReason"
 
-        private const val PACKS_DIRECTORY = "page-translation/packs"
-        private const val STAGING_SUFFIX = ".tmp"
         private const val NOTIFICATION_CHANNEL_ID = "com.duckduckgo.pagetranslation.downloads"
         private const val NOTIFICATION_ID = 7_341
-
-        fun getStagingDirectory(context: Context, pair: String): File = context.filesDir.resolve(PACKS_DIRECTORY).resolve(pair + STAGING_SUFFIX)
-
-        fun getPackDirectory(context: Context, pair: String): File = context.filesDir.resolve(PACKS_DIRECTORY).resolve(pair)
     }
 }
