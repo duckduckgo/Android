@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Hadd foglalkozzunk velük helyetted. Ha lehetséges, elutasítjuk a sütiket, és elfogadjuk azokat, amelyeket nem lehet elutasítani.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Elutasítás, ha lehetséges; egyébként elfogadás helyettem</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Majd én foglalkozom velük</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Nem kötelező sütik elutasítása</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maximalizálja az adatvédelmet és bezárja a sütikkel kapcsolatos felugró ablakokat</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Néhány süti elfogadása</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">További felugró ablakokat rejt el az el nem utasítható sütik elfogadásával</string>
 </resources>
