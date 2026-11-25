@@ -214,6 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Sünkroonimiseks skanni QR-kood</string>
     <string name="sync_simplified_scanner_camera_header_body">Ava <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>ja mine <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sünkrooni teise seadmega</annotation></string>
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Ava <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo töölauarakendus</annotation></b>\n<annotation type="gap">\n</annotation>mine aadressile <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Sain aru</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo vajab juurdepääsu sinu kaamerale.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">QR-koodi skannimiseks on vaja kaamera luba.</string>
@@ -223,6 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Sisesta sünkroonimiskood</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Ava oma teine <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo rakendus</annotation></b>\n<annotation type="gap">\n</annotation>Vali <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sünkrooni teise seadmega</annotation> › <annotation type="highlight">Kopeeri tekstikood</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Ava teine <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo rakendus</annotation></b>\n<annotation type="gap">\n</annotation>mine aadressile <b><annotation type="url">%1$s</annotation></b> ja kopeeri tekstikood.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Näidiskood:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Kleebi sünkroonimiskood</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Kahjuks on kleebitud kood kehtetu.</string>
@@ -231,6 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">QR-kood</string>
     <string name="sync_simplified_qr_code_header_headline">Skanni teisest seadmest</string>
     <string name="sync_simplified_qr_code_header_body">Ava teises seadmes <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ja mine menüüsse <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sünkrooni teise seadmega</annotation> ja skanni see kood:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Ava teises seadmes <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>mine aadressile <b><annotation type="url">%1$s</annotation></b> ja skanni see kood:</string>
     <string name="sync_simplified_qr_code_copy_button">Kopeeri tekstikood</string>
     <string name="sync_simplified_qr_code_share_button">Jaga</string>
     <string name="sync_simplified_qr_code_copied_message">Taastamiskood kopeeritud</string>
