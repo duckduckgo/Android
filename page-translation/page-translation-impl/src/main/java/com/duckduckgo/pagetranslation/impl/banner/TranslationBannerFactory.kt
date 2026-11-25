@@ -17,6 +17,8 @@
 package com.duckduckgo.pagetranslation.impl.banner
 
 import android.content.Context
+import android.os.Build
+import android.view.accessibility.AccessibilityManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
 import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
@@ -39,7 +41,24 @@ class TranslationBannerFactory @Inject constructor(
             languagePacks = languagePacks,
             translateAction = translateAction,
             downloadPrompt = downloadPrompt,
+            timeoutMillis = recommendedTimeoutMillis(context),
         )
         return TranslationBannerView(context).also { it.bind(controller, deviceLanguages, dispatchers.main()) }
+    }
+
+    private fun recommendedTimeoutMillis(context: Context): Long {
+        val accessibilityManager = context.getSystemService(AccessibilityManager::class.java)
+        return when {
+            Build.VERSION.SDK_INT >= 29 -> accessibilityManager.getRecommendedTimeoutMillis(
+                TIMEOUT_MILLIS,
+                AccessibilityManager.FLAG_CONTENT_ICONS or AccessibilityManager.FLAG_CONTENT_TEXT or AccessibilityManager.FLAG_CONTENT_CONTROLS,
+            ).toLong()
+            accessibilityManager.isTouchExplorationEnabled -> Long.MAX_VALUE
+            else -> TIMEOUT_MILLIS.toLong()
+        }
+    }
+
+    private companion object {
+        const val TIMEOUT_MILLIS = 5_000
     }
 }

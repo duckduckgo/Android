@@ -119,6 +119,19 @@ class BannerControllerTest {
     }
 
     @Test
+    fun whenTimeoutIsInfiniteThenNeverDismissed() = runTest {
+        val noAutoDismiss = BannerController(offerSource, languagePacks, translateAction, downloadPrompt, Long.MAX_VALUE)
+        backgroundScope.launch { noAutoDismiss.run() }
+        noAutoDismiss.setOnScreen(true)
+        offers.value = first
+        runCurrent()
+
+        advanceTimeBy(TIMEOUT * 1_000)
+
+        assertEquals(BannerState.Showing(first), noAutoDismiss.state.value)
+    }
+
+    @Test
     fun whenNewDocumentArrivesThenTimerRestartsAndBannerShowsAgain() = runTest {
         start()
         offers.value = first
