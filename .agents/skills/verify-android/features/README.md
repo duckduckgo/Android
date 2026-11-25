@@ -32,6 +32,7 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 - **Tab switcher:** `$V tap id:inputModeWidgetNavTabs` on the New Tab Page or `$V tap id:tabsMenu` on a page, `$V assert where TabSwitcherActivity`.
 - **Duck.ai chat:** browser menu, `$V tap id:newDuckChatMenuItem`, `$V wait id:duckAIHeader 25`.
 - **App Tracking Protection:** Settings, `$V scroll up` until `text:App Tracking Protection` is visible, `$V tap "text:App Tracking Protection"`: `VpnOnboardingActivity` until the user has onboarded, `DeviceShieldTrackerActivity` after (`steps.apptp`).
+- **PIR dev settings:** Settings, `$V scroll up` until `text:PIR dev settings` is visible (Internal Features), `$V tap "text:PIR dev settings"`, `$V assert where PirDevSettingsActivity`. Its "Open PIR Dashboard" (`id:pirOpenDashboard`) opens `PirDashboardWebViewActivity` whatever the subscription state.
 
 ## Proof and skip reporting
 
@@ -51,11 +52,13 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 | [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history | Duck.ai chat |
 | [ai-settings.md](ai-settings.md) | AI Features settings: Search Only vs Search & Duck.ai, New Tab Toggle Position, Duck.ai on/off, shortcuts, Without AI | AI Features |
 | [app-tracking-protection.md](app-tracking-protection.md) | App Tracking Protection: onboarding and VPN consent, on/off, per-app protection, report forms, dev settings, blocking trackers in another app | App Tracking Protection |
+| [pir.md](pir.md) | Personal Information Removal: Settings rows, the free scan (landing page, profile steps, scan-only run, results, notification), the subscriber dashboard, dev settings | PIR dev settings, Settings |
 
 Without a recipe yet: bookmarks, page forms, the rest of Settings, onboarding, sync, autofill and downloads.
-Not covered on purpose: anything that depends on a paid plan (Duck.ai's paid models, the subscription VPN, PIR,
-ITR), because the debug build can't reach a subscribed state through the UI. App Tracking Protection is free and
-has a recipe; the subscription VPN is a different feature.
+Not covered on purpose: anything that depends on a paid plan (Duck.ai's paid models, the subscription VPN, ITR),
+because the debug build can't reach a subscribed state through the UI. App Tracking Protection is free and has a
+recipe; the subscription VPN is a different feature. PIR has a recipe for its free scan; its subscriber steps need a
+device already signed in to a subscription.
 
 ## Proofs
 
