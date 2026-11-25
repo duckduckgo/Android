@@ -1903,7 +1903,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(vpnMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_VPN)
-                viewModel.onVpnMenuClicked()
+                viewModel.onVpnMenuClicked(omnibar.viewMode)
             }
             onMenuItemClicked(newDuckChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)

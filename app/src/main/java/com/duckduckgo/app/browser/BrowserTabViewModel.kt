@@ -6339,11 +6339,13 @@ class BrowserTabViewModel @Inject constructor(
         submitQuery(duckChat.getDuckChatUrl(query ?: "", false), QueryOrigin.FromUser, QuerySubmissionSource.INTERNAL_NAVIGATION)
     }
 
-    fun onVpnMenuClicked() {
+    fun onVpnMenuClicked(omnibarViewMode: ViewMode) {
         val state = currentBrowserViewState().vpnMenuState
         when (state) {
-            VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill ->
-                command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=funnel_appmenu_android".toUri())
+            VpnMenuState.NotSubscribed, VpnMenuState.NotSubscribedNoPill -> {
+                val origin = if (omnibarViewMode is ViewMode.DuckAI) "funnel_appmenu_android__chat" else "funnel_appmenu_android"
+                command.value = LaunchSubscription("https://duckduckgo.com/pro?origin=$origin".toUri())
+            }
             is VpnMenuState.Subscribed -> command.value = LaunchVpnManagement
             VpnMenuState.Hidden -> {} // Menu item not visible
         }

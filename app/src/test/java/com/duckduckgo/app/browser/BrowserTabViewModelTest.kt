@@ -14820,7 +14820,7 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.NotSubscribed,
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
@@ -14834,7 +14834,7 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.NotSubscribedNoPill,
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
@@ -14848,7 +14848,7 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true),
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
@@ -14862,10 +14862,23 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.NotSubscribed,
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         assertCommandIssued<LaunchSubscription> {
             assertEquals("funnel_appmenu_android", uri.getQueryParameter("origin"))
+        }
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateInDuckAiModeThenLaunchSubscriptionWithAppMenuChatOrigin() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked(ViewMode.DuckAI)
+
+        assertCommandIssued<LaunchSubscription> {
+            assertEquals("funnel_appmenu_android__chat", uri.getQueryParameter("origin"))
         }
     }
 
