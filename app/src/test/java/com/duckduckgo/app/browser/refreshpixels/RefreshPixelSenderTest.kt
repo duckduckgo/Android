@@ -2,15 +2,15 @@ package com.duckduckgo.app.browser.refreshpixels
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.brokensite.FakeFeatureTogglesInventory
+import com.duckduckgo.app.brokensite.TestBlockListFeature
 import com.duckduckgo.app.browser.customtabs.CustomTabPixelNames
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
-import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
 import com.duckduckgo.app.trackerdetection.blocklist.RealBlockListExperiment
-import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension

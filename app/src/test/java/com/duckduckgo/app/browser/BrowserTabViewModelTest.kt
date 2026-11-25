@@ -248,7 +248,9 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_RESULTS
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_TRACKERS_BLOCKED
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_VISIT_SITE
 import com.duckduckgo.app.privacy.db.NetworkLeaderboardDao
+import com.duckduckgo.app.privacy.db.TrackerStatsWriter
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
+import com.duckduckgo.app.privacy.model.TestingEntity
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.StatisticsUpdater
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -268,8 +270,6 @@ import com.duckduckgo.app.tabs.model.TabPageContextRepository
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.tabs.store.TabStatsBucketing
 import com.duckduckgo.app.trackerdetection.EntityLookup
-import com.duckduckgo.app.trackerdetection.TestEntity
-import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
@@ -1773,7 +1773,7 @@ class BrowserTabViewModelTest {
 
     @Test
     fun whenTrackerDetectedThenNetworkLeaderboardUpdated() {
-        val networkEntity = TestEntity("Network1", "Network1", 10.0)
+        val networkEntity = TestingEntity("Network1", "Network1", 10.0)
         val event =
             TrackingEvent(
                 documentUrl = "http://www.example.com",
@@ -3648,7 +3648,7 @@ class BrowserTabViewModelTest {
     fun whentrackersDetectedThenPrivacyGradeIsUpdated() {
         val grade = privacyShieldState().privacyShield
         loadUrl("https://example.com")
-        val entity = TestEntity("Network1", "Network1", 10.0)
+        val entity = TestingEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
             testee.trackerDetected(
                 TrackingEvent(
@@ -3671,7 +3671,7 @@ class BrowserTabViewModelTest {
             whenever(it.privacyProtection()).thenReturn(PROTECTED)
         }
         loadUrl("https://example.com")
-        val entity = TestEntity("Network1", "Network1", 10.0)
+        val entity = TestingEntity("Network1", "Network1", 10.0)
         for (i in 1..10) {
             testee.trackerDetected(
                 TrackingEvent(

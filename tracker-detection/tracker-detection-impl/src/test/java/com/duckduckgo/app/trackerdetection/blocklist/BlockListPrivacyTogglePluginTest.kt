@@ -8,7 +8,6 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.BREAKAGE_FORM
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.DASHBOARD
 import com.duckduckgo.privacy.dashboard.api.PrivacyToggleOrigin.MENU
@@ -50,16 +49,11 @@ class BlockListPrivacyTogglePluginTest {
             featureName = "blockList",
         ).build().create(TestBlockListFeature::class.java)
 
-        inventory = RealFeatureTogglesInventory(
-            setOf(
-                FakeFeatureTogglesInventory(
-                    features = listOf(
-                        testBlockListFeature.tdsNextExperimentTest(),
-                        testBlockListFeature.tdsNextExperimentAnotherTest(),
-                    ),
-                ),
+        inventory = FakeFeatureTogglesInventory(
+            features = listOf(
+                testBlockListFeature.tdsNextExperimentTest(),
+                testBlockListFeature.tdsNextExperimentAnotherTest(),
             ),
-            coroutineRule.testDispatcherProvider,
         )
 
         fakeMetricsPixelExtension.register()

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.app.referencetests.brokensites
 
+import com.duckduckgo.app.brokensite.FakeFeatureTogglesInventory
+import com.duckduckgo.app.brokensite.TestBlockListFeature
 import com.duckduckgo.app.brokensite.api.BrokenSiteSubmitter
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.statistics.model.Atb
@@ -24,9 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.TdsMetadataProvider
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
-import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
 import com.duckduckgo.app.trackerdetection.blocklist.RealBlockListExperiment
-import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport

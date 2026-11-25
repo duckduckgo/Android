@@ -17,7 +17,7 @@
 package com.duckduckgo.app.trackerdetection
 
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.tracker.detection.impl.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

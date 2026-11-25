@@ -29,13 +29,32 @@ dependencies {
     }
     api project(':tracker-detection-api')
 
+    implementation project(':ad-click-api')
+    implementation project(':app-build-config-api')
+    implementation project(':browser-feature-toggles')
     implementation project(':codegen-annotations')
+    implementation project(':common-utils')
     implementation project(':data-store-api')
     implementation project(':di')
+    implementation project(':experiments-api')
+    implementation project(':feature-toggles-api')
+    implementation project(':privacy-config-api')
+    implementation project(':privacy-dashboard-api')
+    implementation project(':statistics-api')
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.common
     implementation AndroidX.room.runtime
+    implementation KotlinX.coroutines.core
     implementation Square.moshi
+    implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.retrofit
 
     testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.room.testing
     testImplementation AndroidX.test.ext.junit

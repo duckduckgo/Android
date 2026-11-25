@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.api
+package com.duckduckgo.app.privacy.db
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
-import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
-import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -32,14 +30,9 @@ import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 /**
- * Persists per-tracker statistics without issuing one database transaction per tracker request.
+ * Persists the lifetime tracker counters without issuing one database transaction per tracker request.
  */
 interface TrackerStatsWriter {
-    /**
-     * Queues a blocked-tracker history row, stamped with the time of this call.
-     */
-    fun recordBlockedHistory(trackerUrl: String, trackerCompany: String)
-
     /**
      * Queues an increment of the lifetime blocked-tracker count.
      */
@@ -49,32 +42,23 @@ interface TrackerStatsWriter {
      * Queues an increment of [networkName] in the tracker network leaderboard.
      */
     fun incrementNetworkCount(networkName: String)
-
-    /**
-     * Drops queued history rows and deletes the persisted ones. A flush already in progress either completes
-     * before the delete or has its history discarded, so no row recorded before this call survives it.
-     */
-    suspend fun deleteAllHistory()
 }
 
 /**
- * Accumulates tracker events in memory and flushes them once per [FLUSH_WINDOW_MS] burst: the history rows in one
- * `tracker_detection.db` transaction and the counters in one `app.db` transaction.
+ * Accumulates counter increments in memory and flushes them in one `app.db` transaction per [FLUSH_WINDOW_MS] burst.
  *
- * Both databases have a single connection, so independent writes per tracker queue up on the connection pool.
- * Events queued in the window are lost if the process dies before the flush.
+ * The database has a single connection, so independent writes per tracker queue up on the connection pool.
+ * Increments queued in the window are lost if the process dies before the flush.
  */
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTrackerStatsWriter @Inject constructor(
     private val appDatabase: AppDatabase,
-    private val webTrackersBlockedDao: WebTrackersBlockedDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : TrackerStatsWriter {
 
     private class Pending {
-        val history = mutableListOf<WebTrackerBlocked>()
         var blockedCount = 0
         val networkCounts = linkedMapOf<String, Int>()
     }
@@ -86,25 +70,12 @@ class RealTrackerStatsWriter @Inject constructor(
     // Keeps flushes strictly sequential even if a slow one overlaps the next window.
     private val writeMutex = Mutex()
 
-    override fun recordBlockedHistory(trackerUrl: String, trackerCompany: String) {
-        // Built here so the persisted timestamp is the request time, not the flush time.
-        val row = WebTrackerBlocked(trackerUrl = trackerUrl, trackerCompany = trackerCompany)
-        enqueue { history.add(row) }
-    }
-
     override fun incrementBlockedCount() {
         enqueue { blockedCount++ }
     }
 
     override fun incrementNetworkCount(networkName: String) {
         enqueue { networkCounts.merge(networkName, 1, Int::plus) }
-    }
-
-    override suspend fun deleteAllHistory() {
-        writeMutex.withLock {
-            synchronized(lock) { pending.history.clear() }
-            webTrackersBlockedDao.deleteAll()
-        }
     }
 
     private fun enqueue(update: Pending.() -> Unit) {
@@ -124,12 +95,10 @@ class RealTrackerStatsWriter @Inject constructor(
 
     private suspend fun flush() {
         writeMutex.withLock {
-            // Swapped inside the mutex so a concurrent deleteAllHistory can't be followed by a stale batch insert.
             val batch = synchronized(lock) {
                 flushScheduled = false
                 pending.also { pending = Pending() }
             }
-            if (batch.history.isNotEmpty()) webTrackersBlockedDao.insertAll(batch.history)
             appDatabase.runInTransaction {
                 if (batch.blockedCount > 0) appDatabase.privacyProtectionCountsDao().incrementBlockedTrackerCountBy(batch.blockedCount)
                 batch.networkCounts.forEach { (network, delta) -> appDatabase.networkLeaderboardDao().incrementNetworkCountBy(network, delta) }

@@ -33,6 +33,7 @@ import com.duckduckgo.app.fakes.FakeMaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.fakes.UserAgentFake
 import com.duckduckgo.app.fakes.UserAllowListRepositoryFake
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.TrackerStatsWriter
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.ResourceSurrogateLoader
 import com.duckduckgo.app.surrogates.ResourceSurrogatesImpl
@@ -45,9 +46,9 @@ import com.duckduckgo.app.trackerdetection.TdsClient
 import com.duckduckgo.app.trackerdetection.TdsEntityLookup
 import com.duckduckgo.app.trackerdetection.TrackerDetectorClientProvider
 import com.duckduckgo.app.trackerdetection.TrackerDetectorImpl
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
-import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
 import com.duckduckgo.app.trackerdetection.db.TdsCnameEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
@@ -108,6 +109,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
     private val mockTrackerAllowlist: TrackerAllowlist = mock()
     private val mockRequestBlocklist: RequestBlocklist = mock()
     private var mockTrackerStatsWriter: TrackerStatsWriter = mock()
+    private var mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
     private var mockHttpsUpgrader: HttpsUpgrader = mock()
     private var mockRequest: WebResourceRequest = mock()
     private val mockPrivacyProtectionCountDao: PrivacyProtectionCountDao = mock()
@@ -206,6 +208,7 @@ class DomainsReferenceTest(private val testCase: TestCase) {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             trackerStatsWriter = mockTrackerStatsWriter,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
     }
 

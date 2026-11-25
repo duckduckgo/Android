@@ -27,11 +27,11 @@ import javax.inject.Inject
 @ContributesBinding(AppScope::class)
 class WebTrackersBlockedAppRepository @Inject constructor(
     private val dao: WebTrackersBlockedDao,
-    private val trackerStatsWriter: TrackerStatsWriter,
+    private val writer: WebTrackersBlockedWriter,
 ) : WebTrackersBlockedHistory {
 
     override suspend fun onTrackerBlocked(trackerUrl: String, trackerCompany: String) {
-        trackerStatsWriter.recordBlockedHistory(trackerUrl = trackerUrl, trackerCompany = trackerCompany)
+        writer.record(trackerUrl = trackerUrl, trackerCompany = trackerCompany)
     }
 
     override suspend fun trackerCountForLast7Days(): Int = dao.getTrackersCountBetween(
@@ -40,7 +40,7 @@ class WebTrackersBlockedAppRepository @Inject constructor(
     )
 
     override suspend fun deleteAll() {
-        trackerStatsWriter.deleteAllHistory()
+        writer.deleteAll()
     }
 
     override suspend fun deleteExpiredEntries() {

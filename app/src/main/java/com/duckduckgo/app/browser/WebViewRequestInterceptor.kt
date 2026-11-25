@@ -32,9 +32,10 @@ import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegra
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.TrackerStatsWriter
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
@@ -101,6 +102,7 @@ class WebViewRequestInterceptor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     @IsMainProcess private val isMainProcess: Boolean,
     private val trackerStatsWriter: TrackerStatsWriter,
+    private val webTrackersBlockedHistory: WebTrackersBlockedHistory,
 ) : RequestInterceptor {
 
     private var checkMaliciousAfterHttpsUpgrade = false
@@ -331,7 +333,7 @@ class WebViewRequestInterceptor(
         maliciousSiteBlockerWebViewIntegration.onSiteExempted(url, feed)
     }
 
-    private fun getWebResourceResponse(
+    private suspend fun getWebResourceResponse(
         request: WebResourceRequest,
         documentUrl: Uri,
         webViewClientListener: WebViewClientListener?,
@@ -429,9 +431,9 @@ class WebViewRequestInterceptor(
         return trackingEvent
     }
 
-    private fun recordTrackerBlocked(trackingEvent: TrackingEvent) {
+    private suspend fun recordTrackerBlocked(trackingEvent: TrackingEvent) {
         val trackerCompany = trackingEvent.entity?.displayName ?: "Undefined"
-        trackerStatsWriter.recordBlockedHistory(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany)
+        webTrackersBlockedHistory.onTrackerBlocked(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany)
     }
 
     private fun appUrlPixel(url: Uri?): Boolean =
