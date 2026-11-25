@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Wir kümmern uns für dich darum. Wir lehnen Cookies ab, wenn möglich, und akzeptieren diejenigen, die nicht abgelehnt werden können.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Wenn möglich ablehnen oder für mich akzeptieren</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Ich kümmere mich selbst darum</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Optionale Cookies ablehnen</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maximiert die Privatsphäre und schließt Cookie-Pop-ups</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Einige Cookies akzeptieren</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Blendet mehr Pop-ups aus, indem Cookies akzeptiert werden, die nicht abgelehnt werden können</string>
 </resources>
