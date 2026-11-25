@@ -966,8 +966,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Започнете поверителен чат с AI с Duck.ai или превключете към „Търсене“ за защитено сърфиране.<br/><br/>Можете да използвате Duck.ai от всяко място, където видите иконата за чат]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Предлагаме и платен абонамент с усъвършенствани AI модели с по-високи лимити за чат от GPT и Claude, защитена VPN и други.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Можете винаги да коригирате това по-късно в Настройки.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Подредете нещата по своя начин</string>
+    <string name="downloadReasonBody">Избери една опция, която Ви интересува най-много, и ще подготвим всичко много бързо.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Поверително търсене\nи сърфиране</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Поверителен чат\nс AI</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Деактивиране на\nфункциите с AI</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Блокиране на рекламите\nи изскачащите прозорци</string>
+    <string name="downloadReasonPrimaryCta">Напред</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Вие сте на правилното място!<br/>Защитите са активирани.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Вашето търсене, по Вашия начин.</string>
+    <string name="searchPathPreferenceHistoryPrimary">История на търсенето</string>
+    <string name="searchPathPreferenceHistorySecondary">Показване на наскоро посетени сайтове в предложенията за търсене. Поверително, само на Вашето устройство.</string>
+    <string name="searchPathPreferenceSafePrimary">Безопасно търсене</string>
+    <string name="searchPathPreferenceSafeSecondary">Пропускане съмнителен (главно за възрастни) материал в резултатите.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">А сега изпробвайте поверително търсене!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Поверителен чат с популярни AI модели в Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Чатовете са анонимизирани, не е необходим акаунт. И е безплатно!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Изпробвайте Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Пропускане</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Вие сте на правилното място!<br/>Защитите са активирани.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Търсете в мрежата анонимно с блокирани тракери</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Изберете AI, който да изпробвате първо</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">С Duck.ai можете да промените по всяко време.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Искате ли нови раздели да се отварят с AI чат?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Можете да превключите към търсене с едно докосване</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Започнете поверителен чат с AI с Duck.ai или превключете към „Търсене“ за защитено сърфиране.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Вие сте на правилното място!<br/>Функциите с AI са изключени.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Без отговори, подпомагани от AI в търсенето</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Скриване на генерираните от AI изображения в търсенето</string>
+    <string name="noAiPathPreferenceSelectorTitle">Търсене без AI</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Включване на генерирани от AI отговори в резултатите от търсенето</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Скриване на генерирани от AI изображения</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Филтрира известни спам AI сайтове в резултатите от търсенето на изображения</string>
+    <string name="noAiPathDuckAiStateTitle">Искате ли опцията за поверителен чат с популярни AI модели?</string>
+    <string name="noAiPathDuckAiStateBody">Чатовете в Duck.ai са анонимизирани и никога не се използват за обучение на AI.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Интернет, без излишния шум.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Вие сте на правилното място!<br/>Блокирането на реклами е активирано.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Само търсене</string>
     <string name="input_screen_user_pref_with_ai_updated">Превключвайте между\nТърсене и Duck.ai</string>
