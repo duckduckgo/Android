@@ -1,9 +1,0 @@
-{
-    "agents": ["ddg_android"],
-    "target": {
-        "key": "appVersion",
-        "versionUrl": "https://raw.githubusercontent.com/duckduckgo/Android/refs/heads/develop/app/version/version.properties",
-        "versionRef": "VERSION"
-    },
-    "forceLowerCase": false
-}

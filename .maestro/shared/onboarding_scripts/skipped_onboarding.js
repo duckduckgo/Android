@@ -1,3 +1,0 @@
-output.onboarding = {
-    runFullOnboarding: false
-}

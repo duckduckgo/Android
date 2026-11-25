@@ -1,5 +1,0 @@
-appId: com.duckduckgo.mobile.android
----
-- runFlow: ../shared/browser_screen/click_on_menu_button.yaml
-- tapOn: "Settings"
-- tapOn: "Sync & Backup"
