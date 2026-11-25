@@ -586,17 +586,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             steps = buildList {
                 add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath)))
                 add(defaultBrowserPromptStep())
-                add(
-                    preferenceSelectorStep(
-                        ctx = ctx,
-                        pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_SERP,
-                        titleRes = R.string.searchPathPreferenceSelectorTitle,
-                        listOf(
-                            OnboardingPreference.SEARCH_HISTORY,
-                            OnboardingPreference.SAFE_SEARCH,
-                        ),
-                    ),
-                )
                 addAll(widgetSteps(ctx))
                 add(
                     inputScreenStep(

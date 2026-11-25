@@ -64,7 +64,6 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_M
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_TOGGLE_MODE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_DUCK_AI
-import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_SERP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_EXPERIENCE
@@ -845,11 +844,9 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when on the segmented search path then walks the full plan to completed`() = runTest {
         whenever(duckAiAvailability.isDuckAiOnboardingEnabled()).thenReturn(true)
-        val offeredRows = listOf(
-            preferenceRow(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = false),
-            preferenceRow(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = true),
+        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(
+            listOf(preferenceRow(OnboardingPreference.SEARCH_ASSIST, initiallyEnabled = false)),
         )
-        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(offeredRows)
         startSegmentedAtDownloadReason()
 
         orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
@@ -857,24 +854,6 @@ class NewUserOnboardingPlanProviderTest {
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
         assertStep(NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT)
         orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
-        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
-        val selectorStep = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
-        assertEquals(
-            NewUserOnboardingActivityDialog.PreferenceSelector(
-                titleRes = R.string.searchPathPreferenceSelectorTitle,
-                rows = offeredRows,
-            ),
-            selectorStep.resolveDialog(),
-        )
-        orchestrator.onEvent(
-            NewUserOnboardingEvent.PreferenceSelectorConfirmed(
-                mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to true,
-                    OnboardingPreference.SAFE_SEARCH to true,
-                ),
-            ),
-        )
-        verify(onboardingPreferenceCatalog, never()).apply(any())
         assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
         orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = false))
         verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
@@ -895,26 +874,7 @@ class NewUserOnboardingPlanProviderTest {
             Completed(rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID, result = NewUserOnboardingResult.LaunchSearch(query = "weather")),
             orchestrator.state.value,
         )
-        verify(onboardingPreferenceCatalog).apply(
-            mapOf(
-                OnboardingPreference.SEARCH_HISTORY to true,
-                OnboardingPreference.SAFE_SEARCH to true,
-            ),
-        )
-    }
-
-    @Test
-    fun `when no preference is available then the selector is skipped and the search path is persisted`() = runTest {
-        startSegmentedAtDownloadReason()
-
-        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
-        assertStep(NewUserOnboardingStepIds.INPUT_SCREEN)
-        orchestrator.onEvent(NewUserOnboardingEvent.InputModeConfirmed(withAi = true))
-
-        verify(onboardingStore).setDownloadReason(DownloadReasonSelection.SEARCH)
-        assertStep(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
+        verify(onboardingPreferenceCatalog, never()).apply(any())
     }
 
     @Test
@@ -1855,9 +1815,9 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenSegmentedSearchPlanAndNoWidgetThenWidgetStepsBetweenPreferencesAndInputScreen() = runTest {
+    fun whenSegmentedSearchPlanAndNoWidgetThenWidgetStepsBetweenDefaultBrowserAndInputScreen() = runTest {
         val ids = segmentedPlanStepIds(DownloadReasonSelection.SEARCH)
-        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.INPUT_SCREEN)
+        assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.DEFAULT_BROWSER_PROMPT, NewUserOnboardingStepIds.INPUT_SCREEN)
     }
 
     @Test
@@ -2145,31 +2105,6 @@ class NewUserOnboardingPlanProviderTest {
                 OnboardingPixelAction.DownloadReasonClicked(DownloadReasonSelection.BLOCK_ADS),
             )
         }
-    }
-
-    @Test
-    fun `when the search path preferences are confirmed then fires the serp preferences pixel`() = runTest {
-        val selections = mapOf(
-            OnboardingPreference.SEARCH_HISTORY to true,
-            OnboardingPreference.SAFE_SEARCH to false,
-        )
-        whenever(onboardingPreferenceCatalog.offer(any())).thenReturn(
-            listOf(
-                preferenceRow(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = true),
-                preferenceRow(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = true),
-            ),
-        )
-        startSegmentedAtDownloadReason()
-        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
-        assertStep(NewUserOnboardingStepIds.PREFERENCE_SELECTOR)
-        orchestrator.onEvent(NewUserOnboardingEvent.Presented)
-
-        orchestrator.onEvent(NewUserOnboardingEvent.PreferenceSelectorConfirmed(selections))
-
-        verify(onboardingPixelSender).fire(ONBOARDING_PREFERENCES_SERP, OnboardingPixelAction.Shown)
-        verify(onboardingPixelSender).fire(ONBOARDING_PREFERENCES_SERP, OnboardingPixelAction.PreferencesClicked(selections))
     }
 
     @Test

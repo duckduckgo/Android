@@ -97,12 +97,12 @@ class OnboardingDialogShownPixelsTest {
         testee.fireFor(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedSearchPath))
         testee.fireFor(
             NewUserOnboardingActivityDialog.PreferenceSelector(
-                titleRes = R.string.searchPathPreferenceSelectorTitle,
+                titleRes = R.string.noAiPathPreferenceSelectorTitle,
                 rows = listOf(
                     ContentConfig.PreferenceSelector.Row(
-                        preference = OnboardingPreference.SEARCH_HISTORY,
+                        preference = OnboardingPreference.SEARCH_ASSIST,
                         iconRes = null,
-                        primaryText = TextConfig.Literal("history"),
+                        primaryText = TextConfig.Literal("search assist"),
                         secondaryText = null,
                         initiallyEnabled = true,
                     ),

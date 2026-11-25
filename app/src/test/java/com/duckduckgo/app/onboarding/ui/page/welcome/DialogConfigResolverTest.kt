@@ -101,8 +101,8 @@ class DialogConfigResolverTest {
     @Test
     fun `resolves the preference selector by passing its rows through against a submitting cta`() {
         val rows = listOf(
-            row(OnboardingPreference.SEARCH_HISTORY, initiallyEnabled = true),
-            row(OnboardingPreference.SAFE_SEARCH, initiallyEnabled = false),
+            row(OnboardingPreference.SEARCH_ASSIST, initiallyEnabled = true),
+            row(OnboardingPreference.HIDE_AI_GENERATED_IMAGES, initiallyEnabled = false),
         )
 
         val config = testee.resolve(
@@ -123,8 +123,8 @@ class DialogConfigResolverTest {
         assertEquals(
             PreferenceSelectorContentState(
                 mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to true,
-                    OnboardingPreference.SAFE_SEARCH to false,
+                    OnboardingPreference.SEARCH_ASSIST to true,
+                    OnboardingPreference.HIDE_AI_GENERATED_IMAGES to false,
                 ),
             ),
             content.initialState(),

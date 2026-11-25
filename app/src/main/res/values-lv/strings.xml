@@ -999,12 +999,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Tu esi īstajā vietā!<br/>Aizsardzība ir aktivizēta.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Meklē tā, kā vēlies.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Meklēšanas vēsture</string>
-    <string name="searchPathPreferenceHistorySecondary">Meklēšanas ieteikumos rādīt nesen apmeklētās vietnes. Vēsture paliek tikai tavā ierīcē.</string>
-    <string name="searchPathPreferenceSafePrimary">Drošā meklēšana</string>
-    <string name="searchPathPreferenceSafeSecondary">Meklēšanas rezultātos nerādīt apšaubāmu saturu, kas lielākoties paredzēts pieaugušajiem.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Tagad izmēģini privātu meklēšanu!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Privāti tērzē ar populāriem MI modeļiem pakalpojumā Duck.ai</string>

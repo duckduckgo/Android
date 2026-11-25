@@ -981,12 +981,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Sei nel posto giusto!<br/>Protezioni attivate.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">La tua ricerca, a modo tuo.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Cronologia delle ricerche</string>
-    <string name="searchPathPreferenceHistorySecondary">Mostra i siti visitati di recente nei suggerimenti di ricerca. Privati, solo sul tuo dispositivo.</string>
-    <string name="searchPathPreferenceSafePrimary">Ricerca sicura</string>
-    <string name="searchPathPreferenceSafeSecondary">Escludi dai risultati i contenuti discutibili (per lo più per adulti).</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Ora prova la ricerca privata.</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Chatta in privato con le AI più popolari su Duck.ai</string>

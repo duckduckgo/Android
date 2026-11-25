@@ -522,31 +522,6 @@
             }
         ]
     },
-    "onboarding_preferences_serp": {
-        "description": "Search-preferences step of the search path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms, with one param per offered toggle. A toggle the run did not offer is absent. Unique once per user per event.",
-        "owners": ["LukasPaczos"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": [
-            "appVersion",
-            "onboardingEvent",
-            "onboardingInstallType",
-            "onboardingDaysSinceInstall",
-            "onboardingFlow",
-            "onboardingPixelSource",
-            "onboardingDownloadReasonVariant",
-            {
-                "key": "recently_visited_sites_enabled",
-                "type": "boolean",
-                "description": "Only set when event=clicked. Whether recently visited sites are kept."
-            },
-            {
-                "key": "safe_search_enabled",
-                "type": "boolean",
-                "description": "Only set when event=clicked. Whether safe search is on."
-            }
-        ]
-    },
     "onboarding_preferences_ai-model": {
         "description": "Duck.ai model-provider step of the AI path of the segmented onboarding flow. shown when the step is displayed; clicked when the user confirms a provider. Unique once per user per (event, value).",
         "owners": ["LukasPaczos"],

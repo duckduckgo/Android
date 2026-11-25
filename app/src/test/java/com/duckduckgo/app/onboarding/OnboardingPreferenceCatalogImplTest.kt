@@ -21,13 +21,9 @@ import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig.PreferenceSel
 import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
-import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Preference
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
-import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -47,7 +43,6 @@ class OnboardingPreferenceCatalogImplTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val navigationHistory: NavigationHistory = mock()
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
     private val adBlockingPlugin = FakeOnboardingBooleanPreferencePlugin()
     private val rejectOptionalCookiesPlugin = FakeOnboardingBooleanPreferencePlugin(
@@ -77,7 +72,6 @@ class OnboardingPreferenceCatalogImplTest {
     }
 
     private val testee = OnboardingPreferenceCatalogImpl(
-        navigationHistory = navigationHistory,
         serpSettingsDataProvider = serpSettingsDataProvider,
         booleanPreferencePlugins = booleanPreferencePlugins,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -93,36 +87,23 @@ class OnboardingPreferenceCatalogImplTest {
     // region availability
 
     @Test
-    fun `when history feature unavailable then search history is not offered`() = runTest {
-        whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(false)
-
-        assertNull(rowFor(OnboardingPreference.SEARCH_HISTORY))
-    }
-
-    @Test
-    fun `when history feature available then search history is offered`() = runTest {
-        whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
-        whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(false)
-
+    fun `when search assist offered then its row carries its copy and icon`() = runTest {
         assertEquals(
             Row(
-                preference = OnboardingPreference.SEARCH_HISTORY,
-                iconRes = CommonR.drawable.history_color_24,
-                primaryText = TextConfig.Resource(R.string.searchPathPreferenceHistoryPrimary),
-                secondaryText = TextConfig.Resource(R.string.searchPathPreferenceHistorySecondary),
+                preference = OnboardingPreference.SEARCH_ASSIST,
+                iconRes = CommonR.drawable.search_assist_color_24,
+                primaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistPrimary),
+                secondaryText = TextConfig.Resource(R.string.noAiPathPreferenceSearchAssistSecondary),
                 initiallyEnabled = false,
             ),
-            rowFor(OnboardingPreference.SEARCH_HISTORY),
+            rowFor(OnboardingPreference.SEARCH_ASSIST),
         )
     }
 
     @Test
     fun `when serp backed preferences are requested then they are offered`() = runTest {
-        whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf(null))
-
         val offered = testee.offer(
             listOf(
-                OnboardingPreference.SAFE_SEARCH,
                 OnboardingPreference.SEARCH_ASSIST,
                 OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
             ),
@@ -130,7 +111,6 @@ class OnboardingPreferenceCatalogImplTest {
 
         assertEquals(
             listOf(
-                OnboardingPreference.SAFE_SEARCH,
                 OnboardingPreference.SEARCH_ASSIST,
                 OnboardingPreference.HIDE_AI_GENERATED_IMAGES,
             ),
@@ -189,14 +169,10 @@ class OnboardingPreferenceCatalogImplTest {
 
     @Test
     fun `when preferences are offered then rows follow the requested order`() = runTest {
-        whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
-        whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(false)
-        whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf(null))
-
-        val offered = testee.offer(listOf(OnboardingPreference.SAFE_SEARCH, OnboardingPreference.SEARCH_HISTORY))
+        val offered = testee.offer(listOf(OnboardingPreference.HIDE_AI_GENERATED_IMAGES, OnboardingPreference.SEARCH_ASSIST))
 
         assertEquals(
-            listOf(OnboardingPreference.SAFE_SEARCH, OnboardingPreference.SEARCH_HISTORY),
+            listOf(OnboardingPreference.HIDE_AI_GENERATED_IMAGES, OnboardingPreference.SEARCH_ASSIST),
             offered.map { it.preference },
         )
     }
@@ -204,49 +180,6 @@ class OnboardingPreferenceCatalogImplTest {
     // endregion
 
     // region seeds
-
-    @Test
-    fun `when search history offered then switch seeds from user setting`() = runTest {
-        whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
-        whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(true)
-
-        assertTrue(rowFor(OnboardingPreference.SEARCH_HISTORY)!!.initiallyEnabled)
-    }
-
-    @Test
-    fun `when kp not stored then safe search seeds on`() = runTest {
-        whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf(null))
-
-        assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
-    }
-
-    @Test
-    fun `when kp is off then safe search seeds off`() = runTest {
-        whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf("-2"))
-
-        assertFalse(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
-    }
-
-    @Test
-    fun `when kp is on then safe search seeds on`() = runTest {
-        whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flowOf("-1"))
-
-        assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
-    }
-
-    @Test
-    fun `when settings flow completes empty then safe search seeds on`() = runTest {
-        whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(emptyFlow())
-
-        assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
-    }
-
-    @Test
-    fun `when settings flow never emits then safe search seeds on`() = runTest {
-        whenever(serpSettingsDataProvider.observeSetting("kp")).thenReturn(flow { awaitCancellation() })
-
-        assertTrue(rowFor(OnboardingPreference.SAFE_SEARCH)!!.initiallyEnabled)
-    }
 
     @Test
     fun `when search assist already on then onboarding still seeds it off`() = runTest {
@@ -275,27 +208,6 @@ class OnboardingPreferenceCatalogImplTest {
     // endregion
 
     // region apply
-
-    @Test
-    fun `when search history applied then user setting written`() = runTest {
-        testee.apply(mapOf(OnboardingPreference.SEARCH_HISTORY to false))
-
-        verify(navigationHistory).setHistoryUserEnabled(false)
-    }
-
-    @Test
-    fun `when safe search enabled then kp set to on`() = runTest {
-        testee.apply(mapOf(OnboardingPreference.SAFE_SEARCH to true))
-
-        verify(serpSettingsDataProvider).setSetting("kp", "-1")
-    }
-
-    @Test
-    fun `when safe search disabled then kp set to off`() = runTest {
-        testee.apply(mapOf(OnboardingPreference.SAFE_SEARCH to false))
-
-        verify(serpSettingsDataProvider).setSetting("kp", "-2")
-    }
 
     @Test
     fun `when search assist enabled then kbe set to sometimes`() = runTest {
@@ -343,12 +255,12 @@ class OnboardingPreferenceCatalogImplTest {
     fun `when several selections applied then each reaches its own setting`() = runTest {
         testee.apply(
             mapOf(
-                OnboardingPreference.SEARCH_HISTORY to true,
+                OnboardingPreference.SEARCH_ASSIST to true,
                 OnboardingPreference.REJECT_OPTIONAL_COOKIES to false,
             ),
         )
 
-        verify(navigationHistory).setHistoryUserEnabled(true)
+        verify(serpSettingsDataProvider).setSetting("kbe", "2")
         assertEquals(listOf(false), rejectOptionalCookiesPlugin.applied)
     }
 
@@ -433,17 +345,13 @@ class OnboardingPreferenceCatalogImplTest {
     @Test
     fun `when the catalog is built then nothing is evaluated`() {
         assertEquals(0, pluginLookups)
-        verifyNoInteractions(navigationHistory, serpSettingsDataProvider)
+        verifyNoInteractions(serpSettingsDataProvider)
     }
 
     @Test
     fun `when one step offers its preferences then no other preference is evaluated`() = runTest {
-        whenever(navigationHistory.isHistoryFeatureAvailable()).thenReturn(true)
-        whenever(navigationHistory.isHistoryUserEnabled()).thenReturn(false)
+        testee.offer(listOf(OnboardingPreference.BLOCK_ADS))
 
-        testee.offer(listOf(OnboardingPreference.SEARCH_HISTORY))
-
-        assertEquals(0, pluginLookups)
         verifyNoInteractions(serpSettingsDataProvider)
     }
 

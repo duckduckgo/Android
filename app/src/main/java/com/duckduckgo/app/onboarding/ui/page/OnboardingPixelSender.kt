@@ -350,8 +350,6 @@ class RealOnboardingPixelSender @Inject constructor(
 
     private val OnboardingPreference.pixelParamKey: String
         get() = when (this) {
-            OnboardingPreference.SEARCH_HISTORY -> PARAM_RECENTLY_VISITED_SITES_ENABLED
-            OnboardingPreference.SAFE_SEARCH -> PARAM_SAFE_SEARCH_ENABLED
             OnboardingPreference.SEARCH_ASSIST -> PARAM_SEARCH_ASSIST_ENABLED
             OnboardingPreference.HIDE_AI_GENERATED_IMAGES -> PARAM_AI_GENERATED_IMAGES_ENABLED
             OnboardingPreference.BLOCK_ADS -> PARAM_YOUTUBE_AD_BLOCKING_ENABLED
@@ -413,8 +411,6 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val PREFS_VARIANT_SEARCH = "search"
         private const val PREFS_VARIANT_CHAT = "chat"
 
-        private const val PARAM_RECENTLY_VISITED_SITES_ENABLED = "recently_visited_sites_enabled"
-        private const val PARAM_SAFE_SEARCH_ENABLED = "safe_search_enabled"
         private const val PARAM_SEARCH_ASSIST_ENABLED = "search_assist_enabled"
         private const val PARAM_AI_GENERATED_IMAGES_ENABLED = "ai_generated_images_enabled"
         private const val PARAM_YOUTUBE_AD_BLOCKING_ENABLED = "youtube_ad_blocking_enabled"
