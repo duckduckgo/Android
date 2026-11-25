@@ -103,7 +103,7 @@ class RealLanguagePackFetcher internal constructor(
                 val url = (baseUrl + file.path).toHttpUrlOrNull() ?: return FetchResult.FAILURE
 
                 val call = client.value.newCall(Request.Builder().url(url).build())
-                val cancelWhenStopped = cancelWhenStopped(call)
+                val cancelWhenStopped = call.cancelWhenStopped()
                 try {
                     call.execute().use { response ->
                         if (response.code != HTTP_OK) {
@@ -156,13 +156,13 @@ class RealLanguagePackFetcher internal constructor(
     }
 
     // the request and the body are read with blocking calls that don't see cancellation, so a stopped job cancels the call to end them
-    private suspend fun cancelWhenStopped(call: Call): Job {
+    private suspend fun Call.cancelWhenStopped(): Job {
         val job = currentCoroutineContext().job
         return CoroutineScope(currentCoroutineContext()).launch(start = UNDISPATCHED) {
             try {
                 awaitCancellation()
             } finally {
-                if (job.isCancelled) call.cancel()
+                if (job.isCancelled) this@cancelWhenStopped.cancel()
             }
         }
     }
