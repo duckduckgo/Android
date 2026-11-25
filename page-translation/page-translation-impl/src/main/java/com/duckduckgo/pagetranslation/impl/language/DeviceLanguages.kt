@@ -17,6 +17,9 @@
 package com.duckduckgo.pagetranslation.impl.language
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.app.LocaleManagerCompat
+import androidx.core.os.LocaleListCompat
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
@@ -34,7 +37,10 @@ class RealDeviceLanguages @Inject constructor(
 ) : DeviceLanguages {
 
     override fun get(): List<String> {
-        val locales = context.resources.configuration.locales
-        return (0 until locales.size()).map { locales[it].toLanguageTag() }
+        val appLocales = AppCompatDelegate.getApplicationLocales()
+        val systemLocales = LocaleManagerCompat.getSystemLocales(context)
+        return (appLocales.tags() + systemLocales.tags()).distinct()
     }
+
+    private fun LocaleListCompat.tags(): List<String> = (0 until size()).mapNotNull { get(it)?.toLanguageTag() }
 }

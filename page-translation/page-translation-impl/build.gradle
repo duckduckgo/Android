@@ -36,6 +36,8 @@ dependencies {
     implementation "com.duckduckgo.translatekit:translate-kit-android:_"
     implementation "com.squareup.logcat:logcat:_"
     implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation AndroidX.appCompat
+    implementation AndroidX.core.ktx
     implementation AndroidX.dataStore.preferences
     implementation AndroidX.work.runtimeKtx
     implementation KotlinX.coroutines.core
