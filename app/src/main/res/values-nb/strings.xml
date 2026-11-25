@@ -966,8 +966,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Start en privat AI-chat med Duck.ai eller bytt til Søk for beskyttet surfing.<br/><br/>Du kan bruke Duck.ai overalt der du ser chat-ikonet]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Vi tilbyr også et betalt abonnement med avanserte AI-modeller med høyere chattegrenser fra GPT og Claude, en sikker VPN og mye mer.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Du kan når som helst justere dette i innstillingene senere.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Tilpass alt akkurat som du vil ha det</string>
+    <string name="downloadReasonBody">Velg ett alternativ som interesserer deg mest, så hjelper vi deg raskt i gang.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Søk og\nsurf privat</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Chat privat\nmed AI</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Deaktiver\nAI-funksjoner</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Blokker annonser\nog popup-vinduer</string>
+    <string name="downloadReasonPrimaryCta">Neste</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Du er på rett sted!<br/>Beskyttelsene er aktivert.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Ditt søk, på din måte.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Søkehistorikk</string>
+    <string name="searchPathPreferenceHistorySecondary">Vis nylig besøkte nettsteder i søkeforslag. Privat, bare på enheten din.</string>
+    <string name="searchPathPreferenceSafePrimary">Sikkert søk</string>
+    <string name="searchPathPreferenceSafeSecondary">Utelat tvilsomt (for det meste seksuelt) innhold i resultatene.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Nå kan du prøve et privat søk!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Chat privat med populære AI-modeller på Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Chatter anonymiseres, og du behøver ikke en konto. Og det er gratis!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Prøv Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Hopp over</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Du er på rett sted!<br/>Beskyttelsene er aktivert.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Søk privat på nettet med sporere blokkert</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Velg en AI du vil prøve først</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">Med Duck.ai kan du bytte når som helst.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Vil du at nye faner skal åpnes med AI-chat?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Du kan bytte til Søk med ett trykk</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Start en privat AI-chat med Duck.ai eller bytt til Søk for beskyttet surfing.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Du er på rett sted!<br/>AI-funksjoner er deaktivert.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Ingen AI-assisterte svar i søk</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Skjul AI-genererte bilder i søk</string>
+    <string name="noAiPathPreferenceSelectorTitle">Søk uten AI</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Inkluder AI-genererte svar i søkeresultatene</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Skjul AI-genererte bilder</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filtrer ut kjente AI-søppelnettsteder fra bildesøkresultater</string>
+    <string name="noAiPathDuckAiStateTitle">Vil du ha muligheten til å chatte privat med populære AI-modeller?</string>
+    <string name="noAiPathDuckAiStateBody">I Duck.ai blir chattene dine anonymisert av oss og brukes aldri til å trene AI.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Internett, uten støyen.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Du er på rett sted!<br/>Annonseblokkering er aktivert.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Bare søk</string>
     <string name="input_screen_user_pref_with_ai_updated">Bytt mellom\nsøk og Duck.ai</string>
