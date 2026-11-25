@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Naj se z njimi ukvarjamo namesto vas. Piškotke bomo zavrnili, kadar bo mogoče, in sprejeli tiste, ki jih ni mogoče zavrniti.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Zavrni, če je mogoče, ali sprejmi zame</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">S tem se bom ukvarjal/-a sam/-a</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Zavrni izbirne piškotke</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Poveča zasebnost in zapira pojavna okna s piškotki</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Sprejmi nekatere piškotke</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Skrije več pojavnih oken s sprejemanjem piškotkov, ki jih ni mogoče zavrniti</string>
 </resources>
