@@ -224,7 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Indtast synkroniseringskoden</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Åbn din anden <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo -app</annotation></b>\n<annotation type="gap">\n</annotation>Gå til <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkroniser med en anden enhed</annotation> › <annotation type="highlight">Kopiér tekstkode</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Åbn en anden <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo -app</annotation></b>\n<annotation type="gap">\n</annotation>gå til <b><annotation type="url">%1$s</annotation></b> og kopiér tekstkoden.</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Åbn en anden <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-app</annotation></b>\n<annotation type="gap">\n</annotation>gå til <b><annotation type="url">%1$s</annotation></b> og kopiér tekstkoden.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Eksempelkode:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Indsæt synkroniseringskode</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Beklager, den indsatte kode er ugyldig.</string>

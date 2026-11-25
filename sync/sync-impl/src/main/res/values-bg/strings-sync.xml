@@ -233,7 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">QR код</string>
     <string name="sync_simplified_qr_code_header_headline">Сканиране от друго устройство</string>
     <string name="sync_simplified_qr_code_header_body">На друго устройство отворете <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>и влезте в <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Синхронизиране с друго устройство</annotation> и сканирайте този код:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Отворете друг <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>, отворете <b><annotation type="url">%1$s</annotation></b> и сканирате този код:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Отворете друг <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>,\n<annotation type="gap">\n</annotation> отворете <b><annotation type="url">%1$s</annotation></b> и сканирате този код:</string>
     <string name="sync_simplified_qr_code_copy_button">Копиране на текстов код</string>
     <string name="sync_simplified_qr_code_share_button">Споделяне</string>
     <string name="sync_simplified_qr_code_copied_message">Кодът за възстановяване е копиран</string>

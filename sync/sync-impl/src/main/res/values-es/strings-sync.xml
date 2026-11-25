@@ -224,7 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Introduce el código de sincronización</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Abre tu otro <annotation type="icon">￼</annotation> <b><annotation type="highlight">navegador DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Ve a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizar con otro dispositivo</annotation> › <annotation type="highlight">Copiar código de texto</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Abre otra <annotation type="icon">￼</annotation> <b><annotation type="highlight">applicación DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ve a <b><annotation type="url">%1$s</annotation></b> y copia el código de texto.</string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Abre otra <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplicación DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ve a <b><annotation type="url">%1$s</annotation></b> y copia el código de texto.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Código de ejemplo:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Pegar código de sincronización</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Lo sentimos, el código pegado no es válido.</string>
