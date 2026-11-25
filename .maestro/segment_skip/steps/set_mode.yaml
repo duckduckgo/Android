@@ -1,0 +1,17 @@
+appId: com.duckduckgo.mobile.android
+---
+# MODE is one of the radio options in Settings > Ad Blocking > Skip Sponsored Content:
+# "Ask to Skip", "Always" or "Never".
+- runFlow: ../../shared/browser_screen/click_on_menu_button.yaml
+- tapOn: "Settings"
+- scrollUntilVisible:
+    element: "Ad Blocking"
+    direction: DOWN
+- tapOn: "Ad Blocking"
+- tapOn: "Skip Sponsored Content"
+- tapOn: ${MODE}
+- tapOn: "Save"
+- assertVisible: ${MODE}
+- back
+- back
+- runFlow: ../../shared/dismiss_native_input.yaml

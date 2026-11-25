@@ -1,0 +1,27 @@
+appId: com.duckduckgo.mobile.android
+name: "Segment Skip: Always skips the segment and Undo Skip replays it"
+tags:
+  - segmentSkip
+---
+# Requires an internal release build with remote_config_patches/segment_skip_enabled_patch.json.
+- runFlow: steps/start_app.yaml
+- runFlow:
+    file: steps/set_mode.yaml
+    env:
+      MODE: "Always"
+- runFlow: steps/open_video.yaml
+# Undo Skip is only offered right after an automatic skip, so seeing it proves the skip ran.
+- extendedWaitUntil:
+    visible: "Undo Skip"
+    timeout: 90000
+- tapOn:
+    text: "Undo Skip"
+    waitToSettleTimeoutMs: 500
+- extendedWaitUntil:
+    notVisible: "Undo Skip"
+    timeout: 2000
+# Undoing goes back to the segment's start, which then plays without another skip or a button.
+- repeat:
+    times: 2
+    commands:
+      - runFlow: steps/expect_no_button.yaml

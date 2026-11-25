@@ -1,0 +1,13 @@
+appId: com.duckduckgo.mobile.android
+---
+# wHAT_JDwFOY has a single SponsorBlock "sponsor" segment from 48s to 114s; the diagnose step in the
+# E2E workflow checks that segment against the live service. Starting at 40s leaves a few seconds of
+# playback before it, so the segment is reached by playing rather than by the initial seek.
+- tapOn:
+    id: "omnibarTextInput|inputField"
+- inputText: "https://m.youtube.com/watch?v=wHAT_JDwFOY&t=40"
+- pressKey: Enter
+- runFlow: ../../duckplayer/common/handle_youtube_cookies.yaml
+- tapOn:
+    text: "No Thanks"
+    optional: true

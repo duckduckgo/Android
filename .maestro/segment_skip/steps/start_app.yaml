@@ -1,0 +1,10 @@
+appId: com.duckduckgo.mobile.android
+---
+# Runs through the real onboarding rather than the skip-onboarding seeder, so the sponsor dataset
+# download that starts at first launch gets onboarding's duration as a head start.
+- launchApp:
+    clearState: true
+- runFlow: ../../shared/pre_onboarding.yaml
+- tapOn:
+    id: "contextualBrandDesignDismissButton"
+- runFlow: ../../shared/dismiss_native_input.yaml

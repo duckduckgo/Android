@@ -79,7 +79,7 @@ jobs:
         # Reports whether a live dependency, rather than the app, broke the Segment Skip suite.
         if: ${{ !cancelled() && steps.maestro-segment-skip.outcome == 'failure' }}
         env:
-          # Must match the video and segment used in .maestro/segment_skip/segment_skip_live_player.yaml.
+          # Must match the video and segment used in .maestro/segment_skip/steps/open_video.yaml.
           VIDEO_ID: wHAT_JDwFOY
           SEGMENT_START: 48
           BASE_URL: https://protection.duckduckgo.com/api/protection/segmentSkip/v1/android

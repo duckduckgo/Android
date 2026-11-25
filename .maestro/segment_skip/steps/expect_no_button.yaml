@@ -1,0 +1,15 @@
+appId: com.duckduckgo.mobile.android
+---
+# One 5s slice in which no skip or undo button may show. assertNotVisible would wait for a button to
+# hide itself (it does after 8s) and pass, so a button showing fails the flow here instead.
+- extendedWaitUntil:
+    visible: "Skip|Undo Skip"
+    timeout: 5000
+    optional: true
+- runFlow:
+    when:
+      visible: "Skip|Undo Skip"
+    commands:
+      - assertTrue:
+          condition: ${false}
+          label: "A skip or undo button showed when none should"
