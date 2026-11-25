@@ -45,7 +45,7 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesWorker(AppScope::class)
-internal class LanguagePackWorker(
+internal class LanguagePackDownloadWorker(
     context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {

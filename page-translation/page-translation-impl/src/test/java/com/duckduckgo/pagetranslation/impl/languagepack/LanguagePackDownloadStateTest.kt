@@ -27,9 +27,9 @@ import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadStat
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Idle
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.InProgress
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Interrupted
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.DOWNLOADED_BYTES_KEY
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.FAILURE_REASON_KEY
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.TOTAL_BYTES_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.DOWNLOADED_BYTES_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.FAILURE_REASON_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.TOTAL_BYTES_KEY
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.UUID
