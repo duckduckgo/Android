@@ -30,6 +30,7 @@ dependencies {
     implementation project(':browser-api')
     implementation project(':codegen-annotations')
     implementation project(':common-utils')
+    implementation project(':design-system')
     implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':page-translation-api')
