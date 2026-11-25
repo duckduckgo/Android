@@ -966,8 +966,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Duck.ai ile gizli bir yapay zekâ sohbeti başlatın veya korumalı gezinme için Arama moduna geçin.<br/><br/>Sohbet simgesini gördüğünüz her yerden Duck.ai kullanabilirsiniz]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ayrıca, GPT ve Claude\'dan daha yüksek sohbet limitlerine sahip gelişmiş yapay zekâ modelleri, güvenli bir VPN ve daha fazlasını içeren ücretli bir abonelik de sunuyoruz.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Bunu daha sonra Ayarlar\'dan dilediğin zaman değiştirebilirsin.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Her şeyi kendi istediğin gibi ayarla</string>
+    <string name="downloadReasonBody">En çok ilgini çeken seçeneği seç, her şeyi hızlıca ayarlayalım.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Gizliliğini koruyarak ara\nve web\'de gezin</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Yapay zekayla\nözel olarak sohbet et</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Yapay zeka özelliklerini\ndevre dışı bırak</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Reklamları\nve açılır pencereleri engelle</string>
+    <string name="downloadReasonPrimaryCta">Sonraki</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Doğru yerdesin!<br/>Korumalar etkinleştirildi.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Aramaların tam istediğin gibi.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Arama Geçmişi</string>
+    <string name="searchPathPreferenceHistorySecondary">Son ziyaret edilen siteleri arama önerilerinde göster. Gizli, yalnızca cihazında.</string>
+    <string name="searchPathPreferenceSafePrimary">Güvenli Arama</string>
+    <string name="searchPathPreferenceSafeSecondary">Sonuçlarda sakıncalı (çoğunlukla yetişkinlere yönelik) içerikleri gösterme.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Şimdi, gizli aramayı dene!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Duck.ai\'da popüler yapay zekalarla özel olarak sohbet et</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Sohbetler anonimleştirilir, hesap gerekmez. Üstelik ücretsiz!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Duck.ai\'ı dene</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Atla</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Doğru yerdesin!<br/>Korumalar etkinleştirildi.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">İzleyiciler engellenmiş olarak web\'de gizlice arama yap</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Önce denemek istediğin yapay zekayı seç</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">Duck.ai ile istediğin zaman model değiştirebilirsin.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Yeni sekmeler yapay zeka sohbetiyle açılsın mı?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Tek dokunuşla Arama moduna geçebilirsin</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Duck.ai ile gizli bir yapay zeka sohbeti başlat veya korumalı gezinme için Arama moduna geç.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Doğru yerdesin!<br/>Yapay zeka özellikleri devre dışı.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Aramada yapay zeka destekli yanıt yok</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Arama sonuçlarında yapay zeka tarafından oluşturulan görselleri gizle</string>
+    <string name="noAiPathPreferenceSelectorTitle">Yapay zeka olmadan ara</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Arama sonuçlarına yapay zeka tarafından oluşturulan yanıtları dahil et</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Yapay zeka tarafından oluşturulan görselleri gizle</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Görsel arama sonuçlarında bilinen yapay zeka spam sitelerini filtrele</string>
+    <string name="noAiPathDuckAiStateTitle">Popüler yapay zekalarla özel olarak sohbet etme seçeneği ister misin?</string>
+    <string name="noAiPathDuckAiStateBody">Duck.ai\'da sohbetlerini biz anonimleştiririz ve yapay zekayı eğitmek için asla kullanmayız.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Gürültüsüz internet.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Doğru yerdesin!<br/>Reklam engelleme etkinleştirildi.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Yalnızca Arama</string>
     <string name="input_screen_user_pref_with_ai_updated">Arama ile\nDuck.ai arasında geçiş yapın</string>
