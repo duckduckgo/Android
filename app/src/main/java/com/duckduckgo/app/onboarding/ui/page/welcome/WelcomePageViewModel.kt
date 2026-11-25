@@ -59,7 +59,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -408,7 +408,7 @@ class WelcomePageViewModel @Inject constructor(
         if (state.value !is ImportCompleteContentState.Parsing) return
         if (importOutcomeJob?.isActive == true) return
         importOutcomeJob = viewModelScope.launch {
-            val result = withTimeoutOrNull(IMPORT_STATUS_TIMEOUT) { savedPasswordsResult.filterNotNull().first() }
+            val result = withTimeoutOrNull(IMPORT_STATUS_TIMEOUT) { savedPasswordsResult.filterNotNull().firstOrNull() }
                 ?: PasswordImportResult.Terminal.Failed
             state.value = when (result) {
                 is PasswordImportResult.Terminal.Imported -> ImportCompleteContentState.Finished(result.imported, result.skipped)
