@@ -135,11 +135,13 @@ class LanguagePackSchedulerTest {
     @Test
     fun joinAnUnfinishedDownloadWhenAConfirmedDeleteIsQueuedAfterIt() = runTest {
         scheduler.download(PAIR)
+        val download = getActiveWork(PAIR).single { it.isDownload() }
         scheduler.confirmDelete(PAIR)
 
         scheduler.download(PAIR)
 
-        assertEquals(1, getActiveWork(PAIR).count { it.isDownload() })
+        assertEquals(listOf(download.id), getActiveWork(PAIR).filter { it.isDownload() }.map { it.id })
+        assertEquals(listOf(PAIR to REMOVE_OLD), getQueuedOperations())
     }
 
     @Test
@@ -259,15 +261,16 @@ class LanguagePackSchedulerTest {
     }
 
     @Test
-    fun removeOnlyInstalledPairsMissingFromTheList() {
+    fun removeInstalledAndDeletedPairsMissingFromTheList() {
         directories.getPackDirectory(PAIR).mkdirs()
+        directories.getOldDirectory(PAIR).mkdirs()
         directories.getPackDirectory(OTHER_PAIR).mkdirs()
         directories.getStagingDirectory(STAGED_PAIR).mkdirs()
         directories.getOldDirectory(DELETED_PAIR).mkdirs()
 
         scheduler.removeUnlisted(setOf(PAIR))
 
-        assertEquals(listOf(OTHER_PAIR to REMOVE), getQueuedOperations())
+        assertEquals(setOf(OTHER_PAIR to REMOVE, DELETED_PAIR to REMOVE), getQueuedOperations().toSet())
     }
 
     @Test

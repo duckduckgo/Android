@@ -84,7 +84,7 @@ interface LanguagePackScheduler {
     /** Removes the pack [delete] kept for [undoDelete]. */
     fun confirmDelete(pair: String)
 
-    /** Removes every installed pack whose pair isn't in [listedPairs]. Reads the disk, so call it off the main thread. */
+    /** Removes every installed or deleted pack whose pair isn't in [listedPairs]. Reads the disk, so call it off the main thread. */
     fun removeUnlisted(listedPairs: Set<String>)
 
     /** Removes the packs [delete] kept that were never confirmed or restored. Reads the disk, so call it off the main thread. */
@@ -124,7 +124,7 @@ class RealLanguagePackScheduler @Inject constructor(
     override fun confirmDelete(pair: String) = enqueueFileOperation(pair, REMOVE_OLD)
 
     override fun removeUnlisted(listedPairs: Set<String>) {
-        (directories.getInstalledPairs() - listedPairs).forEach { enqueueFileOperation(it, REMOVE) }
+        (directories.getInstalledPairs() + directories.getPairsWithOldDirectory() - listedPairs).forEach { enqueueFileOperation(it, REMOVE) }
     }
 
     override fun removeLeftoverOldDirectories() {
