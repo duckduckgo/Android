@@ -135,6 +135,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private var pendingScheduleNotificationDaysBeforeCancel: Int? = null
 
+    private var awaitingReturnFromNotificationSettings = false
+
     // Origin the offer webview was launched with, captured when the paywall is shown, so the subscribe
     // (primary CTA) click can be attributed to the same subscription-funnel entry point.
     private var launchOrigin: String? = null
@@ -289,8 +291,24 @@ class SubscriptionWebViewViewModel @Inject constructor(
     }
 
     fun onNotificationsDeniedDialogOpenSettings(id: String) {
+        awaitingReturnFromNotificationSettings = true
         viewModelScope.launch {
             sendNotificationsDeniedDialogResponse(id, NOTIFICATIONS_DENIED_DIALOG_OPEN_SETTINGS)
+            command.send(OpenNotificationSettings)
+        }
+    }
+
+    fun onResume(notificationsEnabled: () -> Boolean) {
+        if (!awaitingReturnFromNotificationSettings) return
+        awaitingReturnFromNotificationSettings = false
+        val status = if (notificationsEnabled()) NOTIFICATIONS_PERMISSION_GRANTED else NOTIFICATIONS_PERMISSION_DENIED
+        viewModelScope.launch {
+            val event = SubscriptionEventData(
+                featureName = PURCHASE_COMPLETED_FEATURE_NAME,
+                subscriptionName = NOTIFICATIONS_PERMISSION_CHANGED_SUBSCRIPTION_NAME,
+                params = JSONObject().apply { put("notificationsPermission", status) },
+            )
+            command.send(SendJsEvent(event))
         }
     }
 
@@ -941,6 +959,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data class ComputeUserSettings(val id: String) : Command()
         data class RequestNotificationsPermission(val id: String) : Command()
         data class ShowNotificationsDeniedDialog(val id: String, val days: Int) : Command()
+        data object OpenNotificationSettings : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data object GoToPIRDashboard : Command()
@@ -959,5 +978,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         private const val NOTIFICATIONS_PERMISSION_NOT_DETERMINED = "notDetermined"
         private const val NOTIFICATIONS_DENIED_DIALOG_OPEN_SETTINGS = "openSettings"
         private const val NOTIFICATIONS_DENIED_DIALOG_NOT_NOW = "notNow"
+        private const val NOTIFICATIONS_PERMISSION_CHANGED_SUBSCRIPTION_NAME = "onNotificationsPermissionChanged"
     }
 }

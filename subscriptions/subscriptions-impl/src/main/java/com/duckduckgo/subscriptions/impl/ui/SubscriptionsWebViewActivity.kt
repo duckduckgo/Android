@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.os.Message
+import android.provider.Settings
 import android.view.MenuItem
 import android.webkit.URLUtil
 import android.webkit.WebChromeClient
@@ -104,6 +105,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToNetP
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIR
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.GoToPIRDashboard
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.OpenNotificationSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestNotificationsPermission
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
@@ -582,6 +584,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is ComputeUserSettings -> computeUserSettings(command.id)
             is RequestNotificationsPermission -> launchNotificationsPermission(command.id)
             is ShowNotificationsDeniedDialog -> showNotificationsDeniedDialog(command.id, command.days)
+            is OpenNotificationSettings -> openNotificationSettings()
             Reload -> binding.webview.reload()
         }
     }
@@ -669,6 +672,12 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 },
             )
             .show()
+    }
+
+    private fun openNotificationSettings() {
+        val settingsIntent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            .putExtra(Settings.EXTRA_APP_PACKAGE, packageName)
+        startActivity(settingsIntent)
     }
 
     private fun renderPurchaseState(purchaseState: PurchaseStateView) {
@@ -842,6 +851,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onResume() {
         launchDownloadMessagesJob()
         super.onResume()
+        viewModel.onResume { NotificationManagerCompat.from(this).areNotificationsEnabled() }
     }
 
     override fun onDestroy() {

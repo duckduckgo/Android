@@ -642,6 +642,51 @@ class SubscriptionWebViewViewModelTest {
             assertEquals("msgId", response.id)
             assertEquals("showNotificationsDeniedDialog", response.method)
             assertEquals("openSettings", response.params.getString("action"))
+            assertEquals(Command.OpenNotificationSettings, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsWithNotificationsEnabledThenSendGrantedEvent() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { true }
+            val event = (awaitItem() as Command.SendJsEvent).event
+            assertEquals("useSubscription", event.featureName)
+            assertEquals("onNotificationsPermissionChanged", event.subscriptionName)
+            assertEquals("granted", event.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsWithNotificationsDisabledThenSendDeniedEvent() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { false }
+            val event = (awaitItem() as Command.SendJsEvent).event
+            assertEquals("denied", event.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsThenEventSentOnlyOnce() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { true }
+            assertTrue(awaitItem() is Command.SendJsEvent)
+            viewModel.onResume { true }
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenResumeWithoutOpenSettingsThenNoEventAndNotificationsNotChecked() = runTest {
+        viewModel.commands().test {
+            viewModel.onResume { throw AssertionError("notifications should not be checked") }
+            expectNoEvents()
         }
     }
 
