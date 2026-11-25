@@ -64,6 +64,8 @@ data class ModelState(
      * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
      * */
     val chatScopedReasoningMode: ReasoningMode? = null,
+    /** Where a new chat starts while `resetModelForNewChats` is on; null while it is off. */
+    val newChatDefault: NewChatDefault? = null,
 ) {
     /**
      * Models not loaded yet count as supported, so the entry points are not hidden while they fetch.
@@ -228,7 +230,12 @@ class RealDuckAiModelManager @Inject constructor(
                 stateMutex.withLock {
                     // Selection is resolved before sorting so the derived default keeps following
                     // endpoint order, and only the picker's display order changes.
-                    val selectedModelId = if (resetForNewChats) NewChatDefaults.modelId(userTier, models) else resolveSelection(models)
+                    val newChatDefault = if (resetForNewChats) NewChatDefaults.preferred(userTier, response.newChatDefault) else null
+                    val selectedModelId = if (newChatDefault != null) {
+                        NewChatDefaults.modelId(userTier, newChatDefault, models)
+                    } else {
+                        resolveSelection(models)
+                    }
                     val displayModels = models.sortLabelledFirst()
                     val selectedModel = models.find { it.id == selectedModelId }
                     val available = ReasoningResolver.availableModes(
@@ -236,8 +243,8 @@ class RealDuckAiModelManager @Inject constructor(
                         effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
                         isEligible = isSubscriptionEligible,
                     )
-                    val nextReasoningMode = if (resetForNewChats) {
-                        NewChatDefaults.reasoningMode(preferred = null, available)
+                    val nextReasoningMode = if (newChatDefault != null) {
+                        NewChatDefaults.reasoningMode(newChatDefault, selectedModelId, available)
                     } else {
                         validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
                     }
@@ -252,6 +259,7 @@ class RealDuckAiModelManager @Inject constructor(
                         attachmentLimits = attachmentLimits,
                         selectedReasoningMode = nextReasoningMode,
                         availableReasoningModes = available,
+                        newChatDefault = newChatDefault,
                     )
                     logcat { "Duck.ai Model Manager: fetched ${displayModels.size} models, tier=$userTier, selected=$selectedModelId" }
                 }
@@ -268,12 +276,13 @@ class RealDuckAiModelManager @Inject constructor(
      */
     private suspend fun selectHardcodedDefaultWhileModelsMissing() {
         if (_modelState.value.models.isNotEmpty()) return
-        val modelId = NewChatDefaults.tierDefaultModelId(resolveUserTier())
+        val newChatDefault = NewChatDefaults.preferred(resolveUserTier(), remote = null)
         _modelState.value = _modelState.value.copy(
-            selectedModelId = modelId,
-            selectedReasoningMode = ReasoningMode.FAST,
+            selectedModelId = newChatDefault.modelId,
+            selectedReasoningMode = newChatDefault.mode,
+            newChatDefault = newChatDefault,
         )
-        logcat { "Duck.ai Model Manager: models not loaded, selected hardcoded default $modelId" }
+        logcat { "Duck.ai Model Manager: models not loaded, selected hardcoded default ${newChatDefault.modelId}" }
     }
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {

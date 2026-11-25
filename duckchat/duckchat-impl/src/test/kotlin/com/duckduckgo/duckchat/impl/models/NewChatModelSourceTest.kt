@@ -202,7 +202,7 @@ class NewChatModelSourceTest {
 
     /** The global selection the model manager publishes with `resetModelForNewChats` on. */
     private fun globalSelection(tier: UserTier, models: List<AIChatModel>): ModelState {
-        val selected = models.firstOrNull { it.id == NewChatDefaults.modelId(tier, models) }
+        val selected = models.firstOrNull { it.id == NewChatDefaults.modelId(tier, NewChatDefaults.preferred(tier, null), models) }
         val available = ReasoningResolver.availableModes(selected?.supportedReasoningEfforts.orEmpty())
         return ModelState(
             models = models,

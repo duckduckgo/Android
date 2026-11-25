@@ -18,24 +18,34 @@ package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 
+/** The model and effort a new chat starts on before checking them against the models endpoint. */
+data class NewChatDefault(val modelId: String, val mode: ReasoningMode)
+
 /**
- * Where a new chat starts when `resetModelForNewChats` is on. Hardcoded until the models endpoint
- * supplies a default per tier.
+ * Where a new chat starts when `resetModelForNewChats` is on: the models endpoint's `newChatDefault`, with the
+ * hardcoded tier default as the fallback when the endpoint sends none or has not loaded.
  */
 internal object NewChatDefaults {
 
-    /** The tier's default model, or the first accessible one when the default is missing or locked. */
-    fun modelId(tier: UserTier, models: List<AIChatModel>): String? {
-        val preferred = tierDefaultModelId(tier)
-        return models.firstOrNull { it.id == preferred && it.isAccessible }?.id
-            ?: models.firstOrNull { it.isAccessible }?.id
+    /** The server's default when it names a model, an unknown or missing effort counting as fast; else the tier default on fast. */
+    fun preferred(tier: UserTier, remote: RemoteNewChatDefault?): NewChatDefault {
+        val modelId = remote?.modelId?.takeUnless { it.isBlank() } ?: return NewChatDefault(tierDefaultModelId(tier), ReasoningMode.FAST)
+        val mode = ReasoningEffort.from(remote.reasoningEffort)?.let { ReasoningMode.forEffort(it) } ?: ReasoningMode.FAST
+        return NewChatDefault(modelId, mode)
     }
 
-    /** The tier's default model id, unchecked against the models endpoint. */
-    fun tierDefaultModelId(tier: UserTier): String = when (tier) {
-        UserTier.FREE -> FREE_DEFAULT_MODEL_ID
-        UserTier.PLUS, UserTier.PRO -> PAID_DEFAULT_MODEL_ID
-    }
+    /** [preferred]'s model, else the tier default, else the first accessible model, skipping any that are missing or locked. */
+    fun modelId(tier: UserTier, preferred: NewChatDefault, models: List<AIChatModel>): String? =
+        models.firstOrNull { it.id == preferred.modelId && it.isAccessible }?.id
+            ?: models.firstOrNull { it.id == tierDefaultModelId(tier) && it.isAccessible }?.id
+            ?: models.firstOrNull { it.isAccessible }?.id
+
+    /** [preferred]'s mode only on [preferred]'s own model, since the effort was chosen for it; else as [reasoningMode] with no preference. */
+    fun reasoningMode(
+        preferred: NewChatDefault,
+        selectedModelId: String?,
+        available: List<AvailableReasoningMode>,
+    ): ReasoningMode? = reasoningMode(preferred.mode.takeIf { selectedModelId == preferred.modelId }, available)
 
     /** [preferred] while [available] offers it, else fast, else the first accessible mode. */
     fun reasoningMode(
@@ -46,6 +56,12 @@ internal object NewChatDefaults {
         return preferred?.takeIf { it in accessible }
             ?: ReasoningMode.FAST.takeIf { it in accessible }
             ?: accessible.firstOrNull()
+    }
+
+    /** The tier's default model id, unchecked against the models endpoint. */
+    fun tierDefaultModelId(tier: UserTier): String = when (tier) {
+        UserTier.FREE -> FREE_DEFAULT_MODEL_ID
+        UserTier.PLUS, UserTier.PRO -> PAID_DEFAULT_MODEL_ID
     }
 
     private const val FREE_DEFAULT_MODEL_ID = "gpt-6-luna"
