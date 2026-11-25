@@ -28,6 +28,8 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 - **Settings:** browser menu, `$V wait id:settingsMenuItem 5`, `$V tap id:settingsMenuItem`, `$V assert where SettingsActivity`.
 - **AI Features:** Settings, `$V scroll up`, `$V tap id:includeDuckChatSetting`, `$V assert where DuckChatSettingsActivity`.
 - **Developer Settings:** Settings, `$V scroll up 3` to Internal Features, `$V tap "text:Developer Settings"`, `$V assert where DevSettingsActivity`.
+- **Sync & Backup:** Sync Dev Settings, then `$V tap id:launchSyncSettingsButton` ("Launch Sync Settings"), `$V assert where SyncActivity`. `SyncActivity` isn't exported. The Settings row is in sync.md.
+- **Sync Dev Settings:** `adb shell am start --activity-clear-top -n com.duckduckgo.mobile.android.debug/com.duckduckgo.sync.internal.ui.SyncInternalSettingsActivity` (exported; the other exported dev screens are listed in sync.md), `$V assert where SyncInternalSettingsActivity`.
 - **Duck.ai developer settings:** Settings, `$V scroll up 6`, `$V tap "text:Developer settings and tools"` (the subtitle; the title "Duck.ai" repeats), `$V assert where DuckAiDevActivity`. From there `$V tap "text:URL Settings"` (`DuckAiUrlSettingsActivity`) or `$V tap "text:Browser Tools"`.
 - **Tab switcher:** `$V tap id:inputModeWidgetNavTabs` on the New Tab Page or `$V tap id:tabsMenu` on a page, `$V assert where TabSwitcherActivity`.
 - **Duck.ai chat:** browser menu, `$V tap id:newDuckChatMenuItem`, `$V wait id:duckAIHeader 25`.
@@ -51,8 +53,9 @@ Recipes reach their starting point the way a user does. `$V wait` for the first 
 | [duck-ai.md](duck-ai.md) | Duck.ai chat: open, ask, pickers, history | Duck.ai chat |
 | [ai-settings.md](ai-settings.md) | AI Features settings: Search Only vs Search & Duck.ai, New Tab Toggle Position, Duck.ai on/off, shortcuts, Without AI | AI Features |
 | [app-tracking-protection.md](app-tracking-protection.md) | App Tracking Protection: onboarding and VPN consent, on/off, per-app protection, report forms, dev settings, blocking trackers in another app | App Tracking Protection |
+| [sync.md](sync.md) | Sync & Backup: turning Sync on and off, the login audit log check after real syncs (app open, background), Device Activity; setup through a debug broadcast | Sync & Backup, Sync Dev Settings |
 
-Without a recipe yet: bookmarks, page forms, the rest of Settings, onboarding, sync, autofill and downloads.
+Without a recipe yet: bookmarks, page forms, the rest of Settings, onboarding, autofill and downloads.
 Not covered on purpose: anything that depends on a paid plan (Duck.ai's paid models, the subscription VPN, PIR,
 ITR), because the debug build can't reach a subscribed state through the UI. App Tracking Protection is free and
 has a recipe; the subscription VPN is a different feature.
