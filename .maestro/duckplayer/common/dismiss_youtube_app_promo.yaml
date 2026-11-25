@@ -1,0 +1,12 @@
+appId: com.duckduckgo.mobile.android
+---
+# YouTube's "Get the best experience" app promo dialog covers the player; it can show at any point after load.
+- runFlow:
+    when:
+      visible: "Get the best experience"
+    commands:
+      - tapOn:
+          text: "Close"
+      - extendedWaitUntil:
+          notVisible: "Get the best experience"
+          timeout: 3000

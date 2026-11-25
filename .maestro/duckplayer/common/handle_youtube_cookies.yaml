@@ -25,12 +25,4 @@ appId: com.duckduckgo.mobile.android
     visible: "Get the best experience"
     timeout: 3000
     optional: true
-- runFlow:
-    when:
-      visible: "Get the best experience"
-    commands:
-      - tapOn:
-          text: "Close"
-      - extendedWaitUntil:
-          notVisible: "Get the best experience"
-          timeout: 3000
+- runFlow: dismiss_youtube_app_promo.yaml
