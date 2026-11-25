@@ -97,6 +97,13 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun customWebViewUserAgentClientHints(): Toggle
+
+    /**
+     * When enabled, detached scan WebViews are laid out 1024 CSS px wide at the screen's aspect ratio instead of 0×0,
+     * so responsive broker pages render the content that extraction reads.
+     */
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun scanWebViewSize(): Toggle
 }
 
 @SingleIn(AppScope::class)
