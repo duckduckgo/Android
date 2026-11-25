@@ -214,6 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Senkronize etmek için QR kodunu tara</string>
     <string name="sync_simplified_scanner_camera_header_body"><annotation type="icon">￼</annotation> <b><annotation type="highlight">Masaüstü için DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>uygulamasını açın ve <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Başka Bir Cihazla Senkronize Et</annotation>bölümüne gidin</string>
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair"><annotation type="icon">￼</annotation> <b><annotation type="highlight">Masaüstü için DuckDuckGo</annotation></b>⏎<annotation type="gap">\nuygulamasını aç ve</annotation> <b><annotation type="url">%1$s</annotation></b>adresine git</string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Anladım</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo\'nun kamerana erişmesi gerekiyor.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">QR kodunu taramak için kamera izinleri gerekiyor.</string>
@@ -223,6 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Senkronizasyon kodunu girin</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Diğer <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo Uygulamanızı</annotation></b> açın <annotation type="gap">\n</annotation>Şu sırayı takip edin: <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Başka Bir Cihazla Senkronize Et</annotation> › <annotation type="highlight">Metin Kodunu Kopyala</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Başka bir <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo Uygulamasını</annotation></b> aç, <annotation type="gap">\n</annotation> <b><annotation type="url">%1$s</annotation></b> adresine git ve Metin Kodunu Kopyala.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Örnek Kod:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Senkronizasyon Kodunu Yapıştır</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Üzgünüz, yapıştırılan kod geçersiz.</string>
@@ -231,6 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">QR Kodu</string>
     <string name="sync_simplified_qr_code_header_headline">Başka bir cihazdan tarayın</string>
     <string name="sync_simplified_qr_code_header_body">Başka bir cihazda <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>uygulamasını açın ve <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sync With Another Device</annotation> bölümüne gidip bu kodu tarayın:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Başka bir <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b> uygulamasını aç, <annotation type="gap">\n</annotation> <b><annotation type="url">%1$s</annotation></b> adresine git ve bu kodu tara:</string>
     <string name="sync_simplified_qr_code_copy_button">Metin Kodunu Kopyala</string>
     <string name="sync_simplified_qr_code_share_button">Paylaş</string>
     <string name="sync_simplified_qr_code_copied_message">Kurtarma Kodu Kopyalandı</string>
