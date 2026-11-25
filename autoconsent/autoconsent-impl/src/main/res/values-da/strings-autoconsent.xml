@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Lad os gøre det for dig. Vi afviser cookies, når det er muligt, og accepterer dem, der ikke kan fravælges.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Afvis hvis muligt, eller acceptér for mig</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Jeg klarer dem selv</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Afvis valgfrie cookies</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maksimerer fortroligheden og lukker pop op-vinduer om cookies</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Acceptér nogle cookies</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Skjuler flere pop op-vinduer ved at acceptere cookies, der ikke kan fravælges</string>
 </resources>
