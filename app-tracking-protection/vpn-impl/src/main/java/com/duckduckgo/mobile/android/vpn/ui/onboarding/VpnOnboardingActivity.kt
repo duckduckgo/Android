@@ -30,7 +30,6 @@ import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
-import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -81,6 +80,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        theme.applyStyle(R.style.ThemeOverlay_AppTP_OnboardingStatusBar, true)
         enableTransparentEdgeToEdge()
 
         setContentView(binding.root)
@@ -110,12 +110,6 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         binding.onboardingClose.setOnClickListener {
             close()
         }
-
-        overrideStatusBarColor()
-    }
-
-    private fun overrideStatusBarColor() {
-        window.statusBarColor = getColorFromAttr(com.duckduckgo.mobile.android.R.attr.appTPHeaderBackground)
     }
 
     private fun observeViewModel() {

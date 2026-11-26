@@ -67,21 +67,16 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
         super.onCreate(savedInstanceState)
         overridePendingTransition(0, 0)
         makeBackgroundTransparent()
+        enableTransparentEdgeToEdge()
         setContentView(binding.root)
         configureToolbar()
         configureViews()
         observeViewModel()
     }
 
-    @SuppressLint("NewApi")
     private fun configureViews() {
         setInitialMode()
 
-        if (appBuildConfig.sdkInt >= Build.VERSION_CODES.R) {
-            window.setDecorFitsSystemWindows(false)
-            window.statusBarColor = Color.TRANSPARENT
-            window.navigationBarColor = Color.TRANSPARENT
-        }
         binding.indicator.onAction {
             if (it == INDICATOR_CLICKED) {
                 viewModel.userInitiatesSearchComplete()
