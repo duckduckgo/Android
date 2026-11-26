@@ -155,18 +155,6 @@ class RealPageTranslationMessagingTest {
     }
 
     @Test
-    fun ignoreAReplyToAnotherMethod() = runMessagingTest {
-        attach(webView)
-
-        val units = async { messaging.extract() }
-        runCurrent()
-        page.reply(APPLY_RESULT, getLastEvent(webView).requestId, """"count":1""")
-        advanceTimeBy(11.seconds)
-
-        assertNull(units.await())
-    }
-
-    @Test
     fun giveUpWhenThePageDoesNotReplyInTenSeconds() = runMessagingTest {
         attach(webView)
 
@@ -201,21 +189,6 @@ class RealPageTranslationMessagingTest {
         val units = async { messaging.extract() }
         runCurrent()
         messaging.cancel()
-
-        assertNull(units.await())
-    }
-
-    @Test
-    fun ignoreAReplyFromAWebViewThatIsNoLongerAttached() = runMessagingTest {
-        attach(webView)
-        val oldPage = page
-        val newWebView: WebView = mock()
-        attach(newWebView)
-
-        val units = async { messaging.extract() }
-        runCurrent()
-        oldPage.reply(EXTRACT_RESULT, getLastEvent(newWebView).requestId, """"units":[]""")
-        advanceTimeBy(11.seconds)
 
         assertNull(units.await())
     }

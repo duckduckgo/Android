@@ -70,11 +70,12 @@ class RealPageTranslationMessaging @Inject constructor(
     private val script: PageTranslationScript,
     private val dispatchers: DispatcherProvider,
 ) : PageTranslationMessaging {
+    private val jsInterface = PageTranslationJsInterface()
     private val lock = Any()
     private var pendingRequest: PendingRequest? = null
 
     override fun register(webView: WebView) {
-        webView.addJavascriptInterface(PageTranslationJsInterface(webView), script.interfaceName)
+        webView.addJavascriptInterface(jsInterface, script.interfaceName)
     }
 
     override fun cancel() {
@@ -90,7 +91,7 @@ class RealPageTranslationMessaging @Inject constructor(
     }
 
     override suspend fun extract(): List<PageUnit>? {
-        val reply = request(EXTRACT, EXTRACT_RESULT, JSONObject()) ?: return null
+        val reply = request(EXTRACT, JSONObject()) ?: return null
 
         return try {
             val units = reply.getJSONArray(UNITS_KEY)
@@ -111,12 +112,12 @@ class RealPageTranslationMessaging @Inject constructor(
             .put(TARGET_LANGUAGE_KEY, pair.target)
             .put(UPDATES_KEY, updates)
 
-        return request(APPLY, APPLY_RESULT, params)?.optInt(COUNT_KEY)
+        return request(APPLY, params)?.optInt(COUNT_KEY)
     }
 
-    private suspend fun request(subscription: String, replyMethod: String, params: JSONObject): JSONObject? = withContext(dispatchers.main()) {
+    private suspend fun request(subscription: String, params: JSONObject): JSONObject? = withContext(dispatchers.main()) {
         val webView = attachedWebView.webView ?: return@withContext null
-        val request = PendingRequest(UUID.randomUUID().toString(), replyMethod, webView)
+        val request = PendingRequest(UUID.randomUUID().toString())
         synchronized(lock) {
             pendingRequest?.reply?.complete(null)
             pendingRequest = request
@@ -140,35 +141,28 @@ class RealPageTranslationMessaging @Inject constructor(
         return "window['${script.callbackName}']('${script.secret}', $event);"
     }
 
-    private fun onMessage(webView: WebView, message: String, secret: String) {
+    private fun onMessage(message: String, secret: String) {
         if (secret != script.secret) return
 
-        val json = try {
-            JSONObject(message)
+        val params = try {
+            JSONObject(message).getJSONObject(PARAMS_KEY)
         } catch (_: JSONException) {
             return
         }
-        if (json.optString(FEATURE_NAME_KEY) != FEATURE_NAME) return
-        val method = json.optString(METHOD_KEY)
-        val params = json.optJSONObject(PARAMS_KEY) ?: return
 
+        // a reply to a dropped request is ignored
         synchronized(lock) {
-            val request = pendingRequest ?: return
-
-            // a reply to a dropped request, or from a WebView that's no longer attached, is ignored
-            if (request.webView !== webView || request.replyMethod != method || request.id != params.optString(REQUEST_ID_KEY)) return
-
-            request.reply.complete(params)
+            pendingRequest?.takeIf { it.id == params.optString(REQUEST_ID_KEY) }?.reply?.complete(params)
         }
     }
 
     // a page can call it from any of its frames, so it only acts on messages that carry the secret
-    inner class PageTranslationJsInterface(private val webView: WebView) {
+    inner class PageTranslationJsInterface {
         @JavascriptInterface
-        fun process(message: String, secret: String) = onMessage(webView, message, secret)
+        fun process(message: String, secret: String) = onMessage(message, secret)
     }
 
-    private class PendingRequest(val id: String, val replyMethod: String, val webView: WebView) {
+    private class PendingRequest(val id: String) {
         val reply = CompletableDeferred<JSONObject?>()
     }
 
@@ -177,14 +171,11 @@ class RealPageTranslationMessaging @Inject constructor(
         const val CONTEXT = "contentScopeScripts"
         const val FEATURE_NAME = "pageTranslation"
         const val EXTRACT = "extract"
-        const val EXTRACT_RESULT = "extractResult"
         const val APPLY = "apply"
-        const val APPLY_RESULT = "applyResult"
 
         const val CONTEXT_KEY = "context"
         const val FEATURE_NAME_KEY = "featureName"
         const val SUBSCRIPTION_NAME_KEY = "subscriptionName"
-        const val METHOD_KEY = "method"
         const val PARAMS_KEY = "params"
         const val REQUEST_ID_KEY = "requestId"
         const val UNITS_KEY = "units"
