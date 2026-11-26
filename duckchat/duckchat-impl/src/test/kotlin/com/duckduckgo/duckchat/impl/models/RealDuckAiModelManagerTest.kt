@@ -443,6 +443,82 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsThenPersistedPickNotRestoredOnInit() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id", "model"))
+
+        testee = createManager()
+
+        assertNull(testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsThenFetchSelectsTierDefaultOnFastAndKeepsPersistedPick() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("picked", "Picked"))
+        whenever(dataStore.getSelectedProvider()).thenReturn("ANTHROPIC")
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn("reasoning")
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("picked", provider = "anthropic"),
+                    remoteModel("gpt-6-luna", supportedReasoningEffort = listOf("low", "none")),
+                ),
+            ),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        verify(dataStore, never()).setSelectedReasoningMode(anyOrNull())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndTierChangesThenDefaultFollowsTier() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            AIChatModelsResponse(
+                listOf(
+                    remoteModel("gpt-6-luna", accessTier = listOf("free", "plus", "pro")),
+                    remoteModel("gpt-5.6-terra", accessTier = listOf("plus", "pro"), entityHasAccess = false),
+                ),
+            ),
+        )
+        testee = createManager()
+        testee.fetchModels()
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.AUTO_RENEWABLE)
+        whenever(subscriptions.getEntitlements()).thenReturn(flowOf(setOf(Entitlement(name = "plus", product = "Duck.ai"))))
+        testee.fetchModels()
+
+        assertEquals("gpt-5.6-terra", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsThenPicksDoNotChangeOrPersistTheGlobalSelection() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        testee = createManager()
+
+        testee.selectModel(AIChatModel("id", "model", "Model", "M", listOf("free"), true))
+        testee.selectProvider(ModelProvider.ANTHROPIC)
+        testee.selectReasoningMode(ReasoningMode.REASONING)
+
+        assertNull(testee.modelState.value.selectedModelId)
+        assertNull(testee.modelState.value.selectedReasoningMode)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        verify(dataStore, never()).setSelectedProvider(anyOrNull())
+        verify(dataStore, never()).setSelectedReasoningMode(anyOrNull())
+    }
+
+    @Test
     fun whenGetSelectedModelIdThenReturnsCurrentStateValue() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("id", "model"))
 
@@ -1890,6 +1966,19 @@ class RealDuckAiModelManagerTest {
         assertFalse(testee.ensureImageCapableModelSelected())
 
         assertEquals("text", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsThenEnsureImageCapablePublishesImageModelWithoutPersisting() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        givenModels(remoteModel("text"), remoteModel("image", supportedTools = listOf(Tool.IMAGE_GENERATION.rawValue)))
+        clearInvocations(dataStore)
+
+        assertTrue(testee.ensureImageCapableModelSelected())
+
+        assertEquals("image", testee.modelState.value.selectedModelId)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        verify(dataStore, never()).setSelectedProvider(anyOrNull())
     }
 
     private suspend fun givenModels(vararg models: RemoteAIChatModel) {
