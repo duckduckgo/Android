@@ -150,6 +150,17 @@
             app:leadingIconBackground="circular"
             app:primaryText="@string/syncAuditLogTitle" />
 
+        <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+            android:id="@+id/newLoginNotificationsItem"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:leadingIcon="@drawable/bell_24"
+            app:leadingIconBackground="circular"
+            app:primaryText="@string/syncNewLoginNotificationsTitle"
+            app:secondaryText="@string/syncNewLoginNotificationsDescription"
+            app:showSwitch="true" />
+
         <com.duckduckgo.common.ui.view.divider.HorizontalDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
