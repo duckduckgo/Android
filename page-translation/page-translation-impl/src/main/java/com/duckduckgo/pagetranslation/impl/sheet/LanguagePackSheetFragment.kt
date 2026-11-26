@@ -16,6 +16,7 @@
 
 package com.duckduckgo.pagetranslation.impl.sheet
 
+import android.app.Dialog
 import android.os.Bundle
 import android.text.format.Formatter
 import android.view.LayoutInflater
@@ -25,6 +26,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.setFragmentResult
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoBottomSheetDialogFragment
+import com.duckduckgo.common.ui.setRoundCorners
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pagetranslation.impl.R
 import com.duckduckgo.pagetranslation.impl.databinding.FragmentLanguagePackSheetBinding
@@ -38,6 +40,12 @@ class LanguagePackSheetFragment : DuckDuckGoBottomSheetDialogFragment() {
 
     @Inject
     lateinit var deviceLanguages: DeviceLanguages
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        dialog.setOnShowListener { dialog.setRoundCorners() }
+        return dialog
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

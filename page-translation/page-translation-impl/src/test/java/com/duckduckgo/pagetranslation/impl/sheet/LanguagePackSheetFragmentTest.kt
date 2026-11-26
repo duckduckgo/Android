@@ -15,16 +15,22 @@
  */
 package com.duckduckgo.pagetranslation.impl.sheet
 
+import android.graphics.RectF
+import android.os.Looper
 import android.view.View
 import android.widget.TextView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.pagetranslation.impl.R
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.shape.MaterialShapeDrawable
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
+import org.robolectric.Shadows.shadowOf
 
 @RunWith(AndroidJUnit4::class)
 class LanguagePackSheetFragmentTest {
@@ -62,5 +68,24 @@ class LanguagePackSheetFragmentTest {
 
         val title = view.findViewById<TextView>(R.id.languagePackSheetTitle).text.toString()
         assertTrue(title, title.contains("Spanish"))
+    }
+
+    @Test
+    fun whenSheetIsExpandedThenTopCornersStayRounded() {
+        val sheet = LanguagePackSheetFragment.newInstance(pair, sizeBytes = null)
+        sheet.show(activity.supportFragmentManager, LanguagePackSheetFragment.TAG)
+        activity.supportFragmentManager.executePendingTransactions()
+        shadowOf(Looper.getMainLooper()).idle()
+        val dialog = sheet.dialog as BottomSheetDialog
+
+        dialog.behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        val background = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)!!.background as MaterialShapeDrawable
+        shadowOf(Looper.getMainLooper()).idle()
+        val bounds = RectF(0f, 0f, 1000f, 1000f)
+        // Material animates this to 0 when an expanded sheet would otherwise lose its corners.
+        assertEquals(1f, background.interpolation, 0f)
+        assertTrue(background.shapeAppearanceModel.topLeftCornerSize.getCornerSize(bounds) > 0f)
+        assertTrue(background.shapeAppearanceModel.topRightCornerSize.getCornerSize(bounds) > 0f)
     }
 }
