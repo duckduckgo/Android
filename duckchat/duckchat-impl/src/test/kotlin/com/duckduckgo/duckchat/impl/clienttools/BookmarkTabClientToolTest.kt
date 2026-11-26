@@ -70,6 +70,10 @@ class BookmarkTabClientToolTest {
     // Folder ID to its children, in order.
     private val tree = mutableMapOf<String, MutableList<FolderTreeItem>>()
     private val savedSites: SavedSitesRepository = mock {
+        on { getBookmark(any()) } doAnswer { call ->
+            tree.values.flatten().firstOrNull { it.url == call.getArgument<String>(0) }
+                ?.let { Bookmark(it.id, it.name, it.url!!, it.parentId, lastModified = null) }
+        }
         on { getFolderTreeItems(any()) } doAnswer { tree[it.getArgument<String>(0)].orEmpty().toList() }
         on { insert(any<BookmarkFolder>()) } doAnswer {
             val folder = it.getArgument<BookmarkFolder>(0)
@@ -206,14 +210,17 @@ class BookmarkTabClientToolTest {
     }
 
     @Test
-    fun whenPageIsBookmarkedInAnotherFolderThenItIsAlsoAddedHere() = runTest {
+    fun whenPageIsBookmarkedInAnotherFolderThenNothingIsAddedOrCreated() = runTest {
         givenTab(TAB, PAGE)
         tree.getOrPut(BOOKMARKS_ROOT) { mutableListOf() } += FolderTreeItem("b", "Paris", BOOKMARKS_ROOT, PAGE)
 
         val value = success(testee.execute(JSONObject("""{"tabId":"$TAB","folder":["Travel"]}"""), allowed(PAGE)))
 
-        assertFalse(value.getBoolean("alreadyBookmarked"))
-        assertTrue(value.getBoolean("folderCreated"))
+        assertEquals("""{"tabId":"$TAB","alreadyBookmarked":true,"folderCreated":false}""", value.toString())
+        assertEquals(listOf("b"), tree.values.flatten().map { it.id })
+        verify(savedSites, never()).insert(any<SavedSite>())
+        verify(savedSites, never()).insert(any<BookmarkFolder>())
+        verify(faviconManager, never()).persistCachedFavicon(any(), any())
     }
 
     @Test

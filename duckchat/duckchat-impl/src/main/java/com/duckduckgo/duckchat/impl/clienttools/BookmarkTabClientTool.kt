@@ -97,14 +97,15 @@ class BookmarkTabClientTool @Inject constructor(
         title: String,
         folderPath: List<String>,
     ): Saved {
+        // Matches the browser's Add Bookmark: one bookmark per URL, and no folders made for a page already saved.
+        if (savedSitesRepository.getBookmark(url) != null) return Saved(alreadyBookmarked = true, folderCreated = false)
+
         var folderId = SavedSitesNames.BOOKMARKS_ROOT
         var folderCreated = false
         folderPath.forEach { name ->
             val existing = savedSitesRepository.getFolderTreeItems(folderId).firstOrNull { it.url == null && it.name == name }
             folderId = existing?.id ?: savedSitesRepository.insert(BookmarkFolder(name = name, parentId = folderId)).id.also { folderCreated = true }
         }
-        if (savedSitesRepository.getFolderTreeItems(folderId).any { it.url == url }) return Saved(alreadyBookmarked = true, folderCreated)
-
         savedSitesRepository.insert(
             Bookmark(
                 id = UUID.randomUUID().toString(),
