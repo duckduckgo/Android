@@ -83,8 +83,10 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.Si
 import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -2104,6 +2106,56 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenNotificationStateNotLoadedYetThenNotifyMeHidden() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationSetting.loadGate = CompletableDeferred()
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertTrue(state.showAccount)
+            assertFalse(state.showNotifyMe)
+            assertNull(state.newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncStateNotEmittedYetThenNotificationSettingsStillLoad() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        whenever(syncStateMonitor.syncState()).thenReturn(MutableSharedFlow())
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = true, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationSettingsShownThenNotifyMeHidden() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().showNotifyMe)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoginNotificationFlagOffThenNotifyMeShown() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            assertTrue(expectMostRecentItem().showNotifyMe)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenLoginNotificationFlagOffThenNoNotificationSettings() = runViewModelTest {
         givenAuthenticatedUser()
         fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
@@ -2351,8 +2403,12 @@ class SyncActivityViewModelTest {
     private class FakeNotificationSetting : NewLoginNotificationSetting {
         var enabled = true
         var cardDismissed = false
+        var loadGate: CompletableDeferred<Unit>? = null
 
-        override suspend fun isEnabled(): Boolean = enabled
+        override suspend fun isEnabled(): Boolean {
+            loadGate?.await()
+            return enabled
+        }
 
         override suspend fun setEnabled(enabled: Boolean) {
             this.enabled = enabled

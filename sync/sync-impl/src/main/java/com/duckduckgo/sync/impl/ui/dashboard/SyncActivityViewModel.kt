@@ -153,7 +153,7 @@ class SyncActivityViewModel @Inject constructor(
 
     private val newDeviceBanner = MutableStateFlow<NewDeviceBanner?>(null)
 
-    private val newLoginNotifications = MutableStateFlow<NewLoginNotificationsViewState?>(null)
+    private val newLoginNotifications = MutableStateFlow<NewLoginNotificationsLoad>(NewLoginNotificationsLoad.Loading)
 
     val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
@@ -172,8 +172,12 @@ class SyncActivityViewModel @Inject constructor(
             state.copy(isContentHidden = isContentHidden)
         }.combine(newDeviceBanner) { state, banner ->
             state.copy(newDeviceBanner = banner)
-        }.combine(newLoginNotifications) { state, notifications ->
-            state.copy(newLoginNotifications = notifications)
+        }.combine(newLoginNotifications) { state, load ->
+            val notifications = (load as? NewLoginNotificationsLoad.Loaded)?.state
+            state.copy(
+                newLoginNotifications = notifications,
+                showNotifyMe = state.showAccount && load is NewLoginNotificationsLoad.Loaded && notifications == null,
+            )
         }.flowOn(dispatchers.io())
 
     private fun observeState() {
@@ -191,6 +195,7 @@ class SyncActivityViewModel @Inject constructor(
                 }
                 refreshNewLoginNotifications()
             }.onStart {
+                refreshNewLoginNotifications()
                 initViewStateThisDeviceState()
                 fetchRemoteDevices()
                 syncEngine.triggerSync(FEATURE_READ)
@@ -220,7 +225,7 @@ class SyncActivityViewModel @Inject constructor(
 
     private fun refreshNewLoginNotifications() {
         newLoginNotificationsJob += viewModelScope.launch(dispatchers.io()) {
-            newLoginNotifications.value = loadNewLoginNotifications()
+            newLoginNotifications.value = NewLoginNotificationsLoad.Loaded(loadNewLoginNotifications())
         }
     }
 
@@ -312,7 +317,13 @@ class SyncActivityViewModel @Inject constructor(
         val showDeviceActivity: Boolean = false,
         val newDeviceBanner: NewDeviceBanner? = null,
         val newLoginNotifications: NewLoginNotificationsViewState? = null,
+        val showNotifyMe: Boolean = false,
     )
+
+    private sealed interface NewLoginNotificationsLoad {
+        data object Loading : NewLoginNotificationsLoad
+        data class Loaded(val state: NewLoginNotificationsViewState?) : NewLoginNotificationsLoad
+    }
 
     data class NewLoginNotificationsViewState(
         val switchOn: Boolean,

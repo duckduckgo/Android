@@ -382,7 +382,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.root.isInvisible = viewState.isContentHidden
-        binding.notifyMeContainer.isVisible = viewState.showAccount && viewState.newLoginNotifications == null
+        binding.notifyMeContainer.isVisible = viewState.showNotifyMe
         binding.syncHeader.setState(
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
