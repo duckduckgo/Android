@@ -23,10 +23,9 @@ import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 interface ClientToolPermissionPrompt {
@@ -100,34 +99,35 @@ class PendingClientToolPermission(
 }
 
 /**
- * Publishes the open prompt to the screen hosting its chat, which shows the dialog and answers it.
- * The gate keeps it to one prompt at a time.
+ * Publishes each chat's open prompt to the screen hosting that chat, which shows the dialog and answers it.
+ * The gate keeps it to one prompt at a time per chat.
  */
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class PublishingClientToolPermissionPrompt @Inject constructor() : ClientToolPermissionPrompt {
 
-    private val _pending = MutableStateFlow<PendingClientToolPermission?>(null)
-    val pending: StateFlow<PendingClientToolPermission?> = _pending.asStateFlow()
+    // Keyed by chat tab ID and whether the chat runs in the contextual sheet.
+    private val pendingByChat = MutableStateFlow<Map<Pair<String, Boolean>, PendingClientToolPermission>>(emptyMap())
 
     /** The open prompt of the chat in [chatTabId], hosted in the contextual sheet when [contextual], or null. */
     fun pendingFor(
         chatTabId: String,
         contextual: Boolean,
     ): Flow<PendingClientToolPermission?> =
-        pending
-            .map { prompt -> prompt?.takeIf { it.request.chatTabId == chatTabId && it.request.contextual == contextual } }
+        pendingByChat
+            .map { it[chatTabId to contextual] }
             .distinctUntilChanged()
 
     override suspend fun request(request: ClientToolPermissionRequest): ClientToolPermissionAnswer {
         val reply = CompletableDeferred<ClientToolPermissionAnswer>()
         val prompt = PendingClientToolPermission(request, reply)
-        _pending.value = prompt
+        val chat = request.chatTabId to request.contextual
+        pendingByChat.update { it + (chat to prompt) }
         try {
             return reply.await()
         } finally {
             reply.cancel()
-            _pending.compareAndSet(prompt, null)
+            pendingByChat.update { if (it[chat] === prompt) it - chat else it }
         }
     }
 }

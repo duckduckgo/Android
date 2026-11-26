@@ -28,7 +28,6 @@ import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
-import org.junit.Assert.assertSame
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -76,7 +75,7 @@ class RealDuckAiToolPermissionPromptsTest {
 
             selectedTab.value = TabEntity(tabId = "tab-1", position = 0)
 
-            assertSame(prompt.pending.value, awaitItem())
+            assertEquals(request(chatTabId = "tab-1"), awaitItem()?.request)
             reply.cancel()
             assertNull(awaitItem())
         }
@@ -121,7 +120,7 @@ class RealDuckAiToolPermissionPromptsTest {
 
             sheetTabId.value = "tab-1"
 
-            assertSame(prompt.pending.value, awaitItem())
+            assertEquals(request(chatTabId = "tab-1", contextual = true), awaitItem()?.request)
             reply.cancel()
             assertNull(awaitItem())
         }

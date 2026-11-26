@@ -110,8 +110,13 @@ class RealClientToolPermissionGate @Inject constructor(
         val contextual: Boolean,
     )
 
-    private val promptLock = Mutex()
-    private val waitingByChat = mutableMapOf<ChatHost, MutableSet<CompletableDeferred<Unit>>>()
+    // One lock per chat, so a prompt waiting in a chat the user can't see doesn't hold up the others.
+    private class ChatQueue {
+        val promptLock = Mutex()
+        val waiting = mutableSetOf<CompletableDeferred<Unit>>()
+    }
+
+    private val queues = mutableMapOf<ChatHost, ChatQueue>()
 
     override suspend fun decide(
         tool: ClientTool,
@@ -163,7 +168,9 @@ class RealClientToolPermissionGate @Inject constructor(
         chatTabId: String,
         contextual: Boolean,
     ) {
-        val waiting = synchronized(waitingByChat) { waitingByChat.remove(ChatHost(chatTabId, contextual)) }
+        val waiting = synchronized(queues) {
+            queues[ChatHost(chatTabId, contextual)]?.waiting?.let { set -> set.toList().also { set.clear() } }
+        }
         waiting?.forEach { it.complete(Unit) }
     }
 
@@ -214,7 +221,7 @@ class RealClientToolPermissionGate @Inject constructor(
         }
 
     /**
-     * Runs [decide] holding the prompt lock, so one prompt is open at a time.
+     * Runs [decide] holding the chat's prompt lock, so each chat has one prompt open at a time.
      * Gives [cancelled] when the deadline passes or the chat goes away first.
      */
     private suspend fun <T> awaitTurn(
@@ -222,11 +229,11 @@ class RealClientToolPermissionGate @Inject constructor(
         cancelled: T,
         decide: suspend () -> T,
     ): T {
-        val chatGone = startWaiting(host)
+        val (queue, chatGone) = startWaiting(host)
         try {
             return withTimeoutOrNull(DECISION_DEADLINE_MILLIS) {
                 coroutineScope {
-                    val decision = async { promptLock.withLock { decide() } }
+                    val decision = async { queue.promptLock.withLock { decide() } }
                     select {
                         decision.onAwait { it }
                         chatGone.onAwait {
@@ -243,20 +250,20 @@ class RealClientToolPermissionGate @Inject constructor(
 
     private fun ClientToolCallContext.chatHost() = ChatHost(chatTabId, contextual)
 
-    private fun startWaiting(host: ChatHost): CompletableDeferred<Unit> {
+    private fun startWaiting(host: ChatHost): Pair<ChatQueue, CompletableDeferred<Unit>> {
         val chatGone = CompletableDeferred<Unit>()
-        synchronized(waitingByChat) { waitingByChat.getOrPut(host) { mutableSetOf() }.add(chatGone) }
-        return chatGone
+        val queue = synchronized(queues) { queues.getOrPut(host) { ChatQueue() }.also { it.waiting.add(chatGone) } }
+        return queue to chatGone
     }
 
     private fun stopWaiting(
         host: ChatHost,
         chatGone: CompletableDeferred<Unit>,
     ) {
-        synchronized(waitingByChat) {
-            val waiting = waitingByChat[host] ?: return
-            waiting.remove(chatGone)
-            if (waiting.isEmpty()) waitingByChat.remove(host)
+        synchronized(queues) {
+            val queue = queues[host] ?: return
+            queue.waiting.remove(chatGone)
+            if (queue.waiting.isEmpty()) queues.remove(host)
         }
     }
 

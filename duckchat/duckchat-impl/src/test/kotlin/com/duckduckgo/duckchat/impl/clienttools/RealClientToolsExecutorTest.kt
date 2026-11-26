@@ -433,10 +433,10 @@ class RealClientToolsExecutorTest {
     }
 
     @Test
-    fun whenTwoCallsArriveTogetherThenOnlyOnePromptIsOpenAtATime() = runTest {
+    fun whenTwoCallsOfOneChatArriveTogetherThenOnlyOnePromptIsOpenAtATime() = runTest {
         val executor = executor()
         val first = async { executor.execute(request("askTool", 1, chatId = CHAT_ID), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
-        val second = async { executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, OTHER_CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val second = async { executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
         runCurrent()
         assertEquals(1, prompt.prompts.size)
 
@@ -448,6 +448,23 @@ class RealClientToolsExecutorTest {
         assertEquals(true, first.await().getBoolean("ok"))
         assertEquals(true, second.await().getBoolean("ok"))
         assertEquals(1, prompt.maxOpenAtOnce)
+    }
+
+    @Test
+    fun whenAnotherChatsPromptIsUnansweredThenThisChatStillGetsItsPrompt() = runTest {
+        val executor = executor()
+        val hiddenChat = async {
+            executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, OTHER_CHAT_TAB_ID, BrowserMode.REGULAR)
+        }
+        runCurrent()
+        val visibleChat = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+
+        assertEquals(CHAT_TAB_ID, prompt.current.request.chatTabId)
+        prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
+        assertEquals(true, visibleChat.await().getBoolean("ok"))
+        assertFalse(hiddenChat.isCompleted)
+        hiddenChat.cancel()
     }
 
     @Test
@@ -509,7 +526,7 @@ class RealClientToolsExecutorTest {
             executor.execute(request("askTool", 1, chatId = OTHER_CHAT_ID), DUCK_AI_URL, OTHER_CHAT_TAB_ID, BrowserMode.REGULAR)
         }
         runCurrent()
-        val firstPrompt = prompt.current
+        val firstPrompt = prompt.prompts.first()
 
         executor.cancelPendingCalls(CHAT_TAB_ID, contextual = false)
         runCurrent()
