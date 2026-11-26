@@ -45,6 +45,7 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Missi
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
+import com.duckduckgo.subscriptions.impl.billing.BillingConnect
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -83,11 +84,12 @@ interface AuthTokenRefreshWideEvent {
     suspend fun onRefreshTokenValidationFailed(reason: TokenValidationFailureReason)
     suspend fun onUnknownAccountError()
     suspend fun onBackupRecovery(result: BackupRecoveryResult)
-    suspend fun onPlayLoginSuccess()
+    suspend fun onPlayLoginSuccess(billingConnect: BillingConnect?)
     suspend fun onPlayLoginFailure(
         signedOut: Boolean,
         refreshException: Exception,
         loginError: String,
+        billingConnect: BillingConnect?,
     )
 
     suspend fun onTokensSaved()
@@ -144,7 +146,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_TIME_SINCE_LAST_SUCCESS to refreshHistory.lastSuccessAt.toHoursSinceBucket(timeProvider.currentTimeMillis()).toString(),
                     KEY_LAST_REFRESH_PROCESS to refreshHistory.lastSuccessProcess.toProcessParamValue(),
                 ) + listOfNotNull(backupTokenState?.let { KEY_BACKUP_TOKEN_STATE to it.paramValue }),
-                definition = WideEventDefinition(version = Version(minor = 1, patch = 5)),
+                definition = WideEventDefinition(version = Version(minor = 1, patch = 6)),
             )
             .getOrNull()
             ?.also { wideEventId ->
@@ -312,7 +314,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         BackupRecoveryResult.Failure.NotAvailable -> mapOf(KEY_BACKUP_RECOVERY_RESULT to "not_available")
     }
 
-    override suspend fun onPlayLoginSuccess() {
+    override suspend fun onPlayLoginSuccess(billingConnect: BillingConnect?) {
         if (!isFeatureEnabled()) return
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
             wideEventClient.flowStep(
@@ -321,7 +323,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                 metadata = mapOf(
                     KEY_RECOVERY_STRATEGY to RECOVERY_STRATEGY_PLAY_LOGIN,
                     KEY_RECOVERY_OUTCOME to RECOVERY_OUTCOME_RECOVERED,
-                ),
+                ) + billingConnectMetadata(billingConnect = billingConnect),
             )
         }
     }
@@ -330,6 +332,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         signedOut: Boolean,
         refreshException: Exception,
         loginError: String,
+        billingConnect: BillingConnect?,
     ) {
         if (!isFeatureEnabled()) return
         ongoingTokenRefreshWideEventId?.let { wideEventId ->
@@ -341,7 +344,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
                     KEY_PLAY_LOGIN_ERROR to loginError,
                     KEY_RECOVERY_STRATEGY to RECOVERY_STRATEGY_PLAY_LOGIN,
                     KEY_RECOVERY_OUTCOME to if (signedOut) RECOVERY_OUTCOME_SIGNED_OUT else RECOVERY_OUTCOME_DEFERRED,
-                ),
+                ) + billingConnectMetadata(billingConnect = billingConnect),
             )
             wideEventClient.intervalEnd(wideEventId = wideEventId, key = INTERVAL_TOTAL_DURATION)
             wideEventClient.flowFinish(
@@ -354,6 +357,9 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
             if (!signedOut) recordRefreshFailure()
         }
     }
+
+    private fun billingConnectMetadata(billingConnect: BillingConnect?): Map<String, String> =
+        if (billingConnect == null) emptyMap() else mapOf(KEY_BILLING_CONNECT to billingConnect.paramValue)
 
     override suspend fun onSkipped() {
         if (!isFeatureEnabled()) return
@@ -442,6 +448,7 @@ class AuthTokenRefreshWideEventImpl @Inject constructor(
         const val KEY_BACKEND_ERROR_RESPONSE = "backend_error_response"
         const val KEY_BACKEND_ERROR_CODE = "backend_error_code"
         const val KEY_PLAY_LOGIN_ERROR = "play_login_error"
+        const val KEY_BILLING_CONNECT = "billing_connect"
         const val KEY_SIGNED_OUT = "signed_out"
         const val KEY_NETP_IS_ENABLED = "netp_is_enabled"
         const val KEY_NETP_IS_RUNNING = "netp_is_running"

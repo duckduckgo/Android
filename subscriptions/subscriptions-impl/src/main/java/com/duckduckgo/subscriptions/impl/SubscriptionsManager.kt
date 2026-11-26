@@ -57,6 +57,7 @@ import com.duckduckgo.subscriptions.impl.auth.ResponseErrorCode
 import com.duckduckgo.subscriptions.impl.auth.TokenPair
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationException
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
+import com.duckduckgo.subscriptions.impl.billing.BillingConnect
 import com.duckduckgo.subscriptions.impl.billing.BillingFlowType
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
@@ -547,7 +548,7 @@ class RealSubscriptionsManager @Inject constructor(
                 expiresAt = subscription.expiresOrRenewsAt,
             )
 
-            val ownedPurchase = (playBillingManager.getLatestPurchase() as? LatestPurchaseResult.Present)
+            val ownedPurchase = (playBillingManager.getLatestPurchase().result as? LatestPurchaseResult.Present)
                 ?.purchase
                 ?.takeIf { purchase ->
                     purchase.products.contains(SubscriptionTier.fromPlanId(subscription.productId).productId) &&
@@ -1002,9 +1003,10 @@ class RealSubscriptionsManager @Inject constructor(
         accountExternalId: String,
         refreshException: HttpException,
     ): ValidatedTokenPair {
-        return when (val storeLoginResult = storeLogin(accountExternalId)) {
+        val storeLoginAttempt = storeLogin(accountExternalId)
+        return when (val storeLoginResult = storeLoginAttempt.result) {
             is StoreLoginResult.Success -> {
-                tokenRefreshWideEvent.onPlayLoginSuccess()
+                tokenRefreshWideEvent.onPlayLoginSuccess(billingConnect = storeLoginAttempt.billingConnect)
                 pixelSender.reportAuthV2InvalidRefreshTokenRecovered()
                 storeLoginResult.tokens
             }
@@ -1017,6 +1019,7 @@ class RealSubscriptionsManager @Inject constructor(
                     signedOut = true,
                     refreshException = refreshException,
                     loginError = storeLoginResult.javaClass.simpleName,
+                    billingConnect = storeLoginAttempt.billingConnect,
                 )
                 pixelSender.reportAuthV2InvalidRefreshTokenSignedOut()
                 signOut(invalidateTokens = false)
@@ -1036,6 +1039,7 @@ class RealSubscriptionsManager @Inject constructor(
                     signedOut = false,
                     refreshException = refreshException,
                     loginError = loginError,
+                    billingConnect = storeLoginAttempt.billingConnect,
                 )
                 throw refreshException
             }
@@ -1170,12 +1174,27 @@ class RealSubscriptionsManager @Inject constructor(
         }
     }
 
-    private suspend fun storeLogin(accountExternalId: String? = null): StoreLoginResult {
+    private suspend fun storeLogin(accountExternalId: String? = null): StoreLoginAttempt {
+        val latestPurchase = try {
+            playBillingManager.getLatestPurchase()
+        } catch (_: Exception) {
+            return StoreLoginAttempt(result = StoreLoginResult.Failure.UnknownError, billingConnect = null)
+        }
+        return StoreLoginAttempt(
+            result = loginWithPurchase(latestPurchase = latestPurchase.result, accountExternalId = accountExternalId),
+            billingConnect = latestPurchase.billingConnect,
+        )
+    }
+
+    private suspend fun loginWithPurchase(
+        latestPurchase: LatestPurchaseResult,
+        accountExternalId: String?,
+    ): StoreLoginResult {
         return try {
-            val signedPurchase = when (val result = playBillingManager.getLatestPurchase()) {
-                is LatestPurchaseResult.Present -> SignedPurchase(result.purchase.signature, result.purchase.originalJson)
+            val signedPurchase = when (latestPurchase) {
+                is LatestPurchaseResult.Present -> SignedPurchase(latestPurchase.purchase.signature, latestPurchase.purchase.originalJson)
                 LatestPurchaseResult.Absent -> return StoreLoginResult.Failure.NoActivePurchase
-                is LatestPurchaseResult.Unknown -> return StoreLoginResult.Failure.PurchaseInfoNotAvailable(cause = result.cause)
+                is LatestPurchaseResult.Unknown -> return StoreLoginResult.Failure.PurchaseInfoNotAvailable(cause = latestPurchase.cause)
             }
 
             val codeVerifier = pkceGenerator.generateCodeVerifier()
@@ -1207,7 +1226,7 @@ class RealSubscriptionsManager @Inject constructor(
     override suspend fun recoverSubscriptionFromStore(externalId: String?): RecoverSubscriptionResult {
         require(externalId == null) { "Use storeLogin() directly to re-authenticate using existing externalId" }
         return try {
-            when (val storeLoginResult = storeLogin()) {
+            when (val storeLoginResult = storeLogin().result) {
                 is StoreLoginResult.Success -> {
                     saveTokens(storeLoginResult.tokens)
                     refreshSubscriptionData()
@@ -1526,6 +1545,8 @@ class RealSubscriptionsManager @Inject constructor(
     private data class ParsedResponseError(val error: String?, val errorCode: Int?)
 
     private data class SignedPurchase(val signature: String, val originalJson: String)
+
+    private data class StoreLoginAttempt(val result: StoreLoginResult, val billingConnect: BillingConnect?)
 
     private sealed class StoreLoginResult {
         data class Success(val tokens: ValidatedTokenPair) : StoreLoginResult()

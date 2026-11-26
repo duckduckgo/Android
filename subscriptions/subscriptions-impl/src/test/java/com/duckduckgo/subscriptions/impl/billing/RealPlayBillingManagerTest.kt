@@ -602,7 +602,7 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.activePurchases = listOf(activePurchase)
         processLifecycleOwner.currentState = RESUMED
 
-        val result = subject.getLatestPurchase()
+        val result = subject.getLatestPurchase().result
 
         assertEquals(LatestPurchaseResult.Present(activePurchase), result)
     }
@@ -622,7 +622,7 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.activePurchases = listOf(older, newer)
         processLifecycleOwner.currentState = RESUMED
 
-        val result = subject.getLatestPurchase()
+        val result = subject.getLatestPurchase().result
 
         assertEquals(LatestPurchaseResult.Present(newer), result)
     }
@@ -637,7 +637,7 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.activePurchases = listOf(pendingPurchase)
         processLifecycleOwner.currentState = RESUMED
 
-        val result = subject.getLatestPurchase()
+        val result = subject.getLatestPurchase().result
 
         assertEquals(LatestPurchaseResult.Absent, result)
     }
@@ -652,7 +652,7 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.activePurchases = listOf(otherProductPurchase)
         processLifecycleOwner.currentState = RESUMED
 
-        val result = subject.getLatestPurchase()
+        val result = subject.getLatestPurchase().result
 
         assertEquals(LatestPurchaseResult.Absent, result)
     }
@@ -662,7 +662,7 @@ class RealPlayBillingManagerTest {
         billingClientAdapter.activePurchases = emptyList()
         processLifecycleOwner.currentState = RESUMED
 
-        val result = subject.getLatestPurchase()
+        val result = subject.getLatestPurchase().result
 
         assertEquals(LatestPurchaseResult.Absent, result)
     }
@@ -673,8 +673,34 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), result)
+        assertEquals(
+            LatestPurchaseLookup(result = LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), billingConnect = BillingConnect.FLAG_OFF),
+            result,
+        )
         billingClientAdapter.verifyConnectInvoked(times = 0)
+    }
+
+    @Test
+    fun `getLatestPurchase reports flag off when billing client is already connected and flag is off`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = false)
+        billingClientAdapter.activePurchases = emptyList()
+        processLifecycleOwner.currentState = RESUMED
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Absent, billingConnect = BillingConnect.FLAG_OFF), result)
+    }
+
+    @Test
+    fun `getLatestPurchase reports already connected without connecting again when billing client is connected and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.activePurchases = emptyList()
+        processLifecycleOwner.currentState = RESUMED
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Absent, billingConnect = BillingConnect.ALREADY_CONNECTED), result)
+        billingClientAdapter.verifyConnectInvoked(times = 1)
     }
 
     @Test
@@ -689,7 +715,7 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Present(activePurchase), result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Present(activePurchase), billingConnect = BillingConnect.CONNECTED), result)
         billingClientAdapter.verifyConnectInvoked()
     }
 
@@ -700,7 +726,7 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Absent, result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Absent, billingConnect = BillingConnect.CONNECTED), result)
     }
 
     @Test
@@ -710,7 +736,7 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_connect_failed"), result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Unknown(cause = "billing_connect_failed"), billingConnect = null), result)
         billingClientAdapter.verifyConnectInvoked()
     }
 
@@ -721,7 +747,7 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_connect_timeout"), result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Unknown(cause = "billing_connect_timeout"), billingConnect = null), result)
     }
 
     @Test
@@ -732,7 +758,7 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Absent, result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Absent, billingConnect = BillingConnect.CONNECTED), result)
     }
 
     @Test
@@ -742,7 +768,7 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_connect_error"), result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Unknown(cause = "billing_connect_error"), billingConnect = null), result)
     }
 
     @Test
@@ -753,7 +779,7 @@ class RealPlayBillingManagerTest {
 
         val result = subject.getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Absent, result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Absent, billingConnect = BillingConnect.CONNECTED), result)
     }
 
     @Test
@@ -762,7 +788,7 @@ class RealPlayBillingManagerTest {
 
         val result = createSubject(isMainProcess = false).getLatestPurchase()
 
-        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), result)
+        assertEquals(LatestPurchaseLookup(result = LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), billingConnect = null), result)
         billingClientAdapter.verifyConnectInvoked(times = 0)
     }
 
