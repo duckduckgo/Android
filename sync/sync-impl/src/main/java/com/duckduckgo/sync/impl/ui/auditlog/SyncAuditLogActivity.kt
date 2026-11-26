@@ -131,9 +131,10 @@ class SyncAuditLogActivity : DuckDuckGoActivity() {
         val content = state.content
         binding.loadingIndicator.isVisible = content == Content.LOADING
         binding.syncAuditLogList.isVisible = content == Content.LIST
-        binding.messageText.isVisible = content == Content.EMPTY || content == Content.ERROR
+        binding.messageText.isVisible = content == Content.EMPTY || content == Content.ONLY_THIS_DEVICE || content == Content.ERROR
         when (content) {
             Content.EMPTY -> binding.messageText.setText(R.string.syncAuditLogEmpty)
+            Content.ONLY_THIS_DEVICE -> binding.messageText.setText(R.string.syncAuditLogOnlyThisDevice)
             Content.ERROR -> binding.messageText.setText(R.string.syncAuditLogError)
             Content.LOADING, Content.LIST -> Unit
         }
