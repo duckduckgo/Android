@@ -29,9 +29,8 @@ import org.robolectric.RuntimeEnvironment
 class CookieAnimationRadiusOverlayTest {
 
     @Test
-    fun whenAddressBarRebrandIsDisabledThenGeneralRebrandOverlayKeepsLegacyCookieRadius() {
+    fun whenAddressBarRebrandIsDisabledThenBaseThemeKeepsLegacyCookieRadius() {
         val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), R.style.Theme_DuckDuckGo_Light)
-        context.theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
 
         assertEquals(
             context.resources.getDimension(R.dimen.cookiesAnimationRadius),

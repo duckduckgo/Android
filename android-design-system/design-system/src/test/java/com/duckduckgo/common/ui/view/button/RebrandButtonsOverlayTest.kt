@@ -19,12 +19,12 @@ package com.duckduckgo.common.ui.view.button
 import android.content.Context
 import android.content.res.ColorStateList
 import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.mobile.android.R
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -33,12 +33,9 @@ import com.google.android.material.R as MaterialR
 @RunWith(AndroidJUnit4::class)
 class RebrandButtonsOverlayTest {
 
-    private fun themedContext(overlay: Boolean): Context {
+    private fun themedContext(): Context {
         val context = ApplicationProvider.getApplicationContext<Context>()
         context.setTheme(R.style.Theme_DuckDuckGo_Light)
-        if (overlay) {
-            context.theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
-        }
         return context
     }
 
@@ -49,8 +46,8 @@ class RebrandButtonsOverlayTest {
     }
 
     @Test
-    fun whenOverlayAppliedThenDaxButtonStyleAttrsResolveToRebrandStyles() {
-        val context = themedContext(overlay = true)
+    fun whenBaseThemeThenDaxButtonStyleAttrsResolveToRebrandStyles() {
+        val context = themedContext()
         assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Primary, context.resolveStyleAttr(R.attr.daxButtonPrimary))
         assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_SecondaryFill, context.resolveStyleAttr(R.attr.daxButtonSecondary))
         assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Ghost, context.resolveStyleAttr(R.attr.daxButtonGhost))
@@ -66,28 +63,18 @@ class RebrandButtonsOverlayTest {
     }
 
     @Test
-    fun whenOverlayNotAppliedThenDaxButtonStyleAttrsResolveToLegacyStyles() {
-        val context = themedContext(overlay = false)
-        assertEquals(R.style.Widget_DuckDuckGo_DaxButton_TextButton_Primary, context.resolveStyleAttr(R.attr.daxButtonPrimary))
-        assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Secondary, context.resolveStyleAttr(R.attr.daxButtonSecondary))
-        assertEquals(R.style.Typography_DuckDuckGo_Button, context.resolveStyleAttr(MaterialR.attr.textAppearanceButton))
-    }
-
-    @Test
-    fun whenOverlayNotAppliedThenVerticalInsetAndTextAppearanceButtonLargeAttrsAreUndefined() {
-        val context = themedContext(overlay = false)
-        val value = TypedValue()
-        assertFalse(context.theme.resolveAttribute(R.attr.daxButtonSmallVerticalInset, value, true))
-        assertFalse(context.theme.resolveAttribute(R.attr.daxButtonLargeVerticalInset, value, true))
-        assertFalse(context.theme.resolveAttribute(R.attr.textAppearanceButtonLarge, value, true))
-    }
-
-    @Test
-    fun whenBaseThemeThenBrandAttrsResolveWithoutOverlay() {
-        val context = themedContext(overlay = false)
+    fun whenBaseThemeThenBrandAttrsResolve() {
+        val context = themedContext()
         assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Brand, context.resolveStyleAttr(R.attr.daxButtonBrand))
         val value = TypedValue()
         assertTrue(context.theme.resolveAttribute(R.attr.daxColorButtonBrandContainer, value, true))
+    }
+
+    @Test
+    fun whenOnboardingThemeWrapsBaseThemeThenButtonStyleAttrsStayRebrand() {
+        val context = ContextThemeWrapper(themedContext(), R.style.ThemeOverlay_DuckDuckGo_Onboarding)
+        assertEquals(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_SecondaryFill, context.resolveStyleAttr(R.attr.daxButtonSecondary))
+        assertEquals(R.style.Typography_DuckDuckGo_Rebrand_Button, context.resolveStyleAttr(MaterialR.attr.textAppearanceButton))
     }
 
     private fun Context.colorStateList(colorRes: Int): ColorStateList =
@@ -105,7 +92,7 @@ class RebrandButtonsOverlayTest {
 
     @Test
     fun whenRebrandContainerSelectorsThenPressedStateMatchesRestingColor() {
-        val context = themedContext(overlay = true)
+        val context = themedContext()
         val containers = listOf(
             R.color.button_brand_container_selector,
             R.color.rebrand_button_primary_container_selector,
@@ -122,7 +109,7 @@ class RebrandButtonsOverlayTest {
 
     @Test
     fun whenRebrandTextSelectorsThenPressedStateMatchesRestingColor() {
-        val context = themedContext(overlay = true)
+        val context = themedContext()
         val textSelectors = listOf(
             R.color.rebrand_button_ghost_text_selector,
             R.color.rebrand_button_destructive_secondary_text_selector,
@@ -136,7 +123,7 @@ class RebrandButtonsOverlayTest {
 
     @Test
     fun whenRebrandStylesThenRippleColorResolvesToARippleSelector() {
-        val context = themedContext(overlay = true)
+        val context = themedContext()
         assertEquals(
             R.color.rebrand_button_primary_ripple_selector,
             context.resolveRippleColorRes(R.style.Widget_DuckDuckGo_DaxButton_Rebrand_Primary),

@@ -61,9 +61,8 @@ import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
 class RebrandBottomSheetsTest {
-    private fun context(enabled: Boolean, dark: Boolean = false, buttons: Boolean = false): Context =
+    private fun context(enabled: Boolean, dark: Boolean = false): Context =
         ContextThemeWrapper(RuntimeEnvironment.getApplication(), if (dark) R.style.Theme_DuckDuckGo_Dark else R.style.Theme_DuckDuckGo_Light).apply {
-            if (buttons) theme.applyStyle(R.style.ThemeOverlay_Rebrand, true)
             if (enabled) theme.applyStyle(R.style.ThemeOverlay_Rebrand_BottomSheets, true)
         }
 
@@ -135,47 +134,45 @@ class RebrandBottomSheetsTest {
     @Test
     fun enabledAppliesFigmaSpacingTertiaryCloseAndSecondaryStyle() {
         listOf(false, true).forEach { dark ->
-            listOf(false, true).forEach { buttons ->
-                listOf(320, 800).forEach { width ->
-                    val sheet = Sheet(context(true, dark, buttons))
-                    val primaryTint = sheet.primary.backgroundTintList
-                    val primaryHeight = sheet.primary.minHeight
-                    sheet.apply()
-                    sheet.measure(width)
-                    assertEquals(sheet.dp(32), sheet.title.left)
-                    assertEquals(sheet.dp(width - 32), sheet.title.right)
-                    assertEquals(-sheet.dp(8), sheet.header.top - sheet.close.bottom)
-                    assertEquals(sheet.dp(24), sheet.title.top - sheet.header.bottom)
-                    assertEquals(sheet.dp(12), sheet.message.top - sheet.title.bottom)
-                    assertEquals(sheet.dp(24), sheet.primary.top + sheet.dp(6) - sheet.message.bottom)
-                    assertEquals(sheet.dp(8), sheet.secondary.top + sheet.dp(6) - (sheet.primary.bottom - sheet.dp(6)))
-                    assertEquals(sheet.dp(24), sheet.root.height - (sheet.secondary.bottom - sheet.dp(6)))
-                    assertEquals(sheet.context.getColorFromAttr(R.attr.daxColorSurfaceTertiary), sheet.root.backgroundTintList!!.defaultColor)
-                    assertEquals(sheet.dp(16), sheet.close.top + sheet.close.paddingTop)
-                    assertEquals(sheet.dp(16), sheet.root.width - sheet.close.right + sheet.close.paddingRight)
-                    assertEquals(sheet.dp(20), sheet.close.top + (sheet.close.height - sheet.close.drawable.intrinsicHeight) / 2)
-                    assertEquals(sheet.dp(20), sheet.root.width - sheet.close.right + (sheet.close.width - sheet.close.drawable.intrinsicWidth) / 2)
-                    val reference = DaxButtonSecondary(sheet.context, null)
+            listOf(320, 800).forEach { width ->
+                val sheet = Sheet(context(true, dark))
+                val primaryTint = sheet.primary.backgroundTintList
+                val primaryHeight = sheet.primary.minHeight
+                sheet.apply()
+                sheet.measure(width)
+                assertEquals(sheet.dp(32), sheet.title.left)
+                assertEquals(sheet.dp(width - 32), sheet.title.right)
+                assertEquals(-sheet.dp(8), sheet.header.top - sheet.close.bottom)
+                assertEquals(sheet.dp(24), sheet.title.top - sheet.header.bottom)
+                assertEquals(sheet.dp(12), sheet.message.top - sheet.title.bottom)
+                assertEquals(sheet.dp(18), sheet.primary.top - sheet.message.bottom)
+                assertEquals(-sheet.dp(4), sheet.secondary.top - sheet.primary.bottom)
+                assertEquals(sheet.dp(18), sheet.root.height - sheet.secondary.bottom)
+                assertEquals(sheet.context.getColorFromAttr(R.attr.daxColorSurfaceTertiary), sheet.root.backgroundTintList!!.defaultColor)
+                assertEquals(sheet.dp(16), sheet.close.top + sheet.close.paddingTop)
+                assertEquals(sheet.dp(16), sheet.root.width - sheet.close.right + sheet.close.paddingRight)
+                assertEquals(sheet.dp(20), sheet.close.top + (sheet.close.height - sheet.close.drawable.intrinsicHeight) / 2)
+                assertEquals(sheet.dp(20), sheet.root.width - sheet.close.right + (sheet.close.width - sheet.close.drawable.intrinsicWidth) / 2)
+                val reference = DaxButtonSecondary(sheet.context, null)
+                listOf(
+                    reference.backgroundTintList to sheet.secondary.backgroundTintList,
+                    reference.textColors to sheet.secondary.textColors,
+                    reference.strokeColor to sheet.secondary.strokeColor,
+                    reference.rippleColor to sheet.secondary.rippleColor,
+                ).forEach { (expected, actual) ->
                     listOf(
-                        reference.backgroundTintList to sheet.secondary.backgroundTintList,
-                        reference.textColors to sheet.secondary.textColors,
-                        reference.strokeColor to sheet.secondary.strokeColor,
-                        reference.rippleColor to sheet.secondary.rippleColor,
-                    ).forEach { (expected, actual) ->
-                        listOf(
-                            intArrayOf(android.R.attr.state_enabled),
-                            intArrayOf(-android.R.attr.state_enabled),
-                            intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked),
-                            intArrayOf(android.R.attr.state_enabled, android.R.attr.state_pressed),
-                            intArrayOf(android.R.attr.state_enabled, android.R.attr.state_focused),
-                        ).forEach { state ->
-                            assertEquals(expected?.getColorForState(state, 0), actual?.getColorForState(state, 0))
-                        }
+                        intArrayOf(android.R.attr.state_enabled),
+                        intArrayOf(-android.R.attr.state_enabled),
+                        intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked),
+                        intArrayOf(android.R.attr.state_enabled, android.R.attr.state_pressed),
+                        intArrayOf(android.R.attr.state_enabled, android.R.attr.state_focused),
+                    ).forEach { state ->
+                        assertEquals(expected?.getColorForState(state, 0), actual?.getColorForState(state, 0))
                     }
-                    assertEquals(reference.strokeWidth, sheet.secondary.strokeWidth)
-                    assertSame(primaryTint, sheet.primary.backgroundTintList)
-                    assertEquals(primaryHeight, sheet.primary.minHeight)
                 }
+                assertEquals(reference.strokeWidth, sheet.secondary.strokeWidth)
+                assertSame(primaryTint, sheet.primary.backgroundTintList)
+                assertEquals(primaryHeight, sheet.primary.minHeight)
             }
         }
     }
@@ -183,7 +180,7 @@ class RebrandBottomSheetsTest {
     @Test
     fun secondaryDestructiveButtonKeepsItsStyle() {
         listOf(false, true).forEach { dark ->
-            val sheet = Sheet(context(true, dark, buttons = true))
+            val sheet = Sheet(context(true, dark))
             val button = DaxButtonDestructiveSecondary(sheet.context, null)
             sheet.root.addView(button)
             val backgroundTint = button.backgroundTintList
@@ -266,10 +263,10 @@ class RebrandBottomSheetsTest {
                 View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
             )
             root.layout(0, 0, root.measuredWidth, root.measuredHeight)
-            assertEquals(sheet.dp(24), buttons.top + sheet.primary.top + sheet.dp(6) - (content.top + sheet.message.bottom))
+            assertEquals(sheet.dp(18), buttons.top + sheet.primary.top - (content.top + sheet.message.bottom))
             val last = if (stacked) sheet.secondary else sheet.primary
-            assertEquals(sheet.dp(24), root.height - (buttons.top + last.bottom - sheet.dp(6)))
-            if (stacked) assertEquals(sheet.dp(8), sheet.secondary.top - sheet.primary.bottom + sheet.dp(12))
+            assertEquals(sheet.dp(18), root.height - (buttons.top + last.bottom))
+            if (stacked) assertEquals(-sheet.dp(4), sheet.secondary.top - sheet.primary.bottom)
         }
     }
 
@@ -482,7 +479,7 @@ class RebrandBottomSheetsTest {
 
             sheet.primary.visibility = View.VISIBLE
             shadowOf(Looper.getMainLooper()).idle()
-            assertEquals(sheet.dp(8), sheet.secondary.top - sheet.primary.bottom + sheet.dp(12))
+            assertEquals(-sheet.dp(4), sheet.secondary.top - sheet.primary.bottom)
         } finally {
             controller.pause().stop().destroy()
         }
