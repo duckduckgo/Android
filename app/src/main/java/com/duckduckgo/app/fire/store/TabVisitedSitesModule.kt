@@ -16,9 +16,9 @@
 
 package com.duckduckgo.app.fire.store
 
-import android.content.Context
-import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
@@ -31,11 +31,15 @@ class TabVisitedSitesModule {
 
     @SingleIn(AppScope::class)
     @Provides
-    fun provideDatabase(context: Context): TabVisitedSitesDatabase {
-        return Room.databaseBuilder(context, TabVisitedSitesDatabase::class.java, "tab_visited_sites.db")
-            .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideDatabase(databaseProvider: DatabaseProvider): TabVisitedSitesDatabase {
+        return databaseProvider.buildRoomDatabase(
+            TabVisitedSitesDatabase::class.java,
+            "tab_visited_sites.db",
+            config = RoomDatabaseConfig(
+                journalMode = RoomDatabase.JournalMode.TRUNCATE,
+                fallbackToDestructiveMigration = true,
+            ),
+        )
     }
 
     @SingleIn(AppScope::class)
