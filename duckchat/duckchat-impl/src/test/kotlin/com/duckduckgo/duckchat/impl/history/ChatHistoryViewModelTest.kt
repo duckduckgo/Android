@@ -28,6 +28,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.dataclearing.api.plugin.DataClearingTrigger
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.messaging.fakes.FakeDuckChatInternal
 import com.duckduckgo.duckchat.impl.models.AIChatModel
@@ -38,10 +39,13 @@ import com.duckduckgo.duckchat.impl.models.ModelProvider
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -71,6 +75,7 @@ class ChatHistoryViewModelTest {
         onBlocking { it.getTabs() } doReturn emptyList()
     }
     private val pixel: Pixel = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
 
     // Build the ViewModel lazily so it's created inside the test, not as a field. The rule that
     // swaps in the test dispatcher runs after fields are initialized, so an eagerly-built ViewModel
@@ -89,6 +94,7 @@ class ChatHistoryViewModelTest {
         tabRepository,
         pixel,
         browserMode,
+        duckChatFeature,
     )
 
     @Test
@@ -446,6 +452,59 @@ class ChatHistoryViewModelTest {
                 cancelAndIgnoreRemainingEvents()
             }
         }
+
+    // --- Duck.ai settings action ---
+
+    @Test
+    fun `settings action is hidden when the simplified prompt box is off`() = coroutineRule.testScope.runTest {
+        source.value = listOf(item("a"))
+
+        viewModel.showSettingsAction.test {
+            assertFalse(awaitItem())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `settings action shows when the simplified prompt box is on and hides in select mode`() = coroutineRule.testScope.runTest {
+        duckChatFeature.unifiedToggleInputSimplifiedPromptBox().setRawStoredState(Toggle.State(enable = true))
+        source.value = listOf(item("a"))
+
+        viewModel.showSettingsAction.test {
+            if (!awaitItem()) assertTrue(awaitItem())
+
+            viewModel.onChatRowLongClicked("a")
+            assertFalse(awaitItem())
+
+            viewModel.onSelectModeCancelled()
+            assertTrue(awaitItem())
+        }
+    }
+
+    @Test
+    fun `settings action shows on the empty Chats screen when the simplified prompt box is on`() = coroutineRule.testScope.runTest {
+        duckChatFeature.unifiedToggleInputSimplifiedPromptBox().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.showSettingsAction.test {
+            if (!awaitItem()) assertTrue(awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `onSettingsRequested opens web Duck_ai settings in a new tab anchored to the current tab`() = coroutineRule.testScope.runTest {
+        whenever(tabRepository.getSelectedTab()).thenReturn(TabEntity(tabId = "current-tab"))
+
+        viewModel.navigationEvents.test {
+            viewModel.onSettingsRequested()
+
+            assertEquals(
+                ChatHistoryViewModel.NavigationEvent.OpenDuckAiSettings(url = "https://duck.ai?settings=open", sourceTabId = "current-tab"),
+                awaitItem(),
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 
     @Test
     fun `onChatRowLongClicked in default mode enters select mode with the row pre-selected`() = runTest {

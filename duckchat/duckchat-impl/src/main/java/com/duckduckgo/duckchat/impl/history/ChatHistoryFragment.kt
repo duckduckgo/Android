@@ -166,6 +166,11 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
             .onEach(::onNavigationEvent)
             .launchIn(viewLifecycleOwner.lifecycleScope)
 
+        viewModel.showSettingsAction
+            .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+            .onEach { visible -> binding.toolbar.menu.findItem(R.id.chat_history_action_settings)?.isVisible = visible }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
+
         viewModel.messageEvents
             .flowWithLifecycle(viewLifecycleOwner.lifecycle, Lifecycle.State.STARTED)
             .onEach(::onMessageEvent)
@@ -175,6 +180,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
     private fun onNavigationEvent(event: ChatHistoryViewModel.NavigationEvent) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenChat ->
+                startActivity(browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId))
+            is ChatHistoryViewModel.NavigationEvent.OpenDuckAiSettings ->
                 startActivity(browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId))
             is ChatHistoryViewModel.NavigationEvent.OpenExistingTab ->
                 startActivity(browserNav.openExistingTab(requireContext(), event.tabId))
@@ -367,6 +374,10 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         }
         R.id.chat_history_action_download_selected -> {
             viewModel.onDownloadSelectedRequested()
+            true
+        }
+        R.id.chat_history_action_settings -> {
+            viewModel.onSettingsRequested()
             true
         }
         else -> false

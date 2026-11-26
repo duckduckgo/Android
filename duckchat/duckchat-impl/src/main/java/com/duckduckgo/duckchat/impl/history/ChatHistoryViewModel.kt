@@ -32,6 +32,7 @@ import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.isDuckAiConversation
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Loaded
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.Mode
 import com.duckduckgo.duckchat.impl.history.ChatHistoryUiState.PendingConfirmation
@@ -65,6 +66,7 @@ class ChatHistoryViewModel @Inject constructor(
     @RegularMode private val tabRepository: TabRepository,
     private val pixel: Pixel,
     private val browserMode: BrowserMode,
+    duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     private val controls = MutableStateFlow(UiControls())
@@ -88,6 +90,18 @@ class ChatHistoryViewModel @Inject constructor(
         initialValue = ChatHistoryUiState.Loading,
     )
 
+    /** The settings action belongs to the simplified prompt box, and select mode replaces the default actions. */
+    val showSettingsAction: StateFlow<Boolean> = combine(
+        duckChatFeature.unifiedToggleInputSimplifiedPromptBox().enabled(),
+        uiState,
+    ) { enabled, state ->
+        enabled && (state as? Loaded)?.mode !is Mode.Selecting
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(STOP_TIMEOUT_MILLIS),
+        initialValue = false,
+    )
+
     init {
         // Warm the models cache so a Download tap has provider/model labels ready;
         // failures are swallowed and exports fall back to the raw model id.
@@ -107,6 +121,13 @@ class ChatHistoryViewModel @Inject constructor(
                 duckChat.reportDuckChatEntry(DuckChatEntryPoint.CHAT_HISTORY_OPEN_CHAT, opensNewTab = true, hasPrompt = false)
                 navigationChannel.trySend(NavigationEvent.OpenChat(url = duckChat.buildChatUrl(chatId), sourceTabId = sourceTabId))
             }
+        }
+    }
+
+    fun onSettingsRequested() {
+        viewModelScope.launch {
+            val sourceTabId = tabRepository.getSelectedTab()?.tabId
+            navigationChannel.trySend(NavigationEvent.OpenDuckAiSettings(url = duckChat.getDuckChatSettingsUrl(), sourceTabId = sourceTabId))
         }
     }
 
@@ -423,6 +444,7 @@ class ChatHistoryViewModel @Inject constructor(
 
     sealed interface NavigationEvent {
         data class OpenChat(val url: String, val sourceTabId: String?) : NavigationEvent
+        data class OpenDuckAiSettings(val url: String, val sourceTabId: String?) : NavigationEvent
         data class OpenExistingTab(val tabId: String) : NavigationEvent
         data class OpenRename(val chatId: String, val currentTitle: String) : NavigationEvent
         data class ShowDownloadComplete(val fileName: String) : NavigationEvent
