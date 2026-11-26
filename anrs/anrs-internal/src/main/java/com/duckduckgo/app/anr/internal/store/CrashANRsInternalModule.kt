@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.anr.internal.store
 
-import android.content.Context
-import androidx.room.Room
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
@@ -30,10 +30,14 @@ class CrashANRsInternalModule {
 
     @Provides
     @SingleIn(AppScope::class)
-    fun provideAnrDatabase(context: Context): CrashANRsInternalDatabase {
-        return Room.databaseBuilder(context, CrashANRsInternalDatabase::class.java, "crash_anr_internal_database.db")
-            .addMigrations(*CrashANRsInternalDatabase.ALL_MIGRATIONS)
-            .fallbackToDestructiveMigration()
-            .build()
+    fun provideAnrDatabase(databaseProvider: DatabaseProvider): CrashANRsInternalDatabase {
+        return databaseProvider.buildRoomDatabase(
+            CrashANRsInternalDatabase::class.java,
+            "crash_anr_internal_database.db",
+            config = RoomDatabaseConfig(
+                migrations = CrashANRsInternalDatabase.ALL_MIGRATIONS,
+                fallbackToDestructiveMigration = true,
+            ),
+        )
     }
 }
