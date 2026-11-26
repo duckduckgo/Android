@@ -31,6 +31,8 @@ class RebrandAreaOverlayTest {
     private val areas = mapOf(
         R.attr.daxRebrandBadges to R.style.ThemeOverlay_Rebrand_Badges,
         R.attr.daxRebrandInfoPanels to R.style.ThemeOverlay_Rebrand_InfoPanels,
+        R.attr.daxRebrandDialogSpacing to R.style.ThemeOverlay_Rebrand_DialogSpacing,
+        R.attr.daxRebrandBottomSheets to R.style.ThemeOverlay_Rebrand_BottomSheets,
     )
 
     @Test

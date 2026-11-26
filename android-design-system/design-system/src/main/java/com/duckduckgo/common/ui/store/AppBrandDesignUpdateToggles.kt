@@ -69,4 +69,10 @@ interface AppBrandDesignUpdateToggles {
 
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun infoPanels(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun dialogSpacing(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun bottomSheets(): Toggle
 }
