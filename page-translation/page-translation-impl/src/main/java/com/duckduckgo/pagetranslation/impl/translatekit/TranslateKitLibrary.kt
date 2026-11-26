@@ -18,6 +18,7 @@ package com.duckduckgo.pagetranslation.impl.translatekit
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.translatekit.LanguageResult
 import com.duckduckgo.translatekit.ModelSpec
@@ -36,7 +37,7 @@ import javax.inject.Inject
 interface TranslateKitLibrary {
     /**
      * Loads translate-kit once and returns whether it's available, which it never is while page translation is off or on a device
-     * it doesn't ship for.
+     * page translation doesn't support.
      */
     fun init(): Boolean
 
@@ -66,13 +67,14 @@ interface Translator {
 class RealTranslateKitLibrary @Inject constructor(
     private val context: Context,
     private val feature: PageTranslationFeature,
+    private val deviceSupport: PageTranslationDeviceSupport,
 ) : TranslateKitLibrary {
     // translate-kit doesn't remember a failed native init, so it would try again, and fail again, on every call
     @Volatile
     private var hasInitFailed = false
 
     override fun init(): Boolean {
-        if (!feature.translation().isEnabled() || hasInitFailed) return false
+        if (!feature.translation().isEnabled() || !deviceSupport.isSupported() || hasInitFailed) return false
 
         return try {
             TranslateKit.init(context)
