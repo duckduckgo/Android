@@ -24,9 +24,6 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
 import javax.inject.Inject
@@ -75,7 +72,7 @@ class SearchDownloadsClientTool @Inject constructor(
                         .put(FILE_NAME, ClientToolOutput.truncate(fileName, MAX_FILE_NAME_LENGTH))
                         // Downloads don't keep their source URL on Android, and the contract allows it empty.
                         .put(URL, "")
-                        .put(DOWNLOADED_AT, UTC_TIMESTAMP.format(downloadedAt)),
+                        .put(DOWNLOADED_AT, ClientToolOutput.timestamp(downloadedAt)),
                 )
             }
         return ClientToolResult.Success(JSONObject().put(RESULTS, results))
@@ -83,7 +80,7 @@ class SearchDownloadsClientTool @Inject constructor(
 
     /** createdAt is stored as device-local time without an offset, by DatabaseDateFormatter.timestamp. */
     private fun downloadedAt(createdAt: String): Instant? = try {
-        LocalDateTime.parse(createdAt).atZone(ZoneId.systemDefault()).toInstant()
+        ClientToolOutput.instantOf(LocalDateTime.parse(createdAt))
     } catch (e: DateTimeParseException) {
         null
     }
@@ -111,6 +108,5 @@ class SearchDownloadsClientTool @Inject constructor(
         const val MAX_LIMIT = 50
         const val MAX_QUERY_LENGTH = 1000
         const val MAX_FILE_NAME_LENGTH = 256
-        val UTC_TIMESTAMP: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'").withZone(ZoneOffset.UTC)
     }
 }

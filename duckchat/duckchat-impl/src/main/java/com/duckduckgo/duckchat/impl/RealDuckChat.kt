@@ -44,6 +44,7 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessSettingsActivity
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -177,6 +178,9 @@ interface DuckChatInternal : DuckChat {
      * Opens DuckChat settings.
      */
     fun openDuckChatSettings()
+
+    /** Opens the Browser Access settings, where the user manages each browser tool's permission. */
+    fun openBrowserAccessSettings()
 
     /**
      * Closes DuckChat.
@@ -649,6 +653,11 @@ class RealDuckChat @Inject constructor(
         appCoroutineScope.launch {
             closeChatFlow.emit(Unit)
         }
+    }
+
+    // Unlike openDuckChatSettings this leaves the chat open, so Back returns to the conversation that asked.
+    override fun openBrowserAccessSettings() {
+        context.startActivity(Intent(context, BrowserAccessSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
     }
 
     override fun closeDuckChat() {

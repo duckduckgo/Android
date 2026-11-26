@@ -81,6 +81,18 @@
     <string name="duckAiClientToolSearchDownloadsDescription">Search the names of files you’ve downloaded.</string>
     <string name="duckAiClientToolSearchDownloadsPromptTitle">Allow Duck.ai to search your downloads?</string>
     <string name="duckAiClientToolSearchDownloadsPromptMessage">It will see the name and download date of the files it finds.</string>
+    <string name="duckAiClientToolReadTabContentName">Read Tab Content</string>
+    <string name="duckAiClientToolReadTabContentDescription">Read the text of a page you have open.</string>
+    <string name="duckAiClientToolReadTabContentPromptTitle">Allow Duck.ai to read your open tabs?</string>
+    <string name="duckAiClientToolReadTabContentPromptMessage">It will see the text of the pages it reads.</string>
+    <string name="duckAiClientToolFindInPageName">Find in Page</string>
+    <string name="duckAiClientToolFindInPageDescription">Find words or phrases in a page you have open.</string>
+    <string name="duckAiClientToolFindInPagePromptTitle">Allow Duck.ai to search the text of your open tabs?</string>
+    <string name="duckAiClientToolFindInPagePromptMessage">It will see each match and the text around it.</string>
+    <string name="duckAiClientToolSearchHistoryName">Search History</string>
+    <string name="duckAiClientToolSearchHistoryDescription">Search the pages you’ve visited.</string>
+    <string name="duckAiClientToolSearchHistoryPromptTitle">Allow Duck.ai to search your history?</string>
+    <string name="duckAiClientToolSearchHistoryPromptMessage">It will see the title, address and visit date of the pages it finds.</string>
 
     <!-- Browser Access settings -->
     <string name="duckAiBrowserAccessTitle">Browser Access</string>
