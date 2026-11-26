@@ -1648,9 +1648,6 @@ class RealNativeInputManager @Inject constructor(
                     ),
                 )
             }
-            rootView.findViewById<View?>(R.id.browserLayout)?.let {
-                it.setPadding(it.paddingLeft, it.paddingTop, it.paddingRight, 0)
-            }
         }
         // The root is at full height from the moment it attaches, so painting it now would mask the
         // content while the card is still morphing out of the omnibar. Hold it until the morph lands.
