@@ -64,13 +64,13 @@
     <string name="duckAiClientToolSwitchToTabName">Switch to Tab</string>
     <string name="duckAiClientToolSwitchToTabDescription">Bring one of your open tabs to the front.</string>
     <string name="duckAiClientToolBookmarkTabName">Bookmark Page</string>
-    <string name="duckAiClientToolBookmarkTabDescription">Add a page to your bookmarks.</string>
+    <string name="duckAiClientToolBookmarkTabDescription">Bookmark pages and add bookmark folders.</string>
     <string name="duckAiClientToolOpenTabPromptTitle">Allow Duck.ai to open this page?</string>
     <string name="duckAiClientToolOpenTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will open %1$s in a new tab.</string>
     <string name="duckAiClientToolBookmarkTabPromptTitle">Allow Duck.ai to bookmark this page?</string>
     <string name="duckAiClientToolBookmarkTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will add %1$s to your bookmarks.</string>
     <string name="duckAiClientToolCloseTabsName">Close Tabs</string>
-    <string name="duckAiClientToolCloseTabsDescription">Close tabs you ask it to close.</string>
+    <string name="duckAiClientToolCloseTabsDescription">Close tabs when asked.</string>
     <string name="duckAiClientToolCloseTabsPromptTitle">Allow Duck.ai to close tabs?</string>
     <string name="duckAiClientToolCloseTabsPromptMessage">It will close the tabs you asked it to close.</string>
     <string name="duckAiClientToolSearchBookmarksName">Search Bookmarks</string>
@@ -78,7 +78,7 @@
     <string name="duckAiClientToolSearchBookmarksPromptTitle">Allow Duck.ai to search your bookmarks?</string>
     <string name="duckAiClientToolSearchBookmarksPromptMessage">It will see the title, address and folder of the bookmarks it finds.</string>
     <string name="duckAiClientToolSearchDownloadsName">Search Downloads</string>
-    <string name="duckAiClientToolSearchDownloadsDescription">Search the names and sources of files you’ve downloaded.</string>
+    <string name="duckAiClientToolSearchDownloadsDescription">Search the names of files you’ve downloaded.</string>
     <string name="duckAiClientToolSearchDownloadsPromptTitle">Allow Duck.ai to search your downloads?</string>
     <string name="duckAiClientToolSearchDownloadsPromptMessage">It will see the name and download date of the files it finds.</string>
 
