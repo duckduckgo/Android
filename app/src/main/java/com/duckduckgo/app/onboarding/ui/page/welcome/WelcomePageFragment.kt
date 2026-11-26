@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
@@ -61,6 +62,8 @@ import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
 import com.duckduckgo.autofill.api.ImportPasswords
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsParams
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsRequest
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
@@ -143,9 +146,14 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
         viewModel.onMigrationDefaultBrowserPromptFinished()
     }
 
+    private lateinit var passwordImport: ActivityResultLauncher<ImportPasswordsRequest>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().enableEdgeToEdge()
+        passwordImport = registerForActivityResult(importPasswords.importContract()) { result ->
+            viewModel.onPasswordImportResult(result)
+        }
     }
 
     override fun onGetLayoutInflater(savedInstanceState: Bundle?): LayoutInflater {
@@ -344,7 +352,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
 
     private fun launchPasswordImport() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.onPasswordImportLaunched(importPasswords.launchImport(requireActivity(), Onboarding))
+            importPasswords.launchImport(ImportPasswordsParams(Onboarding), passwordImport)
         }
     }
 

@@ -13,178 +13,173 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.duckduckgo.autofill.impl.importing
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.app.ActivityOptionsCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsParams
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsRequest
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsStatus
+import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
-import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleScreen
-import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
 class RealImportPasswordsTest {
 
-    @get:Rule
-    val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
-
     private val context: Context = mock()
     private val passwordImportAvailability: PasswordImportAvailability = mock()
-    private val passwordImportEvents = PasswordImportEvents()
+    private val credentialImporter: CredentialImporter = mock()
     private val globalActivityStarter: GlobalActivityStarter = mock()
     private val launchIntent = Intent()
 
-    private val testee = RealImportPasswords(
-        passwordImportAvailability = passwordImportAvailability,
-        passwordImportEvents = passwordImportEvents,
-        globalActivityStarter = globalActivityStarter,
-    )
+    private lateinit var testee: RealImportPasswords
+    private lateinit var contract: ActivityResultContract<ImportPasswordsRequest, ImportPasswordsResult>
 
     @Before
-    fun setUp() = runTest {
-        whenever(passwordImportAvailability.canImport()).thenReturn(true)
-        whenever(globalActivityStarter.startIntent(any(), any<ImportPasswordsFromGoogleScreen>())).thenReturn(launchIntent)
+    fun setUp() {
+        testee = RealImportPasswords(
+            passwordImportAvailability = passwordImportAvailability,
+            credentialImporter = credentialImporter,
+            globalActivityStarter = globalActivityStarter,
+        )
+        contract = testee.importContract()
+
+        whenever(globalActivityStarter.startIntent(any(), any<ImportPasswordsHostScreen>())).thenReturn(launchIntent)
     }
 
     @Test
     fun whenEitherImportMethodAvailableThenSupported() = runTest {
+        whenever(passwordImportAvailability.canImport()).thenReturn(true)
         assertTrue(testee.isSupported())
     }
 
     @Test
     fun whenNoImportMethodAvailableThenNotSupported() = runTest {
         whenever(passwordImportAvailability.canImport()).thenReturn(false)
-
         assertFalse(testee.isSupported())
     }
 
     @Test
-    fun whenSupportedThenLaunchStartsTheImportScreenWithTheLaunchSource() = runTest {
-        launch()
+    fun whenTheImporterReportsProgressThenImportStatusReportsItWithTheCounts() = runTest {
+        whenever(credentialImporter.getImportStatus()).thenReturn(
+            flowOf(ImportResult.InProgress, ImportResult.Finished(savedCredentials = 3, numberSkipped = 1, source = SOURCE)),
+        )
 
-        verify(globalActivityStarter).startIntent(context, ImportPasswordsFromGoogleScreen(SOURCE))
-        verify(context).startActivity(launchIntent)
+        assertEquals(
+            listOf(ImportPasswordsStatus.InProgress, ImportPasswordsStatus.Finished(imported = 3, skipped = 1)),
+            testee.importStatus().toList(),
+        )
     }
 
     @Test
-    fun whenNotSupportedThenLaunchStartsNothingAndEmitsPermanentError() = runTest {
-        whenever(passwordImportAvailability.canImport()).thenReturn(false)
+    fun whenLaunchingThenExactlyOneRequestIsLaunched() = runTest {
+        whenever(passwordImportAvailability.canImport()).thenReturn(true)
+        val launcher = FakeActivityResultLauncher()
 
-        launch().test {
-            assertEquals(ImportPasswordsEvent.Error.Permanent, awaitItem())
-            awaitComplete()
-        }
-        verify(context, never()).startActivity(any())
+        testee.launchImport(PARAMS, launcher)
+
+        assertEquals(1, launcher.launchedInputs.size)
     }
 
     @Test
-    fun whenThereIsNoScreenToStartThenLaunchEmitsPermanentError() = runTest {
-        whenever(globalActivityStarter.startIntent(any(), any<ImportPasswordsFromGoogleScreen>())).thenReturn(null)
-
-        launch().test {
-            assertEquals(ImportPasswordsEvent.Error.Permanent, awaitItem())
-            awaitComplete()
-        }
-        verify(context, never()).startActivity(any())
+    fun whenSupportedThenThereIsNoSynchronousResult() = runTest {
+        assertNull(contract.getSynchronousResult(context, launchedRequest(isSupported = true)))
     }
 
     @Test
-    fun whenPasswordsAreSavedAfterLaunchThenEmitsProgressThenTheCountsAndCompletes() = runTest {
-        launch().test {
-            passwordImportEvents.emit(ImportPasswordsEvent.InProgress)
-            passwordImportEvents.emit(FINISHED)
-
-            assertEquals(ImportPasswordsEvent.InProgress, awaitItem())
-            assertEquals(FINISHED, awaitItem())
-            awaitComplete()
-        }
+    fun whenNotSupportedThenSynchronousResultIsUnavailable() = runTest {
+        val result = contract.getSynchronousResult(context, launchedRequest(isSupported = false))
+        assertEquals(ImportPasswordsResult.Unavailable, result?.value)
     }
 
     @Test
-    fun whenFinishedWithoutProgressThenEmitsTheCountsAndCompletes() = runTest {
-        launch().test {
-            passwordImportEvents.emit(FINISHED)
-
-            assertEquals(FINISHED, awaitItem())
-            awaitComplete()
+    fun whenRequestWasNotCreatedByLaunchImportThenSynchronousResultIsUnavailable() {
+        val request = object : ImportPasswordsRequest {
+            override val params = PARAMS
         }
+        assertEquals(ImportPasswordsResult.Unavailable, contract.getSynchronousResult(context, request)?.value)
     }
 
     @Test
-    fun whenTheFlowEndsWithoutImportingThenEmitsThatOutcomeAndCompletes() = runTest {
-        launch().test {
-            passwordImportEvents.emit(ImportPasswordsEvent.UserCancelled)
+    fun whenThereIsNoScreenToStartThenSynchronousResultIsUnavailable() = runTest {
+        whenever(globalActivityStarter.startIntent(any(), any<ImportPasswordsHostScreen>())).thenReturn(null)
 
-            assertEquals(ImportPasswordsEvent.UserCancelled, awaitItem())
-            awaitComplete()
-        }
+        val result = contract.getSynchronousResult(context, launchedRequest(isSupported = true))
+
+        assertEquals(ImportPasswordsResult.Unavailable, result?.value)
     }
 
     @Test
-    fun whenSavingFailsAfterProgressThenEmitsProgressThenTheErrorAndCompletes() = runTest {
-        launch().test {
-            passwordImportEvents.emit(ImportPasswordsEvent.InProgress)
-            passwordImportEvents.emit(ImportPasswordsEvent.Error.Transient)
+    fun whenCreatingTheIntentThenItOpensTheImportScreenWithTheLaunchSource() = runTest {
+        val intent = contract.createIntent(context, launchedRequest(isSupported = true))
 
-            assertEquals(ImportPasswordsEvent.InProgress, awaitItem())
-            assertEquals(ImportPasswordsEvent.Error.Transient, awaitItem())
-            awaitComplete()
-        }
+        assertSame(launchIntent, intent)
+        verify(globalActivityStarter).startIntent(context, ImportPasswordsHostScreen(SOURCE))
     }
 
     @Test
-    fun whenAnEarlierImportFinishedBeforeLaunchThenItsResultIsNotEmitted() = runTest {
-        passwordImportEvents.emit(ImportPasswordsEvent.Finished(imported = 9, skipped = 9))
-
-        launch().test {
-            expectNoEvents()
-
-            passwordImportEvents.emit(FINISHED)
-
-            assertEquals(FINISHED, awaitItem())
-            awaitComplete()
-        }
+    fun whenNoResultIsReturnedThenUserCancelled() {
+        assertEquals(ImportPasswordsResult.UserCancelled, contract.parseResult(Activity.RESULT_CANCELED, null))
+        assertEquals(ImportPasswordsResult.UserCancelled, contract.parseResult(Activity.RESULT_OK, Intent()))
     }
 
     @Test
-    fun whenALaunchEndedThenTheNextLaunchReportsOnlyItsOwnOutcome() = runTest {
-        launch().test {
-            passwordImportEvents.emit(ImportPasswordsEvent.UserCancelled)
-            assertEquals(ImportPasswordsEvent.UserCancelled, awaitItem())
-            awaitComplete()
-        }
-
-        launch().test {
-            passwordImportEvents.emit(FINISHED)
-
-            assertEquals(FINISHED, awaitItem())
-            awaitComplete()
-        }
+    fun whenTheHostReturnsAResultThenItIsMappedToThePublicResult() {
+        assertEquals(ImportPasswordsResult.Success, parse(ImportPasswordsHostResult.Success))
+        assertEquals(ImportPasswordsResult.UserCancelled, parse(ImportPasswordsHostResult.UserCancelled))
+        assertEquals(ImportPasswordsResult.Error.Transient, parse(ImportPasswordsHostResult.TransientError))
+        assertEquals(ImportPasswordsResult.Error.Permanent, parse(ImportPasswordsHostResult.PermanentError))
     }
 
-    private suspend fun launch(): Flow<ImportPasswordsEvent> = testee.launchImport(context, SOURCE)
+    private suspend fun launchedRequest(isSupported: Boolean): ImportPasswordsRequest {
+        whenever(passwordImportAvailability.canImport()).thenReturn(isSupported)
+        val launcher = FakeActivityResultLauncher()
+        testee.launchImport(PARAMS, launcher)
+        return launcher.launchedInputs.single()
+    }
+
+    private fun parse(result: ImportPasswordsHostResult): ImportPasswordsResult {
+        val intent = Intent().putExtra(ImportPasswordsHostResult.RESULT_KEY, result)
+        return contract.parseResult(Activity.RESULT_OK, intent)
+    }
+
+    private class FakeActivityResultLauncher : ActivityResultLauncher<ImportPasswordsRequest>() {
+        val launchedInputs = mutableListOf<ImportPasswordsRequest>()
+
+        override fun getContract(): ActivityResultContract<ImportPasswordsRequest, *> = throw UnsupportedOperationException()
+
+        override fun launch(input: ImportPasswordsRequest, options: ActivityOptionsCompat?) {
+            launchedInputs += input
+        }
+
+        override fun unregister() = Unit
+    }
 
     private companion object {
         val SOURCE = AutofillImportLaunchSource.Onboarding
-        val FINISHED = ImportPasswordsEvent.Finished(imported = 3, skipped = 1)
+        val PARAMS = ImportPasswordsParams(launchSource = SOURCE)
     }
 }

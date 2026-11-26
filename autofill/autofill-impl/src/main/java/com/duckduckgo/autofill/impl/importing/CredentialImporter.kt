@@ -19,7 +19,6 @@ package com.duckduckgo.autofill.impl.importing
 import android.os.Parcelable
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.Finished
@@ -66,7 +65,6 @@ class CredentialImporterImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val credentialImportTimestamp: CredentialImportTimestamp,
-    private val passwordImportEvents: PasswordImportEvents,
 ) : CredentialImporter {
 
     private val _importStatus = MutableSharedFlow<ImportResult>(replay = 1)
@@ -79,7 +77,6 @@ class CredentialImporterImpl @Inject constructor(
         // emitted before the work starts so the replay buffer cannot hand a late subscriber the
         // result of the previous import
         _importStatus.emit(InProgress)
-        passwordImportEvents.emit(ImportPasswordsEvent.InProgress)
 
         appCoroutineScope.launch(dispatchers.io()) {
             doImportCredentials(importList, originalImportListSize, source)
@@ -104,7 +101,6 @@ class CredentialImporterImpl @Inject constructor(
         }
 
         _importStatus.emit(Finished(savedCredentials = insertedIds.size, numberSkipped = skippedCredentials, source = source))
-        passwordImportEvents.emit(ImportPasswordsEvent.Finished(imported = insertedIds.size, skipped = skippedCredentials))
     }
 
     override fun getImportStatus(): Flow<ImportResult> = _importStatus

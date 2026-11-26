@@ -52,7 +52,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
-import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsStatus
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.onboarding.api.LinearOnboardingEvent
@@ -63,7 +65,6 @@ import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition
 import com.duckduckgo.onboarding.impl.LinearOnboardingOrchestratorImpl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
@@ -149,6 +150,12 @@ class WelcomePageViewModelTest {
         }
     }
 
+    private val mockImportPasswords: ImportPasswords = mock()
+
+    private fun givenImportStatus(vararg statuses: ImportPasswordsStatus) {
+        whenever(mockImportPasswords.importStatus()).thenReturn(flowOf(*statuses))
+    }
+
     private fun createViewModel(
         orchestrator: LinearOnboardingOrchestrator = mockOrchestrator,
         pendingOnboardingStarter: PendingOnboardingStarter = mockPendingOnboardingStarter,
@@ -165,6 +172,7 @@ class WelcomePageViewModelTest {
         pixel = pixel,
         appInstallStore = mockAppInstallStore,
         customAiOnboardingStore = customAiOnboardingStore,
+        importPasswords = mockImportPasswords,
     )
 
     // A one-step plan that renders [dialog]. By default the step records every event it is handed and stays put,
@@ -721,7 +729,7 @@ class WelcomePageViewModelTest {
             // The step launches the import as soon as it is presented.
             assertEquals(Command.LaunchPasswordImport, awaitItem())
 
-            testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Error.Transient))
+            testee.onPasswordImportResult(ImportPasswordsResult.Error.Transient)
             advanceUntilIdle()
             expectNoEvents()
         }
@@ -737,7 +745,7 @@ class WelcomePageViewModelTest {
     fun `keeps the transient import error flagged so a recreated view can restore the alert`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
         advanceUntilIdle()
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Error.Transient))
+        testee.onPasswordImportResult(ImportPasswordsResult.Error.Transient)
         advanceUntilIdle()
 
         // The view collecting the state again is what a configuration change looks like to the view model.
@@ -748,7 +756,7 @@ class WelcomePageViewModelTest {
     fun `clears the transient import error and asks for the import again on retry`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
         advanceUntilIdle()
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Error.Transient))
+        testee.onPasswordImportResult(ImportPasswordsResult.Error.Transient)
         advanceUntilIdle()
 
         testee.onPasswordImportRetry()
@@ -762,7 +770,7 @@ class WelcomePageViewModelTest {
     fun `clears the transient import error and skips the import when the alert is dismissed with cancel`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
         advanceUntilIdle()
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Error.Transient))
+        testee.onPasswordImportResult(ImportPasswordsResult.Error.Transient)
         advanceUntilIdle()
 
         testee.onPasswordImportErrorCancelled()
@@ -776,7 +784,7 @@ class WelcomePageViewModelTest {
     fun `clears the transient import error without moving the flow when the alert is cancelled`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
         advanceUntilIdle()
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Error.Transient))
+        testee.onPasswordImportResult(ImportPasswordsResult.Error.Transient)
         advanceUntilIdle()
         val eventsBefore = recordedEvents.toList()
 
@@ -795,7 +803,7 @@ class WelcomePageViewModelTest {
         testee.commands.test {
             assertEquals(Command.LaunchPasswordImport, awaitItem())
 
-            testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Error.Permanent))
+            testee.onPasswordImportResult(ImportPasswordsResult.Error.Permanent)
             advanceUntilIdle()
             expectNoEvents()
         }
@@ -818,10 +826,11 @@ class WelcomePageViewModelTest {
 
     @Test
     fun `finishes the import successfully when the import succeeds`() = runTest {
+        givenImportStatus(ImportPasswordsStatus.Finished(imported = 3, skipped = 1))
         val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
         advanceUntilIdle()
 
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Finished(imported = 3, skipped = 1)))
+        testee.onPasswordImportResult(ImportPasswordsResult.Success)
         advanceUntilIdle()
 
         assertEquals(listOf(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS)), recordedEvents)
@@ -832,7 +841,7 @@ class WelcomePageViewModelTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
         advanceUntilIdle()
 
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.UserCancelled))
+        testee.onPasswordImportResult(ImportPasswordsResult.UserCancelled)
         advanceUntilIdle()
 
         assertEquals(listOf(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.CANCELLED)), recordedEvents)
@@ -841,9 +850,10 @@ class WelcomePageViewModelTest {
 
     @Test
     fun `resolves the outcome card with the counts the import finished with`() = runTest {
+        givenImportStatus(ImportPasswordsStatus.InProgress, ImportPasswordsStatus.Finished(imported = 3, skipped = 1))
         val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
         advanceUntilIdle()
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.Finished(imported = 3, skipped = 1)))
+        testee.onPasswordImportResult(ImportPasswordsResult.Success)
         advanceUntilIdle()
 
         // What the engine reports once the outcome card is bound.
@@ -863,13 +873,12 @@ class WelcomePageViewModelTest {
 
     @Test
     fun `shows the outcome card loading while passwords are saved, then resolves it with their counts`() = runTest {
+        val status = MutableStateFlow<ImportPasswordsStatus>(ImportPasswordsStatus.InProgress)
+        whenever(mockImportPasswords.importStatus()).thenReturn(status)
         val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
         advanceUntilIdle()
-        val events = MutableSharedFlow<ImportPasswordsEvent>()
-        testee.onPasswordImportLaunched(events)
-        runCurrent()
 
-        events.emit(ImportPasswordsEvent.InProgress)
+        testee.onPasswordImportResult(ImportPasswordsResult.Success)
         runCurrent()
         bindContent(testee)
         runCurrent()
@@ -877,7 +886,7 @@ class WelcomePageViewModelTest {
         assertEquals(listOf(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS)), recordedEvents)
         assertEquals(ImportCompleteContentState.Parsing, importCompleteState(testee).value)
 
-        events.emit(ImportPasswordsEvent.Finished(imported = 3, skipped = 1))
+        status.value = ImportPasswordsStatus.Finished(imported = 3, skipped = 1)
         runCurrent()
 
         assertEquals(ImportCompleteContentState.Finished(imported = 3, skipped = 1), importCompleteState(testee).value)
@@ -891,16 +900,16 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun `fails the outcome card when the import errors after saving started`() = runTest {
+    fun `fails the outcome card when saving ends without reporting the counts`() = runTest {
+        givenImportStatus(ImportPasswordsStatus.InProgress)
         val testee = startAt(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress))
         advanceUntilIdle()
 
-        testee.onPasswordImportLaunched(flowOf(ImportPasswordsEvent.InProgress, ImportPasswordsEvent.Error.Transient))
+        testee.onPasswordImportResult(ImportPasswordsResult.Success)
         bindContent(testee)
         runCurrent()
 
         assertEquals(ImportCompleteContentState.Failed, importCompleteState(testee).value)
-        assertFalse(testee.viewState.value.showPasswordImportError)
         assertEquals(
             listOf(
                 NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS),
@@ -923,19 +932,17 @@ class WelcomePageViewModelTest {
     }
 
     @Test
-    fun `ignores an earlier launch's outcome once the import is launched again`() = runTest {
+    fun `resolves an unavailable import like a permanent error`() = runTest {
         val testee = startAt(NewUserOnboardingActivityDialog.ImportPasswordsLaunch)
         advanceUntilIdle()
-        val firstLaunch = MutableSharedFlow<ImportPasswordsEvent>()
-        testee.onPasswordImportLaunched(firstLaunch)
-        advanceUntilIdle()
-        testee.onPasswordImportLaunched(MutableSharedFlow())
+
+        testee.onPasswordImportResult(ImportPasswordsResult.Unavailable)
         advanceUntilIdle()
 
-        firstLaunch.emit(ImportPasswordsEvent.UserCancelled)
-        advanceUntilIdle()
-
-        assertTrue(recordedEvents.isEmpty())
+        assertEquals(
+            listOf(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.PERMANENT_ERROR)),
+            recordedEvents,
+        )
     }
 
     @Test

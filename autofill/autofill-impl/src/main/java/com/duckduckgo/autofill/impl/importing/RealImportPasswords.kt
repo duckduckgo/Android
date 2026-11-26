@@ -13,49 +13,104 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.duckduckgo.autofill.impl.importing
 
 import android.content.Context
-import com.duckduckgo.autofill.api.AutofillImportLaunchSource
+import android.content.Intent
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.core.content.IntentCompat
 import com.duckduckgo.autofill.api.ImportPasswords
-import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsParams
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsRequest
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsStatus
+import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult
 import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailability
-import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleScreen
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class RealImportPasswords @Inject constructor(
     private val passwordImportAvailability: PasswordImportAvailability,
-    private val passwordImportEvents: PasswordImportEvents,
-    private val globalActivityStarter: GlobalActivityStarter,
+    private val credentialImporter: CredentialImporter,
+    globalActivityStarter: GlobalActivityStarter,
 ) : ImportPasswords {
+
+    private val contract = ImportPasswordsContract(globalActivityStarter)
 
     override suspend fun isSupported(): Boolean = passwordImportAvailability.canImport()
 
-    override suspend fun launchImport(
-        context: Context,
-        launchSource: AutofillImportLaunchSource,
-    ): Flow<ImportPasswordsEvent> {
-        val intent = if (isSupported()) {
-            globalActivityStarter.startIntent(context, ImportPasswordsFromGoogleScreen(launchSource))
-        } else {
-            null
-        }
-        if (intent == null) {
-            return flowOf(ImportPasswordsEvent.Error.Permanent)
-        }
+    override fun importContract(): ActivityResultContract<ImportPasswordsRequest, ImportPasswordsResult> = contract
 
-        context.startActivity(intent)
-        return passwordImportEvents.events.transformWhile { event ->
-            emit(event)
-            event is ImportPasswordsEvent.InProgress
+    override suspend fun launchImport(
+        params: ImportPasswordsParams,
+        launcher: ActivityResultLauncher<ImportPasswordsRequest>,
+    ) {
+        launcher.launch(AvailabilityCheckedPasswordsRequest(isAvailable = isSupported(), params = params))
+    }
+
+    override fun importStatus(): Flow<ImportPasswordsStatus> = credentialImporter.getImportStatus().map { status ->
+        when (status) {
+            ImportResult.InProgress -> ImportPasswordsStatus.InProgress
+            is ImportResult.Finished -> ImportPasswordsStatus.Finished(imported = status.savedCredentials, skipped = status.numberSkipped)
         }
     }
 }
+
+private class ImportPasswordsContract(
+    private val globalActivityStarter: GlobalActivityStarter,
+) : ActivityResultContract<ImportPasswordsRequest, ImportPasswordsResult>() {
+
+    override fun getSynchronousResult(
+        context: Context,
+        input: ImportPasswordsRequest,
+    ): SynchronousResult<ImportPasswordsResult>? {
+        val isAvailable = (input as? AvailabilityCheckedPasswordsRequest)?.isAvailable == true
+        return when {
+            !isAvailable -> SynchronousResult(ImportPasswordsResult.Unavailable)
+            buildIntent(context, input) == null -> SynchronousResult(ImportPasswordsResult.Unavailable)
+            else -> null
+        }
+    }
+
+    override fun createIntent(
+        context: Context,
+        input: ImportPasswordsRequest,
+    ): Intent {
+        return checkNotNull(buildIntent(context, input)) {
+            "getSynchronousResult should return a result when there is no intent"
+        }
+    }
+
+    override fun parseResult(
+        resultCode: Int,
+        intent: Intent?,
+    ): ImportPasswordsResult {
+        val result = intent?.let {
+            IntentCompat.getParcelableExtra(it, ImportPasswordsHostResult.RESULT_KEY, ImportPasswordsHostResult::class.java)
+        }
+        return when (result) {
+            ImportPasswordsHostResult.Success -> ImportPasswordsResult.Success
+            ImportPasswordsHostResult.UserCancelled, null -> ImportPasswordsResult.UserCancelled
+            ImportPasswordsHostResult.TransientError -> ImportPasswordsResult.Error.Transient
+            ImportPasswordsHostResult.PermanentError -> ImportPasswordsResult.Error.Permanent
+        }
+    }
+
+    private fun buildIntent(
+        context: Context,
+        request: ImportPasswordsRequest,
+    ): Intent? {
+        return globalActivityStarter.startIntent(context, ImportPasswordsHostScreen(request.params.launchSource))
+    }
+}
+
+private data class AvailabilityCheckedPasswordsRequest(
+    val isAvailable: Boolean,
+    override val params: ImportPasswordsParams,
+) : ImportPasswordsRequest

@@ -41,7 +41,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
+import com.duckduckgo.autofill.api.ImportPasswords
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsStatus
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -85,6 +87,7 @@ class WelcomePageViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
+    private val importPasswords: ImportPasswords,
 ) : ViewModel() {
 
     data class ViewState(
@@ -163,8 +166,6 @@ class WelcomePageViewModel @Inject constructor(
     private var quickSetupDefaultBrowserDialogShown = false
 
     private var passwordImportJob: Job? = null
-
-    private var passwordsSaving = false
 
     private val savedPasswordsResult = MutableStateFlow<PasswordImportResult.Terminal?>(null)
 
@@ -363,33 +364,14 @@ class WelcomePageViewModel @Inject constructor(
     /** The alert was cancelled without choosing: the import card underneath still offers both actions. */
     fun onPasswordImportErrorDismissed() = dismissPasswordImportError()
 
-    fun onPasswordImportLaunched(events: Flow<ImportPasswordsEvent>) {
-        passwordImportJob?.cancel()
-        passwordsSaving = false
-        savedPasswordsResult.value = null
-        passwordImportJob = events.onEach(::onPasswordImportEvent).launchIn(viewModelScope)
-    }
-
-    private fun onPasswordImportEvent(event: ImportPasswordsEvent) {
-        when (event) {
-            ImportPasswordsEvent.InProgress -> onPasswordsSaving()
-            is ImportPasswordsEvent.Finished -> {
-                savedPasswordsResult.value = PasswordImportResult.Terminal.Imported(imported = event.imported, skipped = event.skipped)
-                onPasswordsSaving()
-            }
-            // Once saving has started the outcome card is showing, so it resolves as failed instead of reopening the import card.
-            else -> if (passwordsSaving) savedPasswordsResult.value = PasswordImportResult.Terminal.Failed else onPasswordImportNotSaved(event)
-        }
-    }
-
-    private fun onPasswordImportNotSaved(event: ImportPasswordsEvent) {
-        when (event) {
-            ImportPasswordsEvent.UserCancelled -> cancelPasswordImport()
-            ImportPasswordsEvent.Error.Transient -> showImportErrorDialog()
-            ImportPasswordsEvent.Error.Permanent -> emit(
+    fun onPasswordImportResult(result: ImportPasswordsResult) {
+        when (result) {
+            ImportPasswordsResult.Success -> onPasswordsReceived()
+            ImportPasswordsResult.UserCancelled -> cancelPasswordImport()
+            ImportPasswordsResult.Error.Transient -> showImportErrorDialog()
+            ImportPasswordsResult.Error.Permanent, ImportPasswordsResult.Unavailable -> emit(
                 NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.PERMANENT_ERROR),
             )
-            ImportPasswordsEvent.InProgress, is ImportPasswordsEvent.Finished -> Unit
         }
     }
 
@@ -398,9 +380,14 @@ class WelcomePageViewModel @Inject constructor(
     }
 
     /** Moves to the import outcome card, which shows its loading state until [resolveImportOutcome] has the counts. */
-    private fun onPasswordsSaving() {
-        if (passwordsSaving) return
-        passwordsSaving = true
+    private fun onPasswordsReceived() {
+        passwordImportJob?.cancel()
+        savedPasswordsResult.value = null
+        passwordImportJob = viewModelScope.launch {
+            val saved = importPasswords.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
+            savedPasswordsResult.value = saved?.let { PasswordImportResult.Terminal.Imported(imported = it.imported, skipped = it.skipped) }
+                ?: PasswordImportResult.Terminal.Failed
+        }
         emit(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS))
     }
 
