@@ -186,18 +186,19 @@ class CachedTdsEntityLookupTest {
         val lookup = thread(isDaemon = true) { testee.entityForUrl("http://tracker.com") }
         lazyLoadReading.await()
         val refresh = thread(isDaemon = true) { testee.refresh() }
-        awaitParkedOrDone(refresh)
+        refresh.join(TIMEOUT_MS)
+        assertFalse("refresh() blocked on the in-flight first load", refresh.isAlive)
         releaseLazyLoad.countDown()
         lookup.join(TIMEOUT_MS)
-        refresh.join(TIMEOUT_MS)
 
-        assertFalse("threads did not finish", lookup.isAlive || refresh.isAlive)
+        assertFalse("first lookup did not finish", lookup.isAlive)
         assertEquals("Acme", testee.entityForUrl("http://tracker.com")?.name)
     }
 
     @Test
     fun whenRefreshRunsInsideTransactionWhileFirstLookupWaitsForDatabaseThenBothComplete() {
-        val database = mockDatabase(transactionLock = ReentrantLock())
+        val transactionLock = ReentrantLock()
+        val database = mockDatabase(transactionLock)
         val testee = CachedTdsEntityLookup(database)
         whenever(mockEntityDao.getAll()).thenReturn(
             listOf(TdsEntity(name = "Acme", displayName = "Acme", prevalence = 0.5)),
@@ -220,7 +221,7 @@ class CachedTdsEntityLookupTest {
         }
         downloaderInTransaction.await()
         val lookup = thread(isDaemon = true) { lookupResult.set(testee.entityForUrl("http://tracker.com")?.name) }
-        awaitParkedOrDone(lookup)
+        awaitQueued(transactionLock, lookup)
         continueDownload.countDown()
         downloader.join(TIMEOUT_MS)
         lookup.join(TIMEOUT_MS)
@@ -238,10 +239,10 @@ class CachedTdsEntityLookupTest {
         }
     }
 
-    private fun awaitParkedOrDone(thread: Thread) {
+    private fun awaitQueued(lock: ReentrantLock, thread: Thread) {
         val deadline = System.currentTimeMillis() + TIMEOUT_MS
-        while (thread.state !in setOf(Thread.State.BLOCKED, Thread.State.WAITING, Thread.State.TERMINATED)) {
-            check(System.currentTimeMillis() < deadline) { "thread neither parked nor finished" }
+        while (!lock.hasQueuedThread(thread)) {
+            check(System.currentTimeMillis() < deadline) { "thread never queued on the transaction lock" }
             Thread.sleep(1)
         }
     }
