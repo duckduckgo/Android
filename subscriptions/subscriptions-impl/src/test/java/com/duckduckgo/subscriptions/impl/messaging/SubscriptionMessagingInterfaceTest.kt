@@ -560,6 +560,20 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun `when process and show notifications denied dialog then callback executed`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"showNotificationsDeniedDialog","id":"myId","params":{"days":3}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+        assertEquals("myId", callback.id)
+    }
+
+    @Test
     fun `when process and feature selected message if url not in allow listed domains then do nothing`() = runTest {
         messagingInterface.register(webView, callback)
         givenUrl("https://duckduckgo.example.com")
