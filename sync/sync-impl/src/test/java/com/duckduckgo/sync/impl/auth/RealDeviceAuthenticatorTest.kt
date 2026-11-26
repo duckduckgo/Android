@@ -20,6 +20,7 @@ import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Enroll
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Verify
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import kotlinx.coroutines.Deferred
@@ -158,11 +159,11 @@ class RealDeviceAuthenticatorTest {
         val response = authenticateAsync()
 
         withPrompt<Verify> {
-            onError("reason")
-            onError("other reason")
+            onError(FailureReason.HwUnavailable, "reason")
+            onError(FailureReason.HwUnavailable, "other reason")
         }
 
-        assertEquals(Response.Failed("reason"), response.await())
+        assertEquals(Response.Failed(FailureReason.HwUnavailable, "reason"), response.await())
         assertNull(testee.currentPrompt.value)
     }
 
@@ -208,7 +209,7 @@ class RealDeviceAuthenticatorTest {
     fun `when verification fails then do not start grace period`() = runTest {
         authenticateAsync()
 
-        withPrompt<Verify> { onError("reason") }
+        withPrompt<Verify> { onError(FailureReason.HwUnavailable, "reason") }
 
         assertTrue(gracePeriod.isAuthRequired())
     }

@@ -93,7 +93,7 @@ class RealAuthPromptRenderer @Inject constructor(
                 when (result) {
                     is AuthResult.Success -> onVerified()
                     is AuthResult.UserCancelled -> onCancelled()
-                    is AuthResult.Error -> onError(result.reason)
+                    is AuthResult.Error -> onError(result.failureReason, result.reason)
                 }
             }
         }

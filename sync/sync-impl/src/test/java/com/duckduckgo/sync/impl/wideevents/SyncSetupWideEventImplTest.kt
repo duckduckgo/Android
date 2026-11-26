@@ -24,6 +24,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Denial
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.AdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
@@ -888,6 +889,80 @@ class SyncSetupWideEventImplTest {
         advanceUntilIdle()
 
         verify(wideEventClient, never()).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
+    }
+
+    @Test
+    fun `user closing after a device auth denial finishes with the denial reasons`(
+        @TestParameter reason: Denial.Reason,
+    ) = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(reason, "sub_reason")) }
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        advanceUntilIdle()
+
+        val (status, statusReason) = when (reason) {
+            Denial.Reason.Canceled -> FlowStatus.Cancelled to "device_auth_cancelled"
+            Denial.Reason.Unavailable -> FlowStatus.Cancelled to "device_auth_unavailable"
+            Denial.Reason.Error -> FlowStatus.Failure(reason = "device_auth_error") to "device_auth_error"
+        }
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = status,
+            metadata = mapOf("status_reason" to statusReason, "status_sub_reason" to "sub_reason"),
+        )
+    }
+
+    @Test
+    fun `device auth passing after a denial clears the denial`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
+        wideEvent.onUpdate { it.copy(deviceAuthDenial = null) }
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("status_reason" to "user_closed"),
+        )
+    }
+
+    @Test
+    fun `device auth denial does not replace a cancellation other than user closed`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
+        wideEvent.onCancelled(SetupCancellationReason.CODE_REJECTED)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("status_reason" to "code_rejected"),
+        )
+    }
+
+    @Test
+    fun `device auth denial does not finish the attempt on its own`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
+        advanceUntilIdle()
+
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `success after a device auth denial finishes as success`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted()
+        wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
+        wideEvent.onSucceeded()
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success, metadata = emptyMap())
     }
 
     private suspend fun enableUnifiedEvent() {

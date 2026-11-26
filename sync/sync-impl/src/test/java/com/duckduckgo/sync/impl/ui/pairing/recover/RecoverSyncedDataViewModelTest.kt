@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui.pairing.recover
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -153,7 +154,7 @@ class RecoverSyncedDataViewModelTest {
 
     @Test
     fun `when authentication fails then an auth error is shown`() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
         val testee = createTestee()
 
         testee.commands.test {
