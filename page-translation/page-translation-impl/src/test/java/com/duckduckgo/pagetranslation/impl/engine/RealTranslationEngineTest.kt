@@ -47,6 +47,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import java.io.File
 import kotlin.time.Duration.Companion.minutes
@@ -201,6 +202,30 @@ class RealTranslationEngineTest {
 
         assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("hola")), visible) })
         verify(scheduler).removeIfCorrupted("es-en")
+    }
+
+    @Test
+    fun loadAPackThatFailedToLoadOnlyOnce() = runEngineTest {
+        install(ES_EN)
+        library.isLoadFailing = true
+
+        repeat(2) { assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("hola")), visible) }) }
+
+        assertEquals(1, library.loadedSpecs.size)
+        verify(scheduler, times(1)).removeIfCorrupted("es-en")
+    }
+
+    @Test
+    fun loadAPackAgainOnceItWasReplaced() = runEngineTest {
+        install(ES_EN)
+        library.isLoadFailing = true
+        call { engine.translate(ES_EN, listOf(plain("hola")), visible) }
+
+        library.isLoadFailing = false
+        val packDirectory = directories.getPackDirectory("es-en")
+        packDirectory.setLastModified(packDirectory.lastModified() + 1000)
+
+        assertEquals(BatchTranslation.Translated(listOf("hola [es-en]")), call { engine.translate(ES_EN, listOf(plain("hola")), visible) })
     }
 
     @Test

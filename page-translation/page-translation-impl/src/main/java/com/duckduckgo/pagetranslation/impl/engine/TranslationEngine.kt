@@ -100,6 +100,9 @@ class RealTranslationEngine @Inject constructor(
     // only touched on engineDispatcher
     private var loadedTranslator: LoadedTranslator? = null
 
+    // only touched on engineDispatcher; a pack that failed to load fails again until it's replaced, and each failure checks it again
+    private var failedPackVersion: PackVersion? = null
+
     override fun onCreate(owner: LifecycleOwner) {
         context.registerComponentCallbacks(
             object : ComponentCallbacks2 {
@@ -150,6 +153,9 @@ class RealTranslationEngine @Inject constructor(
         unloadTranslator()
         if (!isAvailable() || !packDirectory.exists()) return null
 
+        val packVersion = PackVersion(pair, packDirectory.lastModified())
+        if (packVersion == failedPackVersion) return null
+
         // an installed file is named after its manifest key, with the extension that tells translate-kit its format
         val files = packDirectory.listFiles().orEmpty().associateBy { it.nameWithoutExtension }
         fun path(key: String) = (files[key] ?: packDirectory.resolve(key)).path
@@ -170,6 +176,7 @@ class RealTranslationEngine @Inject constructor(
             library.loadTranslator(spec).also { loadedTranslator = LoadedTranslator(pair, it) }
         } catch (e: IllegalArgumentException) {
             logcat(ERROR) { "Page translation language pack failed to load: ${e.asLog()}" }
+            failedPackVersion = packVersion
             scheduler.removeIfCorrupted(pair.key)
             null
         }
@@ -215,6 +222,8 @@ class RealTranslationEngine @Inject constructor(
     }
 
     private class LoadedTranslator(val pair: LanguagePair, val translator: Translator)
+
+    private data class PackVersion(val pair: LanguagePair, val lastModified: Long)
 
     private companion object {
         val IDLE_TIMEOUT = 1.minutes
