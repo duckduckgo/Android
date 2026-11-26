@@ -58,7 +58,7 @@ data class ModelsManifest(
         }
     }
 
-    /** The keys of [TranslationModel.files], which also name the decompressed files in an installed pack. */
+    /** The keys of [TranslationModel.files], which also name the decompressed files in an installed pack, with their format extension. */
     companion object {
         const val MODEL_FILE = "model"
         const val LEXICAL_SHORTLIST_FILE = "lexicalShortlist"

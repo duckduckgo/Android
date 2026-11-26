@@ -25,13 +25,7 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 
-/**
- * Runs translate-kit calls one at a time on [dispatcher], which must run one task at a time. Whenever a call finishes, the next one is the
- * oldest waiting call whose `isVisible` returns true, or the oldest waiting call if none does. `isVisible` is read on
- * [dispatcher].
- *
- * A caller that's canceled while its call waits drops it. A call that's already running finishes and its result is dropped.
- */
+/** Runs [TranslationEngine]'s calls in the order it documents, on [dispatcher], which must run one task at a time. */
 class TranslationPriorityQueue(
     private val scope: CoroutineScope,
     private val dispatcher: CoroutineDispatcher,

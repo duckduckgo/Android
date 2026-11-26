@@ -67,7 +67,8 @@ sealed interface BatchTranslation {
 
 /**
  * Runs every translate-kit call for all tabs, one at a time. Whenever a call finishes, the next one is the oldest pending call
- * whose `isVisible` returns true, or the oldest pending call if none does. `isVisible` is read off the main thread.
+ * whose `isVisible` returns true, or the oldest pending call if none does. `isVisible` is read off the main thread while other
+ * callers wait, so it must be cheap and must not throw.
  *
  * A caller that's canceled while its call waits drops it. A call that's already running finishes and its result is dropped.
  */
@@ -147,7 +148,7 @@ class RealTranslationEngine @Inject constructor(
     private fun getTranslator(pair: LanguagePair): Translator? {
         val packDirectory = directories.getPackDirectory(pair.key)
 
-        // a pack deleted or replaced while its translator is loaded must not keep translating
+        // a pack deleted while its translator is loaded must not keep translating
         loadedTranslator?.takeIf { it.pair == pair && packDirectory.exists() }?.let { return it.translator }
 
         unloadTranslator()

@@ -18,6 +18,7 @@ package com.duckduckgo.pagetranslation.impl.engine
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runCurrent
@@ -77,6 +78,22 @@ class TranslationPriorityQueueTest {
 
         assertEquals(listOf("kept"), ranCalls)
         assertTrue(kept.isCompleted)
+    }
+
+    @Test
+    fun finishACallWhoseCallerIsCanceledWhileItRunsAndRunTheNextOne() = coroutineRule.testScope.runTest {
+        lateinit var canceled: Deferred<Unit>
+        canceled = async(start = UNDISPATCHED) {
+            queue.run({ true }) {
+                canceled.cancel()
+                ranCalls += "canceled"
+            }
+        }
+        val next = async(start = UNDISPATCHED) { queue.run({ true }) { ranCalls += "next" } }
+        runCurrent()
+
+        assertEquals(listOf("canceled", "next"), ranCalls)
+        assertTrue(canceled.isCancelled && next.isCompleted)
     }
 
     @Test

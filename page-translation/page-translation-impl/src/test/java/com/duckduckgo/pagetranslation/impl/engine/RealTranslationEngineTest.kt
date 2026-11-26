@@ -268,9 +268,8 @@ class RealTranslationEngineTest {
     @Test
     fun runTheVisibleTabsCallsFirst() = runEngineTest {
         install(ES_EN)
-        var isHiddenTabVisible = false
 
-        val hiddenTabCall = async { engine.translate(ES_EN, listOf(plain("hidden")), { isHiddenTabVisible }) }
+        val hiddenTabCall = async { engine.translate(ES_EN, listOf(plain("hidden")), hidden) }
         val visibleTabCall = async { engine.translate(ES_EN, listOf(plain("visible")), visible) }
         runCurrent()
 
