@@ -201,6 +201,21 @@ class NewChatDefaultsTest {
     }
 
     @Test
+    fun whenNewChatDefaultModelPickedWithoutEffortThenNewChatUsesDefaultEffort() {
+        val state = modelState(selected = luna).copy(newChatDefault = server("gpt-5.6-terra", "high"))
+
+        assertEquals(EXTENDED_REASONING, state.forNewChat(pickedModelId = "gpt-5.6-terra", pickedReasoningMode = null).selectedReasoningMode)
+        assertEquals(FAST, state.forNewChat(pickedModelId = "gpt-6-luna", pickedReasoningMode = null).selectedReasoningMode)
+    }
+
+    @Test
+    fun whenNewChatDefaultModelPickedWithEffortThenPickedEffortWins() {
+        val state = modelState(selected = luna).copy(newChatDefault = server("gpt-5.6-terra", "high"))
+
+        assertEquals(REASONING, state.forNewChat(pickedModelId = "gpt-5.6-terra", pickedReasoningMode = "reasoning").selectedReasoningMode)
+    }
+
+    @Test
     fun whenPickedModelInaccessibleThenNewChatUsesGlobalSelection() {
         val state = modelState(selected = luna, extra = terra.copy(isAccessible = false))
 

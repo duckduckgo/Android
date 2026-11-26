@@ -69,7 +69,8 @@ internal object NewChatDefaults {
 
 /**
  * The selection a new chat in a tab sends with: the tab's pick while it is still accessible, else the
- * global selection. Without a pick this is the receiver unchanged.
+ * global selection. A model picked without an effort starts on the new-chat default's effort when it is that
+ * default's model, else on fast. Without a pick this is the receiver unchanged.
  */
 internal fun ModelState.forNewChat(
     pickedModelId: String?,
@@ -81,10 +82,11 @@ internal fun ModelState.forNewChat(
     val available = pickedModel?.let {
         ReasoningResolver.availableModes(it.supportedReasoningEfforts, it.reasoningEffortAccess, isSubscriptionEligible)
     } ?: availableReasoningModes
+    val mode = pickedMode ?: newChatDefault?.takeIf { it.modelId == pickedModel?.id }?.mode
     return copy(
         selectedModelId = pickedModel?.id ?: selectedModelId,
         selectedModelShortName = pickedModel?.shortName ?: selectedModelShortName,
-        selectedReasoningMode = NewChatDefaults.reasoningMode(pickedMode, available),
+        selectedReasoningMode = NewChatDefaults.reasoningMode(mode, available),
         availableReasoningModes = available,
     )
 }

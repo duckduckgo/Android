@@ -182,6 +182,13 @@ class NewChatModelSourceTest {
     }
 
     @Test
+    fun whenServerDefaultModelPickedWithoutEffortThenDefault() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), server = RemoteNewChatDefault("gpt-5.6-terra", "high"))
+
+        assertEquals(ModelSource.DEFAULT, sourceFor(global, pickedModelId = terra.id))
+    }
+
+    @Test
     fun whenServerModelMissingThenHardcodedDefaultIsFallback() {
         val global = globalSelection(UserTier.FREE, listOf(luna, terra), server = RemoteNewChatDefault("gone", "none"))
 
