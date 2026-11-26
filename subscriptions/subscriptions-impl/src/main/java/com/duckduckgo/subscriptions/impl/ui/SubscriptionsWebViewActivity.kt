@@ -877,7 +877,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                super.onBackPressed()
+                if (isCancellationFlow) onBackPressed() else super.onBackPressed()
                 return true
             }
         }
