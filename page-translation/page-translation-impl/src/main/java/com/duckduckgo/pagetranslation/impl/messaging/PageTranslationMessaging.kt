@@ -22,6 +22,8 @@ import androidx.annotation.MainThread
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pagetranslation.impl.AttachedWebView
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
+import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -46,7 +48,10 @@ data class UnitTranslation(val id: Int, val translation: String, val isHtml: Boo
  * previous one, whose reply is then ignored.
  */
 interface PageTranslationMessaging {
-    /** Registers the bundle's JavaScript interface, so call it before [webView] loads its first page. */
+    /**
+     * Registers the bundle's JavaScript interface, so call it before [webView] loads its first page. Does nothing while page
+     * translation is off or on a device it doesn't support, so pages don't see the interface.
+     */
     @MainThread
     fun register(webView: WebView)
 
@@ -69,12 +74,16 @@ class RealPageTranslationMessaging @Inject constructor(
     private val attachedWebView: AttachedWebView,
     private val script: PageTranslationScript,
     private val dispatchers: DispatcherProvider,
+    private val feature: PageTranslationFeature,
+    private val deviceSupport: PageTranslationDeviceSupport,
 ) : PageTranslationMessaging {
     private val jsInterface = PageTranslationJsInterface()
     private val lock = Any()
     private var pendingRequest: PendingRequest? = null
 
     override fun register(webView: WebView) {
+        if (!feature.translation().isEnabled() || !deviceSupport.isSupported()) return
+
         webView.addJavascriptInterface(jsInterface, script.interfaceName)
     }
 
