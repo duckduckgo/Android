@@ -23,6 +23,7 @@ import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pagetranslation.api.PageTranslation
 import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.api.TranslationProgress
+import com.duckduckgo.pagetranslation.impl.banner.TranslationBannerFactory
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -32,11 +33,13 @@ import javax.inject.Inject
 
 @ContributesBinding(FragmentScope::class, binding = binding<PageTranslation>())
 @SingleIn(FragmentScope::class)
-class RealPageTranslation @Inject constructor() : PageTranslation {
+class RealPageTranslation @Inject constructor(
+    private val bannerFactory: TranslationBannerFactory,
+) : PageTranslation {
 
     override val progress: StateFlow<TranslationProgress> = MutableStateFlow(TranslationProgress.Idle)
 
-    override fun getBannerView(context: Context): View = View(context).apply { visibility = View.GONE }
+    override fun getBannerView(context: Context): View = bannerFactory.create(context)
 
     override fun attach(webView: WebView) = Unit
 

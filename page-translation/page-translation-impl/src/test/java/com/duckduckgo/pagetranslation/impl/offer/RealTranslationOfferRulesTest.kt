@@ -18,6 +18,8 @@ package com.duckduckgo.pagetranslation.impl.offer
 
 import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
 import com.duckduckgo.pagetranslation.impl.store.TranslationPreferencesStore
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -31,7 +33,8 @@ class RealTranslationOfferRulesTest {
 
     private val preferencesStore: TranslationPreferencesStore = mock()
     private val deviceLanguages: DeviceLanguages = mock()
-    private val testee = RealTranslationOfferRules(deviceLanguages, preferencesStore)
+    private val manifestStore: ModelsManifestStore = mock()
+    private val testee = RealTranslationOfferRules(deviceLanguages, preferencesStore, manifestStore)
 
     private val pairs = setOf("fr-en", "de-en", "es-en", "en-fr", "en-en", "de-fr", "es-fr", "fr-fr")
 
@@ -45,8 +48,26 @@ class RealTranslationOfferRulesTest {
         content: TabContent = TabContent.WebPage,
         detection: Detection? = Detection("es", isReliable = true),
         bannerSuppressed: Boolean = false,
-        availablePairs: Set<String> = pairs,
-    ) = testee.decide(content, detection, bannerSuppressed, availablePairs)
+        availablePairs: Set<String>? = pairs,
+    ): TranslationOffer {
+        whenever(manifestStore.readManifest()).thenReturn(availablePairs?.let(::manifestOf))
+        return testee.decide(content, detection, bannerSuppressed)
+    }
+
+    private fun manifestOf(pairs: Set<String>) = ModelsManifest(
+        schemaVersion = 1,
+        baseUrl = "https://example.com",
+        models = pairs.associateWith { pair ->
+            ModelsManifest.TranslationModel(
+                sourceLanguage = pair.substringBefore('-'),
+                targetLanguage = pair.substringAfter('-'),
+                version = "1",
+                architecture = "base",
+                totalBytes = 1L,
+                files = emptyMap(),
+            )
+        },
+    )
 
     @Test
     fun whenContentIsNotABrowserOrCustomTabWebPageThenNone() = runTest {
@@ -68,6 +89,16 @@ class RealTranslationOfferRulesTest {
     @Test
     fun whenNoPairFromDetectedToPreferredLanguageThenNone() = runTest {
         assertEquals(TranslationOffer.None, decide(detection = Detection("ja", isReliable = true)))
+    }
+
+    @Test
+    fun whenManifestIsNotAvailableThenNone() = runTest {
+        assertEquals(TranslationOffer.None, decide(availablePairs = null))
+    }
+
+    @Test
+    fun whenManifestHasNoModelsThenNone() = runTest {
+        assertEquals(TranslationOffer.None, decide(availablePairs = emptySet()))
     }
 
     @Test

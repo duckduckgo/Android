@@ -41,6 +41,7 @@ dependencies {
     implementation AndroidX.core.ktx
     implementation AndroidX.dataStore.preferences
     implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
     implementation KotlinX.coroutines.core
     implementation Square.okHttp3.okHttp
 

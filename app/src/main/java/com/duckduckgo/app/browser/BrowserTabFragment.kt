@@ -368,6 +368,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import com.duckduckgo.pagetranslation.api.PageTranslation
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -455,6 +456,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var pageTranslation: PageTranslation
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -1270,6 +1274,7 @@ class BrowserTabFragment :
 
         configureNavigationBar()
         configureOmnibar()
+        configureTranslationBanner()
         configureBrowserTabKeyboardListener()
 
         disableViewStateSaving()
@@ -1319,6 +1324,29 @@ class BrowserTabFragment :
         }
 
         launchDownloadMessagesJob()
+    }
+
+    private fun configureTranslationBanner() {
+        val container = if (omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM) binding.translationBannerBottom else binding.translationBannerTop
+        container.removeAllViews()
+        container.addView(pageTranslation.getBannerView(requireContext()))
+
+        val updateVisibility = {
+            container.isVisible = !omnibar.omnibarTextInput.isFocused && !nativeInputManager.isNativeInputShown()
+        }
+        omnibar.omnibarTextInput.setOnFocusChangeListener { _, _ -> container.post(updateVisibility) }
+        // The native input is added to and removed from rootView without moving the omnibar focus.
+        binding.rootView.setOnHierarchyChangeListener(
+            object : ViewGroup.OnHierarchyChangeListener {
+                override fun onChildViewAdded(parent: View?, child: View?) {
+                    container.post(updateVisibility)
+                }
+
+                override fun onChildViewRemoved(parent: View?, child: View?) {
+                    container.post(updateVisibility)
+                }
+            },
+        )
     }
 
     private fun disableViewStateSaving() {

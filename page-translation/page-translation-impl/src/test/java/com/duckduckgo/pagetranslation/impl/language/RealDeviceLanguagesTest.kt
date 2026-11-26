@@ -22,18 +22,27 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
+import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
 @Config(qualifiers = "fr-rFR")
 class RealDeviceLanguagesTest {
 
+    private val originalLocale = Locale.getDefault()
     private val testee = RealDeviceLanguages(ApplicationProvider.getApplicationContext())
+
+    @Before
+    fun setUp() {
+        Locale.setDefault(Locale.ENGLISH)
+    }
 
     @After
     fun tearDown() {
+        Locale.setDefault(originalLocale)
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.getEmptyLocaleList())
     }
 
@@ -54,5 +63,23 @@ class RealDeviceLanguagesTest {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags("fr-FR"))
 
         assertEquals(listOf("fr-FR"), testee.get())
+    }
+
+    @Test
+    fun whenLocaleIsEnglishThenNamesAreEnglishAndCapitalised() {
+        assertEquals("Spanish", testee.displayName("es"))
+        assertEquals("English", testee.displayName("en"))
+    }
+
+    @Test
+    fun whenLocaleIsFrenchThenNamesAreCapitalisedInFrench() {
+        Locale.setDefault(Locale.FRENCH)
+
+        assertEquals("Espagnol", testee.displayName("es"))
+    }
+
+    @Test
+    fun whenCodeIsUnknownThenCodeIsReturned() {
+        assertEquals("zz", testee.displayName("zz").lowercase())
     }
 }
