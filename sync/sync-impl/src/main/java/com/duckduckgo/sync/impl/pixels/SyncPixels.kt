@@ -318,6 +318,7 @@ interface SyncPixels {
         RELAY_CHANNEL_UNAVAILABLE("relay_channel_unavailable"),
         PROTOCOL_ERROR("protocol_error"),
         UNEXPECTED_FAILURE("unexpected_failure"),
+        DEVICE_AUTH_ERROR("device_auth_error"),
     }
 
     enum class AuthenticationResult(val value: String) {

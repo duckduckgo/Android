@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
@@ -600,7 +601,7 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when authentication fails while syncing this device then an auth error is shown`() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         val testee = createTestee()
 
@@ -658,7 +659,7 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when authentication fails while choosing to sync with another device then an auth error is shown`() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         val testee = createTestee()
 
@@ -716,7 +717,7 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when authentication fails then no auth outcome event is tracked`() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         val testee = createTestee()
 

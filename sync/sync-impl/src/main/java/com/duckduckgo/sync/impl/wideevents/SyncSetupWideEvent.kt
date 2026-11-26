@@ -24,6 +24,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Denial
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.AdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.pixels.RealSyncPixels.Companion.FLOW_VERSION_V2_1
@@ -40,7 +41,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.impl.pixels.toKnownLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity.Companion.LAUNCH_SOURCE_OTHER
-import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
 import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -109,6 +109,7 @@ data class SetupFields(
     val accountSwitch: Boolean = false,
     val flowVersion: ExchangeProtocolVersion.Supported,
     val deviceAuthShown: Boolean = false,
+    val deviceAuthDenial: Denial? = null,
 )
 
 @SingleIn(AppScope::class)
@@ -288,8 +289,25 @@ class SyncSetupWideEventImpl @Inject constructor(
 
     override fun onCancelled(reason: SetupCancellationReason) = enqueue { cancel(reason) }
 
-    private suspend fun cancel(reason: SetupCancellationReason) =
-        finishUnifiedAttempt(FlowStatus.Cancelled, metadata = mapOf(KEY_STATUS_REASON to reason.value))
+    private suspend fun cancel(reason: SetupCancellationReason) {
+        val denial = currentData?.unified?.fields?.deviceAuthDenial
+        // A user who leaves after device auth stopped them didn't get past it, so we report why instead of user_closed.
+        if (reason == SetupCancellationReason.USER_CLOSED && denial != null) {
+            finishWithDeviceAuthDenial(denial)
+        } else {
+            finishUnifiedAttempt(FlowStatus.Cancelled, metadata = mapOf(KEY_STATUS_REASON to reason.value))
+        }
+    }
+
+    private suspend fun finishWithDeviceAuthDenial(denial: Denial) {
+        val (status, statusReason) = when (denial.reason) {
+            Denial.Reason.Canceled -> FlowStatus.Cancelled to SetupCancellationReason.DEVICE_AUTH_CANCELLED.value
+            Denial.Reason.Unavailable -> FlowStatus.Cancelled to SetupCancellationReason.DEVICE_AUTH_UNAVAILABLE.value
+            Denial.Reason.Error -> FlowStatus.Failure(reason = SetupFailureReason.DEVICE_AUTH_ERROR.value) to
+                SetupFailureReason.DEVICE_AUTH_ERROR.value
+        }
+        finishUnifiedAttempt(status, metadata = mapOf(KEY_STATUS_REASON to statusReason, KEY_STATUS_SUB_REASON to denial.subReason))
+    }
 
     private suspend fun timeOut(stage: TimeoutStage?) {
         val status = when (stage) {
@@ -402,6 +420,7 @@ class SyncSetupWideEventImpl @Inject constructor(
         const val STEP_RECOVERY_CODE_SHOWN = "recovery_code_shown"
         const val STEP_RECOVERY_CODE_GENERATION_FAILED = "recovery_code_generation_failed"
         const val KEY_STATUS_REASON = "status_reason"
+        const val KEY_STATUS_SUB_REASON = "status_sub_reason"
         const val STATUS_REASON_DUPLICATED = "duplicated"
         const val KEY_TIMEOUT_STAGE = "timeout_stage"
         const val TIMEOUT_STAGE_UNKNOWN = "unknown"

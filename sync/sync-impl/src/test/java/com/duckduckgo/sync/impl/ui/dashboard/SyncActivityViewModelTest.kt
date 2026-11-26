@@ -52,6 +52,7 @@ import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.impl.auditlog.RealLoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -724,7 +725,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenAddAnotherDeviceVerificationFailsThenShowError() = runViewModelTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         testee.commands().test {
             testee.onAddAnotherDevice()
