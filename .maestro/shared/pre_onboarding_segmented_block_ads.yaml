@@ -35,6 +35,20 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     id: "inputScreenTitle"
 - tapOn: "next"
+# The onboarding password import experiment's treatment adds an import step before the address bar step.
+# Skipping it is optional so this flow passes whichever cohort a run gets enrolled into.
+- extendedWaitUntil:
+    visible:
+      id: "importPasswordsTitle"
+    timeout: 3000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        id: "importPasswordsTitle"
+    commands:
+      - tapOn:
+          id: "secondaryCta"
 - assertVisible:
     id: "addressBarTitle"
 - tapOn: "next"
