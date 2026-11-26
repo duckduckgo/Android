@@ -17,6 +17,7 @@
 package com.duckduckgo.pagetranslation.impl.manifest
 
 import androidx.annotation.Keep
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 
 @Keep
 data class ModelsManifest(
@@ -25,6 +26,11 @@ data class ModelsManifest(
     val baseUrl: String,
     val models: Map<String, TranslationModel>,
 ) {
+    val pairs: Set<LanguagePair>
+        get() = models.keys.mapNotNullTo(mutableSetOf(), LanguagePair::fromKey)
+
+    fun getModel(pair: LanguagePair): TranslationModel? = models[pair.key]
+
     @Keep
     data class TranslationModel(
         val sourceLanguage: String,

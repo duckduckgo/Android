@@ -19,6 +19,7 @@ package com.duckduckgo.pagetranslation.impl.offer
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
 import com.duckduckgo.pagetranslation.impl.store.TranslationPreferencesStore
 import dev.zacsweers.metro.ContributesBinding
@@ -62,13 +63,11 @@ class RealTranslationOfferRules @Inject constructor(
 
         if (detected == preferred) return TranslationOffer.None
         // a pair listed in the manifest is offered even if its language pack isn't installed yet, the download sheet installs it
-        if (manifestStore.readManifest()?.models?.containsKey(pairKey(detected, preferred)) != true) return TranslationOffer.None
+        if (manifestStore.readManifest()?.getModel(LanguagePair(detected, preferred)) == null) return TranslationOffer.None
 
         val bannerAllowed = detected !in languages && !bannerSuppressed && (preferencesStore.askToTranslatePages.firstOrNull() ?: true)
         return if (bannerAllowed) TranslationOffer.BannerAndMenuRow else TranslationOffer.MenuRowOnly
     }
-
-    private fun pairKey(from: String, to: String) = "$from-$to"
 
     private fun String.baseLanguage(): String = substringBefore('-').substringBefore('_').lowercase()
 }

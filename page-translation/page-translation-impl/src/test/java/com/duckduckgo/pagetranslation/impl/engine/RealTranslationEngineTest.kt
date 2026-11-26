@@ -62,9 +62,9 @@ class RealTranslationEngineTest {
     private val context: Context = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
     private val directories = object : LanguagePackDirectories {
-        override fun getStagingDirectory(pair: String) = error("unused")
-        override fun getPackDirectory(pair: String): File = temporaryFolder.root.resolve(pair)
-        override fun getOldDirectory(pair: String) = error("unused")
+        override fun getStagingDirectory(pair: LanguagePair) = error("unused")
+        override fun getPackDirectory(pair: LanguagePair): File = temporaryFolder.root.resolve(pair.key)
+        override fun getOldDirectory(pair: LanguagePair) = error("unused")
         override fun getInstalledPairs() = error("unused")
         override fun getPairsWithOldDirectory() = error("unused")
     }
@@ -109,7 +109,7 @@ class RealTranslationEngineTest {
 
         assertEquals(BatchTranslation.Translated(listOf("hola [es-en]", "adiós [es-en]")), result)
         val spec = library.loadedSpecs.single()
-        val packDirectory = directories.getPackDirectory("es-en")
+        val packDirectory = directories.getPackDirectory(ES_EN)
         assertEquals("es", spec.sourceLang)
         assertEquals("en", spec.targetLang)
         assertEquals(packDirectory.resolve("model.bin").path, spec.modelPath)
@@ -121,11 +121,11 @@ class RealTranslationEngineTest {
     @Test
     fun loadTheModelInTheFormatItWasInstalledIn() = runEngineTest {
         install(ES_EN)
-        directories.getPackDirectory("es-en").run { resolve("model.bin").renameTo(resolve("model.npz")) }
+        directories.getPackDirectory(ES_EN).run { resolve("model.bin").renameTo(resolve("model.npz")) }
 
         call { engine.translate(ES_EN, listOf(plain("hola")), visible) }
 
-        assertEquals(directories.getPackDirectory("es-en").resolve("model.npz").path, library.loadedSpecs.single().modelPath)
+        assertEquals(directories.getPackDirectory(ES_EN).resolve("model.npz").path, library.loadedSpecs.single().modelPath)
     }
 
     @Test
@@ -134,7 +134,7 @@ class RealTranslationEngineTest {
 
         call { engine.translate(ES_EN, listOf(plain("hola")), visible) }
 
-        val packDirectory = directories.getPackDirectory("es-en")
+        val packDirectory = directories.getPackDirectory(ES_EN)
         assertEquals(
             listOf(packDirectory.resolve("srcVocab.spm").path, packDirectory.resolve("trgVocab.spm").path),
             library.loadedSpecs.single().vocabPaths,
@@ -167,7 +167,7 @@ class RealTranslationEngineTest {
     fun stopTranslatingWithAPackDeletedWhileItsModelIsLoaded() = runEngineTest {
         install(ES_EN)
         call { engine.translate(ES_EN, listOf(plain("hola")), visible) }
-        directories.getPackDirectory("es-en").deleteRecursively()
+        directories.getPackDirectory(ES_EN).deleteRecursively()
 
         assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("adiós")), visible) })
         assertEquals(listOf(true), library.translators.map { it.isClosed })
@@ -204,7 +204,7 @@ class RealTranslationEngineTest {
         library.isLoadFailing = true
 
         assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("hola")), visible) })
-        verify(scheduler).removeIfCorrupted("es-en")
+        verify(scheduler).removeIfCorrupted(ES_EN)
     }
 
     @Test
@@ -215,7 +215,7 @@ class RealTranslationEngineTest {
         repeat(2) { assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("hola")), visible) }) }
 
         assertEquals(1, library.loadedSpecs.size)
-        verify(scheduler, times(1)).removeIfCorrupted("es-en")
+        verify(scheduler, times(1)).removeIfCorrupted(ES_EN)
     }
 
     @Test
@@ -225,7 +225,7 @@ class RealTranslationEngineTest {
         call { engine.translate(ES_EN, listOf(plain("hola")), visible) }
 
         library.isLoadFailing = false
-        val packDirectory = directories.getPackDirectory("es-en")
+        val packDirectory = directories.getPackDirectory(ES_EN)
         packDirectory.setLastModified(packDirectory.lastModified() + 1000)
 
         assertEquals(BatchTranslation.Translated(listOf("hola [es-en]")), call { engine.translate(ES_EN, listOf(plain("hola")), visible) })
@@ -352,7 +352,7 @@ class RealTranslationEngineTest {
         } else {
             listOf("model.bin", "srcVocab.spm", "trgVocab.spm", "lexicalShortlist.bin")
         }
-        val directory = directories.getPackDirectory(pair.key).apply { mkdirs() }
+        val directory = directories.getPackDirectory(pair).apply { mkdirs() }
         files.forEach { directory.resolve(it).writeText(it) }
     }
 

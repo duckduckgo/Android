@@ -22,6 +22,7 @@ import androidx.work.WorkerParameters
 import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.PAIR_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE
@@ -48,7 +49,7 @@ internal class LanguagePackFileWorker(
     lateinit var installer: LanguagePackInstaller
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        val pair = inputData.getString(PAIR_KEY)
+        val pair = inputData.getString(PAIR_KEY)?.let(LanguagePair::fromKey)
         val operation = LanguagePackFileOperation.entries.firstOrNull { it.name == inputData.getString(OPERATION_KEY) }
         if (pair == null || operation == null) return@withContext Result.failure()
 
@@ -65,13 +66,13 @@ internal class LanguagePackFileWorker(
         Result.success()
     }
 
-    private fun remove(pair: String) {
+    private fun remove(pair: LanguagePair) {
         // the rename uninstalls the pack at once, so a crash while deleting never leaves a partly deleted pack installed
         moveToOld(pair)
         directories.getOldDirectory(pair).deleteRecursively()
     }
 
-    private fun moveToOld(pair: String) {
+    private fun moveToOld(pair: LanguagePair) {
         directories.getStagingDirectory(pair).deleteRecursively()
 
         // a rerun after the process died must keep the pack the first run moved aside

@@ -26,4 +26,13 @@ data class LanguagePair(
     /** The pair as the manifest and the language pack files name it, e.g. "es-en". */
     val key: String
         get() = "$source-$target"
+
+    companion object {
+        /** The pair a [key] names, or null when it doesn't name one. */
+        fun fromKey(key: String): LanguagePair? {
+            val languages = key.split('-').takeIf { it.size == 2 && it.none(String::isEmpty) } ?: return null
+
+            return LanguagePair(languages[0], languages[1])
+        }
+    }
 }

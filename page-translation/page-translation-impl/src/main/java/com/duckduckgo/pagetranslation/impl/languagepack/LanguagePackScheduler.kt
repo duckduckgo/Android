@@ -32,6 +32,7 @@ import androidx.work.workDataOf
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason.DOWNLOAD_ERROR
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.DOWNLOADED_BYTES_KEY
@@ -71,34 +72,34 @@ interface LanguagePackScheduler {
      * Joins a running or pending download of the same pair, unless a delete or removal is queued after it.
      * Otherwise downloads after the pair's pending operations.
      */
-    suspend fun download(pair: String)
+    suspend fun download(pair: LanguagePair)
 
     /**
      * Starts the download at once, replacing a pending rerun of a download the system stopped.
      * Does nothing when a delete or removal is queued after that download.
      */
-    suspend fun retry(pair: String)
+    suspend fun retry(pair: LanguagePair)
 
     /** Uninstalls the pair's pack, keeping it until [confirmDelete] so [undoDelete] can restore it. */
-    fun delete(pair: String)
+    fun delete(pair: LanguagePair)
 
     /** Restores the pack [delete] removed, unless another operation on the pair started since. */
-    fun undoDelete(pair: String)
+    fun undoDelete(pair: LanguagePair)
 
     /** Removes the pack [delete] kept for [undoDelete]. */
-    fun confirmDelete(pair: String)
+    fun confirmDelete(pair: LanguagePair)
 
     /** Removes every installed or deleted pack whose pair isn't in [listedPairs]. Reads the disk, so call it off the main thread. */
-    fun removeUnlisted(listedPairs: Set<String>)
+    fun removeUnlisted(listedPairs: Set<LanguagePair>)
 
     /** Removes the pair's installed pack if its files no longer match the manifest entry saved with it, e.g. after it failed to load. */
-    fun removeIfCorrupted(pair: String)
+    fun removeIfCorrupted(pair: LanguagePair)
 
     /** Removes the packs [delete] kept that were never confirmed or restored. Reads the disk, so call it off the main thread. */
     fun removeLeftoverOldDirectories()
 
     /** Emits [LanguagePackDownloadState.Idle] when no download of the pair is known, including after one is cancelled. */
-    fun getDownloadStateFlow(pair: String): Flow<LanguagePackDownloadState>
+    fun getDownloadStateFlow(pair: LanguagePair): Flow<LanguagePackDownloadState>
 }
 
 @ContributesBinding(AppScope::class)
@@ -108,7 +109,7 @@ class RealLanguagePackScheduler @Inject constructor(
     private val deviceSupport: PageTranslationDeviceSupport,
     private val directories: LanguagePackDirectories,
 ) : LanguagePackScheduler {
-    override suspend fun download(pair: String) {
+    override suspend fun download(pair: LanguagePair) {
         if (!canDownload()) return
 
         val infos = getWorkInfos(pair)
@@ -118,7 +119,7 @@ class RealLanguagePackScheduler @Inject constructor(
         enqueue(pair, createDownloadRequest(pair))
     }
 
-    override suspend fun retry(pair: String) {
+    override suspend fun retry(pair: LanguagePair) {
         if (!canDownload()) return
 
         // REPLACE cancels every unfinished work of the pair, so it would also cancel the uninstall
@@ -129,28 +130,28 @@ class RealLanguagePackScheduler @Inject constructor(
         workManager.enqueueUniqueWork(getWorkName(pair), ExistingWorkPolicy.REPLACE, createDownloadRequest(pair))
     }
 
-    override fun delete(pair: String) = enqueueFileOperation(pair, DELETE)
+    override fun delete(pair: LanguagePair) = enqueueFileOperation(pair, DELETE)
 
-    override fun undoDelete(pair: String) = enqueueFileOperation(pair, UNDO_DELETE)
+    override fun undoDelete(pair: LanguagePair) = enqueueFileOperation(pair, UNDO_DELETE)
 
-    override fun confirmDelete(pair: String) = enqueueFileOperation(pair, REMOVE_OLD)
+    override fun confirmDelete(pair: LanguagePair) = enqueueFileOperation(pair, REMOVE_OLD)
 
-    override fun removeUnlisted(listedPairs: Set<String>) {
+    override fun removeUnlisted(listedPairs: Set<LanguagePair>) {
         (directories.getInstalledPairs() + directories.getPairsWithOldDirectory() - listedPairs).forEach { enqueueFileOperation(it, REMOVE) }
     }
 
-    override fun removeIfCorrupted(pair: String) = enqueueFileOperation(pair, REMOVE_IF_CORRUPTED)
+    override fun removeIfCorrupted(pair: LanguagePair) = enqueueFileOperation(pair, REMOVE_IF_CORRUPTED)
 
     override fun removeLeftoverOldDirectories() {
         directories.getPairsWithOldDirectory().forEach { enqueueFileOperation(it, REMOVE_OLD) }
     }
 
-    override fun getDownloadStateFlow(pair: String): Flow<LanguagePackDownloadState> =
+    override fun getDownloadStateFlow(pair: LanguagePair): Flow<LanguagePackDownloadState> =
         workManager.getWorkInfosForUniqueWorkFlow(getWorkName(pair)).map { infos ->
             infos.getNewestDownload()?.toLanguagePackDownloadState() ?: LanguagePackDownloadState.Idle
         }
 
-    private suspend fun getWorkInfos(pair: String) = workManager.getWorkInfosForUniqueWorkFlow(getWorkName(pair)).firstOrNull().orEmpty()
+    private suspend fun getWorkInfos(pair: LanguagePair) = workManager.getWorkInfosForUniqueWorkFlow(getWorkName(pair)).firstOrNull().orEmpty()
 
     private fun List<WorkInfo>.getNewestDownload() = filter { it.isDownload() }.maxByOrNull { it.order }
 
@@ -159,24 +160,24 @@ class RealLanguagePackScheduler @Inject constructor(
     // before Android 12 a queued job would show its download notification before the worker sees the feature is off
     private fun canDownload() = feature.translation().isEnabled() && deviceSupport.isSupported()
 
-    private fun createDownloadRequest(pair: String) = OneTimeWorkRequestBuilder<LanguagePackDownloadWorker>()
+    private fun createDownloadRequest(pair: LanguagePair) = OneTimeWorkRequestBuilder<LanguagePackDownloadWorker>()
         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-        .setInputData(workDataOf(PAIR_KEY to pair))
+        .setInputData(workDataOf(PAIR_KEY to pair.key))
         .addTag(DOWNLOAD_TAG)
         .addTag("$ORDER_TAG_PREFIX${nextOrder()}")
         .build()
 
-    private fun enqueueFileOperation(pair: String, operation: LanguagePackFileOperation) = enqueue(
+    private fun enqueueFileOperation(pair: LanguagePair, operation: LanguagePackFileOperation) = enqueue(
         pair,
         OneTimeWorkRequestBuilder<LanguagePackFileWorker>()
-            .setInputData(workDataOf(PAIR_KEY to pair, OPERATION_KEY to operation.name))
+            .setInputData(workDataOf(PAIR_KEY to pair.key, OPERATION_KEY to operation.name))
             .addTag("$OPERATION_TAG_PREFIX${operation.name}")
             .addTag("$ORDER_TAG_PREFIX${nextOrder()}")
             .build(),
     )
 
     // APPEND would fail every operation queued after a failed download, so a failed or cancelled chain is replaced instead
-    private fun enqueue(pair: String, request: OneTimeWorkRequest) {
+    private fun enqueue(pair: LanguagePair, request: OneTimeWorkRequest) {
         workManager.enqueueUniqueWork(getWorkName(pair), ExistingWorkPolicy.APPEND_OR_REPLACE, request)
     }
 
@@ -188,7 +189,7 @@ class RealLanguagePackScheduler @Inject constructor(
     private val WorkInfo.order: Long
         get() = tags.firstOrNull { it.startsWith(ORDER_TAG_PREFIX) }?.removePrefix(ORDER_TAG_PREFIX)?.toLongOrNull() ?: 0
 
-    private fun getWorkName(pair: String) = "$WORK_NAME_PREFIX$pair"
+    private fun getWorkName(pair: LanguagePair) = "$WORK_NAME_PREFIX${pair.key}"
 
     private companion object {
         const val WORK_NAME_PREFIX = "pageTranslationLanguagePack-"
