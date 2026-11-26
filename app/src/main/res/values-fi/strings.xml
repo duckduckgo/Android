@@ -981,12 +981,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Olet oikeassa paikassa!<br/>Suojaukset aktivoitu.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Haku omalla tavallasi.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Hakuhistoria</string>
-    <string name="searchPathPreferenceHistorySecondary">Näytä äskettäin vieraillut sivustot hakuehdotuksissa. Yksityisesti vain omalla laitteellasi.</string>
-    <string name="searchPathPreferenceSafePrimary">Turvallinen haku</string>
-    <string name="searchPathPreferenceSafeSecondary">Jätä kyseenalainen (enimmäkseen aikuisille suunnattu) materiaali pois tuloksista.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Kokeile nyt yksityistä hakua!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Keskustele yksityisesti suosittujen tekoälyjen kanssa Duck.ai:ssa</string>

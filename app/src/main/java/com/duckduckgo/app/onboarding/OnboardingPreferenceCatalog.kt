@@ -24,22 +24,16 @@ import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.settings.api.HideAiGeneratedImages
-import com.duckduckgo.settings.api.SafeSearch
 import com.duckduckgo.settings.api.SearchAssistVisibility
 import com.duckduckgo.settings.api.SerpSettingsDataProvider
-import com.duckduckgo.settings.api.observeSetting
 import com.duckduckgo.settings.api.setSetting
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
-import kotlin.time.Duration.Companion.milliseconds
 import com.duckduckgo.mobile.android.R as CommonR
 
 interface OnboardingPreferenceCatalog {
@@ -56,7 +50,6 @@ interface OnboardingPreferenceCatalog {
 @ContributesBinding(AppScope::class, binding = binding<OnboardingPreferenceCatalog>())
 @SingleIn(AppScope::class)
 class OnboardingPreferenceCatalogImpl @Inject constructor(
-    private val navigationHistory: NavigationHistory,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
     private val booleanPreferencePlugins: ActivePluginPoint<OnboardingBooleanPreferencePlugin>,
     private val dispatcherProvider: DispatcherProvider,
@@ -81,24 +74,6 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
      */
     private val definitions: Map<OnboardingPreference, Definition> by lazy {
         mapOf(
-            OnboardingPreference.SEARCH_HISTORY to definition(
-                iconRes = CommonR.drawable.history_color_24,
-                primary = R.string.searchPathPreferenceHistoryPrimary,
-                secondary = R.string.searchPathPreferenceHistorySecondary,
-                available = navigationHistory::isHistoryFeatureAvailable,
-                seed = navigationHistory::isHistoryUserEnabled,
-                apply = navigationHistory::setHistoryUserEnabled,
-            ),
-
-            OnboardingPreference.SAFE_SEARCH to definition(
-                iconRes = CommonR.drawable.exclamation_color_24,
-                primary = R.string.searchPathPreferenceSafePrimary,
-                secondary = R.string.searchPathPreferenceSafeSecondary,
-                available = { true },
-                seed = ::safeSearchEnabled,
-                apply = { enabled -> serpSettingsDataProvider.setSetting(if (enabled) SafeSearch.ON else SafeSearch.OFF) },
-            ),
-
             OnboardingPreference.SEARCH_ASSIST to definition(
                 iconRes = CommonR.drawable.search_assist_color_24,
                 primary = R.string.noAiPathPreferenceSearchAssistPrimary,
@@ -204,20 +179,4 @@ class OnboardingPreferenceCatalogImpl @Inject constructor(
 
     private suspend fun plugin(id: OnboardingBooleanPreferencePlugin.Id): OnboardingBooleanPreferencePlugin? =
         booleanPreferencePlugins.getPlugins().firstOrNull { it.id == id }
-
-    /**
-     * The SERP only pushes `kp` to us once the user has loaded a SERP, so during onboarding it is normally absent:
-     * we fall back to DuckDuckGo's own default of safe search being on. The timeout guards the step against a
-     * settings flow that never emits, which would otherwise stall the screen behind a blank card.
-     */
-    private suspend fun safeSearchEnabled(): Boolean {
-        val stored = withTimeoutOrNull(SERP_SETTING_READ_TIMEOUT) {
-            serpSettingsDataProvider.observeSetting(SafeSearch.ON).firstOrNull()
-        }
-        return stored != SafeSearch.OFF
-    }
-
-    private companion object {
-        val SERP_SETTING_READ_TIMEOUT = 500.milliseconds
-    }
 }

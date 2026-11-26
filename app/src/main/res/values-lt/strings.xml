@@ -1017,12 +1017,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Pataikei ten, kur reikia!<br/>Apsauga aktyvuota.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Tavo paieška – pagal tave.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Paieškos istorija</string>
-    <string name="searchPathPreferenceHistorySecondary">Rodyk neseniai aplankytas svetaines paieškos pasiūlymuose. Privatu – tik tavo įrenginyje.</string>
-    <string name="searchPathPreferenceSafePrimary">Saugi paieška</string>
-    <string name="searchPathPreferenceSafeSecondary">Nerodyk abejotino (daugiausia suaugusiesiems skirto) turinio rezultatuose.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">O dabar išbandyk privačią paiešką!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Bendrauk privačiai su populiariais DI modeliais per „Duck.ai“</string>

@@ -981,12 +981,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Doğru yerdesin!<br/>Korumalar etkinleştirildi.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Aramaların tam istediğin gibi.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Arama Geçmişi</string>
-    <string name="searchPathPreferenceHistorySecondary">Son ziyaret edilen siteleri arama önerilerinde göster. Gizli, yalnızca cihazında.</string>
-    <string name="searchPathPreferenceSafePrimary">Güvenli Arama</string>
-    <string name="searchPathPreferenceSafeSecondary">Sonuçlarda sakıncalı (çoğunlukla yetişkinlere yönelik) içerikleri gösterme.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Şimdi, gizli aramayı dene!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Duck.ai\'da popüler yapay zekalarla özel olarak sohbet et</string>

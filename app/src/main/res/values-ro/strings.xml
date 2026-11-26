@@ -999,12 +999,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Te afli în locul potrivit!<br/>Mecanismele de protecție au fost activate.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Căutarea ta, așa cum vrei.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Istoricul căutărilor</string>
-    <string name="searchPathPreferenceHistorySecondary">Afișează site-urile accesate recent în sugestiile de căutare. Privat, doar pe dispozitivul tău.</string>
-    <string name="searchPathPreferenceSafePrimary">Căutare sigură</string>
-    <string name="searchPathPreferenceSafeSecondary">Omite conținutul discutabil (în mare parte pentru adulți) din rezultate.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Acum, încearcă o căutare privată!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Discută în privat cu sisteme de IA populare pe Duck.ai</string>

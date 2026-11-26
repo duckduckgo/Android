@@ -981,12 +981,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Jó helyen jársz!<br/>Védelem aktiválva.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">A keresésed, saját igényeid szerint.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Keresési előzmények</string>
-    <string name="searchPathPreferenceHistorySecondary">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. Privát, csak az eszközödön.</string>
-    <string name="searchPathPreferenceSafePrimary">Biztonságos keresés</string>
-    <string name="searchPathPreferenceSafeSecondary">Kérdéses (többnyire felnőtteknek szóló) tartalmak szűrése a találatok közül.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Most próbálkozz privát kereséssel!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Privát csevegés népszerű AI-modellekkel a Duck.ai használatával</string>

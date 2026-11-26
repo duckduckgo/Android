@@ -33,7 +33,6 @@ import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PASSWORD_IMPORT_
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AD_BLOCKING
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_AI_SEARCH
-import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_PREFERENCES_SERP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_QUICK_SETUP
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_SEARCH_CHAT_TOGGLE
@@ -1189,35 +1188,6 @@ class RealOnboardingPixelSenderTest {
                 "value" to "no-ai",
             ),
             type = Unique(tag = "onboarding_download-choice_clicked_no-ai"),
-        )
-    }
-
-    @Test
-    fun whenFireSerpPreferencesClickedThenEachToggleIsItsOwnParam() = runTest {
-        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
-
-        testee.fire(
-            ONBOARDING_PREFERENCES_SERP,
-            OnboardingPixelAction.PreferencesClicked(
-                mapOf(
-                    OnboardingPreference.SEARCH_HISTORY to true,
-                    OnboardingPreference.SAFE_SEARCH to false,
-                ),
-            ),
-        )
-
-        verify(mockPixel).fire(
-            ONBOARDING_PREFERENCES_SERP,
-            mapOf(
-                "installType" to "new",
-                "flow" to "default",
-                "pixelSource" to "phone",
-                "daysSinceInstall" to "0",
-                "event" to "clicked",
-                "recently_visited_sites_enabled" to "true",
-                "safe_search_enabled" to "false",
-            ),
-            type = Unique(tag = "onboarding_preferences_serp_clicked"),
         )
     }
 

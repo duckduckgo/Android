@@ -1017,12 +1017,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Na pravem mestu ste!<br/>Zaščite so aktivirane.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Vaše iskanje, po vaši meri.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Zgodovina iskanja</string>
-    <string name="searchPathPreferenceHistorySecondary">Prikaži nedavno obiskana spletna mesta v predlogih za iskanje. Zasebno, samo v vaši napravi.</string>
-    <string name="searchPathPreferenceSafePrimary">Varno iskanje</string>
-    <string name="searchPathPreferenceSafeSecondary">Skrij vprašljivo vsebino (večinoma za odrasle) med rezultati.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Zdaj pa preizkusite zasebno iskanje!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Klepetajte zasebno s priljubljenimi umetnimi inteligencami v Duck.ai</string>

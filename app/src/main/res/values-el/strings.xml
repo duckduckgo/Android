@@ -981,12 +981,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Βρίσκεστε στο σωστό μέρος!<br/>Οι προστασίες ενεργοποιήθηκαν.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Η αναζήτησή σας, όπως την επιθυμείτε.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Ιστορικό αναζήτησης</string>
-    <string name="searchPathPreferenceHistorySecondary">Προβολή ιστότοπων που επισκεφθήκατε πρόσφατα σε προτάσεις αναζήτησης. Ιδιωτικά, μόνο στη συσκευή σας.</string>
-    <string name="searchPathPreferenceSafePrimary">Ασφαλής αναζήτηση</string>
-    <string name="searchPathPreferenceSafeSecondary">Παράλειψη ανάρμοστου περιεχομένου (κυρίως για ενήλικες) από τα αποτελέσματα.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Τώρα, δοκιμάστε μια ιδιωτική αναζήτηση!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Ιδιωτική συνομιλία με δημοφιλή μοντέλα ΤΝ στο Duck.ai</string>

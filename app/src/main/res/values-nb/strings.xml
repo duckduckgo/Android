@@ -981,12 +981,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Du er på rett sted!<br/>Beskyttelsene er aktivert.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Ditt søk, på din måte.</string>
-    <string name="searchPathPreferenceHistoryPrimary">Søkehistorikk</string>
-    <string name="searchPathPreferenceHistorySecondary">Vis nylig besøkte nettsteder i søkeforslag. Privat, bare på enheten din.</string>
-    <string name="searchPathPreferenceSafePrimary">Sikkert søk</string>
-    <string name="searchPathPreferenceSafeSecondary">Utelat tvilsomt (for det meste seksuelt) innhold i resultatene.</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Nå kan du prøve et privat søk!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Chat privat med populære AI-modeller på Duck.ai</string>

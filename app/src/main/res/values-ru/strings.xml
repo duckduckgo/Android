@@ -1017,12 +1017,6 @@
 
     <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Ты в нужном месте!<br/>Защита включена.]]></string>
 
-    <string name="searchPathPreferenceSelectorTitle">Ваш поиск — ваши правила.</string>
-    <string name="searchPathPreferenceHistoryPrimary">История поиска</string>
-    <string name="searchPathPreferenceHistorySecondary">Показывать в рекомендациях поиска недавно посещенные сайты. Конфиденциально и только на вашем устройстве.</string>
-    <string name="searchPathPreferenceSafePrimary">Безопасный поиск</string>
-    <string name="searchPathPreferenceSafeSecondary">Исключает из результатов сомнительные материалы (в основном — материалы для взрослых).</string>
-
     <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Теперь попробуйте конфидециальный поиск!</string>
 
     <string name="searchPathWithToggleEnabledContextualEndTitle">Приватный чат с популярными ИИ в Duck.ai</string>
