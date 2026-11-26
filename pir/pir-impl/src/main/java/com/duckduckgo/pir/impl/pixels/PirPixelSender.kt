@@ -1851,9 +1851,10 @@ class RealPirPixelSender @Inject constructor(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
     ) {
+        val allParams = params.withRunContext(pixel)
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            logcat { "PIR-LOGGING: $pixelName params: $params" }
-            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            logcat { "PIR-LOGGING: $pixelName params: $allParams" }
+            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = allParams)
         }
     }
 
@@ -1861,9 +1862,21 @@ class RealPirPixelSender @Inject constructor(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
     ) {
+        val allParams = params.withRunContext(pixel)
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            logcat { "PIR-LOGGING: $pixelName params: $params" }
-            pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = params)
+            logcat { "PIR-LOGGING: $pixelName params: $allParams" }
+            pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = allParams)
+        }
+    }
+
+    private fun Map<String, String>.withRunContext(pixel: PirPixel): Map<String, String> =
+        if (pixel in RUN_PIXELS) this + (PARAM_KEY_SCAN_WEBVIEW_SIZE to scanWebViewSizeState()) else this
+
+    private fun scanWebViewSizeState(): String {
+        return if (pirRemoteFeatures.scanWebViewSize().isEnabled()) {
+            "enabled"
+        } else {
+            "disabled"
         }
     }
 
@@ -1912,6 +1925,67 @@ class RealPirPixelSender @Inject constructor(
     private fun Long.roundToNearest10Ms(): Long = ((this + 5) / 10) * 10
 
     companion object {
+        /**
+         * Pixels emitted by, or reporting the outcome of, scan and opt-out runs. They carry the scan WebView size
+         * state so results can be compared with the scanWebViewSize flag on and off.
+         */
+        private val RUN_PIXELS = setOf(
+            PIR_FOREGROUND_RUN_STARTED,
+            PIR_FOREGROUND_RUN_COMPLETED,
+            PIR_FOREGROUND_RUN_LOW_MEMORY,
+            PIR_INITIAL_SCAN_INCOMPLETE,
+            PIR_SCHEDULED_RUN_STARTED,
+            PIR_SCHEDULED_RUN_COMPLETED,
+            PIR_CPU_USAGE,
+            PIR_EMAIL_CONFIRMATION_ATTEMPT_START,
+            PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS,
+            PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED,
+            PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED,
+            PIR_EMAIL_CONFIRMATION_JOB_SUCCESS,
+            PIR_EMAIL_CONFIRMATION_RUN_STARTED,
+            PIR_EMAIL_CONFIRMATION_RUN_COMPLETED,
+            PIR_OPTOUT_SUBMIT_SUCCESS,
+            PIR_OPTOUT_SUBMIT_FAILURE,
+            PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE,
+            PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED,
+            PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND,
+            PIR_FIRST_SCAN_STARTED,
+            PIR_SCAN_STARTED,
+            PIR_SCAN_STAGE,
+            PIR_SCAN_STAGE_EMAIL_GET_DATA,
+            PIR_SCAN_STAGE_RESULT_MATCHES,
+            PIR_SCAN_STAGE_RESULT_NO_MATCH,
+            PIR_SCAN_STAGE_RESULT_ERROR,
+            PIR_OPTOUT_STAGE_START,
+            PIR_OPTOUT_STAGE_EMAIL_GENERATE,
+            PIR_OPTOUT_STAGE_EMAIL_GET_DATA,
+            PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION,
+            PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
+            PIR_OPTOUT_STAGE_CAPTCHA_SEND,
+            PIR_OPTOUT_STAGE_CAPTCHA_SOLVE,
+            PIR_OPTOUT_STAGE_SUBMIT,
+            PIR_OPTOUT_STAGE_CONDITION_FOUND,
+            PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND,
+            PIR_OPTOUT_STAGE_VALIDATE,
+            PIR_OPTOUT_STAGE_FILLFORM,
+            PIR_OPTOUT_STAGE_FINISH,
+            PIR_BROKER_ACTION_FAILED,
+            PIR_INITIAL_SCAN_DURATION,
+            PIR_BG_STATS,
+            PIR_SCAN_INVALID_EVENT,
+            PIR_OPTOUT_INVALID_EVENT,
+            PIR_SCAN_RENDERER_GONE,
+        )
+
+        private const val PARAM_KEY_SCAN_WEBVIEW_SIZE = "scan_webview_size_state"
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
         private const val PARAM_BROKER_VERSION = "broker_version"

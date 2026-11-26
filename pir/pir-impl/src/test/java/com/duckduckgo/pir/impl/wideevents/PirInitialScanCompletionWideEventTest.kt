@@ -36,6 +36,7 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_FLOW_TIMEOUT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_INTERVAL_BUCKETS
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.DEFINITION_VERSION
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.ENTRY_POINT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.INTERVAL_TOTAL_DURATION
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_BATTERY_OPTIMIZATIONS
@@ -45,6 +46,7 @@ import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_POWER_SAVING
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_PROFILE_QUERIES_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_SCAN_WEBVIEW_SIZE_STATE
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_SCHEDULED_RUN_COUNT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_TOTAL_SCAN_JOBS
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_TOTAL_SCAN_JOBS_AT_FINISH
@@ -207,9 +209,10 @@ class PirInitialScanCompletionWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "enabled",
                 KEY_FREE_SCAN to "true",
+                KEY_SCAN_WEBVIEW_SIZE_STATE to "disabled",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = COMPLETION_FLOW_TIMEOUT, flowStatus = FlowStatus.Unknown),
-            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+            definition = WideEventDefinition(version = DEFINITION_VERSION),
         )
         verify(wideEventClient).intervalStart(
             wideEventId = 42L,
