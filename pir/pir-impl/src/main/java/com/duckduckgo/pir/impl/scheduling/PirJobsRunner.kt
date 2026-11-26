@@ -125,7 +125,7 @@ class RealPirJobsRunner @Inject constructor(
         pirScan.stop()
 
         if (profileQueries.isEmpty()) {
-            emitStartPixel(context, executionType, 0, activeBrokers.size)
+            emitStartPixel(context, executionType, 0, activeBrokers.size, isFreeScan)
             logcat { "PIR-JOB-RUNNER: No profile queries available. Completing run." }
             emitCompletedPixel(
                 context = context,
@@ -135,6 +135,7 @@ class RealPirJobsRunner @Inject constructor(
                 totalOptOutJobs = 0,
                 profileQueryCount = 0,
                 brokerCount = activeBrokers.size,
+                isFreeScan = isFreeScan,
             )
             return@withContext Result.success(Unit)
         }
@@ -164,7 +165,7 @@ class RealPirJobsRunner @Inject constructor(
             activeBrokers = ungatedActiveBrokers
         }
 
-        emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size)
+        emitStartPixel(context, executionType, profileQueries.size, activeBrokers.size, isFreeScan)
 
         // Pre-create scan jobs and resolve eligible jobs up front so the wide event has the accurate
         // total_scan_jobs count at flowStart.
@@ -221,6 +222,7 @@ class RealPirJobsRunner @Inject constructor(
             batteryOptimizationsEnabled = batteryOptimizationsEnabled,
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+            isFreeScan = isFreeScan,
         )
 
         if (activeBrokers.isEmpty()) {
@@ -244,6 +246,7 @@ class RealPirJobsRunner @Inject constructor(
                 totalOptOutJobs = 0,
                 profileQueryCount = profileQueries.size,
                 brokerCount = 0,
+                isFreeScan = isFreeScan,
             )
             return@withContext Result.success(Unit)
         }
@@ -302,6 +305,7 @@ class RealPirJobsRunner @Inject constructor(
                     totalOptOutJobs = 0,
                     profileQueryCount = profileQueries.size,
                     brokerCount = activeBrokers.size,
+                    isFreeScan = isFreeScan,
                 )
                 pirScanCompleteNotifier.onRunCompleted(runMode)
                 return@withContext Result.success(Unit)
@@ -321,6 +325,7 @@ class RealPirJobsRunner @Inject constructor(
                     totalOptOutJobs = 0,
                     profileQueryCount = profileQueries.size,
                     brokerCount = activeBrokers.size,
+                    isFreeScan = isFreeScan,
                 )
                 pirScanCompleteNotifier.onRunCompleted(runMode)
                 return@withContext Result.success(Unit)
@@ -342,6 +347,7 @@ class RealPirJobsRunner @Inject constructor(
                 totalOptOutJobs = totalOptOutJobs,
                 profileQueryCount = profileQueries.size,
                 brokerCount = activeBrokers.size,
+                isFreeScan = isFreeScan,
             )
             pirScanCompleteNotifier.onRunCompleted(runMode)
             return@withContext Result.success(Unit)
@@ -387,6 +393,7 @@ class RealPirJobsRunner @Inject constructor(
         executionType: PirExecutionType,
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     ) {
         if (executionType.isManual) {
             val isPowerSavingEnabled = context.isPowerSavingModeEnabled()
@@ -396,9 +403,10 @@ class RealPirJobsRunner @Inject constructor(
                 brokerCount = brokerCount,
                 executionType = executionType,
                 notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+                isFreeScan = isFreeScan,
             )
         } else {
-            pixelSender.reportScheduledScanStarted(profileQueryCount, brokerCount)
+            pixelSender.reportScheduledScanStarted(profileQueryCount, brokerCount, isFreeScan)
         }
     }
 
@@ -410,6 +418,7 @@ class RealPirJobsRunner @Inject constructor(
         totalOptOutJobs: Int,
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     ) {
         val totalTimeMillis = currentTimeProvider.currentTimeMillis() - startTimeInMillis
         if (executionType.isManual) {
@@ -424,6 +433,7 @@ class RealPirJobsRunner @Inject constructor(
                 isPowerSavingEnabled = context.isPowerSavingModeEnabled(),
                 executionType = executionType,
                 notificationsPermissionGranted = context.areNotificationsPermissionGranted(),
+                isFreeScan = isFreeScan,
             )
         } else {
             pixelSender.reportScheduledScanCompleted(
@@ -432,6 +442,7 @@ class RealPirJobsRunner @Inject constructor(
                 totalOptOutJobs = totalOptOutJobs,
                 profileQueryCount = profileQueryCount,
                 brokerCount = brokerCount,
+                isFreeScan = isFreeScan,
             )
         }
     }

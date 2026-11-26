@@ -62,6 +62,7 @@ class RealPirPixelSenderTest {
             brokerCount = 10,
             executionType = PirExecutionType.MANUAL_INITIAL,
             notificationsPermissionGranted = true,
+            isFreeScan = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -81,6 +82,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
         assert(paramsCaptor.firstValue["notifications_permission_granted"] == "true")
+        assert(paramsCaptor.firstValue["free_scan"] == "true")
     }
 
     @Test
@@ -93,6 +95,7 @@ class RealPirPixelSenderTest {
             brokerCount = 5,
             executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
             notificationsPermissionGranted = false,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -106,6 +109,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
         assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
+        assert(paramsCaptor.firstValue["free_scan"] == "false")
     }
 
     @Test
@@ -123,6 +127,7 @@ class RealPirPixelSenderTest {
             isPowerSavingEnabled = true,
             executionType = PirExecutionType.MANUAL_INITIAL,
             notificationsPermissionGranted = true,
+            isFreeScan = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -150,6 +155,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["scan_trigger"] == "onboarding")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "disconnected")
         assert(paramsCaptor.firstValue["notifications_permission_granted"] == "true")
+        assert(paramsCaptor.firstValue["free_scan"] == "true")
     }
 
     @Test
@@ -166,6 +172,7 @@ class RealPirPixelSenderTest {
             isPowerSavingEnabled = false,
             executionType = PirExecutionType.MANUAL_EDIT_PROFILE,
             notificationsPermissionGranted = false,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -179,6 +186,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["scan_trigger"] == "profile_edit")
         assert(paramsCaptor.firstValue["vpn_connection_state"] == "connected")
         assert(paramsCaptor.firstValue["notifications_permission_granted"] == "false")
+        assert(paramsCaptor.firstValue["free_scan"] == "false")
     }
 
     @Test
@@ -231,6 +239,7 @@ class RealPirPixelSenderTest {
         testee.reportScheduledScanStarted(
             profileQueryCount = 3,
             brokerCount = 10,
+            isFreeScan = true,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -245,6 +254,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["profile_queries"] == "3")
         assert(paramsCaptor.firstValue.containsKey("broker_count"))
         assert(paramsCaptor.firstValue["broker_count"] == "10")
+        assert(paramsCaptor.firstValue["free_scan"] == "true")
     }
 
     @Test
@@ -257,6 +267,7 @@ class RealPirPixelSenderTest {
             totalOptOutJobs = 4,
             profileQueryCount = 3,
             brokerCount = 10,
+            isFreeScan = false,
         )
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
@@ -277,6 +288,7 @@ class RealPirPixelSenderTest {
         assert(paramsCaptor.firstValue["profile_queries"] == "3")
         assert(paramsCaptor.firstValue.containsKey("broker_count"))
         assert(paramsCaptor.firstValue["broker_count"] == "10")
+        assert(paramsCaptor.firstValue["free_scan"] == "false")
     }
 
     @Test
@@ -801,7 +813,7 @@ class RealPirPixelSenderTest {
 
     @Test
     fun whenReportScanStartedThenFiresPixelWithBrokerUrl() = runTest {
-        testee.reportScanStarted("https://broker.com")
+        testee.reportScanStarted(brokerUrl = "https://broker.com", isFreeScan = true)
 
         val paramsCaptor = argumentCaptor<Map<String, String>>()
         verify(mockPixelSender).fire(
@@ -812,6 +824,7 @@ class RealPirPixelSenderTest {
         )
 
         assert(paramsCaptor.firstValue["data_broker"] == "https://broker.com")
+        assert(paramsCaptor.firstValue["free_scan"] == "true")
     }
 
     @Test
