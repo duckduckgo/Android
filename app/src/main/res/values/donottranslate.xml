@@ -148,9 +148,4 @@
     <string name="syncAfterDeviceTransferDaxDialogDescription"><![CDATA[Want to keep your data in sync across your other devices?<br/><br/>Sync &amp; Backup syncs bookmarks, autofill data, and Duck.ai chats with end-to-end encryption.]]></string>
     <string name="syncAfterDeviceTransferDaxDialogPrimaryCta" instruction="Button that opens the screen to set up Sync and Backup">Turn On Sync &amp; Backup</string>
 
-    <!-- Onboarding password import -->
-    <string name="preOnboardingImportYourPasswordsTitle">Import your passwords</string>
-    <string name="preOnboardingImportYourPasswordsBody">I\'ll bring them over from Google or another password manager. You may need to confirm it\'s you.</string>
-    <string name="preOnboardingImportYourPasswordsPrimaryCta">Import Passwords</string>
-
 </resources>
