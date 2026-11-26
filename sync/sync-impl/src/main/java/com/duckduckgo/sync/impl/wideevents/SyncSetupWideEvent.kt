@@ -31,9 +31,12 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_FLOW_VERSI
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.SYNC_SETUP_UI_VERSION
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
+import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.impl.pixels.toKnownLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity.Companion.LAUNCH_SOURCE_OTHER
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP_DEVICE_AUTH_NOT_ENROLLED
@@ -65,8 +68,13 @@ interface SyncSetupWideEvent {
     suspend fun onRecoveryCodeGenerationFailed()
     suspend fun onFlowCancelled()
     suspend fun onSyncRestoreStarted()
+
+    // Unified wide event API
     suspend fun onStep(step: SetupStep)
     suspend fun onUpdate(change: (SetupFields) -> SetupFields)
+    suspend fun onSucceeded()
+    suspend fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage? = null)
+    suspend fun onCancelled(reason: SetupCancellationReason)
 }
 
 data class SetupFields(
@@ -198,6 +206,45 @@ class SyncSetupWideEventImpl @Inject constructor(
         unified.appendLastStep(openAttempt.flowId)
     }
 
+    override suspend fun onSucceeded() = finishUnifiedAttempt(FlowStatus.Success, metadata = emptyMap())
+
+    override suspend fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage?) = when (reason) {
+        SetupFailureReason.ALREADY_PAIRED -> onCancelled(SetupCancellationReason.ALREADY_PAIRED)
+        SetupFailureReason.ALREADY_UPGRADED -> onCancelled(SetupCancellationReason.ALREADY_UPGRADED)
+        SetupFailureReason.UNRECOGNIZED_CODE,
+        SetupFailureReason.INCOMPATIBLE_CODE,
+        -> onCancelled(SetupCancellationReason.CODE_REJECTED)
+        SetupFailureReason.SESSION_TIMEOUT -> onTimedOut(timeoutStage)
+        else -> finishUnifiedAttempt(FlowStatus.Failure(reason = reason.value), metadata = mapOf(KEY_STATUS_REASON to reason.value))
+    }
+
+    override suspend fun onCancelled(reason: SetupCancellationReason) =
+        finishUnifiedAttempt(FlowStatus.Cancelled, metadata = mapOf(KEY_STATUS_REASON to reason.value))
+
+    private suspend fun onTimedOut(stage: TimeoutStage?) {
+        val status = when (stage) {
+            TimeoutStage.WAITING_FOR_PEER_HELLO,
+            TimeoutStage.WAITING_FOR_CONFIRMATION,
+            -> FlowStatus.Cancelled
+            TimeoutStage.WAITING_FOR_PEER_STATUS,
+            TimeoutStage.WAITING_FOR_RECOVERY_CODE,
+            TimeoutStage.LOGGING_IN,
+            null,
+            -> FlowStatus.Failure(reason = SetupFailureReason.SESSION_TIMEOUT.value)
+        }
+        val metadata = mapOf(
+            KEY_STATUS_REASON to SetupFailureReason.SESSION_TIMEOUT.value,
+            KEY_TIMEOUT_STAGE to (stage?.value ?: TIMEOUT_STAGE_UNKNOWN),
+        )
+        finishUnifiedAttempt(status, metadata)
+    }
+
+    private suspend fun finishUnifiedAttempt(status: FlowStatus, metadata: Map<String, String>) = mutex.withLock {
+        val unifiedAttempt = currentData?.takeIf { it.unified != null } ?: return@withLock
+        wideEventClient.flowFinish(wideEventId = unifiedAttempt.flowId, status = status, metadata = metadata)
+        currentData = null
+    }
+
     private suspend fun createUnifiedData(setupMode: SetupMode) = UnifiedData(
         // Until a pairing session negotiates a version, we report the newest one this device supports.
         fields = SetupFields(setupMode = setupMode, flowVersion = advertisedExchangeVersion.resolve()),
@@ -263,6 +310,8 @@ class SyncSetupWideEventImpl @Inject constructor(
         const val STEP_RECOVERY_CODE_GENERATION_FAILED = "recovery_code_generation_failed"
         const val KEY_STATUS_REASON = "status_reason"
         const val STATUS_REASON_DUPLICATED = "duplicated"
+        const val KEY_TIMEOUT_STAGE = "timeout_stage"
+        const val TIMEOUT_STAGE_UNKNOWN = "unknown"
         const val KEY_EXISTING_ACCOUNT = "existing_account"
         const val KEY_ACCOUNT_SWITCH = "account_switch"
         const val KEY_DEVICE_AUTH_SHOWN = "device_auth_shown"

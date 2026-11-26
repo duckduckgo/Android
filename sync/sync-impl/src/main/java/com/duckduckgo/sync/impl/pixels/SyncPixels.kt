@@ -258,6 +258,20 @@ interface SyncPixels {
         SUCCESS_SCREEN_SHOWN("success_screen_shown"),
     }
 
+    enum class SetupCancellationReason(val value: String) {
+        USER_CLOSED("user_closed"),
+        USER_CLOSED_SYNC_THIS_DEVICE_FALLBACK("user_closed_sync_this_device_fallback"),
+        DEVICE_AUTH_CANCELLED("device_auth_cancelled"),
+        DEVICE_AUTH_UNAVAILABLE("device_auth_unavailable"),
+        CODE_REJECTED("code_rejected"),
+        SYNC_CONFIRMATION_DENIED("sync_confirmation_denied"),
+        ACCOUNT_SWITCH_DECLINED("account_switch_declined"),
+        ACCOUNT_SWITCH_BLOCKED("account_switch_blocked"),
+        PEER_LEFT("peer_left"),
+        ALREADY_PAIRED("already_paired"),
+        ALREADY_UPGRADED("already_upgraded"),
+    }
+
     /**
      * Why a setup was cancelled, per the "Cancellation" telemetry. Based on the v2 protocol state at
      * the moment of cancellation: [SCANNING_CANCELLED] before the exchange engages a peer,
