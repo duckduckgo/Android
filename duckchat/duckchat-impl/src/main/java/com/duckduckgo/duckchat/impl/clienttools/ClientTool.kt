@@ -36,6 +36,21 @@ interface ClientTool {
         input: JSONObject,
         context: ClientToolCallContext,
     ): ClientToolResult
+
+    /**
+     * What an [ClientToolPermissionMode.AskEveryTime] prompt shows for this call, such as the URL it acts on.
+     * Called before the prompt, so a target that cannot be resolved fails the call without asking.
+     */
+    suspend fun promptDetail(
+        input: JSONObject,
+        context: ClientToolCallContext,
+    ): ClientToolPromptDetail? = null
+}
+
+sealed interface ClientToolPromptDetail {
+    data class Shown(val text: String) : ClientToolPromptDetail
+
+    data class Failure(val code: ClientToolErrorCode) : ClientToolPromptDetail
 }
 
 sealed interface ClientToolPermissionMode {
@@ -50,6 +65,15 @@ sealed interface ClientToolPermissionMode {
         @StringRes val promptMessage: Int,
         @StringRes val name: Int,
     ) : ClientToolPermissionMode
+
+    /**
+     * Asks before every call, and the answer covers that call only: never the chat grant, `requestAccess` or Always Allow.
+     * @param promptMessage takes the call's [ClientToolPromptDetail.Shown] text as its only argument.
+     */
+    data class AskEveryTime(
+        @StringRes val promptTitle: Int,
+        @StringRes val promptMessage: Int,
+    ) : ClientToolPermissionMode
 }
 
 /**
@@ -62,6 +86,8 @@ data class ClientToolCallContext(
     val browserMode: BrowserMode,
     val chatId: String?,
     val contextual: Boolean = false,
+    /** The [ClientToolPromptDetail.Shown] text the user allowed, for an [ClientToolPermissionMode.AskEveryTime] tool. */
+    val allowedDetail: String? = null,
 )
 
 sealed interface ClientToolResult {

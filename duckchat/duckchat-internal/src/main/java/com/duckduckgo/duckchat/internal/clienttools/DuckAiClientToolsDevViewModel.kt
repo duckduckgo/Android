@@ -49,6 +49,12 @@ class DuckAiClientToolsDevViewModel @Inject constructor(
         REQUEST_ACCESS("requestAccess", FlagGroup.GENERAL, { it.requestAccess() }),
         REQUEST_ACCESS_REMOVE_TOOLS("requestAccessRemoveTools", FlagGroup.GENERAL, { it.requestAccessRemoveTools() }),
         LIST_OPEN_TABS("listOpenTabs", FlagGroup.TOOLS, { it.listOpenTabs() }),
+        SWITCH_TO_TAB("switchToTab", FlagGroup.TOOLS, { it.switchToTab() }),
+        OPEN_TAB("openTab", FlagGroup.TOOLS, { it.openTab() }),
+        BOOKMARK_TAB("bookmarkTab", FlagGroup.TOOLS, { it.bookmarkTab() }),
+        CLOSE_TABS("closeTabs", FlagGroup.TOOLS, { it.closeTabs() }),
+        SEARCH_BOOKMARKS("searchBookmarks", FlagGroup.TOOLS, { it.searchBookmarks() }),
+        SEARCH_DOWNLOADS("searchDownloads", FlagGroup.TOOLS, { it.searchDownloads() }),
     }
 
     data class FlagRow(
