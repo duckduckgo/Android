@@ -1,7 +1,9 @@
 appId: com.duckduckgo.mobile.android
 ---
-# One 5s slice in which no skip or undo button may show. assertNotVisible would wait for a button to
-# hide itself (it does after 8s) and pass, so a button showing fails the flow here instead.
+# One 5s slice in which no skip or undo button may show and the player must still be working.
+# assertNotVisible would wait for a button to hide itself (it does after 8s) and pass, so a button
+# showing fails the flow here instead. A player stuck on YouTube's error never shows a button either,
+# so that fails too rather than passing.
 - extendedWaitUntil:
     visible: "Skip|Undo Skip"
     timeout: 5000
@@ -13,3 +15,10 @@ appId: com.duckduckgo.mobile.android
       - assertTrue:
           condition: ${false}
           label: "A skip or undo button showed when none should"
+- runFlow:
+    when:
+      visible: "Something went wrong.*"
+    commands:
+      - assertTrue:
+          condition: ${false}
+          label: "YouTube's player showed an error, so no button proves nothing"

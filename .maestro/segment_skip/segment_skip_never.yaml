@@ -12,9 +12,9 @@ tags:
       MODE: "Never"
 - runFlow: steps/open_video.yaml
 - assertVisible: "Rise of Skanderbeg.*"
-# From 40s to past the segment's end at 114s, in 5s slices so a button showing at any point fails the flow.
+# From 20s to past the segment's end at 114s, in 5s slices so a button showing at any point fails the flow.
 - repeat:
-    times: 16
+    times: 22
     commands:
       - runFlow: steps/expect_no_button.yaml
 - assertVisible: "Rise of Skanderbeg.*"
