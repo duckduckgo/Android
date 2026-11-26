@@ -20,7 +20,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -33,10 +32,10 @@ class RealPageTranslationScriptTest {
 
     @Test
     fun configureTheBundleToTalkOverItsOwnInterface() = runTest {
-        val source = script.get(TIME_ORIGIN)
+        val source = script.get(TIME_ORIGIN, SECRET)
 
-        val preferences = """{"platform":{"name":"android"},"messageSecret":"${script.secret}",""" +
-            """"messageCallback":"${script.callbackName}","javascriptInterface":"${script.interfaceName}"}"""
+        val preferences = """{"platform":{"name":"android"},"messageSecret":"$SECRET",""" +
+            """"messageCallback":"DDGPageTranslationCallback","javascriptInterface":"DDGPageTranslation"}"""
         assertTrue(
             source.contains("""initCode({ config: {"features":{},"unprotectedTemporary":[]}, unprotected: [], preferences: $preferences });"""),
         )
@@ -45,24 +44,24 @@ class RealPageTranslationScriptTest {
 
     @Test
     fun runTheBundleOnlyOnceAndOnlyInTheDocumentItWasCreatedFor() = runTest {
-        val source = script.get(TIME_ORIGIN)
+        val source = script.get(TIME_ORIGIN, SECRET)
 
         assertTrue(source.contains("performance.timeOrigin !== $TIME_ORIGIN"))
-        assertTrue(source.contains("Object.prototype.hasOwnProperty.call(window, '${script.callbackName}')"))
+        assertTrue(source.contains("Object.prototype.hasOwnProperty.call(window, 'DDGPageTranslationCallback')"))
     }
 
     @Test
-    fun keepTheNamesForTheAppSessionAndPickNewOnesForTheNext() = runTest {
-        val nextSession = RealPageTranslationScript(coroutineRule.testDispatcherProvider)
+    fun useTheSameNamesForEveryUser() {
+        val otherUser = RealPageTranslationScript(coroutineRule.testDispatcherProvider)
 
-        assertEquals(script.get(TIME_ORIGIN), script.get(TIME_ORIGIN))
-        assertEquals(3, setOf(script.interfaceName, script.secret, script.callbackName).size)
-        assertNotEquals(script.interfaceName, nextSession.interfaceName)
-        assertNotEquals(script.secret, nextSession.secret)
-        assertNotEquals(script.callbackName, nextSession.callbackName)
+        assertEquals("DDGPageTranslation", script.interfaceName)
+        assertEquals("DDGPageTranslationCallback", script.callbackName)
+        assertEquals(script.interfaceName, otherUser.interfaceName)
+        assertEquals(script.callbackName, otherUser.callbackName)
     }
 
     private companion object {
         const val TIME_ORIGIN = 1732634400123.456
+        const val SECRET = "secret"
     }
 }

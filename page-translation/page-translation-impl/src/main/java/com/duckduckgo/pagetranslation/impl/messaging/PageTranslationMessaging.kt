@@ -40,7 +40,7 @@ import kotlin.time.Duration.Companion.seconds
 /** One piece of a page's text: plain text, or HTML when [isHtml]. */
 data class PageUnit(val id: Int, val text: String, val isHtml: Boolean, val isInViewport: Boolean)
 
-/** The translation of the unit [id]: its plain text, or for an HTML unit translate-kit's JSON tree. */
+/** The translation of the unit [id]: its plain text, or for an HTML unit its JSON tree. */
 data class UnitTranslation(val id: Int, val translation: String, val isHtml: Boolean)
 
 /**
@@ -55,13 +55,13 @@ interface PageTranslationMessaging {
     @MainThread
     fun register(webView: WebView)
 
-    /** Drops the request in flight, e.g. when the WebView is detached. */
+    /** Drops the request in flight. */
     fun cancel()
 
     /** Runs the bundle in the attached WebView's document whose `performance.timeOrigin` is [timeOrigin]. */
     suspend fun inject(timeOrigin: Double)
 
-    /** Returns the page's units, or null when the page doesn't reply in time or the request is dropped. */
+    /** Returns the page's units, or null when the bundle wasn't injected, the page doesn't reply in time or the request is dropped. */
     suspend fun extract(): List<PageUnit>?
 
     /** Writes [translations] into the page and returns how many units were written, or null as [extract] does. */
@@ -81,6 +81,9 @@ class RealPageTranslationMessaging @Inject constructor(
     private val lock = Any()
     private var pendingRequest: PendingRequest? = null
 
+    // a new secret per document, so a page that reads one can't recognize the user on another page
+    private var injectedDocument: InjectedDocument? = null
+
     override fun register(webView: WebView) {
         if (!feature.translation().isEnabled() || !deviceSupport.isSupported()) return
 
@@ -95,7 +98,12 @@ class RealPageTranslationMessaging @Inject constructor(
     }
 
     override suspend fun inject(timeOrigin: Double) {
-        val source = script.get(timeOrigin)
+        // the bundle runs once per document, so injecting into the same document again must keep its secret
+        val secret = synchronized(lock) {
+            injectedDocument?.takeIf { it.timeOrigin == timeOrigin }?.secret
+                ?: UUID.randomUUID().toString().also { injectedDocument = InjectedDocument(timeOrigin, it) }
+        }
+        val source = script.get(timeOrigin, secret)
         withContext(dispatchers.main()) { attachedWebView.webView?.evaluateJavascript(source, null) }
     }
 
@@ -126,6 +134,7 @@ class RealPageTranslationMessaging @Inject constructor(
 
     private suspend fun request(subscription: String, params: JSONObject): JSONObject? = withContext(dispatchers.main()) {
         val webView = attachedWebView.webView ?: return@withContext null
+        val secret = synchronized(lock) { injectedDocument?.secret } ?: return@withContext null
         val request = PendingRequest(UUID.randomUUID().toString())
         synchronized(lock) {
             pendingRequest?.reply?.complete(null)
@@ -133,25 +142,25 @@ class RealPageTranslationMessaging @Inject constructor(
         }
 
         try {
-            webView.evaluateJavascript(createEvent(subscription, params.put(REQUEST_ID_KEY, request.id)), null)
+            webView.evaluateJavascript(createEvent(subscription, params.put(REQUEST_ID_KEY, request.id), secret), null)
             withTimeoutOrNull(REPLY_TIMEOUT) { request.reply.await() }
         } finally {
             synchronized(lock) { if (pendingRequest === request) pendingRequest = null }
         }
     }
 
-    private fun createEvent(subscription: String, params: JSONObject): String {
+    private fun createEvent(subscription: String, params: JSONObject, secret: String): String {
         val event = JSONObject()
             .put(CONTEXT_KEY, CONTEXT)
             .put(FEATURE_NAME_KEY, FEATURE_NAME)
             .put(SUBSCRIPTION_NAME_KEY, subscription)
             .put(PARAMS_KEY, params)
 
-        return "window['${script.callbackName}']('${script.secret}', $event);"
+        return "window['${script.callbackName}']('$secret', $event);"
     }
 
     private fun onMessage(message: String, secret: String) {
-        if (secret != script.secret) return
+        if (secret != synchronized(lock) { injectedDocument?.secret }) return
 
         val params = try {
             JSONObject(message).getJSONObject(PARAMS_KEY)
@@ -170,6 +179,8 @@ class RealPageTranslationMessaging @Inject constructor(
         @JavascriptInterface
         fun process(message: String, secret: String) = onMessage(message, secret)
     }
+
+    private class InjectedDocument(val timeOrigin: Double, val secret: String)
 
     private class PendingRequest(val id: String) {
         val reply = CompletableDeferred<JSONObject?>()
