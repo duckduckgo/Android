@@ -18,6 +18,8 @@ package com.duckduckgo.duckchat.impl.attention
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.tabs.model.TabEntity
+import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.dataclearing.api.plugin.ClearableData
@@ -56,6 +58,7 @@ class DuckAiResponseAttentionTrackerImplTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckChatFeatureRepository: DuckChatFeatureRepository = mock()
     private val listener = RecordingListener()
+    private val fireTabRepository: TabRepository = mock()
 
     private lateinit var testee: DuckAiResponseAttentionTrackerImpl
 
@@ -77,6 +80,7 @@ class DuckAiResponseAttentionTrackerImplTest {
         duckChat = duckChat,
         duckChatFeature = lazy { duckChatFeature },
         duckChatFeatureRepository = duckChatFeatureRepository,
+        fireTabRepository = lazy { fireTabRepository },
         dispatchers = coroutineRule.testDispatcherProvider,
         appCoroutineScope = coroutineRule.testScope,
     ).also {
@@ -463,6 +467,40 @@ class DuckAiResponseAttentionTrackerImplTest {
     }
 
     @Test
+    fun `when an address bar prompt page loads and the app is backgrounded then LeftWhileGenerating once`() {
+        testee.onDuckAiPageVisible(tabId = "t1", url = HANDOVER_URL)
+        testee.onClose()
+        testee.onDuckAiPageVisible(tabId = "t1", url = HANDOVER_URL)
+        testee.onNativePromptSubmitted(tabId = "t1", browserMode = BrowserMode.REGULAR)
+        status("start_stream:new_prompt")
+        idle()
+
+        assertEquals(
+            listOf(LeftWhileGenerating(r(chatId = null)), StatusWhileAway(r(chatId = null), "start_stream:new_prompt")),
+            listener.events,
+        )
+    }
+
+    @Test
+    fun `when an address bar prompt page loads in a fire tab then events carry FIRE`() = runTest {
+        whenever(fireTabRepository.getTab("t1")).thenReturn(TabEntity(tabId = "t1"))
+        testee.onDuckAiPageVisible(tabId = "t1", url = HANDOVER_URL)
+        testee.onClose()
+        idle()
+
+        assertEquals(listOf(LeftWhileGenerating(r(chatId = null, mode = BrowserMode.FIRE))), listener.events)
+    }
+
+    @Test
+    fun `when a handover page loads without a query then nothing is tracked`() {
+        testee.onDuckAiPageVisible(tabId = "t1", url = "$DUCK_AI_URL?prompt=1")
+        testee.onClose()
+        idle()
+
+        assertEquals(emptyList<ResponseAttentionEvent>(), listener.events)
+    }
+
+    @Test
     fun `when the app reopens on the chat then Returned`() {
         promptInChat()
         status("loading")
@@ -587,5 +625,6 @@ class DuckAiResponseAttentionTrackerImplTest {
     private companion object {
         const val DUCK_AI_URL = "https://duck.ai/"
         const val OTHER_URL = "https://example.com/"
+        const val HANDOVER_URL = "$DUCK_AI_URL?q=hi&prompt=1"
     }
 }

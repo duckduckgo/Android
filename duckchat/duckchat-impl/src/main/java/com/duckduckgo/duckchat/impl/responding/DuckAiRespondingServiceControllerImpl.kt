@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.browser.api.BrowserLifecycleObserver
+import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -34,11 +35,13 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.minutes
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class, binding = binding<DuckAiRespondingServiceController>())
@@ -65,6 +68,13 @@ class DuckAiRespondingServiceControllerImpl @Inject constructor(
      */
     private var lateStartAllowed = false
 
+    private var timedOut = false
+
+    /**
+     * Android enforces the 3-minute `shortService` limit through `onTimeout` only on API 34+, so this timer gives every API the same cap.
+     */
+    private val timeoutJob = ConflatedJob()
+
     private val runStoreDispatcher = dispatchers.io().limitedParallelism(1)
 
     private val _keepServiceRunning = MutableStateFlow(false)
@@ -75,6 +85,7 @@ class DuckAiRespondingServiceControllerImpl @Inject constructor(
         appScope.launch(dispatchers.main()) {
             updateKeepServiceRunning()
             if (!keepAliveOnLeave) {
+                timeoutJob.cancel()
                 updateRunStore { clear() }
             } else if (!appOpen && lateStartAllowed) {
                 tryStart(reportIfStartFails = LATE_REQUEST_NOT_ALLOWED)
@@ -97,23 +108,29 @@ class DuckAiRespondingServiceControllerImpl @Inject constructor(
 
     override fun onOpen(isFreshLaunch: Boolean) {
         appOpen = true
+        timedOut = false
+        timeoutJob.cancel()
         updateKeepServiceRunning()
         updateRunStore { clear() }
     }
 
     override fun onStartFailed(failure: RespondingServiceStartFailure) {
+        timeoutJob.cancel()
         updateRunStore { clear() }
         pixels.value.reportRespondingServiceStartFailed(failure)
     }
 
     override fun onServiceTimedOut() {
         if (!keepServiceRunning.value) return
+        timeoutJob.cancel()
+        timedOut = true
+        updateKeepServiceRunning()
         updateRunStore { clear() }
         pixels.value.reportRespondingServiceTimedOut()
     }
 
     private fun updateKeepServiceRunning() {
-        _keepServiceRunning.value = keepAliveOnLeave && !appOpen
+        _keepServiceRunning.value = keepAliveOnLeave && !appOpen && !timedOut
     }
 
     private fun updateRunStore(block: DuckAiRespondingServiceRunStore.() -> Unit) {
@@ -131,5 +148,13 @@ class DuckAiRespondingServiceControllerImpl @Inject constructor(
             return
         }
         pixels.value.reportRespondingServiceStarted(restricted)
+        timeoutJob += appScope.launch(dispatchers.main()) {
+            delay(SERVICE_TIME_LIMIT)
+            onServiceTimedOut()
+        }
+    }
+
+    private companion object {
+        val SERVICE_TIME_LIMIT = 3.minutes
     }
 }

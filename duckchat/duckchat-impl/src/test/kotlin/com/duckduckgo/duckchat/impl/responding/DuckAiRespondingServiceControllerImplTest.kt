@@ -29,6 +29,8 @@ import com.duckduckgo.duckchat.impl.responding.RespondingServiceStartFailure.LAT
 import com.duckduckgo.duckchat.impl.responding.RespondingServiceStartFailure.REQUEST_FAILED
 import com.duckduckgo.duckchat.impl.responding.RespondingServiceStartFailure.REQUEST_NOT_ALLOWED
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -45,6 +47,9 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @RunWith(AndroidJUnit4::class)
 class DuckAiRespondingServiceControllerImplTest {
@@ -270,6 +275,117 @@ class DuckAiRespondingServiceControllerImplTest {
     }
 
     @Test
+    fun `when service runs for 3 minutes then keepServiceRunning false and timed out pixel once`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(3.minutes)
+
+        assertFalse(testee.keepServiceRunning.value)
+        verify(pixels, times(1)).reportRespondingServiceTimedOut()
+        assertNull(takeRun())
+    }
+
+    @Test
+    fun `when 3 minutes have not passed then service keeps running`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(179.seconds)
+
+        assertTrue(testee.keepServiceRunning.value)
+        verify(pixels, never()).reportRespondingServiceTimedOut()
+    }
+
+    @Test
+    fun `when Android timeout comes first then the app timer sends no second pixel`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advance()
+        testee.onServiceTimedOut()
+        advanceBy(4.minutes)
+
+        verify(pixels, times(1)).reportRespondingServiceTimedOut()
+        assertFalse(testee.keepServiceRunning.value)
+    }
+
+    @Test
+    fun `when app timer comes first then Android timeout sends no second pixel`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(3.minutes)
+        testee.onServiceTimedOut()
+
+        verify(pixels, times(1)).reportRespondingServiceTimedOut()
+    }
+
+    @Test
+    fun `when app returns before 3 minutes then no timed out pixel`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(2.minutes)
+        testee.onOpen(false)
+        advanceBy(4.minutes)
+
+        verify(pixels, never()).reportRespondingServiceTimedOut()
+    }
+
+    @Test
+    fun `when keep alive disabled before 3 minutes then no timed out pixel`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(2.minutes)
+        testee.setKeepAliveOnLeave(false)
+        advanceBy(4.minutes)
+
+        verify(pixels, never()).reportRespondingServiceTimedOut()
+    }
+
+    @Test
+    fun `when keep alive enabled again after timeout in same leave then keepServiceRunning stays false`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(3.minutes)
+        testee.setKeepAliveOnLeave(false)
+        testee.setKeepAliveOnLeave(true)
+        advance()
+
+        assertFalse(testee.keepServiceRunning.value)
+        verify(context, times(1)).startForegroundService(any())
+    }
+
+    @Test
+    fun `when leaving again after a timed out run then service starts and runs again`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(3.minutes)
+        testee.onOpen(false)
+        testee.onClose()
+        advance()
+
+        assertTrue(testee.keepServiceRunning.value)
+        verify(context, times(2)).startForegroundService(any())
+    }
+
+    @Test
+    fun `when start fails then no timer and no timed out pixel`() {
+        whenever(context.startForegroundService(any())).doThrow(IllegalStateException())
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        advanceBy(4.minutes)
+
+        verify(pixels, never()).reportRespondingServiceTimedOut()
+    }
+
+    @Test
+    fun `when startForeground fails then no timed out pixel`() {
+        testee.setKeepAliveOnLeave(true)
+        testee.onClose()
+        testee.onStartFailed(FOREGROUND_NOT_ALLOWED)
+        advanceBy(4.minutes)
+
+        verify(pixels, never()).reportRespondingServiceTimedOut()
+    }
+
+    @Test
     fun `when startForeground fails then failure pixel and flag cleared`() {
         testee.setKeepAliveOnLeave(true)
         testee.onClose()
@@ -329,5 +445,12 @@ class DuckAiRespondingServiceControllerImplTest {
         return store.takeInterruptedRun()
     }
 
-    private fun advance() = coroutineRule.testScope.testScheduler.advanceUntilIdle()
+    private fun advance() = coroutineRule.testScope.testScheduler.runCurrent()
+
+    private fun advanceBy(duration: Duration) {
+        val scheduler = coroutineRule.testScope.testScheduler
+        scheduler.runCurrent()
+        scheduler.advanceTimeBy(duration)
+        scheduler.runCurrent()
+    }
 }

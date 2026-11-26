@@ -256,6 +256,12 @@ interface DuckChatFeature {
     fun sendDuckAiResponseWaitWideEvent(): Toggle
 
     /**
+     * @return `true` when Duck.ai response-ready notifications run. Defaults to `false`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun responseReadyNotifications(): Toggle
+
+    /**
      * @return `true` when the updated Duck.ai model and reasoning pickers are enabled: models grouped
      * by availability, backend-driven ordering and sublines, and a gated section header that follows the
      * user's tier.
