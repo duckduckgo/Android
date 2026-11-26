@@ -167,6 +167,30 @@ class FindInPageClientToolTest {
         )
     }
 
+    @Test
+    fun whenTitleAndUrlTooLongThenCutToContractLimits() = runTest {
+        val longUrl = "https://example.com/" + "p".repeat(2000)
+        whenever(tabs.getTab(OTHER_TAB)).thenReturn(TabEntity(tabId = OTHER_TAB, url = longUrl))
+        val pageContext = JSONObject().put("title", "t".repeat(300)).put("content", "paris").put("attachable", true)
+        pageContexts.storePageContext(OTHER_TAB, longUrl, pageContext.toString())
+
+        val value = success(testee.execute(JSONObject("""{"query":"paris","tabId":"other"}"""), context))
+
+        assertEquals("t".repeat(256), value.getString("title"))
+        assertEquals(longUrl.take(1280), value.getString("url"))
+    }
+
+    @Test
+    fun whenQueryIsLongerThanTheSnippetLimitThenSnippetIsCutWithoutSplittingSurrogatePair() = runTest {
+        val query = "a" + "🦆".repeat(60)
+        givenPage(OTHER_TAB, "https://example.com/", query)
+
+        val snippet = success(testee.execute(JSONObject().put("query", query).put("tabId", OTHER_TAB), context))
+            .getJSONArray("matches").getJSONObject(0).getString("snippet")
+
+        assertEquals("a" + "🦆".repeat(49), snippet)
+    }
+
     private suspend fun givenPage(
         tabId: String,
         url: String,

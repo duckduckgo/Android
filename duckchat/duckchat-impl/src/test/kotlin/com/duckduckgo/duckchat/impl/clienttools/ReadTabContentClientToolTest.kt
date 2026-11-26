@@ -148,6 +148,29 @@ class ReadTabContentClientToolTest {
         assertEquals(ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE), testee.execute(JSONObject().put("tabId", OTHER_TAB), context))
     }
 
+    @Test
+    fun whenTitleAndUrlTooLongThenCutToContractLimits() = runTest {
+        val longUrl = "https://example.com/" + "p".repeat(2000)
+        givenTab(OTHER_TAB, longUrl)
+        givenPageContext(OTHER_TAB, longUrl, pageContext(title = "t".repeat(300)))
+
+        val value = success(testee.execute(JSONObject().put("tabId", OTHER_TAB), context))
+
+        assertEquals("t".repeat(256), value.getString("title"))
+        assertEquals(longUrl.take(1280), value.getString("url"))
+    }
+
+    @Test
+    fun whenContentCutWouldSplitSurrogatePairThenWholePairIsDropped() = runTest {
+        givenTab(OTHER_TAB, "https://example.com/")
+        givenPageContext(OTHER_TAB, "https://example.com/", pageContext(content = "a".repeat(2999) + "🦆🦆"))
+
+        val value = success(testee.execute(JSONObject().put("tabId", OTHER_TAB), context))
+
+        assertEquals("a".repeat(2999), value.getString("content"))
+        assertTrue(value.getBoolean("truncated"))
+    }
+
     private suspend fun givenTab(
         tabId: String,
         url: String,

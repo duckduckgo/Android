@@ -1003,6 +1003,42 @@ class RealClientToolsExecutorTest {
         assertTrue(prompt.prompts.isEmpty())
     }
 
+    @Test
+    fun whenRequestBreaksMessageSchemaThenInvalidArgumentsEchoingCallIdAndToolNotRun() = runTest {
+        listOf(
+            """{"callId":"call-1","capability":"autoTool","input":{}}""",
+            """{"callId":"call-1","capability":{"name":"","version":2},"input":{}}""",
+            """{"callId":"call-1","capability":{"name":"${"a".repeat(65)}","version":2},"input":{}}""",
+            """{"callId":"call-1","capability":{"name":"auto tool","version":2},"input":{}}""",
+            """{"callId":"call-1","capability":{"name":"autoTool","version":0},"input":{}}""",
+            """{"callId":"call-1","capability":{"name":"autoTool","version":-2},"input":{}}""",
+            """{"callId":"call-1","capability":{"name":"autoTool","version":"2"},"input":{}}""",
+            """{"callId":"call-1","capability":{"name":"autoTool","version":2},"input":[]}""",
+            """{"callId":"call-1","capability":{"name":"autoTool","version":2},"input":"{}"}""",
+            """{"callId":"call-1","capability":{"name":"autoTool","version":2},"input":{},"chatId":5}""",
+        ).forEach { params ->
+            assertEquals(
+                params,
+                """{"callId":"call-1","ok":false,"error":{"code":"invalid_arguments"}}""",
+                executor().execute(JSONObject(params), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR).toString(),
+            )
+        }
+        assertTrue(autoTool.calls.isEmpty())
+    }
+
+    @Test
+    fun whenCallIdBreaksMessageSchemaThenInvalidArgumentsAndToolNotRun() = runTest {
+        listOf("\"\"", "\"${"c".repeat(129)}\"", "\"call 1\"", "5").forEach { callId ->
+            val params = JSONObject("""{"callId":$callId,"capability":{"name":"autoTool","version":2},"input":{}}""")
+
+            val reply = executor().execute(params, DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
+
+            assertFalse(callId, reply.getBoolean("ok"))
+            assertEquals(callId, "invalid_arguments", reply.getJSONObject("error").getString("code"))
+        }
+        assertTrue(autoTool.calls.isEmpty())
+    }
+
     private suspend fun executeOnceTool(): JSONObject =
         executor(askTool, onceTool).execute(request("onceTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR)
 
