@@ -16,8 +16,6 @@
 
 package com.duckduckgo.breakagereporting.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.breakagereporting.impl.ALL_MIGRATIONS
@@ -25,6 +23,8 @@ import com.duckduckgo.breakagereporting.impl.BreakageReportingDatabase
 import com.duckduckgo.breakagereporting.impl.BreakageReportingRepository
 import com.duckduckgo.breakagereporting.impl.RealBreakageReportingRepository
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.BindingContainer
 import dev.zacsweers.metro.ContributesTo
@@ -38,12 +38,16 @@ object BreakageReportingModule {
 
     @SingleIn(AppScope::class)
     @Provides
-    fun provideBreakageReportingDatabase(context: Context): BreakageReportingDatabase {
-        return Room.databaseBuilder(context, BreakageReportingDatabase::class.java, "breakage_reporting.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideBreakageReportingDatabase(databaseProvider: DatabaseProvider): BreakageReportingDatabase {
+        return databaseProvider.buildRoomDatabase(
+            BreakageReportingDatabase::class.java,
+            "breakage_reporting.db",
+            config = RoomDatabaseConfig(
+                enableMultiInstanceInvalidation = true,
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleIn(AppScope::class)

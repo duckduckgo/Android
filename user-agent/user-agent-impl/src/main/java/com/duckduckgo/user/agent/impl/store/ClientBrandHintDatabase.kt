@@ -32,4 +32,4 @@ abstract class ClientBrandHintDatabase : RoomDatabase() {
     abstract fun clientBrandHintDao(): ClientBrandHintDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()
