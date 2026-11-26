@@ -21,4 +21,9 @@ interface LanguagePacks {
      * True when the files of the language pack for [pair] are on the device.
      */
     fun isInstalled(pair: LanguagePair): Boolean
+
+    /**
+     * Download size of the pack for [pair] in bytes, or null when unknown.
+     */
+    fun sizeBytes(pair: LanguagePair): Long?
 }

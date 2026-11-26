@@ -4388,6 +4388,8 @@ class BrowserTabFragment :
                 }
             }
 
+            pageTranslation.attach(it)
+
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             MainFrameCommitNavigationClient.install(it, viewModel::onMainFrameCommitted)
@@ -5474,6 +5476,7 @@ class BrowserTabFragment :
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
+            pageTranslation.detach(it)
             it.removeSystemAutofillCallback()
             it.destroy()
         }

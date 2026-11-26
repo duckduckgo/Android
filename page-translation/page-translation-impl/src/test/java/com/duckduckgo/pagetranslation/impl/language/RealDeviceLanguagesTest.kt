@@ -29,7 +29,7 @@ import org.robolectric.annotation.Config
 import java.util.Locale
 
 @RunWith(AndroidJUnit4::class)
-@Config(qualifiers = "fr-rFR")
+@Config(qualifiers = "fr-rFR", sdk = [30])
 class RealDeviceLanguagesTest {
 
     private val originalLocale = Locale.getDefault()

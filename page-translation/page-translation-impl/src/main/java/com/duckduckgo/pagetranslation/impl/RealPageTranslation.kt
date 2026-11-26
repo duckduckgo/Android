@@ -24,6 +24,7 @@ import com.duckduckgo.pagetranslation.api.PageTranslation
 import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.api.TranslationProgress
 import com.duckduckgo.pagetranslation.impl.banner.TranslationBannerFactory
+import com.duckduckgo.pagetranslation.impl.sheet.LanguagePackSheetPresenter
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -35,15 +36,22 @@ import javax.inject.Inject
 @SingleIn(FragmentScope::class)
 class RealPageTranslation @Inject constructor(
     private val bannerFactory: TranslationBannerFactory,
+    private val attachedWebView: AttachedWebView,
+    private val sheetPresenter: LanguagePackSheetPresenter,
 ) : PageTranslation {
 
     override val progress: StateFlow<TranslationProgress> = MutableStateFlow(TranslationProgress.Idle)
 
     override fun getBannerView(context: Context): View = bannerFactory.create(context)
 
-    override fun attach(webView: WebView) = Unit
+    override fun attach(webView: WebView) {
+        attachedWebView.attach(webView)
+        sheetPresenter.listen(webView)
+    }
 
-    override fun detach(webView: WebView) = Unit
+    override fun detach(webView: WebView) {
+        attachedWebView.detach(webView)
+    }
 
     override fun onTabStateChanged(isVisible: Boolean, content: TabContent) = Unit
 }
