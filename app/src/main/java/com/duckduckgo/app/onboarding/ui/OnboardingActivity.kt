@@ -38,6 +38,8 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.onboarding.api.OnboardingDuckAiModelChoice
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -48,6 +50,9 @@ class OnboardingActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var duckChat: DuckChat
+
+    @Inject
+    lateinit var duckAiModelChoice: OnboardingDuckAiModelChoice
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -105,10 +110,10 @@ class OnboardingActivity : DuckDuckGoActivity() {
         finish()
     }
 
-    fun finishAndSubmitChatPrompt(prompt: String) {
+    fun finishAndSubmitChatPrompt(prompt: String, model: Option?) {
         lifecycleScope.launch {
             viewModel.onOnboardingDone(extendedOnboardingFlow = DUCK_AI_FOCUSED)
-            val duckChatUrl = duckChat.getDuckChatUrl(prompt, autoPrompt = true) + "&flow=mobile-app-onboarding"
+            val duckChatUrl = duckAiModelChoice.chatUrl(prompt, model) + "&flow=mobile-app-onboarding"
             duckChat.reportDuckChatEntry(DuckChatEntryPoint.ONBOARDING, opensNewTab = true, hasPrompt = prompt.isNotBlank())
             startActivity(BrowserActivity.intent(this@OnboardingActivity, launchSource = Onboarding, duckChatUrl = duckChatUrl, openDuckChat = true))
             finish()

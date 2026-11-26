@@ -52,6 +52,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingHost
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingStepId
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -128,7 +129,10 @@ class WelcomePageViewModel @Inject constructor(
         data object LaunchAddWidgetPrompt : Command
         data object Finish : Command
         data class FinishAndSubmitSearchQuery(val query: String) : Command
-        data class FinishAndSubmitChatPrompt(val prompt: String) : Command
+        data class FinishAndSubmitChatPrompt(
+            val prompt: String,
+            val model: Option?,
+        ) : Command
         data object OnboardingSkipped : Command
         data object HandOffToBrowserActivity : Command
         data class ShowQuickSetupDefaultBrowserDialog(val intent: Intent) : Command
@@ -510,7 +514,9 @@ class WelcomePageViewModel @Inject constructor(
                             return@onEach
                         }
                         when (val result = state.result as? NewUserOnboardingResult) {
-                            is NewUserOnboardingResult.LaunchChat -> _commands.send(Command.FinishAndSubmitChatPrompt(prompt = result.prompt))
+                            is NewUserOnboardingResult.LaunchChat -> _commands.send(
+                                Command.FinishAndSubmitChatPrompt(prompt = result.prompt, model = result.model),
+                            )
                             is NewUserOnboardingResult.LaunchSearch -> _commands.send(Command.FinishAndSubmitSearchQuery(query = result.query))
                             null -> _commands.send(Command.Finish)
                         }

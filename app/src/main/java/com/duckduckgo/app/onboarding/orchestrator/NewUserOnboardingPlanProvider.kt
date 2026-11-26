@@ -45,6 +45,7 @@ import com.duckduckgo.app.onboarding.ui.page.OnboardingBackground
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.welcome.Embellishment
 import com.duckduckgo.app.pixels.AppPixelName.PREONBOARDING_AICHAT_SELECTED
@@ -80,6 +81,7 @@ import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Advance
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.GoBack
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.Stay
 import com.duckduckgo.onboarding.api.LinearOnboardingTransition.SwitchTo
+import com.duckduckgo.onboarding.api.OnboardingDuckAiModelChoice
 import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin
 import com.duckduckgo.sync.api.SyncAutoRestore
 import dev.zacsweers.metro.SingleIn
@@ -125,6 +127,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private val onboardingPasswordImportExperimentManager: OnboardingPasswordImportExperimentManager,
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog,
     private val singleChoiceDataPlugins: ActivePluginPoint<OnboardingSingleChoiceDataPlugin>,
+    private val duckAiModelChoice: OnboardingDuckAiModelChoice,
+    private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val deviceMigration: DeviceMigration,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) {
@@ -277,12 +281,11 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     ): LinearOnboardingPlan {
         onboardingPixelSender.segmentedFlowStarted()
         val firstDialog = SuspendMemo { FirstDialog.INITIAL }
-        val modelProviderChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiModelProvider)
         val togglePositionChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition)
         val duckAiStateChoice = singleChoiceDataPlugin(OnboardingSingleChoiceDataPlugin.Id.DuckAiState)
 
         // Warms the options up while the user is still several screens away from the step that renders them.
-        appCoroutineScope.launch(dispatchers.io()) { modelProviderChoice?.prefetch() }
+        appCoroutineScope.launch(dispatchers.io()) { if (isDuckAiModelChoiceEnabled()) duckAiModelChoice.prefetch() }
         appCoroutineScope.launch(dispatchers.io()) { togglePositionChoice?.prefetch() }
 
         return rootPlan(
@@ -293,7 +296,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(introAnimationStep())
                 add(notificationPermissionStep())
                 add(initialStep(firstDialog))
-                add(downloadReasonStep(ctx, modelProviderChoice, togglePositionChoice, duckAiStateChoice))
+                add(downloadReasonStep(ctx, togglePositionChoice, duckAiStateChoice))
             },
         )
     }
@@ -537,7 +540,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private fun downloadReasonStep(
         ctx: NewUserOnboardingPlanContext,
-        modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
         duckAiStateChoice: OnboardingSingleChoiceDataPlugin?,
     ): NewUserOnboardingActivityStep {
@@ -566,7 +568,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
                         when (selection) {
                             DownloadReasonSelection.SEARCH -> SwitchTo(segmentedSearchPlan(ctx))
-                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, modelProviderChoice, togglePositionChoice))
+                            DownloadReasonSelection.AI_CHAT -> SwitchTo(segmentedAiPlan(ctx, togglePositionChoice))
                             DownloadReasonSelection.NO_AI -> SwitchTo(segmentedNoAiPlan(ctx, duckAiStateChoice))
                             DownloadReasonSelection.BLOCK_ADS -> SwitchTo(segmentedBlockAdsPlan(ctx))
                         }
@@ -617,7 +619,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
     private suspend fun segmentedAiPlan(
         ctx: NewUserOnboardingPlanContext,
-        modelProviderChoice: OnboardingSingleChoiceDataPlugin?,
         togglePositionChoice: OnboardingSingleChoiceDataPlugin?,
     ): LinearOnboardingPlan {
         applyInputModeSelection(ctx, withAi = true, fireTelemetry = false)
@@ -627,7 +628,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
             steps = buildList {
                 add(comparisonChartStep(NewUserOnboardingActivityDialog.SegmentedComparisonChart(ComparisonChartConfig.SegmentedAiPath)))
                 add(defaultBrowserPromptStep())
-                add(modelProviderStep(modelProviderChoice))
+                add(modelProviderStep(ctx))
                 add(togglePositionStep(togglePositionChoice))
                 addAll(widgetSteps(ctx))
                 add(addressBarPositionStep())
@@ -746,9 +747,13 @@ class NewUserOnboardingPlanProvider @Inject constructor(
     private suspend fun singleChoiceDataPlugin(id: OnboardingSingleChoiceDataPlugin.Id): OnboardingSingleChoiceDataPlugin? =
         singleChoiceDataPlugins.getPlugins().firstOrNull { it.id == id }
 
-    private fun modelProviderStep(plugin: OnboardingSingleChoiceDataPlugin?): NewUserOnboardingActivityStep {
+    private suspend fun isDuckAiModelChoiceEnabled(): Boolean = withContext(dispatchers.io()) {
+        extendedOnboardingFeatureToggles.duckAiModelChoice().isEnabled()
+    }
+
+    private fun modelProviderStep(ctx: NewUserOnboardingPlanContext): NewUserOnboardingActivityStep {
         val pixelName = OnboardingPixelName.ONBOARDING_PREFERENCES_AI_MODEL
-        val options = SuspendMemo { plugin?.options().orEmpty() }
+        val options = SuspendMemo { if (isDuckAiModelChoiceEnabled()) duckAiModelChoice.options() else emptyList() }
         return NewUserOnboardingActivityStep(
             id = NewUserOnboardingStepIds.MODEL_PROVIDER,
             pixelName = pixelName,
@@ -766,7 +771,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     is NewUserOnboardingEvent.SingleChoiceConfirmed -> {
                         logcat { "Model provider confirmed: ${event.option.id}" }
                         onboardingPixelSender.fire(pixelName, OnboardingPixelAction.SingleChoiceClicked(event.option.id))
-                        plugin?.apply(event.option)
+                        ctx.duckAiModel = event.option
                         Advance
                     }
 
@@ -1179,7 +1184,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         } else {
                             ctx.completionResult = if (event.isChat) {
                                 onboardingStore.setTriedDuckAi()
-                                NewUserOnboardingResult.LaunchChat(prompt = event.query)
+                                NewUserOnboardingResult.LaunchChat(prompt = event.query, model = ctx.duckAiModel)
                             } else {
                                 NewUserOnboardingResult.LaunchSearch(query = event.query)
                             }

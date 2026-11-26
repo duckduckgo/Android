@@ -38,7 +38,6 @@ interface OnboardingSingleChoiceDataPlugin : ActivePlugin {
     suspend fun apply(option: Option)
 
     enum class Id {
-        DuckAiModelProvider,
         DuckAiNewTabTogglePosition,
         DuckAiState,
     }

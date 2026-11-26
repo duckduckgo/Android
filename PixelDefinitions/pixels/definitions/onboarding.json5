@@ -564,7 +564,7 @@
                 "key": "value",
                 "type": "string",
                 "description": "Only set when event=clicked. The provider of the chosen Duck.ai model.",
-                "enum": ["openai", "anthropic", "mistral"]
+                "enum": ["openai", "anthropic", "mistral", "gemma"]
             }
         ]
     },

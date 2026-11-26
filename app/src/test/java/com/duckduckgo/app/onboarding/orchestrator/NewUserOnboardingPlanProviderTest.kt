@@ -25,6 +25,7 @@ import com.duckduckgo.app.onboarding.CustomAiOnboardingPixelName
 import com.duckduckgo.app.onboarding.CustomAiOnboardingResolver
 import com.duckduckgo.app.onboarding.DuckAiOnboardingAvailability
 import com.duckduckgo.app.onboarding.DuckAiOnboardingDemo
+import com.duckduckgo.app.onboarding.FakeOnboardingDuckAiModelChoice
 import com.duckduckgo.app.onboarding.FakeOnboardingSingleChoiceDataPlugin
 import com.duckduckgo.app.onboarding.OnboardingInputScreenLaunchTarget
 import com.duckduckgo.app.onboarding.OnboardingPasswordImportExperimentManager
@@ -41,6 +42,7 @@ import com.duckduckgo.app.onboarding.ui.page.ComparisonChartConfig
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
 import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
 import com.duckduckgo.app.onboarding.ui.page.PasswordImportErrorAction
+import com.duckduckgo.app.onboarding.ui.page.extendedonboarding.ExtendedOnboardingFeatureToggles
 import com.duckduckgo.app.onboarding.ui.page.welcome.ContentConfig
 import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.onboarding.ui.page.welcome.TextConfig
@@ -80,7 +82,9 @@ import com.duckduckgo.common.utils.plugins.ActivePluginPoint
 import com.duckduckgo.devicemigration.api.DeviceMigration
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.impl.wideevents.InputScreenOnboardingWideEvent
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.onboarding.api.LinearOnboardingState
 import com.duckduckgo.onboarding.api.LinearOnboardingState.Completed
@@ -139,8 +143,9 @@ class NewUserOnboardingPlanProviderTest {
     private val onboardingPreferenceCatalog: OnboardingPreferenceCatalog = mock {
         onBlocking { offer(any()) } doReturn emptyList()
     }
-    private val providerOptions = listOf(TestOption("openai"), TestOption("anthropic"), TestOption("mistral"))
-    private val modelProviderPlugin = FakeOnboardingSingleChoiceDataPlugin(options = providerOptions)
+    private val providerOptions = listOf(TestOption("openai"), TestOption("anthropic"), TestOption("gemma"))
+    private val duckAiModelChoice = FakeOnboardingDuckAiModelChoice(options = providerOptions)
+    private val extendedOnboardingFeatureToggles = FakeFeatureToggleFactory.create(ExtendedOnboardingFeatureToggles::class.java)
     private val togglePositionOptions = listOf(TestOption("duckAI"), TestOption("lastUsed"))
     private val togglePositionPlugin = FakeOnboardingSingleChoiceDataPlugin(
         id = OnboardingSingleChoiceDataPlugin.Id.DuckAiNewTabTogglePosition,
@@ -152,7 +157,7 @@ class NewUserOnboardingPlanProviderTest {
         options = duckAiStateOptions,
     )
     private var singleChoicePlugins: List<OnboardingSingleChoiceDataPlugin> =
-        listOf(modelProviderPlugin, togglePositionPlugin, duckAiStatePlugin)
+        listOf(togglePositionPlugin, duckAiStatePlugin)
     private val singleChoiceDataPlugins = object : ActivePluginPoint<OnboardingSingleChoiceDataPlugin> {
         override suspend fun getPlugins(): Collection<OnboardingSingleChoiceDataPlugin> = singleChoicePlugins
     }
@@ -210,6 +215,8 @@ class NewUserOnboardingPlanProviderTest {
             onboardingPasswordImportExperimentManager = passwordImportExperiment,
             onboardingPreferenceCatalog = onboardingPreferenceCatalog,
             singleChoiceDataPlugins = singleChoiceDataPlugins,
+            duckAiModelChoice = duckAiModelChoice,
+            extendedOnboardingFeatureToggles = extendedOnboardingFeatureToggles,
             deviceMigration = deviceMigration,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -495,7 +502,7 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(
             Completed(
                 rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-                result = NewUserOnboardingResult.LaunchChat(prompt = "why is privacy hard"),
+                result = NewUserOnboardingResult.LaunchChat(prompt = "why is privacy hard", model = providerOptions.first()),
             ),
             orchestrator.state.value,
         )
@@ -508,12 +515,12 @@ class NewUserOnboardingPlanProviderTest {
 
         start()
 
-        assertEquals(1, modelProviderPlugin.prefetchCount)
+        assertEquals(1, duckAiModelChoice.prefetchCount)
         assertEquals(1, togglePositionPlugin.prefetchCount)
     }
 
     @Test
-    fun `when the provider step is reached then it offers the plugin options`() = runTest {
+    fun `when the provider step is reached then it offers the model choice options`() = runTest {
         startSegmentedAtAiProviderChoice()
 
         val step = (orchestrator.state.value as InProgress).currentStep as NewUserOnboardingActivityStep
@@ -528,30 +535,55 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun `when a provider is confirmed then it is applied to the plugin that offered it`() = runTest {
+    fun `when a model is confirmed then the chat the run finishes on carries it`() = runTest {
         startSegmentedAtAiProviderChoice()
 
-        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions[1]))
-
-        assertEquals(listOf(providerOptions[1]), modelProviderPlugin.applied)
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions[2]))
         assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
-    }
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(togglePositionOptions.first()))
+        orchestrator.onEvent(NewUserOnboardingEvent.AddressBarConfirmed(OmnibarType.SINGLE_TOP))
+        orchestrator.onEvent(NewUserOnboardingEvent.InputDemoQuerySubmitted(query = "hi", isChat = true, fromSuggestion = false))
 
-    @Test
-    fun `when no plugin offers the provider choice then the step is skipped`() = runTest {
-        singleChoicePlugins = listOf(togglePositionPlugin)
-
-        startSegmentedAtAiProviderChoice()
-
-        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
-    }
-
-    @Test
-    fun `when only one provider is offered then the step is skipped`() = runTest {
-        singleChoicePlugins = listOf(
-            FakeOnboardingSingleChoiceDataPlugin(options = listOf(TestOption("openai"))),
-            togglePositionPlugin,
+        assertEquals(
+            Completed(
+                rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
+                result = NewUserOnboardingResult.LaunchChat(prompt = "hi", model = providerOptions[2]),
+            ),
+            orchestrator.state.value,
         )
+    }
+
+    @Test
+    fun `when the model choice is turned off remotely then the step is skipped`() = runTest {
+        extendedOnboardingFeatureToggles.duckAiModelChoice().setRawStoredState(State(enable = false))
+
+        startSegmentedAtAiProviderChoice()
+
+        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
+    @Test
+    fun `when the model choice is turned off remotely then its options are not prefetched`() = runTest {
+        extendedOnboardingFeatureToggles.duckAiModelChoice().setRawStoredState(State(enable = false))
+        whenever(segmentedOnboardingExperiment.enroll()).thenReturn(SegmentedOnboardingExperimentVariant.TREATMENT)
+
+        start()
+
+        assertEquals(0, duckAiModelChoice.prefetchCount)
+    }
+
+    @Test
+    fun `when no model choice is offered then the step is skipped`() = runTest {
+        duckAiModelChoice.options = emptyList()
+
+        startSegmentedAtAiProviderChoice()
+
+        assertStep(NewUserOnboardingStepIds.TOGGLE_POSITION)
+    }
+
+    @Test
+    fun `when only one model is offered then the step is skipped`() = runTest {
+        duckAiModelChoice.options = listOf(TestOption("openai"))
 
         startSegmentedAtAiProviderChoice()
 
@@ -581,7 +613,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when no plugin offers the toggle position choice then the step is skipped`() = runTest {
-        singleChoicePlugins = listOf(modelProviderPlugin)
+        singleChoicePlugins = emptyList()
 
         startSegmentedAtAiProviderChoice()
         orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(providerOptions.first()))
@@ -768,7 +800,7 @@ class NewUserOnboardingPlanProviderTest {
 
     @Test
     fun `when no plugin offers the duck ai state choice then the step is skipped`() = runTest {
-        singleChoicePlugins = listOf(modelProviderPlugin, togglePositionPlugin)
+        singleChoicePlugins = listOf(togglePositionPlugin)
 
         startSegmentedAtDuckAiState()
 
@@ -794,7 +826,7 @@ class NewUserOnboardingPlanProviderTest {
         assertEquals(
             Completed(
                 rootPlanId = NewUserOnboardingPlanProvider.ROOT_PLAN_ID,
-                result = NewUserOnboardingResult.LaunchChat(prompt = "why is privacy hard"),
+                result = NewUserOnboardingResult.LaunchChat(prompt = "why is privacy hard", model = providerOptions.first()),
             ),
             orchestrator.state.value,
         )
