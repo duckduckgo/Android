@@ -3,7 +3,8 @@ name: "Segment Skip: Always skips the segment and Undo Skip replays it"
 tags:
   - segmentSkip
 ---
-# Requires an internal release build with remote_config_patches/segment_skip_enabled_patch.json.
+# Requires an internal release build with remote_config_patches/segment_skip_enabled_patch.json
+# and remote_config_patches/duck_player_disabled_patch.json.
 - runFlow: steps/start_app.yaml
 - runFlow:
     file: steps/set_mode.yaml

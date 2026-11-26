@@ -22,3 +22,10 @@ appId: com.duckduckgo.mobile.android
       - assertTrue:
           condition: ${false}
           label: "YouTube's player showed an error, so no button proves nothing"
+- runFlow:
+    when:
+      visible: "No Thanks"
+    commands:
+      - assertTrue:
+          condition: ${false}
+          label: "Duck Player's prompt is holding playback, so no button proves nothing"
