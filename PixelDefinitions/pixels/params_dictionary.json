@@ -52,7 +52,7 @@
         "enum": ["phone", "tablet"]
     },
     "inputPreviewAction": {
-        "key": "variant",
+        "key": "variant_search_experience",
         "type": "string",
         "description": "Onboarding Duck.ai search/chat branch, chosen at the input-screen preview step. Set on every onboarding pixel fired after the user passes that step; absent for pixels fired before it or for users who never see it.",
         "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
@@ -60,7 +60,7 @@
     "onboardingDownloadReasonVariant": {
         "key": "variant_download_reason",
         "type": "string",
-        "description": "Download reason picked on the download-choice screen of the segmented onboarding flow. Set on every onboarding pixel fired after that screen; absent for pixels fired before it and for flows that never show it. Independent of the search/chat branch reported by `variant`, since a run can make both choices.",
+        "description": "Download reason picked on the download-choice screen of the segmented onboarding flow. Set on every onboarding pixel fired after that screen; absent for pixels fired before it and for flows that never show it. Independent of the search/chat branch reported by `variant_search_experience`, since a run can make both choices.",
         "enum": ["download_reason_search", "download_reason_ai-chat", "download_reason_no-ai", "download_reason_ad-blocking"]
     },
     "contextualSuggestionsPageType": {

@@ -19,11 +19,15 @@ package com.duckduckgo.app.onboarding
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_COMPLETED
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -40,6 +44,7 @@ class OnboardingCompletedMetricObserverTest {
     private val passwordImportMetrics: OnboardingPasswordImportExperimentMetrics = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
     private val contextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit()
+    private val onboardingPixelSender: OnboardingPixelSender = mock()
 
     private val testee = OnboardingCompletedMetricObserver(
         appCoroutineScope = coroutineRule.testScope,
@@ -47,6 +52,7 @@ class OnboardingCompletedMetricObserverTest {
         segmentedOnboardingExperimentMetrics = segmentedMetrics,
         onboardingPasswordImportExperimentMetrics = passwordImportMetrics,
         contextualOnboardingTimeLimit = contextualOnboardingTimeLimit,
+        onboardingPixelSender = onboardingPixelSender,
     )
 
     @Test
@@ -96,5 +102,45 @@ class OnboardingCompletedMetricObserverTest {
 
         verify(passwordImportMetrics, never()).fireOnboardingCompletedMetric()
         verify(segmentedMetrics, never()).fireOnboardingCompletedMetric()
+    }
+
+    @Test
+    fun `when user app stage transitions to established then onboarding completed pixel is fired`() = runTest {
+        testee.onCreate(lifecycleOwner)
+
+        appStageFlow.emit(AppStage.DAX_ONBOARDING)
+        appStageFlow.emit(AppStage.ESTABLISHED)
+
+        verify(onboardingPixelSender).fire(ONBOARDING_COMPLETED, OnboardingPixelAction.Reached)
+    }
+
+    @Test
+    fun `when user app stage is already established on start then onboarding completed pixel is not fired`() = runTest {
+        testee.onCreate(lifecycleOwner)
+
+        appStageFlow.emit(AppStage.ESTABLISHED)
+
+        verify(onboardingPixelSender, never()).fire(any(), any())
+    }
+
+    @Test
+    fun `when user app stage never reaches established then onboarding completed pixel is not fired`() = runTest {
+        testee.onCreate(lifecycleOwner)
+
+        appStageFlow.emit(AppStage.NEW)
+        appStageFlow.emit(AppStage.DAX_ONBOARDING)
+
+        verify(onboardingPixelSender, never()).fire(any(), any())
+    }
+
+    @Test
+    fun `when onboarding ended by time limit then onboarding completed pixel is not fired`() = runTest {
+        contextualOnboardingTimeLimit.onboardingEndedByTimeLimit = true
+        testee.onCreate(lifecycleOwner)
+
+        appStageFlow.emit(AppStage.DAX_ONBOARDING)
+        appStageFlow.emit(AppStage.ESTABLISHED)
+
+        verify(onboardingPixelSender, never()).fire(any(), any())
     }
 }

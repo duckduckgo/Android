@@ -21,13 +21,18 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.onboarding.store.AppStage
 import com.duckduckgo.app.onboarding.store.UserStageStore
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelAction
+import com.duckduckgo.app.onboarding.ui.page.OnboardingPixelSender
+import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesIntoSet(
@@ -40,6 +45,7 @@ class OnboardingCompletedMetricObserver @Inject constructor(
     private val segmentedOnboardingExperimentMetrics: SegmentedOnboardingExperimentMetrics,
     private val onboardingPasswordImportExperimentMetrics: OnboardingPasswordImportExperimentMetrics,
     private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
+    private val onboardingPixelSender: OnboardingPixelSender,
 ) : MainProcessLifecycleObserver {
 
     override fun onCreate(owner: LifecycleOwner) {
@@ -50,5 +56,15 @@ class OnboardingCompletedMetricObserver @Inject constructor(
                 onboardingPasswordImportExperimentMetrics.fireOnboardingCompletedMetric()
             }
             .launchIn(appCoroutineScope)
+
+        appCoroutineScope.launch {
+            val appStages = userStageStore.userAppStageFlow()
+            // Only a transition seen by this process counts, so users established before this pixel shipped never send it.
+            if (appStages.firstOrNull() == AppStage.ESTABLISHED) return@launch
+            appStages.firstOrNull { it == AppStage.ESTABLISHED } ?: return@launch
+            if (!contextualOnboardingTimeLimit.wasOnboardingEndedByTimeLimit()) {
+                onboardingPixelSender.fire(OnboardingPixelName.ONBOARDING_COMPLETED, OnboardingPixelAction.Reached)
+            }
+        }
     }
 }
