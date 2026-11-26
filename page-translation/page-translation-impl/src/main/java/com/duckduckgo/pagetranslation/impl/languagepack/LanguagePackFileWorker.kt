@@ -25,12 +25,13 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.PAIR_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_IF_CORRUPTED
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_OLD
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.UNDO_DELETE
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-enum class LanguagePackFileOperation { DELETE, UNDO_DELETE, REMOVE_OLD, REMOVE }
+enum class LanguagePackFileOperation { DELETE, UNDO_DELETE, REMOVE_OLD, REMOVE, REMOVE_IF_CORRUPTED }
 
 @ContributesWorker(AppScope::class)
 internal class LanguagePackFileWorker(
@@ -43,6 +44,9 @@ internal class LanguagePackFileWorker(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
+    @Inject
+    lateinit var installer: LanguagePackInstaller
+
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
         val pair = inputData.getString(PAIR_KEY)
         val operation = LanguagePackFileOperation.entries.firstOrNull { it.name == inputData.getString(OPERATION_KEY) }
@@ -54,18 +58,22 @@ internal class LanguagePackFileWorker(
             DELETE -> moveToOld(pair)
             UNDO_DELETE -> if (oldDirectory.exists() && !packDirectory.exists()) oldDirectory.renameTo(packDirectory)
             REMOVE_OLD -> oldDirectory.deleteRecursively()
-            REMOVE -> {
-                // the rename uninstalls the pack at once, so a crash while deleting never leaves a partly deleted pack installed
-                moveToOld(pair)
-                oldDirectory.deleteRecursively()
-            }
+            REMOVE -> remove(pair)
+            REMOVE_IF_CORRUPTED -> if (packDirectory.exists() && !installer.isIntact(packDirectory)) remove(pair)
         }
 
         Result.success()
     }
 
+    private fun remove(pair: String) {
+        // the rename uninstalls the pack at once, so a crash while deleting never leaves a partly deleted pack installed
+        moveToOld(pair)
+        directories.getOldDirectory(pair).deleteRecursively()
+    }
+
     private fun moveToOld(pair: String) {
         directories.getStagingDirectory(pair).deleteRecursively()
+
         // a rerun after the process died must keep the pack the first run moved aside
         val packDirectory = directories.getPackDirectory(pair)
         if (!packDirectory.exists()) return

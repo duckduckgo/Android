@@ -40,6 +40,7 @@ import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWork
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.TOTAL_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_IF_CORRUPTED
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_OLD
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.UNDO_DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileWorker.Companion.OPERATION_KEY
@@ -90,6 +91,9 @@ interface LanguagePackScheduler {
     /** Removes every installed or deleted pack whose pair isn't in [listedPairs]. Reads the disk, so call it off the main thread. */
     fun removeUnlisted(listedPairs: Set<String>)
 
+    /** Removes the pair's installed pack if its files no longer match the manifest entry saved with it, e.g. after it failed to load. */
+    fun removeIfCorrupted(pair: String)
+
     /** Removes the packs [delete] kept that were never confirmed or restored. Reads the disk, so call it off the main thread. */
     fun removeLeftoverOldDirectories()
 
@@ -135,6 +139,8 @@ class RealLanguagePackScheduler @Inject constructor(
         (directories.getInstalledPairs() + directories.getPairsWithOldDirectory() - listedPairs).forEach { enqueueFileOperation(it, REMOVE) }
     }
 
+    override fun removeIfCorrupted(pair: String) = enqueueFileOperation(pair, REMOVE_IF_CORRUPTED)
+
     override fun removeLeftoverOldDirectories() {
         directories.getPairsWithOldDirectory().forEach { enqueueFileOperation(it, REMOVE_OLD) }
     }
@@ -176,7 +182,7 @@ class RealLanguagePackScheduler @Inject constructor(
 
     private fun WorkInfo.isDownload() = DOWNLOAD_TAG in tags
 
-    private fun WorkInfo.isUninstall() = "$OPERATION_TAG_PREFIX${DELETE.name}" in tags || "$OPERATION_TAG_PREFIX${REMOVE.name}" in tags
+    private fun WorkInfo.isUninstall() = listOf(DELETE, REMOVE, REMOVE_IF_CORRUPTED).any { "$OPERATION_TAG_PREFIX${it.name}" in tags }
 
     // a chain's infos come in no particular order
     private val WorkInfo.order: Long

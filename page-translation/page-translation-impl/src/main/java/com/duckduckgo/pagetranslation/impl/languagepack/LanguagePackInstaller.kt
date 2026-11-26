@@ -24,6 +24,7 @@ import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationMo
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
 import com.duckduckgo.pagetranslation.impl.translatekit.TranslateKitLibrary
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dev.zacsweers.metro.ContributesBinding
@@ -43,6 +44,9 @@ interface LanguagePackInstaller {
      * [stagingDirectory], when the pack isn't installed.
      */
     suspend fun install(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean
+
+    /** True when every file of the pack in [packDirectory] still matches the manifest entry [install] saved with it. */
+    suspend fun isIntact(packDirectory: File): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -71,6 +75,18 @@ class RealLanguagePackInstaller @Inject constructor(
         }
 
         isInstalled
+    }
+
+    override suspend fun isIntact(packDirectory: File): Boolean = withContext(dispatchers.io()) {
+        val model = try {
+            adapter.fromJson(packDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).readText())
+        } catch (_: IOException) {
+            null
+        } catch (_: JsonDataException) {
+            null
+        } ?: return@withContext false
+
+        model.files.all { (key, file) -> packDirectory.resolve(file.getInstalledFileName(key)).matches(file.decompressedSize, file.decompressedHash) }
     }
 
     private suspend fun installFiles(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean {

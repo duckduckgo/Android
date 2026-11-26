@@ -124,6 +124,45 @@ class LanguagePackInstallerTest {
         assertNotInstalled(MODEL)
     }
 
+    @Test
+    fun reportAnInstalledPackAsIntact() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+
+        assertTrue(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithAChangedFileAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve("vocab.spm").writeText("vocab-corrupted!!!")
+
+        assertFalse(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithAMissingFileAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve("model.bin").delete()
+
+        assertFalse(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithoutItsManifestEntryAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).delete()
+
+        assertFalse(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithAnUnreadableManifestEntryAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).writeText("""{"version": 3}""")
+
+        assertFalse(installer.isIntact(packDirectory))
+    }
+
     private suspend fun assertNotInstalled(model: TranslationModel) {
         assertFalse(installer.install(PAIR, model, stagingDirectory, packDirectory))
 
