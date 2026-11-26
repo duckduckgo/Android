@@ -443,6 +443,13 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun backupRefreshToken(): Toggle
 
+    /**
+     * When enabled, the main process connects the Play Billing client before querying purchases for a store login
+     * (token refresh recovery and restore from the Play Store), instead of giving up when the client is not connected yet.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun connectBillingBeforeQueryingPurchases(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
