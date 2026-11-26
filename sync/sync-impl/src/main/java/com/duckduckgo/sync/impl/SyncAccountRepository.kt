@@ -873,7 +873,7 @@ class AppSyncAccountRepository @Inject constructor(
         val unifiedDeviceInfo = signupAccountInfoBuilder.build(account.secretKey, deviceName, deviceType.deviceFactor)
 
         val result = try {
-            runBlocking { syncSetupWideEvent.onAccountCreationApiStarted() }
+            syncSetupWideEvent.onAccountCreationApiStarted()
             syncApi.createAccount(
                 account.userId,
                 account.passwordHash,
@@ -886,7 +886,7 @@ class AppSyncAccountRepository @Inject constructor(
                 keys = unifiedDeviceInfo?.keys,
             )
         } finally {
-            runBlocking { syncSetupWideEvent.onAccountCreationApiFinished() }
+            syncSetupWideEvent.onAccountCreationApiFinished()
         }
 
         return when (result) {
@@ -912,10 +912,10 @@ class AppSyncAccountRepository @Inject constructor(
                     logcat { "Sync-UnifiedDevices: signup wrote device_info + account_info key (kid=${it.publicKey.keyId})" }
                 }
                 try {
-                    runBlocking { syncSetupWideEvent.onInitialSyncStarted() }
+                    syncSetupWideEvent.onInitialSyncStarted()
                     syncEngine.triggerSync(ACCOUNT_CREATION)
                 } finally {
-                    runBlocking { syncSetupWideEvent.onInitialSyncFinished() }
+                    syncSetupWideEvent.onInitialSyncFinished()
                 }
                 logcat { "Sync-Account: recovery code is ${getRecoveryCode()}" }
                 Success(true)

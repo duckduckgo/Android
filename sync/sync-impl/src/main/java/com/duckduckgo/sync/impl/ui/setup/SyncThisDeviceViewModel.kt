@@ -69,9 +69,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
 
     init {
         syncPixels.fireSyncAnotherDevicePromptShown()
-        viewModelScope.launch {
-            syncSetupWideEvent.onIntroScreenShown()
-        }
+        syncSetupWideEvent.onIntroScreenShown()
     }
 
     fun syncThisDevice(launchSource: String) {
@@ -147,12 +145,10 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
     private suspend fun authenticate(): Boolean {
         if (!isAuthRequired) return true
         val response = deviceAuthenticator.authenticate(AuthenticationSource.THIS_DEVICE, Request()) { event ->
-            viewModelScope.launch {
-                when (event) {
-                    Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
-                    Event.EnrollmentShown -> Unit
-                    Event.VerificationShown -> Unit
-                }
+            when (event) {
+                Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
+                Event.EnrollmentShown -> Unit
+                Event.VerificationShown -> Unit
             }
         }
         return when (response) {

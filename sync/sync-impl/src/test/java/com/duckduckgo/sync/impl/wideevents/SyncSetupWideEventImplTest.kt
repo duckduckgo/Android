@@ -38,6 +38,9 @@ import com.duckduckgo.sync.store.SyncStore
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.google.testing.junit.testparameterinjector.TestParameterValuesProvider
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -59,7 +62,7 @@ import org.mockito.kotlin.whenever
 class SyncSetupWideEventImplTest {
 
     @get:Rule
-    val coroutineRule = CoroutineTestRule()
+    val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
 
     private val wideEventClient: WideEventClient = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
@@ -91,6 +94,7 @@ class SyncSetupWideEventImplTest {
             buildConfig = buildConfig,
             syncStore = syncStore,
             advertisedExchangeVersion = advertisedExchangeVersion,
+            appCoroutineScope = coroutineRule.testScope,
         )
     }
 
@@ -100,6 +104,7 @@ class SyncSetupWideEventImplTest {
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
@@ -115,6 +120,7 @@ class SyncSetupWideEventImplTest {
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted(launchSource = "promotion_passwords")
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
@@ -130,6 +136,7 @@ class SyncSetupWideEventImplTest {
             .thenReturn(Result.success(1L))
 
         wideEvent.onFlowStarted(launchSource = "duckai_card")
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
             name = "sync-setup",
@@ -144,6 +151,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 99L)
 
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 99L,
@@ -157,6 +165,7 @@ class SyncSetupWideEventImplTest {
 
         wideEvent.onFlowStarted()
         wideEvent.onIntroScreenShown()
+        advanceUntilIdle()
 
         verifyNoInteractions(wideEventClient)
     }
@@ -166,6 +175,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onIntroScreenShown()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
@@ -179,6 +189,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onSyncEnabled()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
@@ -192,6 +203,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onAccountCreationApiStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).intervalStart(
             wideEventId = 1L,
@@ -204,6 +216,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onAccountCreationApiFinished()
+        advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(
             wideEventId = 1L,
@@ -216,6 +229,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onInitialSyncStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).intervalStart(
             wideEventId = 1L,
@@ -228,6 +242,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onInitialSyncFinished()
+        advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(
             wideEventId = 1L,
@@ -240,6 +255,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onAccountCreated()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
@@ -253,6 +269,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onAccountCreationFailed()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -265,6 +282,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onRecoveryCodeShown()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
@@ -282,6 +300,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onDeviceAuthNotEnrolled()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
@@ -295,6 +314,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onUserAuthSuccess()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(
             wideEventId = 1L,
@@ -308,6 +328,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onRecoveryCodeGenerationFailed()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -320,6 +341,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onFlowCancelled()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -332,6 +354,7 @@ class SyncSetupWideEventImplTest {
         startFlow(flowId = 1L)
 
         wideEvent.onSyncRestoreStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowAbort(wideEventId = 1L)
     }
@@ -340,6 +363,7 @@ class SyncSetupWideEventImplTest {
     fun `operations without flowId are no-ops`() = runTest {
         wideEvent.onIntroScreenShown()
         wideEvent.onFlowCancelled()
+        advanceUntilIdle()
 
         verifyNoInteractions(wideEventClient)
     }
@@ -348,6 +372,7 @@ class SyncSetupWideEventImplTest {
     fun `non back up attempt sends nothing without the unified event`() = runTest {
         wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
         wideEvent.onIntroScreenShown()
+        advanceUntilIdle()
 
         verifyNoInteractions(wideEventClient)
     }
@@ -358,6 +383,7 @@ class SyncSetupWideEventImplTest {
 
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
         wideEvent.onUpdate { it.copy(setupMode = SetupMode.MULTI_DEVICE) }
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStart(any(), any(), any(), any(), any(), any())
         verifyNoMoreInteractions(wideEventClient)
@@ -368,6 +394,7 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
 
         wideEvent.onFlowStarted(launchSource = "promotion_passwords", setupMode = SetupMode.MULTI_DEVICE)
+        advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).flowStart(
@@ -389,6 +416,7 @@ class SyncSetupWideEventImplTest {
         isSignedIn = true
 
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowAppendToPath(
             wideEventId = 1L,
@@ -403,6 +431,7 @@ class SyncSetupWideEventImplTest {
         whenever(advertisedExchangeVersion.resolve()).thenReturn(ExchangeProtocolVersion.V2_0)
 
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowAppendToPath(
             wideEventId = 1L,
@@ -415,8 +444,10 @@ class SyncSetupWideEventImplTest {
     fun `onStep appends the step with the current fields`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowAppendToPath(wideEventId = 1L, step = "choice_screen", metadata = unifiedMetadata())
     }
@@ -426,6 +457,7 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+        advanceUntilIdle()
 
         wideEvent.onUpdate {
             it.copy(
@@ -438,6 +470,7 @@ class SyncSetupWideEventImplTest {
                 deviceAuthShown = true,
             )
         }
+        advanceUntilIdle()
 
         verify(wideEventClient).flowAppendToPath(
             wideEventId = 1L,
@@ -461,6 +494,7 @@ class SyncSetupWideEventImplTest {
     fun `unified attempt gets the original fields and keeps its own outcome`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onIntroScreenShown()
         wideEvent.onAccountCreationApiStarted()
@@ -468,6 +502,7 @@ class SyncSetupWideEventImplTest {
         wideEvent.onAccountCreationFailed()
         wideEvent.onFlowCancelled()
         wideEvent.onSyncRestoreStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowStep(wideEventId = 1L, stepName = "intro_screen_shown", success = true)
         verify(wideEventClient).intervalStart(wideEventId = 1L, key = "account_creation_latency_ms_bucketed")
@@ -480,8 +515,10 @@ class SyncSetupWideEventImplTest {
     fun `second start finishes the unified attempt as duplicated and starts a new one`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFlowStarted(launchSource = "promotion_passwords")
+        advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).flowFinish(
@@ -497,9 +534,11 @@ class SyncSetupWideEventImplTest {
     fun `unified attempt keeps its fields after the unified event is disabled`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
         syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(false))
 
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowAppendToPath(wideEventId = 1L, step = "choice_screen", metadata = unifiedMetadata())
     }
@@ -511,6 +550,7 @@ class SyncSetupWideEventImplTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(2L))
 
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Unknown)
         verify(wideEventClient).flowAppendToPath(wideEventId = 2L, step = "started", metadata = unifiedMetadata())
@@ -520,8 +560,10 @@ class SyncSetupWideEventImplTest {
     fun `onSucceeded finishes the unified attempt as success without a reason`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onSucceeded()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success, metadata = emptyMap())
     }
@@ -532,8 +574,10 @@ class SyncSetupWideEventImplTest {
     ) = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFailed(reason)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -548,8 +592,10 @@ class SyncSetupWideEventImplTest {
     ) = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFailed(reason)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -564,8 +610,10 @@ class SyncSetupWideEventImplTest {
     ) = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFailed(reason)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -580,8 +628,10 @@ class SyncSetupWideEventImplTest {
     ) = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT, stage)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -596,8 +646,10 @@ class SyncSetupWideEventImplTest {
     ) = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT, stage)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -610,8 +662,10 @@ class SyncSetupWideEventImplTest {
     fun `session timeout without a stage finishes the unified attempt as failure at an unknown stage`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -624,8 +678,10 @@ class SyncSetupWideEventImplTest {
     fun `onFailed ignores the timeout stage for other reasons`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE, TimeoutStage.WAITING_FOR_PEER_HELLO)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -640,8 +696,10 @@ class SyncSetupWideEventImplTest {
     ) = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onCancelled(reason)
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
             wideEventId = 1L,
@@ -655,10 +713,12 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
         wideEvent.onSucceeded()
+        advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(any(), any(), any())
     }
@@ -671,6 +731,7 @@ class SyncSetupWideEventImplTest {
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
         wideEvent.onFlowCancelled()
+        advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Cancelled)
         verify(wideEventClient).flowFinish(any(), any(), any())
@@ -683,6 +744,7 @@ class SyncSetupWideEventImplTest {
         wideEvent.onSucceeded()
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        advanceUntilIdle()
 
         verifyNoInteractions(wideEventClient)
     }
@@ -692,6 +754,7 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
 
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         verify(wideEventClient).intervalStart(wideEventId = 1L, key = "total_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
         verify(wideEventClient).intervalStart(wideEventId = 1L, key = "last_step_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
@@ -708,8 +771,10 @@ class SyncSetupWideEventImplTest {
     fun `new step restarts the last step latency`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+        advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "last_step_latency_ms_bucketed")
@@ -721,8 +786,10 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+        advanceUntilIdle()
 
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+        advanceUntilIdle()
 
         verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "last_step_latency_ms_bucketed")
     }
@@ -731,8 +798,10 @@ class SyncSetupWideEventImplTest {
     fun `finished attempt ends its latencies before it finishes`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onSucceeded()
+        advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "total_latency_ms_bucketed")
@@ -744,8 +813,10 @@ class SyncSetupWideEventImplTest {
     fun `duplicated attempt ends its latencies before it finishes`() = runTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "total_latency_ms_bucketed")
@@ -763,10 +834,12 @@ class SyncSetupWideEventImplTest {
         wideEvent.onFlowStarted()
         wideEvent.onStep(SetupStep.PREPARING_SYNC)
         wideEvent.onStep(SetupStep.ACCOUNT_CREATED)
+        advanceUntilIdle()
         verify(wideEventClient, never()).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
 
         wideEvent.onStep(SetupStep.RECOVERY_CODE_SHOWN)
         wideEvent.onSucceeded()
+        advanceUntilIdle()
 
         verify(wideEventClient).intervalStart(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
         verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
@@ -777,8 +850,10 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
         wideEvent.onStep(SetupStep.PREPARING_SYNC)
+        advanceUntilIdle()
 
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
         order.verify(wideEventClient).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
@@ -791,8 +866,10 @@ class SyncSetupWideEventImplTest {
         wideEvent.onFlowStarted()
         wideEvent.onStep(SetupStep.PREPARING_SYNC)
         wideEvent.onStep(SetupStep.ERROR_SCREEN)
+        advanceUntilIdle()
 
         wideEvent.onStep(SetupStep.PREPARING_SYNC)
+        advanceUntilIdle()
 
         verify(
             wideEventClient,
@@ -805,8 +882,10 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
         wideEvent.onFlowStarted()
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
+        advanceUntilIdle()
 
         wideEvent.onSucceeded()
+        advanceUntilIdle()
 
         verify(wideEventClient, never()).intervalEnd(wideEventId = 1L, key = "preparing_sync_latency_ms_bucketed")
     }
@@ -830,9 +909,10 @@ class SyncSetupWideEventImplTest {
         "initial_setup_mode" to initialSetupMode,
     )
 
-    private suspend fun startFlow(flowId: Long) {
+    private suspend fun TestScope.startFlow(flowId: Long) {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(flowId))
         wideEvent.onFlowStarted()
+        advanceUntilIdle()
     }
 
     private class FailureReasonsProvider : TestParameterValuesProvider() {
