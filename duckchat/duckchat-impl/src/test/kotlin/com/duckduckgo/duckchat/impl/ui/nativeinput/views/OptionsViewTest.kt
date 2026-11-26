@@ -128,13 +128,13 @@ class OptionsViewTest {
     }
 
     @Test
-    fun whenMergedMenuOnAtTopCompactLevelThenChipKeepsCloseIconAndTurnsToolOff() {
+    fun whenMergedMenuOnAtTopCompactLevelThenChipDropsCloseIconAndStillTurnsToolOff() {
         isMergedMenu.value = true
         selectedTool.value = Tool.WEB_SEARCH
         attach()
         view.setCompactLevel(AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS)
 
-        assertTrue(chip().findViewById<View>(R.id.optionsChipClose).isVisible)
+        assertFalse(chip().findViewById<View>(R.id.optionsChipClose).isVisible)
         chip().performClick()
 
         verify(viewModel).onToolDeselectedByUser(Tool.WEB_SEARCH)
@@ -143,7 +143,18 @@ class OptionsViewTest {
     }
 
     @Test
-    fun whenMergedMenuOnThenReservedWidthIsOnlyTheChip() {
+    fun whenMergedMenuOnBelowTopCompactLevelThenChipKeepsCloseIcon() {
+        isMergedMenu.value = true
+        selectedTool.value = Tool.WEB_SEARCH
+        attach()
+        view.setCompactLevel(AdaptiveBottomRowLayout.LEVEL_MODEL_ICON)
+
+        assertTrue(chip().findViewById<View>(R.id.optionsChipClose).isVisible)
+    }
+
+    // Each compact level has to free space, or a narrow row with a long submit label overflows.
+    @Test
+    fun whenMergedMenuOnThenReservedWidthIsTheChipAndShrinksAtTopCompactLevel() {
         isMergedMenu.value = true
         attach()
         assertEquals(0, view.worstCaseWidth(AdaptiveBottomRowLayout.LEVEL_FULL))
@@ -154,8 +165,9 @@ class OptionsViewTest {
         val withButton = view.worstCaseWidth(AdaptiveBottomRowLayout.LEVEL_FULL)
         isMergedMenu.value = true
 
-        assertEquals(withButton - button, view.worstCaseWidth(AdaptiveBottomRowLayout.LEVEL_FULL))
-        assertEquals(withButton - button, view.worstCaseWidth(AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS))
+        val mergedFull = view.worstCaseWidth(AdaptiveBottomRowLayout.LEVEL_FULL)
+        assertEquals(withButton - button, mergedFull)
+        assertTrue(view.worstCaseWidth(AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS) < mergedFull)
     }
 
     private fun toolsButton(): View = view.getChildAt(0)

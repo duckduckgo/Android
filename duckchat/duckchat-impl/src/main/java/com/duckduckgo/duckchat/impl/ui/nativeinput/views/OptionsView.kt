@@ -165,11 +165,10 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
             !viewModel.isMergedMenu.value
     }
 
-    // At the top compact level the active mode's chip stands in for the tools button: tapping it opens the
-    // tools menu, and the mode is turned off from there. With the merged menu the tools live in the attach
-    // menu, so the chip only ever turns its mode off.
-    private fun isMergedWithChip(): Boolean =
-        compactLevel >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS && childCount > 1 && !viewModel.isMergedMenu.value
+    // At the top compact level the active mode's chip drops its close icon and stands in for the tools button:
+    // tapping it opens the tools menu, and the mode is turned off from there. With the merged menu the tools live
+    // in the attach menu, so tapping the chip turns its mode off at every level.
+    private fun isMergedWithChip(): Boolean = compactLevel >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS && childCount > 1
 
     override fun setCompactLevel(level: Int) {
         if (compactLevel == level) return
@@ -177,8 +176,8 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         applyMergedState()
     }
 
-    // The tools button, plus the mode chip when one is active. At the top level the chip alone stands in for both.
-    // The merged menu has no tools button, so only the chip with its close icon takes space.
+    // The tools button, plus the mode chip when one is active. At the top level the chip alone, without its close
+    // icon, stands in for both. The merged menu has no tools button.
     override fun worstCaseWidth(level: Int): Int {
         val button = if (viewModel.isMergedMenu.value) 0 else resources.getDimensionPixelSize(R.dimen.nativeInputButtonSize)
         if (childCount <= 1) return button
@@ -187,7 +186,6 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         val chipIcon = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_5)
         val chipClose = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
         val mergedChip = space + chipPadding * 2 + chipIcon
-        if (viewModel.isMergedMenu.value) return mergedChip + space + chipClose
         if (level >= AdaptiveBottomRowLayout.LEVEL_MERGED_TOOLS) return mergedChip
         return button + mergedChip + space + chipClose
     }
@@ -316,7 +314,7 @@ class OptionsView(context: Context, private val host: NativeInputHost) : LinearL
         view.findViewById<ImageView>(R.id.optionsChipIcon).setImageResource(item.iconRes)
         view.contentDescription = context.getString(R.string.duckChatOptionsChipDismissContentDescription, context.getString(item.titleRes))
         view.setOnClickListener {
-            if (isMergedWithChip()) {
+            if (isMergedWithChip() && !viewModel.isMergedMenu.value) {
                 showMenu()
             } else {
                 viewModel.onToolDeselectedByUser(item.tool)
