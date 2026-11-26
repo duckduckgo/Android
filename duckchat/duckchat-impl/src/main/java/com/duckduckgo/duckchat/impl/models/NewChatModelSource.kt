@@ -62,9 +62,14 @@ internal fun modelSourceFor(
     return if (sentModelId != startModelId || sentReasoningEffort != startEffort) ModelSource.PICKED else startSource
 }
 
+/**
+ * [ModelSource.DEFAULT] while the global selection is still the effective new-chat default, the server's or
+ * else the hardcoded one. Before a fetch has set that default, the hardcoded one stands in.
+ */
 private fun ModelState.globalSource(): ModelSource {
-    val isTierDefault = models.isNotEmpty() &&
-        selectedModelId == NewChatDefaults.tierDefaultModelId(userTier) &&
-        (availableReasoningModes.isEmpty() || selectedReasoningMode == ReasoningMode.FAST)
-    return if (isTierDefault) ModelSource.DEFAULT else ModelSource.FALLBACK
+    val default = newChatDefault ?: NewChatDefaults.preferred(userTier, remote = null)
+    val isDefault = models.isNotEmpty() &&
+        selectedModelId == default.modelId &&
+        (availableReasoningModes.isEmpty() || selectedReasoningMode == default.mode)
+    return if (isDefault) ModelSource.DEFAULT else ModelSource.FALLBACK
 }

@@ -44,6 +44,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.Mockito.mockingDetails
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.atLeastOnce
@@ -56,6 +57,7 @@ import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.coroutines.Continuation
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RealDuckAiModelManagerTest {
@@ -612,6 +614,132 @@ class RealDuckAiModelManagerTest {
         verify(dataStore, never()).setSelectedModel(anyOrNull())
         verify(dataStore, never()).setSelectedProvider(anyOrNull())
         verify(dataStore, never()).setSelectedReasoningMode(anyOrNull())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndServerDefaultSentThenNewChatsStartOnIt() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            serverDefaultResponse(RemoteNewChatDefault(modelId = "server-model", reasoningEffort = "high")),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("server-model", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.EXTENDED_REASONING, testee.modelState.value.selectedReasoningMode)
+        assertEquals("high", testee.getResolvedReasoningEffort())
+        assertEquals(NewChatDefault("server-model", ReasoningMode.EXTENDED_REASONING), testee.modelState.value.newChatDefault)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+        verify(dataStore, never()).setSelectedReasoningMode(anyOrNull())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndServerDefaultAbsentThenTierDefaultOnFast() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(serverDefaultResponse(null))
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndServerModelMissingThenTierDefaultOnFastNotTheServerMode() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            serverDefaultResponse(RemoteNewChatDefault(modelId = "gone", reasoningEffort = "low")),
+        )
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.FAST, testee.modelState.value.selectedReasoningMode)
+        assertEquals(NewChatDefault("gone", ReasoningMode.REASONING), testee.modelState.value.newChatDefault)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndModelsNotFetchedThenNewChatDefaultIsTheHardcodedOne() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+
+        testee = createManager()
+
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsOffThenServerDefaultChangesNothing() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(dataStore.getSelectedReasoningMode()).thenReturn("extended_reasoning")
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        val serverDefaults = listOf(
+            RemoteNewChatDefault(modelId = "server-model", reasoningEffort = "none"),
+            RemoteNewChatDefault(modelId = "gpt-6-luna", reasoningEffort = "low"),
+            RemoteNewChatDefault(modelId = null, reasoningEffort = null),
+        )
+
+        val (baselineState, baselineWrites) = flagOffFetch(serverDefaultResponse(null))
+
+        assertEquals("first", baselineState.selectedModelId)
+        serverDefaults.forEach { serverDefault ->
+            val (state, writes) = flagOffFetch(serverDefaultResponse(serverDefault))
+
+            assertEquals(baselineState, state)
+            assertEquals(baselineWrites, writes)
+            assertNull(state.newChatDefault)
+        }
+    }
+
+    @Test
+    fun whenResetModelForNewChatsTurnedOffThenNextFetchClearsNewChatDefaultAndRestoresTheOldSelection() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            serverDefaultResponse(RemoteNewChatDefault(modelId = "server-model", reasoningEffort = "none")),
+        )
+        testee = createManager()
+        testee.fetchModels()
+        assertEquals("server-model", testee.modelState.value.selectedModelId)
+
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = false))
+        testee.fetchModels()
+
+        assertEquals("first", testee.modelState.value.selectedModelId)
+        assertNull(testee.modelState.value.newChatDefault)
+    }
+
+    /** The first accessible model differs from both the tier default and the server's model, so a leak would show. */
+    private fun serverDefaultResponse(newChatDefault: RemoteNewChatDefault?) = AIChatModelsResponse(
+        models = listOf(
+            remoteModel("first", supportedReasoningEffort = listOf("low")),
+            remoteModel("gpt-6-luna", supportedReasoningEffort = listOf("none", "low")),
+            remoteModel("server-model", supportedReasoningEffort = listOf("none", "low", "high")),
+        ),
+        newChatDefault = newChatDefault,
+    )
+
+    /** The state a flag-off manager publishes for [response], and every write it made to [DuckChatDataStore] on the way. */
+    private suspend fun flagOffFetch(response: AIChatModelsResponse): Pair<ModelState, List<Pair<String, List<Any?>>>> {
+        clearInvocations(dataStore)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(response)
+        testee = createManager()
+        testee.fetchModels()
+        val writes = mockingDetails(dataStore).invocations
+            .filter { it.method.name.startsWith("set") }
+            .map { invocation -> invocation.method.name to invocation.arguments.filterNot { it is Continuation<*> } }
+        return testee.modelState.value to writes
     }
 
     @Test

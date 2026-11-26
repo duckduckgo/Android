@@ -21,6 +21,13 @@ import com.squareup.moshi.Json
 data class AIChatModelsResponse(
     val models: List<RemoteAIChatModel>,
     val attachmentLimits: Map<String, RemoteTierAttachmentLimits>? = null,
+    val newChatDefault: RemoteNewChatDefault? = null,
+)
+
+/** Where the server wants a new chat to start. Read only while `resetModelForNewChats` is on. */
+data class RemoteNewChatDefault(
+    val modelId: String? = null,
+    val reasoningEffort: String? = null,
 )
 
 data class RemoteAIChatModel(
