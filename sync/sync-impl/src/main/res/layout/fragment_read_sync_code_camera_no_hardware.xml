@@ -23,6 +23,7 @@
     tools:showIn="@layout/fragment_read_sync_code_camera">
 
     <com.duckduckgo.sync.impl.ui.pairing.SyncPairingHeaderView
+        android:id="@+id/pairingHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/keyline_4"

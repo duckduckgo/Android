@@ -23,42 +23,41 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+	implementation(project(":app-build-config-api")) {
+		because 'needed for feature toggles'
+	}
+	implementation project(':browser-api')
+	implementation project(':codegen-annotations')
+	implementation project(':common-utils')
+	implementation project(':data-store-api')
+	implementation project(':design-system')
+	implementation project(':di')
+	implementation project(':feature-toggles-api')
+	implementation project(':internal-features-api')
+	implementation project(':navigation-api')
 	implementation project(":remote-messaging-api")
 	implementation project(":remote-messaging-impl")
+	implementation "com.squareup.logcat:logcat:_"
+	implementation AndroidX.constraintLayout
+	implementation AndroidX.core.ktx
+	implementation Google.android.material
+	implementation KotlinX.coroutines.android
 
-    ksp project(':codegen-ksp')
-    implementation project(':codegen-annotations')
-    implementation project(':di')
-    implementation project(':design-system')
-    implementation project(':common-utils')
-    implementation project(':navigation-api')
-    implementation project(':internal-features-api')
-    implementation project(':feature-toggles-api')
-    implementation project(":app-build-config-api") // needed for feature toggles
-    implementation project(':browser-api')
-    implementation project(':data-store-api')
-
-    ksp AndroidX.room.compiler
-
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.core.ktx
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
-
-    implementation "com.squareup.logcat:logcat:_"
-
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation project(':common-test')
-    testImplementation project(':feature-toggles-test')
-    testImplementation project(':data-store-test')
-    testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
-    testImplementation(KotlinX.coroutines.test) {
+	testImplementation project(':common-test')
+	testImplementation project(':data-store-test')
+	testImplementation project(':feature-toggles-test')
+	testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+	testImplementation CashApp.turbine
+	testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+	testImplementation Testing.junit4
+	testImplementation Testing.robolectric
+
+	ksp project(':codegen-ksp')
+	ksp AndroidX.room.compiler
 }
 
 android {

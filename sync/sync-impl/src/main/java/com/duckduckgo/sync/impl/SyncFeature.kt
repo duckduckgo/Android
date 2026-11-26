@@ -87,4 +87,10 @@ interface SyncFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun loginNotification(): Toggle
+
+    /**
+     * Gates the typeable pairing URL: opening Sync pairing when the user types duck.com/pair or duck.ai/pair in the address bar.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun syncPairingUrl(): Toggle
 }

@@ -21,7 +21,7 @@ package com.duckduckgo.sync.api
  *
  * The suggestion is due when the install came from a device transfer that has finished, neither the previous phone
  * nor this one has Sync, and the user has not dismissed it. Accepting the suggestion should open
- * [SyncActivityStartSetupFlow]; that does not dismiss it, so it stays due until Sync is on.
+ * [SyncActivityStartSyncFlow]; that does not dismiss it, so it stays due until Sync is on.
  */
 interface SyncAfterDeviceTransferPrompt {
     suspend fun shouldShow(): Boolean

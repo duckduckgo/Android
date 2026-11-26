@@ -49,7 +49,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV2PairingErrorContent
@@ -74,7 +73,7 @@ import kotlin.time.Duration.Companion.seconds
 
 class ProcessSyncCodeViewModel @AssistedInject constructor(
     @Assisted private val codeSource: SyncCodeSource,
-    @Assisted private val launchSource: SyncLaunchSource,
+    @Assisted private val launchSource: String,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val syncPixels: SyncPixels,
@@ -487,13 +486,13 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             codeSource: SyncCodeSource,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ): ProcessSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val codeSource: SyncCodeSource,
-            private val launchSource: SyncLaunchSource,
+            private val launchSource: String,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")

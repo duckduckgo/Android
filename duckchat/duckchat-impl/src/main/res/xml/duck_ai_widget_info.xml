@@ -16,7 +16,6 @@
   ~ limitations under the License.
   -->
 
-<!-- previewImage is the pre-Android 12 picker fallback, a placeholder pending a design asset. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:initialLayout="@layout/duck_ai_widget_daynight"
     android:minWidth="250dp"
@@ -25,8 +24,7 @@
     android:minResizeHeight="142dp"
     android:targetCellWidth="4"
     android:targetCellHeight="2"
-    android:previewImage="@drawable/duck_ai_widget_preview"
-    android:previewLayout="@layout/duck_ai_widget_preview"
+    android:previewImage="@drawable/image_preview_chat_widget_daynight"
     android:description="@string/duckAiWidgetDescription"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="86400000"

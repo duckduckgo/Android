@@ -22,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
@@ -29,6 +30,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.ADVANCED_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.billing.BillingError.ERROR
 import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
 import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_DISCONNECTED
@@ -51,8 +53,10 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,6 +66,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import logcat.logcat
 import java.util.EnumSet
 import javax.inject.Inject
@@ -135,6 +140,8 @@ class RealPlayBillingManager @Inject constructor(
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent,
     private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent,
     private val subscriptionUndoCancellationWideEvent: SubscriptionUndoCancellationWideEvent,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
+    @IsMainProcess private val isMainProcess: Boolean,
 ) : PlayBillingManager, MainProcessLifecycleObserver {
 
     private val connectionMutex = Mutex()
@@ -498,7 +505,15 @@ class RealPlayBillingManager @Inject constructor(
     }
 
     override suspend fun getLatestPurchase(): LatestPurchaseResult = withContext(dispatcherProvider.io()) {
-        if (!billingClient.ready) return@withContext LatestPurchaseResult.Unknown(cause = "billing_client_not_ready")
+        if (!billingClient.ready) {
+            if (!shouldConnectBeforeQuery()) {
+                return@withContext LatestPurchaseResult.Unknown(cause = "billing_client_not_ready")
+            }
+            val connectFailureCause = connectWithTimeout()
+            if (connectFailureCause != null) {
+                return@withContext LatestPurchaseResult.Unknown(cause = connectFailureCause)
+            }
+        }
 
         when (val result = billingClient.queryPurchases()) {
             is QueryPurchasesResult.Success -> {
@@ -515,6 +530,31 @@ class RealPlayBillingManager @Inject constructor(
                 LatestPurchaseResult.Unknown(cause = "query_purchases_failed:${result.billingError?.name ?: "unknown"}")
             }
         }
+    }
+
+    private fun shouldConnectBeforeQuery(): Boolean {
+        val flagIsOn = subscriptionsFeature.value.connectBillingBeforeQueryingPurchases().isEnabled()
+        return isMainProcess && flagIsOn
+    }
+
+    private suspend fun connectWithTimeout(): String? {
+        val connecting = coroutineScope.async(dispatcherProvider.io()) { connect() }
+        val failureCause = try {
+            withTimeoutOrNull(timeout = CONNECT_BEFORE_QUERY_TIMEOUT) {
+                connecting.await()
+                "billing_connect_failed"
+            } ?: "billing_connect_timeout"
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat { "Billing: connect before query failed: ${e.javaClass.simpleName}" }
+            "billing_connect_error"
+        }
+        return if (billingClient.ready) null else failureCause
+    }
+
+    private companion object {
+        val CONNECT_BEFORE_QUERY_TIMEOUT = 5.seconds
     }
 }
 

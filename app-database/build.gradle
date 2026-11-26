@@ -34,37 +34,35 @@ android {
 }
 
 dependencies {
-    implementation project(path: ':di')
-    implementation project(path: ':codegen-annotations')
-    implementation project(path: ':common-utils')
+    implementation project(path: ':app-build-config-api')
     implementation project(path: ':browser-api')
     implementation project(path: ':browser-mode-api')
-    implementation project(path: ':app-store')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':di')
     implementation project(path: ':saved-sites-api')
     implementation project(path: ':saved-sites-store')
-    implementation project(path: ':app-build-config-api')
     implementation project(path: ':statistics-api')
-
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
     implementation AndroidX.lifecycle.liveDataKtx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
     implementation KotlinX.coroutines.core
     implementation Square.moshi
-    implementation "com.squareup.logcat:logcat:_"
-    implementation "io.reactivex.rxjava2:rxjava:_"
 
-    ksp AndroidX.room.compiler
-    ksp project(':codegen-ksp')
-
-    testImplementation Testing.junit4
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
 
+    androidTestImplementation "org.mockito:mockito-android:_"
+    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
     androidTestImplementation AndroidX.archCore.testing
     androidTestImplementation AndroidX.room.testing
     androidTestImplementation AndroidX.test.ext.junit
     androidTestImplementation AndroidX.test.runner
-    androidTestImplementation "org.mockito:mockito-android:_"
-    androidTestImplementation "org.mockito.kotlin:mockito-kotlin:_"
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 tasks.register('androidTestsBuild') {

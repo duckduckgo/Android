@@ -44,6 +44,7 @@ import com.duckduckgo.autofill.impl.ui.credential.updating.AutofillUpdatingExist
 import com.duckduckgo.autofill.impl.ui.credential.updating.AutofillUpdatingExistingCredentialsDialogFragment.DialogEvent.Updated
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.android.support.AndroidSupportInjection
@@ -128,6 +129,15 @@ class AutofillUpdatingExistingCredentialsDialogFragment : BottomSheetDialogFragm
 
         val binding = ContentAutofillUpdateExistingCredentialsBinding.inflate(inflater, container, false)
         configureViews(binding)
+        binding.dialogRootView.applyRebrandBottomSheetSpacing(
+            header = binding.appIcon,
+            title = binding.dialogTitle,
+            messages = listOf(binding.dialogSubtitle),
+            buttons = binding.updateCredentialsButton,
+            secondary = listOf(binding.cancelButton),
+            close = binding.closeButton,
+            content = binding.autofillDialogContentContainer,
+        )
         binding.dialogRootView.applyBottomSystemBarInsetPadding()
         return binding.root
     }

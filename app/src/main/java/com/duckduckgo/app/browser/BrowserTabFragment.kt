@@ -368,6 +368,7 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParam
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
+import com.duckduckgo.pagetranslation.api.PageTranslation
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -387,7 +388,7 @@ import com.duckduckgo.site.permissions.api.SitePermissionsDialogLauncher
 import com.duckduckgo.site.permissions.api.SitePermissionsGrantedListener
 import com.duckduckgo.site.permissions.api.SitePermissionsManager.SitePermissions
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.duckduckgo.sync.api.SyncActivityStartSetupFlow
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.user.agent.api.ClientBrandHintProvider
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.voice.api.VoiceSearchLauncher
@@ -455,6 +456,9 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fireDialogProvider: FireDialogProvider
+
+    @Inject
+    lateinit var pageTranslation: PageTranslation
 
     override val coroutineContext: CoroutineContext
         get() = supervisorJob + dispatchers.main()
@@ -1270,6 +1274,7 @@ class BrowserTabFragment :
 
         configureNavigationBar()
         configureOmnibar()
+        configureTranslationBanner()
         configureBrowserTabKeyboardListener()
 
         disableViewStateSaving()
@@ -1319,6 +1324,29 @@ class BrowserTabFragment :
         }
 
         launchDownloadMessagesJob()
+    }
+
+    private fun configureTranslationBanner() {
+        val container = if (omnibar.omnibarType == OmnibarType.SINGLE_BOTTOM) binding.translationBannerBottom else binding.translationBannerTop
+        container.removeAllViews()
+        container.addView(pageTranslation.getBannerView(requireContext()))
+
+        val updateVisibility = {
+            container.isVisible = !omnibar.omnibarTextInput.isFocused && !nativeInputManager.isNativeInputShown()
+        }
+        omnibar.omnibarTextInput.setOnFocusChangeListener { _, _ -> container.post(updateVisibility) }
+        // The native input is added to and removed from rootView without moving the omnibar focus.
+        binding.rootView.setOnHierarchyChangeListener(
+            object : ViewGroup.OnHierarchyChangeListener {
+                override fun onChildViewAdded(parent: View?, child: View?) {
+                    container.post(updateVisibility)
+                }
+
+                override fun onChildViewRemoved(parent: View?, child: View?) {
+                    container.post(updateVisibility)
+                }
+            },
+        )
     }
 
     private fun disableViewStateSaving() {
@@ -1903,7 +1931,7 @@ class BrowserTabFragment :
             }
             onMenuItemClicked(vpnMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_VPN)
-                viewModel.onVpnMenuClicked()
+                viewModel.onVpnMenuClicked(omnibar.viewMode)
             }
             onMenuItemClicked(newDuckChatMenuItem) {
                 pixel.fire(AppPixelName.SHEET_MENU_AICHAT)
@@ -2924,7 +2952,14 @@ class BrowserTabFragment :
             }
 
             is Command.LaunchSyncSetup -> {
-                globalActivityStarter.start(requireContext(), SyncActivityStartSetupFlow(source = null))
+                globalActivityStarter.start(requireContext(), SyncActivityStartSyncFlow(source = null))
+            }
+
+            is Command.LaunchSyncPairing -> {
+                globalActivityStarter.start(
+                    requireContext(),
+                    SyncActivityStartSyncFlow(source = it.launchSource, joinExistingAccount = true),
+                )
             }
 
             is Command.DialNumber -> {
@@ -4353,6 +4388,8 @@ class BrowserTabFragment :
                 }
             }
 
+            pageTranslation.attach(it)
+
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
             MainFrameCommitNavigationClient.install(it, viewModel::onMainFrameCommitted)
@@ -5439,6 +5476,7 @@ class BrowserTabFragment :
     private fun destroyWebView() {
         if (::webViewContainer.isInitialized) webViewContainer.removeAllViews()
         webView?.let {
+            pageTranslation.detach(it)
             it.removeSystemAutofillCallback()
             it.destroy()
         }

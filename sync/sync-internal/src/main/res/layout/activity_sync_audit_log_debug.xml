@@ -190,12 +190,26 @@
                 app:textType="secondary"
                 app:typography="body2" />
 
-            <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
-                android:id="@+id/simulateLoginButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
-                android:text="Simulate login on other device" />
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+                    android:id="@+id/simulateLoginButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text="Simulate login on other device" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/syncNowButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sync now"
+                    app:daxButtonSize="small" />
+            </LinearLayout>
 
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/otherDevicesResultTextView"

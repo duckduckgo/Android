@@ -104,6 +104,7 @@ class CustomAlertDialogBuilder(val context: Context) : DaxAlertDialog {
             }
         dialog = dialogBuilder.create()
         setViews(binding, dialog!!)
+        binding.applySpacing()
 
         return this
     }

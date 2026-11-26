@@ -23,25 +23,22 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':codegen-ksp')
-
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':design-system')
-    implementation project(path: ':di')
-    implementation project(path: ':statistics-api')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':browser-mode-api')
-    implementation project(path: ':site-permissions-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':feature-toggles-api')
-    implementation project(path: ':navigation-api')
-    implementation project(path: ':data-store-api')
-    implementation project(path: ':duckchat-api')
     api project(path: ':site-permissions-store')
 
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':browser-api')
+    implementation project(path: ':browser-mode-api')
     implementation project(path: ':codegen-annotations')
-
+    implementation project(path: ':common-utils')
+    implementation project(path: ':data-store-api')
+    implementation project(path: ':design-system')
+    implementation project(path: ':di')
+    implementation project(path: ':duckchat-api')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':navigation-api')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':site-permissions-api')
+    implementation project(path: ':statistics-api')
     implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
@@ -51,16 +48,18 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':feature-toggles-test')
-    testImplementation CashApp.turbine
-    testImplementation Testing.junit4
     testImplementation AndroidX.test.ext.junit
-    testImplementation Testing.mockito.kotlin
-    testImplementation Testing.robolectric
+    testImplementation CashApp.turbine
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.mockito.kotlin
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }
 
 android {

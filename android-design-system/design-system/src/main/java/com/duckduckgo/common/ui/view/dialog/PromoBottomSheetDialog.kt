@@ -24,10 +24,11 @@ import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.mobile.android.databinding.BottomSheetPromoBinding
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.duckduckgo.mobile.android.R as CommonR
 
 @SuppressLint("NoBottomSheetDialog")
 class PromoBottomSheetDialog(builder: Builder) :
-    BottomSheetDialog(builder.context, com.duckduckgo.mobile.android.R.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge) {
+    BottomSheetDialog(builder.context, CommonR.style.Widget_DuckDuckGo_BottomSheetDialog_EdgeToEdge) {
 
     abstract class EventListener {
         /** Sets a listener to be invoked when the bottom sheet is shown */

@@ -85,6 +85,8 @@
                 "promotion_bookmark_multi_device_added_dialog",
                 "promotion_bookmark_added_dialog",
                 "promotion_ai_chat",
+                "typed_url_duck_com",
+                "typed_url_duck_ai",
                 "other"
             ]
         }

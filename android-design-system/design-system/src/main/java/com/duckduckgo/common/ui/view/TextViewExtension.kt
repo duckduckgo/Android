@@ -16,8 +16,11 @@
 
 package com.duckduckgo.common.ui.view
 
+import android.view.View
+import android.view.ViewGroup.MarginLayoutParams
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.core.view.updateLayoutParams
 
 fun TextView.leftDrawable(@DrawableRes id: Int = 0) {
     this.setCompoundDrawablesWithIntrinsicBounds(id, 0, 0, 0)
@@ -25,4 +28,13 @@ fun TextView.leftDrawable(@DrawableRes id: Int = 0) {
 
 fun TextView.rightDrawable(@DrawableRes id: Int = 0) {
     this.setCompoundDrawablesWithIntrinsicBounds(0, 0, id, 0)
+}
+
+fun TextView.alignToFirstLine(icon: View) {
+    val metrics = paint.fontMetricsInt
+    val firstBaseline = paddingTop - if (includeFontPadding) metrics.top else metrics.ascent
+    val textTop = (layoutParams as MarginLayoutParams).topMargin
+    icon.updateLayoutParams<MarginLayoutParams> {
+        topMargin = (textTop + firstBaseline + (metrics.ascent + metrics.descent) / 2 - height / 2).coerceAtLeast(0)
+    }
 }

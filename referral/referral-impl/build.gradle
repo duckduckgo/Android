@@ -45,33 +45,32 @@ tasks.named('jvm_tests').configure { setDependsOn(['testPlayDebugUnitTest']) }
 tasks.named('jvm_checks').configure { setDependsOn(['spotlessCheck', 'lint', 'testPlayDebugUnitTest']) }
 
 dependencies {
-    ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
-
-    implementation project(':di')
     implementation project(':common-utils')
-    implementation project(':statistics-api')
-    implementation project(':experiments-api')
-    implementation project(':verified-installation-api')
-    implementation project(':referral-api')
-    implementation project(':data-store-api')
-    implementation project(':test-seeder-api')
     implementation project(':content-scope-scripts-api')
+    implementation project(':data-store-api')
+    implementation project(':di')
+    implementation project(':experiments-api')
     implementation project(':js-messaging-api')
-
+    implementation project(':referral-api')
+    implementation project(':statistics-api')
+    implementation project(':test-seeder-api')
+    implementation project(':verified-installation-api')
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.core.ktx
     implementation KotlinX.coroutines.core
-    implementation "com.squareup.logcat:logcat:_"
 
     playImplementation("com.android.installreferrer:installreferrer:_")
 
     testImplementation project(':common-test')
-    testImplementation Testing.junit4
+    testImplementation "androidx.test:runner:_"
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
     testImplementation (KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
+
+    ksp project(':codegen-ksp')
 }

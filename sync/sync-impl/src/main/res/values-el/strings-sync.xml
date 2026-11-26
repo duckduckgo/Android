@@ -214,6 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Σάρωση κωδικού QR για συγχρονισμό</string>
     <string name="sync_simplified_scanner_camera_header_body">Ανοίξτε το <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo για υπολογιστή</annotation></b>\n<annotation type="gap">\n</annotation>και μεταβείτε στο <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Συγχρονισμός με άλλη συσκευή</annotation></string>
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Ανοίξτε το <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo για υπολογιστή</annotation></b>\n<annotation type="gap">\n</annotation>μεταβείτε στο <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Το κατάλαβα</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">Το DuckDuckGo χρειάζεται πρόσβαση στην κάμερά σου.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Απαιτούνται άδειες πρόσβασης στην κάμερα για τη σάρωση του κωδικού QR.</string>
@@ -223,6 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Εισαγάγετε τον κωδικό συγχρονισμού</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Ανοίξτε την άλλη σας <annotation type="icon">￼</annotation> <b><annotation type="highlight">εφαρμογή DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Μεταβείτε στο <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Συγχρονισμός με άλλη συσκευή</annotation> › <annotation type="highlight">Αντιγραφή κωδικού κειμένου</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Ανοίξτε μια άλλη <annotation type="icon">￼</annotation> <b><annotation type="highlight">εφαρμογή DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>μεταβείτε στο <b><annotation type="url">%1$s</annotation></b> και αντιγράψτε τον κωδικό κειμένου.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Υπόδειγμα κωδικού:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Επικόλληση κωδικού συγχρονισμού</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Δυστυχώς, ο κωδικός που επικολλήθηκε δεν είναι έγκυρος.</string>
@@ -231,6 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">Κωδικός QR</string>
     <string name="sync_simplified_qr_code_header_headline">Σάρωση από άλλη συσκευή</string>
     <string name="sync_simplified_qr_code_header_body">Σε μια άλλη συσκευή, ανοίξτε το <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>και μεταβείτε στο <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Συγχρονισμός με άλλη συσκευή</annotation> και σαρώστε αυτόν τον κωδικό:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Ανοίξτε ένα άλλο <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>μεταβείτε στο <b><annotation type="url">%1$s</annotation></b> και σαρώστε αυτόν τον κωδικό:</string>
     <string name="sync_simplified_qr_code_copy_button">Αντιγραφή κωδικού κειμένου</string>
     <string name="sync_simplified_qr_code_share_button">Κοινή χρήση</string>
     <string name="sync_simplified_qr_code_copied_message">Αντιγραφή κωδικού ανάκτησης</string>

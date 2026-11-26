@@ -69,4 +69,17 @@ class NewAddressBarPickerDataStoreTest {
         assertEquals(2, testee.incrementDisplayCount())
         assertEquals(3, testee.incrementDisplayCount())
     }
+
+    @Test
+    fun `when never displayed then displayCount is 0`() = runTest {
+        assertEquals(0, testee.displayCount())
+    }
+
+    @Test
+    fun `when displayed twice then displayCount is 2`() = runTest {
+        testee.incrementDisplayCount()
+        testee.incrementDisplayCount()
+
+        assertEquals(2, testee.displayCount())
+    }
 }

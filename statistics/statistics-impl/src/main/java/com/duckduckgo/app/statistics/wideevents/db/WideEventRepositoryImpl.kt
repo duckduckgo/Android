@@ -83,6 +83,32 @@ class WideEventRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun appendToWideEventPath(
+        eventId: Long,
+        step: String,
+        metadata: Map<String, String?>,
+    ) {
+        require(step.isNotEmpty()) { "Path step must not be empty" }
+        require(',' !in step) { "Path step must not contain commas: '$step'" }
+        require(step != WideEventRepository.PATH_TRUNCATED) { "Path step must not be '${WideEventRepository.PATH_TRUNCATED}'" }
+
+        updateWideEvent(eventId) { event ->
+            checkEventIsActive(event)
+
+            val path = when {
+                step == event.lastPathStep -> event.path
+                event.path.size < WideEventRepository.MAX_PATH_SIZE -> event.path + step
+                else -> event.path.take(WideEventRepository.MAX_PATH_SIZE - 1) + WideEventRepository.PATH_TRUNCATED
+            }
+
+            event.copy(
+                path = path,
+                lastPathStep = step,
+                metadata = mergeMetadata(event.metadata, metadata),
+            )
+        }
+    }
+
     override suspend fun setWideEventStatus(
         eventId: Long,
         status: WideEventRepository.WideEventStatus,

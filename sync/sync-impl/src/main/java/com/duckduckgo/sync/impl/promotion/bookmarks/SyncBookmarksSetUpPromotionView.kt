@@ -36,6 +36,7 @@ import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.savedsites.api.promotion.BookmarksScreenPromotionPlugin.Callback
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.databinding.ViewSyncBookmarksSetUpPromotionBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
@@ -45,8 +46,6 @@ import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType.B
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command.DismissPromotion
 import com.duckduckgo.sync.impl.promotion.bookmarks.SyncBookmarksSetUpPromotionViewModel.Command.LaunchSyncSetup
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityStartSyncFlow
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.firstOrNull
@@ -115,7 +114,10 @@ class SyncBookmarksSetUpPromotionView @JvmOverloads constructor(
     }
 
     private fun launchSyncSetup() {
-        globalActivityStarter.start(context, SyncActivityStartSyncFlow(source = SyncLaunchSource.PromotionBookmarks))
+        globalActivityStarter.start(
+            context,
+            SyncActivityStartSyncFlow(source = "promotion_bookmarks"),
+        )
     }
 }
 

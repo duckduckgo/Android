@@ -653,6 +653,14 @@ class MigrationsProvider(val context: Context, private val legacyFireproofSettin
     }
 
     /**
+     * `web_trackers_blocked` moved to tracker_detection.db (TrackerDetectionDatabase). The table is left here on purpose:
+     * WebTrackersBlockedLegacyImporter copies its rows into tracker_detection.db and then drops it.
+     */
+    private val MIGRATION_65_TO_66: Migration = object : Migration(65, 66) {
+        override fun migrate(database: SupportSQLiteDatabase) = Unit
+    }
+
+    /**
      * WARNING ⚠️
      * This needs to happen because Room doesn't support UNIQUE (...) ON CONFLICT REPLACE when creating the bookmarks table.
      * When updating the bookmarks table, you will need to update this creation script in order to properly maintain the above
@@ -736,6 +744,7 @@ class MigrationsProvider(val context: Context, private val legacyFireproofSettin
             MIGRATION_62_TO_63,
             MIGRATION_63_TO_64,
             MIGRATION_64_TO_65,
+            MIGRATION_65_TO_66,
         )
 
     @Deprecated(

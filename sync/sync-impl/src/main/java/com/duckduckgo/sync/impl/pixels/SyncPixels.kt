@@ -69,7 +69,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.stats.SyncStatsRepository
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity.Companion.LAUNCH_SOURCE_OTHER
 import com.duckduckgo.sync.store.SharedPrefsProvider
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.ContributesIntoSet
@@ -109,7 +109,7 @@ interface SyncPixels {
      * Fired when user sets up a sync account directly.
      * @param launchSource: the entry point that opened Sync.
      */
-    fun fireSignupDirectPixel(launchSource: SyncLaunchSource)
+    fun fireSignupDirectPixel(launchSource: String)
 
     fun fireSyncAccountErrorPixel(
         result: Error,
@@ -121,7 +121,10 @@ interface SyncPixels {
         apiError: Error,
     )
 
-    fun fireSyncSettingsShown()
+    /**
+     * @param launchSource the entry point that opened Sync.
+     */
+    fun fireSyncSettingsShown(launchSource: String)
     fun fireBackupThisDeviceTapped()
     fun fireRecoverSyncDataTapped()
     fun fireRecoverSyncDataConfirmed()
@@ -138,12 +141,12 @@ interface SyncPixels {
     fun fireSetupAuthenticationResult(result: AuthenticationResult, source: AuthenticationSource)
     fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         path: SetupPath?,
         myRole: SetupRole?,
         peerKind: PeerKind?,
     )
-    fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: SyncLaunchSource, reason: CancellationReason? = null)
+    fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: String, reason: CancellationReason? = null)
     fun fireSyncSetupManualCodeScreenShown(screenType: ScreenType)
     fun fireSyncSetupCodePastedParseSuccess(screenType: ScreenType, codeVersion: CodeVersion, codeType: SyncCodeType? = null)
     fun fireSyncSetupCodePastedParseFailure(screenType: ScreenType, reason: SetupFailureReason? = null)
@@ -168,7 +171,7 @@ interface SyncPixels {
      */
     fun fireSyncSetupFailed(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         reason: SetupFailureReason,
         path: SetupPath? = null,
         myRole: SetupRole? = null,
@@ -219,6 +222,54 @@ interface SyncPixels {
     enum class PeerKind(val value: String) {
         DDG("ddg"),
         THIRD_PARTY("3party"),
+    }
+
+    enum class SetupMode(val value: String) {
+        SINGLE_DEVICE("single_device"),
+        MULTI_DEVICE("multi_device"),
+        RECOVERY("recovery"),
+    }
+
+    enum class ConnectMethod(val value: String) {
+        SHOW_CODE("show_code"),
+        SCAN_CODE("scan_code"),
+        PASTE_CODE("paste_code"),
+        LINK("link"),
+    }
+
+    enum class SetupStep(val value: String) {
+        STARTED("started"),
+        CHOICE_SCREEN("choice_screen"),
+        DEVICE_AUTH("device_auth"),
+        PREPARING_CODE("preparing_code"),
+        CODE_SCREEN("code_screen"),
+        CODE_ENTRY("code_entry"),
+        CODE_ACCEPTED_BY_OTHER_DEVICE("code_accepted_by_other_device"),
+        CONFIRMATION_SCREEN("confirmation_screen"),
+        WAITING_FOR_CONFIRMATION("waiting_for_confirmation"),
+        SYNC_CONFIRMATION("sync_confirmation"),
+        PREPARING_SYNC("preparing_sync"),
+        HOST_AWAITING_JOINER("host_awaiting_joiner"),
+        ACCOUNT_CREATED("account_created"),
+        SYNC_THIS_DEVICE_OFFER("sync_this_device_offer"),
+        RESTORE_OFFER("restore_offer"),
+        ERROR_SCREEN("error_screen"),
+        RECOVERY_CODE_SHOWN("recovery_code_shown"),
+        SUCCESS_SCREEN_SHOWN("success_screen_shown"),
+    }
+
+    enum class SetupCancellationReason(val value: String) {
+        USER_CLOSED("user_closed"),
+        USER_CLOSED_SYNC_THIS_DEVICE_FALLBACK("user_closed_sync_this_device_fallback"),
+        DEVICE_AUTH_CANCELLED("device_auth_cancelled"),
+        DEVICE_AUTH_UNAVAILABLE("device_auth_unavailable"),
+        CODE_REJECTED("code_rejected"),
+        SYNC_CONFIRMATION_DENIED("sync_confirmation_denied"),
+        ACCOUNT_SWITCH_DECLINED("account_switch_declined"),
+        ACCOUNT_SWITCH_BLOCKED("account_switch_blocked"),
+        PEER_LEFT("peer_left"),
+        ALREADY_PAIRED("already_paired"),
+        ALREADY_UPGRADED("already_upgraded"),
     }
 
     /**
@@ -380,13 +431,13 @@ class RealSyncPixels @Inject constructor(
      */
     private fun setupSuccessParams(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         path: SetupPath?,
         myRole: SetupRole?,
         peerKind: PeerKind?,
     ): Map<String, String> = buildMap {
         put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
-        put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.value)
+        put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.toKnownLaunchSource())
         if (path != null) put(SYNC_SETUP_PATH, path.value)
         if (myRole != null) put(SYNC_SETUP_MY_ROLE, myRole.value)
         if (peerKind != null) put(SYNC_SETUP_PEER_KIND, peerKind.value)
@@ -421,11 +472,11 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireSignupDirectPixel(launchSource: SyncLaunchSource) {
+    override fun fireSignupDirectPixel(launchSource: String) {
         pixel.fire(
             SyncPixelName.SYNC_SIGNUP_DIRECT,
             parameters = buildMap {
-                putAll(buildSourceMap(launchSource.value))
+                putAll(buildSourceMap(launchSource.toKnownLaunchSource()))
                 putAll(setupUiMetadata())
             },
         )
@@ -573,10 +624,13 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireSyncSettingsShown() {
+    override fun fireSyncSettingsShown(launchSource: String) {
         pixel.fire(
             SyncPixelName.SYNC_SETTINGS_SCREEN_SHOWN,
-            parameters = setupUiMetadata(),
+            parameters = buildMap {
+                putAll(buildSourceMap(launchSource.toKnownLaunchSource()))
+                putAll(setupUiMetadata())
+            },
         )
     }
 
@@ -733,12 +787,12 @@ class RealSyncPixels @Inject constructor(
         )
     }
 
-    override fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: SyncLaunchSource, reason: CancellationReason?) {
+    override fun fireSyncSetupAbandoned(screenType: ScreenType, launchSource: String, reason: CancellationReason?) {
         pixel.fire(
             SyncPixelName.SYNC_SETUP_ENDED_ABANDONED,
             parameters = buildMap {
                 put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
-                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.value)
+                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.toKnownLaunchSource())
                 if (reason != null) put(SYNC_SETUP_REASON, reason.value)
                 putAll(setupFlowMetadata())
             },
@@ -747,7 +801,7 @@ class RealSyncPixels @Inject constructor(
 
     override fun fireSyncSetupFinishedSuccessfully(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         path: SetupPath?,
         myRole: SetupRole?,
         peerKind: PeerKind?,
@@ -760,7 +814,7 @@ class RealSyncPixels @Inject constructor(
 
     override fun fireSyncSetupFailed(
         screenType: ScreenType,
-        launchSource: SyncLaunchSource,
+        launchSource: String,
         reason: SetupFailureReason,
         path: SetupPath?,
         myRole: SetupRole?,
@@ -771,7 +825,7 @@ class RealSyncPixels @Inject constructor(
             SyncPixelName.SYNC_SETUP_ENDED_FAILED,
             parameters = buildMap {
                 put(SYNC_SETUP_SCREEN_TYPE, screenType.value)
-                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.value)
+                put(SYNC_SETUP_LAUNCH_SOURCE, launchSource.toKnownLaunchSource())
                 put(SYNC_SETUP_REASON, reason.value)
                 if (path != null) put(SYNC_SETUP_PATH, path.value)
                 if (myRole != null) put(SYNC_SETUP_MY_ROLE, myRole.value)
@@ -1336,7 +1390,25 @@ internal fun Int.toSetupFailureReason(): SetupFailureReason = when (this) {
  * setup errors (the latter pending the cancellation-telemetry follow-up).
  */
 
-internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, launchSource: SyncLaunchSource, outcome: DispatchOutcome) {
+private val KNOWN_LAUNCH_SOURCES = setOf(
+    "promotion_bookmarks",
+    "promotion_bookmarks_multi_device",
+    "promotion_passwords",
+    "promotion_passwords_multi_device",
+    "promotion_bookmark_added_dialog",
+    "promotion_bookmark_multi_device_added_dialog",
+    "promotion_ai_chat",
+    "promotion_passwords_import",
+    "promotion_bookmarks_import",
+    "typed_url_duck_com",
+    "typed_url_duck_ai",
+    LAUNCH_SOURCE_OTHER,
+)
+
+// Launch sources arrive as free-form strings through the public SyncActivityStartSyncFlow, so we send only the ones we know.
+internal fun String.toKnownLaunchSource(): String = takeIf { it in KNOWN_LAUNCH_SOURCES } ?: LAUNCH_SOURCE_OTHER
+
+internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, launchSource: String, outcome: DispatchOutcome) {
     when (outcome) {
         is UpgradeRequired ->
             fireSyncSetupFailed(screenType, launchSource, SetupFailureReason.NEEDS_UPGRADE, outcome.path, outcome.myRole, outcome.peerKind)
@@ -1366,7 +1438,7 @@ internal fun SyncPixels.fireSetupFailed(screenType: ScreenType, launchSource: Sy
 // Both devices fire the "abandoned" pixel on a v2 confirmation denial — from each device's POV the
 // setup ended via denial. PAIRING_CANCELLED is this device's own denial; PAIRING_REJECTED is the peer's
 // denial received on the wire.
-internal fun SyncPixels.fireSetupCancelledIfDenied(screenType: ScreenType, launchSource: SyncLaunchSource, outcome: DispatchOutcome) {
+internal fun SyncPixels.fireSetupCancelledIfDenied(screenType: ScreenType, launchSource: String, outcome: DispatchOutcome) {
     if (outcome is Failed &&
         (outcome.code == AccountErrorCodes.PAIRING_CANCELLED.code || outcome.code == AccountErrorCodes.PAIRING_REJECTED.code)
     ) {

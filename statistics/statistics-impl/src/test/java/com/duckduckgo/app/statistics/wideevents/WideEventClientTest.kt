@@ -194,6 +194,7 @@ class WideEventClientTest {
         listOf(
             "flowStart" to { wideEventClient.flowStart(name = "flow") },
             "flowStep" to { wideEventClient.flowStep(wideEventId = 1L, stepName = "step") },
+            "flowAppendToPath" to { wideEventClient.flowAppendToPath(wideEventId = 1L, step = "step") },
             "flowFinish" to { wideEventClient.flowFinish(wideEventId = 1L, status = FlowStatus.Success) },
             "flowAbort" to { wideEventClient.flowAbort(wideEventId = 1L) },
             "getFlowIds" to { wideEventClient.getFlowIds(name = "flow") },
@@ -714,6 +715,39 @@ class WideEventClientTest {
     fun `when flowStep called with SAMPLED_OUT_ID then returns success without repository interaction`() =
         runTest {
             val result = wideEventClient.flowStep(SAMPLED_OUT_FLOW_ID, "step1")
+
+            assertTrue(result.isSuccess)
+            verifyNoInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when flowAppendToPath called then appends step to path in repository`() =
+        runTest {
+            val result = wideEventClient.flowAppendToPath(123L, "code_screen", mapOf("method" to "qr"))
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).appendToWideEventPath(
+                eventId = 123L,
+                step = "code_screen",
+                metadata = mapOf("method" to "qr"),
+            )
+        }
+
+    @Test
+    fun `when flowAppendToPath encounters repository exception then returns failure`() =
+        runTest {
+            val exception = RuntimeException("Database connection failed")
+            whenever(wideEventRepository.appendToWideEventPath(any(), any(), any())).thenThrow(exception)
+
+            val result = wideEventClient.flowAppendToPath(123L, "code_screen")
+
+            assertEquals(exception, result.exceptionOrNull())
+        }
+
+    @Test
+    fun `when flowAppendToPath called with SAMPLED_OUT_ID then returns success without repository interaction`() =
+        runTest {
+            val result = wideEventClient.flowAppendToPath(SAMPLED_OUT_FLOW_ID, "code_screen")
 
             assertTrue(result.isSuccess)
             verifyNoInteractions(wideEventRepository)

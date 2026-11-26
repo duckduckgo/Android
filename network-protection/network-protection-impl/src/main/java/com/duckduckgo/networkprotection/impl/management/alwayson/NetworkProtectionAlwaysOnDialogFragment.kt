@@ -25,6 +25,7 @@ import androidx.annotation.StringRes
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.store.AppTheme
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.utils.extensions.getSerializable
 import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
@@ -63,6 +64,16 @@ class NetworkProtectionAlwaysOnDialogFragment : BottomSheetDialogFragment() {
     ): View {
         return DialogNetpAlwaysOnBinding.inflate(inflater, container, false).apply {
             fragmentType = requireArguments().getSerializable<FragmentType>(ARGUMENT_FRAGMENT_TYPE) ?: FragmentType.PROMOTION
+            root.applyRebrandBottomSheetSpacing(
+                header = alwaysOnIllustration,
+                edgeToEdgeHeader = true,
+                title = alwaysOnModalHeading,
+                messages = listOf(alwaysOnModalDescription),
+                buttons = goToSettingsButton,
+                secondary = listOf(notNowButton),
+                close = closeButton,
+                sections = listOf(alwaysOnModalHeading.parent as ViewGroup),
+            )
             configureViews(this)
             root.applyBottomSystemBarInsetPadding()
         }.root

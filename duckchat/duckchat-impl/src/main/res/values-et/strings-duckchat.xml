@@ -408,4 +408,12 @@
     <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Analüüsi faile</string>
     <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Küsi fotode kohta</string>
     <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Loo pilt</string>
+
+    <!-- Duck.ai home-screen widget -->
+    <string name="duckAiWidgetLabel" instruction="Name of the Duck.ai home-screen widget, shown in the Android widget picker">Duck.ai ja hiljutised vestlused</string>
+    <string name="duckAiWidgetDescription" instruction="Short description of the Duck.ai home-screen widget, shown in the Android widget picker">Alusta Duck.ai-ga privaatset vestlust või jätka hiljutisi vestlusi.</string>
+    <string name="duckAiWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai home-screen widget">Vestle privaatselt</string>
+    <string name="duckAiWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the home-screen widget">Hääl</string>
+    <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Pilt</string>
+    <string name="duckAiWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the home-screen widget">Kaamera</string>
 </resources>

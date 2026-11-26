@@ -1814,6 +1814,24 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenContextualResponseStateReceivedThenOnlyContextualChatStateUpdated() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "responseState",
+                "123",
+                JSONObject(mapOf("status" to "streaming")),
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
+            ),
+        )
+
+        assertEquals(ChatState.STREAMING, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-1")).value)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
     fun whenErrorResponseStateReceivedThenUpdateChatStateWithError() = runTest {
         val featureName = "aiChat"
         val method = "responseState"
@@ -1915,6 +1933,45 @@ class RealDuckChatJSHelperTest {
         )
 
         assertEquals(ChatState.SHOW, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
+    fun whenContextualHideChatInputThenOnlyContextualChatStateHidden() = runTest {
+        chatStateStore.update("tab-1", ChatState.SHOW)
+        chatStateStore.update(ChatStateStore.contextualKey("tab-1"), ChatState.SHOW)
+
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "hideChatInput",
+                "123",
+                null,
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
+            ),
+        )
+
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-1")).value)
+        assertEquals(ChatState.SHOW, chatStateStore.stateFor("tab-1").value)
+    }
+
+    @Test
+    fun whenContextualShowChatInputThenOnlyContextualChatStateShown() = runTest {
+        assertNull(
+            testee.processJsCallbackMessage(
+                "aiChat",
+                "showChatInput",
+                "123",
+                null,
+                mode = Mode.CONTEXTUAL,
+                pageContext = viewModel.updatedPageContext,
+                tabId = "tab-1",
+            ),
+        )
+
+        assertEquals(ChatState.SHOW, chatStateStore.stateFor(ChatStateStore.contextualKey("tab-1")).value)
+        assertEquals(ChatState.HIDE, chatStateStore.stateFor("tab-1").value)
     }
 
     @Test

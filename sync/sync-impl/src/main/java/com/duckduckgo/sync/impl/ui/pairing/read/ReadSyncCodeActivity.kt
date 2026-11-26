@@ -41,7 +41,6 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivityReadSyncCodeBinding
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeContract
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel.Command
@@ -60,7 +59,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivityReadSyncCodeBinding>()
 
     private val launchSource
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
             "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
         }
 
@@ -235,7 +234,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ): Intent {
             return Intent(context, ReadSyncCodeActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)

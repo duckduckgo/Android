@@ -50,9 +50,11 @@ import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeCameraBinding
+import com.duckduckgo.sync.impl.setup.SyncPairingUrl
+import com.duckduckgo.sync.impl.setup.SyncPairingUrlFeature
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command.ExpandScannerCutout
@@ -83,8 +85,8 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             "Missing fragment argument: '$ENTRY_POINT_ARG'"
         }
 
-    private val launchSource: SyncLaunchSource
-        get() = requireNotNull(BundleCompat.getSerializable(requireArguments(), LAUNCH_SOURCE_ARG, SyncLaunchSource::class.java)) {
+    private val launchSource: String
+        get() = requireNotNull(requireArguments().getString(LAUNCH_SOURCE_ARG)) {
             "Missing fragment argument: '$LAUNCH_SOURCE_ARG'"
         }
 
@@ -93,6 +95,9 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     @Inject
     lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
+
+    @Inject
+    lateinit var syncPairingUrlFeature: SyncPairingUrlFeature
 
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
@@ -128,6 +133,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        configureInstructions()
         configureIntroAnimation()
         configureGotItButton()
         configureChangePermissionsButton()
@@ -135,6 +141,14 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         configureCutout()
 
         observeUiEvents()
+    }
+
+    private fun configureInstructions() {
+        if (!syncPairingUrlFeature.isEnabled) return
+        val body = R.string.sync_simplified_scanner_camera_header_body_pairing_url
+        binding.includeIntro.pairingHeader.setBody(body, SyncPairingUrl.INSTRUCTIONS_URL)
+        binding.includeCamera.scannerHeader.setBody(body, SyncPairingUrl.INSTRUCTIONS_URL)
+        binding.includeNoHardware.pairingHeader.setBody(body, SyncPairingUrl.INSTRUCTIONS_URL)
     }
 
     override fun onResume() {
@@ -373,7 +387,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
         fun instance(
             entryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ) = ReadSyncCodeCameraFragment().apply {
             arguments = bundleOf(
                 ENTRY_POINT_ARG to entryPoint,

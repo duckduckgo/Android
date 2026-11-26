@@ -35,30 +35,29 @@ android {
 }
 
 dependencies {
+    implementation project(path: ':common-utils')
+    implementation project(path: ':saved-sites-api')
     implementation AndroidX.core.ktx
-    implementation AndroidX.security.crypto
-    implementation Square.okio
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation KotlinX.coroutines.core
+    implementation AndroidX.security.crypto
     implementation KotlinX.coroutines.android
+    implementation KotlinX.coroutines.core
+    implementation Square.okio
 
-    ksp AndroidX.room.compiler
-
-    implementation project(path: ':saved-sites-api')
-    implementation project(path: ':common-utils')
-
+    testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.test.ext.junit
+    testImplementation CashApp.turbine
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation CashApp.turbine
-    testImplementation AndroidX.test.ext.junit
-    testImplementation project(path: ':common-test')
-    testImplementation AndroidX.archCore.testing
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
     androidTestImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+
+    ksp AndroidX.room.compiler
 }

@@ -214,6 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Skann QR-kode for å synkronisere</string>
     <string name="sync_simplified_scanner_camera_header_body">Åpne <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for datamaskin</annotation></b>\n<annotation type="gap">\n</annotation>og gå til <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkroniser med en annen  enhet</annotation></string>
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Åpne <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for datamaskin</annotation></b>\n<annotation type="gap">\n</annotation>gå til <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Den er grei</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo trenger tilgang til kameraet ditt.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Kameratilgang kreves for å skanne QR-koden.</string>
@@ -223,6 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Skriv inn synkroniseringskoden</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Åpne din andre <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-app</annotation></b>\n<annotation type="gap">\n</annotation>Gå til <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkroniser med en annen enhet</annotation> › <annotation type="highlight">Kopier tekstkode</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Åpne en annen <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-app</annotation></b>\n<annotation type="gap">\n</annotation>gå til <b><annotation type="url">%1$s</annotation></b> og kopier tekstkode.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Eksempelkode:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Lim inn synkroniseringskoden</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Beklager, den innlimte koden er ugyldig.</string>
@@ -231,6 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">QR-kode</string>
     <string name="sync_simplified_qr_code_header_headline">Skann fra en annen enhet</string>
     <string name="sync_simplified_qr_code_header_body">På en annen enhet, åpne <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>og gå til <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkroniser med en annen enhet</annotation> og skann denne koden:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Åpne en annen <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>gå til <b><annotation type="url">%1$s</annotation></b> og skann denne koden:</string>
     <string name="sync_simplified_qr_code_copy_button">Kopier tekstkode</string>
     <string name="sync_simplified_qr_code_share_button">Del</string>
     <string name="sync_simplified_qr_code_copied_message">Gjenopprettingskoden er kopiert</string>

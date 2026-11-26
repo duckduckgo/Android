@@ -41,8 +41,9 @@ import com.duckduckgo.sync.impl.databinding.ActivityDisplayQrCodeBinding
 import com.duckduckgo.sync.impl.databinding.DialogSyncCheckOtherDeviceBinding
 import com.duckduckgo.sync.impl.databinding.DialogSyncConnectingBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.setup.SyncPairingUrl
+import com.duckduckgo.sync.impl.setup.SyncPairingUrlFeature
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command
@@ -65,6 +66,9 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class DisplayQrCodeActivity : DuckDuckGoActivity() {
+    @Inject
+    lateinit var syncPairingUrlFeature: SyncPairingUrlFeature
+
     private val binding by viewBinding<ActivityDisplayQrCodeBinding>()
 
     @Inject
@@ -77,7 +81,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
     lateinit var shareAction: ShareAction
 
     private val launchSource
-        get() = requireNotNull(IntentCompat.getSerializableExtra(intent, LAUNCH_SOURCE_EXTRA_KEY, SyncLaunchSource::class.java)) {
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
             "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
         }
 
@@ -101,6 +105,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         configureEdgeToEdgeInsets()
 
         configureToolbar()
+        configureInstructions()
         configureCodeButtons()
 
         observeViewModel()
@@ -110,6 +115,15 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         super.onDestroy()
         visibleDialog?.dismiss()
         visibleDialog = null
+    }
+
+    private fun configureInstructions() {
+        if (syncPairingUrlFeature.isEnabled) {
+            binding.pairingHeader.setBody(
+                R.string.sync_simplified_qr_code_header_body_pairing_url,
+                SyncPairingUrl.INSTRUCTIONS_URL,
+            )
+        }
     }
 
     private fun configureCodeButtons() {
@@ -280,7 +294,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
-            launchSource: SyncLaunchSource,
+            launchSource: String,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)

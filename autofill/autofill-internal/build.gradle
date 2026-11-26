@@ -33,25 +33,22 @@ android {
 dependencies {
     implementation project(path: ':autofill-api')
     implementation project(':autofill-impl')
-    implementation project(':credential-exchange-api')
-    implementation project(':internal-features-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(':credential-exchange-api')
+    implementation project(path: ':design-system')
+    implementation project(':di')
+    implementation project(':internal-features-api')
     implementation project(path: ':navigation-api')
     implementation project(':saved-sites-api')
-
-    ksp project(path: ':codegen-ksp')
-    implementation project(path: ':codegen-annotations')
-    implementation project(':di')
-    implementation project(path: ':common-utils')
-
+    implementation "androidx.appcompat:appcompat:_"
+    implementation "androidx.constraintlayout:constraintlayout:_"
+    implementation "com.google.android.material:material:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.lifecycle.process
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.process
 
-    implementation "com.squareup.logcat:logcat:_"
-    implementation "androidx.appcompat:appcompat:_"
-    implementation "com.google.android.material:material:_"
-    implementation "androidx.constraintlayout:constraintlayout:_"
-    implementation project(path: ':design-system')
-
+    ksp project(path: ':codegen-ksp')
 }

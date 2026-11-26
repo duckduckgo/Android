@@ -55,6 +55,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
     private val pixel: Pixel,
     private val appTheme: AppTheme,
     private val promptExposureReporter: PromptExposureReporter,
+    private val duckAiToggleMigrationFeature: DuckAiToggleMigrationFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarPickerManager {
@@ -132,6 +133,9 @@ class RealNewAddressBarPickerManager @Inject constructor(
                         if (searchAndAiSelected) {
                             duckChat.setInputScreenUserSetting(true)
                             duckChat.onAddressBarPickerDuckAiSelected()
+                        } else if (isSearchOnlyWriteEnabled()) {
+                            // Record the explicit "no" like a Settings change, so nothing later mistakes it for "never asked".
+                            duckChat.setInputScreenUserSetting(false)
                         }
                     }
                     val params = mapOf(SELECTION_PARAM to if (searchAndAiSelected) SELECTION_SEARCH_AND_AI else SELECTION_SEARCH_ONLY)
@@ -143,6 +147,10 @@ class RealNewAddressBarPickerManager @Inject constructor(
             setOnDismissListener { currentDialog = null }
             show()
         }
+    }
+
+    private suspend fun isSearchOnlyWriteEnabled(): Boolean = withContext(dispatchers.io()) {
+        duckAiToggleMigrationFeature.self().isEnabled() && duckAiToggleMigrationFeature.pickerSearchOnlyWritesSetting().isEnabled()
     }
 
     private companion object {

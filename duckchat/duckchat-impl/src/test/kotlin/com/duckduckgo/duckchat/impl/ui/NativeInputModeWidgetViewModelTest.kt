@@ -95,6 +95,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -883,6 +884,34 @@ class NativeInputModeWidgetViewModelTest {
         chatStateStore.update("other-tab", ChatState.STREAMING)
 
         assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `state isChatStreaming ignores the contextual sheet streaming on the same tab`() = runTest {
+        chatStateStore.update(ChatStateStore.contextualKey("test-tab"), ChatState.STREAMING)
+
+        assertFalse(testee.state.firstOrNull()!!.isChatStreaming)
+    }
+
+    @Test
+    fun `contextual widget reads the contextual chat state`() = runTest {
+        chatStateStore.update("test-tab", ChatState.READY)
+        chatStateStore.update(ChatStateStore.contextualKey("test-tab"), ChatState.STREAMING)
+        testee.configureContextual(tabId = "test-tab")
+
+        assertEquals(ChatState.STREAMING, testee.chatState.firstOrNull()!!)
+    }
+
+    @Test
+    fun `contextual widget never sees the tab chat state`() = runTest {
+        val vm = createViewModel()
+        chatStateStore.update("probe-tab", ChatState.READY)
+        chatStateStore.update(ChatStateStore.contextualKey("probe-tab"), ChatState.STREAMING)
+        val seen = mutableListOf<ChatState>()
+        val job = launch(UnconfinedTestDispatcher(testScheduler)) { vm.chatState.collect { seen += it } }
+        vm.configureContextual(tabId = "probe-tab")
+        job.cancel()
+        assertEquals(listOf(ChatState.STREAMING), seen)
     }
 
     @Test

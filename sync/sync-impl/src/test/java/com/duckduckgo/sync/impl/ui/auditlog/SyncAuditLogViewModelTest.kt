@@ -23,8 +23,11 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntrySkipReason
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry
+import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogAction.SYNCED
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Command
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Content
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Footer
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Status
@@ -38,6 +41,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Duration
 import java.time.Instant
@@ -49,8 +54,37 @@ class SyncAuditLogViewModelTest {
 
     private val loader = FakeLoader()
     private val stateStore = FakeStateStore()
+    private val newLoginNotifier: NewLoginNotifier = mock()
+    private val loginAuditLogFeature = FakeLoginAuditLogFeature()
     private val timeProvider: CurrentTimeProvider = mock<CurrentTimeProvider>().also {
         whenever(it.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
+    }
+
+    @Test
+    fun whenOpenedFromNotificationAndAuditLogIsOffThenScreenClosesWithoutLoading() = runTest {
+        loginAuditLogFeature.auditLogEnabled = false
+
+        val testee = viewModel(openedFromNotification = true)
+
+        assertEquals(Command.Close, testee.commands.first())
+        assertEquals(0, loader.calls)
+        verify(newLoginNotifier, never()).cancel()
+    }
+
+    @Test
+    fun whenOpenedFromNotificationAndAuditLogIsOnThenLoads() = runTest {
+        viewModel(openedFromNotification = true)
+
+        assertEquals(1, loader.calls)
+    }
+
+    @Test
+    fun whenNotOpenedFromNotificationThenLoadsWhateverTheFlag() = runTest {
+        loginAuditLogFeature.auditLogEnabled = false
+
+        viewModel()
+
+        assertEquals(1, loader.calls)
     }
 
     @Test
@@ -306,6 +340,22 @@ class SyncAuditLogViewModelTest {
     }
 
     @Test
+    fun whenLoadedThenNotificationIsCancelled() = runTest {
+        loadedViewModel(loaded(ITEM_1))
+
+        verify(newLoginNotifier).cancel()
+    }
+
+    @Test
+    fun whenLoadFailsThenNotificationIsKept() = runTest {
+        viewModel()
+
+        loader.result.complete(SyncAuditLogLoadResult.Failed)
+
+        verify(newLoginNotifier, never()).cancel()
+    }
+
+    @Test
     fun whenPendingLoginIsLoadedThenItsRowIsHighlighted() = runTest {
         stateStore.state = AuditLogCheckState(pendingLogins = listOf(pending("e2")))
         val testee = viewModel()
@@ -399,8 +449,15 @@ class SyncAuditLogViewModelTest {
         assertEquals(listOf(row(ITEM_1, highlighted = true), row(ITEM_2, highlighted = true)), testee.viewState.value.rows)
     }
 
-    private fun viewModel(entriesPerPage: Int? = null) =
-        SyncAuditLogViewModel(SyncAuditLogScreenParams(entriesPerPage), loader, timeProvider, stateStore)
+    private fun viewModel(entriesPerPage: Int? = null, openedFromNotification: Boolean = false) =
+        SyncAuditLogViewModel(
+            SyncAuditLogScreenParams(entriesPerPage, openedFromNotification),
+            loader,
+            timeProvider,
+            stateStore,
+            newLoginNotifier,
+            loginAuditLogFeature,
+        )
 
     private fun loadedViewModel(first: SyncAuditLogLoadResult.Loaded, entriesPerPage: Int? = null) =
         viewModel(entriesPerPage).also { loader.result.complete(first) }
@@ -430,6 +487,14 @@ class SyncAuditLogViewModelTest {
         }
 
         override fun pendingLogins(): Flow<List<PendingLogin>> = flowOf(state.pendingLogins)
+    }
+
+    private class FakeLoginAuditLogFeature : LoginAuditLogFeature {
+        var auditLogEnabled = true
+
+        override suspend fun isAuditLogEnabled(): Boolean = auditLogEnabled
+
+        override suspend fun isNotificationEnabled(): Boolean = auditLogEnabled
     }
 
     private class FakeLoader : SyncAuditLogLoader {

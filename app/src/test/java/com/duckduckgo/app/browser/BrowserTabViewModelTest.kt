@@ -147,6 +147,7 @@ import com.duckduckgo.app.browser.omnibar.Omnibar
 import com.duckduckgo.app.browser.omnibar.Omnibar.ViewMode
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.omnibar.OmnibarType
+import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromAutocomplete
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromBookmark
 import com.duckduckgo.app.browser.omnibar.QueryOrigin.FromUser
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
@@ -388,6 +389,7 @@ import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingPrompt
+import com.duckduckgo.sync.api.setup.SyncUrlIdentifier
 import com.duckduckgo.voice.api.VoiceSearchAvailabilityPixelLogger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -545,6 +547,8 @@ class BrowserTabViewModelTest {
     private val mockEmailManager: EmailManager = mock()
 
     private val mockSpecialUrlDetector: SpecialUrlDetector = mock()
+
+    private val mockSyncUrlIdentifier: SyncUrlIdentifier = mock()
 
     private val mockAppLinksHandler: AppLinksHandler = mock()
 
@@ -1065,6 +1069,7 @@ class BrowserTabViewModelTest {
                 duckPlayer = mockDuckPlayer,
                 duckChat = mockDuckChat,
                 duckAiHostProvider = mockDuckAiHostProvider,
+                syncUrlIdentifier = mockSyncUrlIdentifier,
                 duckAiFeatureState = mockDuckAiFeatureState,
                 duckChatInputModeState = mockDuckChatInputModeState,
                 duckPlayerJSHelper =
@@ -11263,6 +11268,51 @@ class BrowserTabViewModelTest {
     }
 
     @Test
+    fun whenTypedDuckComPairingUrlThenSyncPairingLaunchesInsteadOfNavigating() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.com/pair", null, FromUser)).thenReturn("https://duck.com/pair")
+        whenever(mockSyncUrlIdentifier.shouldOpenSyncPairing("https://duck.com/pair")).thenReturn(true)
+
+        testee.onUserSubmittedQuery("duck.com/pair", queryOrigin = FromUser)
+
+        assertCommandIssued<Command.LaunchSyncPairing> { assertEquals("typed_url_duck_com", launchSource) }
+        assertCommandNotIssued<Navigate>()
+    }
+
+    @Test
+    fun whenTypedDuckAiPairingUrlThenSyncPairingLaunchesInsteadOfDuckAi() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.ai/pair", null, FromUser)).thenReturn("https://duck.ai/pair")
+        whenever(mockSyncUrlIdentifier.shouldOpenSyncPairing("https://duck.ai/pair")).thenReturn(true)
+        whenever(mockSpecialUrlDetector.determineType(anyString())).thenReturn(SpecialUrlDetector.UrlType.ShouldLaunchDuckChatLink)
+
+        testee.onUserSubmittedQuery("duck.ai/pair", queryOrigin = FromUser)
+
+        assertCommandIssued<Command.LaunchSyncPairing> { assertEquals("typed_url_duck_ai", launchSource) }
+        verify(mockDuckChat, never()).openDuckChat(any())
+        verify(mockPixel, never()).fire(eq(AppPixelName.AI_CHAT_DUCK_AI_DIRECT_NAVIGATION_COUNT), any(), any(), any())
+    }
+
+    @Test
+    fun whenUrlSubmittedFromBookmarkThenSyncPairingIsNotChecked() {
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.com/pair", null, FromBookmark)).thenReturn("https://duck.com/pair")
+
+        testee.onUserSubmittedQuery("duck.com/pair", queryOrigin = FromBookmark)
+
+        verify(mockSyncUrlIdentifier, never()).shouldOpenSyncPairing(any())
+        assertCommandNotIssued<Command.LaunchSyncPairing>()
+    }
+
+    @Test
+    fun whenUrlSubmittedFromAutocompleteThenSyncPairingIsNotChecked() {
+        val autocomplete = FromAutocomplete(isNav = true)
+        whenever(mockOmnibarConverter.convertQueryToUrl("duck.com/pair", null, autocomplete)).thenReturn("https://duck.com/pair")
+
+        testee.onUserSubmittedQuery("duck.com/pair", queryOrigin = autocomplete)
+
+        verify(mockSyncUrlIdentifier, never()).shouldOpenSyncPairing(any())
+        assertCommandNotIssued<Command.LaunchSyncPairing>()
+    }
+
+    @Test
     fun givenSuggestedSearchesDialogShownWhenUserSubmittedQueryThenCustomSearchPixelIsSent() {
         whenever(mockOmnibarConverter.convertQueryToUrl("foo", null)).thenReturn("foo.com")
         val cta = DaxTryASearchBubbleCta(mockOnboardingStore, mockAppInstallStore, isLightTheme = true, deviceInfo = mockDeviceInfo)
@@ -14770,7 +14820,7 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.NotSubscribed,
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
@@ -14784,7 +14834,7 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.NotSubscribedNoPill,
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
@@ -14798,7 +14848,7 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true),
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         verify(mockPixel).fire(
             AppPixelName.MENU_ACTION_VPN_PRESSED,
@@ -14812,10 +14862,23 @@ class BrowserTabViewModelTest {
             vpnMenuState = VpnMenuState.NotSubscribed,
         )
 
-        testee.onVpnMenuClicked()
+        testee.onVpnMenuClicked(ViewMode.Browser(null))
 
         assertCommandIssued<LaunchSubscription> {
             assertEquals("funnel_appmenu_android", uri.getQueryParameter("origin"))
+        }
+    }
+
+    @Test
+    fun whenVpnMenuClickedWithNotSubscribedStateInDuckAiModeThenLaunchSubscriptionWithAppMenuChatOrigin() {
+        testee.browserViewState.value = browserViewState().copy(
+            vpnMenuState = VpnMenuState.NotSubscribed,
+        )
+
+        testee.onVpnMenuClicked(ViewMode.DuckAI)
+
+        assertCommandIssued<LaunchSubscription> {
+            assertEquals("funnel_appmenu_android__chat", uri.getQueryParameter("origin"))
         }
     }
 

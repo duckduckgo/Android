@@ -34,28 +34,23 @@ android {
 }
 
 dependencies {
-
-    implementation "com.squareup.logcat:logcat:_"
-
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
     implementation project(path: ':design-system')
-
     implementation project(path: ':di')
-    implementation project(path: ':codegen-annotations')
-    implementation project(path: ':app-build-config-api')
     implementation project(':internal-features-api')
     implementation project(path: ':navigation-api')
     implementation "androidx.datastore:datastore-preferences:_"
-
     implementation "com.airbnb.android:lottie-compose:_"
     implementation "com.facebook.shimmer:shimmer:_"
-
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.activity.compose
     implementation AndroidX.appCompat
-    implementation Google.android.material
     implementation AndroidX.constraintLayout
     implementation AndroidX.core.splashscreen
     implementation AndroidX.fragment.ktx
-    implementation AndroidX.recyclerView
     implementation AndroidX.lifecycle.viewModelKtx
+    implementation AndroidX.recyclerView
+    implementation Google.android.material
 }

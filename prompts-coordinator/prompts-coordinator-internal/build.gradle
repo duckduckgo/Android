@@ -27,12 +27,11 @@ android {
 }
 
 dependencies {
-    implementation project(':prompts-coordinator-api')
-    implementation project(':prompts-coordinator-impl')
-
-    ksp project(':codegen-ksp')
     implementation project(':codegen-annotations')
     implementation project(':di')
-
+    implementation project(':prompts-coordinator-api')
+    implementation project(':prompts-coordinator-impl')
     implementation KotlinX.coroutines.core
+
+    ksp project(':codegen-ksp')
 }

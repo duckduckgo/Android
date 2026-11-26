@@ -35,15 +35,20 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncAuditLogBinding
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Command
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Content
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.ViewState
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-/** [entriesPerPage] null uses the server's default page size. */
+/**
+ * [entriesPerPage] null uses the server's default page size.
+ * [openedFromNotification] true closes the screen at once if the audit log flag was turned off after the notification was posted.
+ */
 data class SyncAuditLogScreenParams(
     val entriesPerPage: Int? = null,
+    val openedFromNotification: Boolean = false,
 ) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
@@ -83,6 +88,17 @@ class SyncAuditLogActivity : DuckDuckGoActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
             .onEach { render(it) }
             .launchIn(lifecycleScope)
+
+        viewModel.commands
+            .flowWithLifecycle(lifecycle, Lifecycle.State.STARTED)
+            .onEach { processCommand(it) }
+            .launchIn(lifecycleScope)
+    }
+
+    private fun processCommand(command: Command) {
+        when (command) {
+            Command.Close -> finish()
+        }
     }
 
     private val listEndListener = object : RecyclerView.OnScrollListener() {

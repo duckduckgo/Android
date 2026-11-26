@@ -42,6 +42,7 @@ import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auth.AuthPrompt
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
@@ -58,7 +59,6 @@ import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SO
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
-import com.duckduckgo.sync.impl.ui.SyncLaunchSource
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
@@ -122,6 +122,7 @@ class SyncActivityViewModel @Inject constructor(
     private val syncSetupWideEvent: SyncSetupWideEvent,
     private val loginAuditLogFeature: LoginAuditLogFeature,
     private val auditLogStateStore: AuditLogCheckStateStore,
+    private val newLoginNotifier: NewLoginNotifier,
 ) : ViewModel() {
 
     private val syncStateObserverJob = ConflatedJob()
@@ -147,8 +148,8 @@ class SyncActivityViewModel @Inject constructor(
 
     val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
-    init {
-        syncPixels.fireSyncSettingsShown()
+    fun onScreenOpened(launchSource: String) {
+        syncPixels.fireSyncSettingsShown(launchSource)
     }
 
     fun commands(): Flow<Command> = command.receiveAsFlow().onStart {
@@ -346,12 +347,12 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onSyncThisDevice(launchSource: SyncLaunchSource = SyncLaunchSource.Other) {
+    fun onSyncThisDevice(launchSource: String) {
         syncPixels.fireBackupThisDeviceTapped()
         startSyncThisDevice(launchSource)
     }
 
-    private fun startSyncThisDevice(launchSource: SyncLaunchSource) {
+    private fun startSyncThisDevice(launchSource: String) {
         viewState.update { it.setThisDeviceSyncInProgress() }
         viewModelScope.launch(dispatchers.io()) {
             syncSetupWideEvent.onFlowStarted(launchSource)
@@ -685,6 +686,7 @@ class SyncActivityViewModel @Inject constructor(
         viewModelScope.launch(dispatchers.io()) {
             // Only the logins on screen: one found while the user tapped Close must still show.
             auditLogStateStore.update { state -> state.copy(pendingLogins = state.pendingLogins.filterNot { it.entryId in shown }) }
+            newLoginNotifier.cancel()
         }
     }
 
@@ -798,25 +800,31 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun processSyncWithDesktopDeepLink(launchSource: SyncLaunchSource) {
+    /**
+     * Starts the Sync flow and returns whether the settings start hidden. Only creating an account opens without the settings
+     * behind it; adding a device and joining an account open over them. The real decision waits for the account read below,
+     * so we go by the cached sign-in state and hide when it isn't known yet. We return the value so the caller can apply it
+     * on the first frame, before the view state arrives.
+     */
+    fun processSourceDeepLink(launchSource: String, joinExistingAccount: Boolean, offerDesktopApp: Boolean): Boolean {
+        val hidesContent = !joinExistingAccount && syncAccountRepository.cachedIsSignedIn() != true
+        isContentHidden.value = hidesContent
         viewModelScope.launch(dispatchers.io()) {
-            if (syncAccountRepository.isSignedIn()) {
-                command.send(Command.AskSyncWithDesktop)
-            } else {
-                processSourceDeepLink(launchSource)
-            }
-        }
-    }
-
-    fun processSourceDeepLink(launchSource: SyncLaunchSource) {
-        isContentHidden.value = launchSource !in MULTI_DEVICE_PROMOTIONS
-        viewModelScope.launch(dispatchers.io()) {
+            val isSignedIn = syncAccountRepository.isSignedIn()
+            val setupFlow = if (joinExistingAccount) SetupFlows.SignInFlow else SetupFlows.CreateAccountFlow
             when {
-                syncAccountRepository.isSignedIn() -> onAddAnotherDevice()
-                SetupFlows.CreateAccountFlow in disabledSetupFlows() -> isContentHidden.value = false
+                isSignedIn && offerDesktopApp -> {
+                    // We show the settings because the sheet would otherwise appear over a blank screen.
+                    isContentHidden.value = false
+                    command.send(Command.AskSyncWithDesktop)
+                }
+                isSignedIn -> onAddAnotherDevice()
+                setupFlow in disabledSetupFlows() -> isContentHidden.value = false
+                joinExistingAccount -> onSyncWithAnotherDevice()
                 else -> startSyncThisDevice(launchSource)
             }
         }
+        return hidesContent
     }
 
     fun onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl: SyncBarcodeUrl) {
@@ -835,11 +843,5 @@ class SyncActivityViewModel @Inject constructor(
         )
         private const val LEARN_MORE_URL =
             "https://duckduckgo.com/duckduckgo-help-pages/sync-and-backup/recovery-codes-and-troubleshooting#data-expiration"
-
-        val MULTI_DEVICE_PROMOTIONS = setOf(
-            SyncLaunchSource.PromotionBookmarksMultiDevice,
-            SyncLaunchSource.PromotionPasswordsMultiDevice,
-            SyncLaunchSource.PromotionBookmarkAddedDialogMultiDevice,
-        )
     }
 }

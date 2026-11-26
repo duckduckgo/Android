@@ -41,6 +41,7 @@ class ChatStateStore @Inject constructor() {
 
     fun clear(key: String) {
         flows.remove(key)
+        flows.remove(contextualKey(key))
     }
 
     fun clearAll() {
@@ -49,4 +50,8 @@ class ChatStateStore @Inject constructor() {
 
     private fun flowFor(key: String): MutableStateFlow<ChatState> =
         flows.computeIfAbsent(key) { MutableStateFlow(ChatState.HIDE) }
+
+    companion object {
+        fun contextualKey(key: String): String = "contextual:$key"
+    }
 }
