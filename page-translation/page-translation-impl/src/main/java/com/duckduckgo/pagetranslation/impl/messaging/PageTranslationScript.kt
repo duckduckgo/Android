@@ -21,24 +21,22 @@ import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
-import java.util.UUID
 import javax.inject.Inject
 
 /**
- * The C-S-S pageTranslation bundle, set up to talk to the app over its own JavaScript interface. contentScope.js removes its
- * interface from the page when it starts, so the bundle can't reuse it.
- *
- * The names and the secret are random and stay the same for the app session, so every WebView registers the same interface.
+ * The C-S-S pageTranslation bundle, set up to talk to the app over its own JavaScript interface. The names are the same for every
+ * user, so pages that see them can't tell users apart.
  */
 interface PageTranslationScript {
     val interfaceName: String
 
-    val secret: String
-
     val callbackName: String
 
-    /** The bundle, run only in the document whose `performance.timeOrigin` is [timeOrigin] and only once per document. */
-    suspend fun get(timeOrigin: Double): String
+    /**
+     * The bundle, run only in the document whose `performance.timeOrigin` is [timeOrigin] and only once per document. It only
+     * accepts messages that carry [secret], and sends it with every message.
+     */
+    suspend fun get(timeOrigin: Double, secret: String): String
 }
 
 @SingleIn(AppScope::class)
@@ -46,35 +44,32 @@ interface PageTranslationScript {
 class RealPageTranslationScript @Inject constructor(
     private val dispatchers: DispatcherProvider,
 ) : PageTranslationScript {
-    override val interfaceName: String = createRandomName()
+    override val interfaceName: String = INTERFACE_NAME
 
-    override val secret: String = createRandomName()
-
-    override val callbackName: String = createRandomName()
+    override val callbackName: String = CALLBACK_NAME
 
     private val bundle: String by lazy {
         val source = javaClass.classLoader?.getResource(BUNDLE_FILE_NAME)?.readText().orEmpty()
         source
             .replace(CONTENT_SCOPE_PLACEHOLDER, CONTENT_SCOPE)
             .replace(USER_UNPROTECTED_DOMAINS_PLACEHOLDER, "[]")
-            .replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferences())
     }
 
-    override suspend fun get(timeOrigin: Double): String = withContext(dispatchers.io()) {
+    override suspend fun get(timeOrigin: Double, secret: String): String = withContext(dispatchers.io()) {
         // the bundle locks its callback, and the page's interface is gone once a first copy ran
         "(function() {\n" +
             "'use strict';\n" +
             "if (performance.timeOrigin !== $timeOrigin || Object.prototype.hasOwnProperty.call(window, '$callbackName')) return;\n" +
-            "$bundle\n" +
+            bundle.replace(USER_PREFERENCES_PLACEHOLDER, getUserPreferences(secret)) + "\n" +
             "})();"
     }
 
-    private fun getUserPreferences(): String =
+    private fun getUserPreferences(secret: String): String =
         """{"platform":{"name":"android"},"messageSecret":"$secret","messageCallback":"$callbackName","javascriptInterface":"$interfaceName"}"""
 
-    private fun createRandomName(): String = UUID.randomUUID().toString().replace("-", "")
-
     private companion object {
+        const val INTERFACE_NAME = "DDGPageTranslation"
+        const val CALLBACK_NAME = "DDGPageTranslationCallback"
         const val BUNDLE_FILE_NAME = "pageTranslation.js"
         const val CONTENT_SCOPE_PLACEHOLDER = "\$CONTENT_SCOPE$"
         const val USER_UNPROTECTED_DOMAINS_PLACEHOLDER = "\$USER_UNPROTECTED_DOMAINS$"

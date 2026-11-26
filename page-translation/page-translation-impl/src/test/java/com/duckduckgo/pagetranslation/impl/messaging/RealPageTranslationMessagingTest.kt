@@ -98,10 +98,52 @@ class RealPageTranslationMessagingTest {
     fun injectTheScriptForTheDocument() = runMessagingTest {
         attach(webView)
 
+        verify(webView).evaluateJavascript("script for $TIME_ORIGIN with $secret", null)
+    }
+
+    @Test
+    fun keepTheSecretWhenTheSameDocumentIsInjectedAgain() = runMessagingTest {
+        attach(webView)
+
         messaging.inject(TIME_ORIGIN)
+
+        assertEquals(2, script.secrets.size)
+        assertEquals(1, script.secrets.toSet().size)
+    }
+
+    @Test
+    fun useANewSecretForEachDocument() = runMessagingTest {
+        attach(webView)
+
+        messaging.inject(TIME_ORIGIN + 1)
+
+        assertEquals(2, script.secrets.toSet().size)
+    }
+
+    @Test
+    fun ignoreAReplyWithThePreviousDocumentsSecret() = runMessagingTest {
+        attach(webView)
+        val previousSecret = secret
+        messaging.inject(TIME_ORIGIN + 1)
+
+        val units = async { messaging.extract() }
+        runCurrent()
+        page.reply(EXTRACT_RESULT, getLastEvent(webView).requestId, """"units":[]""", secret = previousSecret)
+        advanceTimeBy(11.seconds)
+
+        assertNull(units.await())
+    }
+
+    @Test
+    fun sendNothingBeforeTheBundleIsInjected() = runMessagingTest {
+        attachedWebView.attach(webView)
+        messaging.register(webView)
+
+        val units = async(start = UNDISPATCHED) { messaging.extract() }
         runCurrent()
 
-        verify(webView).evaluateJavascript("script for $TIME_ORIGIN", null)
+        assertNull(units.await())
+        verify(webView, never()).evaluateJavascript(any(), anyOrNull())
     }
 
     @Test
@@ -235,10 +277,14 @@ class RealPageTranslationMessagingTest {
 
     private fun runMessagingTest(block: suspend TestScope.() -> Unit) = coroutineRule.testScope.runTest { block() }
 
-    private fun attach(webView: WebView) {
+    private suspend fun attach(webView: WebView) {
         attachedWebView.attach(webView)
         messaging.register(webView)
+        messaging.inject(TIME_ORIGIN)
     }
+
+    private val secret: String
+        get() = script.secrets.last()
 
     private fun getInterface(webView: WebView): PageTranslationJsInterface =
         argumentCaptor<Any>().also {
@@ -249,7 +295,7 @@ class RealPageTranslationMessagingTest {
 
     private fun getLastEvent(webView: WebView): JSONObject {
         val source = argumentCaptor<String>().also { verify(webView, atLeastOnce()).evaluateJavascript(it.capture(), anyOrNull()) }.lastValue
-        val prefix = "window['$CALLBACK_NAME']('$SECRET', "
+        val prefix = "window['$CALLBACK_NAME']('$secret', "
         assertTrue(source.startsWith(prefix))
 
         return JSONObject(source.removePrefix(prefix).removeSuffix(");"))
@@ -258,7 +304,12 @@ class RealPageTranslationMessagingTest {
     private val JSONObject.requestId: String
         get() = getJSONObject("params").getString("requestId")
 
-    private fun PageTranslationJsInterface.reply(method: String, requestId: String, params: String, secret: String = SECRET) {
+    private fun PageTranslationJsInterface.reply(
+        method: String,
+        requestId: String,
+        params: String,
+        secret: String = this@RealPageTranslationMessagingTest.secret,
+    ) {
         process(
             """{"context":"contentScopeScripts","featureName":"pageTranslation","method":"$method","params":{"requestId":"$requestId",$params}}""",
             secret,
@@ -267,15 +318,17 @@ class RealPageTranslationMessagingTest {
 
     private class FakePageTranslationScript : PageTranslationScript {
         override val interfaceName = INTERFACE_NAME
-        override val secret = SECRET
         override val callbackName = CALLBACK_NAME
+        val secrets = mutableListOf<String>()
 
-        override suspend fun get(timeOrigin: Double) = "script for $timeOrigin"
+        override suspend fun get(timeOrigin: Double, secret: String): String {
+            secrets += secret
+            return "script for $timeOrigin with $secret"
+        }
     }
 
     private companion object {
         const val INTERFACE_NAME = "pageTranslationInterface"
-        const val SECRET = "secret"
         const val CALLBACK_NAME = "pageTranslationCallback"
         const val EXTRACT_RESULT = "extractResult"
         const val APPLY_RESULT = "applyResult"
