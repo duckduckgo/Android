@@ -30,6 +30,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.Locale
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class SearchDownloadsClientTool @Inject constructor(
@@ -43,6 +44,13 @@ class SearchDownloadsClientTool @Inject constructor(
         promptTitle = R.string.duckAiClientToolSearchDownloadsPromptTitle,
         promptMessage = R.string.duckAiClientToolSearchDownloadsPromptMessage,
         name = R.string.duckAiClientToolSearchDownloadsName,
+    )
+
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.SEE,
+        name = R.string.duckAiClientToolSearchDownloadsName,
+        description = R.string.duckAiClientToolSearchDownloadsDescription,
+        icon = CommonR.drawable.ic_downloads_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.searchDownloads().isEnabled()

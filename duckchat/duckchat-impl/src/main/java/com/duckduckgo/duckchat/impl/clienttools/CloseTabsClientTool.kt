@@ -25,6 +25,7 @@ import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class CloseTabsClientTool @Inject constructor(
@@ -40,6 +41,13 @@ class CloseTabsClientTool @Inject constructor(
         promptTitle = R.string.duckAiClientToolCloseTabsPromptTitle,
         promptMessage = R.string.duckAiClientToolCloseTabsPromptMessage,
         name = R.string.duckAiClientToolCloseTabsName,
+    )
+
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.DO,
+        name = R.string.duckAiClientToolCloseTabsName,
+        description = R.string.duckAiClientToolCloseTabsDescription,
+        icon = CommonR.drawable.ic_close_24,
     )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.closeTabs().isEnabled()

@@ -41,6 +41,10 @@ class ClientToolChatGrants @Inject constructor() {
         synchronized(toolsByChat) { toolsByChat.getOrPut(chatId) { mutableSetOf() }.addAll(toolNames) }
     }
 
+    fun revoke(toolName: String) {
+        synchronized(toolsByChat) { toolsByChat.values.forEach { it.remove(toolName) } }
+    }
+
     fun clear() {
         synchronized(toolsByChat) { toolsByChat.clear() }
     }
