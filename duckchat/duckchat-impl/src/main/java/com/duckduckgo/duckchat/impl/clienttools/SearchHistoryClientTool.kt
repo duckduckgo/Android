@@ -96,7 +96,7 @@ class SearchHistoryClientTool @Inject constructor(
         return ClientToolResult.Success(JSONObject().put(RESULTS, results))
     }
 
-    /** One page per URL as the contract shows it, so addresses that differ only by query or fragment merge. */
+    /** One page per output URL and title: searches stay apart by their titles, and copies of a page that differ only by query merge. */
     private suspend fun pagesVisitedIn(range: VisitRange): List<Page> {
         return navigationHistory.getHistory().firstOrNull().orEmpty()
             .filter { it.url.toString().isHttpOrHttps() }
@@ -104,11 +104,11 @@ class SearchHistoryClientTool @Inject constructor(
                 val url = ClientToolOutput.url(entry.url.toString())
                 entry.visits.map { ClientToolOutput.instantOf(it) }.filter { it in range }.map { Visit(url, entry.title, it) }
             }
-            .groupBy { it.url }
-            .map { (url, visits) ->
+            .groupBy { it.url to it.title }
+            .map { (key, visits) ->
                 val latest = visits.maxBy { it.at }
                 Page(
-                    url = url,
+                    url = key.first,
                     title = latest.title,
                     latestVisit = latest.at,
                     daysVisited = visits.map { it.at.atZone(ZoneOffset.UTC).toLocalDate() }.distinct().size,

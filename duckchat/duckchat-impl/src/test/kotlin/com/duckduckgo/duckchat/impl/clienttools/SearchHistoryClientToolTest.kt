@@ -124,20 +124,6 @@ class SearchHistoryClientToolTest {
     }
 
     @Test
-    fun whenAddressesDifferOnlyByQueryThenTheyAppearOnceAtTheLatestVisit() = runTest {
-        givenHistory(
-            page("https://example.com/a?x=1", "First", "2026-10-27T09:00:00"),
-            page("https://example.com/a?x=2#top", "Second", "2026-10-28T09:00:00"),
-        )
-
-        val results = success(testee.execute(JSONObject(), context)).getJSONArray("results")
-
-        assertEquals(1, results.length())
-        assertEquals("Second", results.getJSONObject(0).getString("title"))
-        assertEquals("https://example.com/a", results.getJSONObject(0).getString("url"))
-    }
-
-    @Test
     fun whenPageIsNotWebThenItIsLeftOut() = runTest {
         givenHistory(page("file:///sdcard/a.html", "Local", "2026-10-27T09:00:00"))
 
@@ -237,6 +223,45 @@ class SearchHistoryClientToolTest {
         )
 
         assertEquals(listOf("https://duckduckgo.com/"), urls("{}"))
+    }
+
+    @Test
+    fun whenAddressesDifferOnlyByQueryWithTheSameTitleThenTheyAppearOnce() = runTest {
+        givenHistory(
+            page("https://example.com/a?utm_source=x", "Page A", "2026-10-27T09:00:00"),
+            page("https://example.com/a?utm_source=y#top", "Page A", "2026-10-28T09:00:00"),
+        )
+
+        val results = success(testee.execute(JSONObject(), context)).getJSONArray("results")
+
+        assertEquals(1, results.length())
+        assertEquals("https://example.com/a", results.getJSONObject(0).getString("url"))
+    }
+
+    @Test
+    fun whenTwoSearchesMatchThenEachIsItsOwnResult() = runTest {
+        givenHistory(
+            VisitedSERP(
+                Uri.parse("https://duckduckgo.com/?q=paris+hotels"),
+                "paris hotels at DuckDuckGo",
+                "paris hotels",
+                listOf(LocalDateTime.parse("2026-10-27T09:00:00")),
+            ),
+            VisitedSERP(
+                Uri.parse("https://duckduckgo.com/?q=paris+weather"),
+                "paris weather at DuckDuckGo",
+                "paris weather",
+                listOf(LocalDateTime.parse("2026-10-28T09:00:00")),
+            ),
+        )
+
+        val results = success(testee.execute(JSONObject("""{"query":"paris"}"""), context)).getJSONArray("results")
+
+        assertEquals(2, results.length())
+        assertEquals("paris weather at DuckDuckGo", results.getJSONObject(0).getString("title"))
+        assertEquals("paris hotels at DuckDuckGo", results.getJSONObject(1).getString("title"))
+        assertEquals("https://duckduckgo.com/", results.getJSONObject(0).getString("url"))
+        assertEquals("https://duckduckgo.com/", results.getJSONObject(1).getString("url"))
     }
 
     private suspend fun urls(input: String): List<String> {
