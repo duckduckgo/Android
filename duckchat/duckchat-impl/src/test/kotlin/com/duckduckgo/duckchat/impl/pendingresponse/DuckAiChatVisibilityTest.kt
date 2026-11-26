@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.attention
+package com.duckduckgo.duckchat.impl.pendingresponse
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.duckchat.api.DuckChat
-import com.duckduckgo.duckchat.impl.attention.ChatVisibilityEvent.AppClosed
-import com.duckduckgo.duckchat.impl.attention.ChatVisibilityEvent.AppOpened
-import com.duckduckgo.duckchat.impl.attention.ChatVisibilityEvent.LaunchLandingResolved
-import com.duckduckgo.duckchat.impl.attention.ChatVisibilityEvent.SelectedTabChanged
+import com.duckduckgo.duckchat.impl.pendingresponse.ChatVisibilityEvent.AppClosed
+import com.duckduckgo.duckchat.impl.pendingresponse.ChatVisibilityEvent.AppOpened
+import com.duckduckgo.duckchat.impl.pendingresponse.ChatVisibilityEvent.LaunchLandingResolved
+import com.duckduckgo.duckchat.impl.pendingresponse.ChatVisibilityEvent.SelectedTabChanged
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

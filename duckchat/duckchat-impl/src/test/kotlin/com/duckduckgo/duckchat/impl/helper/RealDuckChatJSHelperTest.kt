@@ -44,7 +44,6 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SELECT_FIRST_HISTORY_I
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
-import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionGate
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
@@ -58,6 +57,7 @@ import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_C
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
+import com.duckduckgo.duckchat.impl.pendingresponse.DuckAiPendingResponseTracker
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
@@ -150,7 +150,7 @@ class RealDuckChatJSHelperTest {
     private val mockTermsConsent: DuckAiTermsConsent = mock()
     private val chatStateStore = ChatStateStore()
     private val mockResponseWaitWideEvent: DuckAiResponseWaitWideEvent = mock()
-    private val mockAttentionTracker: DuckAiResponseAttentionTracker = mock()
+    private val mockPendingResponseTracker: DuckAiPendingResponseTracker = mock()
 
     private val mockDuckDuckGoUrlDetector: DuckDuckGoUrlDetector = mock {
         on { isDuckDuckGoQueryUrl(SERP_URL) } doReturn true
@@ -199,7 +199,7 @@ class RealDuckChatJSHelperTest {
         termsConsent = mockTermsConsent,
         chatStateStore = chatStateStore,
         responseWaitWideEvent = mockResponseWaitWideEvent,
-        attentionTracker = mockAttentionTracker,
+        pendingResponseTracker = mockPendingResponseTracker,
         duckDuckGoUrlDetector = mockDuckDuckGoUrlDetector,
         tabSessions = tabSessions,
         newChatHintsUsage = newChatHintsUsage,
@@ -3032,7 +3032,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockResponseWaitWideEvent).onResponseState("tab-1", "start_stream:restart_stream")
-        verify(mockAttentionTracker).onResponseState("tab-1", "start_stream:restart_stream", BrowserMode.REGULAR)
+        verify(mockPendingResponseTracker).onResponseState("tab-1", "start_stream:restart_stream", BrowserMode.REGULAR)
     }
 
     @Test
@@ -3047,7 +3047,7 @@ class RealDuckChatJSHelperTest {
             browserMode = BrowserMode.FIRE,
         )
 
-        verify(mockAttentionTracker).onResponseState("tab", "streaming", BrowserMode.FIRE)
+        verify(mockPendingResponseTracker).onResponseState("tab", "streaming", BrowserMode.FIRE)
     }
 
     @Test
@@ -3063,7 +3063,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verifyNoInteractions(mockResponseWaitWideEvent)
-        verifyNoInteractions(mockAttentionTracker)
+        verifyNoInteractions(mockPendingResponseTracker)
     }
 
     @Test
@@ -3082,7 +3082,7 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockResponseWaitWideEvent).onNativePromptSubmitted("tab-1", BrowserMode.FIRE, "high", "WebSearch")
-        verify(mockAttentionTracker).onNativePromptSubmitted("tab-1", BrowserMode.FIRE)
+        verify(mockPendingResponseTracker).onNativePromptSubmitted("tab-1", BrowserMode.FIRE)
     }
 
     @Test
@@ -3092,7 +3092,7 @@ class RealDuckChatJSHelperTest {
         testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext, tabId = "tab-1")
 
         verifyNoInteractions(mockResponseWaitWideEvent)
-        verifyNoInteractions(mockAttentionTracker)
+        verifyNoInteractions(mockPendingResponseTracker)
     }
 
     @Test

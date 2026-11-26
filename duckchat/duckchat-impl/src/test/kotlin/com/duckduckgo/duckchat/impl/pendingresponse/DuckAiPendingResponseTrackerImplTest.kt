@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.duckchat.impl.attention
+package com.duckduckgo.duckchat.impl.pendingresponse
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -60,7 +60,7 @@ import kotlin.coroutines.resume
 
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [34])
-class DuckAiResponseAttentionTrackerImplTest {
+class DuckAiPendingResponseTrackerImplTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
@@ -80,7 +80,7 @@ class DuckAiResponseAttentionTrackerImplTest {
     /** [log] without keep-alive changes. */
     private val effects get() = log.filterNot { it.startsWith("keepAlive") }
 
-    private lateinit var testee: DuckAiResponseAttentionTrackerImpl
+    private lateinit var testee: DuckAiPendingResponseTrackerImpl
 
     @Before
     fun setup() = runTest {
@@ -95,7 +95,7 @@ class DuckAiResponseAttentionTrackerImplTest {
         whenever(duckChat.isDuckChatUrl(any())).thenAnswer { invocation ->
             (invocation.arguments[0] as Uri).toString().startsWith(DUCK_AI_URL)
         }
-        testee = DuckAiResponseAttentionTrackerImpl(
+        testee = DuckAiPendingResponseTrackerImpl(
             duckChat = duckChat,
             duckChatFeature = lazy { duckChatFeature },
             duckChatFeatureRepository = duckChatFeatureRepository,
