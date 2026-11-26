@@ -33,6 +33,9 @@ import com.duckduckgo.sync.impl.auth.SyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
@@ -70,6 +73,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
     init {
         syncPixels.fireSyncAnotherDevicePromptShown()
         syncSetupWideEvent.onIntroScreenShown()
+        syncSetupWideEvent.onStep(SetupStep.CHOICE_SCREEN)
     }
 
     fun syncThisDevice(launchSource: String) {
@@ -81,6 +85,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
 
             _viewState.update { it.copy(isSyncing = true) }
             syncSetupWideEvent.onSyncEnabled()
+            syncSetupWideEvent.onStep(SetupStep.PREPARING_SYNC)
 
             suspend fun getDeviceAndFinish() {
                 val device = syncAccountRepository.getThisConnectedDevice()
@@ -88,6 +93,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
                     _commands.send(Command.FinishSyncing(device))
                 } else {
                     syncSetupWideEvent.onAccountCreationFailed()
+                    syncSetupWideEvent.onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
                     _commands.send(
                         Command.ShowError(R.string.sync_simplified_error_dialog_create_account_body),
                     )
@@ -106,6 +112,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
 
                     is Result.Error -> {
                         syncSetupWideEvent.onAccountCreationFailed()
+                        syncSetupWideEvent.onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
                         _commands.send(
                             Command.ShowError(
                                 R.string.sync_simplified_error_dialog_create_account_body,
@@ -132,6 +139,7 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
 
     fun onCloseClicked() {
         viewModelScope.launch {
+            syncSetupWideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
             _commands.send(Command.AbortSyncing)
         }
     }

@@ -69,6 +69,7 @@ import com.duckduckgo.sync.impl.crypto.RealSyncJweCrypto
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
@@ -174,6 +175,29 @@ class AppSyncAccountRepositoryTest {
             secretKey = secretKey,
             token = token,
         )
+    }
+
+    @Test
+    fun whenCreateAccountSucceedsThenAccountCreatedStepRecorded() {
+        prepareToProvideDeviceIds()
+        prepareForCreateAccountSuccess()
+
+        syncRepo.createAccount()
+
+        verify(syncSetupWideEvent).onStep(SetupStep.ACCOUNT_CREATED)
+    }
+
+    @Test
+    fun whenCreateAccountFailsThenAccountCreatedStepNotRecorded() {
+        prepareToProvideDeviceIds()
+        prepareForEncryption()
+        whenever(nativeLib.generateAccountKeys(userId = anyString(), password = anyString())).thenReturn(accountKeys)
+        whenever(anyCreateAccountCall())
+            .thenReturn(accountCreatedFailDupUser)
+
+        syncRepo.createAccount()
+
+        verify(syncSetupWideEvent, never()).onStep(SetupStep.ACCOUNT_CREATED)
     }
 
     @Test

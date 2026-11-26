@@ -27,6 +27,9 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.AbortSyncing
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.FinishSyncing
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.ShowAuthError
@@ -40,6 +43,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -287,6 +291,107 @@ class SyncThisDeviceViewModelTest {
         testee.commands.test {
             testee.onErrorDismissed()
             assertIs<AbortSyncing>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user closes the screen then the unified event is cancelled as user closed`() = runTest {
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onCloseClicked()
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onCancelled(SetupCancellationReason.USER_CLOSED)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user dismisses the error then the unified event is not cancelled`() = runTest {
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onErrorDismissed()
+            skipItems(1)
+
+            verify(syncSetupWideEvent, never()).onCancelled(any())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the view model is created then the choice screen step is recorded`() = runTest {
+        createTestee()
+
+        verify(syncSetupWideEvent).onStep(SetupStep.CHOICE_SCREEN)
+    }
+
+    @Test
+    fun `when syncing this device then the preparing sync step is recorded`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onStep(SetupStep.PREPARING_SYNC)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user dismisses verification while syncing this device then the preparing sync step is not recorded`() = runTest {
+        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            expectNoEvents()
+
+            verify(syncSetupWideEvent, never()).onStep(SetupStep.PREPARING_SYNC)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when account creation fails then the unified event fails with account creation failed`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(1, ""))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the connected device cannot be retrieved then the unified event fails with account creation failed`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
 
             cancel()
         }
