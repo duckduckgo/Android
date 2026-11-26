@@ -62,13 +62,11 @@ class RealPageTranslationScript @Inject constructor(
 
     override suspend fun get(timeOrigin: Double): String = withContext(dispatchers.io()) {
         // the bundle locks its callback, and the page's interface is gone once a first copy ran
-        """
-        (function() {
-            'use strict';
-            if (performance.timeOrigin !== $timeOrigin || Object.prototype.hasOwnProperty.call(window, '$callbackName')) return;
-            $bundle
-        })();
-        """.trimIndent()
+        "(function() {\n" +
+            "'use strict';\n" +
+            "if (performance.timeOrigin !== $timeOrigin || Object.prototype.hasOwnProperty.call(window, '$callbackName')) return;\n" +
+            "$bundle\n" +
+            "})();"
     }
 
     private fun getUserPreferences(): String =
