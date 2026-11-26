@@ -42,7 +42,7 @@ class RealDaxUrlProviderTest {
     @Before
     fun setup() {
         whenever(feature.useUnifiedUrl()).thenReturn(toggle)
-        provider = RealDaxUrlProvider({ feature })
+        provider = RealDaxUrlProvider(lazy { feature })
     }
 
     @Test
@@ -72,7 +72,6 @@ class RealDaxUrlProviderTest {
         assertFalse(provider.getUrl("https://other.com").matches(exception))
         assertFalse(provider.getUrl("https://notexample.com").matches(exception))
     }
-
 
     @Test
     fun whenDomainExtractedThenNormalizedWwwStripped() {

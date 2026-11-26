@@ -22,12 +22,12 @@ Shipped behind the `unifiedUrlModel` feature flag (`UnifiedUrlModelFeature`):
   resolved `DaxDomain`s. Resolution happens in `ToggleImpl` via a `daxDomainResolver` lambda passed
   through `FeatureToggles.Builder`, which the codegen'd `*_ProxyModule` supplies from an injected
   `Lazy<DaxUrlProvider>` — `Lazy` because `RealDaxUrlProvider` reads its own feature flag and eager
-  injection would close a Dagger cycle back through that module.
+  injection would close a DI cycle back through that module.
 
   **`FeatureException` stays an untouched DTO.** It is the Moshi/Room shape for remote config and is
   what content-scope-scripts serializes back out to the JS layer; it carries no `DaxDomain`. Keeping
   the DTO and the domain model separate is what removes the need for a process-wide service-locator
-  holder: resolution moved to `ToggleImpl`, which is constructed from the Dagger graph, so there is
+  holder: resolution moved to `ToggleImpl`, which is constructed from the DI graph, so there is
   no install point, no startup-ordering window, and no null-until-installed state.
 
 Key properties already established:
@@ -144,7 +144,7 @@ stay distinct. They do **not** map to `DaxDomain`. Triaged:
   `DaxDomain` field, computed or stored. Content-scope-scripts serializes `List<FeatureException>`
   straight back out to the JS layer, so the DTO must stay exactly the wire shape.
 - **Resolution happens in the producer, which is always injectable.** Every place that builds
-  exceptions is either a Dagger `@Provides` or an `@Inject` class, so it can take `DaxUrlProvider`
+  exceptions is either a `@Provides` or an `@Inject` class, so it can take `DaxUrlProvider`
   directly. For remote-config toggles that producer is `ToggleImpl`, fed by a `daxDomainResolver`
   lambda on `FeatureToggles.Builder` that the codegen'd `*_ProxyModule` supplies. For the legacy
   per-feature Room repositories it is the repository's own `@Provides`. There is no service-locator
@@ -206,7 +206,7 @@ stay distinct. They do **not** map to `DaxDomain`. Triaged:
   (pre-existing latent bug). Fix when consolidating caching into the model.
 - **Behavior parity.** `getDomain` intentionally allows `localhost`/IPs; strict `isValidDomain`
   (rejects them) is opt-in via `type`. Don't silently tighten during migration.
-- **Dagger cycle.** `RealDaxUrlProvider` injects `UnifiedUrlModelFeature` to read its own flag, and
+- **DI cycle.** `RealDaxUrlProvider` injects `UnifiedUrlModelFeature` to read its own flag, and
   every codegen'd `*_ProxyModule` now injects `DaxUrlProvider`. That is a cycle unless the generated
   module takes `Lazy<DaxUrlProvider>` — it does. Anything else that injects `DaxUrlProvider` into a
   feature-toggle provision point must do the same.

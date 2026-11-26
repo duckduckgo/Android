@@ -93,9 +93,9 @@ internal class RealDaxUrl(
     override fun queryParameter(key: String): String? =
         if (uri.isOpaque) null else uri.getQueryParameter(key)
 
-    override fun matches(other: DaxUrl): Boolean = matches(other.domain ?: return false)
+    override fun matches(other: DaxUrl): Boolean = other.domain?.let { matches(it) } ?: false
 
-    override fun matches(other: DaxDomain): Boolean = other.sameOrSubdomain(domain ?: return false)
+    override fun matches(other: DaxDomain): Boolean = domain?.let { other.sameOrSubdomain(it) } ?: false
 
     // Mirrors UriString.isWebUrl (default, no search-query disambiguation — a DaxUrl is already a
     // URL). The two should converge, with UriString eventually delegating here. Takes the parsed

@@ -23,16 +23,15 @@ import com.duckduckgo.url.DaxDomain
 import com.duckduckgo.url.DaxScheme
 import com.duckduckgo.url.DaxUrl
 import com.duckduckgo.url.DaxUrlProvider
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class)
 // Lazy: every generated feature-toggle module injects this provider, so eager injection of a feature
-// here would close a Dagger cycle. Breaking it once at this end keeps `Lazy` out of generated code.
+// here would close a DI cycle. Breaking it once at this end keeps `Lazy` out of generated code.
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class)
 class RealDaxUrlProvider @Inject constructor(
     private val unifiedUrlModelFeature: Lazy<UnifiedUrlModelFeature>,
 ) : DaxUrlProvider {
@@ -42,7 +41,7 @@ class RealDaxUrlProvider @Inject constructor(
     // A flag flip therefore takes effect on next process start — the right granularity for an
     // implementation switch (no swapping the URL model mid-session).
     private val useUnifiedUrl by lazy {
-        unifiedUrlModelFeature.get().useUnifiedUrl().isEnabled().also {
+        unifiedUrlModelFeature.value.useUnifiedUrl().isEnabled().also {
             logcat("Cris") { "DaxUrlProvider resolved memoize=$it" }
         }
     }

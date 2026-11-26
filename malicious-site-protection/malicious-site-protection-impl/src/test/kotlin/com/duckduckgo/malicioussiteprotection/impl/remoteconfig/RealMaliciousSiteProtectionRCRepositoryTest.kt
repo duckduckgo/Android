@@ -1,18 +1,18 @@
 package com.duckduckgo.malicioussiteprotection.impl.remoteconfig
 
 import android.annotation.SuppressLint
+import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.browser.Domain
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.fakeDaxDomainResolver
 import com.duckduckgo.feature.toggles.api.FeatureException
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.fakeDaxDomainResolver
 import com.duckduckgo.malicioussiteprotection.impl.MaliciousSiteProtectionFeature
 import com.duckduckgo.url.DaxDomain
 import com.duckduckgo.url.DaxScheme
 import com.duckduckgo.url.DaxUrl
 import com.duckduckgo.url.DaxUrlProvider
-import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue

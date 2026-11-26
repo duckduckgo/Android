@@ -16,52 +16,46 @@
 
 plugins {
     id 'com.android.library'
-    id 'kotlin-android'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
-
-    implementation project(':unified-url-model-api')
-    implementation project(':feature-toggles-api')
     implementation project(':app-build-config-api')
-    implementation project(':privacy-config-api')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
     implementation project(':di')
-
+    implementation project(':feature-toggles-api')
+    implementation project(':privacy-config-api')
+    implementation project(':unified-url-model-api')
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation Square.moshi
-    implementation Square.okio
     implementation Square.okHttp3.okHttp
-    implementation "com.squareup.logcat:logcat:_"
+    implementation Square.okio
 
     testImplementation project(':common-test')
     testImplementation project(':feature-toggles-test')
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
-    testImplementation Testing.robolectric
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
     coreLibraryDesugaring Android.tools.desugarJdkLibs
+
+    ksp project(':codegen-ksp')
 }
 
 android {
     namespace 'com.duckduckgo.url.impl'
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

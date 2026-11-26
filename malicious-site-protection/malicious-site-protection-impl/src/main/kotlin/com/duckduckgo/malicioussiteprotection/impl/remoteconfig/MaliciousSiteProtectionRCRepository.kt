@@ -48,6 +48,10 @@ interface MaliciousSiteProtectionRCRepository {
     scope = AppScope::class,
     binding = binding<PrivacyConfigCallbackPlugin>(),
 )
+@ContributesIntoSet(
+    scope = AppScope::class,
+    binding = binding<MainProcessLifecycleObserver>(),
+)
 @SingleIn(AppScope::class)
 class RealMaliciousSiteProtectionRCRepository @Inject constructor(
     private val feature: MaliciousSiteProtectionFeature,
