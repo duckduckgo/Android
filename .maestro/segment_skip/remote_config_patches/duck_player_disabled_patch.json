@@ -1,7 +1,0 @@
-[
-  {
-    "op": "replace",
-    "path": "/features/duckPlayer/state",
-    "value": "disabled"
-  }
-]

@@ -3,8 +3,7 @@ name: "Segment Skip: Never plays the segment untouched"
 tags:
   - segmentSkip
 ---
-# Requires an internal release build with remote_config_patches/segment_skip_enabled_patch.json
-# and remote_config_patches/duck_player_disabled_patch.json.
+# Requires an internal release build with remote_config_patches/segment_skip_enabled_patch.json.
 # Never turns the feature off for the page, so no segment markers, no skip and no button.
 - runFlow: steps/start_app.yaml
 - runFlow:

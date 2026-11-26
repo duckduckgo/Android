@@ -8,3 +8,6 @@ appId: com.duckduckgo.mobile.android
 - tapOn:
     id: "contextualBrandDesignDismissButton"
 - runFlow: ../../shared/dismiss_native_input.yaml
+# Duck Player's prompt holds playback on every YouTube load until dismissed.
+- runFlow: ../../duckplayer/common/enable_duck_player_never.yaml
+- runFlow: ../../shared/dismiss_native_input.yaml

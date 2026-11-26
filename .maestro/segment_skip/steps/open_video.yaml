@@ -2,8 +2,6 @@ appId: com.duckduckgo.mobile.android
 ---
 # wHAT_JDwFOY has a single SponsorBlock "sponsor" segment from 48s to 114s; the diagnose step in the
 # E2E workflow checks that segment against the live service.
-# Needs a build with remote_config_patches/duck_player_disabled_patch.json, or Duck Player's prompt
-# holds playback on each load.
 # The first load only gets YouTube's cookie and promo dialogs out of the way, which takes 30s or more
 # in CI while the video plays. The second load starts at 44s without them, so playback reaches the
 # segment a few seconds later, by playing rather than by the initial seek, with the flow already

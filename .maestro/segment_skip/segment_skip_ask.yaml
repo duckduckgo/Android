@@ -3,8 +3,7 @@ name: "Segment Skip: Ask to Skip shows Skip and skips on tap"
 tags:
   - segmentSkip
 ---
-# Requires an internal release build with remote_config_patches/segment_skip_enabled_patch.json
-# and remote_config_patches/duck_player_disabled_patch.json.
+# Requires an internal release build with remote_config_patches/segment_skip_enabled_patch.json.
 # Ask to Skip is the default mode, so the flow doesn't change it.
 # The button hides itself after 8s of playback, and with a playing video every Maestro step waits
 # for a settle that never comes, so it is tapped as soon as it shows.
