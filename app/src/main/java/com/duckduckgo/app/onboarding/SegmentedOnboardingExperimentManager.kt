@@ -16,9 +16,6 @@
 
 package com.duckduckgo.app.onboarding
 
-import com.duckduckgo.app.onboarding.SegmentedOnboardingExperimentManager.SegmentedOnboardingExperimentVariant
-import com.duckduckgo.app.onboarding.SegmentedOnboardingFeatureToggles.Cohorts
-import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -28,39 +25,17 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 interface SegmentedOnboardingExperimentManager {
-    suspend fun enroll(): SegmentedOnboardingExperimentVariant?
-
-    enum class SegmentedOnboardingExperimentVariant {
-        CONTROL,
-        TREATMENT,
-    }
+    suspend fun isEnabled(): Boolean
 }
 
 @ContributesBinding(AppScope::class, binding = binding<SegmentedOnboardingExperimentManager>())
 @SingleIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
-    private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
-    private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
-    private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
 ) : SegmentedOnboardingExperimentManager {
 
-    override suspend fun enroll(): SegmentedOnboardingExperimentVariant? = withContext(dispatcherProvider.io()) {
-        if (!onboardingPrivacyConfigPersistedGate.awaitPersisted() || !checkPrerequisites()) {
-            return@withContext null
-        }
-
-        val toggle = segmentedOnboardingFeatureToggles.onboardingFlowByDownloadReasonExperiment()
-        toggle.enroll()
-        when {
-            toggle.isEnrolledAndEnabled(Cohorts.TREATMENT) -> SegmentedOnboardingExperimentVariant.TREATMENT
-            toggle.isEnrolledAndEnabled(Cohorts.CONTROL) -> SegmentedOnboardingExperimentVariant.CONTROL
-            else -> null
-        }
+    override suspend fun isEnabled(): Boolean = withContext(dispatcherProvider.io()) {
+        segmentedOnboardingFeatureToggles.onboardingFlowByDownloadReason().isEnabled()
     }
-
-    private suspend fun checkPrerequisites() =
-        !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
-            !appBuildConfig.isAppReinstall()
 }

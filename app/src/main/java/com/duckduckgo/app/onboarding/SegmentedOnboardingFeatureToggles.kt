@@ -20,7 +20,6 @@ import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
-import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 
 @ContributesRemoteFeature(
     scope = AppScope::class,
@@ -34,8 +33,12 @@ interface SegmentedOnboardingFeatureToggles {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun onboardingFlowByDownloadReasonExperiment(): Toggle
 
-    enum class Cohorts(override val cohortName: String) : CohortName {
-        CONTROL("control"),
-        TREATMENT("treatment"),
-    }
+    /**
+     * Shows the segmented onboarding flow to new users.
+     *
+     * Remote config usually arrives after the first run has picked its onboarding plan, so the code default decides for most users.
+     * To roll back, release a patch that flips this default to FALSE.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun onboardingFlowByDownloadReason(): Toggle
 }
