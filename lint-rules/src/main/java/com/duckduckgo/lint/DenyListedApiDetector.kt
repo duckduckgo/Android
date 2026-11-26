@@ -137,8 +137,8 @@ internal class DenyListedApiDetector : Detector(), SourceCodeScanner, XmlScanner
         DenyListedEntry(
             className = "com.duckduckgo.translatekit.TranslateKit",
             functionName = MATCH_ALL,
-            errorMessage = "Go through TranslateKitLoader. translate-kit has no native library on 32-bit devices, " +
-                "so every call must be gated on TranslateKitLoader.isAvailable().",
+            errorMessage = "Go through TranslateKitLibrary. translate-kit has no native library on 32-bit devices, " +
+                "so every call must follow a TranslateKitLibrary.init() that returned true.",
         ),
     )
 
