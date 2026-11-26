@@ -22,8 +22,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.BucketRounding.ROUND_DOWN
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.BucketRounding.ROUND_UP
+import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventPath
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.FAILURE
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.SUCCESS
+import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStatus.UNKNOWN
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.WideEventStep
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
@@ -35,6 +37,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -1072,6 +1075,120 @@ class WideEventRepositoryTest {
 
         assertTrue(isFirstDailyOccurrence(firstEventId))
     }
+
+    @Test
+    fun `when no step is appended to the path, the event has no path`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+
+        assertNull(readPath(eventId))
+    }
+
+    @Test
+    fun `when steps are appended to the path, they are kept in order including returns to earlier steps`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+
+        appendToPath(eventId, "started", "code_screen", "code_entry", "code_screen")
+
+        assertEquals(
+            WideEventPath(steps = listOf("started", "code_screen", "code_entry", "code_screen"), lastStep = "code_screen"),
+            readPath(eventId),
+        )
+    }
+
+    @Test
+    fun `when a step equal to the last one is appended, the path is unchanged but its metadata is merged`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+        appendToPath(eventId, "started", "code_screen")
+
+        wideEventRepository.appendToWideEventPath(eventId = eventId, step = "code_screen", metadata = mapOf("method" to "qr"))
+
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        assertEquals(WideEventPath(steps = listOf("started", "code_screen"), lastStep = "code_screen"), event.path)
+        assertEquals("qr", event.metadata["method"])
+    }
+
+    @Test
+    fun `when a step contains a comma, it is rejected and the path and metadata are unchanged`() = runTest {
+        assertStepRejected("code,screen")
+    }
+
+    @Test
+    fun `when a step is empty, it is rejected and the path and metadata are unchanged`() = runTest {
+        assertStepRejected("")
+    }
+
+    @Test
+    fun `when a step is truncated, it is rejected and the path and metadata are unchanged`() = runTest {
+        assertStepRejected("truncated")
+    }
+
+    private suspend fun assertStepRejected(step: String) {
+        val eventId = insertEvent(name = "test_event")
+        appendToPath(eventId, "started")
+
+        assertThrows(IllegalArgumentException::class.java) {
+            runBlocking { wideEventRepository.appendToWideEventPath(eventId = eventId, step = step, metadata = mapOf("method" to "qr")) }
+        }
+
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        assertEquals(WideEventPath(steps = listOf("started"), lastStep = "started"), event.path)
+        assertNull(event.metadata["method"])
+    }
+
+    @Test
+    fun `when the path reaches 20 steps, it keeps all of them`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+        val steps = (1..20).map { "step_$it" }
+
+        appendToPath(eventId, *steps.toTypedArray())
+
+        assertEquals(WideEventPath(steps = steps, lastStep = "step_20"), readPath(eventId))
+    }
+
+    @Test
+    fun `when the path would exceed 20 steps, it keeps the first 19 and ends with truncated while last step stays real`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+
+        appendToPath(eventId, *(1..25).map { "step_$it" }.toTypedArray())
+
+        assertEquals(
+            WideEventPath(steps = (1..19).map { "step_$it" } + "truncated", lastStep = "step_25"),
+            readPath(eventId),
+        )
+    }
+
+    @Test
+    fun `when appending to the path of a completed event, it fails and the path is unchanged`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+        appendToPath(eventId, "started")
+        wideEventRepository.setWideEventStatus(eventId = eventId, status = SUCCESS, metadata = emptyMap())
+
+        assertThrows(IllegalStateException::class.java) {
+            runBlocking { wideEventRepository.appendToWideEventPath(eventId = eventId, step = "code_screen", metadata = emptyMap()) }
+        }
+        assertEquals(WideEventPath(steps = listOf("started"), lastStep = "started"), readPath(eventId))
+    }
+
+    @Test
+    fun `when an event with a path is cleaned up, it keeps the path`() = runTest {
+        val eventId = insertEvent(name = "test_event")
+        appendToPath(eventId, "started", "code_screen")
+
+        wideEventRepository.cleanUpWideEvent(eventId) { WideEventRepository.CleanupDecision(status = UNKNOWN, metadata = emptyMap()) }
+
+        val event = wideEventRepository.getWideEvents(setOf(eventId)).single()
+        assertEquals(UNKNOWN, event.status)
+        assertEquals(WideEventPath(steps = listOf("started", "code_screen"), lastStep = "code_screen"), event.path)
+    }
+
+    private suspend fun appendToPath(
+        eventId: Long,
+        vararg steps: String,
+    ) {
+        steps.forEach { step -> wideEventRepository.appendToWideEventPath(eventId = eventId, step = step, metadata = emptyMap()) }
+    }
+
+    private suspend fun readPath(eventId: Long): WideEventPath? = wideEventRepository.getWideEvents(setOf(eventId)).single().path
 
     private suspend fun insertEvent(name: String): Long =
         wideEventRepository.insertWideEvent(

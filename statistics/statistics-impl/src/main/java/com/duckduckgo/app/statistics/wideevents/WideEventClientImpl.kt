@@ -87,6 +87,24 @@ class WideEventClientImpl @Inject constructor(
         }
     }
 
+    override suspend fun flowAppendToPath(
+        wideEventId: Long,
+        step: String,
+        metadata: Map<String, String>,
+    ): Result<Unit> {
+        if (!isFeatureEnabled()) return Result.failure(Exception("Wide events feature disabled"))
+        if (wideEventId == SAMPLED_OUT_FLOW_ID) return Result.success(Unit)
+
+        return runCatching {
+            wideEventCleaner.ensureInitialized()
+            wideEventRepository.appendToWideEventPath(
+                eventId = wideEventId,
+                step = step,
+                metadata = metadata,
+            )
+        }
+    }
+
     override suspend fun flowFinish(
         wideEventId: Long,
         status: FlowStatus,
