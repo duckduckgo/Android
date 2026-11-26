@@ -26,6 +26,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.clienttools.ClientTool
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolChatGrants
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermission
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionMode
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionStore
@@ -47,6 +48,7 @@ import javax.inject.Inject
 class BrowserAccessSettingsViewModel @Inject constructor(
     private val tools: PluginPoint<ClientTool>,
     private val permissionStore: ClientToolPermissionStore,
+    private val chatGrants: ClientToolChatGrants,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -103,6 +105,8 @@ class BrowserAccessSettingsViewModel @Inject constructor(
             } else {
                 permissionStore.set(toolName, choice.toStored())
             }
+            // Grants from Allow in This Chat are not shown here, so picking any choice restates the whole answer.
+            chatGrants.revoke(toolName)
         }
     }
 
@@ -111,7 +115,10 @@ class BrowserAccessSettingsViewModel @Inject constructor(
     }
 
     fun onResetAllConfirmed() {
-        viewModelScope.launch { permissionStore.clearAll() }
+        viewModelScope.launch {
+            permissionStore.clearAll()
+            chatGrants.clear()
+        }
     }
 
     private fun toRow(

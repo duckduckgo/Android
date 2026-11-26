@@ -17,26 +17,41 @@
 package com.duckduckgo.duckchat.impl.clienttools.settings
 
 import app.cash.turbine.test
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.duckchat.impl.clienttools.AiChatBrowserToolsFeature
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolCallContext
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolChatGrants
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermission
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionMode
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolSettingsListing
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolSettingsSection
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
+import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPermissionPrompt
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPermissionStore
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPluginPoint
+import com.duckduckgo.duckchat.impl.clienttools.RealClientToolPermissionGate
 import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessChoice.ALWAYS_ALLOW
 import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessChoice.ALWAYS_ASK
 import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessChoice.NEVER_ALLOW
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 
 class BrowserAccessSettingsViewModelTest {
 
@@ -44,6 +59,18 @@ class BrowserAccessSettingsViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val store = FakeClientToolPermissionStore()
+    private val chatGrants = ClientToolChatGrants()
+    private val prompt = FakeClientToolPermissionPrompt()
+    private val appBuildConfig: AppBuildConfig = mock {
+        on { flavor } doReturn BuildFlavor.PLAY
+    }
+    private val gate = RealClientToolPermissionGate(
+        appBuildConfig,
+        FakeFeatureToggleFactory.create(AiChatBrowserToolsFeature::class.java),
+        store,
+        chatGrants,
+        prompt,
+    )
 
     private val listOpenTabs = tool("listOpenTabs", ClientToolSettingsSection.SEE, ClientToolPermissionMode.Ask(1, 2, 3))
     private val searchBookmarks = tool("searchBookmarks", ClientToolSettingsSection.SEE, ClientToolPermissionMode.Ask(1, 2, 3))
@@ -143,6 +170,40 @@ class BrowserAccessSettingsViewModelTest {
     }
 
     @Test
+    fun whenChatGrantedToolSetToAlwaysAskThenNextCallInThatChatPrompts() = runTest {
+        val testee = testee(listOpenTabs)
+        chatGrants.grant(CHAT_ID, listOf("listOpenTabs"))
+        assertEquals(ClientToolPermissionDecision.ALLOWED, gate.decide(listOpenTabs, callContext, null))
+
+        testee.onChoiceSelected("listOpenTabs", ALWAYS_ASK)
+
+        assertPrompts(listOpenTabs)
+    }
+
+    @Test
+    fun whenOneToolChoiceChangedThenOtherToolsKeepTheirChatGrants() = runTest {
+        val testee = testee(listOpenTabs, searchBookmarks)
+        chatGrants.grant(CHAT_ID, listOf("listOpenTabs", "searchBookmarks"))
+
+        testee.onChoiceSelected("listOpenTabs", NEVER_ALLOW)
+
+        assertEquals(ClientToolPermissionDecision.ALLOWED, gate.decide(searchBookmarks, callContext, null))
+        assertTrue(prompt.prompts.isEmpty())
+    }
+
+    @Test
+    fun whenResetAllConfirmedThenEveryChatGrantedToolPromptsAgain() = runTest {
+        store.choices["openTab"] = ClientToolPermission.NEVER_ALLOW
+        val testee = testee(listOpenTabs, searchBookmarks, openTab)
+        chatGrants.grant(CHAT_ID, listOf("listOpenTabs", "searchBookmarks"))
+
+        testee.onResetAllConfirmed()
+
+        assertPrompts(listOpenTabs)
+        assertPrompts(searchBookmarks)
+    }
+
+    @Test
     fun whenToolClickedThenShowsItsChoices() = runTest {
         val testee = testee(listOpenTabs)
 
@@ -164,9 +225,20 @@ class BrowserAccessSettingsViewModelTest {
         }
     }
 
+    private fun TestScope.assertPrompts(tool: FakeClientTool) {
+        val decision = async { gate.decide(tool, callContext, null) }
+        runCurrent()
+
+        assertEquals(tool.name, (prompt.current.request as ClientToolPermissionRequest.RunTool).tool.name)
+        assertFalse(decision.isCompleted)
+        decision.cancel()
+        runCurrent()
+    }
+
     private fun TestScope.testee(vararg tools: FakeClientTool) = BrowserAccessSettingsViewModel(
         tools = FakeClientToolPluginPoint(*tools),
         permissionStore = store,
+        chatGrants = chatGrants,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     ).also { viewModel -> backgroundScope.launch(coroutineRule.testDispatcher) { viewModel.viewState.collect() } }
 
@@ -182,4 +254,9 @@ class BrowserAccessSettingsViewModelTest {
         permissionMode = mode,
         settingsListing = ClientToolSettingsListing(section, name = 0, description = 0, icon = 0),
     )
+
+    private companion object {
+        const val CHAT_ID = "chat-1"
+        val callContext = ClientToolCallContext(chatTabId = "tab-1", browserMode = BrowserMode.REGULAR, chatId = CHAT_ID)
+    }
 }
