@@ -440,9 +440,7 @@ class SyncActivityViewModel @Inject constructor(
     }
 
     fun onConnectionCancelled() {
-        viewModelScope.launch {
-            syncSetupWideEvent.onFlowCancelled()
-        }
+        syncSetupWideEvent.onFlowCancelled()
         showAccountDetailsIfNeeded()
     }
 

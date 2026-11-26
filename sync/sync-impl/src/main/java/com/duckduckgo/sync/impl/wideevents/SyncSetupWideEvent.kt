@@ -16,6 +16,7 @@
 
 package com.duckduckgo.sync.impl.wideevents
 
+import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy.OnProcessStart
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
@@ -43,41 +44,47 @@ import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEventImpl.Companion.STEP
 import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
+import logcat.logcat
 import javax.inject.Inject
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 interface SyncSetupWideEvent {
-    suspend fun onFlowStarted(
+    fun onFlowStarted(
         launchSource: String = LAUNCH_SOURCE_OTHER,
         setupMode: SetupMode = SetupMode.SINGLE_DEVICE,
     )
 
-    suspend fun onDeviceAuthNotEnrolled()
-    suspend fun onUserAuthSuccess()
-    suspend fun onIntroScreenShown()
-    suspend fun onSyncEnabled()
-    suspend fun onAccountCreationApiStarted()
-    suspend fun onAccountCreationApiFinished()
-    suspend fun onInitialSyncStarted()
-    suspend fun onInitialSyncFinished()
-    suspend fun onAccountCreated()
-    suspend fun onAccountCreationFailed()
-    suspend fun onRecoveryCodeShown()
-    suspend fun onRecoveryCodeGenerationFailed()
-    suspend fun onFlowCancelled()
-    suspend fun onSyncRestoreStarted()
+    fun onDeviceAuthNotEnrolled()
+    fun onUserAuthSuccess()
+    fun onIntroScreenShown()
+    fun onSyncEnabled()
+    fun onAccountCreationApiStarted()
+    fun onAccountCreationApiFinished()
+    fun onInitialSyncStarted()
+    fun onInitialSyncFinished()
+    fun onAccountCreated()
+    fun onAccountCreationFailed()
+    fun onRecoveryCodeShown()
+    fun onRecoveryCodeGenerationFailed()
+    fun onFlowCancelled()
+    fun onSyncRestoreStarted()
 
     // Unified wide event API
-    suspend fun onStep(step: SetupStep)
-    suspend fun onUpdate(change: (SetupFields) -> SetupFields)
-    suspend fun onSucceeded()
-    suspend fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage? = null)
-    suspend fun onCancelled(reason: SetupCancellationReason)
+    fun onStep(step: SetupStep)
+    fun onUpdate(change: (SetupFields) -> SetupFields)
+    fun onSucceeded()
+    fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage? = null)
+    fun onCancelled(reason: SetupCancellationReason)
 }
 
 internal val SHARED_LATENCY_BUCKETS = setOf(
@@ -113,18 +120,33 @@ class SyncSetupWideEventImpl @Inject constructor(
     private val buildConfig: SyncBuildConfig,
     private val syncStore: SyncStore,
     private val advertisedExchangeVersion: AdvertisedExchangeV2Version,
+    @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SyncSetupWideEvent {
+    private val serialDispatcher = dispatchers.io().limitedParallelism(1)
     private val mutex = Mutex()
     private var currentData: EventData? = null
 
-    override suspend fun onFlowStarted(launchSource: String, setupMode: SetupMode) = mutex.withLock {
+    private fun enqueue(command: suspend () -> Unit) {
+        appCoroutineScope.launch(serialDispatcher) {
+            mutex.withLock {
+                try {
+                    command()
+                } catch (e: Exception) {
+                    currentCoroutineContext().ensureActive()
+                    logcat(WARN) { "Sync setup wide event: report failed: ${e.message}" }
+                }
+            }
+        }
+    }
+
+    override fun onFlowStarted(launchSource: String, setupMode: SetupMode) = enqueue {
         finishOpenEvent()
-        if (!isEventEnabled()) return@withLock
+        if (!isEventEnabled()) return@enqueue
         val isUnified = isUnifiedEventEnabled()
         // Without the unified event, we keep sending only the back up attempts the event has always covered.
-        if (!isUnified && setupMode != SetupMode.SINGLE_DEVICE) return@withLock
+        if (!isUnified && setupMode != SetupMode.SINGLE_DEVICE) return@enqueue
 
-        val flowId = startFlow(launchSource) ?: return@withLock
+        val flowId = startFlow(launchSource) ?: return@enqueue
         val unified = if (isUnified) createUnifiedData(setupMode) else null
         currentData = EventData(flowId = flowId, unified = unified)
         if (unified != null) {
@@ -140,46 +162,46 @@ class SyncSetupWideEventImpl @Inject constructor(
      * There, [STEP_DEVICE_AUTH_NOT_ENROLLED] can be followed by [STEP_USER_AUTH] and a successful finish,
      * and leaving the screen finishes the flow as [FlowStatus.Cancelled].
      */
-    override suspend fun onDeviceAuthNotEnrolled() = recordStep(STEP_DEVICE_AUTH_NOT_ENROLLED)
+    override fun onDeviceAuthNotEnrolled() = recordStep(STEP_DEVICE_AUTH_NOT_ENROLLED)
 
-    override suspend fun onUserAuthSuccess() = recordStep(STEP_USER_AUTH)
+    override fun onUserAuthSuccess() = recordStep(STEP_USER_AUTH)
 
-    override suspend fun onIntroScreenShown() = recordStep(STEP_INTRO_SCREEN_SHOWN)
+    override fun onIntroScreenShown() = recordStep(STEP_INTRO_SCREEN_SHOWN)
 
-    override suspend fun onSyncEnabled() = recordStep(STEP_SYNC_ENABLED)
+    override fun onSyncEnabled() = recordStep(STEP_SYNC_ENABLED)
 
-    override suspend fun onAccountCreationApiStarted() = withFlowId { flowId ->
+    override fun onAccountCreationApiStarted() = withFlowId { flowId ->
         wideEventClient.intervalStart(wideEventId = flowId, key = KEY_ACCOUNT_CREATION_LATENCY)
     }
 
-    override suspend fun onAccountCreationApiFinished() = withFlowId { flowId ->
+    override fun onAccountCreationApiFinished() = withFlowId { flowId ->
         wideEventClient.intervalEnd(wideEventId = flowId, key = KEY_ACCOUNT_CREATION_LATENCY)
     }
 
-    override suspend fun onInitialSyncStarted() = withFlowId { flowId ->
+    override fun onInitialSyncStarted() = withFlowId { flowId ->
         wideEventClient.intervalStart(wideEventId = flowId, key = KEY_INITIAL_SYNC_LATENCY)
     }
 
-    override suspend fun onInitialSyncFinished() = withFlowId { flowId ->
+    override fun onInitialSyncFinished() = withFlowId { flowId ->
         wideEventClient.intervalEnd(wideEventId = flowId, key = KEY_INITIAL_SYNC_LATENCY)
     }
 
-    override suspend fun onAccountCreated() = recordStep(STEP_ACCOUNT_CREATED)
+    override fun onAccountCreated() = recordStep(STEP_ACCOUNT_CREATED)
 
-    override suspend fun onAccountCreationFailed() = finishBackUpAttempt(FlowStatus.Failure(reason = STEP_ACCOUNT_CREATION_FAILED))
+    override fun onAccountCreationFailed() = finishBackUpAttempt(FlowStatus.Failure(reason = STEP_ACCOUNT_CREATION_FAILED))
 
-    override suspend fun onRecoveryCodeShown() {
+    override fun onRecoveryCodeShown() {
         recordStep(STEP_RECOVERY_CODE_SHOWN)
         finishBackUpAttempt(FlowStatus.Success)
     }
 
-    override suspend fun onRecoveryCodeGenerationFailed() =
+    override fun onRecoveryCodeGenerationFailed() =
         finishBackUpAttempt(FlowStatus.Failure(reason = STEP_RECOVERY_CODE_GENERATION_FAILED))
 
-    override suspend fun onFlowCancelled() = finishBackUpAttempt(FlowStatus.Cancelled)
+    override fun onFlowCancelled() = finishBackUpAttempt(FlowStatus.Cancelled)
 
-    override suspend fun onSyncRestoreStarted() = mutex.withLock {
-        val backUpAttempt = currentData?.takeIf { it.unified == null } ?: return@withLock
+    override fun onSyncRestoreStarted() = enqueue {
+        val backUpAttempt = currentData?.takeIf { it.unified == null } ?: return@enqueue
         wideEventClient.flowAbort(wideEventId = backUpAttempt.flowId)
         currentData = null
     }
@@ -206,20 +228,20 @@ class SyncSetupWideEventImpl @Inject constructor(
         currentData = null
     }
 
-    private suspend fun recordStep(stepName: String) = withFlowId { flowId ->
+    private fun recordStep(stepName: String) = withFlowId { flowId ->
         wideEventClient.flowStep(wideEventId = flowId, stepName = stepName, success = true)
     }
 
-    private suspend fun finishBackUpAttempt(status: FlowStatus) = mutex.withLock {
+    private fun finishBackUpAttempt(status: FlowStatus) = enqueue {
         // The unified event follows the spec's outcome rules instead, so these back up outcomes only end attempts without it.
-        val backUpAttempt = currentData?.takeIf { it.unified == null } ?: return@withLock
+        val backUpAttempt = currentData?.takeIf { it.unified == null } ?: return@enqueue
         wideEventClient.flowFinish(wideEventId = backUpAttempt.flowId, status = status)
         currentData = null
     }
 
-    override suspend fun onStep(step: SetupStep) = mutex.withLock {
-        val openAttempt = currentData ?: return@withLock
-        val previous = openAttempt.unified ?: return@withLock
+    override fun onStep(step: SetupStep) = enqueue {
+        val openAttempt = currentData ?: return@enqueue
+        val previous = openAttempt.unified ?: return@enqueue
         val unified = if (step == previous.lastStep) previous else previous.moveToStep(openAttempt.flowId, step)
         currentData = openAttempt.copy(unified = unified)
         unified.appendLastStep(openAttempt.flowId)
@@ -243,29 +265,33 @@ class SyncSetupWideEventImpl @Inject constructor(
         return copy(lastStep = step, isPreparingSyncRunning = preparingSyncRunning)
     }
 
-    override suspend fun onUpdate(change: (SetupFields) -> SetupFields) = mutex.withLock {
-        val openAttempt = currentData ?: return@withLock
-        val unified = openAttempt.unified?.let { it.copy(fields = change(it.fields)) } ?: return@withLock
+    override fun onUpdate(change: (SetupFields) -> SetupFields) = enqueue {
+        val openAttempt = currentData ?: return@enqueue
+        val unified = openAttempt.unified?.let { it.copy(fields = change(it.fields)) } ?: return@enqueue
         currentData = openAttempt.copy(unified = unified)
         unified.appendLastStep(openAttempt.flowId)
     }
 
-    override suspend fun onSucceeded() = finishUnifiedAttempt(FlowStatus.Success, metadata = emptyMap())
+    override fun onSucceeded() = enqueue { finishUnifiedAttempt(FlowStatus.Success, metadata = emptyMap()) }
 
-    override suspend fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage?) = when (reason) {
-        SetupFailureReason.ALREADY_PAIRED -> onCancelled(SetupCancellationReason.ALREADY_PAIRED)
-        SetupFailureReason.ALREADY_UPGRADED -> onCancelled(SetupCancellationReason.ALREADY_UPGRADED)
-        SetupFailureReason.UNRECOGNIZED_CODE,
-        SetupFailureReason.INCOMPATIBLE_CODE,
-        -> onCancelled(SetupCancellationReason.CODE_REJECTED)
-        SetupFailureReason.SESSION_TIMEOUT -> onTimedOut(timeoutStage)
-        else -> finishUnifiedAttempt(FlowStatus.Failure(reason = reason.value), metadata = mapOf(KEY_STATUS_REASON to reason.value))
+    override fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage?) = enqueue {
+        when (reason) {
+            SetupFailureReason.ALREADY_PAIRED -> cancel(SetupCancellationReason.ALREADY_PAIRED)
+            SetupFailureReason.ALREADY_UPGRADED -> cancel(SetupCancellationReason.ALREADY_UPGRADED)
+            SetupFailureReason.UNRECOGNIZED_CODE,
+            SetupFailureReason.INCOMPATIBLE_CODE,
+            -> cancel(SetupCancellationReason.CODE_REJECTED)
+            SetupFailureReason.SESSION_TIMEOUT -> timeOut(timeoutStage)
+            else -> finishUnifiedAttempt(FlowStatus.Failure(reason = reason.value), metadata = mapOf(KEY_STATUS_REASON to reason.value))
+        }
     }
 
-    override suspend fun onCancelled(reason: SetupCancellationReason) =
+    override fun onCancelled(reason: SetupCancellationReason) = enqueue { cancel(reason) }
+
+    private suspend fun cancel(reason: SetupCancellationReason) =
         finishUnifiedAttempt(FlowStatus.Cancelled, metadata = mapOf(KEY_STATUS_REASON to reason.value))
 
-    private suspend fun onTimedOut(stage: TimeoutStage?) {
+    private suspend fun timeOut(stage: TimeoutStage?) {
         val status = when (stage) {
             TimeoutStage.WAITING_FOR_PEER_HELLO,
             TimeoutStage.WAITING_FOR_CONFIRMATION,
@@ -283,9 +309,9 @@ class SyncSetupWideEventImpl @Inject constructor(
         finishUnifiedAttempt(status, metadata)
     }
 
-    private suspend fun finishUnifiedAttempt(status: FlowStatus, metadata: Map<String, String>) = mutex.withLock {
-        val openAttempt = currentData ?: return@withLock
-        val unified = openAttempt.unified ?: return@withLock
+    private suspend fun finishUnifiedAttempt(status: FlowStatus, metadata: Map<String, String>) {
+        val openAttempt = currentData ?: return
+        val unified = openAttempt.unified ?: return
         finishUnifiedAttempt(openAttempt.flowId, unified, status, metadata)
         currentData = null
     }
@@ -330,8 +356,8 @@ class SyncSetupWideEventImpl @Inject constructor(
         fields.connectMethod?.let { put(KEY_CONNECT_METHOD, it.value) }
     }
 
-    private suspend fun withFlowId(block: suspend (Long) -> Unit) = mutex.withLock {
-        val flowId = currentData?.flowId ?: return@withLock
+    private fun withFlowId(block: suspend (Long) -> Unit) = enqueue {
+        val flowId = currentData?.flowId ?: return@enqueue
         block(flowId)
     }
 

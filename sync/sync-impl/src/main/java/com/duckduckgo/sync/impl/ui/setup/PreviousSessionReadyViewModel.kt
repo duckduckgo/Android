@@ -98,12 +98,10 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
 
     private suspend fun authenticate(): Boolean {
         val response = deviceAuthenticator.authenticate(AuthenticationSource.SESSION_RESTORE, Request()) { event ->
-            viewModelScope.launch {
-                when (event) {
-                    Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
-                    Event.EnrollmentShown -> Unit
-                    Event.VerificationShown -> Unit
-                }
+            when (event) {
+                Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
+                Event.EnrollmentShown -> Unit
+                Event.VerificationShown -> Unit
             }
         }
         return when (response) {
