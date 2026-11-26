@@ -4375,8 +4375,6 @@ class BrowserTabFragment :
                     true,
                 ).findViewById<DuckDuckGoWebView>(R.id.browserWebView)
 
-        webView?.let { pageTranslation.attach(it) }
-
         webView?.let {
             val bindResult = webViewModeInitializer.bind(it, browserMode)
             if (bindResult.isFailure) {
@@ -4389,6 +4387,8 @@ class BrowserTabFragment :
                     return
                 }
             }
+
+            pageTranslation.attach(it)
 
             it.webViewClient = webViewClient
             it.webChromeClient = webChromeClient
