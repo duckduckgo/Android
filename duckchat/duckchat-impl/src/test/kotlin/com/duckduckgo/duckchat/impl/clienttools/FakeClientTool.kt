@@ -18,12 +18,16 @@ package com.duckduckgo.duckchat.impl.clienttools
 
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import org.json.JSONObject
+import kotlin.coroutines.cancellation.CancellationException
 
 class FakeClientTool(
     override val name: String = "fakeTool",
     override val version: Int = 1,
-    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.AUTO,
+    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Auto,
     var enabled: Boolean = true,
     var validInput: (JSONObject) -> Boolean = { true },
     var result: suspend (JSONObject) -> ClientToolResult = { ClientToolResult.Success(JSONObject().put("echo", it)) },
@@ -51,4 +55,61 @@ class FakeClientToolPluginPoint(vararg tools: ClientTool) : PluginPoint<ClientTo
 
 class FakeDuckAiHostProvider(private val host: String = "duck.ai") : DuckAiHostProvider {
     override fun getHost(): String = host
+}
+
+class FakeClientToolPermissionStore : ClientToolPermissionStore {
+    val choices = mutableMapOf<String, ClientToolPermission>()
+
+    override suspend fun get(toolName: String): ClientToolPermission? = choices[toolName]
+
+    override suspend fun set(
+        toolName: String,
+        permission: ClientToolPermission,
+    ) {
+        choices[toolName] = permission
+    }
+
+    override suspend fun clear(toolName: String) {
+        choices.remove(toolName)
+    }
+
+    override suspend fun clearAll() {
+        choices.clear()
+    }
+
+    override fun observe(): Flow<Map<String, ClientToolPermission>> = flowOf(choices.toMap())
+}
+
+/** Holds each prompt open until the test answers it, recording how many were open at once. */
+class FakeClientToolPermissionPrompt : ClientToolPermissionPrompt {
+    val prompts = mutableListOf<OpenPrompt>()
+    var maxOpenAtOnce = 0
+        private set
+    private var open = 0
+
+    val current: OpenPrompt get() = prompts.last()
+
+    override suspend fun request(request: ClientToolPermissionRequest): ClientToolPermissionAnswer {
+        val prompt = OpenPrompt(request)
+        prompts += prompt
+        open++
+        maxOpenAtOnce = maxOf(maxOpenAtOnce, open)
+        try {
+            return prompt.answer.await()
+        } catch (e: CancellationException) {
+            prompt.withdrawn = true
+            throw e
+        } finally {
+            open--
+        }
+    }
+
+    class OpenPrompt(val request: ClientToolPermissionRequest) {
+        val answer = CompletableDeferred<ClientToolPermissionAnswer>()
+        var withdrawn = false
+
+        fun answer(answer: ClientToolPermissionAnswer) {
+            this.answer.complete(answer)
+        }
+    }
 }

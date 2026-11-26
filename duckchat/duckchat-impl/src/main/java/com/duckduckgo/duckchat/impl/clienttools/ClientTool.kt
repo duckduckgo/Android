@@ -16,6 +16,7 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -37,17 +38,30 @@ interface ClientTool {
     ): ClientToolResult
 }
 
-enum class ClientToolPermissionMode {
-    ASK,
-    AUTO,
+sealed interface ClientToolPermissionMode {
+    data object Auto : ClientToolPermissionMode
+
+    /**
+     * Asks the user before running, with the tool's own prompt copy.
+     * @param name lists the tool, with [promptMessage] under it, in a prompt that asks for several tools at once.
+     */
+    data class Ask(
+        @StringRes val promptTitle: Int,
+        @StringRes val promptMessage: Int,
+        @StringRes val name: Int,
+    ) : ClientToolPermissionMode
 }
 
 /**
  * @param chatTabId the tab the chat belongs to: the Duck.ai tab itself, or the page tab hosting the contextual sheet.
+ * @param chatId the Duck.ai conversation, or null when the page has not started one.
+ * @param contextual whether the chat runs in the contextual sheet rather than a Duck.ai tab.
  */
 data class ClientToolCallContext(
     val chatTabId: String,
     val browserMode: BrowserMode,
+    val chatId: String?,
+    val contextual: Boolean = false,
 )
 
 sealed interface ClientToolResult {

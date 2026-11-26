@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
 import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
+import com.duckduckgo.duckchat.impl.clienttools.AiChatBrowserToolsFeature
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionGate
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
@@ -169,6 +170,7 @@ class RealDuckChatJSHelperTest {
         tools = FakeClientToolPluginPoint(fakeClientTool),
         permissionGate = allowingPermissionGate,
         duckAiHostProvider = FakeDuckAiHostProvider(),
+        browserToolsFeature = FakeFeatureToggleFactory.create(AiChatBrowserToolsFeature::class.java),
     )
 
     private val testee = RealDuckChatJSHelper(
@@ -504,6 +506,32 @@ class RealDuckChatJSHelperTest {
         assertEquals("executeClientTool", result.method)
         assertEquals("""{"callId":"c1","ok":true,"value":{"echo":{}}}""", result.params.toString())
         assertEquals("tab-1", fakeClientTool.calls.single().second.chatTabId)
+    }
+
+    @Test
+    fun whenExecuteClientToolFromContextualSheetThenTheCallIsMarkedContextual() = runTest {
+        fakeClientTool.enabled = true
+        val params = JSONObject("""{"callId":"c1","capability":{"name":"listOpenTabs","version":1},"input":{}}""")
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "executeClientTool",
+            "1",
+            params,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+            pageUrl = "https://duck.ai/chat",
+        )
+        testee.processJsCallbackMessage("aiChat", "executeClientTool", "2", params, tabId = "tab-1", pageUrl = "https://duck.ai/chat")
+
+        assertEquals(listOf(true, false), fakeClientTool.calls.map { it.second.contextual })
+    }
+
+    @Test
+    fun whenCancelPendingClientToolCallsThenTheTabsWaitingCallsAreCancelled() {
+        testee.cancelPendingClientToolCalls("tab-1", contextual = false)
+
+        verify(allowingPermissionGate).cancelPending("tab-1", false)
     }
 
     @Test
