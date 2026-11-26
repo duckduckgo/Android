@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Επίτρεψέ μας να τα χειριζόμαστε εκ μέρους σου. Θα απορρίπτουμε τα cookie όποτε είναι εφικτό και θα αποδεχόμαστε όσα δεν μπορούν να απορριφθούν.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Απόρριψη αν είναι εφικτό ή αποδοχή εκ μέρους μου</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Θα τα χειρίζομαι εγώ προσωπικά</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Απόρριψη προαιρετικών cookie</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Μεγιστοποιεί την ιδιωτικότητά σας και κλείνει τα αναδυόμενα παράθυρα για τα cookie</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Αποδοχή ορισμένων cookie</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Γίνεται απόκρυψη περισσότερων αναδυόμενων παραθύρων με αποδοχή cookie που δεν μπορούν να απορριφθούν</string>
 </resources>

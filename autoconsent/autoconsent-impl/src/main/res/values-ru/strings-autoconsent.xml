@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Мы разберёмся с ними за вас. По возможности мы будем отклонять файлы cookie и принимать те, которые нельзя отклонить.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Отклонять, если это возможно, или принимать за меня</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Я сам разберусь с ними</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Отклонять дополнительные файлы cookie</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Обеспечивает максимальную конфиденциальность и закрывает всплывающие окна согласия на использование файлов cookie</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Принимать некоторые файлы cookie</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Скрывает больше всплывающих окон, принимая только те файлы cookie, от которых нельзя отказаться</string>
 </resources>

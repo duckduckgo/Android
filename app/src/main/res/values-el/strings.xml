@@ -966,8 +966,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Αρχίστε μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη με το Duck.ai ή αλλάξτε στην Αναζήτηση για προστατευμένη περιήγηση.<br/><br/>Μπορείτε να χρησιμοποιήσετε το Duck.ai από οπουδήποτε βλέπετε το εικονίδιο συνομιλίας]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Προσφέρουμε επίσης μια συνδρομή επί πληρωμή με προηγμένα μοντέλα τεχνητής νοημοσύνης με υψηλότερα όρια συνομιλίας από τα GPT και Claude, ένα ασφαλές VPN και πολλά άλλα.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Μπορείτε πάντα να προσαρμόσετε την επιλογή από τις Ρυθμίσεις.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Προσαρμόστε τις ρυθμίσεις όπως επιθυμείτε</string>
+    <string name="downloadReasonBody">Κάντε μία επιλογή που σας ενδιαφέρει περισσότερο και θα σας βοηθήσουμε να ξεκινήσετε γρήγορα.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Αναζήτηση και\nιδιωτική περιήγηση</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Ιδιωτική συνομιλία\nμε ΤΝ</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Απενεργοποίηση\nλειτουργιών ΤΝ</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Αποκλεισμός διαφημίσεων\nκαι αναδυόμενων παραθύρων</string>
+    <string name="downloadReasonPrimaryCta">Επόμενο</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Βρίσκεστε στο σωστό μέρος!<br/>Οι προστασίες ενεργοποιήθηκαν.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Η αναζήτησή σας, όπως την επιθυμείτε.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Ιστορικό αναζήτησης</string>
+    <string name="searchPathPreferenceHistorySecondary">Προβολή ιστότοπων που επισκεφθήκατε πρόσφατα σε προτάσεις αναζήτησης. Ιδιωτικά, μόνο στη συσκευή σας.</string>
+    <string name="searchPathPreferenceSafePrimary">Ασφαλής αναζήτηση</string>
+    <string name="searchPathPreferenceSafeSecondary">Παράλειψη ανάρμοστου περιεχομένου (κυρίως για ενήλικες) από τα αποτελέσματα.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Τώρα, δοκιμάστε μια ιδιωτική αναζήτηση!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Ιδιωτική συνομιλία με δημοφιλή μοντέλα ΤΝ στο Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Οι συνομιλίες είναι ανωνυμοποιημένες, δεν απαιτείται λογαριασμός. Και είναι δωρεάν!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Δοκιμάστε το Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Παράλειψη</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Βρίσκεστε στο σωστό μέρος!<br/>Οι προστασίες ενεργοποιήθηκαν.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Κάντε ιδιωτικές αναζητήσεις στο διαδίκτυο με αποκλεισμό των εφαρμογών παρακολούθησης</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Επιλέξτε μια ΤΝ για να τη δοκιμάσετε πρώτοι</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">Με το Duck.ai, μπορείτε να αλλάξετε ανά πάσα στιγμή.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Θέλετε να ανοίγουν οι νέες καρτέλες με συνομιλία ΤΝ;</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Μπορείτε να μεταβείτε στην Αναζήτηση με ένα πάτημα</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Αρχίστε μια ιδιωτική συνομιλία με τεχνητή νοημοσύνη με το Duck.ai ή αλλάξτε στην Αναζήτηση για προστατευμένη περιήγηση.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Βρίσκεστε στο σωστό μέρος!<br/>Οι λειτουργίες ΤΝ είναι απενεργοποιημένες.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Δεν υπάρχουν απαντήσεις με βοήθεια ΤΝ στην αναζήτηση</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Απόκρυψη εικόνων που δημιουργήθηκαν με ΤΝ στην αναζήτηση</string>
+    <string name="noAiPathPreferenceSelectorTitle">Αναζήτηση χωρίς ΤΝ</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Συμπεριλάβετε απαντήσεις που δημιουργούνται με ΤΝ στα αποτελέσματα αναζήτησης</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Απόκρυψη εικόνων που δημιουργήθηκαν με ΤΝ</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Αποκλείστε γνωστούς ιστότοπους με απατηλό περιεχόμενο ΤΝ από τα αποτελέσματα αναζήτησης εικόνων</string>
+    <string name="noAiPathDuckAiStateTitle">Θέλετε να έχετε την επιλογή να συνομιλείτε ιδιωτικά με δημοφιλή μοντέλα ΤΝ;</string>
+    <string name="noAiPathDuckAiStateBody">Στο Duck.ai, οι συνομιλίες σας ανωνυμοποιούνται από εμάς και δεν χρησιμοποιούνται ποτέ για την εκπαίδευση ΤΝ.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Διαδίκτυο, χωρίς τη βαβούρα.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Βρίσκεστε στο σωστό μέρος!<br/>Ο αποκλεισμός διαφημίσεων ενεργοποιήθηκε.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Αναζήτηση μόνο</string>
     <string name="input_screen_user_pref_with_ai_updated">Εναλλαγή μεταξύ\nΑναζήτησης και Duck.ai</string>

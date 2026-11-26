@@ -966,8 +966,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.<br/><br/>Saad Duck.ai\'t kasutada kõikjal, kus näed vestluse ikooni]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Pakume ka tasulist tellimust, mis sisaldab täiustatud tehisintellekti mudeleid, millel on GPT ja Claude kõrgemad vestluspiirangud, turvaline VPN ja palju muud.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Saad seda hiljem alati seadetes muuta.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Seadista kõik enda soovide järgi</string>
+    <string name="downloadReasonBody">Vali üks variant, mis sind kõige rohkem huvitab, ja aitame selle kiiresti valmis seada.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Otsi ja sirvi\nprivaatselt</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Vestle tehisintellektiga\nprivaatselt</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Keela\ntehisintellekti funktsioonid</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Blokeeri reklaamid\nja hüpikaknad</string>
+    <string name="downloadReasonPrimaryCta">Järgmine</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Oled õiges kohas!<br/>Kaitsed aktiveeritud.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Sinu otsing, sinu moodi.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Otsinguajalugu</string>
+    <string name="searchPathPreferenceHistorySecondary">Kuva hiljuti külastatud saidid otsingusoovitustes. Privaatne, ainult sinu seadmes.</string>
+    <string name="searchPathPreferenceSafePrimary">Ohutuotsing</string>
+    <string name="searchPathPreferenceSafeSecondary">Jätab tulemustest välja küsitava (enamasti täiskasvanutele mõeldud) materjali.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Proovi nüüd privaatset otsingut!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Vestle privaatselt populaarsete tehisintellektidega Duck.ai-s</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Vestlused anonüümitakse, kontot pole vaja. Ja see on tasuta!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Proovi Duck.ai-d</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Jäta vahele</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Oled õiges kohas!<br/>Kaitsed aktiveeritud.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Otsi veebist privaatselt, jälgijad blokeeritud</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Vali AI, mida esimesena proovida</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">Duck.ai-ga saad igal ajal mudelit vahetada.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Kas soovid, et uutel vahekaartidel avaneks tehisintellekti vestlus?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Saad ühe puudutusega lülituda otsingule</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Alusta privaatset AI-vestlust Duck.ai-ga või lülita sisse, et otsida kaitstud sirvimist.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Oled õiges kohas!<br/>Tehisintellekti funktsioonid on välja lülitatud.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Otsingus pole tehisintellekti abil koostatud vastuseid</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Peida otsingus tehisintellekti loodud pildid</string>
+    <string name="noAiPathPreferenceSelectorTitle">Otsi ilma tehisintellektita</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Kaasa otsingutulemustesse tehisintellekti loodud vastused</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Peida AI loodud pildid</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Eemalda pildiotsingu tulemustest teadaolevad tehisintellekti rämpsposti saidid</string>
+    <string name="noAiPathDuckAiStateTitle">Kas soovid võimalust vestelda privaatselt populaarsete tehisintellektidega?</string>
+    <string name="noAiPathDuckAiStateBody">Duck.ai-s muudame sinu vestlused anonüümseks ega kasuta neid kunagi tehisintellekti treenimiseks.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Internet, ilma mürata.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Oled õiges kohas!<br/>Reklaamide blokeerimine aktiveeritud.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Ainult otsi</string>
     <string name="input_screen_user_pref_with_ai_updated">Lülita \n otsingu ja Duck.ai vahel</string>

@@ -408,4 +408,13 @@
     <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Анализиране на файлове</string>
     <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Въпроси за снимки</string>
     <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Създаване на изображение</string>
+
+    <!-- Onboarding choices -->
+    <string name="duckChatModelProviderOpenAi" translatable="false">ChatGPT</string>
+    <string name="duckChatModelProviderAnthropic" translatable="false">Claude</string>
+    <string name="duckChatModelGemma" translatable="false">Gemma</string>
+    <string name="duckChatOnboardingNewTabTogglePositionDuckAi" instruction="Onboarding button. Makes new tabs open in Duck.ai chat mode instead of search">Отваряне на раздели с AI чат</string>
+    <string name="duckChatOnboardingNewTabTogglePositionLastUsed" instruction="Onboarding button. Declines opening new tabs in Duck.ai chat mode">Не сега</string>
+    <string name="duckChatOnboardingDuckAiStateOn" instruction="Onboarding button. Duck.ai is the name of the AI chat feature">Включване на Duck.ai</string>
+    <string name="duckChatOnboardingDuckAiStateOff" instruction="Onboarding button. Duck.ai is the name of the AI chat feature">Duck.ai остава изключен</string>
 </resources>

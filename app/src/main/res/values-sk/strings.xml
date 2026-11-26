@@ -1002,8 +1002,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Začni súkromný čet s umelou inteligenciou s Duck.ai alebo prepni na vyhľadávanie pre chránené prehliadanie.<br/><br/>Duck.ai môžeš používať odkiaľkoľvek, kde vidíš ikonu četu]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Ponúkame tiež platené predplatné s pokročilými modelmi umelej inteligencie s vyššími limitmi chatu od GPT a Claude, bezpečnou VPN a ďalšími funkciami.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Toto môžeš kedykoľvek neskôr upraviť v Nastaveniach.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Nastav si veci podľa seba</string>
+    <string name="downloadReasonBody">Vyber si jednu možnosť, ktorá ťa zaujíma najviac, a rýchlo ti všetko nastavíme.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Vyhľadávaj a\nprehliadaj súkromne</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Četovať s AI\nsúkromne</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Vypnúť\nfunkcie AI</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Blokovať reklamy\na vyskakovacie okná</string>
+    <string name="downloadReasonPrimaryCta">Ďalšie</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Si na správnom mieste!<br/>Ochrany boli aktivované.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Tvoje vyhľadávanie, po tvojom.</string>
+    <string name="searchPathPreferenceHistoryPrimary">História vyhľadávania</string>
+    <string name="searchPathPreferenceHistorySecondary">Zobraziť naposledy navštívené lokality v návrhoch vyhľadávania. Súkromné, iba v tvojom zariadení.</string>
+    <string name="searchPathPreferenceSafePrimary">Bezpečné vyhľadávanie</string>
+    <string name="searchPathPreferenceSafeSecondary">Vynechať nežiaduci obsah (väčšinou pre dospelých) vo výsledkoch.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Vyskúšaj teraz súkromné vyhľadávanie!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Četuj súkromne s populárnymi AI v Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Čety sú anonymizované, účet nie je potrebný. A je to zadarmo!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Vyskúšaj Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Preskočiť</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Si na správnom mieste!<br/>Ochrany boli aktivované.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Vyhľadávaj na webe súkromne so zablokovanými sledovacími prvkami</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Vyber si AI, ktorú chceš vyskúšať ako prvú</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">S Duck.ai môžeš kedykoľvek prejsť na inú AI.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Chceš, aby sa v nových kartách otváral čet s AI?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Môžeš prepnúť na Vyhľadávanie jedným ťuknutím</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Začni súkromný čet s umelou inteligenciou s Duck.ai alebo prepni na vyhľadávanie pre chránené prehliadanie.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Si na správnom mieste!<br/>Funkcie AI sú vypnuté.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Vo vyhľadávaní sa nezobrazujú odpovede vytvorené s pomocou AI</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Skryť obrázky vytvorené umelou inteligenciou vo vyhľadávaní</string>
+    <string name="noAiPathPreferenceSelectorTitle">Vyhľadávanie bez AI</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Zahrnúť odpovede vytvorené umelou inteligenciou do výsledkov vyhľadávania</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Skryť obrázky generované umelou inteligenciou</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Filtrovať známe spamové stránky generované umelou inteligenciou z výsledkov vyhľadávania obrázkov</string>
+    <string name="noAiPathDuckAiStateTitle">Chceš mať možnosť súkromne četovať s populárnymi AI?</string>
+    <string name="noAiPathDuckAiStateBody">V Duck.ai sú tvoje čety nami anonymizované a nikdy sa nepoužívajú na trénovanie AI.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Internet bez rušivých prvkov.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Si na správnom mieste!<br/>Blokovanie reklám je aktivované.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Len vyhľadávanie</string>
     <string name="input_screen_user_pref_with_ai_updated">Prepínať medzi\nvyhľadávaním a Duck.ai</string>

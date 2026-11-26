@@ -33,4 +33,10 @@
     <string name="autoconsentPromptCpmOffMessage">Wij regelen het voor je. We wijzen cookies af waar mogelijk en accepteren cookies die niet kunnen worden afgewezen.</string>
     <string name="autoconsentPromptCpmOffPrimaryButton">Wijs af waar mogelijk of accepteer voor mij</string>
     <string name="autoconsentPromptCpmOffSecondaryButton">Ik regel het zelf wel</string>
+
+    <!-- Onboarding cookie pop-up preferences -->
+    <string name="autoconsent_onboarding_reject_optional_cookies_primary">Optionele cookies afwijzen</string>
+    <string name="autoconsent_onboarding_reject_optional_cookies_secondary">Maximaliseert je privacy en sluit cookiepop-ups</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_primary" instruction="Setting label. Accepts cookies only on sites where cookie pop-ups cannot be rejected">Sommige cookies accepteren</string>
+    <string name="autoconsent_onboarding_accept_non_opt_out_cookies_secondary">Verbergt meer pop-ups door cookies te accepteren die niet kunnen worden afgewezen</string>
 </resources>

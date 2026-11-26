@@ -966,8 +966,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Indíts privát MI-beszélgetést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.<br/><br/>A Duck.ai-t bárhol használhatod, ahol látod a beszélgetés ikonját]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Előfizetéses csomagot is kínálunk, amely fejlett AI-modelleket, a GPT és a Claude modelljeihez biztosított magasabb csevegési limiteket, valamint biztonságos VPN-t és további funkciókat is tartalmaz.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Ezt a beállításokban később bármikor módosíthatod.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Állíts be mindent úgy, ahogy szeretnéd</string>
+    <string name="downloadReasonBody">Válassz egy lehetőséget, amelyik a legjobban érdekel, és gyorsan beállítjuk neked.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Privát keresés és\nböngészés</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Privát csevegés\nAI-jal</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">AI-funkciók\nletiltása</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Hirdetések és felugró ablakok\nblokkolása</string>
+    <string name="downloadReasonPrimaryCta">Következő</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Jó helyen jársz!<br/>Védelem aktiválva.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">A keresésed, saját igényeid szerint.</string>
+    <string name="searchPathPreferenceHistoryPrimary">Keresési előzmények</string>
+    <string name="searchPathPreferenceHistorySecondary">A legutóbb meglátogatott webhelyek megjelenítése a keresési javaslatokban. Privát, csak az eszközödön.</string>
+    <string name="searchPathPreferenceSafePrimary">Biztonságos keresés</string>
+    <string name="searchPathPreferenceSafeSecondary">Kérdéses (többnyire felnőtteknek szóló) tartalmak szűrése a találatok közül.</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Most próbálkozz privát kereséssel!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Privát csevegés népszerű AI-modellekkel a Duck.ai használatával</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">A csevegések anonimizáltak, nincs szükség fiókra. És ingyenes!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Próbáld ki a Duck.ai-t</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Kihagyás</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Jó helyen jársz!<br/>Védelem aktiválva.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Privát keresés az interneten blokkolt nyomkövetők mellett</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Válassz egy AI-t, amelyet először kipróbálsz</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">A Duck.ai segítségével bármikor válthatsz.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Szeretnéd, hogy az új lapok AI-csevegéssel nyíljanak meg?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Egyetlen koppintással átválthatsz a keresésre</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Indíts privát AI-csevegést a Duck.ai-jal, vagy válts a Keresésre a védett böngészéshez.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Jó helyen jársz!<br/>AI-funkciók letiltva.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Nincsenek AI-alapú válaszok a keresésben</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">AI által generált képek elrejtése a keresésben</string>
+    <string name="noAiPathPreferenceSelectorTitle">Keresés AI nélkül</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">AI által generált válaszok megjelenítése a keresési találatok között</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">AI által generált képek elrejtése</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Kiszűri az ismert AI-spam-webhelyeket a képkeresési találatok közül</string>
+    <string name="noAiPathDuckAiStateTitle">Szeretnéd, hogy legyen lehetőséged privát módon csevegni népszerű AI-modellekkel?</string>
+    <string name="noAiPathDuckAiStateBody">A Duck.ai használatakor a csevegéseidet anonimizáljuk, és soha nem használjuk fel őket az AI betanítására.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Internet, zaj nélkül.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Jó helyen jársz!<br/>Hirdetésblokkolás aktiválva.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Csak keresés</string>
     <string name="input_screen_user_pref_with_ai_updated">Váltás a keresés\nés a Duck.ai között</string>

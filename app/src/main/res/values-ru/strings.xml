@@ -1002,8 +1002,56 @@
     <!-- Pre-onboarding: add to home screen -->
 
     <!-- In-context onboarding. -->
-    <string name="onboardingEndCustomAiFlowDaxDialogDescription"><![CDATA[Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.<br/><br/>Duck.ai можно использовать в любом месте, где вы видите значок чата]]></string>
     <string name="onboardingPrivacyProCustomAiFlowDaxDialogDescription">Мы также предлагаем платную подписку, включающую расширенные ИИ-модели с более высокими лимитами чатов с GPT и Claude, безопасный VPN и многое другое.</string>
+
+    <!-- Segmented onboarding -->
+    <string name="preferenceChangeInSettingsCaption">Эту настройку всегда можно изменить позже в настройках.</string>
+
+    <string name="downloadReasonTitle" instruction="Onboarding screen title. The user picks the main reason they installed the app">Настройте всё по-своему</string>
+    <string name="downloadReasonBody">Выбери вариант, который тебя больше всего интересует, и мы быстро всё настроим.</string>
+    <string name="downloadReasonOptionSearch" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Конфиденциальный\nпоиск и просмотр веб-страниц</string>
+    <string name="downloadReasonOptionAiChat" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Конфиденциальный\nчат с ИИ</string>
+    <string name="downloadReasonOptionNoAi" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Отключить\nфункции ИИ</string>
+    <string name="downloadReasonOptionBlockAds" instruction="Option label on an onboarding screen. The line break is intentional, keep both lines short">Блокировать рекламу\nи всплывающие окна</string>
+    <string name="downloadReasonPrimaryCta">Далее</string>
+
+    <string name="searchPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Ты в нужном месте!<br/>Защита включена.]]></string>
+
+    <string name="searchPathPreferenceSelectorTitle">Ваш поиск — ваши правила.</string>
+    <string name="searchPathPreferenceHistoryPrimary">История поиска</string>
+    <string name="searchPathPreferenceHistorySecondary">Показывать в рекомендациях поиска недавно посещенные сайты. Конфиденциально и только на вашем устройстве.</string>
+    <string name="searchPathPreferenceSafePrimary">Безопасный поиск</string>
+    <string name="searchPathPreferenceSafeSecondary">Исключает из результатов сомнительные материалы (в основном — материалы для взрослых).</string>
+
+    <string name="searchPathInputPreviewTitle" instruction="Shown above the address bar, inviting the user to type a first search">Теперь попробуйте конфидециальный поиск!</string>
+
+    <string name="searchPathWithToggleEnabledContextualEndTitle">Приватный чат с популярными ИИ в Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndDescription">Чаты анонимны, учетная запись не требуется. И это бесплатно!</string>
+    <string name="searchPathWithToggleEnabledContextualEndPrimaryCta">Попробовать Duck.ai</string>
+    <string name="searchPathWithToggleEnabledContextualEndSecondaryCta">Пропустить</string>
+
+    <string name="aiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Ты в нужном месте!<br/>Защита включена.]]></string>
+    <string name="aiPathComparisonChartItem5" instruction="Row in a chart comparing DuckDuckGo with other browsers">Блокировка трекеров и поиск с сохранением конфиденциальности</string>
+    <string name="aiPathModelChoiceTitle" instruction="Title above a list of AI models such as ChatGPT and Claude">Выберите, какой ИИ попробовать первым</string>
+    <string name="aiPathModelChoiceBody" instruction="Swap means switching to a different AI model. Duck.ai is the name of the AI chat feature">С Duck.ai модель можно сменить в любое время.</string>
+    <string name="aiPathTogglePositionTitle" instruction="Asks whether new tabs should open in AI chat mode instead of search mode">Хотите, чтобы в новых вкладках открывался чат с ИИ?</string>
+    <string name="aiPathTogglePositionPictogramCaption" instruction="Search is the name of the search mode of a toggle in the address bar">Переключайтесь в режим поиска одним касанием</string>
+    <string name="aiPathWithToggleEnabledContextualEndDescription" instruction="Search is the name of the search mode of a toggle in the address bar">Начните приватный чат с ИИ через Duck.ai или переключитесь на поиск для защищенного просмотра веб-страниц.</string>
+
+    <string name="noAiPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo with other browsers"><![CDATA[Ты в нужном месте!<br/>Функции ИИ отключены.]]></string>
+    <string name="noAiPathComparisonChartNoSearchAssist" instruction="Row in a chart comparing DuckDuckGo with other browsers">Скрытие ответов с применением ИИ</string>
+    <string name="noAiPathComparisonChartNoAiImages" instruction="Row in a chart comparing DuckDuckGo with other browsers">Скрытие в поиске изображений, сгенерированных ИИ</string>
+    <string name="noAiPathPreferenceSelectorTitle">Поиск без ИИ</string>
+    <string name="noAiPathPreferenceSearchAssistPrimary" instruction="Search Assist is the name of a DuckDuckGo search feature">Search Assist</string>
+    <string name="noAiPathPreferenceSearchAssistSecondary">Включать ответы, сгенерированные ИИ, в результаты поиска</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesPrimary">Скрыть изображения, сгенерированные ИИ</string>
+    <string name="noAiPathPreferenceHideAiGeneratedImagesSecondary">Исключает из результатов поиска изображений известные сайты с ИИ-спамом</string>
+    <string name="noAiPathDuckAiStateTitle">Хотите иметь возможность приватно общаться с популярными ИИ-моделями?</string>
+    <string name="noAiPathDuckAiStateBody">С Duck.ai ваши чаты анонимны и никогда не используются для обучения ИИ.</string>
+
+    <string name="blockAdsPathPreferenceSelectorTitle" instruction="Title of an onboarding screen with ad blocking settings">Интернет без лишнего шума.</string>
+
+    <string name="blockAdsPathComparisonChartTitle" instruction="Title above a chart comparing DuckDuckGo protections with other browsers"><![CDATA[Ты в нужном месте!<br/>Блокировка рекламы включена.]]></string>
 
     <string name="input_screen_user_pref_without_ai_updated">Только поиск</string>
     <string name="input_screen_user_pref_with_ai_updated">Переключайтесь между\nПоиском и Duck.ai</string>
