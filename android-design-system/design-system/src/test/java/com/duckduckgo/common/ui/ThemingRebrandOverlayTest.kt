@@ -472,17 +472,18 @@ class ThemingRebrandOverlayTest {
 
     @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpInRegularAndFireThemes() {
+    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpMenuRadiusInRegularAndFireThemes() {
         listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
             listOf(false, true).forEach { fireTheme ->
                 val activity = toggleAwareActivity(TOGGLE_RADIUS, theme, fireTheme)
                 val background = Snackbar.make(activity.findViewById(android.R.id.content), "Message", Snackbar.LENGTH_SHORT)
                     .view.background as MaterialShapeDrawable
                 val shape = background.shapeAppearanceModel
-                val expectedRadius = 16f * activity.resources.displayMetrics.density
+                val menuRadius = resolveDimension(activity, R.attr.daxMenuRadius)
 
+                assertEquals(16f * activity.resources.displayMetrics.density, menuRadius, 0f)
                 listOf(shape.topLeftCornerSize, shape.topRightCornerSize, shape.bottomLeftCornerSize, shape.bottomRightCornerSize)
-                    .forEach { corner -> assertEquals(expectedRadius, corner.getCornerSize(RectF(0f, 0f, 100f, 100f)), 0f) }
+                    .forEach { corner -> assertEquals(menuRadius, corner.getCornerSize(RectF(0f, 0f, 100f, 100f)), 0f) }
             }
         }
     }
