@@ -57,13 +57,12 @@ class ContentControllerImpl(
     private val contentValues: ContentValueStore,
     private val onBeforeContentBound: (LinearOnboardingStepId, ContentConfig) -> Unit,
     isLightMode: () -> Boolean,
-    isAddressBarRebrandEnabled: () -> Boolean,
 ) : ContentController {
 
     private val comparisonChart = ComparisonChartBinder(binding.comparisonChartContent)
     private val addressBar = AddressBarBinder(binding.addressBarContent, isLightMode)
     private val inputScreen = InputScreenBinder(binding.inputScreenContent, isLightMode)
-    private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent, isAddressBarRebrandEnabled)
+    private val inputScreenPreview = InputScreenPreviewBinder(binding.inputScreenPreviewContent)
     private val quickSetup = QuickSetupBinder(binding.reinstallerQuickSetupContent)
     private val welcome = WelcomeBinder(binding.welcomeContent)
     private val widgetPrompt = WidgetPromptBinder(binding.widgetPromptContent)

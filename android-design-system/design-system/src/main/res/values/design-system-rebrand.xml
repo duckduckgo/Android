@@ -158,8 +158,4 @@
         <item name="rippleColor">@color/rebrand_button_destructive_ghost_ripple_selector</item>
     </style>
 
-    <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
-        <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
-    </style>
-
 </resources>

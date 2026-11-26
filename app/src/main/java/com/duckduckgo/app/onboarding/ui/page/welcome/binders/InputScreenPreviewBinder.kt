@@ -43,7 +43,6 @@ import com.duckduckgo.app.onboarding.ui.page.welcome.InputScreenPreviewContentSt
 import com.duckduckgo.app.onboarding.ui.page.welcome.StatefulDialogBinder
 import com.duckduckgo.common.ui.view.addBottomShadow
 import com.google.android.material.card.MaterialCardView
-import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.tabs.TabLayout
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectIndexed
@@ -59,7 +58,6 @@ import com.duckduckgo.mobile.android.R as CommonR
  */
 class InputScreenPreviewBinder(
     private val binding: IncludeBrandDesignInputScreenPreviewBinding,
-    private val isAddressBarRebrandEnabled: () -> Boolean,
 ) : StatefulDialogBinder<ContentConfig.InputScreenPreview, InputScreenPreviewContentState> {
 
     override val view: View = binding.root
@@ -122,9 +120,8 @@ class InputScreenPreviewBinder(
         isSearchSelected: Boolean,
         scope: BindScope,
     ) = with(binding) {
-        val isAddressBarRebrandEnabled = isAddressBarRebrandEnabled()
-        inputModeDemoCard.applyInputScreenPreviewShape(isAddressBarRebrandEnabled)
-        inputText.applyInputScreenPreviewInsets(isAddressBarRebrandEnabled, inputModeDemoActionIcon)
+        inputModeDemoCard.applyInputScreenPreviewShape()
+        inputText.applyInputScreenPreviewInsets(inputModeDemoActionIcon)
 
         bindSuggestionButtons(
             suggestions = if (isSearchSelected) content.searchSuggestions else content.chatSuggestions,
@@ -249,26 +246,14 @@ class InputScreenPreviewBinder(
     }
 }
 
-internal fun MaterialCardView.applyInputScreenPreviewShape(
-    isAddressBarRebrandEnabled: Boolean,
-) {
-    shapeAppearanceModel = inputScreenPreviewShape(
-        baseShape = shapeAppearanceModel,
-        isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
-        // The full input radius keeps the taller Duck.ai preview pill-shaped; half leaves straight sides.
-        rebrandCornerSize = resources.getDimension(CommonR.dimen.rebrandInputRadius) / 2f,
-        legacyCornerSize = resources.getDimension(CommonR.dimen.largeShapeCornerRadius),
-    )
+internal fun MaterialCardView.applyInputScreenPreviewShape() {
+    // The full input radius keeps the taller Duck.ai preview pill-shaped; half leaves straight sides.
+    shapeAppearanceModel = shapeAppearanceModel.withCornerSize(resources.getDimension(CommonR.dimen.rebrandInputRadius) / 2f)
     clipToOutline = false
     invalidateOutline()
 }
 
-internal fun EditText.applyInputScreenPreviewInsets(
-    isAddressBarRebrandEnabled: Boolean,
-    actionIcon: View,
-) {
-    if (!isAddressBarRebrandEnabled) return
-
+internal fun EditText.applyInputScreenPreviewInsets(actionIcon: View) {
     val container = parent as View
     val horizontalInset = resources.getDimensionPixelSize(CommonR.dimen.keyline_4)
     val verticalInset = resources.getDimensionPixelSize(CommonR.dimen.keyline_3)
@@ -322,15 +307,3 @@ internal inline fun EditText.updateInputModePreservingSelection(updateInputMode:
         )
     }
 }
-
-internal fun inputScreenPreviewShape(
-    baseShape: ShapeAppearanceModel,
-    isAddressBarRebrandEnabled: Boolean,
-    rebrandCornerSize: Float,
-    legacyCornerSize: Float,
-): ShapeAppearanceModel =
-    if (isAddressBarRebrandEnabled) {
-        baseShape.withCornerSize(rebrandCornerSize)
-    } else {
-        baseShape.withCornerSize(legacyCornerSize)
-    }

@@ -63,7 +63,6 @@ import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.codegen.annotations.ContributesViewModel
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extractDomain
 import com.duckduckgo.common.utils.isLocalUrl
@@ -119,14 +118,12 @@ class OmnibarLayoutViewModel @Inject constructor(
     private val standardizedLeadingIconToggle: StandardizedLeadingIconFeatureToggle,
     private val omnibarPreFillKillSwitch: OmnibarPreFillKillSwitch,
     private val progressBarUpgradeFeature: ProgressBarUpgradeFeature,
-    appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles,
 ) : ViewModel() {
 
     private val isSplitOmnibarEnabled = settingsDataStore.omnibarType == OmnibarType.SPLIT
     private val isProgressBarUpgradeEnabled = progressBarUpgradeFeature.behaviourUpdate().isEnabled()
     private val isAnimationUpdateEnabled =
         isProgressBarUpgradeEnabled && progressBarUpgradeFeature.animationConfigUpdate().isEnabled()
-    private val addressBarRebrandToggle = appBrandDesignUpdateToggles.addressBar()
 
     // Tracked separately from ViewState so the derived enabledState can be recomputed
     // whenever either the lock or the fire-button highlight changes.
@@ -139,7 +136,6 @@ class OmnibarLayoutViewModel @Inject constructor(
             showTabsMenu = !isSplitOmnibarEnabled,
             showBrowserMenu = !isSplitOmnibarEnabled,
             isProgressBarUpgradeEnabled = isProgressBarUpgradeEnabled,
-            isAddressBarRebrandEnabled = addressBarRebrandToggle.isEnabled(),
             isAnimationUpdateEnabled = isAnimationUpdateEnabled,
         ),
     )
@@ -253,7 +249,6 @@ class OmnibarLayoutViewModel @Inject constructor(
         val useSoftwareRenderingMode: Boolean = false,
         val isProgressBarUpgradeEnabled: Boolean = false,
         val enabledState: EnabledState = EnabledState.ALL,
-        val isAddressBarRebrandEnabled: Boolean = false,
         val isAnimationUpdateEnabled: Boolean = false,
     ) {
         /**
@@ -363,15 +358,6 @@ class OmnibarLayoutViewModel @Inject constructor(
                 it.copy(showDuckAISidebar = shouldShowDuckAiSidebar(it.viewMode, voiceActive))
             }
         }.launchIn(viewModelScope)
-
-        addressBarRebrandToggle.enabled().onEach { isAddressBarRebrandEnabled ->
-            _viewState.update {
-                it.copy(
-                    isAddressBarRebrandEnabled = isAddressBarRebrandEnabled,
-                )
-            }
-        }.flowOn(dispatcherProvider.io())
-            .launchIn(viewModelScope)
     }
 
     fun onFindInPageRequested() {
