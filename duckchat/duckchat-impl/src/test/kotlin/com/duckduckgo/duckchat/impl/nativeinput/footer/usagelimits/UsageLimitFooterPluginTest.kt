@@ -29,6 +29,7 @@ import com.duckduckgo.common.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
@@ -59,6 +60,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -81,6 +83,8 @@ class UsageLimitFooterPluginTest {
     private val repository: DuckAiUsageLimitsRepository = mock()
     private val dismissalStore: UsageNoticeDismissalStore = mock()
     private val modelManager: DuckAiModelManager = mock()
+    private val inputState = MutableStateFlow(NativeInputState.zero())
+    private val nativeInputStateProvider: NativeInputStateProvider = mock { on { state } doReturn inputState }
     private val settingsDao: DuckAiBridgeSettingsDao = mock()
     private val storage: DuckAiBridgeStorage = mock()
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage> = mock()
@@ -108,6 +112,7 @@ class UsageLimitFooterPluginTest {
             messageMapper = UsageLimitFooterMessageMapper(),
             ctaResolver = UsageLimitCtaResolver(),
             modelManager = modelManager,
+            nativeInputStateProvider = nativeInputStateProvider,
             storageProvider = storageProvider,
             duckChatFeature = feature,
             currentTimeProvider = currentTimeProvider,
@@ -315,6 +320,19 @@ class UsageLimitFooterPluginTest {
 
             assertEquals(listOf(HAIKU.id), host.selectedModelIds)
             verify(dismissalStore).markActedOn(snapshot.value!!.notice)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatAlreadyPickedTheCandidateThenNoticeShowsWithoutButton() = runTest {
+        inputState.value = inputState.value.copy(newChatModelId = HAIKU.id)
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            assertEquals(android.view.View.GONE, footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta).visibility)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -618,6 +636,26 @@ class UsageLimitFooterPluginTest {
             listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.Abandoned::class),
             pixelSender.events.map { it::class },
         )
+    }
+
+    @Test
+    fun whenPromptIsSentOnAPickedModelThenEnteringTheChatDoesNotActOnTheSwitchCta() = runTest {
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id)
+        inputState.value = inputState.value.copy(newChatModelId = SONNET.id)
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            hostContext.value = duckAiContext(promptSubmissions = 1)
+            hostContext.value = duckAiContext(isInputFocused = false, promptSubmissions = 1)
+            inputState.value = inputState.value.copy(chatId = "chat-1", newChatModelId = null)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
     }
 
     private fun switchCta(vararg modelIds: String) =

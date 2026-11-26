@@ -81,6 +81,7 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.helper.PendingNativeFile
 import com.duckduckgo.duckchat.impl.helper.PendingNativeImage
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterCoordinator
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterDockLayout
@@ -1972,6 +1973,14 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun changeModelSubmitted(modelId: String) {
         onChangeModelSubmitted?.invoke(modelId)
+    }
+
+    override fun pickNewChatModel(modelId: String) {
+        viewModel.pickNewChatModel(modelId)
+    }
+
+    override fun pickNewChatReasoningMode(mode: ReasoningMode) {
+        viewModel.pickNewChatReasoningMode(mode)
     }
 
     override fun requestCameraCapture(callback: ValueCallback<Array<Uri>>) {

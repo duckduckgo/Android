@@ -1605,6 +1605,79 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenNewChatModelPickedThenSubmissionUsesItAndOnlyThatTabCarriesIt() = runTest {
+        modelStateFlow.value = pickableModels()
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
+
+        assertEquals("picked-model", viewModel.getSelectedModelId())
+        assertEquals("low", viewModel.getResolvedReasoningEffort())
+        assertNull(nativeInputStateProvider.stateForTab("tab-B").value.newChatModelId)
+        viewModel.configure(tabId = "tab-B", isDuckAiMode = true, isBottom = true)
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenPromptSubmittedThenNewChatPickIsKeptUntilTheTabEntersAChat() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
+
+        viewModel.onPromptSubmitted()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+
+        viewModel.setActiveChatId("chat-1")
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertNull(state.newChatModelId)
+        assertNull(state.newChatReasoningMode)
+    }
+
+    @Test
+    fun whenPromptIsHandedOffThenNewChatPickIsCleared() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = true)
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
+
+        viewModel.storePendingPrompt("hello", modelId = "picked-model", reasoningEffort = "low")
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertNull(state.newChatModelId)
+        assertNull(state.newChatReasoningMode)
+    }
+
+    @Test
+    fun whenTabHasAChatThenNewChatPickIsIgnoredOnSubmission() = runTest {
+        modelStateFlow.value = pickableModels()
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+        viewModel.pickNewChatModel("picked-model")
+
+        viewModel.setActiveChatId("missing-chat")
+        advanceUntilIdle()
+
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    private fun pickableModels() = ModelState(
+        models = listOf(
+            aiModel(id = "global-model", supported = listOf(ReasoningEffort.NONE)),
+            aiModel(id = "picked-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+        ),
+        selectedModelId = "global-model",
+    )
+
+    @Test
     fun whenChatHasReasoningModeThenGetResolvedReasoningEffortMatchesChatsMode() = runTest {
         val modelStateFlow = MutableStateFlow(
             ModelState(
