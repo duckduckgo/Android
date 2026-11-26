@@ -24,7 +24,7 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/keyline_4"
     android:layout_marginEnd="@dimen/keyline_4"
-    android:background="@drawable/selectable_rounded_container_ripple"
+    android:background="@drawable/sync_bookmark_added_promo_background"
     tools:ignore="Overdraw"
     app:trailingIcon="@drawable/ic_menu_vertical_24"
     app:primaryText="@string/addBookmarkDialogSyncPromoText" />

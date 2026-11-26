@@ -186,11 +186,8 @@ class InfoPanelRebrandTest {
     }
 
     @Test
-    fun whenOnlyInfoPanelsAreaIsOnThenBackgroundStillUsesRadiusAttribute() {
+    fun rebrandBackgroundUsesTheDefaultBrandRadius() {
         forEachTheme(true) { context ->
-            val panel = InfoPanel(context)
-            assertEquals(context.resources.getDimension(R.dimen.smallShapeCornerRadius), (panel.background as GradientDrawable).cornerRadius, 0f)
-            context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
             assertEquals(
                 context.resources.getDimension(R.dimen.rebrandContainerRadius),
                 (InfoPanel(context).background as GradientDrawable).cornerRadius,

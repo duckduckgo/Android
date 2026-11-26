@@ -27,6 +27,7 @@ import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.mobile.android.R
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RuntimeEnvironment
@@ -36,34 +37,17 @@ import org.robolectric.annotation.Config
 class PopupMenuRadiusDrawableTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenPopupSurfaceAndCustomRipplesUse8DpInLightAndDarkThemes() {
-        assertPopupRadii(
-            overlayEnabled = false,
-            expectedDimen = R.dimen.smallShapeCornerRadius,
-        )
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenPopupSurfaceAndCustomRipplesUse16DpInLightAndDarkThemes() {
-        assertPopupRadii(
-            overlayEnabled = true,
-            expectedDimen = R.dimen.largeShapeCornerRadius,
-        )
+    fun whenThemedThenPopupSurfaceAndCustomRipplesUse16DpInLightAndDarkThemes() {
+        assertPopupRadii(expectedDimen = R.dimen.largeShapeCornerRadius)
     }
 
-    private fun assertPopupRadii(
-        overlayEnabled: Boolean,
-        expectedDimen: Int,
-    ) {
+    private fun assertPopupRadii(expectedDimen: Int) {
         listOf(
             R.style.Theme_DuckDuckGo_Light,
             R.style.Theme_DuckDuckGo_Dark,
         ).forEach { themeResId ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeResId)
-            if (overlayEnabled) {
-                context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-            }
             val expectedRadius = context.resources.getDimension(expectedDimen)
 
             val popupBackground = checkNotNull(AppCompatResources.getDrawable(context, R.drawable.popup_menu_bg)) as GradientDrawable
@@ -113,7 +97,7 @@ class PopupMenuRadiusDrawableTest {
                 resourceId = R.layout.view_popup_menu_item,
                 view = popupContent,
             )
-            assertEquals(overlayEnabled, popupContent.clipToOutline)
+            assertTrue(popupContent.clipToOutline)
         }
     }
 

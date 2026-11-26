@@ -82,7 +82,6 @@ abstract class DuckDuckGoActivity : InjectableActivity() {
             themingDataStore.theme,
             applyFireTheme,
             listOfNotNull(
-                R.style.ThemeOverlay_Rebrand_Radius.takeIf { appBrandDesignUpdateToggles.radius().isEnabled() },
                 R.style.ThemeOverlay_Rebrand_Badges.takeIf { appBrandDesignUpdateToggles.badges().isEnabled() },
                 R.style.ThemeOverlay_Rebrand_InfoPanels.takeIf { appBrandDesignUpdateToggles.infoPanels().isEnabled() },
                 R.style.ThemeOverlay_Rebrand_DialogSpacing.takeIf { appBrandDesignUpdateToggles.dialogSpacing().isEnabled() },

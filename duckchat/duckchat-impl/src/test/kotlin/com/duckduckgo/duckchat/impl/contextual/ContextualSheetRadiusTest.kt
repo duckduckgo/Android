@@ -33,34 +33,17 @@ import com.duckduckgo.mobile.android.R as CommonR
 class ContextualSheetRadiusTest {
 
     @Test
-    fun whenRadiusOverlayIsAbsentThenContextualSheetKeeps12DpCorners() {
-        assertTopCorners(
-            overlayEnabled = false,
-            expectedDimen = CommonR.dimen.dialogBorderRadius,
-        )
-    }
-
-    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusOverlayIsAppliedThenContextualSheetUses28DpCorners() {
-        assertTopCorners(
-            overlayEnabled = true,
-            expectedDimen = CommonR.dimen.rebrandContainerRadius,
-        )
+    fun whenThemedThenContextualSheetUses28DpCorners() {
+        assertTopCorners(expectedDimen = CommonR.dimen.rebrandContainerRadius)
     }
 
-    private fun assertTopCorners(
-        overlayEnabled: Boolean,
-        @DimenRes expectedDimen: Int,
-    ) {
+    private fun assertTopCorners(@DimenRes expectedDimen: Int) {
         listOf(
             CommonR.style.Theme_DuckDuckGo_Light,
             CommonR.style.Theme_DuckDuckGo_Dark,
         ).forEach { themeRes ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), themeRes)
-            if (overlayEnabled) {
-                context.theme.applyStyle(CommonR.style.ThemeOverlay_Rebrand_Radius, true)
-            }
             val drawable = checkNotNull(AppCompatResources.getDrawable(context, R.drawable.contextual_sheet_background)) as GradientDrawable
             val expected = context.resources.getDimension(expectedDimen)
             assertArrayEquals(

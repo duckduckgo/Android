@@ -71,82 +71,79 @@ class MessageCtaRebrandTest {
     @Test
     fun cardContainerAndCloseButtonFollowOnlyTheRmfToggleInBothThemes() {
         listOf(R.style.Theme_DuckDuckGo_Light, R.style.Theme_DuckDuckGo_Dark).forEach { theme ->
-            listOf(false, true).forEach { radius ->
-                listOf(false, true).forEach { rebrand ->
-                    val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), theme)
-                    if (radius) context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_Radius, true)
-                    if (rebrand) context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_RmfCards, true)
-                    listOf(
-                        Triple(MessageCta.MessageType.REMOTE_MESSAGE, R.id.remoteMessage, R.layout.view_remote_message_cta),
-                        Triple(MessageCta.MessageType.REMOTE_PROMO_MESSAGE, R.id.promoRemoteMessage, R.layout.view_promo_message_cta),
-                    ).forEach { (type, id, layout) ->
-                        val cta = MessageCta(context).apply { setMessage(MessageCta.Message(messageType = type)) }
-                        val card = cta.findViewById<MaterialCardView>(id)
-                        val content = card.getChildAt(0) as ViewGroup
-                        val close = content.findViewById<ImageView>(R.id.close)
-                        val reference = LayoutInflater.from(context).inflate(layout, null) as MaterialCardView
-                        reference.addBottomShadow()
-                        val referenceContent = reference.getChildAt(0) as ViewGroup
-                        val referenceClose = referenceContent.findViewById<ImageView>(R.id.close)
-                        val title = content.findViewById<TextView>(R.id.messageTitle)
-                        val body = content.findViewById<TextView>(R.id.messageSubtitle)
-                        assertEquals(
-                            if (rebrand) {
-                                context.getColorFromAttr(R.attr.daxColorPrimaryText)
-                            } else {
-                                referenceContent.findViewById<TextView>(R.id.messageTitle).currentTextColor
-                            },
-                            title.currentTextColor,
-                        )
-                        assertEquals(
-                            if (rebrand) {
-                                context.getColorFromAttr(R.attr.daxColorSecondaryText)
-                            } else {
-                                referenceContent.findViewById<TextView>(R.id.messageSubtitle).currentTextColor
-                            },
-                            body.currentTextColor,
-                        )
-                        assertEquals(reference.radius, card.radius, 0f)
-                        assertEquals(reference.cardElevation, card.cardElevation, 0f)
+            listOf(false, true).forEach { rebrand ->
+                val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), theme)
+                if (rebrand) context.theme.applyStyle(R.style.ThemeOverlay_Rebrand_RmfCards, true)
+                listOf(
+                    Triple(MessageCta.MessageType.REMOTE_MESSAGE, R.id.remoteMessage, R.layout.view_remote_message_cta),
+                    Triple(MessageCta.MessageType.REMOTE_PROMO_MESSAGE, R.id.promoRemoteMessage, R.layout.view_promo_message_cta),
+                ).forEach { (type, id, layout) ->
+                    val cta = MessageCta(context).apply { setMessage(MessageCta.Message(messageType = type)) }
+                    val card = cta.findViewById<MaterialCardView>(id)
+                    val content = card.getChildAt(0) as ViewGroup
+                    val close = content.findViewById<ImageView>(R.id.close)
+                    val reference = LayoutInflater.from(context).inflate(layout, null) as MaterialCardView
+                    reference.addBottomShadow()
+                    val referenceContent = reference.getChildAt(0) as ViewGroup
+                    val referenceClose = referenceContent.findViewById<ImageView>(R.id.close)
+                    val title = content.findViewById<TextView>(R.id.messageTitle)
+                    val body = content.findViewById<TextView>(R.id.messageSubtitle)
+                    assertEquals(
                         if (rebrand) {
-                            val padding = context.resources.getDimensionPixelSize(R.dimen.keyline_5)
-                            assertEquals(context.getColorFromAttr(R.attr.daxColorSurfaceSecondary), card.cardBackgroundColor.defaultColor)
-                            assertEquals(
-                                listOf(
-                                    padding,
-                                    padding,
-                                    padding,
-                                    padding - if (type == MessageCta.MessageType.REMOTE_PROMO_MESSAGE) {
-                                        context.resources.getDimensionPixelSize(R.dimen.rebrandButtonSmallVerticalInset)
-                                    } else {
-                                        0
-                                    },
-                                ),
-                                listOf(content.paddingLeft, content.paddingTop, content.paddingRight, content.paddingBottom),
-                            )
-                            assertEquals(context.resources.getDimensionPixelSize(R.dimen.rmfMessageCloseButtonSize), close.layoutParams.width)
-                            assertEquals(close.layoutParams.width, close.layoutParams.height)
-                            val params = close.layoutParams as ConstraintLayout.LayoutParams
-                            val inset = context.resources.getDimensionPixelSize(R.dimen.keyline_4)
-                            assertEquals(inset, content.paddingTop + params.topMargin)
-                            assertEquals(inset, content.paddingEnd + params.marginEnd)
-                            assertTrue(close.background is RippleDrawable)
-                            val fill = (close.background as RippleDrawable).getDrawable(0) as GradientDrawable
-                            assertEquals(GradientDrawable.OVAL, fill.shape)
-                            val mask = (close.background as RippleDrawable).findDrawableByLayerId(AndroidR.id.mask) as GradientDrawable
-                            assertEquals(GradientDrawable.OVAL, mask.shape)
-                            assertEquals(context.getColorFromAttr(R.attr.daxColorContainer), fill.color!!.defaultColor)
-                            assertEquals(context.resources.getDimensionPixelSize(R.dimen.keyline_5), close.drawable.intrinsicWidth)
+                            context.getColorFromAttr(R.attr.daxColorPrimaryText)
                         } else {
-                            assertEquals(reference.cardBackgroundColor.defaultColor, card.cardBackgroundColor.defaultColor)
-                            assertEquals(referenceContent.paddingTop, content.paddingTop)
-                            assertEquals(referenceContent.paddingBottom, content.paddingBottom)
-                            assertEquals(referenceContent.paddingLeft, content.paddingLeft)
-                            assertEquals(referenceContent.paddingRight, content.paddingRight)
-                            assertEquals(referenceClose.layoutParams.width, close.layoutParams.width)
-                            assertEquals(referenceClose.layoutParams.height, close.layoutParams.height)
-                            assertEquals(referenceClose.background.javaClass, close.background.javaClass)
-                        }
+                            referenceContent.findViewById<TextView>(R.id.messageTitle).currentTextColor
+                        },
+                        title.currentTextColor,
+                    )
+                    assertEquals(
+                        if (rebrand) {
+                            context.getColorFromAttr(R.attr.daxColorSecondaryText)
+                        } else {
+                            referenceContent.findViewById<TextView>(R.id.messageSubtitle).currentTextColor
+                        },
+                        body.currentTextColor,
+                    )
+                    assertEquals(reference.radius, card.radius, 0f)
+                    assertEquals(reference.cardElevation, card.cardElevation, 0f)
+                    if (rebrand) {
+                        val padding = context.resources.getDimensionPixelSize(R.dimen.keyline_5)
+                        assertEquals(context.getColorFromAttr(R.attr.daxColorSurfaceSecondary), card.cardBackgroundColor.defaultColor)
+                        assertEquals(
+                            listOf(
+                                padding,
+                                padding,
+                                padding,
+                                padding - if (type == MessageCta.MessageType.REMOTE_PROMO_MESSAGE) {
+                                    context.resources.getDimensionPixelSize(R.dimen.rebrandButtonSmallVerticalInset)
+                                } else {
+                                    0
+                                },
+                            ),
+                            listOf(content.paddingLeft, content.paddingTop, content.paddingRight, content.paddingBottom),
+                        )
+                        assertEquals(context.resources.getDimensionPixelSize(R.dimen.rmfMessageCloseButtonSize), close.layoutParams.width)
+                        assertEquals(close.layoutParams.width, close.layoutParams.height)
+                        val params = close.layoutParams as ConstraintLayout.LayoutParams
+                        val inset = context.resources.getDimensionPixelSize(R.dimen.keyline_4)
+                        assertEquals(inset, content.paddingTop + params.topMargin)
+                        assertEquals(inset, content.paddingEnd + params.marginEnd)
+                        assertTrue(close.background is RippleDrawable)
+                        val fill = (close.background as RippleDrawable).getDrawable(0) as GradientDrawable
+                        assertEquals(GradientDrawable.OVAL, fill.shape)
+                        val mask = (close.background as RippleDrawable).findDrawableByLayerId(AndroidR.id.mask) as GradientDrawable
+                        assertEquals(GradientDrawable.OVAL, mask.shape)
+                        assertEquals(context.getColorFromAttr(R.attr.daxColorContainer), fill.color!!.defaultColor)
+                        assertEquals(context.resources.getDimensionPixelSize(R.dimen.keyline_5), close.drawable.intrinsicWidth)
+                    } else {
+                        assertEquals(reference.cardBackgroundColor.defaultColor, card.cardBackgroundColor.defaultColor)
+                        assertEquals(referenceContent.paddingTop, content.paddingTop)
+                        assertEquals(referenceContent.paddingBottom, content.paddingBottom)
+                        assertEquals(referenceContent.paddingLeft, content.paddingLeft)
+                        assertEquals(referenceContent.paddingRight, content.paddingRight)
+                        assertEquals(referenceClose.layoutParams.width, close.layoutParams.width)
+                        assertEquals(referenceClose.layoutParams.height, close.layoutParams.height)
+                        assertEquals(referenceClose.background.javaClass, close.background.javaClass)
                     }
                 }
             }
