@@ -68,6 +68,9 @@ interface AuthService {
 
     @POST("https://quack.duckduckgo.com/api/auth/v2/logout")
     suspend fun logout(@Header("Authorization") authorization: String)
+
+    @POST("https://quack.duckduckgo.com/api/auth/v2/invalidate")
+    suspend fun invalidate(@Query("refresh_token") refreshToken: String): Response<Unit>
 }
 
 data class TokensResponse(

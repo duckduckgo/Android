@@ -289,6 +289,32 @@ class AuthClientImplTest {
     }
 
     @Test
+    fun `when invalidateRefreshToken succeeds then sends the token as refresh_token and returns`() = runTest {
+        val refreshToken = "fake refresh token"
+        whenever(authService.invalidate(refreshToken = any())).thenReturn(Response.success(Unit))
+
+        authClient.invalidateRefreshToken(refreshToken = refreshToken)
+
+        verify(authService).invalidate(refreshToken = refreshToken)
+    }
+
+    @Test
+    fun `when invalidateRefreshToken responds with non-2xx code then throws HttpException with that code`() = runTest {
+        val errorResponse = Response.error<Unit>(
+            404,
+            "{}".toResponseBody("application/json".toMediaTypeOrNull()),
+        )
+        whenever(authService.invalidate(refreshToken = any())).thenReturn(errorResponse)
+
+        try {
+            authClient.invalidateRefreshToken(refreshToken = "fake refresh token")
+            fail("Expected HttpException to be thrown")
+        } catch (e: HttpException) {
+            assertEquals(404, e.code())
+        }
+    }
+
+    @Test
     fun `when JWKS not cached then fetches from network`() = runTest {
         val jwksJson = """{"keys": [{"kty": "RSA", "kid": "networkKey"}]}"""
         val responseBody = jwksJson.toResponseBody("application/json".toMediaTypeOrNull())
