@@ -28,6 +28,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicInteger
+import kotlin.concurrent.thread
 
 @RunWith(AndroidJUnit4::class)
 class CachedTdsEntityLookupTest {
@@ -152,5 +155,42 @@ class CachedTdsEntityLookupTest {
         val entity = testee.entityForUrl("http://tracker.com")
 
         assertEquals("Lazy", entity?.name)
+    }
+
+    @Test
+    fun whenLazyLoadReadsStaleDataAndFinishesAfterRefreshThenRefreshedDataIsKept() {
+        val lazyLoadReading = CountDownLatch(1)
+        val releaseLazyLoad = CountDownLatch(1)
+        val entityReads = AtomicInteger()
+        whenever(mockEntityDao.getAll()).thenAnswer {
+            if (entityReads.getAndIncrement() == 0) {
+                lazyLoadReading.countDown()
+                releaseLazyLoad.await()
+                emptyList<TdsEntity>()
+            } else {
+                listOf(TdsEntity(name = "Acme", displayName = "Acme", prevalence = 0.5))
+            }
+        }
+        whenever(mockDomainEntityDao.getAll()).thenReturn(
+            listOf(TdsDomainEntity(domain = "tracker.com", entityName = "Acme")),
+        )
+
+        val lookup = thread { testee.entityForUrl("http://tracker.com") }
+        lazyLoadReading.await()
+        val refresh = thread { testee.refresh() }
+        awaitBlockedOrDone(refresh)
+        releaseLazyLoad.countDown()
+        lookup.join()
+        refresh.join()
+
+        assertEquals("Acme", testee.entityForUrl("http://tracker.com")?.name)
+    }
+
+    private fun awaitBlockedOrDone(thread: Thread) {
+        val deadline = System.currentTimeMillis() + 5_000
+        while (thread.state != Thread.State.BLOCKED && thread.state != Thread.State.TERMINATED) {
+            check(System.currentTimeMillis() < deadline) { "refresh thread neither blocked nor finished" }
+            Thread.sleep(1)
+        }
     }
 }
