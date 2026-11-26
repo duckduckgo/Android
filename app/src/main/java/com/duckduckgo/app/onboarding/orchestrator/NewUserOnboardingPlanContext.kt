@@ -17,6 +17,7 @@
 package com.duckduckgo.app.onboarding.orchestrator
 
 import com.duckduckgo.onboarding.api.LinearOnboardingResult
+import com.duckduckgo.onboarding.api.OnboardingSingleChoiceDataPlugin.Option
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -64,6 +65,13 @@ class NewUserOnboardingPlanContext {
      */
     @Volatile
     var pendingDuckAiPrompt: String? = null
+
+    /**
+     * Duck.ai model picked by the [NewUserOnboardingStepIds.MODEL_PROVIDER] step. Kept for this run only and
+     * handed to the chat the run finishes on, so it starts that one chat without becoming the user's default model/provider.
+     */
+    @Volatile
+    var duckAiModel: Option? = null
 
     /**
      * Set true by the [NewUserOnboardingStepIds.WIDGET_PROMPT] step when the user taps "Skip",

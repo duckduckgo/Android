@@ -75,8 +75,8 @@
 
     <string name="aiPathComparisonChartTitle"><![CDATA[You\'re in the right place!<br/>Protections activated.]]></string>
     <string name="aiPathComparisonChartItem5">Search the web privately with trackers blocked</string>
-    <string name="aiPathModelChoiceTitle">Your chats, your way.</string>
-    <string name="aiPathModelChoiceBody">Change your default AI provider now, or anytime during chat.</string>
+    <string name="aiPathModelChoiceTitle">Pick an AI to try first</string>
+    <string name="aiPathModelChoiceBody">With Duck.ai, you can swap anytime.</string>
     <string name="aiPathTogglePositionTitle">Want new tabs to open with AI chat?</string>
     <string name="aiPathTogglePositionPictogramCaption">You can switch to Search with one tap</string>
     <string name="aiPathWithToggleEnabledContextualEndDescription">Start a private AI chat with Duck.ai or toggle to Search for protected browsing.</string>
