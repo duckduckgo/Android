@@ -22,4 +22,8 @@ package com.duckduckgo.pagetranslation.impl.language
 data class LanguagePair(
     val source: String,
     val target: String,
-)
+) {
+    /** The pair as the manifest and the language pack files name it, e.g. "es-en". */
+    val key: String
+        get() = "$source-$target"
+}
