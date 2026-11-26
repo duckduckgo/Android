@@ -1251,6 +1251,11 @@ enum class SyncPixelName(override val pixelName: String) : PixelName {
     SYNC_SETUP_JOINER_RECOVERY_CODE_DONE_FAILED_DAILY("sync_setup_joiner_recovery_code_done_failed_daily"),
     SYNC_AI_CHAT_ACTIVE("sync_ai_chat_active"),
 
+    SYNC_DEVICE_ACTIVITY_SCREEN_SHOWN("sync_device_activity_screen_shown"),
+    SYNC_AUDIT_LOG_FETCH_ERROR("sync_audit_log_fetch_error"),
+    SYNC_AUDIT_LOG_UNKNOWN_VERSION("sync_audit_log_unknown_version"),
+    SYNC_AUDIT_LOG_UNDECRYPTABLE("sync_audit_log_undecryptable"),
+
     SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_DEVICE_INFO("sync_unified_devices_own_row_resolved_device_info"),
     SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_LEGACY("sync_unified_devices_own_row_resolved_legacy"),
     SYNC_UNIFIED_DEVICES_OWN_ROW_RESOLVED_PLACEHOLDER("sync_unified_devices_own_row_resolved_placeholder"),

@@ -42,7 +42,12 @@ interface AccountInfoPrivateKeyProvider {
 
 sealed interface AccountInfoPrivateKeyResult {
     data class Available(val privateKey: String) : AccountInfoPrivateKeyResult
-    data class Unavailable(val reason: AccountInfoKeyUnavailableReason) : AccountInfoPrivateKeyResult
+
+    /** [statusCode] is the keys request's HTTP status code, when the fetch failed with a response. */
+    data class Unavailable(
+        val reason: AccountInfoKeyUnavailableReason,
+        val statusCode: Int? = null,
+    ) : AccountInfoPrivateKeyResult
 }
 
 enum class AccountInfoKeyUnavailableReason {
@@ -83,7 +88,7 @@ class RealAccountInfoPrivateKeyProvider @Inject constructor(
 
         val entry = when (val result = wrappedEntry(token, userId, credentialId)) {
             is WrappedEntryOutcome.Available -> result.entry
-            is WrappedEntryOutcome.Unavailable -> return AccountInfoPrivateKeyResult.Unavailable(result.reason)
+            is WrappedEntryOutcome.Unavailable -> return AccountInfoPrivateKeyResult.Unavailable(result.reason, result.statusCode)
         }
 
         return when (val result = protectedKeyUnwrapper.unwrap(entry)) {
@@ -124,6 +129,7 @@ class RealAccountInfoPrivateKeyProvider @Inject constructor(
                         } else {
                             AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED
                         },
+                        statusCode = result.code.takeIf { it in HTTP_STATUS_CODES },
                     )
                 }
             }
@@ -135,6 +141,11 @@ class RealAccountInfoPrivateKeyProvider @Inject constructor(
 
     private sealed interface WrappedEntryOutcome {
         data class Available(val entry: ProtectedKeyEntry) : WrappedEntryOutcome
-        data class Unavailable(val reason: AccountInfoKeyUnavailableReason) : WrappedEntryOutcome
+        data class Unavailable(val reason: AccountInfoKeyUnavailableReason, val statusCode: Int? = null) : WrappedEntryOutcome
+    }
+
+    private companion object {
+        // Errors with no response use a negative code.
+        val HTTP_STATUS_CODES = 100..599
     }
 }

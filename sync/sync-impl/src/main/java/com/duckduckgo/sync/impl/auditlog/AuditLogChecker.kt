@@ -80,6 +80,7 @@ class RealAuditLogChecker @Inject constructor(
     private val stateStore: AuditLogCheckStateStore,
     private val entryDecoder: AuditLogEntryDecoder,
     private val pendingLoginsUpdater: PendingLoginsUpdater,
+    private val auditLogPixels: AuditLogPixels,
     private val dispatchers: DispatcherProvider,
 ) : AuditLogChecker {
 
@@ -126,7 +127,7 @@ class RealAuditLogChecker @Inject constructor(
 
     /** Gets the newest cursor (one entry) and stores it, so only entries after now are checked. Adds no logins. */
     private suspend fun initialise(token: String, deviceId: String): AuditLogCheckResult {
-        val after = when (val result = syncApi.getAuditLogLatest(token, limit = 1)) {
+        val after = when (val result = syncApi.getAuditLogLatest(token, limit = 1).also(auditLogPixels::fireFetchErrorIfFailed)) {
             is AuditLogResult.Success -> result.page.after ?: return AuditLogCheckResult.Failed(FailureReason.SERVER)
             else -> return result.toFailure()
         }
@@ -174,7 +175,7 @@ class RealAuditLogChecker @Inject constructor(
         val pages = mutableListOf<List<AuditLogEntry>>()
         var nextCursor = cursor
         while (pages.size < MAX_PAGES_PER_CHECK) {
-            val page = when (val result = syncApi.getAuditLogAfter(token, nextCursor)) {
+            val page = when (val result = syncApi.getAuditLogAfter(token, nextCursor).also(auditLogPixels::fireFetchErrorIfFailed)) {
                 is AuditLogResult.Success -> result.page
                 is AuditLogResult.InvalidCursor -> return FetchResult.CursorRejected
                 else -> return FetchResult.Failed(result.toFailure())

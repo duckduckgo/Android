@@ -34,6 +34,8 @@ import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.INFO
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LATER_INFO
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LEGACY
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.PLACEHOLDER
+import com.duckduckgo.sync.store.ScopedPassword
+import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -44,6 +46,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.Instant
 
@@ -55,7 +58,15 @@ class AuditLogDeviceNameResolverTest {
     private val session: DeviceInfoDecryptor.Session = mock()
     private val deviceInfoDecryptor: DeviceInfoDecryptor = mock()
     private val deviceFieldDecryptor: DeviceFieldDecryptor = mock()
-    private val resolver = RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, coroutineTestRule.testDispatcherProvider)
+    private val syncStore: SyncStore = mock()
+    private val auditLogPixels: AuditLogPixels = mock()
+    private val resolver = RealAuditLogDeviceNameResolver(
+        deviceInfoDecryptor,
+        deviceFieldDecryptor,
+        syncStore,
+        auditLogPixels,
+        coroutineTestRule.testDispatcherProvider,
+    )
 
     @Before
     fun setup() {
@@ -291,6 +302,82 @@ class AuditLogDeviceNameResolverTest {
         resolver.resolve(listOf(entry("e1", DEVICE_INFO_ADDED, device("a", info = "info-a"))))
 
         verify(deviceInfoDecryptor, never()).openSession()
+    }
+
+    @Test
+    fun whenSeveralInfosDoNotDecryptThenDeviceInfoPixelFiredOnce() = runTest {
+        whenever(deviceFieldDecryptor.decrypt(any())).thenReturn(Result.Success(DecryptedDevice("a", "Legacy", null)))
+
+        resolver.resolve(
+            listOf(
+                entry("e2", LOGOUT, device("b", info = "info-broken-b")),
+                entry("e1", LOGIN, device("a", info = "info-broken-a")),
+            ),
+        )
+
+        verify(auditLogPixels, times(1)).fireUndecryptable(AuditLogUndecryptableReason.DEVICE_INFO_DECRYPT_ERROR)
+        verify(auditLogPixels, never()).fireUndecryptable(AuditLogUndecryptableReason.LEGACY_NAME_TYPE_DECRYPT_ERROR)
+    }
+
+    @Test
+    fun whenLaterDeviceInfoAddedDoesNotDecryptThenDeviceInfoPixelFired() = runTest {
+        givenInfo("info-new", "Newer name", null)
+
+        resolver.resolve(
+            listOf(
+                entry("e3", DEVICE_INFO_ADDED, device("a", info = "info-new")),
+                entry("e2", DEVICE_INFO_ADDED, device("a", info = "info-broken")),
+                entry("e1", LOGIN, device("a")),
+            ),
+        )
+
+        verify(auditLogPixels).fireUndecryptable(AuditLogUndecryptableReason.DEVICE_INFO_DECRYPT_ERROR)
+    }
+
+    @Test
+    fun whenSeveralLegacyNamesDoNotDecryptThenLegacyPixelFiredOnce() = runTest {
+        resolver.resolve(listOf(entry("e2", LOGIN, device("b")), entry("e1", LOGIN, device("a"))))
+
+        verify(auditLogPixels, times(1)).fireUndecryptable(AuditLogUndecryptableReason.LEGACY_NAME_TYPE_DECRYPT_ERROR)
+        verify(auditLogPixels, never()).fireUndecryptable(AuditLogUndecryptableReason.DEVICE_INFO_DECRYPT_ERROR)
+    }
+
+    @Test
+    fun whenThirdPartyLegacyNameCannotBeReadWithoutThirdPartyCredentialThenNoPixel() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(null)
+
+        resolver.resolve(listOf(entry("e1", LOGIN, device("a", credentialId = "3party"))))
+
+        verifyNoInteractions(auditLogPixels)
+    }
+
+    @Test
+    fun whenThirdPartyLegacyNameDoesNotDecryptWithThirdPartyCredentialThenLegacyPixelFired() = runTest {
+        whenever(syncStore.scopedPassword).thenReturn(ScopedPassword("scoped-password"))
+
+        resolver.resolve(listOf(entry("e1", LOGIN, device("a", credentialId = "3party"))))
+
+        verify(auditLogPixels).fireUndecryptable(AuditLogUndecryptableReason.LEGACY_NAME_TYPE_DECRYPT_ERROR)
+    }
+
+    @Test
+    fun whenEveryNameResolvesThenNoPixel() = runTest {
+        givenInfo("info-a", "Phone A", null)
+        givenLegacy("b", "Phone B")
+
+        resolver.resolve(
+            listOf(
+                entry("e3", DEVICE_INFO_ADDED, device("a", info = "info-a")),
+                entry("e2", LOGIN, device("b")),
+                entry("e1", LOGIN, device("a")),
+            ),
+        )
+
+        verifyNoInteractions(auditLogPixels)
+    }
+
+    private fun givenLegacy(id: String, name: String) {
+        whenever(deviceFieldDecryptor.decrypt(device(id))).thenReturn(Result.Success(DecryptedDevice(id, name, null)))
     }
 
     private fun givenInfo(jwe: String, name: String, type: String?) {

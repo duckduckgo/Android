@@ -89,6 +89,7 @@ enum class AuditLogEntrySkipReason {
 class RealAuditLogEntryDecoder @Inject constructor(
     private val accountInfoPrivateKeyProvider: AccountInfoPrivateKeyProvider,
     private val syncJweCrypto: SyncJweCrypto,
+    private val auditLogPixels: AuditLogPixels,
     private val dispatchers: DispatcherProvider,
 ) : AuditLogEntryDecoder {
 
@@ -112,10 +113,26 @@ class RealAuditLogEntryDecoder @Inject constructor(
             "Sync-AuditLog: decoded ${decoded.count { it is Decoded }} of ${entries.size} entries; " +
                 "skipped ${decoded.filterIsInstance<Skipped>().groupingBy { it.reason }.eachCount()}"
         }
-        return AuditLogDecodeResult(
-            entries = decoded,
-            keyUnavailableReason = keyResult.takeIf { it.isInitialized() }?.let { (it.value as? AccountInfoPrivateKeyResult.Unavailable)?.reason },
-        )
+        val keyUnavailable = keyResult.takeIf { it.isInitialized() }?.value as? AccountInfoPrivateKeyResult.Unavailable
+        firePixels(decoded, keyUnavailable)
+        return AuditLogDecodeResult(entries = decoded, keyUnavailableReason = keyUnavailable?.reason)
+    }
+
+    /** Once per call, so a page with many bad entries fires each pixel once. */
+    private fun firePixels(decoded: List<DecodedAuditLogEntry>, keyUnavailable: AccountInfoPrivateKeyResult.Unavailable?) {
+        val skipReasons = decoded.mapNotNullTo(HashSet()) { (it as? Skipped)?.reason }
+        if (UNKNOWN_VERSION in skipReasons) auditLogPixels.fireUnknownVersion()
+        if (PAYLOAD_DECRYPT_ERROR in skipReasons) auditLogPixels.fireUndecryptable(AuditLogUndecryptableReason.PAYLOAD_DECRYPT_ERROR)
+        when (keyUnavailable?.reason) {
+            null -> Unit
+            AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED,
+            AccountInfoKeyUnavailableReason.RATE_LIMITED,
+            -> auditLogPixels.fireFetchError(keyUnavailable.statusCode)
+            AccountInfoKeyUnavailableReason.NO_KEY_ON_SERVER,
+            AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL,
+            AccountInfoKeyUnavailableReason.UNWRAP_FAILED,
+            -> auditLogPixels.fireUndecryptable(AuditLogUndecryptableReason.KEY_NOT_FOUND)
+        }
     }
 
     private fun decode(entry: AuditLogEntry, privateKey: String): DecodedAuditLogEntry {

@@ -36,6 +36,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Instant
 
@@ -47,9 +50,12 @@ class RealPendingLoginsUpdaterTest {
     private val deviceFieldDecryptor: DeviceFieldDecryptor = mock()
     private val deviceInfoDecryptor = FakeDeviceInfoDecryptor()
 
+    private val auditLogPixels: AuditLogPixels = mock()
+
     private val testee = RealPendingLoginsUpdater(
-        RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, coroutineTestRule.testDispatcherProvider),
+        RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, mock(), mock(), coroutineTestRule.testDispatcherProvider),
         deviceInfoDecryptor,
+        auditLogPixels,
         coroutineTestRule.testDispatcherProvider,
     )
 
@@ -119,6 +125,25 @@ class RealPendingLoginsUpdaterTest {
         val update = testee.prepare(entries, OWN_DEVICE, listOf(fallback("e1", OTHER_DEVICE)))
 
         assertEquals(mapOf(OTHER_DEVICE to "Older"), update.lateNames)
+    }
+
+    @Test
+    fun whenLateNameInfosDoNotDecryptThenDeviceInfoPixelFiredOnce() = runTest {
+        val entries = listOf(
+            infoAdded("e4", THIRD_DEVICE, info = "undecryptable-2"),
+            infoAdded("e3", OTHER_DEVICE, info = "undecryptable-1"),
+        )
+
+        testee.prepare(entries, OWN_DEVICE, listOf(fallback("e1", OTHER_DEVICE), fallback("e2", THIRD_DEVICE)))
+
+        verify(auditLogPixels, times(1)).fireUndecryptable(AuditLogUndecryptableReason.DEVICE_INFO_DECRYPT_ERROR)
+    }
+
+    @Test
+    fun whenLateNameDecryptsThenNoPixel() = runTest {
+        testee.prepare(listOf(infoAdded("e2", OTHER_DEVICE, info = "info:Laptop")), OWN_DEVICE, listOf(fallback("e1", OTHER_DEVICE)))
+
+        verify(auditLogPixels, never()).fireUndecryptable(any())
     }
 
     @Test

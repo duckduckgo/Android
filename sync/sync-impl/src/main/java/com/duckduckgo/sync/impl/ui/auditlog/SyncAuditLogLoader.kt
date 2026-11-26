@@ -25,9 +25,11 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogEntryDecoder
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.DEVICE_INFO_ADDED
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGIN
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGOUT
+import com.duckduckgo.sync.impl.auditlog.AuditLogPixels
 import com.duckduckgo.sync.impl.auditlog.AuditLogResult
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
+import com.duckduckgo.sync.impl.auditlog.fireFetchErrorIfFailed
 import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.ensureActive
@@ -92,6 +94,7 @@ class RealSyncAuditLogLoader @Inject constructor(
     private val syncApi: SyncApi,
     private val entryDecoder: AuditLogEntryDecoder,
     private val nameResolver: AuditLogDeviceNameResolver,
+    private val auditLogPixels: AuditLogPixels,
     private val dispatchers: DispatcherProvider,
 ) : SyncAuditLogLoader {
 
@@ -134,6 +137,7 @@ class RealSyncAuditLogLoader @Inject constructor(
         repeat(MAX_PAGES_PER_LOAD) {
             val result = cursor?.let { syncApi.getAuditLogBefore(token, it, limit) } ?: syncApi.getAuditLogLatest(token, limit)
             if (result !is AuditLogResult.Success) {
+                auditLogPixels.fireFetchErrorIfFailed(result)
                 logcat(WARN) { "Sync-AuditLog: device activity load failed: ${result::class.simpleName}" }
                 return SyncAuditLogLoadResult.Failed
             }

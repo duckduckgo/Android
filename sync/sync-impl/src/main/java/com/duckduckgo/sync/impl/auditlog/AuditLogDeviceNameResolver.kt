@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.auditlog
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.CREDENTIAL_ID_3PARTY
 import com.duckduckgo.sync.impl.DecryptedDevice
 import com.duckduckgo.sync.impl.DeviceFieldDecryptor
 import com.duckduckgo.sync.impl.DeviceInfoDecryptor
@@ -27,11 +28,14 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.DEVICE_INFO_ADDED
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGIN
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGOUT
+import com.duckduckgo.sync.impl.auditlog.AuditLogUndecryptableReason.DEVICE_INFO_DECRYPT_ERROR
+import com.duckduckgo.sync.impl.auditlog.AuditLogUndecryptableReason.LEGACY_NAME_TYPE_DECRYPT_ERROR
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.INFO
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LATER_INFO
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.LEGACY
 import com.duckduckgo.sync.impl.auditlog.DeviceNameSource.PLACEHOLDER
+import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
@@ -69,6 +73,8 @@ enum class DeviceNameSource {
 class RealAuditLogDeviceNameResolver @Inject constructor(
     private val deviceInfoDecryptor: DeviceInfoDecryptor,
     private val deviceFieldDecryptor: DeviceFieldDecryptor,
+    private val syncStore: SyncStore,
+    private val auditLogPixels: AuditLogPixels,
     private val dispatchers: DispatcherProvider,
 ) : AuditLogDeviceNameResolver {
 
@@ -87,15 +93,17 @@ class RealAuditLogDeviceNameResolver @Inject constructor(
         val decoded = context + entries.filterIsInstance<Decoded>()
         if (decoded.drop(context.size).none { it.type in NAMED_TYPES }) return emptyMap()
 
+        val failures = mutableSetOf<AuditLogUndecryptableReason>()
         val session = when (val result = deviceInfoDecryptor.openSession()) {
-            is DeviceInfoSessionResult.Available -> MemoisedSession(result.session)
+            is DeviceInfoSessionResult.Available -> MemoisedSession(result.session, onFailure = { failures += DEVICE_INFO_DECRYPT_ERROR })
             is DeviceInfoSessionResult.Unavailable -> null
         }
         // Input is newest first, so everything before an entry's index happened after it.
         val names = decoded.withIndex()
             .drop(context.size)
             .filter { it.value.type in NAMED_TYPES }
-            .associate { (index, entry) -> entry.id to resolve(entry, newerEntries = decoded.subList(0, index), session) }
+            .associate { (index, entry) -> entry.id to resolve(entry, newerEntries = decoded.subList(0, index), session, failures) }
+        failures.forEach { auditLogPixels.fireUndecryptable(it) }
 
         logcat(VERBOSE) { "Sync-AuditLog: named ${names.size} entries ${names.values.groupingBy { it.source }.eachCount()}" }
         return names
@@ -113,6 +121,7 @@ class RealAuditLogDeviceNameResolver @Inject constructor(
         entry: Decoded,
         newerEntries: List<Decoded>,
         session: MemoisedSession?,
+        failures: MutableSet<AuditLogUndecryptableReason>,
     ): ResolvedDeviceName {
         session?.decryptInfo(entry.device.deviceInfo)?.let { return it.toName(INFO) }
 
@@ -124,10 +133,15 @@ class RealAuditLogDeviceNameResolver @Inject constructor(
 
         val legacy = deviceFieldDecryptor.decrypt(entry.device)
         if (legacy is Result.Success) return ResolvedDeviceName(legacy.data.name, legacy.data.type, LEGACY)
+        if (canReadLegacyFields(entry.device.credentialId)) failures += LEGACY_NAME_TYPE_DECRYPT_ERROR
 
         val placeholder = DecryptedDevice.placeholder(entry.device.deviceId.orEmpty(), entry.device.credentialId)
         return ResolvedDeviceName(placeholder.name, placeholder.type, PLACEHOLDER)
     }
+
+    /** A device signed in with only the ddg credential has no key for a 3party device's legacy fields, so that is not a failure. */
+    private fun canReadLegacyFields(credentialId: String?): Boolean =
+        credentialId != CREDENTIAL_ID_3PARTY || syncStore.scopedPassword != null
 
     /** The `device_info_added` entries for [deviceId] after the login and before that device's next login, oldest first. */
     private fun laterInfoCandidates(deviceId: String?, newerEntries: List<Decoded>): List<Decoded> =
@@ -137,12 +151,17 @@ class RealAuditLogDeviceNameResolver @Inject constructor(
             .filter { it.type == DEVICE_INFO_ADDED }
 
     /** A login's `info` is often repeated on later rows and tried again for each earlier login, and each decrypt is an RSA operation. */
-    private class MemoisedSession(private val session: DeviceInfoDecryptor.Session) {
+    private class MemoisedSession(
+        private val session: DeviceInfoDecryptor.Session,
+        private val onFailure: () -> Unit,
+    ) {
         private val cache = mutableMapOf<String, DeviceInfoPayload?>()
 
         fun decryptInfo(deviceInfo: String?): DeviceInfoPayload? {
             if (deviceInfo.isNullOrEmpty()) return null
-            return cache.getOrPut(deviceInfo) { (session.decrypt(deviceInfo) as? Result.Success)?.data }
+            return cache.getOrPut(deviceInfo) {
+                (session.decrypt(deviceInfo) as? Result.Success)?.data.also { if (it == null) onFailure() }
+            }
         }
     }
 

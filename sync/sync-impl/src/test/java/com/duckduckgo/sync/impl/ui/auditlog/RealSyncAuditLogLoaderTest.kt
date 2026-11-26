@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.DEVICE_INFO_ADDED
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGIN
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGOUT
+import com.duckduckgo.sync.impl.auditlog.AuditLogPixels
 import com.duckduckgo.sync.impl.auditlog.AuditLogResult
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
@@ -66,12 +67,14 @@ class RealSyncAuditLogLoaderTest {
     private val syncApi: SyncApi = mock()
     private val decoder: AuditLogEntryDecoder = mock()
     private val resolver: AuditLogDeviceNameResolver = mock()
+    private val auditLogPixels: AuditLogPixels = mock()
 
     private val testee = RealSyncAuditLogLoader(
         syncStore = syncStore,
         syncApi = syncApi,
         entryDecoder = decoder,
         nameResolver = resolver,
+        auditLogPixels = auditLogPixels,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -94,6 +97,45 @@ class RealSyncAuditLogLoaderTest {
         whenever(syncApi.getAuditLogLatest(TOKEN)).thenReturn(AuditLogResult.ServerError(500))
 
         assertEquals(SyncAuditLogLoadResult.Failed, testee.loadLatest())
+    }
+
+    @Test
+    fun whenServerFailsThenFetchErrorPixelFiredWithStatusCode() = runTest {
+        givenToken()
+        whenever(syncApi.getAuditLogLatest(TOKEN)).thenReturn(AuditLogResult.ServerError(500))
+
+        testee.loadLatest()
+
+        verify(auditLogPixels).fireFetchError(500)
+    }
+
+    @Test
+    fun whenNoConnectionThenFetchErrorPixelFiredWithoutStatusCode() = runTest {
+        givenToken()
+        whenever(syncApi.getAuditLogLatest(TOKEN)).thenReturn(AuditLogResult.NetworkError)
+
+        testee.loadLatest()
+
+        verify(auditLogPixels).fireFetchError(null)
+    }
+
+    @Test
+    fun whenLoadOlderFailsThenFetchErrorPixelFiredWithStatusCode() = runTest {
+        givenToken()
+        whenever(syncApi.getAuditLogBefore(TOKEN, "b1")).thenReturn(AuditLogResult.RateLimited(418))
+
+        testee.loadOlder(loaded(emptyList(), before = "b1"))
+
+        verify(auditLogPixels).fireFetchError(418)
+    }
+
+    @Test
+    fun whenLoadSucceedsThenNoPixel() = runTest {
+        givenPage(decoded = emptyList())
+
+        testee.loadLatest()
+
+        verifyNoInteractions(auditLogPixels)
     }
 
     @Test

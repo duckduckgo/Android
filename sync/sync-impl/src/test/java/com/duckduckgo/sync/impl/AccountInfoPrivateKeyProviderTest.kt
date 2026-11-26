@@ -101,8 +101,30 @@ class AccountInfoPrivateKeyProviderTest {
         val result = provider.privateKey()
 
         assertEquals(
-            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.RATE_LIMITED),
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.RATE_LIMITED, statusCode = 429),
             result,
+        )
+    }
+
+    @Test
+    fun whenKeysFetchGetsServerErrorThenStatusCodeKept() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Error(code = 503))
+
+        assertEquals(
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED, statusCode = 503),
+            provider.privateKey(),
+        )
+    }
+
+    @Test
+    fun whenKeysFetchGetsNoResponseThenNoStatusCode() {
+        stubSignedIn()
+        whenever(syncApi.getProtectedKeys(token)).thenReturn(Result.Error(reason = "Unable to resolve host"))
+
+        assertEquals(
+            AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED, statusCode = null),
+            provider.privateKey(),
         )
     }
 

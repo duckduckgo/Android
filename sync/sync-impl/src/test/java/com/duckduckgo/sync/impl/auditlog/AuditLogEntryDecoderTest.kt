@@ -38,6 +38,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.time.Instant
 
@@ -48,7 +49,8 @@ class AuditLogEntryDecoderTest {
 
     private val privateKeyProvider: AccountInfoPrivateKeyProvider = mock()
     private val syncJweCrypto: SyncJweCrypto = mock()
-    private val decoder = RealAuditLogEntryDecoder(privateKeyProvider, syncJweCrypto, coroutineTestRule.testDispatcherProvider)
+    private val auditLogPixels: AuditLogPixels = mock()
+    private val decoder = RealAuditLogEntryDecoder(privateKeyProvider, syncJweCrypto, auditLogPixels, coroutineTestRule.testDispatcherProvider)
 
     @Test
     fun whenLoginPayloadThenDecoded() = runTest {
@@ -206,6 +208,78 @@ class AuditLogEntryDecoderTest {
         decoder.decode(emptyList())
 
         verify(privateKeyProvider, never()).privateKey()
+    }
+
+    @Test
+    fun whenSeveralEntriesHaveUnknownVersionThenUnknownVersionPixelFiredOnce() = runTest {
+        decoder.decode(listOf(entry("e1", rawVersion = "2"), entry("e2", rawVersion = "3"), entry("e3", rawVersion = null)))
+
+        verify(auditLogPixels, times(1)).fireUnknownVersion()
+    }
+
+    @Test
+    fun whenSeveralPayloadsDoNotDecryptThenPayloadDecryptErrorPixelFiredOnce() = runTest {
+        givenKeyAvailable()
+        whenever(syncJweCrypto.jweDecryptRsaOaep("jwe-1", PRIVATE_KEY)).thenThrow(RuntimeException("bad tag"))
+        givenPayload("jwe-2", "{ malformed")
+        givenPayload("jwe-3", """{"type":"login","occurred_at":"yesterday","device":$DEVICE_A}""")
+
+        decoder.decode(listOf(entry("e1", payload = "jwe-1"), entry("e2", payload = "jwe-2"), entry("e3", payload = "jwe-3")))
+
+        verify(auditLogPixels, times(1)).fireUndecryptable(AuditLogUndecryptableReason.PAYLOAD_DECRYPT_ERROR)
+    }
+
+    @Test
+    fun whenKeyIsMissingThenKeyNotFoundPixelFiredOnce() = runTest {
+        whenever(privateKeyProvider.privateKey())
+            .thenReturn(AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.NO_WRAP_FOR_OUR_CREDENTIAL))
+
+        decoder.decode(listOf(entry("e1"), entry("e2")))
+
+        verify(auditLogPixels, times(1)).fireUndecryptable(AuditLogUndecryptableReason.KEY_NOT_FOUND)
+        verify(auditLogPixels, never()).fireFetchError(any())
+    }
+
+    @Test
+    fun whenKeysFetchFailsThenFetchErrorPixelFiredWithKeysStatusCode() = runTest {
+        whenever(privateKeyProvider.privateKey())
+            .thenReturn(AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED, statusCode = 503))
+
+        decoder.decode(listOf(entry("e1"), entry("e2")))
+
+        verify(auditLogPixels, times(1)).fireFetchError(503)
+        verify(auditLogPixels, never()).fireUndecryptable(any())
+    }
+
+    @Test
+    fun whenKeysFetchIsRateLimitedThenFetchErrorPixelFiredWithKeysStatusCode() = runTest {
+        whenever(privateKeyProvider.privateKey())
+            .thenReturn(AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.RATE_LIMITED, statusCode = 429))
+
+        decoder.decode(listOf(entry("e1")))
+
+        verify(auditLogPixels).fireFetchError(429)
+    }
+
+    @Test
+    fun whenKeysFetchGetsNoResponseThenFetchErrorPixelFiredWithoutStatusCode() = runTest {
+        whenever(privateKeyProvider.privateKey())
+            .thenReturn(AccountInfoPrivateKeyResult.Unavailable(AccountInfoKeyUnavailableReason.KEYS_FETCH_FAILED))
+
+        decoder.decode(listOf(entry("e1")))
+
+        verify(auditLogPixels).fireFetchError(null)
+    }
+
+    @Test
+    fun whenEveryEntryDecodesOrHasUnknownTypeThenNoPixel() = runTest {
+        givenKeyAvailable()
+        givenPayload("jwe-1", LOGIN_PAYLOAD)
+        givenPayload("jwe-2", """{"type":"password_changed","occurred_at":"2026-09-02T14:03:11Z","device":$DEVICE_A}""")
+
+        decoder.decode(listOf(entry("e1", payload = "jwe-1"), entry("e2", payload = "jwe-2")))
+
+        verifyNoInteractions(auditLogPixels)
     }
 
     private suspend fun decodeEntries(entries: List<AuditLogEntry>) = decoder.decode(entries).entries

@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.AuditLogPixels
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import dev.zacsweers.metro.Assisted
@@ -50,6 +51,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     private val stateStore: AuditLogCheckStateStore,
     private val newLoginNotifier: NewLoginNotifier,
     private val loginAuditLogFeature: LoginAuditLogFeature,
+    private val auditLogPixels: AuditLogPixels,
 ) : ViewModel() {
 
     data class ViewState(
@@ -103,14 +105,19 @@ class SyncAuditLogViewModel @AssistedInject constructor(
         if (params.openedFromNotification) {
             viewModelScope.launch {
                 if (loginAuditLogFeature.isAuditLogEnabled()) {
-                    load()
+                    open()
                 } else {
                     _commands.send(Command.Close)
                 }
             }
         } else {
-            load()
+            open()
         }
+    }
+
+    private fun open() {
+        auditLogPixels.fireDeviceActivityScreenShown()
+        load()
     }
 
     fun onNearListEnd() {
