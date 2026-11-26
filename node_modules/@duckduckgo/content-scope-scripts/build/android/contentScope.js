@@ -16380,7 +16380,7 @@ img { display: block; width: 16px; height: 16px; }
     const importConfig = {
       trackerLookup: void 0,
       injectName: "android",
-      contentScopeScriptsVersion: "23.3.0"
+      contentScopeScriptsVersion: "23.4.0"
     };
     const bundledFeatureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] ?? [] : [];
     const featuresToLoad = isGloballyDisabled(args) ? platformSpecificFeatures : args.site.enabledFeatures || bundledFeatureNames;
