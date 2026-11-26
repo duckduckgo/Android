@@ -63,7 +63,7 @@ class PirFreemiumSettingViewModel @Inject constructor(
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
 
-    private var impressionFired = false
+    private var lastImpressionCta: PirFreemiumCtaState? = null
 
     override fun onResume(owner: LifecycleOwner) {
         super.onResume(owner)
@@ -71,9 +71,9 @@ class PirFreemiumSettingViewModel @Inject constructor(
             val cta = resolveCta(pirFreemium.getPirFreemiumState())
             _viewState.update { it.copy(cta = cta) }
 
-            if (cta != null && !impressionFired) {
-                impressionFired = true
-                pixelSender.reportFreemiumSettingsEntryPointImpression()
+            if (cta != null && cta != lastImpressionCta) {
+                lastImpressionCta = cta
+                pixelSender.reportFreemiumSettingsEntryPointImpression(cta)
             }
         }
     }

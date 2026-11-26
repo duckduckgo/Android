@@ -1515,12 +1515,24 @@ class RealPirPixelSenderTest {
     }
 
     @Test
-    fun whenReportFreemiumSettingsEntryPointImpressionThenFiresImpressionPixel() {
-        testee.reportFreemiumSettingsEntryPointImpression()
+    fun whenReportFreemiumSettingsEntryPointImpressionBeforeFirstScanThenCtaStateIsStartFreeScan() {
+        testee.reportFreemiumSettingsEntryPointImpression(PirFreemiumCtaState.START_FREE_SCAN)
 
         verify(mockPixelSender).fire(
             pixelName = "m_dbp_freemium_settings_entry_point_impression_c",
             type = Count,
+            parameters = mapOf("cta_state" to "start_free_scan"),
+        )
+    }
+
+    @Test
+    fun whenReportFreemiumSettingsEntryPointImpressionAfterFirstScanThenCtaStateIsViewScanResults() {
+        testee.reportFreemiumSettingsEntryPointImpression(PirFreemiumCtaState.VIEW_SCAN_RESULTS)
+
+        verify(mockPixelSender).fire(
+            pixelName = "m_dbp_freemium_settings_entry_point_impression_c",
+            type = Count,
+            parameters = mapOf("cta_state" to "view_scan_results"),
         )
     }
 
