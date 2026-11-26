@@ -57,6 +57,7 @@ class LanguagePackInstallerTest {
     @Before
     fun setUp() = runTest {
         whenever(store.readManifest()).thenReturn(manifestOf(MODEL))
+        whenever(translateKit.init()).thenReturn(true)
         doAnswer { it.getArgument<File>(1).writeText(DECOMPRESSED.getValue(it.getArgument<File>(1).name)) }
             .whenever(translateKit).decompressZstd(any(), any())
 
@@ -118,7 +119,7 @@ class LanguagePackInstallerTest {
 
     @Test
     fun failWhenTranslateKitFailsToInitialize() = runTest {
-        doThrow(IllegalStateException()).whenever(translateKit).init()
+        whenever(translateKit.init()).thenReturn(false)
 
         assertNotInstalled(MODEL)
     }

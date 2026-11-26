@@ -31,7 +31,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
-import logcat.asLog
 import logcat.logcat
 import java.io.File
 import java.io.IOException
@@ -59,13 +58,8 @@ class RealLanguagePackInstaller @Inject constructor(
         packDirectory: File,
     ): Boolean = withContext(dispatchers.io()) {
         val isInstalled = try {
-            translateKit.init()
-            installFiles(pair, model, stagingDirectory, packDirectory)
+            translateKit.init() && installFiles(pair, model, stagingDirectory, packDirectory)
         } catch (_: IOException) {
-            false
-        } catch (e: IllegalStateException) {
-            // translate-kit throws it when its native library fails to initialize
-            logcat(ERROR) { "TranslateKit failed to initialize: ${e.asLog()}" }
             false
         }
 
