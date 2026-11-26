@@ -42,5 +42,28 @@ data class ModelsManifest(
         val sha256: String,
         val decompressedSize: Long,
         val decompressedHash: String,
-    )
+    ) {
+        /**
+         * The name of this file decompressed into an installed pack: its [key] with the format extension of [path],
+         * e.g. "model.bin" for "es-en/model.esen.intgemm.alphas.bin.zst". translate-kit tells a file's format by its extension.
+         */
+        fun getInstalledFileName(key: String): String {
+            val extension = path.substringAfterLast('/').removeSuffix(COMPRESSED_EXTENSION).substringAfterLast('.', missingDelimiterValue = "")
+
+            return if (extension.isEmpty()) key else "$key.$extension"
+        }
+
+        private companion object {
+            const val COMPRESSED_EXTENSION = ".zst"
+        }
+    }
+
+    /** The keys of [TranslationModel.files], which also name the decompressed files in an installed pack. */
+    companion object {
+        const val MODEL_FILE = "model"
+        const val LEXICAL_SHORTLIST_FILE = "lexicalShortlist"
+        const val VOCAB_FILE = "vocab"
+        const val SOURCE_VOCAB_FILE = "srcVocab"
+        const val TARGET_VOCAB_FILE = "trgVocab"
+    }
 }

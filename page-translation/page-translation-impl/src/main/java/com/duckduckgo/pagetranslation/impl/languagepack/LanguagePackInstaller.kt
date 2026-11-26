@@ -77,7 +77,7 @@ class RealLanguagePackInstaller @Inject constructor(
         for ((key, file) in model.files) {
             currentCoroutineContext().ensureActive()
             val compressedFile = stagingDirectory.resolve(key + COMPRESSED_FILE_SUFFIX)
-            val decompressedFile = stagingDirectory.resolve(key)
+            val decompressedFile = stagingDirectory.resolve(file.getInstalledFileName(key))
 
             if (!compressedFile.matches(file.bytes, file.sha256)) return false
             currentCoroutineContext().ensureActive()
