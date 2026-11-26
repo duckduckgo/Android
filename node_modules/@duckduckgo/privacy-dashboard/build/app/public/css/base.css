@@ -771,7 +771,7 @@ a.link-action--rounded {
 }
 .environment--ios .icon.icon__back-arrow {
   background-image: url("../../img/refresh-assets/back-chevron-ios.svg");
-  width: 20px;
+  width: 24px;
   height: 20px;
 }
 .environment--ios .icon.icon__back-arrow:before {
