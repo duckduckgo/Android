@@ -19,13 +19,17 @@ package com.duckduckgo.common.ui.view
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
 import androidx.annotation.RawRes
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -34,10 +38,13 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions.withC
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.bumptech.glide.signature.ObjectKey
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_PROMO_MESSAGE
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.mobile.android.R
 import com.duckduckgo.mobile.android.databinding.ViewMessageCtaBinding
+import com.google.android.material.button.MaterialButton
 import java.io.File
 
 class MessageCta : FrameLayout {
@@ -45,6 +52,12 @@ class MessageCta : FrameLayout {
     private val binding: ViewMessageCtaBinding by viewBinding()
     private val remoteMessageBinding = binding.remoteMessage
     private val promoMessageBinding = binding.promoRemoteMessage
+
+    private val rebrandEnabled = context.isRebrandAreaEnabled(R.attr.daxRebrandRmfCards)
+    private val rebrandActions: RmfMessageActions?
+    private val primaryActionButton = remoteMessageBinding.primaryActionButton
+    private val secondaryActionButton = remoteMessageBinding.secondaryActionButton
+    private val promoActionButton = promoMessageBinding.actionButton
 
     private var onCloseButton: () -> Unit = {
         this.gone()
@@ -75,8 +88,71 @@ class MessageCta : FrameLayout {
 
         layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT)
 
+        rebrandActions = if (rebrandEnabled) configureRebrand() else null
+
         binding.remoteMessage.remoteMessage.addBottomShadow()
         binding.promoRemoteMessage.promoMessage.addBottomShadow()
+    }
+
+    private fun configureRebrand(): RmfMessageActions {
+        val padding = resources.getDimensionPixelSize(R.dimen.keyline_5)
+        remoteMessageBinding.root.applyRmfCardStyle(remoteMessageBinding.close)
+        promoMessageBinding.root.applyRmfCardStyle(promoMessageBinding.close)
+        val actions = with(remoteMessageBinding) {
+            val container = root.getChildAt(0) as ConstraintLayout
+            container.removeView(primaryActionButton)
+            container.removeView(secondaryActionButton)
+            barrierButtons.referencedIds = intArrayOf()
+            val actions = RmfMessageActions(context, primaryActionButton, secondaryActionButton)
+            container.addView(
+                actions,
+                ConstraintLayout.LayoutParams(0, LayoutParams.WRAP_CONTENT).apply {
+                    startToStart = ConstraintLayout.LayoutParams.PARENT_ID
+                    endToEnd = ConstraintLayout.LayoutParams.PARENT_ID
+                    topToBottom = messageSubtitle.id
+                    bottomToBottom = ConstraintLayout.LayoutParams.PARENT_ID
+                    topMargin = resources.getDimensionPixelSize(R.dimen.keyline_4)
+                },
+            )
+            listOf(topIllustration, topIllustrationAnimated, topImage).forEach { image ->
+                image.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    width = resources.getDimensionPixelSize(R.dimen.rebrandMessageCtaIllustrationSize)
+                    height = width
+                    topMargin = 0
+                }
+            }
+            listOf(messageTitle, messageSubtitle).forEach { text ->
+                text.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    marginStart = padding
+                    marginEnd = padding
+                    topMargin = resources.getDimensionPixelSize(R.dimen.keyline_2)
+                }
+                text.includeFontPadding = false
+            }
+            messageTitle.setTextColor(context.getColorFromAttr(R.attr.daxColorPrimaryText))
+            messageSubtitle.setTextColor(context.getColorFromAttr(R.attr.daxColorSecondaryText))
+            actions
+        }
+        with(promoMessageBinding) {
+            messageTitle.setTextColor(context.getColorFromAttr(R.attr.daxColorPrimaryText))
+            messageSubtitle.setTextColor(context.getColorFromAttr(R.attr.daxColorSecondaryText))
+            val container = root.getChildAt(0) as ConstraintLayout
+            actionButton.apply {
+                iconGravity = MaterialButton.ICON_GRAVITY_TEXT_START
+                setSingleLine(false)
+                maxLines = Int.MAX_VALUE
+                ellipsize = null
+                updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    width = 0
+                    topMargin = resources.getDimensionPixelSize(R.dimen.keyline_4)
+                }
+            }
+            messageSubtitle.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                bottomToTop = ConstraintLayout.LayoutParams.UNSET
+            }
+            container.updatePadding(bottom = padding - actionButton.insetBottom)
+        }
+        return actions
     }
 
     fun setMessage(message: Message) {
@@ -88,9 +164,9 @@ class MessageCta : FrameLayout {
 
     fun disableStateSaving() {
         binding.remoteMessage.actionButton.isSaveEnabled = false
-        binding.remoteMessage.primaryActionButton.isSaveEnabled = false
-        binding.remoteMessage.secondaryActionButton.isSaveEnabled = false
-        binding.promoRemoteMessage.actionButton.isSaveEnabled = false
+        primaryActionButton.isSaveEnabled = false
+        secondaryActionButton.isSaveEnabled = false
+        promoActionButton.isSaveEnabled = false
     }
 
     private fun setRemoteMessage(message: Message) {
@@ -106,32 +182,64 @@ class MessageCta : FrameLayout {
         remoteMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, HtmlCompat.FROM_HTML_MODE_LEGACY)
 
         if (message.action2.isEmpty()) {
-            remoteMessageBinding.secondaryActionButton.gone()
+            secondaryActionButton.gone()
         } else {
-            remoteMessageBinding.secondaryActionButton.text = message.action2
-            remoteMessageBinding.secondaryActionButton.show()
+            secondaryActionButton.text = message.action2
+            secondaryActionButton.show()
         }
 
         if (message.action.isEmpty()) {
-            remoteMessageBinding.primaryActionButton.gone()
+            primaryActionButton.gone()
         } else {
-            remoteMessageBinding.primaryActionButton.text = message.action
+            primaryActionButton.text = message.action
+            if (rebrandEnabled) primaryActionButton.icon = null
             message.actionIcon?.let { icon ->
-                remoteMessageBinding.primaryActionButton.icon = AppCompatResources.getDrawable(context, icon)
+                primaryActionButton.icon = AppCompatResources.getDrawable(context, icon)
             }
-            remoteMessageBinding.primaryActionButton.show()
+            primaryActionButton.show()
+        }
+
+        if (rebrandEnabled) {
+            remoteMessageBinding.messageSubtitle.isVisible = remoteMessageBinding.messageSubtitle.text.isNotEmpty()
+            rebrandActions?.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                topToBottom = if (remoteMessageBinding.messageSubtitle.isVisible) {
+                    remoteMessageBinding.messageSubtitle.id
+                } else {
+                    remoteMessageBinding.messageTitle.id
+                }
+            }
+            val hasActions = message.action.isNotEmpty() || message.action2.isNotEmpty()
+            rebrandActions?.isVisible = hasActions
+            val bottomInset = if (hasActions) resources.getDimensionPixelSize(R.dimen.rebrandButtonSmallVerticalInset) else 0
+            (remoteMessageBinding.root.getChildAt(0) as ViewGroup).updatePadding(
+                bottom = resources.getDimensionPixelSize(R.dimen.keyline_5) - bottomInset,
+            )
+            updateRebrandTitleSpacing()
         }
 
         remoteMessageBinding.close.setOnClickListener {
             onCloseButton.invoke()
         }
 
-        remoteMessageBinding.primaryActionButton.setOnClickListener {
+        primaryActionButton.setOnClickListener {
             onPrimaryButtonClicked.invoke()
         }
 
-        remoteMessageBinding.secondaryActionButton.setOnClickListener {
+        secondaryActionButton.setOnClickListener {
             onSecondaryButtonClicked.invoke()
+        }
+    }
+
+    private fun updateRebrandTitleSpacing() {
+        if (!rebrandEnabled) return
+        with(remoteMessageBinding) {
+            val hasIllustration = topIllustration.isVisible || topIllustrationAnimated.isVisible || topImage.isVisible
+            val side = resources.getDimensionPixelSize(if (hasIllustration) R.dimen.keyline_5 else R.dimen.keyline_6)
+            messageTitle.updateLayoutParams<ConstraintLayout.LayoutParams> {
+                topMargin = if (hasIllustration) resources.getDimensionPixelSize(R.dimen.keyline_2) else 0
+                marginStart = side
+                marginEnd = side
+            }
         }
     }
 
@@ -202,6 +310,7 @@ class MessageCta : FrameLayout {
                         onRemoteImageLoadFailed()
                         if (drawableRes == null) {
                             imageView.gone()
+                            updateRebrandTitleSpacing()
                         }
                         return false
                     }
@@ -237,7 +346,7 @@ class MessageCta : FrameLayout {
 
         promoMessageBinding.messageTitle.text = message.title
         promoMessageBinding.messageSubtitle.text = HtmlCompat.fromHtml(message.subtitle, 0)
-        promoMessageBinding.actionButton.text = message.promoAction
+        promoActionButton.text = message.promoAction
 
         if (message.imageUrl.orEmpty().isNotEmpty()) {
             loadImageUrl(promoMessageBinding.remoteImage, message.imageUrl.orEmpty(), message.middleIllustration)
@@ -257,7 +366,7 @@ class MessageCta : FrameLayout {
             onCloseButton.invoke()
         }
 
-        promoMessageBinding.actionButton.setOnClickListener {
+        promoActionButton.setOnClickListener {
             onPromoActionButtonClicked.invoke()
         }
     }

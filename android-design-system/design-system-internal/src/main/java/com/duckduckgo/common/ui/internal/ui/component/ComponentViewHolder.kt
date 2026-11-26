@@ -381,6 +381,7 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
         private val isDarkTheme: Boolean,
     ) : ComponentViewHolder(inflate(parent, R.layout.component_remote_message)) {
         override fun bind(component: Component) {
+            val rebrandEnabled = view.context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)
             val smallMessage = Message(title = "Small Message", subtitle = "Body text goes here. This component doesn't have buttons")
             val bigSingleMessage = Message(
                 topIllustration = CommonR.drawable.announcement_96,
@@ -453,6 +454,25 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
             view.findViewById<MessageCta>(R.id.big_two_actions_update_remote_message).apply {
                 setMessage(bigTwoActionsUpdateMessage)
             }
+
+            bindRebrandTwoActions(
+                R.id.side_by_side_remote_message,
+                R.id.side_by_side_remote_message_compose,
+                bigTwoActionsMessage.copy(action = "Try DuckDuckGo Pro", action2 = "No"),
+                rebrandEnabled,
+            )
+            bindRebrandTwoActions(
+                R.id.long_primary_remote_message,
+                R.id.long_primary_remote_message_compose,
+                bigTwoActionsMessage.copy(action = "Subscribe to DuckDuckGo Pro", action2 = "No"),
+                rebrandEnabled,
+            )
+            bindRebrandTwoActions(
+                R.id.long_secondary_remote_message,
+                R.id.long_secondary_remote_message_compose,
+                bigTwoActionsMessage.copy(action = "Subscribe to DuckDuckGo Pro", action2 = "Remind me next week"),
+                rebrandEnabled,
+            )
 
             view.findViewById<MessageCta>(R.id.promo_single_remote_message).apply {
                 setMessage(promoSingleMessage)
@@ -587,6 +607,31 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
                     onDismissed = {
                         view.findViewById<ComposeView>(R.id.big_two_actions_server_image_remote_message_compose).gone()
                     },
+                    modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
+                )
+            }
+        }
+        private fun bindRebrandTwoActions(
+            viewId: Int,
+            composeId: Int,
+            message: Message,
+            rebrandEnabled: Boolean,
+        ) {
+            val messageView = view.findViewById<MessageCta>(viewId)
+            val composeView = view.findViewById<ComposeView>(composeId)
+            messageView.isVisible = rebrandEnabled
+            composeView.isVisible = rebrandEnabled
+            if (!rebrandEnabled) return
+
+            messageView.setMessage(message)
+            composeView.setupThemedComposeView(isDarkTheme = isDarkTheme) {
+                DaxBigTwoActionsMessage(
+                    topIllustration = painterResource(CommonR.drawable.duckduckgo_96),
+                    title = "Compose Big Two Actions",
+                    body = message.subtitle,
+                    primaryAction = DaxAction(text = message.action, onClick = {}),
+                    secondaryAction = DaxAction(text = message.action2, onClick = {}),
+                    onDismissed = { composeView.gone() },
                     modifier = Modifier.padding(dimensionResource(CommonR.dimen.keyline_4)),
                 )
             }

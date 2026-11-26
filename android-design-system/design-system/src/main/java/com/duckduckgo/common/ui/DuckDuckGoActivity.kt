@@ -88,6 +88,7 @@ abstract class DuckDuckGoActivity : InjectableActivity() {
                 R.style.ThemeOverlay_Rebrand_InfoPanels.takeIf { appBrandDesignUpdateToggles.infoPanels().isEnabled() },
                 R.style.ThemeOverlay_Rebrand_DialogSpacing.takeIf { appBrandDesignUpdateToggles.dialogSpacing().isEnabled() },
                 R.style.ThemeOverlay_Rebrand_BottomSheets.takeIf { appBrandDesignUpdateToggles.bottomSheets().isEnabled() },
+                R.style.ThemeOverlay_Rebrand_RmfCards.takeIf { appBrandDesignUpdateToggles.rmfCards().isEnabled() },
             ),
         )
         super.onCreate(savedInstanceState)
