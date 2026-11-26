@@ -17,11 +17,7 @@
 package com.duckduckgo.duckchat.impl.clienttools
 
 import com.duckduckgo.app.statistics.pixels.Pixel
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessChoice
-import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 /**
@@ -224,7 +220,6 @@ class ClientToolPixels @Inject constructor(
     }
 
     companion object {
-        const val PREFIX = "m_aichat_tools_"
         const val ENABLED_DAILY = "m_aichat_tools_enabled_daily"
         const val USED_DAILY = "m_aichat_tools_used_daily"
         const val CALL = "m_aichat_tools_call"
@@ -236,10 +231,4 @@ class ClientToolPixels @Inject constructor(
         const val PERMISSIONS_RESET = "m_aichat_tools_permissions_reset"
         private const val TOOL = "tool"
     }
-}
-
-/** Browser tools pixels go out without ATB, as on the other platforms. */
-@ContributesIntoSet(AppScope::class)
-class ClientToolPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
-    override fun names(): List<Pair<String, Set<PixelParameter>>> = listOf(ClientToolPixels.PREFIX to PixelParameter.removeAtb())
 }

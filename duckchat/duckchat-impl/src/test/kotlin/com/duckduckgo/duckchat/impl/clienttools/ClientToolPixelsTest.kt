@@ -21,7 +21,6 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.browsermode.api.BrowserMode
-import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.async
@@ -321,25 +320,6 @@ class ClientToolPixelsTest {
         requestAccess("listOpenTabs")
 
         assertEquals(listOf(mapOf("decision" to "unavailable")), pixel.fired.map { it.parameters })
-    }
-
-    @Test
-    fun whenAnyToolsPixelIsSentThenAtbIsRemoved() {
-        val removals = ClientToolPixelParamRemovalPlugin().names()
-
-        listOf(
-            ClientToolPixels.ENABLED_DAILY,
-            ClientToolPixels.CALL,
-            ClientToolPixels.PROMPT_ANSWERED,
-            ClientToolPixels.ACCESS_REQUESTED,
-            ClientToolPixels.ACCESS_RESULT,
-            ClientToolPixels.PROTOCOL_ERROR,
-            ClientToolPixels.PERMISSION_CHANGED,
-            ClientToolPixels.PERMISSIONS_RESET,
-            "m_aichat_tools_used_list_open_tabs_daily",
-        ).forEach { name ->
-            assertTrue(name, removals.any { (prefix, params) -> name.startsWith(prefix) && PixelParameter.ATB in params })
-        }
     }
 
     private suspend fun execute(
