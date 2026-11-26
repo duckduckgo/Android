@@ -69,6 +69,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -726,7 +727,14 @@ class NewChatHintsViewModelTest {
         testee.onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
         testee.onHintTapped(NewChatHint.DOCUMENTS, position = 2, "tab")
 
-        pixels.onPromptSubmitted("tab", isNewChat = true, hasImageAttachment = false, hasFileAttachment = true, selectedTool = "none")
+        pixels.onPromptSubmitted(
+            "tab",
+            isNewChat = true,
+            hasImageAttachment = false,
+            hasFileAttachment = true,
+            selectedTool = "none",
+            modelSource = null,
+        )
 
         verify(duckChatPixels).fireNewChatFirstPromptSent(
             hasNewChatHints = eq(true),
@@ -735,6 +743,7 @@ class NewChatHintsViewModelTest {
             hasImageAttachment = eq(false),
             hasFileAttachment = eq(true),
             selectedTool = eq("none"),
+            modelSource = isNull(),
         )
     }
 

@@ -187,6 +187,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onWebViewMode() {
         lastMode = Mode.WEBVIEW
+        widget?.setContextualEntry(false)
         if (isNativeInputEnabled) {
             setInputVisible(true)
             // WEBVIEW mode means a chat is in progress.
@@ -199,6 +200,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onInputMode() {
         lastMode = Mode.INPUT
+        widget?.setContextualEntry(true)
         if (isContextualNativeInputEnabled) {
             // The unified input widget is the composer for the initial sheet.
             setInputVisible(true)

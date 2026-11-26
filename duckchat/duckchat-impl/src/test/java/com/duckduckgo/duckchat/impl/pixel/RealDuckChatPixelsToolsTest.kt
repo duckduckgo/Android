@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.api.DuckChatEntryPoint
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.ToggleSelection
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.models.ModelSource
 import com.duckduckgo.duckchat.impl.repository.DuckChatFeatureRepository
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
@@ -179,6 +180,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = null,
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         val params = mapOf(
@@ -186,6 +188,43 @@ class RealDuckChatPixelsToolsTest {
             DuckChatPixelParameters.MODEL_ID to "gpt-5",
             DuckChatPixelParameters.REASONING_EFFORT to "fast",
             DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "true",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_TEXT to "true",
+            DuckChatPixelParameters.SURFACE to "contextual_chat",
+            DuckChatPixelParameters.PROMPT_PAGE_TYPE to "contextual",
+            DuckChatPixelParameters.ENTRY_SOURCE to "contextual_chat",
+        )
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenPromptSubmittedWithAModelSourceThenParamsIncludeItsPixelValue() = runTest {
+        testee.firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "gpt-6-luna",
+            reasoningEffort = "none",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = null,
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+            modelSource = ModelSource.USER_DEFAULT_UNAVAILABLE,
+        )
+
+        val params = mapOf(
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.MODEL_ID to "gpt-6-luna",
+            DuckChatPixelParameters.REASONING_EFFORT to "none",
+            DuckChatPixelParameters.MODEL_SOURCE to "user_default_unavailable",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
             DuckChatPixelParameters.HAS_TEXT to "true",
             DuckChatPixelParameters.SURFACE to "contextual_chat",
@@ -217,6 +256,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = null,
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         val params = mapOf(
@@ -254,6 +294,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = null,
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         val params = mapOf(
@@ -289,6 +330,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         val params = mapOf(
@@ -324,6 +366,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         val params = mapOf(
@@ -356,6 +399,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = null,
             pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         val params = mapOf(
@@ -388,6 +432,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.WEBSITE,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
 
         verify(pixel).fire(
@@ -410,6 +455,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.WEBSITE,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
 
         verify(browserInteractionsPlugin).onAiPromptSubmitted(source = "address_bar_prompt")
@@ -429,6 +475,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         verify(duckAiSessionCallback).onPromptSubmitted("tab1")
@@ -448,6 +495,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.WEBSITE,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
 
         verify(duckAiSessionCallback, never()).onPromptSubmitted(any())
@@ -467,6 +515,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         verify(duckAiSessionCallback, never()).onPromptSubmitted(any())
@@ -486,6 +535,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.SYSTEM_SEARCH,
+            modelSource = null,
         )
 
         verify(pixel).fire(
@@ -508,6 +558,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = "tab1",
             pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         verify(pixel).fire(
@@ -540,6 +591,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = null,
             pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
 
         val params = mapOf(
@@ -576,6 +628,7 @@ class RealDuckChatPixelsToolsTest {
             tabId = null,
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
 
         val params = mapOf(

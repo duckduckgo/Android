@@ -175,7 +175,10 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     private suspend fun restoreCachedSelection() {
-        if (resetsModelForNewChats()) return
+        if (resetsModelForNewChats()) {
+            selectHardcodedDefaultWhileModelsMissing()
+            return
+        }
         val cachedModel = dataStore.getSelectedModel()
         val cachedReasoningRaw = dataStore.getSelectedReasoningMode()
         if (cachedModel == null) {
@@ -254,8 +257,23 @@ class RealDuckAiModelManager @Inject constructor(
                 }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to fetch models: ${e.message}" }
+                if (resetsModelForNewChats()) stateMutex.withLock { selectHardcodedDefaultWhileModelsMissing() }
             }
         }
+    }
+
+    /**
+     * Without a model list a new chat would go out with no model and the page would choose one, so the
+     * tier default is sent unchecked until a fetch succeeds. Callers hold [stateMutex].
+     */
+    private suspend fun selectHardcodedDefaultWhileModelsMissing() {
+        if (_modelState.value.models.isNotEmpty()) return
+        val modelId = NewChatDefaults.tierDefaultModelId(resolveUserTier())
+        _modelState.value = _modelState.value.copy(
+            selectedModelId = modelId,
+            selectedReasoningMode = ReasoningMode.FAST,
+        )
+        logcat { "Duck.ai Model Manager: models not loaded, selected hardcoded default $modelId" }
     }
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {

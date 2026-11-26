@@ -26,12 +26,15 @@ internal object NewChatDefaults {
 
     /** The tier's default model, or the first accessible one when the default is missing or locked. */
     fun modelId(tier: UserTier, models: List<AIChatModel>): String? {
-        val preferred = when (tier) {
-            UserTier.FREE -> FREE_DEFAULT_MODEL_ID
-            UserTier.PLUS, UserTier.PRO -> PAID_DEFAULT_MODEL_ID
-        }
+        val preferred = tierDefaultModelId(tier)
         return models.firstOrNull { it.id == preferred && it.isAccessible }?.id
             ?: models.firstOrNull { it.isAccessible }?.id
+    }
+
+    /** The tier's default model id, unchecked against the models endpoint. */
+    fun tierDefaultModelId(tier: UserTier): String = when (tier) {
+        UserTier.FREE -> FREE_DEFAULT_MODEL_ID
+        UserTier.PLUS, UserTier.PRO -> PAID_DEFAULT_MODEL_ID
     }
 
     /** [preferred] while [available] offers it, else fast, else the first accessible mode. */

@@ -43,6 +43,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.SubscriptionFunnelSource
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.models.ModelSource
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
@@ -248,6 +249,7 @@ interface DuckChatPixels {
         tabId: String?,
         pageType: DuckChatPixelPageType,
         addressBarEntryPoint: DuckChatEntryPoint?,
+        modelSource: ModelSource?,
     )
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
@@ -334,6 +336,7 @@ interface DuckChatPixels {
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         selectedTool: String,
+        modelSource: ModelSource?,
     )
 
     /** Once per New Chat; [hints] is the row in display order, which is shuffled per tab. */
@@ -1084,6 +1087,7 @@ class RealDuckChatPixels @Inject constructor(
         tabId: String?,
         pageType: DuckChatPixelPageType,
         addressBarEntryPoint: DuckChatEntryPoint?,
+        modelSource: ModelSource?,
     ) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
@@ -1099,6 +1103,7 @@ class RealDuckChatPixels @Inject constructor(
                 put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
                 modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
                 reasoningEffort?.let { put(DuckChatPixelParameters.REASONING_EFFORT, it) }
+                modelSource?.let { put(DuckChatPixelParameters.MODEL_SOURCE, it.pixelValue) }
                 put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
                 put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
                 put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
@@ -1463,17 +1468,19 @@ class RealDuckChatPixels @Inject constructor(
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         selectedTool: String,
+        modelSource: ModelSource?,
     ) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT,
         DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY,
-        mapOf(
-            DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to hasNewChatHints.toString(),
-            DuckChatPixelParameters.HINTS_SHOWN to hintsShown.toString(),
-            DuckChatPixelParameters.HINT_TAPPED to (hintTapped?.pixelValue() ?: "none"),
-            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to hasImageAttachment.toString(),
-            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to hasFileAttachment.toString(),
-            DuckChatPixelParameters.SELECTED_TOOL to selectedTool,
-        ),
+        buildMap {
+            put(DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED, hasNewChatHints.toString())
+            put(DuckChatPixelParameters.HINTS_SHOWN, hintsShown.toString())
+            put(DuckChatPixelParameters.HINT_TAPPED, hintTapped?.pixelValue() ?: "none")
+            put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
+            put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
+            put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
+            modelSource?.let { put(DuckChatPixelParameters.MODEL_SOURCE, it.pixelValue) }
+        },
     )
 
     override fun fireNewChatHintsShown(hints: List<NewChatHint>) {
@@ -1917,6 +1924,7 @@ object DuckChatPixelParameters {
     // Unified Input pixels
     const val SELECTED_TOOL = "selected_tool"
     const val MODEL_ID = "model_id"
+    const val MODEL_SOURCE = "model_source"
     const val REASONING_EFFORT = "reasoning_effort"
     const val EFFORT_LEVEL = "effort_level"
     const val HAS_IMAGE_ATTACHMENT = "has_image_attachment"

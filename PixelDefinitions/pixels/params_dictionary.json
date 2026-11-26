@@ -97,6 +97,12 @@
         "description": "What the user was looking at when the prompt was submitted.",
         "enum": ["ntp", "serp", "website", "duck_ai", "contextual"]
     },
+    "duckAiModelSource": {
+        "key": "model_source",
+        "type": "string",
+        "description": "Where the model and effort of a new chat's first prompt came from. Sent only with resetModelForNewChats on, on the first prompt of a New Chat on the Duck.ai page or from the contextual sheet's entry input; omitted otherwise. Covers model and effort together; the effort itself is in reasoning_effort. default: the tier's default model on its default effort, from a loaded model list. picked: the user changed the model or effort before sending (picking away and back counts as the starting point). onboarding: the model the onboarding flow opened the chat on. fallback: the tier default was missing or locked so the first accessible model was sent, or the model list hadn't loaded so the hardcoded tier default was sent. user_default and user_default_unavailable aren't sent yet.",
+        "enum": ["default", "user_default", "picked", "onboarding", "fallback", "user_default_unavailable"]
+    },
     "duckAiAddressBarMenuPageType": {
         "key": "page_type",
         "type": "string",

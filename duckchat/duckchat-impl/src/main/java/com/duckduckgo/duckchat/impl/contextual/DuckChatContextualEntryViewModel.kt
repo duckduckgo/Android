@@ -20,7 +20,9 @@ import androidx.lifecycle.ViewModel
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.modelSourceFor
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -54,6 +56,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
     private val inputOutcomeTracker: InputOutcomeTracker,
     private val entryWideEvent: DuckAiEntryWideEvent,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     data class ViewState(
@@ -139,12 +142,23 @@ class DuckChatContextualEntryViewModel @Inject constructor(
         submit(prompt, voice = voice)
     }
 
-    // Falls back to the global selection exactly like the sheet does for the request, so the pixel reports what is sent.
+    // Falls back to the global selection exactly like the sheet does for the request, so the pixels report what is sent.
+    // These are only offered on the entry, so each one starts a new chat; the sheet drops the tab's pick on open, so there
+    // is never an onboarding model.
     private fun fireUnifiedInputPromptSubmitted(prompt: NativeInputPrompt) {
+        val sentModelId = prompt.modelId ?: modelManager.getSelectedModelId()
+        val sentReasoningEffort = prompt.reasoningEffort ?: modelManager.getResolvedReasoningEffort()
+        val modelSource = modelSourceFor(
+            isResetEnabled = duckChatFeature.resetModelForNewChats().isEnabled(),
+            global = modelManager.modelState.value,
+            onboardingModelId = null,
+            sentModelId = sentModelId,
+            sentReasoningEffort = sentReasoningEffort,
+        )
         duckChatPixels.firePromptSubmitted(
             selectedTool = "none",
-            modelId = prompt.modelId ?: modelManager.getSelectedModelId(),
-            reasoningEffort = prompt.reasoningEffort ?: modelManager.getResolvedReasoningEffort(),
+            modelId = sentModelId,
+            reasoningEffort = sentReasoningEffort,
             hasImageAttachment = false,
             hasFileAttachment = false,
             hasText = true,
@@ -153,6 +167,7 @@ class DuckChatContextualEntryViewModel @Inject constructor(
             tabId = tabId,
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = modelSource,
         )
     }
 

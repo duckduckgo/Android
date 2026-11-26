@@ -1404,7 +1404,8 @@
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
             "duckAiEntrySource",
-            "firstPromptNewInstall"
+            "firstPromptNewInstall",
+            "duckAiModelSource"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1439,7 +1440,8 @@
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
             "duckAiEntrySource",
-            "firstPromptNewInstall"
+            "firstPromptNewInstall",
+            "duckAiModelSource"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {
@@ -2161,7 +2163,8 @@
                 "type": "string",
                 "description": "Which tool was selected when the prompt was sent",
                 "enum": ["none", "image_generation", "web_search"]
-            }
+            },
+            "duckAiModelSource"
         ]
     },
     "aichat_new_chat_hints_shown": {
