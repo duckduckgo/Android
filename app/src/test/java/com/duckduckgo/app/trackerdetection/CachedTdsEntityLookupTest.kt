@@ -20,17 +20,25 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.TdsDomainEntity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.Callable
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
+import java.util.concurrent.locks.Lock
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.thread
+import kotlin.concurrent.withLock
 
 @RunWith(AndroidJUnit4::class)
 class CachedTdsEntityLookupTest {
@@ -38,7 +46,7 @@ class CachedTdsEntityLookupTest {
     private val mockEntityDao: TdsEntityDao = mock()
     private val mockDomainEntityDao: TdsDomainEntityDao = mock()
 
-    private val testee = CachedTdsEntityLookup(mockEntityDao, mockDomainEntityDao)
+    private val testee = CachedTdsEntityLookup(mockDatabase())
 
     @Test
     fun whenExactDomainHitThenReturnsMatchingEntity() {
@@ -175,22 +183,70 @@ class CachedTdsEntityLookupTest {
             listOf(TdsDomainEntity(domain = "tracker.com", entityName = "Acme")),
         )
 
-        val lookup = thread { testee.entityForUrl("http://tracker.com") }
+        val lookup = thread(isDaemon = true) { testee.entityForUrl("http://tracker.com") }
         lazyLoadReading.await()
-        val refresh = thread { testee.refresh() }
-        awaitBlockedOrDone(refresh)
+        val refresh = thread(isDaemon = true) { testee.refresh() }
+        awaitParkedOrDone(refresh)
         releaseLazyLoad.countDown()
-        lookup.join()
-        refresh.join()
+        lookup.join(TIMEOUT_MS)
+        refresh.join(TIMEOUT_MS)
 
+        assertFalse("threads did not finish", lookup.isAlive || refresh.isAlive)
         assertEquals("Acme", testee.entityForUrl("http://tracker.com")?.name)
     }
 
-    private fun awaitBlockedOrDone(thread: Thread) {
-        val deadline = System.currentTimeMillis() + 5_000
-        while (thread.state != Thread.State.BLOCKED && thread.state != Thread.State.TERMINATED) {
-            check(System.currentTimeMillis() < deadline) { "refresh thread neither blocked nor finished" }
+    @Test
+    fun whenRefreshRunsInsideTransactionWhileFirstLookupWaitsForDatabaseThenBothComplete() {
+        val database = mockDatabase(transactionLock = ReentrantLock())
+        val testee = CachedTdsEntityLookup(database)
+        whenever(mockEntityDao.getAll()).thenReturn(
+            listOf(TdsEntity(name = "Acme", displayName = "Acme", prevalence = 0.5)),
+        )
+        whenever(mockDomainEntityDao.getAll()).thenReturn(
+            listOf(TdsDomainEntity(domain = "tracker.com", entityName = "Acme")),
+        )
+        val downloaderInTransaction = CountDownLatch(1)
+        val continueDownload = CountDownLatch(1)
+        val lookupResult = AtomicReference<String?>()
+
+        val downloader = thread(isDaemon = true) {
+            database.runInTransaction(
+                Callable {
+                    downloaderInTransaction.countDown()
+                    continueDownload.await()
+                    testee.refresh()
+                },
+            )
+        }
+        downloaderInTransaction.await()
+        val lookup = thread(isDaemon = true) { lookupResult.set(testee.entityForUrl("http://tracker.com")?.name) }
+        awaitParkedOrDone(lookup)
+        continueDownload.countDown()
+        downloader.join(TIMEOUT_MS)
+        lookup.join(TIMEOUT_MS)
+
+        assertFalse("deadlocked", downloader.isAlive || lookup.isAlive)
+        assertEquals("Acme", lookupResult.get())
+    }
+
+    private fun mockDatabase(transactionLock: Lock? = null): TrackerDetectionDatabase = mock<TrackerDetectionDatabase>().also { db ->
+        whenever(db.tdsEntityDao()).thenReturn(mockEntityDao)
+        whenever(db.tdsDomainEntityDao()).thenReturn(mockDomainEntityDao)
+        whenever(db.runInTransaction(any<Callable<Any?>>())).thenAnswer { invocation ->
+            val body = invocation.getArgument<Callable<Any?>>(0)
+            transactionLock?.withLock { body.call() } ?: body.call()
+        }
+    }
+
+    private fun awaitParkedOrDone(thread: Thread) {
+        val deadline = System.currentTimeMillis() + TIMEOUT_MS
+        while (thread.state !in setOf(Thread.State.BLOCKED, Thread.State.WAITING, Thread.State.TERMINATED)) {
+            check(System.currentTimeMillis() < deadline) { "thread neither parked nor finished" }
             Thread.sleep(1)
         }
+    }
+
+    private companion object {
+        const val TIMEOUT_MS = 5_000L
     }
 }

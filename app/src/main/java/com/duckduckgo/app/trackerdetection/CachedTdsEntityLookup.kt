@@ -19,30 +19,34 @@ package com.duckduckgo.app.trackerdetection
 import android.net.Uri
 import androidx.annotation.WorkerThread
 import androidx.core.net.toUri
-import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
-import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.SingleIn
+import java.util.concurrent.Callable
+import java.util.concurrent.atomic.AtomicLong
+import java.util.concurrent.atomic.AtomicReference
 import javax.inject.Inject
 
 @SingleIn(AppScope::class)
 class CachedTdsEntityLookup @Inject constructor(
-    private val entityDao: TdsEntityDao,
-    private val domainEntityDao: TdsDomainEntityDao,
+    private val database: TrackerDetectionDatabase,
 ) : EntityLookupWithRefresh {
 
     private data class Snapshot(
+        val version: Long,
         val domainToEntityName: Map<String, String>,
         val entityByName: Map<String, Entity>,
     )
 
-    @Volatile
-    private var snapshot: Snapshot? = null
+    private val snapshot = AtomicReference<Snapshot?>(null)
+    private val lastVersion = AtomicLong()
 
+    // Takes no lock: TDS downloads call this while holding a database transaction, and the lazy load
+    // below holds this object's monitor while waiting for the database.
     override fun refresh() {
-        snapshot = loadSnapshot()
+        publish(loadSnapshot())
     }
 
     override fun entityForUrl(url: String): Entity? {
@@ -71,23 +75,28 @@ class CachedTdsEntityLookup @Inject constructor(
     }
 
     private fun activeSnapshot(): Snapshot {
-        snapshot?.let { return it }
+        snapshot.get()?.let { return it }
         return synchronized(this) {
-            snapshot?.let { return it }
-            loadSnapshot().also { snapshot = it }
+            snapshot.get() ?: publish(loadSnapshot())
         }
     }
 
+    private fun publish(loaded: Snapshot): Snapshot =
+        snapshot.updateAndGet { current -> if (current == null || loaded.version > current.version) loaded else current }!!
+
+    // The version is taken inside the transaction. Transactions on this database run one at a time, so a
+    // higher version always saw the same or newer tables, whichever load finishes last.
     @WorkerThread
-    private fun loadSnapshot(): Snapshot {
-        val entityByName: Map<String, Entity> = entityDao.getAll().associateBy { it.name }
-        val domainToEntityName: Map<String, String> =
-            domainEntityDao.getAll().associate { it.domain to it.entityName }
-        return Snapshot(
-            domainToEntityName = domainToEntityName,
-            entityByName = entityByName,
-        )
-    }
+    private fun loadSnapshot(): Snapshot = database.runInTransaction(
+        Callable {
+            val version = lastVersion.incrementAndGet()
+            Snapshot(
+                version = version,
+                entityByName = database.tdsEntityDao().getAll().associateBy { it.name },
+                domainToEntityName = database.tdsDomainEntityDao().getAll().associate { it.domain to it.entityName },
+            )
+        },
+    )
 }
 
 internal interface EntityLookupWithRefresh : EntityLookup, EntityLookupRefresher
