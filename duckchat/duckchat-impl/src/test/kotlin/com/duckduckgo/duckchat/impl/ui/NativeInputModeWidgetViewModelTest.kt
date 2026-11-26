@@ -2839,6 +2839,40 @@ class NativeInputModeWidgetViewModelTest {
     }
 
     @Test
+    fun whenExistingChatOpenedAfterOnboardingThenAPickOfTheOnboardingModelIsPicked() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        viewModel.setActiveChatId("existing-chat")
+        viewModel.setActiveChatId(null)
+        advanceUntilIdle()
+
+        viewModel.pickNewChatModel("other-model")
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.PICKED)
+    }
+
+    @Test
+    fun whenExistingChatOpenedAfterOnboardingThenAPickOfTheTierDefaultIsDefault() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        viewModel.setActiveChatId("existing-chat")
+        viewModel.setActiveChatId(null)
+        advanceUntilIdle()
+
+        viewModel.pickNewChatModel("gpt-6-luna")
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.DEFAULT)
+    }
+
+    @Test
     fun whenOnboardingChatWasSentThenTheNextNewChatOnThatModelIsPicked() = runTest {
         givenResetOnWithTierDefaultSelected()
         givenCountedNewChatFirstPrompt()

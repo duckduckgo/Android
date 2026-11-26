@@ -505,6 +505,23 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndRefetchFailsAfterLoadThenLoadedSelectionKept() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull()))
+            .thenReturn(AIChatModelsResponse(listOf(remoteModel("other", supportedReasoningEffort = listOf("low")))))
+            .thenThrow(RuntimeException("Network error"))
+
+        testee = createManager()
+        testee.fetchModels()
+        testee.fetchModels()
+
+        assertEquals("other", testee.getSelectedModelId())
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.selectedReasoningMode)
+        assertEquals(listOf("other"), testee.modelState.value.models.map { it.id })
+    }
+
+    @Test
     fun whenResetModelForNewChatsOffAndFetchFailsThenNoHardcodedDefault() = runTest {
         whenever(dataStore.getSelectedModel()).thenReturn(null)
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)

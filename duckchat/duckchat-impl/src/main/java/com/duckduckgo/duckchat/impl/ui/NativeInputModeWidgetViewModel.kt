@@ -197,7 +197,7 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     private var latestTabUrl: String? = null
 
     // The model subscription onboarding opened this tab's new chat on, so its first prompt is judged against it. Other picks
-    // keep it as the starting point; it stops counting once the tab's pick is dropped, as the contextual sheet does.
+    // keep it as the starting point; it is cleared on send, and by the next pick once the tab's pick has been dropped.
     private var onboardingModelId: String? = null
 
     // Defensive buffer for the (rare) case where setActiveChatId fires before configure has set
@@ -307,6 +307,8 @@ class NativeInputModeWidgetViewModel @Inject constructor(
     fun pickNewChatModel(modelId: String) {
         imageLaunchJob.cancel()
         val tabId = activeTabId.value ?: return
+        // No pick means the onboarding one was dropped (a chat entered, a handoff, the sheet), so it no longer counts.
+        if (nativeInputStateProvider.stateForTab(tabId).value.newChatModelId == null) onboardingModelId = null
         nativeInputStatePublisher.update(tabId) { it.copy(newChatModelId = modelId) }
     }
 
