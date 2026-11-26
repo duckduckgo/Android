@@ -23,6 +23,7 @@ import com.duckduckgo.translatekit.ModelSpec
 import com.duckduckgo.translatekit.TranslateKit
 import com.duckduckgo.translatekit.TranslationModel
 import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -56,17 +57,26 @@ interface Translator {
 }
 
 @Suppress("DenyListedApi", "unused")
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTranslateKitLibrary @Inject constructor(
     private val context: Context,
 ) : TranslateKitLibrary {
-    override fun init(): Boolean = try {
-        TranslateKit.init(context)
-        TranslateKit.isInitialized()
-    } catch (e: IllegalStateException) {
-        // translate-kit throws it when its native library fails to initialize
-        logcat(ERROR) { "TranslateKit failed to initialize: ${e.asLog()}" }
-        false
+    // translate-kit doesn't remember a failed native init, so it would try again, and fail again, on every call
+    @Volatile
+    private var hasInitFailed = false
+
+    override fun init(): Boolean {
+        if (hasInitFailed) return false
+
+        return try {
+            TranslateKit.init(context)
+            TranslateKit.isInitialized()
+        } catch (e: IllegalStateException) {
+            hasInitFailed = true
+            logcat(ERROR) { "TranslateKit failed to initialize: ${e.asLog()}" }
+            false
+        }
     }
 
     override fun decompressZstd(compressedFile: File, outputFile: File) = TranslateKit.decompressZstd(compressedFile.path, outputFile.path)

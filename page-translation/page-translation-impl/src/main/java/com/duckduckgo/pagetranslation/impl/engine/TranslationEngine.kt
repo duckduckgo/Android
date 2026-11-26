@@ -25,6 +25,7 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDirectories
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackScheduler
@@ -60,7 +61,7 @@ sealed interface BatchTranslation {
      */
     data class Translated(val translations: List<String?>) : BatchTranslation
 
-    /** translate-kit isn't loaded, or the pair's language pack isn't installed or failed to load. */
+    /** Page translation is off, translate-kit isn't loaded, or the pair's language pack isn't installed or failed to load. */
     data object Failed : BatchTranslation
 }
 
@@ -71,7 +72,7 @@ sealed interface BatchTranslation {
  * A caller that's canceled while its call waits drops it. A call that's already running finishes and its result is dropped.
  */
 interface TranslationEngine {
-    /** Returns null when translate-kit isn't loaded or detects no language. */
+    /** Returns null when page translation is off, translate-kit isn't loaded or it detects no language. */
     suspend fun detectLanguage(text: String, isVisible: () -> Boolean): Detection?
 
     /** Translates [units] with [pair]'s installed language pack, replacing another pair's loaded translator. */
@@ -86,6 +87,7 @@ class RealTranslationEngine @Inject constructor(
     private val library: TranslateKitLibrary,
     private val directories: LanguagePackDirectories,
     private val scheduler: LanguagePackScheduler,
+    private val feature: PageTranslationFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
     dispatchers: DispatcherProvider,
 ) : TranslationEngine, MainProcessLifecycleObserver {
@@ -114,7 +116,7 @@ class RealTranslationEngine @Inject constructor(
     override fun onStop(owner: LifecycleOwner) = unloadTranslatorSoon()
 
     override suspend fun detectLanguage(text: String, isVisible: () -> Boolean): Detection? = runCall(isVisible) {
-        if (!library.init()) return@runCall null
+        if (!isAvailable()) return@runCall null
 
         val result = library.detectLanguage(text)
         result.language?.let { Detection(it, result.isReliable) }
@@ -146,7 +148,7 @@ class RealTranslationEngine @Inject constructor(
         loadedTranslator?.takeIf { it.pair == pair && packDirectory.exists() }?.let { return it.translator }
 
         unloadTranslator()
-        if (!library.init() || !packDirectory.exists()) return null
+        if (!isAvailable() || !packDirectory.exists()) return null
 
         // an installed file is named after its manifest key, with the extension that tells translate-kit its format
         val files = packDirectory.listFiles().orEmpty().associateBy { it.nameWithoutExtension }
@@ -172,6 +174,8 @@ class RealTranslationEngine @Inject constructor(
             null
         }
     }
+
+    private fun isAvailable() = feature.translation().isEnabled() && library.init()
 
     private fun translateUnits(translator: Translator, units: List<TranslationUnit>): List<String?> {
         val translations = arrayOfNulls<String>(units.size)
