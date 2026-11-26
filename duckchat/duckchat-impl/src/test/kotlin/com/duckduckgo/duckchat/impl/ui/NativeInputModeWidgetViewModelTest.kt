@@ -1669,6 +1669,46 @@ class NativeInputModeWidgetViewModelTest {
         assertEquals("global-model", viewModel.getSelectedModelId())
     }
 
+    @Test
+    fun whenResetModelForNewChatsAndImageGenerationLaunchOnAModelWithoutItThenTabPicksAnImageModel() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val imageModel = aiModel(id = "image-model", supported = emptyList()).copy(supportedTools = listOf(Tool.IMAGE_GENERATION))
+        modelStateFlow.value = pickableModels().let { it.copy(models = it.models + imageModel) }
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.ImageGeneration())
+        advanceUntilIdle()
+
+        assertEquals("image-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        assertEquals(Tool.IMAGE_GENERATION.rawValue, nativeInputStateProvider.stateForTab("tab-A").value.selectedTool)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndImageGenerationLaunchOnAnImageModelThenNoTabPick() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val imageModel = aiModel(id = "global-model", supported = emptyList()).copy(supportedTools = listOf(Tool.IMAGE_GENERATION))
+        modelStateFlow.value = ModelState(models = listOf(imageModel), selectedModelId = "global-model")
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.ImageGeneration())
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        assertEquals(Tool.IMAGE_GENERATION.rawValue, nativeInputStateProvider.stateForTab("tab-A").value.selectedTool)
+    }
+
+    @Test
+    fun whenConfiguredWithOverrideModelThenTabPicksIt() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.Open(overrideModelId = "picked-model"))
+
+        assertEquals("picked-model", viewModel.getSelectedModelId())
+    }
+
     private fun pickableModels() = ModelState(
         models = listOf(
             aiModel(id = "global-model", supported = listOf(ReasoningEffort.NONE)),

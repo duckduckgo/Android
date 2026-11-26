@@ -82,7 +82,8 @@ interface DuckAiModelManager {
 
     /**
      * Switches to the first accessible image-capable model unless the selected one already is.
-     * Returns false when no such model exists.
+     * Returns false when no such model exists. While `resetModelForNewChats` is on, only reports whether one
+     * exists and leaves the selection alone, since the tab picks the model for its next new chat.
      */
     suspend fun ensureImageCapableModelSelected(): Boolean
 
@@ -337,7 +338,9 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun ensureImageCapableModelSelected(): Boolean = withContext(dispatcherProvider.io()) {
         val revision = stateMutex.withLock { selectionRevision }
         if (_modelState.value.models.isEmpty()) fetchModels()
-        val resetForNewChats = resetsModelForNewChats()
+        if (resetsModelForNewChats()) {
+            return@withContext _modelState.value.models.any { it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION) }
+        }
         stateMutex.withLock {
             if (selectionRevision != revision) return@withLock false
             val state = _modelState.value
@@ -346,11 +349,7 @@ class RealDuckAiModelManager @Inject constructor(
             val imageCapableModel = state.models.firstOrNull {
                 it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
             } ?: return@withLock false
-            if (resetForNewChats) {
-                publishSelection(modelId = imageCapableModel.id, model = imageCapableModel)
-            } else {
-                persistModelSelection(imageCapableModel)
-            }
+            persistModelSelection(imageCapableModel)
             true
         }
     }

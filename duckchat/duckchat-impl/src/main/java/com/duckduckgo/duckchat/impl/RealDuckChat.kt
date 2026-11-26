@@ -191,6 +191,9 @@ interface DuckChatInternal : DuckChat {
     /** Single source of truth for the URL that opens a Duck.ai voice chat. */
     fun getVoiceDuckChatUrl(): String
 
+    /** Opens Duck.ai from [entryPoint] like [openDuckChat], with the tab's next new chat starting on [overrideModelId]. */
+    fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?)
+
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
 
@@ -720,9 +723,13 @@ class RealDuckChat @Inject constructor(
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
     override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
+        openDuckChat(entryPoint, overrideModelId = null)
+    }
+
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?) {
         logcat { "Duck.ai: openDuckChat" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-        openDuckChat(emptyMap())
+        openDuckChat(emptyMap(), launch = DuckChatLaunch.Open(overrideModelId = overrideModelId))
     }
 
     override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {

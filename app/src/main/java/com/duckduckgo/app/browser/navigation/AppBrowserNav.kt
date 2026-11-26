@@ -84,6 +84,7 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
             duckChatForceImageGeneration = launch is DuckChatLaunch.ImageGeneration,
+            duckChatOverrideModelId = (launch as? DuckChatLaunch.Open)?.overrideModelId,
             duckChatVoice = launch is DuckChatLaunch.Voice,
             openDuckChatHistory = launch is DuckChatLaunch.ChatHistory,
             duckChatTextSelection = contextual?.textSelection ?: externalSelection?.text,
