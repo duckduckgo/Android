@@ -257,6 +257,80 @@ class AttachmentViewTest {
         assertFalse(menu.hasText(activity.getString(R.string.duckChatOptionsMenuWebSearch)))
     }
 
+    @Test
+    fun whenMergedMenuOnWithoutUploadSupportThenMenuOpensWithOnlyToolRows() {
+        isMergedMenu.value = true
+        attachments.value = AttachmentState(supportsUpload = false)
+        attach()
+
+        view.performClick()
+        val menu = latestMenu()
+
+        assertEquals(
+            listOf(R.string.duckChatOptionsMenuCreateImage, R.string.duckChatOptionsMenuWebSearch).map(activity::getString),
+            menu.rowTitles(),
+        )
+    }
+
+    @Test
+    fun whenMergedMenuOnThenAttachRowsComeFirstWithAddLabelsThenToolRows() {
+        isMergedMenu.value = true
+        attachments.value = AttachmentState(supportsUpload = true, supportsImageUpload = true, supportedFileTypes = listOf("application/pdf"))
+        attach()
+
+        view.performClick()
+
+        assertEquals(
+            listOf(
+                R.string.attachmentTakePhoto,
+                R.string.attachmentAddImages,
+                R.string.attachmentAddFiles,
+                R.string.duckChatOptionsMenuCreateImage,
+                R.string.duckChatOptionsMenuWebSearch,
+            ).map(activity::getString),
+            latestMenu().rowTitles(),
+        )
+    }
+
+    @Test
+    fun whenModelSupportsOnlyWebSearchThenMergedMenuOmitsCreateImage() {
+        isMergedMenu.value = true
+        visibleTools.value = setOf(Tool.WEB_SEARCH)
+        attachments.value = AttachmentState(supportsUpload = true, supportsImageUpload = true)
+        attach()
+
+        view.performClick()
+
+        assertEquals(
+            listOf(R.string.attachmentTakePhoto, R.string.attachmentAddImages, R.string.duckChatOptionsMenuWebSearch).map(activity::getString),
+            latestMenu().rowTitles(),
+        )
+    }
+
+    @Test
+    fun whenActiveToolPickedAgainFromMergedMenuThenHostIsNotToldAndMenuCloses() {
+        isMergedMenu.value = true
+        whenever(viewModel.onToolPickedFromMergedMenu(Tool.WEB_SEARCH)).thenReturn(false)
+        attachments.value = AttachmentState(supportsUpload = true, supportsImageUpload = true)
+        attach()
+
+        view.performClick()
+        val popup = shadowOf(activity.application).latestPopupWindow!!
+        latestMenu().rowWithText(activity.getString(R.string.duckChatOptionsMenuWebSearch)).performClick()
+
+        verify(host, never()).toolSelected(any())
+        assertFalse(popup.isShowing)
+    }
+
+    private fun latestMenu() = shadowOf(activity.application).latestPopupWindow?.contentView as android.view.ViewGroup
+
+    // Titles of the clickable rows, top to bottom; a row's first text is its title.
+    private fun android.view.View.rowTitles(): List<String> = when {
+        isClickable -> listOfNotNull(textViews().firstOrNull()?.text?.toString())
+        this is android.view.ViewGroup -> (0 until childCount).flatMap { getChildAt(it).rowTitles() }
+        else -> emptyList()
+    }
+
     private fun attachButton() = view.getChildAt(0) as ImageView
 
     private fun android.view.View.hasText(text: String): Boolean = runCatching { rowWithText(text) }.isSuccess
