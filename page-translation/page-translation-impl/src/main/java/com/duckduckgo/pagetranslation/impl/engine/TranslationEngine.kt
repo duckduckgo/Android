@@ -25,7 +25,6 @@ import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDirectories
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackScheduler
@@ -88,7 +87,6 @@ class RealTranslationEngine @Inject constructor(
     private val library: TranslateKitLibrary,
     private val directories: LanguagePackDirectories,
     private val scheduler: LanguagePackScheduler,
-    private val feature: PageTranslationFeature,
     @AppCoroutineScope private val appScope: CoroutineScope,
     dispatchers: DispatcherProvider,
 ) : TranslationEngine, MainProcessLifecycleObserver {
@@ -120,7 +118,7 @@ class RealTranslationEngine @Inject constructor(
     override fun onStop(owner: LifecycleOwner) = unloadTranslatorSoon()
 
     override suspend fun detectLanguage(text: String, isVisible: () -> Boolean): Detection? = runCall(isVisible) {
-        if (!isAvailable()) return@runCall null
+        if (!library.init()) return@runCall null
 
         val result = library.detectLanguage(text)
         result.language?.let { Detection(it, result.isReliable) }
@@ -152,7 +150,7 @@ class RealTranslationEngine @Inject constructor(
         loadedTranslator?.takeIf { it.pair == pair && packDirectory.exists() }?.let { return it.translator }
 
         unloadTranslator()
-        if (!isAvailable() || !packDirectory.exists()) return null
+        if (!library.init() || !packDirectory.exists()) return null
 
         val packVersion = PackVersion(pair, packDirectory.lastModified())
         if (packVersion == failedPackVersion) return null
@@ -182,8 +180,6 @@ class RealTranslationEngine @Inject constructor(
             null
         }
     }
-
-    private fun isAvailable() = feature.translation().isEnabled() && library.init()
 
     private fun translateUnits(translator: Translator, units: List<TranslationUnit>): List<String?> {
         val translations = arrayOfNulls<String>(units.size)

@@ -20,9 +20,6 @@ import android.content.ComponentCallbacks2
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDirectories
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackScheduler
@@ -61,9 +58,6 @@ class RealTranslationEngineTest {
     val temporaryFolder = TemporaryFolder()
 
     private val library = FakeTranslateKitLibrary()
-    private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java).apply {
-        translation().setRawStoredState(State(enable = true))
-    }
     private val scheduler: LanguagePackScheduler = mock()
     private val context: Context = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
@@ -80,7 +74,6 @@ class RealTranslationEngineTest {
         library,
         directories,
         scheduler,
-        feature,
         coroutineRule.testScope,
         coroutineRule.testDispatcherProvider,
     )
@@ -226,16 +219,6 @@ class RealTranslationEngineTest {
         packDirectory.setLastModified(packDirectory.lastModified() + 1000)
 
         assertEquals(BatchTranslation.Translated(listOf("hola [es-en]")), call { engine.translate(ES_EN, listOf(plain("hola")), visible) })
-    }
-
-    @Test
-    fun detectNothingAndFailToTranslateWhenPageTranslationIsOff() = runEngineTest {
-        install(ES_EN)
-        feature.translation().setRawStoredState(State(enable = false))
-
-        assertNull(call { engine.detectLanguage("hola", visible) })
-        assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("hola")), visible) })
-        assertTrue(library.loadedSpecs.isEmpty() && library.detectedTexts.isEmpty())
     }
 
     @Test
