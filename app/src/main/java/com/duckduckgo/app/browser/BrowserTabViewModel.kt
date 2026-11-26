@@ -3010,7 +3010,7 @@ class BrowserTabViewModel @Inject constructor(
         activeExperiments: List<Toggle>,
     ) {
         // A reload or a new page ends a Duck.ai chat in this tab, so its waiting tool calls must not run.
-        duckChatJSHelper.cancelPendingClientToolCalls(tabId)
+        duckChatJSHelper.cancelPendingClientToolCalls(tabId, contextual = false)
         if (!currentBrowserViewState().browserShowing) return
 
         this.activeExperiments = activeExperiments

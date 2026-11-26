@@ -1036,7 +1036,7 @@ class DuckChatContextualWebViewFragment :
     }
 
     private fun cancelPendingClientToolCalls() {
-        duckChatJSHelper.cancelPendingClientToolCalls(viewModel.viewState.value.tabId)
+        duckChatJSHelper.cancelPendingClientToolCalls(viewModel.viewState.value.tabId, contextual = true)
     }
 
     companion object {

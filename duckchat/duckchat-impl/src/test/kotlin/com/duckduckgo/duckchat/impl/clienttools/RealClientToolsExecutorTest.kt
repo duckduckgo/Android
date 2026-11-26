@@ -511,7 +511,7 @@ class RealClientToolsExecutorTest {
         runCurrent()
         val firstPrompt = prompt.current
 
-        executor.cancelPendingCalls(CHAT_TAB_ID)
+        executor.cancelPendingCalls(CHAT_TAB_ID, contextual = false)
         runCurrent()
 
         assertFailure("cancelled", prompting.await())
@@ -522,6 +522,35 @@ class RealClientToolsExecutorTest {
         prompt.current.answer(ClientToolPermissionAnswer.AllowForChat())
         assertEquals(true, otherChat.await().getBoolean("ok"))
         assertEquals(listOf(OTHER_CHAT_TAB_ID), askTool.calls.map { it.second.chatTabId })
+    }
+
+    @Test
+    fun whenPageUnderContextualSheetReloadsThenTheSheetsPromptStaysOpen() = runTest {
+        val executor = executor()
+        val sheetCall = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR, contextual = true) }
+        runCurrent()
+        val sheetPrompt = prompt.current
+
+        executor.cancelPendingCalls(CHAT_TAB_ID, contextual = false)
+        runCurrent()
+
+        assertFalse(sheetPrompt.withdrawn)
+        sheetPrompt.answer(ClientToolPermissionAnswer.AllowForChat())
+        assertEquals(true, sheetCall.await().getBoolean("ok"))
+    }
+
+    @Test
+    fun whenContextualSheetGoesAwayThenItsPromptIsWithdrawn() = runTest {
+        val executor = executor()
+        val sheetCall = async { executor.execute(request("askTool", 1), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR, contextual = true) }
+        runCurrent()
+
+        executor.cancelPendingCalls(CHAT_TAB_ID, contextual = true)
+        runCurrent()
+
+        assertFailure("cancelled", sheetCall.await())
+        assertTrue(prompt.current.withdrawn)
+        assertTrue(askTool.calls.isEmpty())
     }
 
     @Test
@@ -771,7 +800,7 @@ class RealClientToolsExecutorTest {
                 )
             }
         runCurrent()
-        executor.cancelPendingCalls(CHAT_TAB_ID)
+        executor.cancelPendingCalls(CHAT_TAB_ID, contextual = false)
         runCurrent()
 
         assertFailure("cancelled", reply.await())

@@ -46,8 +46,11 @@ interface ClientToolPermissionGate {
         context: ClientToolCallContext,
     ): ClientToolAccessDecision
 
-    /** Settles every call of [chatTabId] still waiting for a decision as cancelled. */
-    fun cancelPending(chatTabId: String)
+    /** Settles every call of the chat in [chatTabId], hosted in the contextual sheet when [contextual], still waiting for a decision as cancelled. */
+    fun cancelPending(
+        chatTabId: String,
+        contextual: Boolean,
+    )
 }
 
 enum class ClientToolPermissionDecision {
@@ -101,8 +104,14 @@ class RealClientToolPermissionGate @Inject constructor(
         data class NeedsPrompt(val tool: AskingTool) : Standing
     }
 
+    // The contextual sheet's chat shares its tab ID with the page under it, so the host tells the two chats apart.
+    private data class ChatHost(
+        val chatTabId: String,
+        val contextual: Boolean,
+    )
+
     private val promptLock = Mutex()
-    private val waitingByChat = mutableMapOf<String, MutableSet<CompletableDeferred<Unit>>>()
+    private val waitingByChat = mutableMapOf<ChatHost, MutableSet<CompletableDeferred<Unit>>>()
 
     override suspend fun decide(
         tool: ClientTool,
@@ -114,7 +123,7 @@ class RealClientToolPermissionGate @Inject constructor(
             is Standing.NeedsPrompt -> Unit
         }
         // Re-checked once the lock is ours: the prompt this call queued behind may have settled it.
-        return awaitTurn(context.chatTabId, ClientToolPermissionDecision.CANCELLED) {
+        return awaitTurn(context.chatHost(), ClientToolPermissionDecision.CANCELLED) {
             when (val now = standing(tool, context)) {
                 is Standing.Allowed -> ClientToolPermissionDecision.ALLOWED
                 Standing.Denied -> ClientToolPermissionDecision.DENIED
@@ -130,7 +139,7 @@ class RealClientToolPermissionGate @Inject constructor(
     ): ClientToolAccessDecision {
         val accessContext = context.copy(chatId = chatId)
         if (tools.none { standing(it, accessContext) is Standing.NeedsPrompt }) return accessNow(tools, accessContext)
-        return awaitTurn(context.chatTabId, ClientToolAccessDecision.Cancelled) {
+        return awaitTurn(context.chatHost(), ClientToolAccessDecision.Cancelled) {
             val toAsk = tools.mapNotNull { (standing(it, accessContext) as? Standing.NeedsPrompt)?.tool }
             if (toAsk.isEmpty()) return@awaitTurn accessNow(tools, accessContext)
             val request = ClientToolPermissionRequest.GrantAccess(
@@ -150,8 +159,11 @@ class RealClientToolPermissionGate @Inject constructor(
         }
     }
 
-    override fun cancelPending(chatTabId: String) {
-        val waiting = synchronized(waitingByChat) { waitingByChat.remove(chatTabId) }
+    override fun cancelPending(
+        chatTabId: String,
+        contextual: Boolean,
+    ) {
+        val waiting = synchronized(waitingByChat) { waitingByChat.remove(ChatHost(chatTabId, contextual)) }
         waiting?.forEach { it.complete(Unit) }
     }
 
@@ -206,11 +218,11 @@ class RealClientToolPermissionGate @Inject constructor(
      * Gives [cancelled] when the deadline passes or the chat goes away first.
      */
     private suspend fun <T> awaitTurn(
-        chatTabId: String,
+        host: ChatHost,
         cancelled: T,
         decide: suspend () -> T,
     ): T {
-        val chatGone = startWaiting(chatTabId)
+        val chatGone = startWaiting(host)
         try {
             return withTimeoutOrNull(DECISION_DEADLINE_MILLIS) {
                 coroutineScope {
@@ -225,24 +237,26 @@ class RealClientToolPermissionGate @Inject constructor(
                 }
             } ?: cancelled
         } finally {
-            stopWaiting(chatTabId, chatGone)
+            stopWaiting(host, chatGone)
         }
     }
 
-    private fun startWaiting(chatTabId: String): CompletableDeferred<Unit> {
+    private fun ClientToolCallContext.chatHost() = ChatHost(chatTabId, contextual)
+
+    private fun startWaiting(host: ChatHost): CompletableDeferred<Unit> {
         val chatGone = CompletableDeferred<Unit>()
-        synchronized(waitingByChat) { waitingByChat.getOrPut(chatTabId) { mutableSetOf() }.add(chatGone) }
+        synchronized(waitingByChat) { waitingByChat.getOrPut(host) { mutableSetOf() }.add(chatGone) }
         return chatGone
     }
 
     private fun stopWaiting(
-        chatTabId: String,
+        host: ChatHost,
         chatGone: CompletableDeferred<Unit>,
     ) {
         synchronized(waitingByChat) {
-            val waiting = waitingByChat[chatTabId] ?: return
+            val waiting = waitingByChat[host] ?: return
             waiting.remove(chatGone)
-            if (waiting.isEmpty()) waitingByChat.remove(chatTabId)
+            if (waiting.isEmpty()) waitingByChat.remove(host)
         }
     }
 

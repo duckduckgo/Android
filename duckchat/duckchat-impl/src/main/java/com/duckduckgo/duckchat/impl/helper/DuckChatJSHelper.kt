@@ -114,8 +114,14 @@ interface DuckChatJSHelper {
 
     fun clearTabContextPromptEvent()
 
-    /** Settles client tool calls of [tabId] still waiting for permission as `cancelled`; call when its chat page goes away. */
-    fun cancelPendingClientToolCalls(tabId: String)
+    /**
+     * Settles client tool calls of the chat in [tabId], hosted in the contextual sheet when [contextual], still waiting for permission as
+     * `cancelled`; call when its chat page goes away.
+     */
+    fun cancelPendingClientToolCalls(
+        tabId: String,
+        contextual: Boolean,
+    )
 
     fun consumeTabContextPromptOnHandoff(
         method: String,
@@ -487,8 +493,11 @@ class RealDuckChatJSHelper @Inject constructor(
         pendingTabContextStore.clear()
     }
 
-    override fun cancelPendingClientToolCalls(tabId: String) {
-        clientToolsExecutor.cancelPendingCalls(tabId)
+    override fun cancelPendingClientToolCalls(
+        tabId: String,
+        contextual: Boolean,
+    ) {
+        clientToolsExecutor.cancelPendingCalls(tabId, contextual)
     }
 
     override fun consumeTabContextPromptOnHandoff(

@@ -48,8 +48,14 @@ interface ClientToolsExecutor {
         contextual: Boolean = false,
     ): JSONObject
 
-    /** Settles the calls of [chatTabId] still waiting for a permission decision as `cancelled`, so their tools never run. */
-    fun cancelPendingCalls(chatTabId: String)
+    /**
+     * Settles the calls of the chat in [chatTabId], hosted in the contextual sheet when [contextual], still waiting for a permission decision
+     * as `cancelled`, so their tools never run.
+     */
+    fun cancelPendingCalls(
+        chatTabId: String,
+        contextual: Boolean,
+    )
 }
 
 @ContributesBinding(AppScope::class)
@@ -163,8 +169,11 @@ class RealClientToolsExecutor @Inject constructor(
         }
     }
 
-    override fun cancelPendingCalls(chatTabId: String) {
-        permissionGate.cancelPending(chatTabId)
+    override fun cancelPendingCalls(
+        chatTabId: String,
+        contextual: Boolean,
+    ) {
+        permissionGate.cancelPending(chatTabId, contextual)
     }
 
     private data class Caller(val pageChatId: String?)

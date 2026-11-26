@@ -529,9 +529,9 @@ class RealDuckChatJSHelperTest {
 
     @Test
     fun whenCancelPendingClientToolCallsThenTheTabsWaitingCallsAreCancelled() {
-        testee.cancelPendingClientToolCalls("tab-1")
+        testee.cancelPendingClientToolCalls("tab-1", contextual = false)
 
-        verify(allowingPermissionGate).cancelPending("tab-1")
+        verify(allowingPermissionGate).cancelPending("tab-1", false)
     }
 
     @Test

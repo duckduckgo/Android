@@ -2155,7 +2155,7 @@ class BrowserTabViewModelTest {
     fun whenPageStartedThenTabsWaitingClientToolCallsAreCancelled() {
         testee.pageStarted(WebViewNavigationState(mockStack), emptyList())
 
-        verify(mockDuckChatJSHelper).cancelPendingClientToolCalls("abc")
+        verify(mockDuckChatJSHelper).cancelPendingClientToolCalls("abc", contextual = false)
     }
 
     @Test
