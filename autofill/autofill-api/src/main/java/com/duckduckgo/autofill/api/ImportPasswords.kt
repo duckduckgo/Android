@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.duckduckgo.autofill.api
 
-import android.content.Context
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
 import kotlinx.coroutines.flow.Flow
+import java.io.Serializable
 
 /**
  * Importing passwords from another password manager.
  *
- * The flow imports through the FIDO Credential Exchange when the device supports it, and through the Google web flow
+ * The import runs through the FIDO Credential Exchange when the device supports it, and through the Google web flow
  * otherwise or when the exchange fails.
+ *
+ * Register [importContract] with `registerForActivityResult` in the hosting Activity or Fragment, then start the import
+ * with [launchImport]. Every outcome, including the import being unavailable, is delivered to the registered callback.
  */
 interface ImportPasswords {
 
@@ -31,26 +35,51 @@ interface ImportPasswords {
     suspend fun isSupported(): Boolean
 
     /**
-     * Start the password import flow.
+     * The contract to register for the import's result.
+     */
+    fun importContract(): ActivityResultContract<ImportPasswordsRequest, ImportPasswordsResult>
+
+    /**
+     * Start the import. If it is unsupported, nothing is launched and [ImportPasswordsResult.Unavailable] is delivered to
+     * the registered callback.
      *
-     * The returned flow may emit [ImportPasswordsEvent.InProgress] while the passwords are being saved, then emits this
-     * import's outcome once and completes. It is backed by app-wide state, so collecting
-     * it from a scope that survives configuration changes, such as a ViewModel's, keeps the outcome across them. Nothing is
-     * replayed: an outcome emitted while nobody collects is lost, as it is on process death. If the flow is unsupported,
-     * nothing is started and the returned flow emits [ImportPasswordsEvent.Error.Permanent].
-     *
-     * @param context Used to start the flow's screens; pass an Activity.
-     * @param launchSource Where the flow is started from.
+     * @param params How the import is started.
+     * @param launcher The launcher returned when registering [importContract].
      */
     suspend fun launchImport(
-        context: Context,
-        launchSource: AutofillImportLaunchSource,
-    ): Flow<ImportPasswordsEvent>
+        params: ImportPasswordsParams,
+        launcher: ActivityResultLauncher<ImportPasswordsRequest>,
+    )
 
-    /** A state of the import flow started by [launchImport]. */
-    sealed interface ImportPasswordsEvent {
-        /** The passwords were received and are being saved. */
-        data object InProgress : ImportPasswordsEvent
+    /**
+     * Progress of saving the passwords, which continues after [ImportPasswordsResult.Success] is delivered. Replays its most
+     * recent value, so a collector that starts after the result still sees the save finish.
+     */
+    fun importStatus(): Flow<ImportPasswordsStatus>
+
+    /**
+     * How the import is started.
+     *
+     * @param launchSource Where the import is started from.
+     */
+    data class ImportPasswordsParams(
+        val launchSource: AutofillImportLaunchSource,
+    ) : Serializable
+
+    /**
+     * Input of [importContract]. Only [launchImport] creates it.
+     */
+    interface ImportPasswordsRequest {
+        /**
+         * How the import is started, as passed to [launchImport].
+         */
+        val params: ImportPasswordsParams
+    }
+
+    /** Progress of saving the passwords, reported by [importStatus]. */
+    sealed interface ImportPasswordsStatus {
+        /** The passwords are being saved. */
+        data object InProgress : ImportPasswordsStatus
 
         /** The passwords were saved. */
         data class Finished(
@@ -58,17 +87,26 @@ interface ImportPasswords {
             val imported: Int,
             /** How many passwords were not saved, for example because they were already saved. */
             val skipped: Int,
-        ) : ImportPasswordsEvent
+        ) : ImportPasswordsStatus
+    }
 
-        /** The user left the flow before any passwords were received. */
-        data object UserCancelled : ImportPasswordsEvent
+    /** The outcome of an import, delivered to the callback registered for [importContract]. */
+    sealed interface ImportPasswordsResult {
+        /** The passwords were received and are being saved; [importStatus] reports when saving finishes. */
+        data object Success : ImportPasswordsResult
 
-        sealed interface Error : ImportPasswordsEvent {
+        /** The user left the import before any passwords were received. */
+        data object UserCancelled : ImportPasswordsResult
+
+        sealed interface Error : ImportPasswordsResult {
             /** Trying again may succeed. */
             data object Transient : Error
 
             /** Trying again will fail the same way. */
             data object Permanent : Error
         }
+
+        /** This device can't import passwords, so nothing was launched. */
+        data object Unavailable : ImportPasswordsResult
     }
 }

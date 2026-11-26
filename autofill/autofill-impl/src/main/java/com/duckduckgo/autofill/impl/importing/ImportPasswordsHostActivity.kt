@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.importing.gpm
+package com.duckduckgo.autofill.impl.importing
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.core.content.IntentCompat
@@ -25,7 +26,7 @@ import androidx.lifecycle.lifecycleScope
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
-import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleViewModel.Command
+import com.duckduckgo.autofill.impl.importing.ImportPasswordsHostViewModel.Command
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
@@ -39,11 +40,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class ImportPasswordsFromGoogleScreen(val source: AutofillImportLaunchSource) : GlobalActivityStarter.ActivityParams
+data class ImportPasswordsHostScreen(val source: AutofillImportLaunchSource) : GlobalActivityStarter.ActivityParams
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(ImportPasswordsFromGoogleScreen::class)
-class ImportPasswordsFromGoogleActivity : DuckDuckGoActivity() {
+@ContributeToActivityStarter(ImportPasswordsHostScreen::class)
+class ImportPasswordsHostActivity : DuckDuckGoActivity() {
 
     @Inject
     lateinit var credentialExchangeLauncher: CredentialExchangeLauncher
@@ -51,10 +52,10 @@ class ImportPasswordsFromGoogleActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var globalActivityStarter: GlobalActivityStarter
 
-    private val viewModel: ImportPasswordsFromGoogleViewModel by bindViewModel()
+    private val viewModel: ImportPasswordsHostViewModel by bindViewModel()
 
     private val launchSource: AutofillImportLaunchSource
-        get() = intent.getActivityParams(ImportPasswordsFromGoogleScreen::class.java)?.source ?: Unknown
+        get() = intent.getActivityParams(ImportPasswordsHostScreen::class.java)?.source ?: Unknown
 
     private val webFlow = registerForActivityResult(StartActivityForResult()) { result ->
         val details = result.data?.let {
@@ -78,8 +79,13 @@ class ImportPasswordsFromGoogleActivity : DuckDuckGoActivity() {
         when (command) {
             Command.StartCredentialExchange -> startCredentialExchange()
             Command.StartWebFlow -> globalActivityStarter.startForResult(this, AutofillImportPasswordsScreen(launchSource), webFlow)
-            Command.Finish -> finish()
+            is Command.Finish -> finishWithResult(command.result)
         }
+    }
+
+    private fun finishWithResult(result: ImportPasswordsHostResult) {
+        setResult(RESULT_OK, Intent().putExtra(ImportPasswordsHostResult.RESULT_KEY, result))
+        finish()
     }
 
     private fun startCredentialExchange() {

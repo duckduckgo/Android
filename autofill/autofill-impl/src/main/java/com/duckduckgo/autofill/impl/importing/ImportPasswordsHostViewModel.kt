@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.importing.gpm
+package com.duckduckgo.autofill.impl.importing
 
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
-import com.duckduckgo.autofill.impl.importing.PasswordImportEvents
-import com.duckduckgo.autofill.impl.importing.PasswordImportExperimentMetrics
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportHandler
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportOutcome
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
@@ -40,11 +37,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ContributesViewModel(ActivityScope::class)
-class ImportPasswordsFromGoogleViewModel @Inject constructor(
+class ImportPasswordsHostViewModel @Inject constructor(
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter,
     private val credentialExchangeImportHandler: CredentialExchangeImportHandler,
     private val credentialImportWideEvent: CredentialImportWideEvent,
-    private val passwordImportEvents: PasswordImportEvents,
     private val passwordImportExperimentMetrics: PasswordImportExperimentMetrics,
 ) : ViewModel() {
 
@@ -62,7 +58,7 @@ class ImportPasswordsFromGoogleViewModel @Inject constructor(
     sealed interface Command {
         data object StartCredentialExchange : Command
         data object StartWebFlow : Command
-        data object Finish : Command
+        data class Finish(val result: ImportPasswordsHostResult) : Command
     }
 
     private var stage: Stage = Stage.NotStarted
@@ -78,10 +74,10 @@ class ImportPasswordsFromGoogleViewModel @Inject constructor(
      */
     fun onCreated(source: AutofillImportLaunchSource, isRestored: Boolean) {
         when {
-            stage == Stage.CredentialExchange -> finish(ImportPasswordsEvent.UserCancelled)
+            stage == Stage.CredentialExchange -> finish(ImportPasswordsHostResult.UserCancelled)
             stage != Stage.NotStarted -> Unit
             // A fresh ViewModel in a restored Activity means the process died, taking the running import with it.
-            isRestored -> finish(ImportPasswordsEvent.UserCancelled)
+            isRestored -> finish(ImportPasswordsHostResult.UserCancelled)
             else -> start(source)
         }
     }
@@ -90,15 +86,15 @@ class ImportPasswordsFromGoogleViewModel @Inject constructor(
         stage = Stage.Running
         viewModelScope.launch {
             when (credentialExchangeImportHandler.handle(result, source)) {
-                CredentialExchangeImportOutcome.Imported -> close()
+                CredentialExchangeImportOutcome.Imported -> finish(ImportPasswordsHostResult.Success)
                 CredentialExchangeImportOutcome.UserCancelled -> {
                     passwordImportExperimentMetrics.fireImportCancelledMetric()
-                    finish(ImportPasswordsEvent.UserCancelled)
+                    finish(ImportPasswordsHostResult.UserCancelled)
                 }
                 CredentialExchangeImportOutcome.FallBackToWebFlow -> startWebFlow()
                 CredentialExchangeImportOutcome.Failed -> {
                     passwordImportExperimentMetrics.fireImportFailedMetric()
-                    finish(ImportPasswordsEvent.Error.Permanent)
+                    finish(ImportPasswordsHostResult.PermanentError)
                 }
             }
         }
@@ -106,26 +102,26 @@ class ImportPasswordsFromGoogleViewModel @Inject constructor(
 
     fun onWebFlowFinished(resultCode: Int, result: ImportGooglePasswordResult?) {
         if (resultCode != Activity.RESULT_OK) {
-            finish(ImportPasswordsEvent.UserCancelled)
+            finish(ImportPasswordsHostResult.UserCancelled)
             return
         }
         when (result) {
             is ImportGooglePasswordResult.Success -> {
                 credentialImportWideEvent.onWebFlowSucceeded()
-                close()
+                finish(ImportPasswordsHostResult.Success)
             }
             is ImportGooglePasswordResult.UserCancelled -> {
                 credentialImportWideEvent.onWebFlowCancelled()
-                finish(ImportPasswordsEvent.UserCancelled)
+                finish(ImportPasswordsHostResult.UserCancelled)
             }
             is ImportGooglePasswordResult.Error -> {
                 credentialImportWideEvent.onWebFlowFailed(result.reason)
                 when (result.reason) {
-                    is ErrorParsingCsv -> finish(ImportPasswordsEvent.Error.Permanent)
-                    is WebViewCrash -> finish(ImportPasswordsEvent.Error.Transient)
+                    is ErrorParsingCsv -> finish(ImportPasswordsHostResult.PermanentError)
+                    is WebViewCrash -> finish(ImportPasswordsHostResult.TransientError)
                 }
             }
-            null -> finish(ImportPasswordsEvent.Error.Transient)
+            null -> finish(ImportPasswordsHostResult.TransientError)
         }
     }
 
@@ -150,16 +146,8 @@ class ImportPasswordsFromGoogleViewModel @Inject constructor(
         commands.send(Command.StartWebFlow)
     }
 
-    private fun finish(outcome: ImportPasswordsEvent) {
+    private fun finish(result: ImportPasswordsHostResult) {
         stage = Stage.Finished
-        viewModelScope.launch {
-            passwordImportEvents.emit(outcome)
-            commands.send(Command.Finish)
-        }
-    }
-
-    private fun close() {
-        stage = Stage.Finished
-        viewModelScope.launch { commands.send(Command.Finish) }
+        viewModelScope.launch { commands.send(Command.Finish(result)) }
     }
 }

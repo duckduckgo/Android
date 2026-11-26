@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.autofill.impl.importing.gpm
+package com.duckduckgo.autofill.impl.importing
 
 import android.app.Activity
 import app.cash.turbine.test
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
-import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsEvent
-import com.duckduckgo.autofill.impl.importing.PasswordImportEvents
-import com.duckduckgo.autofill.impl.importing.PasswordImportExperimentMetrics
+import com.duckduckgo.autofill.impl.importing.ImportPasswordsHostViewModel.Command
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportHandler
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangeImportOutcome
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
-import com.duckduckgo.autofill.impl.importing.gpm.ImportPasswordsFromGoogleViewModel.Command
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordResult
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.ErrorParsingCsv
 import com.duckduckgo.autofill.impl.importing.gpm.webflow.ImportGooglePasswordsWebFlowViewModel.UserCannotImportReason.WebViewCrash
@@ -33,11 +30,7 @@ import com.duckduckgo.autofill.impl.importing.wideevents.CredentialImportWideEve
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -51,7 +44,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
-class ImportPasswordsFromGoogleViewModelTest {
+class ImportPasswordsHostViewModelTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule(StandardTestDispatcher())
@@ -59,14 +52,12 @@ class ImportPasswordsFromGoogleViewModelTest {
     private val credentialExchangePasswordImporter: CredentialExchangePasswordImporter = mock()
     private val credentialExchangeImportHandler: CredentialExchangeImportHandler = mock()
     private val credentialImportWideEvent: CredentialImportWideEvent = mock()
-    private val passwordImportEvents = PasswordImportEvents()
     private val passwordImportExperimentMetrics: PasswordImportExperimentMetrics = mock()
 
-    private val testee = ImportPasswordsFromGoogleViewModel(
+    private val testee = ImportPasswordsHostViewModel(
         credentialExchangePasswordImporter = credentialExchangePasswordImporter,
         credentialExchangeImportHandler = credentialExchangeImportHandler,
         credentialImportWideEvent = credentialImportWideEvent,
-        passwordImportEvents = passwordImportEvents,
         passwordImportExperimentMetrics = passwordImportExperimentMetrics,
     )
 
@@ -114,8 +105,6 @@ class ImportPasswordsFromGoogleViewModelTest {
 
     @Test
     fun whenActivityRecreatedWhileCredentialExchangeRunsThenImportFinishesAsCancelled() = runTest {
-        val importEvents = collectImportEvents()
-
         whenever(credentialExchangePasswordImporter.isSupported()).thenReturn(true)
 
         testee.commands().test {
@@ -124,68 +113,55 @@ class ImportPasswordsFromGoogleViewModelTest {
 
             testee.onCreated(SOURCE, isRestored = true)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.UserCancelled), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.UserCancelled), importEvents)
         verify(credentialImportWideEvent, times(1)).onImportStarted(any(), any())
     }
 
     @Test
     fun whenRestoredAfterProcessDeathThenImportFinishesAsCancelledWithoutStartingAgain() = runTest {
-        val importEvents = collectImportEvents()
-
         testee.commands().test {
             testee.onCreated(SOURCE, isRestored = true)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.UserCancelled), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.UserCancelled), importEvents)
         verify(credentialImportWideEvent, never()).onImportStarted(any(), any())
     }
 
     @Test
     fun whenCredentialExchangeImportedThenImportFinishesWithSuccess() = runTest {
-        val importEvents = collectImportEvents()
-
         givenExchangeHandledAs(CredentialExchangeImportOutcome.Imported)
 
         testee.commands().test {
             testee.onCredentialExchangeResult(EXCHANGE_SUCCESS, SOURCE)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.Success), awaitItem())
         }
-        assertEquals(emptyList<ImportPasswordsEvent>(), importEvents)
         verify(credentialExchangeImportHandler).handle(EXCHANGE_SUCCESS, SOURCE)
         verifyNoInteractions(passwordImportExperimentMetrics)
     }
 
     @Test
     fun whenCredentialExchangeCancelledThenImportFinishesAsCancelled() = runTest {
-        val importEvents = collectImportEvents()
-
         givenExchangeHandledAs(CredentialExchangeImportOutcome.UserCancelled)
 
         testee.commands().test {
             testee.onCredentialExchangeResult(CredentialExchangeResult.Cancelled, SOURCE)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.UserCancelled), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.UserCancelled), importEvents)
         verify(passwordImportExperimentMetrics).fireImportCancelledMetric()
     }
 
     @Test
     fun whenCredentialExchangeFailsWithoutFallbackThenImportFinishesWithPermanentError() = runTest {
-        val importEvents = collectImportEvents()
-
         givenExchangeHandledAs(CredentialExchangeImportOutcome.Failed)
 
         testee.commands().test {
             testee.onCredentialExchangeResult(EXCHANGE_FAILURE, SOURCE)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.PermanentError), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.Error.Permanent), importEvents)
         verify(passwordImportExperimentMetrics).fireImportFailedMetric()
     }
 
@@ -209,86 +185,62 @@ class ImportPasswordsFromGoogleViewModelTest {
 
     @Test
     fun whenWebFlowResultNotOkThenImportFinishesAsCancelledAndNothingRecorded() = runTest {
-        val importEvents = collectImportEvents()
-
         testee.commands().test {
             testee.onWebFlowFinished(Activity.RESULT_CANCELED, null)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.UserCancelled), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.UserCancelled), importEvents)
         verifyNoInteractions(credentialImportWideEvent)
     }
 
     @Test
     fun whenWebFlowSucceededThenImportFinishesWithSuccessAndIsRecorded() = runTest {
-        val importEvents = collectImportEvents()
-
         testee.commands().test {
             testee.onWebFlowFinished(Activity.RESULT_OK, ImportGooglePasswordResult.Success)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.Success), awaitItem())
         }
-        assertEquals(emptyList<ImportPasswordsEvent>(), importEvents)
         verify(credentialImportWideEvent).onWebFlowSucceeded()
     }
 
     @Test
     fun whenWebFlowCancelledThenImportFinishesAsCancelledAndIsRecorded() = runTest {
-        val importEvents = collectImportEvents()
-
         testee.commands().test {
             testee.onWebFlowFinished(Activity.RESULT_OK, ImportGooglePasswordResult.UserCancelled(stage = "stage"))
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.UserCancelled), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.UserCancelled), importEvents)
         verify(credentialImportWideEvent).onWebFlowCancelled()
     }
 
     @Test
     fun whenWebViewCrashedThenImportFinishesWithTransientErrorAndIsRecorded() = runTest {
-        val importEvents = collectImportEvents()
-
         testee.commands().test {
             testee.onWebFlowFinished(Activity.RESULT_OK, ImportGooglePasswordResult.Error(WebViewCrash))
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.TransientError), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.Error.Transient), importEvents)
         verify(credentialImportWideEvent).onWebFlowFailed(WebViewCrash)
     }
 
     @Test
     fun whenCsvCouldNotBeParsedThenImportFinishesWithPermanentErrorAndIsRecorded() = runTest {
-        val importEvents = collectImportEvents()
-
         testee.commands().test {
             testee.onWebFlowFinished(Activity.RESULT_OK, ImportGooglePasswordResult.Error(ErrorParsingCsv))
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.PermanentError), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.Error.Permanent), importEvents)
         verify(credentialImportWideEvent).onWebFlowFailed(ErrorParsingCsv)
     }
 
     @Test
     fun whenWebFlowReturnedNoDetailsThenImportFinishesWithTransientErrorAndNothingRecorded() = runTest {
-        val importEvents = collectImportEvents()
-
         testee.commands().test {
             testee.onWebFlowFinished(Activity.RESULT_OK, null)
 
-            assertEquals(Command.Finish, awaitItem())
+            assertEquals(Command.Finish(ImportPasswordsHostResult.TransientError), awaitItem())
         }
-        assertEquals(listOf(ImportPasswordsEvent.Error.Transient), importEvents)
         verifyNoInteractions(credentialImportWideEvent)
-    }
-
-    private fun TestScope.collectImportEvents(): List<ImportPasswordsEvent> {
-        val events = mutableListOf<ImportPasswordsEvent>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { passwordImportEvents.events.toList(events) }
-        return events
     }
 
     private suspend fun givenExchangeHandledAs(outcome: CredentialExchangeImportOutcome) {
