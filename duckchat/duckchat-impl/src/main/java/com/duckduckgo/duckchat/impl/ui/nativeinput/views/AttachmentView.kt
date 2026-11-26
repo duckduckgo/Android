@@ -55,6 +55,7 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
+import com.duckduckgo.duckchat.impl.pixel.AttachmentEntryPoint
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.Job
@@ -344,7 +345,7 @@ class AttachmentView(
         when (request) {
             is NewChatHintCommand.OpenDocuments -> {
                 host?.showAttachmentChooser(true)
-                host?.requestFilePicker(buildFilePickerCallback(), request.mimeTypes)
+                host?.requestFilePicker(buildFilePickerCallback(AttachmentEntryPoint.NEW_CHAT_HINT), request.mimeTypes)
             }
             is NewChatHintCommand.OpenPhoto -> {
                 host?.showAttachmentChooser(true)
@@ -412,7 +413,7 @@ class AttachmentView(
             ) {
                 popup.dismiss()
                 host?.showAttachmentChooser(true)
-                host?.requestFilePicker(buildFilePickerCallback(), supportedFileTypes)
+                host?.requestFilePicker(buildFilePickerCallback(AttachmentEntryPoint.ATTACHMENT_MENU), supportedFileTypes)
             }
         }
 
@@ -463,9 +464,9 @@ class AttachmentView(
         restoreInputFocus()
     }
 
-    private fun buildFilePickerCallback(): ValueCallback<Array<Uri>> = ValueCallback { uris ->
+    private fun buildFilePickerCallback(entryPoint: AttachmentEntryPoint): ValueCallback<Array<Uri>> = ValueCallback { uris ->
         val list = uris?.toList()
-        if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list)
+        if (!list.isNullOrEmpty()) viewModel?.onFilesPicked(list, entryPoint)
         restoreInputFocus()
     }
 

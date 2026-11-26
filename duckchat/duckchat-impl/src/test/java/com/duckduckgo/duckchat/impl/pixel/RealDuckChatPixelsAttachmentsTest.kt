@@ -107,9 +107,9 @@ class RealDuckChatPixelsAttachmentsTest {
 
     @Test
     fun whenFileAttachedThenCountAndDaily() = runTest {
-        testee.fireFileAttached(DuckChatPixelSurface.DUCK_AI)
+        testee.fireFileAttached(DuckChatPixelSurface.DUCK_AI, AttachmentEntryPoint.NEW_CHAT_HINT)
 
-        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        val params = mapOf("surface" to "duck_ai", "entry_point" to "new_chat_hint")
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
@@ -133,11 +133,16 @@ class RealDuckChatPixelsAttachmentsTest {
 
     @Test
     fun whenFileValidationFailedThenReasonParam() = runTest {
-        testee.fireFileValidationFailed(reason = "size_exceeded", surface = DuckChatPixelSurface.DUCK_AI)
+        testee.fireFileValidationFailed(
+            reason = "size_exceeded",
+            surface = DuckChatPixelSurface.DUCK_AI,
+            entryPoint = AttachmentEntryPoint.SHARE,
+        )
 
         val params = mapOf(
-            DuckChatPixelParameters.FILE_VALIDATION_REASON to "size_exceeded",
-            DuckChatPixelParameters.SURFACE to "duck_ai",
+            "reason" to "size_exceeded",
+            "surface" to "duck_ai",
+            "entry_point" to "share",
         )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
