@@ -41,6 +41,7 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason.DOWNLOAD_ERROR
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.FAILURE_REASON_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.PAIR_KEY
@@ -163,7 +164,7 @@ class LanguagePackSchedulerTest {
 
         runningWorkResult.complete(ListenableWorker.Result.success(workDataOf(FAILURE_REASON_KEY to DOWNLOAD_ERROR.name)))
 
-        val work = workManager.getWorkInfosForUniqueWorkFlow("$WORK_NAME_PREFIX$PAIR").first { infos -> infos.all { it.state.isFinished } }
+        val work = workManager.getWorkInfosForUniqueWorkFlow("$WORK_NAME_PREFIX${PAIR.key}").first { infos -> infos.all { it.state.isFinished } }
         assertEquals(listOf(SUCCEEDED, SUCCEEDED), work.map { it.state })
         assertEquals(LanguagePackDownloadState.Failed(DOWNLOAD_ERROR), scheduler.getDownloadStateFlow(PAIR).first())
     }
@@ -316,16 +317,19 @@ class LanguagePackSchedulerTest {
         assertEquals(listOf(PAIR to REMOVE_IF_CORRUPTED), getQueuedOperations())
     }
 
-    private fun getActiveWork(pair: String): List<WorkInfo> = getAllWork(pair).filterNot { it.state.isFinished }
+    private fun getActiveWork(pair: LanguagePair): List<WorkInfo> = getAllWork(pair).filterNot { it.state.isFinished }
 
-    private fun getAllWork(pair: String): List<WorkInfo> = workManager.getWorkInfosForUniqueWork("$WORK_NAME_PREFIX$pair").get()
+    private fun getAllWork(pair: LanguagePair): List<WorkInfo> = workManager.getWorkInfosForUniqueWork("$WORK_NAME_PREFIX${pair.key}").get()
 
     private fun WorkInfo.isDownload() = LanguagePackDownloadWorker::class.java.name in tags
 
-    private fun getQueuedOperations(): List<Pair<String?, LanguagePackFileOperation>> =
+    private fun getQueuedOperations(): List<Pair<LanguagePair?, LanguagePackFileOperation>> =
         getEnqueuedRequests()
             .filter { it.workSpec.workerClassName == LanguagePackFileWorker::class.java.name }
-            .map { it.workSpec.input.getString(PAIR_KEY) to LanguagePackFileOperation.valueOf(it.workSpec.input.getString(OPERATION_KEY)!!) }
+            .map { request ->
+                val input = request.workSpec.input
+                LanguagePair.fromKey(input.getString(PAIR_KEY)!!) to LanguagePackFileOperation.valueOf(input.getString(OPERATION_KEY)!!)
+            }
 
     private fun getEnqueuedRequests(): List<OneTimeWorkRequest> {
         val requests = argumentCaptor<OneTimeWorkRequest>()
@@ -352,10 +356,10 @@ class LanguagePackSchedulerTest {
     }
 
     private companion object {
-        const val PAIR = "fr-en"
-        const val OTHER_PAIR = "de-en"
-        const val STAGED_PAIR = "es-en"
-        const val DELETED_PAIR = "it-en"
+        val PAIR = LanguagePair("fr", "en")
+        val OTHER_PAIR = LanguagePair("de", "en")
+        val STAGED_PAIR = LanguagePair("es", "en")
+        val DELETED_PAIR = LanguagePair("it", "en")
         const val WORK_NAME_PREFIX = "pageTranslationLanguagePack-"
     }
 }

@@ -145,7 +145,7 @@ class RealTranslationEngine @Inject constructor(
     }
 
     private fun getTranslator(pair: LanguagePair): Translator? {
-        val packDirectory = directories.getPackDirectory(pair.key)
+        val packDirectory = directories.getPackDirectory(pair)
 
         // a loaded translator must stop translating once page translation is turned off or its pack is deleted
         val canTranslate = library.init() && packDirectory.exists()
@@ -162,7 +162,7 @@ class RealTranslationEngine @Inject constructor(
         } catch (e: IllegalArgumentException) {
             logcat(ERROR) { "Page translation language pack failed to load: ${e.asLog()}" }
             failedPackVersion = packVersion
-            scheduler.removeIfCorrupted(pair.key)
+            scheduler.removeIfCorrupted(pair)
             null
         }
     }

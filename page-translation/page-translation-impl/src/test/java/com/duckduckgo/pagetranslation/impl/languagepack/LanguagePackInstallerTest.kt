@@ -17,6 +17,7 @@
 package com.duckduckgo.pagetranslation.impl.languagepack
 
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.RealLanguagePackInstaller.Companion.MANIFEST_ENTRY_FILE_NAME
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.ModelFile
@@ -51,8 +52,8 @@ class LanguagePackInstallerTest {
     private val translateKit: TranslateKitLibrary = mock()
     private val store: ModelsManifestStore = mock()
     private val installer = RealLanguagePackInstaller(translateKit, store, coroutineRule.testDispatcherProvider)
-    private val stagingDirectory get() = temporaryFolder.root.resolve("$PAIR.tmp")
-    private val packDirectory get() = temporaryFolder.root.resolve(PAIR)
+    private val stagingDirectory get() = temporaryFolder.root.resolve("${PAIR.key}.tmp")
+    private val packDirectory get() = temporaryFolder.root.resolve(PAIR.key)
 
     @Before
     fun setUp() = runTest {
@@ -171,12 +172,12 @@ class LanguagePackInstallerTest {
     }
 
     private fun manifestOf(vararg models: TranslationModel) =
-        ModelsManifest(schemaVersion = 1, baseUrl = "https://models.test/", models = models.associateBy { PAIR })
+        ModelsManifest(schemaVersion = 1, baseUrl = "https://models.test/", models = models.associateBy { PAIR.key })
 
     private fun withModelFile(change: (ModelFile) -> ModelFile) = MODEL.copy(files = MODEL.files + ("model" to change(MODEL_FILE)))
 
     private companion object {
-        const val PAIR = "fr-en"
+        val PAIR = LanguagePair("fr", "en")
 
         val COMPRESSED = mapOf("model" to "model-compressed", "vocab" to "vocab-compressed")
         val DECOMPRESSED = mapOf("model" to "model-decompressed", "vocab" to "vocab-decompressed")

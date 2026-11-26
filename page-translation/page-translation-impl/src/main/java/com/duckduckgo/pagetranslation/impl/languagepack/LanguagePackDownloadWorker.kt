@@ -29,6 +29,7 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.R
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult.FAILURE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult.NOT_ENOUGH_STORAGE
@@ -71,7 +72,7 @@ internal class LanguagePackDownloadWorker(
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        val pair = inputData.getString(PAIR_KEY) ?: return@withContext failure(Reason.DOWNLOAD_ERROR)
+        val pair = inputData.getString(PAIR_KEY)?.let(LanguagePair::fromKey) ?: return@withContext failure(Reason.DOWNLOAD_ERROR)
         // a deleted pack can only be restored until the pair's next operation starts
         directories.getOldDirectory(pair).deleteRecursively()
         directories.getStagingDirectory(pair).deleteRecursively()
@@ -87,11 +88,11 @@ internal class LanguagePackDownloadWorker(
         }
     }
 
-    private suspend fun download(pair: String): Result {
+    private suspend fun download(pair: LanguagePair): Result {
         if (!feature.translation().isEnabled()) return failure(Reason.DOWNLOAD_ERROR)
 
         val manifest = store.readManifest()
-        val model = manifest?.models?.get(pair) ?: return failure(Reason.DOWNLOAD_ERROR)
+        val model = manifest?.getModel(pair) ?: return failure(Reason.DOWNLOAD_ERROR)
 
         // WorkManager keeps the progress of a stopped attempt, but the fetcher starts over
         setProgress(workDataOf(DOWNLOADED_BYTES_KEY to 0L, TOTAL_BYTES_KEY to model.totalBytes))

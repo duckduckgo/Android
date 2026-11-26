@@ -24,6 +24,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackScheduler
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -70,7 +71,7 @@ class ModelsManifestWorkerTest {
 
         assertEquals(Result.success(), createWorker().doWork())
 
-        verify(languagePackScheduler).removeUnlisted(setOf("fr-en"))
+        verify(languagePackScheduler).removeUnlisted(setOf(LanguagePair("fr", "en")))
     }
 
     @Test
