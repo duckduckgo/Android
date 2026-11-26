@@ -16,11 +16,8 @@
 
 package com.duckduckgo.pagetranslation.impl.banner
 
-import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
-import com.duckduckgo.pagetranslation.impl.offer.ActiveOffer
 import com.duckduckgo.pagetranslation.impl.offer.TranslationOfferSource
-import com.duckduckgo.pagetranslation.impl.translate.LanguagePackDownloadPrompt
-import com.duckduckgo.pagetranslation.impl.translate.TranslateAction
+import com.duckduckgo.pagetranslation.impl.translate.TranslateRequest
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,9 +35,7 @@ import kotlin.time.Duration.Companion.milliseconds
  */
 class BannerController(
     private val offerSource: TranslationOfferSource,
-    private val languagePacks: LanguagePacks,
-    private val translateAction: TranslateAction,
-    private val downloadPrompt: LanguagePackDownloadPrompt,
+    private val translateRequest: TranslateRequest,
     private val timeoutMillis: Long = DEFAULT_TIMEOUT_MILLIS,
 ) {
     private val _state = MutableStateFlow<BannerState>(BannerState.Hidden(HiddenReason.NoOffer()))
@@ -82,19 +77,11 @@ class BannerController(
     fun onTranslate() {
         val offer = (state.value as? BannerState.Showing)?.offer ?: return
         reduce(BannerEvent.Dismiss(Dismissal.Translate))
-        route(offer)
+        translateRequest.translate(offer.pair)
     }
 
     fun onDismiss(by: Dismissal) {
         reduce(BannerEvent.Dismiss(by))
-    }
-
-    private fun route(offer: ActiveOffer) {
-        if (languagePacks.isInstalled(offer.pair)) {
-            translateAction.translate(offer.pair)
-        } else {
-            downloadPrompt.requestDownload(offer.pair)
-        }
     }
 
     private fun reduce(event: BannerEvent) {

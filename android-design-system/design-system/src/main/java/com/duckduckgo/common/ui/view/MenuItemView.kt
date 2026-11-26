@@ -114,6 +114,12 @@ constructor(
         invalidate()
     }
 
+    override fun setEnabled(enabled: Boolean) {
+        binding.icon.setEnabledOpacity(enabled)
+        binding.label.setEnabledOpacity(enabled)
+        super.setEnabled(enabled)
+    }
+
     private fun updateContentDescription() {
         binding.root.contentDescription = binding.label.text
     }

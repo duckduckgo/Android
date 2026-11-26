@@ -20,7 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
+import com.duckduckgo.pagetranslation.impl.menu.SessionState
+import com.duckduckgo.pagetranslation.impl.menu.TranslationMenuSource
 import com.duckduckgo.pagetranslation.impl.offer.ActiveOffer
+import com.duckduckgo.pagetranslation.impl.offer.TranslationOffer
 import com.duckduckgo.pagetranslation.impl.offer.TranslationOfferSource
 import com.duckduckgo.pagetranslation.impl.translate.TranslateAction
 import dev.zacsweers.metro.ContributesBinding
@@ -36,10 +39,19 @@ import javax.inject.Inject
  */
 @ContributesBinding(FragmentScope::class, binding = binding<TranslationOfferSource>())
 @ContributesBinding(FragmentScope::class, binding = binding<TranslateAction>())
+@ContributesBinding(FragmentScope::class, binding = binding<TranslationMenuSource>())
 @SingleIn(FragmentScope::class)
-class TemporarySessionSeams @Inject constructor() : TranslationOfferSource, TranslateAction {
+class TemporarySessionSeams @Inject constructor() : TranslationOfferSource, TranslateAction, TranslationMenuSource {
 
     override val offer: StateFlow<ActiveOffer?> = MutableStateFlow(null)
+
+    override val menuOffer: StateFlow<TranslationOffer> = MutableStateFlow(TranslationOffer.None)
+
+    override val pair: StateFlow<LanguagePair?> = MutableStateFlow(null)
+
+    override val state: StateFlow<SessionState> = MutableStateFlow(SessionState.Idle)
+
+    override fun showOriginal() = Unit
 
     override fun translate(pair: LanguagePair) = Unit
 }

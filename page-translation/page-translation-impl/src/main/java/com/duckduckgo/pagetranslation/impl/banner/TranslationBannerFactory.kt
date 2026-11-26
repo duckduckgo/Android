@@ -21,26 +21,20 @@ import android.os.Build
 import android.view.accessibility.AccessibilityManager
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
-import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
 import com.duckduckgo.pagetranslation.impl.offer.TranslationOfferSource
-import com.duckduckgo.pagetranslation.impl.translate.LanguagePackDownloadPrompt
-import com.duckduckgo.pagetranslation.impl.translate.TranslateAction
+import com.duckduckgo.pagetranslation.impl.translate.TranslateRequest
 import javax.inject.Inject
 
 class TranslationBannerFactory @Inject constructor(
     private val offerSource: TranslationOfferSource,
-    private val languagePacks: LanguagePacks,
-    private val translateAction: TranslateAction,
-    private val downloadPrompt: LanguagePackDownloadPrompt,
+    private val translateRequest: TranslateRequest,
     private val deviceLanguages: DeviceLanguages,
     private val dispatchers: DispatcherProvider,
 ) {
     fun create(context: Context): TranslationBannerView {
         val controller = BannerController(
             offerSource = offerSource,
-            languagePacks = languagePacks,
-            translateAction = translateAction,
-            downloadPrompt = downloadPrompt,
+            translateRequest = translateRequest,
             timeoutMillis = recommendedTimeoutMillis(context),
         )
         return TranslationBannerView(context).also { it.bind(controller, deviceLanguages, dispatchers.main()) }

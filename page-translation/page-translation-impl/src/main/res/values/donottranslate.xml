@@ -18,4 +18,5 @@
     <string name="pageTranslationDownloadNotificationChannel">Language pack downloads</string>
     <string name="pageTranslationDownloadNotificationTitle">Downloading language pack</string>
     <string name="pageTranslationBannerDismissAction">Dismiss</string>
+    <string name="pageTranslationMenuTranslating">Translating</string>
 </resources>

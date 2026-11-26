@@ -21,6 +21,7 @@ import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.offer.ActiveOffer
 import com.duckduckgo.pagetranslation.impl.offer.TranslationOfferSource
 import com.duckduckgo.pagetranslation.impl.translate.LanguagePackDownloadPrompt
+import com.duckduckgo.pagetranslation.impl.translate.RealTranslateRequest
 import com.duckduckgo.pagetranslation.impl.translate.TranslateAction
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -49,7 +50,7 @@ class BannerControllerTest {
     private val languagePacks: LanguagePacks = mock()
     private val translateAction: TranslateAction = mock()
     private val downloadPrompt: LanguagePackDownloadPrompt = mock()
-    private val testee = BannerController(offerSource, languagePacks, translateAction, downloadPrompt, TIMEOUT)
+    private val testee = BannerController(offerSource, RealTranslateRequest(languagePacks, translateAction, downloadPrompt), TIMEOUT)
 
     private fun TestScope.showFirst() {
         start()
@@ -154,7 +155,7 @@ class BannerControllerTest {
 
     @Test
     fun whenTimeoutIsInfiniteThenNeverDismissed() = runTest {
-        val noAutoDismiss = BannerController(offerSource, languagePacks, translateAction, downloadPrompt, Long.MAX_VALUE)
+        val noAutoDismiss = BannerController(offerSource, RealTranslateRequest(languagePacks, translateAction, downloadPrompt), Long.MAX_VALUE)
         backgroundScope.launch { noAutoDismiss.run() }
         noAutoDismiss.setOnScreen(true)
         offers.value = first

@@ -53,6 +53,9 @@ import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import logcat.logcat
 
 @SuppressLint("ClickableViewAccessibility")
@@ -239,12 +242,15 @@ class Omnibar(
             omnibarView.isUiLocked = value
         }
 
-    var viewMode: ViewMode = ViewMode.Browser(null)
-        private set
+    private val _viewMode = MutableStateFlow<ViewMode>(ViewMode.Browser(null))
+    val viewModeFlow: StateFlow<ViewMode> = _viewMode.asStateFlow()
+
+    val viewMode: ViewMode
+        get() = _viewMode.value
 
     fun setViewMode(newViewMode: ViewMode) {
         logcat { "Omnibar: setViewMode $newViewMode" }
-        viewMode = newViewMode
+        _viewMode.value = newViewMode
         when (newViewMode) {
             ViewMode.Error -> {
                 omnibarView.decorate(Mode(newViewMode))
