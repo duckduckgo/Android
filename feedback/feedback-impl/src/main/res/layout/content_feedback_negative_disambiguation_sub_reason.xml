@@ -33,7 +33,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="@dimen/keyline_4"
             android:importantForAccessibility="no"
-            android:src="@drawable/ic_sad_face"
+            android:src="@drawable/response_bad_56"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

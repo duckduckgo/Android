@@ -32,11 +32,9 @@ import com.duckduckgo.autofill.impl.databinding.ViewImportPasswordsPromoBinding
 import com.duckduckgo.autofill.impl.importing.credentialtransfer.CredentialExchangePasswordImporter
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command
 import com.duckduckgo.autofill.impl.importing.promo.ImportInPasswordsPromotionViewModel.Command.DismissImport
-import com.duckduckgo.autofill.impl.importing.resolvePasswordsKeychainAnimationAsset
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.isRebrandAreaEnabled
-import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.view.MessageCta.Message
 import com.duckduckgo.common.ui.view.MessageCta.MessageType.REMOTE_MESSAGE
 import com.duckduckgo.common.ui.view.show
@@ -90,9 +88,6 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     @Inject
     lateinit var dispatchers: DispatcherProvider
 
-    @Inject
-    lateinit var appBrandDesignUpdateToggles: AppBrandDesignUpdateToggles
-
     private val binding: ViewImportPasswordsPromoBinding by viewBinding()
 
     private val viewModel: ImportInPasswordsPromotionViewModel by lazy {
@@ -131,9 +126,6 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
     }
 
     private fun showPromo() {
-        val isPictogramsEnabled = appBrandDesignUpdateToggles.pictograms().isEnabled()
-        val animationAsset = resolvePasswordsKeychainAnimationAsset(isPictogramsEnabled)
-
         val subtitle = if (usesCredentialExchange) {
             R.string.passwords_import_promo_subtitle_device_auth
         } else {
@@ -143,7 +135,7 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
         with(binding.importPromo) {
             setMessage(
                 Message(
-                    topAnimation = animationAsset.animationRes,
+                    topAnimation = R.raw.anim_password_keys,
                     title = context.getString(R.string.passwords_import_promo_title),
                     subtitle = context.getString(subtitle),
                     action = context.getString(R.string.passwords_import_promo_action),
@@ -151,19 +143,14 @@ class ImportInPasswordsPromotionView @JvmOverloads constructor(
                 ),
             )
             onTopAnimationConfigured { view ->
-                animationAsset.staticRes?.let { staticRes ->
-                    view.cancelAnimation()
-                    view.setImageResource(
-                        if (context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)) {
-                            R.drawable.passwords_keychain_feature_96
-                        } else {
-                            staticRes
-                        },
-                    )
-                } ?: run {
-                    view.repeatCount = 1
-                    view.playAnimation()
-                }
+                view.cancelAnimation()
+                view.setImageResource(
+                    if (context.isRebrandAreaEnabled(CommonR.attr.daxRebrandRmfCards)) {
+                        R.drawable.passwords_keychain_feature_96
+                    } else {
+                        R.drawable.passwords_keychain_128
+                    },
+                )
             }
             onPrimaryActionClicked {
                 viewModel.onUserClickedToImport()
