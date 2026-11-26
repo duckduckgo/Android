@@ -23,7 +23,6 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -85,12 +84,25 @@ class WebTrackersBlockedDaoTest {
     @Test
     fun whenAllDeletedThenRowsAreGoneAndLegacyImportCountsAsDone() = runTest {
         dao.insertAll(listOf(tracker(), tracker()))
-        assertFalse(dao.isLegacyImportDone())
+        dao.saveLegacyImport(dao.legacyImport().copy(lastImportedId = 500))
 
         dao.deleteAll()
 
         assertEquals(0, dao.countAll())
-        assertTrue(dao.isLegacyImportDone())
+        assertTrue(dao.legacyImport().done)
+    }
+
+    @Test
+    fun whenNoLegacyImportSavedThenItHasNotStarted() {
+        assertEquals(LegacyAppDbImport(name = "web_trackers_blocked", lastImportedId = 0, done = false), dao.legacyImport())
+    }
+
+    @Test
+    fun whenLegacyImportProgressSavedThenItIsReadBack() {
+        dao.saveLegacyImport(dao.legacyImport().copy(lastImportedId = 500))
+        dao.saveLegacyImport(dao.legacyImport().copy(lastImportedId = 1_000))
+
+        assertEquals(LegacyAppDbImport(name = "web_trackers_blocked", lastImportedId = 1_000, done = false), dao.legacyImport())
     }
 
     @Test
@@ -100,7 +112,7 @@ class WebTrackersBlockedDaoTest {
         dao.markLegacyImportDone()
         dao.deleteAll()
 
-        assertTrue(dao.isLegacyImportDone())
+        assertTrue(dao.legacyImport().done)
     }
 
     private suspend fun WebTrackersBlockedDao.countAll(): Int = getTrackersCountBetween(startTime = ALL_TIME_START, endTime = ALL_TIME_END)

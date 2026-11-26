@@ -66,7 +66,10 @@ abstract class TrackerDetectionDatabase : RoomDatabase() {
                     "CREATE TABLE IF NOT EXISTS `web_trackers_blocked` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
                         "`trackerUrl` TEXT NOT NULL, `trackerCompany` TEXT NOT NULL, `timestamp` TEXT NOT NULL)",
                 )
-                db.execSQL("CREATE TABLE IF NOT EXISTS `legacy_app_db_imports` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))")
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `legacy_app_db_imports` (`name` TEXT NOT NULL, `lastImportedId` INTEGER NOT NULL, " +
+                        "`done` INTEGER NOT NULL, PRIMARY KEY(`name`))",
+                )
             }
         }
 

@@ -20,10 +20,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 /**
- * Keyed by the app.db table name, which is only `web_trackers_blocked`. A row means the rows left in that app.db table
- * must never be imported: either the import already committed, or the user cleared the log before it ran.
+ * How far the copy of an app.db table into tracker_detection.db has got, keyed by the app.db table name, which is only
+ * `web_trackers_blocked`. [lastImportedId] is the app.db id of the last row copied and commits with that batch, so a retry
+ * resumes after it. [done] means the rows left in the app.db table must never be imported: either every row was copied,
+ * or the user cleared the log first.
  */
 @Entity(tableName = "legacy_app_db_imports")
 data class LegacyAppDbImport(
     @PrimaryKey val name: String,
+    val lastImportedId: Long = 0,
+    val done: Boolean = false,
 )

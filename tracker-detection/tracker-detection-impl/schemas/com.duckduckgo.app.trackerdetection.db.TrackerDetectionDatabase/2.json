@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "7ae5a613ed513097bec385fbe5955fa4",
+    "identityHash": "47c15f3b293f8311baf33ed8908a2d77",
     "entities": [
       {
         "tableName": "tds_tracker",
@@ -186,12 +186,24 @@
       },
       {
         "tableName": "legacy_app_db_imports",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, PRIMARY KEY(`name`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`name` TEXT NOT NULL, `lastImportedId` INTEGER NOT NULL, `done` INTEGER NOT NULL, PRIMARY KEY(`name`))",
         "fields": [
           {
             "fieldPath": "name",
             "columnName": "name",
             "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastImportedId",
+            "columnName": "lastImportedId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "done",
+            "columnName": "done",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -205,7 +217,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7ae5a613ed513097bec385fbe5955fa4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '47c15f3b293f8311baf33ed8908a2d77')"
     ]
   }
 }

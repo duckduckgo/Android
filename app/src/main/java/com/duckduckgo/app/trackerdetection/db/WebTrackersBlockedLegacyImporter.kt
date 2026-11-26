@@ -29,13 +29,16 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.util.concurrent.Callable
 import javax.inject.Inject
 
 /**
  * Copies the blocked-tracker log that app.db kept before it moved to tracker_detection.db, then drops the app.db table.
  *
- * The copy and the import marker commit in one tracker_detection.db transaction, and clearing the log writes the marker too,
- * so a crash or a retry never duplicates rows, and old rows are never copied in after the user cleared the log.
+ * Each batch commits in its own tracker_detection.db transaction together with the app.db id it reached. A crash or a retry
+ * resumes after that id without duplicating rows, and other users of the database, such as the tracker list loading at startup,
+ * wait for one batch rather than the whole copy. Clearing the log marks the import done, so old rows are never copied in after
+ * the user cleared it.
  */
 @ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
 class WebTrackersBlockedLegacyImporter @Inject constructor(
@@ -56,44 +59,58 @@ class WebTrackersBlockedLegacyImporter @Inject constructor(
         if (!hasLegacyTable()) return
 
         val dao = trackerDetectionDatabase.webTrackersBlockedDao()
-        trackerDetectionDatabase.runInTransaction {
-            if (!dao.isLegacyImportDone()) {
-                copyLegacyRows(dao)
-                dao.markLegacyImportDone()
-            }
-        }
+        do {
+            val copiedBatch = trackerDetectionDatabase.runInTransaction(Callable { copyNextBatch(dao) })
+        } while (copiedBatch)
         appDatabase.openHelper.writableDatabase.execSQL("DROP TABLE IF EXISTS `$LEGACY_TABLE`")
     }
 
     private fun hasLegacyTable(): Boolean =
         appDatabase.query("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?", arrayOf(LEGACY_TABLE)).use { it.moveToFirst() }
 
+    // Returns false once nothing is left to copy.
+    private fun copyNextBatch(dao: WebTrackersBlockedDao): Boolean {
+        val progress = dao.legacyImport()
+        if (progress.done) return false
+
+        val batch = readLegacyBatch(afterId = progress.lastImportedId)
+        if (batch.isEmpty()) {
+            dao.markLegacyImportDone()
+            return false
+        }
+        dao.insertAll(batch.map { it.tracker })
+        dao.saveLegacyImport(progress.copy(lastImportedId = batch.last().legacyId))
+        return true
+    }
+
     // Ids are regenerated because rows written since the upgrade already use ids in the new table.
-    private fun copyLegacyRows(dao: WebTrackersBlockedDao) {
-        appDatabase.query("SELECT trackerUrl, trackerCompany, timestamp FROM `$LEGACY_TABLE`", null).use { cursor ->
+    private fun readLegacyBatch(afterId: Long): List<LegacyRow> =
+        appDatabase.query(
+            "SELECT id, trackerUrl, trackerCompany, timestamp FROM `$LEGACY_TABLE` WHERE id > ? ORDER BY id LIMIT $BATCH_SIZE",
+            arrayOf(afterId),
+        ).use { cursor ->
+            val id = cursor.getColumnIndexOrThrow("id")
             val trackerUrl = cursor.getColumnIndexOrThrow("trackerUrl")
             val trackerCompany = cursor.getColumnIndexOrThrow("trackerCompany")
             val timestamp = cursor.getColumnIndexOrThrow("timestamp")
-            val batch = ArrayList<WebTrackerBlocked>(BATCH_SIZE)
-            while (cursor.moveToNext()) {
-                batch += WebTrackerBlocked(
-                    trackerUrl = cursor.getString(trackerUrl),
-                    trackerCompany = cursor.getString(trackerCompany),
-                    timestamp = cursor.getString(timestamp),
-                )
-                if (batch.size == BATCH_SIZE) {
-                    dao.insertAll(batch)
-                    batch.clear()
+            buildList {
+                while (cursor.moveToNext()) {
+                    val tracker = WebTrackerBlocked(
+                        trackerUrl = cursor.getString(trackerUrl),
+                        trackerCompany = cursor.getString(trackerCompany),
+                        timestamp = cursor.getString(timestamp),
+                    )
+                    add(LegacyRow(legacyId = cursor.getLong(id), tracker = tracker))
                 }
             }
-            if (batch.isNotEmpty()) dao.insertAll(batch)
         }
-    }
+
+    private class LegacyRow(val legacyId: Long, val tracker: WebTrackerBlocked)
 
     private companion object {
         const val LEGACY_TABLE = "web_trackers_blocked"
 
-        // The weekly cleaner lets the table reach about two weeks of rows, so the copy streams instead of loading them all.
+        // tracker_detection.db uses TRUNCATE journaling, so every other reader and writer of it waits while a batch runs.
         const val BATCH_SIZE = 500
     }
 }

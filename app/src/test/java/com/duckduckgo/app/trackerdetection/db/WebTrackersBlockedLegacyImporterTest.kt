@@ -137,31 +137,53 @@ class WebTrackersBlockedLegacyImporterTest {
         runImporter()
 
         val imported = rows()
-        assertEquals(legacyRows.size, imported.size)
-        assertEquals(legacyRows.toSet(), imported.toSet())
+        assertEquals(legacyRows, imported)
         assertFalse(hasLegacyTable())
     }
 
     @Test
-    fun whenImportFailsPartwayThenNothingIsKeptAndTheNextStartImportsEveryRow() {
+    fun whenImportFailsPartwayThenCommittedBatchesAreKeptAndTheNextStartCopiesOnlyTheRest() {
         val legacyRows = (1..600).map { Row("https://tracker.com/$it.js", "Tracker Inc", "2026-01-01T10:00:00") }
         createLegacyTable(legacyRows)
+        failInsertsAfterFirstBatch()
+
+        runImporter()
+
+        assertEquals(legacyRows.take(500), rows())
+        assertEquals(LegacyAppDbImport(name = "web_trackers_blocked", lastImportedId = 500), dao.legacyImport())
+        assertTrue(hasLegacyTable())
+
+        stopFailingInserts()
+        runImporter()
+
+        assertEquals(legacyRows, rows())
+        assertTrue(dao.legacyImport().done)
+        assertFalse(hasLegacyTable())
+    }
+
+    @Test
+    fun whenLogClearedPartwayThroughImportThenTheRestIsNotImported() {
+        createLegacyTable((1..600).map { Row("https://tracker.com/$it.js", "Tracker Inc", "2026-01-01T10:00:00") })
+        failInsertsAfterFirstBatch()
+        runImporter()
+
+        runBlocking { dao.deleteAll() }
+        stopFailingInserts()
+        runImporter()
+
+        assertTrue(rows().isEmpty())
+        assertFalse(hasLegacyTable())
+    }
+
+    private fun failInsertsAfterFirstBatch() {
         trackerDetectionDatabase.openHelper.writableDatabase.execSQL(
             "CREATE TRIGGER fail_after_first_batch BEFORE INSERT ON web_trackers_blocked " +
                 "WHEN (SELECT COUNT(*) FROM web_trackers_blocked) >= 500 BEGIN SELECT RAISE(ABORT, 'disk full'); END",
         )
+    }
 
-        runImporter()
-
-        assertTrue(rows().isEmpty())
-        assertFalse(dao.isLegacyImportDone())
-        assertTrue(hasLegacyTable())
-
+    private fun stopFailingInserts() {
         trackerDetectionDatabase.openHelper.writableDatabase.execSQL("DROP TRIGGER fail_after_first_batch")
-        runImporter()
-
-        assertEquals(legacyRows.toSet(), rows().toSet())
-        assertFalse(hasLegacyTable())
     }
 
     private fun runImporter() {

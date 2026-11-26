@@ -49,9 +49,19 @@ abstract class WebTrackersBlockedDao {
         endTime: String,
     ): Int
 
-    @Query("SELECT EXISTS(SELECT 1 FROM legacy_app_db_imports WHERE name = 'web_trackers_blocked')")
-    abstract fun isLegacyImportDone(): Boolean
+    fun legacyImport(): LegacyAppDbImport = findLegacyImport(LEGACY_TABLE) ?: LegacyAppDbImport(name = LEGACY_TABLE)
 
-    @Query("INSERT OR IGNORE INTO legacy_app_db_imports (name) VALUES ('web_trackers_blocked')")
-    abstract fun markLegacyImportDone()
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun saveLegacyImport(legacyImport: LegacyAppDbImport)
+
+    fun markLegacyImportDone() {
+        saveLegacyImport(LegacyAppDbImport(name = LEGACY_TABLE, done = true))
+    }
+
+    @Query("SELECT * FROM legacy_app_db_imports WHERE name = :name")
+    protected abstract fun findLegacyImport(name: String): LegacyAppDbImport?
+
+    private companion object {
+        const val LEGACY_TABLE = "web_trackers_blocked"
+    }
 }
