@@ -19,6 +19,7 @@ package com.duckduckgo.app.trackerdetection.api
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -57,15 +58,17 @@ interface TrackerStatsWriter {
 }
 
 /**
- * Accumulates tracker events in memory and flushes them in one transaction per [FLUSH_WINDOW_MS] burst.
+ * Accumulates tracker events in memory and flushes them once per [FLUSH_WINDOW_MS] burst: the history rows in one
+ * `tracker_detection.db` transaction and the counters in one `app.db` transaction.
  *
- * `app.db` has a single connection, so independent writes per tracker queue up on the connection pool.
+ * Both databases have a single connection, so independent writes per tracker queue up on the connection pool.
  * Events queued in the window are lost if the process dies before the flush.
  */
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTrackerStatsWriter @Inject constructor(
     private val appDatabase: AppDatabase,
+    private val webTrackersBlockedDao: WebTrackersBlockedDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
 ) : TrackerStatsWriter {
@@ -100,7 +103,7 @@ class RealTrackerStatsWriter @Inject constructor(
     override suspend fun deleteAllHistory() {
         writeMutex.withLock {
             synchronized(lock) { pending.history.clear() }
-            appDatabase.webTrackersBlockedDao().deleteAll()
+            webTrackersBlockedDao.deleteAll()
         }
     }
 
@@ -126,8 +129,8 @@ class RealTrackerStatsWriter @Inject constructor(
                 flushScheduled = false
                 pending.also { pending = Pending() }
             }
+            if (batch.history.isNotEmpty()) webTrackersBlockedDao.insertAll(batch.history)
             appDatabase.runInTransaction {
-                if (batch.history.isNotEmpty()) appDatabase.webTrackersBlockedDao().insertAll(batch.history)
                 if (batch.blockedCount > 0) appDatabase.privacyProtectionCountsDao().incrementBlockedTrackerCountBy(batch.blockedCount)
                 batch.networkCounts.forEach { (network, delta) -> appDatabase.networkLeaderboardDao().incrementNetworkCountBy(network, delta) }
             }

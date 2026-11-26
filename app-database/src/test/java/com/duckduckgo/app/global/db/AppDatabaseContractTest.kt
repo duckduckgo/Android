@@ -78,7 +78,6 @@ class AppDatabaseContractTest {
             "userStage",
             "user_events",
             "user_whitelist",
-            "web_trackers_blocked",
             "webview_sessions",
         )
     }

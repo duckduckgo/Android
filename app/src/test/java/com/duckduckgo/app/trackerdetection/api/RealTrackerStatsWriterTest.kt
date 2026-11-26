@@ -21,6 +21,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.api.RealTrackerStatsWriter.Companion.FLUSH_WINDOW_MS
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -45,20 +46,31 @@ class RealTrackerStatsWriterTest {
     // The invalidation tracker opens its own IMMEDIATE transactions asynchronously, so only count EXCLUSIVE ones.
     private val writeTransactions = mutableListOf<String>()
     private lateinit var db: AppDatabase
+    private lateinit var trackerDetectionDb: TrackerDetectionDatabase
     private lateinit var testee: RealTrackerStatsWriter
 
     @Before
     fun before() {
-        db = Room.inMemoryDatabaseBuilder(InstrumentationRegistry.getInstrumentation().targetContext, AppDatabase::class.java)
+        val context = InstrumentationRegistry.getInstrumentation().targetContext
+        db = Room.inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .allowMainThreadQueries()
             .setQueryCallback({ sql, _ -> if (sql.startsWith("BEGIN EXCLUSIVE")) writeTransactions.add(sql) }, Runnable::run)
             .build()
-        testee = RealTrackerStatsWriter(db, coroutineRule.testScope, coroutineRule.testDispatcherProvider)
+        trackerDetectionDb = Room.inMemoryDatabaseBuilder(context, TrackerDetectionDatabase::class.java)
+            .allowMainThreadQueries()
+            .build()
+        testee = RealTrackerStatsWriter(
+            appDatabase = db,
+            webTrackersBlockedDao = trackerDetectionDb.webTrackersBlockedDao(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatchers = coroutineRule.testDispatcherProvider,
+        )
     }
 
     @After
     fun after() {
         db.close()
+        trackerDetectionDb.close()
     }
 
     @Test
@@ -156,7 +168,7 @@ class RealTrackerStatsWriterTest {
     }
 
     private fun historyRows(): List<Pair<String, String>> =
-        db.query("SELECT trackerUrl, timestamp FROM web_trackers_blocked ORDER BY id", null).use { cursor ->
+        trackerDetectionDb.query("SELECT trackerUrl, timestamp FROM web_trackers_blocked ORDER BY id", null).use { cursor ->
             generateSequence { if (cursor.moveToNext()) cursor.getString(0) to cursor.getString(1) else null }.toList()
         }
 

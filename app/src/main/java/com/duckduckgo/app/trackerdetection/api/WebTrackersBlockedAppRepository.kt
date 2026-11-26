@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.trackerdetection.api
 
-import com.duckduckgo.app.global.db.AppDatabase
 import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
@@ -26,11 +26,9 @@ import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
 class WebTrackersBlockedAppRepository @Inject constructor(
-    appDatabase: AppDatabase,
+    private val dao: WebTrackersBlockedDao,
     private val trackerStatsWriter: TrackerStatsWriter,
 ) : WebTrackersBlockedHistory {
-
-    private val dao = appDatabase.webTrackersBlockedDao()
 
     override suspend fun onTrackerBlocked(trackerUrl: String, trackerCompany: String) {
         trackerStatsWriter.recordBlockedHistory(trackerUrl = trackerUrl, trackerCompany = trackerCompany)

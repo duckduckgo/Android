@@ -20,32 +20,48 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import kotlinx.coroutines.flow.Flow
+import androidx.room.Transaction
 
 @Dao
-interface WebTrackersBlockedDao {
+abstract class WebTrackersBlockedDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insert(tracker: WebTrackerBlocked)
+    abstract fun insertAll(trackers: List<WebTrackerBlocked>)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertAll(trackers: List<WebTrackerBlocked>)
+    /**
+     * Also marks the legacy import done, so a later import can't bring back the rows the user just cleared.
+     */
+    @Transaction
+    open suspend fun deleteAll() {
+        deleteAllRows()
+        markLegacyImportDone()
+    }
 
     @Query("DELETE FROM web_trackers_blocked")
-    suspend fun deleteAll()
+    protected abstract fun deleteAllRows()
 
     @Query("DELETE FROM web_trackers_blocked WHERE timestamp < :startTime")
-    fun deleteOldDataUntil(startTime: String)
-
-    @Query("SELECT * FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime ORDER BY timestamp DESC")
-    fun getTrackersBetween(
-        startTime: String,
-        endTime: String,
-    ): Flow<List<WebTrackerBlocked>>
+    abstract fun deleteOldDataUntil(startTime: String)
 
     @Query("SELECT COUNT(*) FROM web_trackers_blocked WHERE timestamp >= :startTime AND timestamp < :endTime")
-    suspend fun getTrackersCountBetween(
+    abstract suspend fun getTrackersCountBetween(
         startTime: String,
         endTime: String,
     ): Int
+
+    fun legacyImport(): LegacyAppDbImport = findLegacyImport(LEGACY_TABLE) ?: LegacyAppDbImport(name = LEGACY_TABLE)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun saveLegacyImport(legacyImport: LegacyAppDbImport)
+
+    fun markLegacyImportDone() {
+        saveLegacyImport(LegacyAppDbImport(name = LEGACY_TABLE, done = true))
+    }
+
+    @Query("SELECT * FROM legacy_app_db_imports WHERE name = :name")
+    protected abstract fun findLegacyImport(name: String): LegacyAppDbImport?
+
+    private companion object {
+        const val LEGACY_TABLE = "web_trackers_blocked"
+    }
 }

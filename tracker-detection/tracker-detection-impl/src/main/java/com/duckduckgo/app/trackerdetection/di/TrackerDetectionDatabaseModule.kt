@@ -23,6 +23,7 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
@@ -65,4 +66,7 @@ object TrackerDetectionDatabaseModule {
 
     @Provides
     fun provideTdsMetadataDao(database: TrackerDetectionDatabase): TdsMetadataDao = database.tdsMetadataDao()
+
+    @Provides
+    fun provideWebTrackersBlockedDao(database: TrackerDetectionDatabase): WebTrackersBlockedDao = database.webTrackersBlockedDao()
 }

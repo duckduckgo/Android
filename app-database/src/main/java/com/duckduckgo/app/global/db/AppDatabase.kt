@@ -60,7 +60,6 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.LocalDateTimeTypeConverter
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabSelectionEntity
-import com.duckduckgo.app.trackerdetection.db.*
 import com.duckduckgo.app.usage.app.AppDaysUsedDao
 import com.duckduckgo.app.usage.app.AppDaysUsedEntity
 import com.duckduckgo.app.usage.search.SearchCountDao
@@ -84,7 +83,7 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
  */
 @Database(
     exportSchema = true,
-    version = 65,
+    version = 66,
     entities = [
         UserAllowListedDomain::class,
         NetworkLeaderboardEntry::class,
@@ -110,7 +109,6 @@ import com.duckduckgo.savedsites.store.SavedSitesRelationsDao
         PixelEntity::class,
         PageLoadedPixelEntity::class,
         PagePaintedPixelEntity::class,
-        WebTrackerBlocked::class,
         AuthCookieAllowedDomainEntity::class,
         Entity::class,
         Relation::class,
@@ -157,7 +155,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun pageLoadedPixelDao(): PageLoadedPixelDao
     abstract fun pagePaintedPixelDao(): PagePaintedPixelDao
     abstract fun authCookiesAllowedDomainsDao(): AuthCookiesAllowedDomainsDao
-    abstract fun webTrackersBlockedDao(): WebTrackersBlockedDao
 
     abstract fun syncEntitiesDao(): SavedSitesEntitiesDao
 

@@ -35,7 +35,6 @@ android {
 
 dependencies {
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':app-store')
     implementation project(path: ':browser-api')
     implementation project(path: ':browser-mode-api')
     implementation project(path: ':codegen-annotations')
