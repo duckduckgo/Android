@@ -326,6 +326,38 @@ class NewTabPageViewModelTest {
     }
 
     @Test
+    fun whenNextStepsMessageIsHiddenForThisTabThenClaimIsNotDone() = runTest {
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(flowOf(aNextStepsMessage()))
+
+        testee.onStart(mockLifecycleOwner)
+
+        testee.viewState.test {
+            assertNull(expectMostRecentItem().message)
+        }
+        verify(mockPromptsCoordinator, never()).onClaimDone(PromptType.NTP_CARD)
+    }
+
+    @Test
+    fun whenNextStepsMessageHiddenForThisTabEndsThenClaimIsDone() = runTest {
+        val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
+        whenever(mockRemoteMessageModel.observeActiveMessages()).thenReturn(messages)
+
+        testee.onStart(mockLifecycleOwner)
+        messages.emit(aNextStepsMessage())
+        testee.viewState.test {
+            assertNull(expectMostRecentItem().message)
+        }
+        verify(mockPromptsCoordinator, never()).onClaimDone(PromptType.NTP_CARD)
+
+        messages.emit(null)
+
+        testee.viewState.test {
+            assertNull(expectMostRecentItem().message)
+        }
+        verify(mockPromptsCoordinator).onClaimDone(PromptType.NTP_CARD)
+    }
+
+    @Test
     fun whenClaimIsRefusedForAShowingCardThenTheSameCardIsNotNewWhenItReturns() = runTest {
         val remoteMessage = RemoteMessage("id1", Content.Small("", ""), emptyList(), emptyList(), listOf(Surface.NEW_TAB_PAGE))
         val messages = MutableSharedFlow<RemoteMessage?>(replay = 1)
