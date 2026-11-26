@@ -37,6 +37,8 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
@@ -206,6 +208,17 @@ class DuckAiPendingResponseTrackerImplTest {
     }
 
     @Test
+    fun `when user returns while loading then later statuses are not forwarded`() {
+        promptInChat()
+        status("loading")
+        switchToOtherSite()
+        onChat("t1", "A")
+        status("streaming")
+
+        assertEquals(listOf("await t1 A", "wait cancelled t1", "cancel A"), effects)
+    }
+
+    @Test
     fun `when ready on screen then leaving awaits nothing`() {
         promptInChat()
         status("ready")
@@ -221,6 +234,36 @@ class DuckAiPendingResponseTrackerImplTest {
         switchToOtherSite()
 
         assertEquals(listOf("await t1 A"), effects)
+    }
+
+    @Test
+    fun `when stale ready arrives while away then it is not forwarded`() {
+        promptInChat(streamStarted = false)
+        switchToOtherSite()
+        status("ready")
+
+        assertEquals(listOf("await t1 A"), effects)
+    }
+
+    @Test
+    fun `when away then statuses are forwarded`() {
+        promptInChat()
+        switchToOtherSite()
+        status("streaming")
+        status("start_stream:auto_retry_last_prompt")
+        status("error")
+        status("ready")
+
+        assertEquals(
+            listOf(
+                "await t1 A",
+                "status Streaming",
+                "status StartStream",
+                "status Error",
+                "status Ready",
+            ),
+            effects,
+        )
     }
 
     @Test
@@ -242,7 +285,7 @@ class DuckAiPendingResponseTrackerImplTest {
         onChat("t1", "A")
         switchToOtherSite()
 
-        assertEquals(listOf("await t1 A", "wait cancelled t1", "cancel A"), effects)
+        assertEquals(listOf("await t1 A", "status Ready", "wait cancelled t1", "cancel A"), effects)
     }
 
     @Test
@@ -421,6 +464,18 @@ class DuckAiPendingResponseTrackerImplTest {
     }
 
     @Test
+    fun `when a status arrives while away without a wait then it is not forwarded`() {
+        duckChatFeature.responseReadyNotifications().setRawStoredState(Toggle.State(enable = false))
+        promptInChat()
+        switchToOtherSite()
+        status("streaming")
+
+        assertEquals(emptyList<String>(), log)
+    }
+
+    // --- Notifier failures ---
+
+    @Test
     fun `when the notifier throws then later actions still go through and keep alive still updates`() {
         notifier.cancelFailure = IllegalStateException("notifier failure")
 
@@ -438,6 +493,7 @@ class DuckAiPendingResponseTrackerImplTest {
                 "wait cancelled t1",
                 "cancel A failed",
                 "await t1 A",
+                "status Ready",
                 "wait cancelled t1",
                 "cancel A failed",
                 "keepAlive false",
@@ -498,7 +554,7 @@ class DuckAiPendingResponseTrackerImplTest {
         testee.onLaunchLandingResolved(tabId = "t1", url = chatUrl("A"))
         idle()
 
-        assertEquals(listOf("await t1 null", "wait cancelled t1", "cancel A"), effects)
+        assertEquals(listOf("await t1 null", "status StartStream", "wait cancelled t1", "cancel A"), effects)
     }
 
     @Test
@@ -509,7 +565,7 @@ class DuckAiPendingResponseTrackerImplTest {
         status("start_stream:new_prompt")
         onChat(tabId = "t1", chatId = "A")
 
-        assertEquals(listOf("await t1 null", "wait cancelled t1", "cancel A"), effects)
+        assertEquals(listOf("await t1 null", "status StartStream", "wait cancelled t1", "cancel A"), effects)
     }
 
     @Test
@@ -521,7 +577,7 @@ class DuckAiPendingResponseTrackerImplTest {
         status("start_stream:new_prompt")
         idle()
 
-        assertEquals(listOf("await t1 null"), effects)
+        assertEquals(listOf("await t1 null", "status StartStream"), effects)
     }
 
     @Test
@@ -574,7 +630,7 @@ class DuckAiPendingResponseTrackerImplTest {
         onChat("t1", "A")
 
         assertEquals(
-            listOf("keepAlive true", "await t1 A", "wait cancelled t1", "cancel A", "keepAlive false"),
+            listOf("keepAlive true", "await t1 A", "status Ready", "wait cancelled t1", "cancel A", "keepAlive false"),
             log,
         )
     }
@@ -881,7 +937,7 @@ class DuckAiPendingResponseTrackerImplTest {
         testee.onClose()
         status("start_stream:auto_retry_last_prompt")
 
-        assertEquals(listOf("keepAlive true", "await t1 null"), log)
+        assertEquals(listOf("keepAlive true", "await t1 null", "status StartStream"), log)
     }
 
     @Test
@@ -890,7 +946,7 @@ class DuckAiPendingResponseTrackerImplTest {
         switchToOtherSite()
         status("start_stream:auto_retry_last_prompt")
 
-        assertEquals(listOf("keepAlive true", "await t1 null"), log)
+        assertEquals(listOf("keepAlive true", "await t1 null", "status StartStream"), log)
     }
 
     @Test
@@ -1022,17 +1078,23 @@ class DuckAiPendingResponseTrackerImplTest {
         override suspend fun await(
             tabId: String,
             chatId: String?,
+            statuses: ReceiveChannel<PendingResponseStatus>,
             settings: ResponseReadyNotificationsSettings,
             onChatIdFound: suspend (String) -> Unit,
-        ): WaitResult {
+        ): WaitResult = coroutineScope {
             log += "await $tabId $chatId"
             val result = CompletableDeferred<WaitResult>()
             waits += result
             chatIdCallbacks += onChatIdFound
-            // Logs when the wait is cancelled, not when its coroutine next runs on the IO dispatcher.
-            return suspendCancellableCoroutine { continuation ->
-                continuation.invokeOnCancellation { log += "wait cancelled $tabId" }
-                result.invokeOnCompletion { continuation.resume(result.getCompleted()) }
+            val statusLog = launch { for (status in statuses) log += "status ${status::class.simpleName}" }
+            try {
+                // Logs when the wait is cancelled, not when its coroutine next runs on the IO dispatcher.
+                suspendCancellableCoroutine { continuation ->
+                    continuation.invokeOnCancellation { log += "wait cancelled $tabId" }
+                    result.invokeOnCompletion { continuation.resume(result.getCompleted()) }
+                }
+            } finally {
+                statusLog.cancel()
             }
         }
 

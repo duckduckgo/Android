@@ -16,6 +16,8 @@
 package com.duckduckgo.duckchat.impl.responseready
 
 import com.duckduckgo.browsermode.api.RegularMode
+import com.duckduckgo.duckchat.impl.pendingresponse.PendingResponseStatus
+import kotlinx.coroutines.channels.ReceiveChannel
 
 interface DuckAiResponseReadyMonitor {
 
@@ -24,12 +26,14 @@ interface DuckAiResponseReadyMonitor {
      *
      * [tabId] is the tab the response was left in.
      * If [chatId] is `null`, the monitor observes the tab's URL and when chat ID appears, hands it to [onChatIdFound].
+     * [statuses] are the page's statuses received while the user is away; they count only while that tab exists.
      *
      * Only compatible with [RegularMode] tabs.
      */
     suspend fun await(
         tabId: String,
         chatId: String?,
+        statuses: ReceiveChannel<PendingResponseStatus>,
         settings: ResponseReadyNotificationsSettings,
         onChatIdFound: suspend (String) -> Unit,
     ): WaitResult

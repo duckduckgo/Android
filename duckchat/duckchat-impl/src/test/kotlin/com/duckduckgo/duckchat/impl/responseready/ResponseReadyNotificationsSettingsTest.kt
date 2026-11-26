@@ -35,35 +35,35 @@ class ResponseReadyNotificationsSettingsTest {
     fun `when no settings then defaults`() {
         settings(null)
 
-        assertEquals(ResponseReadyNotificationsSettings(4.seconds, 180.seconds), feature.responseReadySettings())
+        assertEquals(ResponseReadyNotificationsSettings(4.seconds, 180.seconds, 5.seconds), feature.responseReadySettings())
     }
 
     @Test
     fun `when settings set then values read`() {
-        settings("""{"pollIntervalSeconds":2,"timeoutSeconds":60}""")
+        settings("""{"pollIntervalSeconds":2,"timeoutSeconds":60,"errorSettleSeconds":8}""")
 
-        assertEquals(ResponseReadyNotificationsSettings(2.seconds, 60.seconds), feature.responseReadySettings())
+        assertEquals(ResponseReadyNotificationsSettings(2.seconds, 60.seconds, 8.seconds), feature.responseReadySettings())
     }
 
     @Test
     fun `when one key missing then only that one defaults`() {
-        settings("""{"pollIntervalSeconds":2}""")
+        settings("""{"pollIntervalSeconds":2,"errorSettleSeconds":8}""")
 
-        assertEquals(ResponseReadyNotificationsSettings(2.seconds, 180.seconds), feature.responseReadySettings())
+        assertEquals(ResponseReadyNotificationsSettings(2.seconds, 180.seconds, 8.seconds), feature.responseReadySettings())
     }
 
     @Test
     fun `when settings malformed then defaults`() {
         settings("not-json")
 
-        assertEquals(ResponseReadyNotificationsSettings(4.seconds, 180.seconds), feature.responseReadySettings())
+        assertEquals(ResponseReadyNotificationsSettings(4.seconds, 180.seconds, 5.seconds), feature.responseReadySettings())
     }
 
     @Test
     fun `when value is zero or negative then default`() {
-        settings("""{"pollIntervalSeconds":0,"timeoutSeconds":-5}""")
+        settings("""{"pollIntervalSeconds":0,"timeoutSeconds":-5,"errorSettleSeconds":8}""")
 
-        assertEquals(ResponseReadyNotificationsSettings(4.seconds, 180.seconds), feature.responseReadySettings())
+        assertEquals(ResponseReadyNotificationsSettings(4.seconds, 180.seconds, 8.seconds), feature.responseReadySettings())
     }
 
     @Test

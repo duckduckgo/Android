@@ -23,9 +23,13 @@ import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.pendingresponse.PendingResponseStatus
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -42,6 +46,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.robolectric.annotation.Config
@@ -68,7 +73,7 @@ class DuckAiResponseReadyMonitorImplTest {
     private val syncCodes = ArrayDeque(listOf(404))
     private val foundChatIds = mutableListOf<String>()
     private val requestTimes = mutableListOf<Long>()
-    private var settings = ResponseReadyNotificationsSettings(pollInterval = 4.seconds, timeout = 180.seconds)
+    private var settings = ResponseReadyNotificationsSettings(pollInterval = 4.seconds, timeout = 180.seconds, errorSettle = 5.seconds)
 
     private lateinit var testee: DuckAiResponseReadyMonitorImpl
 
@@ -91,7 +96,7 @@ class DuckAiResponseReadyMonitorImplTest {
         saveChat("A", pendingUser("r1"))
         syncAnswers(200)
 
-        val result = startAwait()
+        val (_, result) = startAwait()
 
         assertEquals(WaitResult.Ready, result.getCompleted())
     }
@@ -105,7 +110,7 @@ class DuckAiResponseReadyMonitorImplTest {
     fun `when tab never gets a chat id then TimedOut after 180 s`() {
         tabs.value = listOf(TabEntity(tabId = "t1", url = DUCK_AI_URL))
 
-        val result = startAwait(chatId = null)
+        val (_, result) = startAwait(chatId = null)
         advance(179.seconds)
         assertFalse(result.isCompleted)
         advance(1.seconds)
@@ -117,9 +122,23 @@ class DuckAiResponseReadyMonitorImplTest {
     fun `when reading the saved chat throws then Stopped`() = runTest {
         whenever(chatStore.getChatContent(any())).thenThrow(SQLiteException("disk I/O error"))
 
-        val result = startAwait()
+        val (_, result) = startAwait()
 
         assertEquals(WaitResult.Stopped, result.getCompleted())
+    }
+
+    @Test
+    fun `when a page status arrives before the wait starts then it is applied once the wait runs`() {
+        saveChat("A", pendingUser("r1"))
+        syncAnswers(404)
+        val wait = TestWait()
+        wait.statuses.trySend(PendingResponseStatus.from("start_stream:auto_retry_last_prompt"))
+        val result = launchAwait(wait)
+
+        wait.statuses.trySend(PendingResponseStatus.from("ready"))
+        advance(1.seconds)
+
+        assertFalse(result.isCompleted)
     }
 
     @Test
@@ -183,7 +202,7 @@ class DuckAiResponseReadyMonitorImplTest {
     @Test
     fun `when saved chat never has a pending id then TimedOut`() {
         saveChat("A", pendingUser("r0"), ASSISTANT)
-        val result = startAwait()
+        val (_, result) = startAwait()
 
         advance(180.seconds)
 
@@ -193,7 +212,7 @@ class DuckAiResponseReadyMonitorImplTest {
     @Test
     fun `when remote timeout is 60 s then TimedOut after 60 s`() {
         settings = settings.copy(timeout = 60.seconds)
-        val result = startAwait()
+        val (_, result) = startAwait()
 
         advance(59.seconds)
         assertFalse(result.isCompleted)
@@ -273,10 +292,202 @@ class DuckAiResponseReadyMonitorImplTest {
         assertTrue("wait $waitAfterSecondRateLimit ms", waitAfterSecondRateLimit in 30_000 until 60_000)
     }
 
-    private fun startAwait(tabId: String = "t1", chatId: String? = "A"): CompletableDeferred<WaitResult> {
+    @Test
+    fun `when page ready while away and tab open then Ready without Sync 200`() {
+        saveChat("A", pendingUser("r1"))
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "ready")
+
+        assertEquals(WaitResult.Ready, result.getCompleted())
+        advance(60.seconds)
+        assertEquals(1, requestTimes.size)
+    }
+
+    @Test
+    fun `when tab closed then page ready is ignored and Sync 200 gives Ready`() {
+        saveChat("A", pendingUser("r1"))
+        val (wait, result) = startAwait()
+        tabs.value = emptyList()
+        runCurrent()
+
+        pageStatus(wait, "ready")
+        assertFalse(result.isCompleted)
+
+        syncAnswers(200)
+        advance(4.seconds)
+        assertEquals(WaitResult.Ready, result.getCompleted())
+    }
+
+    @Test
+    fun `when tab marked deletable then page ready is ignored`() {
+        saveChat("A", pendingUser("r1"))
+        val (wait, result) = startAwait()
+        tabs.value = listOf(TabEntity(tabId = "t1", url = chatUrl("A"), deletable = true))
+        runCurrent()
+
+        pageStatus(wait, "ready")
+
+        assertFalse(result.isCompleted)
+    }
+
+    @Test
+    fun `when tab state not known yet then page ready is ignored`() {
+        whenever(tabRepository.flowTabs).thenReturn(MutableSharedFlow())
+        saveChat("A", pendingUser("r1"))
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "ready")
+
+        assertFalse(result.isCompleted)
+    }
+
+    @Test
+    fun `when page restarts then ready without streaming is ignored`() {
+        saveChat("A", pendingUser("r1"))
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "start_stream:restart_stream")
+        pageStatus(wait, "ready")
+
+        assertFalse(result.isCompleted)
+    }
+
+    @Test
+    fun `when page restarts then streams then ready then Ready`() {
+        saveChat("A", pendingUser("r1"))
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "start_stream:new_prompt")
+        pageStatus(wait, "streaming")
+        pageStatus(wait, "ready")
+
+        assertEquals(WaitResult.Ready, result.getCompleted())
+    }
+
+    @Test
+    fun `when page errors and no restart within 5 s then Ready`() {
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "error")
+        advance(4.seconds)
+        assertFalse(result.isCompleted)
+        advance(1.seconds)
+
+        assertEquals(WaitResult.Ready, result.getCompleted())
+    }
+
+    @Test
+    fun `when page is blocked and no restart within 5 s then Ready`() {
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "blocked")
+        advance(5.seconds)
+
+        assertEquals(WaitResult.Ready, result.getCompleted())
+    }
+
+    @Test
+    fun `when page errors and restarts within 5 s then not Ready`() {
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "error")
+        advance(2.seconds)
+        pageStatus(wait, "start_stream:new_prompt")
+        advance(10.seconds)
+
+        assertFalse(result.isCompleted)
+    }
+
+    @Test
+    fun `when page errors and tab closes before the settle time then not Ready`() {
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "error")
+        advance(2.seconds)
+        tabs.value = emptyList()
+        advance(10.seconds)
+
+        assertFalse(result.isCompleted)
+    }
+
+    @Test
+    fun `when page errors while the tab is closed then not Ready`() {
+        val (wait, result) = startAwait()
+        tabs.value = emptyList()
+        runCurrent()
+
+        pageStatus(wait, "error")
+        tabs.value = listOf(TabEntity(tabId = "t1", url = chatUrl("A")))
+        advance(10.seconds)
+
+        assertFalse(result.isCompleted)
+    }
+
+    @Test
+    fun `when error settle is 8 s then Ready at 8 s`() {
+        settings = settings.copy(errorSettle = 8.seconds)
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "error")
+        advance(7.seconds)
+        assertFalse(result.isCompleted)
+        advance(1.seconds)
+
+        assertEquals(WaitResult.Ready, result.getCompleted())
+    }
+
+    @Test
+    fun `when page ready arrives before the response id is found then Ready`() = runTest {
+        val (wait, result) = startAwait()
+
+        pageStatus(wait, "ready")
+
+        assertEquals(WaitResult.Ready, result.getCompleted())
+        verify(storedResponseClient, never()).getStoredResponse(any())
+    }
+
+    @Test
+    fun `when page ready and Sync 200 arrive together then Ready and no further request`() = runTest {
+        val inFlight = CompletableDeferred<Response<Unit>>()
+        whenever(storedResponseClient.getStoredResponse(any())) doSuspendableAnswer { inFlight.await() }
+        saveChat("A", pendingUser("r1"))
+        val (wait, result) = startAwait()
+
+        inFlight.complete(syncResponse(200))
+        pageStatus(wait, "ready")
+        advance(60.seconds)
+
+        assertEquals(WaitResult.Ready, result.getCompleted())
+        verify(storedResponseClient, times(1)).getStoredResponse(any())
+    }
+
+    @Test
+    fun `when user returns after the page error then the settle timer does not complete the wait`() {
+        val (wait, result) = startAwait()
+        pageStatus(wait, "error")
+
+        wait.job.cancel()
+        advance(5.seconds)
+
+        assertFalse(result.isCompleted)
+        assertEquals(0, requestTimes.size)
+    }
+
+    private class TestWait {
+        val statuses = Channel<PendingResponseStatus>(capacity = Channel.UNLIMITED)
+        lateinit var job: Job
+    }
+
+    private fun startAwait(tabId: String = "t1", chatId: String? = "A"): Pair<TestWait, CompletableDeferred<WaitResult>> {
+        val wait = TestWait()
+        return wait to launchAwait(wait, tabId, chatId)
+    }
+
+    private fun launchAwait(wait: TestWait, tabId: String = "t1", chatId: String? = "A"): CompletableDeferred<WaitResult> {
         val result = CompletableDeferred<WaitResult>()
-        coroutineRule.testScope.launch {
-            result.complete(testee.await(tabId, chatId, settings) { foundChatIds += it })
+        wait.job = coroutineRule.testScope.launch {
+            result.complete(testee.await(tabId, chatId, wait.statuses, settings) { foundChatIds += it })
         }
         runCurrent()
         return result
@@ -298,7 +509,7 @@ class DuckAiResponseReadyMonitorImplTest {
         syncAnswers(code)
         saveChat("A", pendingUser("r1"))
 
-        val result = startAwait()
+        val (_, result) = startAwait()
         advance(180.seconds)
 
         assertEquals(WaitResult.Stopped, result.getCompleted())
@@ -316,6 +527,11 @@ class DuckAiResponseReadyMonitorImplTest {
 
         val wait = requestTimes[1] - requestTimes[0]
         assertTrue("wait $wait ms", wait in 30_000 until 60_000)
+    }
+
+    private fun pageStatus(wait: TestWait, status: String) {
+        wait.statuses.trySend(PendingResponseStatus.from(status))
+        runCurrent()
     }
 
     private fun syncAnswers(vararg codes: Int) {
