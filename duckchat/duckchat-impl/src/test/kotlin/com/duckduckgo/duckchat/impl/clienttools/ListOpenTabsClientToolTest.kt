@@ -38,6 +38,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import java.time.LocalDateTime
 
 @RunWith(AndroidJUnit4::class)
 class ListOpenTabsClientToolTest {
@@ -135,6 +136,35 @@ class ListOpenTabsClientToolTest {
 
         assertEquals(50, tabs.length())
         assertEquals("t49", tabs.getJSONObject(49).getString("tabId"))
+    }
+
+    @Test
+    fun whenMoreThanFiftyTabsThenChatTabAndMostRecentlyUsedTabsAreListedInTabOrder() = runTest {
+        val now = LocalDateTime.of(2026, 11, 25, 12, 0)
+        givenRegularTabs(
+            *Array(60) { TabEntity(tabId = "t$it", url = "https://example.com/$it", lastAccessTime = now.minusDays(1).plusMinutes(it.toLong())) },
+            TabEntity(tabId = "chat", url = "https://example.org/", lastAccessTime = now.minusYears(1)),
+            TabEntity(tabId = "opened", url = "https://example.net/", lastAccessTime = now),
+        )
+
+        val tabIds = success(testee.execute(JSONObject(), regular)).getJSONArray("tabs")
+            .let { tabs -> List(tabs.length()) { tabs.getJSONObject(it).getString("tabId") } }
+
+        assertEquals((12 until 60).map { "t$it" } + "chat" + "opened", tabIds)
+    }
+
+    @Test
+    fun whenLimitGivenThenMostRecentlyUsedTabsAreKept() = runTest {
+        val now = LocalDateTime.of(2026, 11, 25, 12, 0)
+        givenRegularTabs(
+            TabEntity(tabId = "never", url = "https://example.com/never"),
+            TabEntity(tabId = "old", url = "https://example.com/old", lastAccessTime = now.minusDays(1)),
+            TabEntity(tabId = "new", url = "https://example.com/new", lastAccessTime = now),
+        )
+
+        val tabs = success(testee.execute(JSONObject("""{"limit":2}"""), regular)).getJSONArray("tabs")
+
+        assertEquals(listOf("old", "new"), List(tabs.length()) { tabs.getJSONObject(it).getString("tabId") })
     }
 
     @Test
