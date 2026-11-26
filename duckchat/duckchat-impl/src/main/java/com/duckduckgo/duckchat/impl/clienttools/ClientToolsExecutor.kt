@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl.clienttools
 
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
@@ -64,7 +65,16 @@ class RealClientToolsExecutor @Inject constructor(
     private val permissionGate: ClientToolPermissionGate,
     private val duckAiHostProvider: DuckAiHostProvider,
     private val browserToolsFeature: AiChatBrowserToolsFeature,
+    private val pixels: ClientToolPixels,
+    private val timeProvider: CurrentTimeProvider,
 ) : ClientToolsExecutor {
+
+    /** How a tool call ended: [path] is null when it was refused before its permission was looked at, [durationMillis] when it never ran. */
+    private data class FinishedCall(
+        val result: ClientToolResult,
+        val path: ClientToolPermissionPath? = null,
+        val durationMillis: Long? = null,
+    )
 
     override fun clientToolsConfig(
         pageUrl: String?,
@@ -81,6 +91,7 @@ class RealClientToolsExecutor @Inject constructor(
         if (isRequestAccessEnabled()) {
             capabilities.put(JSONObject().put(NAME, RequestAccess.NAME).put(VERSION, RequestAccess.VERSION))
         }
+        pixels.toolsOffered()
         return JSONObject()
             .put(PROTOCOL_VERSION, CLIENT_TOOLS_PROTOCOL_VERSION)
             .put(CAPABILITIES, capabilities)
@@ -96,11 +107,20 @@ class RealClientToolsExecutor @Inject constructor(
         val parsed = ParsedExecuteClientToolRequest.parse(params)
         val caller = caller(pageUrl, browserMode) ?: return failureReply(parsed.callId, ClientToolErrorCode.UNAVAILABLE)
         val request = when (parsed) {
-            is Malformed -> return failureReply(parsed.callId, ClientToolErrorCode.INVALID_ARGUMENTS)
+            is Malformed -> {
+                pixels.protocolError(ClientToolProtocolError.INVALID_REQUEST, capabilityName(params))
+                return failureReply(parsed.callId, ClientToolErrorCode.INVALID_ARGUMENTS)
+            }
             is Valid -> parsed.request
         }
         val context = ClientToolCallContext(chatTabId, browserMode, request.chatId ?: caller.pageChatId, contextual)
-        val result = if (request.name == RequestAccess.NAME) requestAccess(request, context) else run(request, context)
+        val result = if (request.name == RequestAccess.NAME) {
+            requestAccess(request, context)
+        } else {
+            val call = run(request, context)
+            pixels.callFinished(request.name, call.result, call.path, call.durationMillis)
+            call.result
+        }
         logcat {
             val chatIdSource = when {
                 request.chatId != null -> "params"
@@ -121,24 +141,33 @@ class RealClientToolsExecutor @Inject constructor(
         context: ClientToolCallContext,
     ): ClientToolResult {
         if (!isRequestAccessEnabled() || request.version != RequestAccess.VERSION.toLong()) {
-            return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
+            return rejectAccess(ClientToolAccessRejection.UNAVAILABLE, ClientToolErrorCode.UNAVAILABLE)
         }
-        val names = RequestAccess.parseCapabilities(request.input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
-        val chatId = context.chatId ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
+        val invalid = { rejectAccess(ClientToolAccessRejection.INVALID, ClientToolErrorCode.INVALID_ARGUMENTS) }
+        val names = RequestAccess.parseCapabilities(request.input) ?: return invalid()
+        val chatId = context.chatId ?: return invalid()
         val toolsByName = tools.getPlugins().associateBy { it.name }
-        if (names.any { toolsByName[it]?.permissionMode is ClientToolPermissionMode.AskEveryTime }) {
-            return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
-        }
+        if (names.any { toolsByName[it]?.permissionMode is ClientToolPermissionMode.AskEveryTime }) return invalid()
         val servable = names.mapNotNull { name -> toolsByName[name]?.takeIf { it.isEnabled() } }
-        return when (val decision = permissionGate.requestAccess(servable, chatId, context)) {
-            is ClientToolAccessDecision.Granted -> {
+        val outcome = permissionGate.requestAccess(servable, chatId, context)
+        pixels.accessRequested(names, outcome)
+        return when (outcome.answer) {
+            ClientToolAccessAnswer.NO_PROMPT, ClientToolAccessAnswer.ALLOW -> {
                 val access = JSONObject()
-                names.forEach { access.put(it, (decision.access[it] ?: ClientToolAccessLevel.NOT_GRANTED).wireName) }
+                names.forEach { access.put(it, (outcome.access[it] ?: ClientToolAccessLevel.NOT_GRANTED).wireName) }
                 ClientToolResult.Success(JSONObject().put(ACCESS, access))
             }
-            ClientToolAccessDecision.Denied -> ClientToolResult.Failure(ClientToolErrorCode.DENIED)
-            ClientToolAccessDecision.Cancelled -> ClientToolResult.Failure(ClientToolErrorCode.CANCELLED)
+            ClientToolAccessAnswer.DONT_ALLOW -> ClientToolResult.Failure(ClientToolErrorCode.DENIED)
+            ClientToolAccessAnswer.TIMEOUT, ClientToolAccessAnswer.WITHDRAWN -> ClientToolResult.Failure(ClientToolErrorCode.CANCELLED)
         }
+    }
+
+    private fun rejectAccess(
+        rejection: ClientToolAccessRejection,
+        code: ClientToolErrorCode,
+    ): ClientToolResult {
+        pixels.accessRequestRejected(rejection)
+        return ClientToolResult.Failure(code)
     }
 
     private fun isRequestAccessEnabled(): Boolean =
@@ -149,32 +178,40 @@ class RealClientToolsExecutor @Inject constructor(
     private suspend fun run(
         request: ExecuteClientToolRequest,
         context: ClientToolCallContext,
-    ): ClientToolResult {
+    ): FinishedCall {
         val tool = tools.getPlugins().firstOrNull { it.name == request.name }
-        if (tool == null || tool.version.toLong() != request.version || !tool.isEnabled()) {
-            return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
+        // A known tool turned off by remote config is not a protocol error.
+        if (tool == null || tool.version.toLong() != request.version) {
+            pixels.protocolError(ClientToolProtocolError.UNKNOWN_CAPABILITY, request.name)
+            return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE))
         }
-        if (!tool.isValidInput(request.input)) {
-            return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
-        }
+        if (!tool.isEnabled()) return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE))
+        if (!tool.isValidInput(request.input)) return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS))
         val promptDetail = if (tool.permissionMode is ClientToolPermissionMode.AskEveryTime) {
             when (val detail = failingSafely(tool) { tool.promptDetail(request.input, context) }) {
                 is ClientToolPromptDetail.Shown -> detail.text
-                is ClientToolPromptDetail.Failure -> return ClientToolResult.Failure(detail.code)
-                null -> return ClientToolResult.Failure(ClientToolErrorCode.EXECUTION_FAILED)
+                is ClientToolPromptDetail.Failure -> return FinishedCall(ClientToolResult.Failure(detail.code))
+                null -> return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.EXECUTION_FAILED))
             }
         } else {
             null
         }
-        when (permissionGate.decide(tool, context, promptDetail)) {
-            ClientToolPermissionDecision.DENIED -> return ClientToolResult.Failure(ClientToolErrorCode.DENIED)
-            ClientToolPermissionDecision.CANCELLED -> return ClientToolResult.Failure(ClientToolErrorCode.CANCELLED)
-            // Remote config can turn the tool off while its prompt is open.
-            ClientToolPermissionDecision.ALLOWED -> if (!tool.isEnabled()) return ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE)
+        val path = when (val decision = permissionGate.decide(tool, context, promptDetail)) {
+            is ClientToolPermissionDecision.Denied -> return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.DENIED), decision.path)
+            ClientToolPermissionDecision.Cancelled ->
+                return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.CANCELLED), ClientToolPermissionPath.PROMPT)
+            is ClientToolPermissionDecision.Allowed -> decision.path
         }
-        return failingSafely(tool) { tool.execute(request.input, context.copy(allowedDetail = promptDetail)) }
+        // Remote config can turn the tool off while its prompt is open.
+        if (!tool.isEnabled()) return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.UNAVAILABLE), path)
+        val startedAt = timeProvider.elapsedRealtime()
+        val result = failingSafely(tool) { tool.execute(request.input, context.copy(allowedDetail = promptDetail)) }
             ?: ClientToolResult.Failure(ClientToolErrorCode.EXECUTION_FAILED)
+        return FinishedCall(result, path, timeProvider.elapsedRealtime() - startedAt)
     }
+
+    /** The capability name of a call that could not be read, for the protocol error pixel to map to a slug. */
+    private fun capabilityName(params: JSONObject?): String? = (params?.opt(CAPABILITY) as? JSONObject)?.opt(NAME) as? String
 
     /** Runs [block], or gives null when it throws, so a failing tool settles its call as `execution_failed`. */
     private suspend fun <T> failingSafely(
@@ -222,6 +259,7 @@ class RealClientToolsExecutor @Inject constructor(
         const val CLIENT_TOOLS_PROTOCOL_VERSION = 1
         const val PROTOCOL_VERSION = "protocolVersion"
         const val CAPABILITIES = "capabilities"
+        const val CAPABILITY = "capability"
         const val NAME = "name"
         const val VERSION = "version"
         const val CALL_ID = "callId"

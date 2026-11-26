@@ -30,6 +30,7 @@ import com.duckduckgo.duckchat.impl.clienttools.ClientToolChatGrants
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermission
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionMode
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionStore
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPixels
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolSettingsSection
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
@@ -49,6 +50,7 @@ class BrowserAccessSettingsViewModel @Inject constructor(
     private val tools: PluginPoint<ClientTool>,
     private val permissionStore: ClientToolPermissionStore,
     private val chatGrants: ClientToolChatGrants,
+    private val pixels: ClientToolPixels,
     private val dispatcherProvider: DispatcherProvider,
 ) : ViewModel() {
 
@@ -100,6 +102,8 @@ class BrowserAccessSettingsViewModel @Inject constructor(
     ) {
         val tool = tools.getPlugins().firstOrNull { it.name == toolName } ?: return
         viewModelScope.launch {
+            val previous = currentChoice(tool.permissionMode, permissionStore.get(toolName))
+            if (previous != choice) pixels.permissionChanged(toolName, from = previous, to = choice)
             if (choice == defaultChoice(tool.permissionMode)) {
                 permissionStore.clear(toolName)
             } else {
@@ -117,7 +121,8 @@ class BrowserAccessSettingsViewModel @Inject constructor(
     fun onResetAllConfirmed() {
         viewModelScope.launch {
             permissionStore.clearAll()
-            chatGrants.clear()
+            chatGrants.revokeAll()
+            pixels.permissionsReset()
         }
     }
 

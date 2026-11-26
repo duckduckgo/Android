@@ -23,11 +23,15 @@ import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-/** Tools the user allowed for one Duck.ai chat. Kept in memory only, so an app restart ends every grant. */
+/**
+ * Tools the user allowed for one Duck.ai chat, and how many single-tool prompts it has shown.
+ * Kept in memory only, so an app restart ends every grant.
+ */
 @SingleIn(AppScope::class)
 class ClientToolChatGrants @Inject constructor() {
 
     private val toolsByChat = mutableMapOf<String, MutableSet<String>>()
+    private val promptsByChat = mutableMapOf<String, Int>()
 
     fun isGranted(
         chatId: String,
@@ -41,12 +45,25 @@ class ClientToolChatGrants @Inject constructor() {
         synchronized(toolsByChat) { toolsByChat.getOrPut(chatId) { mutableSetOf() }.addAll(toolNames) }
     }
 
+    /** Counts a single-tool prompt shown in [chatId], and returns its number in the chat, starting at 1. */
+    fun countPrompt(chatId: String): Int = synchronized(toolsByChat) {
+        (promptsByChat.getOrDefault(chatId, 0) + 1).also { promptsByChat[chatId] = it }
+    }
+
     fun revoke(toolName: String) {
         synchronized(toolsByChat) { toolsByChat.values.forEach { it.remove(toolName) } }
     }
 
-    fun clear() {
+    fun revokeAll() {
         synchronized(toolsByChat) { toolsByChat.clear() }
+    }
+
+    /** Forgets every chat, as the Fire Button does. */
+    fun clear() {
+        synchronized(toolsByChat) {
+            toolsByChat.clear()
+            promptsByChat.clear()
+        }
     }
 }
 

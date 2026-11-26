@@ -48,6 +48,8 @@ import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
 import com.duckduckgo.duckchat.impl.clienttools.AiChatBrowserToolsFeature
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionGate
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionPath
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPixels
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPluginPoint
 import com.duckduckgo.duckchat.impl.clienttools.FakeDuckAiHostProvider
@@ -164,13 +166,15 @@ class RealDuckChatJSHelperTest {
 
     private val fakeClientTool = FakeClientTool(name = "listOpenTabs", enabled = false)
     private val allowingPermissionGate: ClientToolPermissionGate = mock {
-        onBlocking { decide(any(), any(), anyOrNull()) } doReturn ClientToolPermissionDecision.ALLOWED
+        onBlocking { decide(any(), any(), anyOrNull()) } doReturn ClientToolPermissionDecision.Allowed(ClientToolPermissionPath.AUTO)
     }
     private val clientToolsExecutor = RealClientToolsExecutor(
         tools = FakeClientToolPluginPoint(fakeClientTool),
         permissionGate = allowingPermissionGate,
         duckAiHostProvider = FakeDuckAiHostProvider(),
         browserToolsFeature = FakeFeatureToggleFactory.create(AiChatBrowserToolsFeature::class.java),
+        pixels = ClientToolPixels(mock()),
+        timeProvider = mock(),
     )
 
     private val testee = RealDuckChatJSHelper(
