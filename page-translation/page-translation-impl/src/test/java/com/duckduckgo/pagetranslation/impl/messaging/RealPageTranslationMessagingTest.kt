@@ -19,7 +19,11 @@ package com.duckduckgo.pagetranslation.impl.messaging
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.pagetranslation.impl.AttachedWebView
+import com.duckduckgo.pagetranslation.impl.PageTranslationDeviceSupport
+import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.messaging.RealPageTranslationMessaging.PageTranslationJsInterface
 import kotlinx.coroutines.CoroutineStart.UNDISPATCHED
@@ -54,7 +58,14 @@ class RealPageTranslationMessagingTest {
 
     private val script = FakePageTranslationScript()
     private val attachedWebView = AttachedWebView()
-    private val messaging = RealPageTranslationMessaging(attachedWebView, script, coroutineRule.testDispatcherProvider)
+    private val feature = FakeFeatureToggleFactory.create(PageTranslationFeature::class.java).apply {
+        translation().setRawStoredState(State(enable = true))
+    }
+    private var isDeviceSupported = true
+    private val deviceSupport = object : PageTranslationDeviceSupport {
+        override fun isSupported() = isDeviceSupported
+    }
+    private val messaging = RealPageTranslationMessaging(attachedWebView, script, coroutineRule.testDispatcherProvider, feature, deviceSupport)
     private val webView: WebView = mock()
     private val page: PageTranslationJsInterface by lazy { getInterface(webView) }
 
@@ -63,6 +74,24 @@ class RealPageTranslationMessagingTest {
         messaging.register(webView)
 
         verify(webView).addJavascriptInterface(any(), eq(INTERFACE_NAME))
+    }
+
+    @Test
+    fun registerNothingWhilePageTranslationIsOff() {
+        feature.translation().setRawStoredState(State(enable = false))
+
+        messaging.register(webView)
+
+        verify(webView, never()).addJavascriptInterface(any(), any())
+    }
+
+    @Test
+    fun registerNothingOnAnUnsupportedDevice() {
+        isDeviceSupported = false
+
+        messaging.register(webView)
+
+        verify(webView, never()).addJavascriptInterface(any(), any())
     }
 
     @Test
