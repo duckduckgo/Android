@@ -93,10 +93,10 @@ class RealPageTranslationMessaging @Inject constructor(
         val reply = request(EXTRACT, EXTRACT_RESULT, JSONObject()) ?: return null
 
         return try {
-            val units = reply.getJSONArray("units")
+            val units = reply.getJSONArray(UNITS_KEY)
             List(units.length()) { i ->
                 val unit = units.getJSONObject(i)
-                PageUnit(unit.getInt("id"), unit.getString("text"), unit.optBoolean("html"), unit.optInt("vp") == 1)
+                PageUnit(unit.getInt(ID_KEY), unit.getString(TEXT_KEY), unit.optBoolean(HTML_KEY), unit.optInt(IN_VIEWPORT_KEY) == 1)
             }
         } catch (_: JSONException) {
             null
@@ -105,13 +105,13 @@ class RealPageTranslationMessaging @Inject constructor(
 
     override suspend fun apply(pair: LanguagePair, translations: List<UnitTranslation>): Int? {
         val updates = JSONArray()
-        translations.forEach { updates.put(JSONObject().put("id", it.id).put(if (it.isHtml) "tree" else "text", it.translation)) }
+        translations.forEach { updates.put(JSONObject().put(ID_KEY, it.id).put(if (it.isHtml) TREE_KEY else TEXT_KEY, it.translation)) }
         val params = JSONObject()
-            .put("sourceLanguage", pair.source)
-            .put("targetLanguage", pair.target)
-            .put("updates", updates)
+            .put(SOURCE_LANGUAGE_KEY, pair.source)
+            .put(TARGET_LANGUAGE_KEY, pair.target)
+            .put(UPDATES_KEY, updates)
 
-        return request(APPLY, APPLY_RESULT, params)?.optInt("count")
+        return request(APPLY, APPLY_RESULT, params)?.optInt(COUNT_KEY)
     }
 
     private suspend fun request(subscription: String, replyMethod: String, params: JSONObject): JSONObject? = withContext(dispatchers.main()) {
@@ -123,7 +123,7 @@ class RealPageTranslationMessaging @Inject constructor(
         }
 
         try {
-            webView.evaluateJavascript(createEvent(subscription, params.put(REQUEST_ID, request.id)), null)
+            webView.evaluateJavascript(createEvent(subscription, params.put(REQUEST_ID_KEY, request.id)), null)
             withTimeoutOrNull(REPLY_TIMEOUT) { request.reply.await() }
         } finally {
             synchronized(lock) { if (pendingRequest === request) pendingRequest = null }
@@ -132,10 +132,10 @@ class RealPageTranslationMessaging @Inject constructor(
 
     private fun createEvent(subscription: String, params: JSONObject): String {
         val event = JSONObject()
-            .put("context", CONTEXT)
-            .put("featureName", FEATURE_NAME)
-            .put("subscriptionName", subscription)
-            .put("params", params)
+            .put(CONTEXT_KEY, CONTEXT)
+            .put(FEATURE_NAME_KEY, FEATURE_NAME)
+            .put(SUBSCRIPTION_NAME_KEY, subscription)
+            .put(PARAMS_KEY, params)
 
         return "window['${script.callbackName}']('${script.secret}', $event);"
     }
@@ -148,14 +148,15 @@ class RealPageTranslationMessaging @Inject constructor(
         } catch (_: JSONException) {
             return
         }
-        if (json.optString("featureName") != FEATURE_NAME) return
-        val params = json.optJSONObject("params") ?: return
+        if (json.optString(FEATURE_NAME_KEY) != FEATURE_NAME) return
+        val method = json.optString(METHOD_KEY)
+        val params = json.optJSONObject(PARAMS_KEY) ?: return
 
         synchronized(lock) {
             val request = pendingRequest ?: return
 
             // a reply to a dropped request, or from a WebView that's no longer attached, is ignored
-            if (request.webView !== webView || request.replyMethod != json.optString("method") || request.id != params.optString(REQUEST_ID)) return
+            if (request.webView !== webView || request.replyMethod != method || request.id != params.optString(REQUEST_ID_KEY)) return
 
             request.reply.complete(params)
         }
@@ -175,10 +176,26 @@ class RealPageTranslationMessaging @Inject constructor(
         val REPLY_TIMEOUT = 10.seconds
         const val CONTEXT = "contentScopeScripts"
         const val FEATURE_NAME = "pageTranslation"
-        const val REQUEST_ID = "requestId"
         const val EXTRACT = "extract"
         const val EXTRACT_RESULT = "extractResult"
         const val APPLY = "apply"
         const val APPLY_RESULT = "applyResult"
+
+        const val CONTEXT_KEY = "context"
+        const val FEATURE_NAME_KEY = "featureName"
+        const val SUBSCRIPTION_NAME_KEY = "subscriptionName"
+        const val METHOD_KEY = "method"
+        const val PARAMS_KEY = "params"
+        const val REQUEST_ID_KEY = "requestId"
+        const val UNITS_KEY = "units"
+        const val ID_KEY = "id"
+        const val TEXT_KEY = "text"
+        const val HTML_KEY = "html"
+        const val IN_VIEWPORT_KEY = "vp"
+        const val TREE_KEY = "tree"
+        const val SOURCE_LANGUAGE_KEY = "sourceLanguage"
+        const val TARGET_LANGUAGE_KEY = "targetLanguage"
+        const val UPDATES_KEY = "updates"
+        const val COUNT_KEY = "count"
     }
 }
