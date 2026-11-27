@@ -53,7 +53,9 @@ import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.PendingNativePromptStore
 import com.duckduckgo.duckchat.impl.models.AIChatModel
+import com.duckduckgo.duckchat.impl.models.AvailableReasoningMode
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelSource
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.ReasoningEffort
 import com.duckduckgo.duckchat.impl.models.ReasoningEffortAccess
@@ -108,11 +110,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.stub
@@ -1405,6 +1409,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(newChatHintsPixels).onPromptSubmitted(
@@ -1413,6 +1418,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = true,
             hasFileAttachment = false,
             selectedTool = "image_generation",
+            modelSource = null,
         )
     }
 
@@ -1448,6 +1454,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(newChatHintsPixels).onPromptSubmitted(
@@ -1456,6 +1463,7 @@ class NativeInputModeWidgetViewModelTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             selectedTool = "none",
+            modelSource = null,
         )
     }
 
@@ -1603,6 +1611,146 @@ class NativeInputModeWidgetViewModelTest {
 
         assertEquals("global-model", viewModel.getSelectedModelId())
     }
+
+    @Test
+    fun whenNewChatModelPickedThenSubmissionUsesItAndOnlyThatTabCarriesIt() = runTest {
+        modelStateFlow.value = pickableModels()
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
+
+        assertEquals("picked-model", viewModel.getSelectedModelId())
+        assertEquals("low", viewModel.getResolvedReasoningEffort())
+        assertNull(nativeInputStateProvider.stateForTab("tab-B").value.newChatModelId)
+        viewModel.configure(tabId = "tab-B", isDuckAiMode = true, isBottom = true)
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenPromptSubmittedThenNewChatPickIsKeptUntilTheTabEntersAChat() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
+
+        viewModel.onPromptSubmitted()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+
+        viewModel.setActiveChatId("chat-1")
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertNull(state.newChatModelId)
+        assertNull(state.newChatReasoningMode)
+    }
+
+    @Test
+    fun whenPromptIsHandedOffThenNewChatPickIsCleared() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = true)
+        viewModel.pickNewChatModel("picked-model")
+        viewModel.pickNewChatReasoningMode(ReasoningMode.REASONING)
+
+        viewModel.storePendingPrompt("hello", modelId = "picked-model", reasoningEffort = "low")
+
+        val state = nativeInputStateProvider.stateForTab("tab-A").value
+        assertNull(state.newChatModelId)
+        assertNull(state.newChatReasoningMode)
+    }
+
+    @Test
+    fun whenTabHasAChatThenNewChatPickIsIgnoredOnSubmission() = runTest {
+        modelStateFlow.value = pickableModels()
+        whenever(modelManager.getSelectedModelId()).thenReturn("global-model")
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+        viewModel.pickNewChatModel("picked-model")
+
+        viewModel.setActiveChatId("missing-chat")
+        advanceUntilIdle()
+
+        assertEquals("global-model", viewModel.getSelectedModelId())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndFooterSwitchesModelInNewChatThenTabPickIsWritten() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+
+        viewModel.selectModelById("picked-model")
+        advanceUntilIdle()
+
+        assertEquals("picked-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        verify(modelManager, never()).selectModel(any())
+    }
+
+    @Test
+    fun whenFooterSwitchesModelWithResetOffThenGlobalSelectionChangesAndNoTabPick() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true)
+
+        viewModel.selectModelById("picked-model")
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        verify(modelManager).selectModel(pickableModels().models.last())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndImageGenerationLaunchOnAModelWithoutItThenTabPicksAnImageModel() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val imageModel = aiModel(id = "image-model", supported = emptyList()).copy(supportedTools = listOf(Tool.IMAGE_GENERATION))
+        modelStateFlow.value = pickableModels().let { it.copy(models = it.models + imageModel) }
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.ImageGeneration())
+        advanceUntilIdle()
+
+        assertEquals("image-model", nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        assertEquals(Tool.IMAGE_GENERATION.rawValue, nativeInputStateProvider.stateForTab("tab-A").value.selectedTool)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndImageGenerationLaunchOnAnImageModelThenNoTabPick() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val imageModel = aiModel(id = "global-model", supported = emptyList()).copy(supportedTools = listOf(Tool.IMAGE_GENERATION))
+        modelStateFlow.value = ModelState(models = listOf(imageModel), selectedModelId = "global-model")
+        whenever(modelManager.ensureImageCapableModelSelected()).thenReturn(true)
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.ImageGeneration())
+        advanceUntilIdle()
+
+        assertNull(nativeInputStateProvider.stateForTab("tab-A").value.newChatModelId)
+        assertEquals(Tool.IMAGE_GENERATION.rawValue, nativeInputStateProvider.stateForTab("tab-A").value.selectedTool)
+    }
+
+    @Test
+    fun whenConfiguredWithOverrideModelThenTabPicksIt() = runTest {
+        modelStateFlow.value = pickableModels()
+        val viewModel = createViewModel()
+
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = true, launch = DuckChatLaunch.Open(overrideModelId = "picked-model"))
+
+        assertEquals("picked-model", viewModel.getSelectedModelId())
+    }
+
+    private fun pickableModels() = ModelState(
+        models = listOf(
+            aiModel(id = "global-model", supported = listOf(ReasoningEffort.NONE)),
+            aiModel(id = "picked-model", supported = listOf(ReasoningEffort.NONE, ReasoningEffort.LOW)),
+        ),
+        selectedModelId = "global-model",
+    )
 
     @Test
     fun whenChatHasReasoningModeThenGetResolvedReasoningEffortMatchesChatsMode() = runTest {
@@ -2194,6 +2342,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -2208,6 +2357,7 @@ class NativeInputModeWidgetViewModelTest {
             tabId = tabId,
             pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
         verify(duckChatPixels).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
@@ -2228,6 +2378,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(responseWaitWideEvent).onNativePromptSubmitted("tab-A", BrowserMode.FIRE, "medium", Tool.IMAGE_GENERATION.rawValue)
@@ -2246,6 +2397,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verifyNoInteractions(responseWaitWideEvent)
@@ -2264,6 +2416,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
         viewModel.fireStopGenerationTapped()
 
@@ -2298,6 +2451,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -2312,6 +2466,7 @@ class NativeInputModeWidgetViewModelTest {
             tabId = tabId,
             pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
         verify(duckChatPixels, never()).fireWebSearchSubmitted(any())
@@ -2332,6 +2487,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -2346,6 +2502,7 @@ class NativeInputModeWidgetViewModelTest {
             tabId = "tab-A",
             pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
     }
 
@@ -2360,6 +2517,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -2374,6 +2532,7 @@ class NativeInputModeWidgetViewModelTest {
             tabId = "test-tab",
             pageType = DuckChatPixelPageType.NTP,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
     }
 
@@ -2393,6 +2552,7 @@ class NativeInputModeWidgetViewModelTest {
             hasFileAttachment = false,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
             submitMethod = InputSubmitMethod.BUTTON,
+            isContextualEntry = false,
         )
 
         verify(duckChatPixels).firePromptSubmitted(
@@ -2407,6 +2567,7 @@ class NativeInputModeWidgetViewModelTest {
             tabId = tabId,
             pageType = DuckChatPixelPageType.DUCK_AI,
             addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
         )
         verify(duckChatPixels).fireWebSearchSubmitted(any())
         verify(duckChatPixels, never()).fireImageGenerationSubmitted(any())
@@ -2527,4 +2688,294 @@ class NativeInputModeWidgetViewModelTest {
 
         assertNull(testee.resolvedTogglePosition())
     }
+
+    // region model_source
+
+    @Test
+    fun whenResetOnAndFirstPromptOfANewChatThenBothPixelsCarryTheSameModelSource() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission()
+
+        verifyFirstPromptSentModelSource(ModelSource.DEFAULT)
+        verifyUnifiedModelSource(ModelSource.DEFAULT)
+    }
+
+    @Test
+    fun whenResetOnAndTheTabPickedAModelThenBothPixelsCarryPicked() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("other-model")
+
+        viewModel.fireNewChatSubmission()
+
+        verifyFirstPromptSentModelSource(ModelSource.PICKED)
+        verifyUnifiedModelSource(ModelSource.PICKED)
+    }
+
+    @Test
+    fun whenResetOnAndNotTheCountedFirstPromptThenUnifiedPixelOmitsModelSource() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(null)
+    }
+
+    @Test
+    fun whenResetOnAndSubmittedFromTheBrowserThenUnifiedPixelOmitsModelSource() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = false, isBottom = false)
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(null)
+    }
+
+    @Test
+    fun whenResetOffAndFirstPromptOfANewChatThenBothPixelsAreUnchanged() = runTest {
+        modelStateFlow.value = tierDefaultModelState()
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-6-luna")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("none")
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open())
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission()
+
+        verify(newChatHintsPixels).onPromptSubmitted(
+            tabId = "tab-A",
+            isNewChat = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+            modelSource = null,
+        )
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "gpt-6-luna",
+            reasoningEffort = "none",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.DUCK_AI,
+            defaultMode = null,
+            tabId = "tab-A",
+            pageType = DuckChatPixelPageType.DUCK_AI,
+            addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+            modelSource = null,
+        )
+    }
+
+    @Test
+    fun whenOpenedFromOnboardingThenModelSourceIsOnboarding() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission()
+
+        verifyFirstPromptSentModelSource(ModelSource.ONBOARDING)
+        verifyUnifiedModelSource(ModelSource.ONBOARDING)
+    }
+
+    @Test
+    fun whenOnboardingModelReplacedByAManualPickOfTheTierDefaultThenModelSourceIsPicked() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("gpt-6-luna")
+
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.PICKED)
+    }
+
+    @Test
+    fun whenOnboardingPickChangedAwayAndBackThenModelSourceIsOnboarding() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        viewModel.pickNewChatModel("gpt-6-luna")
+        viewModel.pickNewChatModel("other-model")
+
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.ONBOARDING)
+    }
+
+    @Test
+    fun whenOnboardingPickDroppedThenTheNewChatIsJudgedAgainstTheGlobalSelection() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        nativeInputStatePublisher.update("tab-A") { it.copy(newChatModelId = null, newChatReasoningMode = null) }
+
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.DEFAULT)
+    }
+
+    @Test
+    fun whenExistingChatOpenedAfterOnboardingThenAPickOfTheOnboardingModelIsPicked() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        viewModel.setActiveChatId("existing-chat")
+        viewModel.setActiveChatId(null)
+        advanceUntilIdle()
+
+        viewModel.pickNewChatModel("other-model")
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.PICKED)
+    }
+
+    @Test
+    fun whenExistingChatOpenedAfterOnboardingThenAPickOfTheTierDefaultIsDefault() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        viewModel.setActiveChatId("existing-chat")
+        viewModel.setActiveChatId(null)
+        advanceUntilIdle()
+
+        viewModel.pickNewChatModel("gpt-6-luna")
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.DEFAULT)
+    }
+
+    @Test
+    fun whenOnboardingChatWasSentThenTheNextNewChatOnThatModelIsPicked() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        givenCountedNewChatFirstPrompt()
+        val viewModel = createViewModel()
+        viewModel.configure(tabId = "tab-A", isDuckAiMode = true, isBottom = false, launch = DuckChatLaunch.Open(overrideModelId = "other-model"))
+        advanceUntilIdle()
+        viewModel.onPromptSubmitted()
+        clearInvocations(duckChatPixels)
+
+        viewModel.pickNewChatModel("other-model")
+        viewModel.fireNewChatSubmission()
+
+        verifyUnifiedModelSource(ModelSource.PICKED)
+    }
+
+    @Test
+    fun whenContextualEntryPromptSentThenUnifiedPixelCarriesModelSource() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission(isContextualEntry = true)
+
+        verifyUnifiedModelSource(ModelSource.DEFAULT)
+    }
+
+    @Test
+    fun whenContextualFollowUpSentThenUnifiedPixelOmitsModelSource() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission(isContextualEntry = false)
+
+        verifyUnifiedModelSource(null)
+    }
+
+    @Test
+    fun whenResetOffAndContextualEntryPromptSentThenUnifiedPixelOmitsModelSource() = runTest {
+        modelStateFlow.value = tierDefaultModelState()
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-6-luna")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("none")
+        val viewModel = createViewModel()
+        viewModel.configureContextual(tabId = "tab-A")
+        advanceUntilIdle()
+
+        viewModel.fireNewChatSubmission(isContextualEntry = true)
+
+        verifyUnifiedModelSource(null)
+    }
+
+    private fun givenResetOnWithTierDefaultSelected() {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        modelStateFlow.value = tierDefaultModelState()
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-6-luna")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("none")
+    }
+
+    private fun tierDefaultModelState() = ModelState(
+        models = listOf(
+            aiModel(id = "gpt-6-luna", supported = listOf(ReasoningEffort.NONE)),
+            aiModel(id = "other-model", supported = listOf(ReasoningEffort.NONE)),
+        ),
+        selectedModelId = "gpt-6-luna",
+        selectedReasoningMode = ReasoningMode.FAST,
+        availableReasoningModes = listOf(AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE)),
+    )
+
+    private fun givenCountedNewChatFirstPrompt() {
+        whenever(newChatHintsPixels.onPromptSubmitted(any(), eq(true), any(), any(), any(), anyOrNull())).thenReturn(true)
+    }
+
+    private fun NativeInputModeWidgetViewModel.fireNewChatSubmission(isContextualEntry: Boolean = false) = fireSubmissionPixels(
+        hasText = true,
+        hasImageAttachment = false,
+        hasFileAttachment = false,
+        addressBarEntryPoint = DuckChatEntryPoint.ADDRESS_BAR_PROMPT,
+        submitMethod = InputSubmitMethod.BUTTON,
+        isContextualEntry = isContextualEntry,
+    )
+
+    private fun verifyUnifiedModelSource(expected: ModelSource?) {
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = any(),
+            modelId = anyOrNull(),
+            reasoningEffort = anyOrNull(),
+            hasImageAttachment = any(),
+            hasFileAttachment = any(),
+            hasText = any(),
+            surface = any(),
+            defaultMode = anyOrNull(),
+            tabId = anyOrNull(),
+            pageType = any(),
+            addressBarEntryPoint = anyOrNull(),
+            modelSource = if (expected == null) isNull() else eq(expected),
+        )
+    }
+
+    private fun verifyFirstPromptSentModelSource(expected: ModelSource) {
+        verify(newChatHintsPixels).onPromptSubmitted(any(), any(), any(), any(), any(), eq(expected))
+    }
+
+    // endregion
 }

@@ -42,6 +42,9 @@ enum class ReasoningMode(
 
     companion object {
         fun from(raw: String?): ReasoningMode? = entries.firstOrNull { it.rawValue == raw }
+
+        /** The mode whose candidate efforts include [effort]. */
+        fun forEffort(effort: ReasoningEffort): ReasoningMode? = entries.firstOrNull { effort in it.candidateEfforts }
     }
 }
 

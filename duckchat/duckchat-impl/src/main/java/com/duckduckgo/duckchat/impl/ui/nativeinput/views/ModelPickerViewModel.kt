@@ -63,9 +63,13 @@ data class ModelSection(
     val gatedHeader: GatedHeader? = null,
 )
 
-/** Emitted when the user picks a model during the FE recovery model-change flow. */
+/** A model pick the view hands to the host instead of the global selection. */
 sealed class PickerModelChange {
+    /** Picked during the FE recovery model-change flow. */
     data class ChangeModel(val modelId: String) : PickerModelChange()
+
+    /** Picked for the next new chat in this tab, with `resetModelForNewChats` on. */
+    data class PickNewChatModel(val modelId: String) : PickerModelChange()
 }
 
 @ContributesViewModel(ViewScope::class)
@@ -169,12 +173,13 @@ class ModelPickerViewModel @Inject constructor(
     /**
      * Model id the picker should mark with the selected tick: prioritizes the recovery model if any,
      * then the active chat's model during recovery, then
-     * the global selection (normal new-chat behaviour).
+     * the chip's model in a new chat, then the global selection.
      */
     fun selectedModelIdForMenu(): String? {
         recoverySelectedModelId.value?.let { return it }
         val chat = currentChat.value
         if (modelChangeMode && chat != null) return chat.model
+        if (publishedChatId == null) return effectiveModelId.value
         return modelManager.modelState.value.selectedModelId
     }
 
@@ -228,6 +233,11 @@ class ModelPickerViewModel @Inject constructor(
                 recoverySelectedModelId.value = model.id
                 effectiveModelProvider.onRecoveryModelPicked(chatId = publishedChatId, modelId = model.id)
                 modelChangeChannel.trySend(PickerModelChange.ChangeModel(model.id))
+            } else if (publishedChatId == null && duckChatFeature.resetModelForNewChats().isEnabled()) {
+                if (model.id != effectiveModelId.value) {
+                    duckChatPixels.fireModelSelected(model.id, pixelSurface)
+                }
+                modelChangeChannel.trySend(PickerModelChange.PickNewChatModel(model.id))
             } else {
                 if (model.id != modelManager.getSelectedModelId()) {
                     duckChatPixels.fireModelSelected(model.id, pixelSurface)

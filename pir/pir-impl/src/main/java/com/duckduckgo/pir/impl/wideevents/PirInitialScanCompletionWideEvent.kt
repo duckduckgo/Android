@@ -19,6 +19,7 @@ package com.duckduckgo.pir.impl.wideevents
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
@@ -64,6 +65,7 @@ interface PirInitialScanCompletionWideEvent {
         batteryOptimizationsEnabled: Boolean,
         notificationsPermissionGranted: Boolean,
         isTrackerBlockingEnabled: Boolean,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -107,6 +109,7 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
         batteryOptimizationsEnabled: Boolean,
         notificationsPermissionGranted: Boolean,
         isTrackerBlockingEnabled: Boolean,
+        isFreeScan: Boolean,
     ) {
         if (!isFeatureEnabled()) return
 
@@ -131,11 +134,14 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
                             KEY_VPN_CONNECTION_STATE to isVpnConnected.toVpnConnectionState(),
                             KEY_NOTIFICATIONS_PERMISSION_GRANTED to notificationsPermissionGranted.toString(),
                             KEY_TRACKER_BLOCKING_STATE to isTrackerBlockingEnabled.toTrackerBlockingState(),
+                            KEY_FREE_SCAN to isFreeScan.toString(),
+                            KEY_SCAN_WEBVIEW_SIZE_STATE to scanWebViewSizeState(),
                         ),
                         cleanupPolicy = CleanupPolicy.OnTimeout(
                             duration = COMPLETION_FLOW_TIMEOUT,
                             flowStatus = FlowStatus.Unknown,
                         ),
+                        definition = WideEventDefinition(version = DEFINITION_VERSION),
                     ).getOrNull() ?: return@withLock
 
                     pirDataStore.initialScanCompletionFlowId = newFlowId
@@ -221,11 +227,14 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
 
     private fun Boolean.toTrackerBlockingState(): String = if (this) "enabled" else "disabled"
 
+    private fun scanWebViewSizeState(): String = if (pirRemoteFeatures.scanWebViewSize().isEnabled()) "enabled" else "disabled"
+
     companion object {
         const val WIDE_EVENT_NAME = "pir-time-to-first-scan-complete"
         const val ENTRY_POINT = "funnel_pir_time_to_first_scan_complete_android"
 
         val COMPLETION_FLOW_TIMEOUT = 14.days
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 2)
 
         const val INTERVAL_TOTAL_DURATION = "total_duration_ms_bucketed"
 
@@ -256,6 +265,8 @@ class PirInitialScanCompletionWideEventImpl @Inject constructor(
         const val KEY_VPN_CONNECTION_STATE = "vpn_connection_state"
         const val KEY_NOTIFICATIONS_PERMISSION_GRANTED = "notifications_permission_granted"
         const val KEY_TRACKER_BLOCKING_STATE = "tracker_blocking_state"
+        const val KEY_FREE_SCAN = "free_scan"
+        const val KEY_SCAN_WEBVIEW_SIZE_STATE = "scan_webview_size_state"
 
         const val KEY_TOTAL_SCAN_JOBS_AT_FINISH = "total_scan_jobs_at_finish"
         const val KEY_FOREGROUND_RUN_COUNT = "foreground_run_count"

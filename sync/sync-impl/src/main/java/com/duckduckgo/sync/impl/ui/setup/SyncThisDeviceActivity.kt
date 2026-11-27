@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.setup
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.addCallback
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -98,6 +99,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
         configureEdgeToEdgeInsets()
 
         configureToolbar()
+        configureBackNavigation()
         configureSyncWithAnotherCta()
         configureSyncWithThisCta()
 
@@ -166,6 +168,12 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
 
     private fun configureToolbar() {
         binding.closeButton.setOnClickListener {
+            viewModel.onCloseClicked()
+        }
+    }
+
+    private fun configureBackNavigation() {
+        onBackPressedDispatcher.addCallback(this) {
             viewModel.onCloseClicked()
         }
     }

@@ -65,6 +65,10 @@ class FakeDuckChatInternal(
         openDuckChatCalls += 1
     }
 
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?) {
+        openDuckChatCalls += 1
+    }
+
     override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) { }
 
     override fun openDuckChatWithPrefill(query: String, entryPoint: DuckChatEntryPoint) { }
@@ -140,6 +144,8 @@ class FakeDuckChatInternal(
     override fun observeShowInVoiceChatUserSetting(): Flow<Boolean> = showInVoiceChatUserSetting
 
     override fun openDuckChatSettings() { }
+
+    override fun openBrowserAccessSettings() { }
 
     override fun closeDuckChat() { }
 

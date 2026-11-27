@@ -19,6 +19,7 @@ package com.duckduckgo.pagetranslation.impl.offer
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.impl.language.DeviceLanguages
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
 import com.duckduckgo.pagetranslation.impl.store.TranslationPreferencesStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
@@ -32,13 +33,11 @@ interface TranslationOfferRules {
      * @param content What the tab currently shows.
      * @param detection Null while detection isn't available yet, e.g. the main frame hasn't finished loading.
      * @param bannerSuppressed True on the reload after Show Original or after a failed translation.
-     * @param availablePairs The manifest's language pairs, each as "<from>-<to>", e.g. "es-en".
      */
     suspend fun decide(
         content: TabContent,
         detection: Detection?,
         bannerSuppressed: Boolean,
-        availablePairs: Set<String>,
     ): TranslationOffer
 }
 
@@ -46,13 +45,13 @@ interface TranslationOfferRules {
 class RealTranslationOfferRules @Inject constructor(
     private val deviceLanguages: DeviceLanguages,
     private val preferencesStore: TranslationPreferencesStore,
+    private val manifestStore: ModelsManifestStore,
 ) : TranslationOfferRules {
 
     override suspend fun decide(
         content: TabContent,
         detection: Detection?,
         bannerSuppressed: Boolean,
-        availablePairs: Set<String>,
     ): TranslationOffer {
         if (content != TabContent.WebPage) return TranslationOffer.None
 
@@ -62,7 +61,8 @@ class RealTranslationOfferRules @Inject constructor(
         val preferred = languages.firstOrNull() ?: return TranslationOffer.None
 
         if (detected == preferred) return TranslationOffer.None
-        if (pairKey(detected, preferred) !in availablePairs) return TranslationOffer.None
+        // a pair listed in the manifest is offered even if its language pack isn't installed yet, the download sheet installs it
+        if (manifestStore.readManifest()?.models?.containsKey(pairKey(detected, preferred)) != true) return TranslationOffer.None
 
         val bannerAllowed = detected !in languages && !bannerSuppressed && (preferencesStore.askToTranslatePages.firstOrNull() ?: true)
         return if (bannerAllowed) TranslationOffer.BannerAndMenuRow else TranslationOffer.MenuRowOnly

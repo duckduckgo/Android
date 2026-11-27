@@ -46,6 +46,7 @@ import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import com.google.android.material.R as MaterialR
 
 private const val EXTRA_THEME = "theme"
 private const val EXTRA_THEME_RES_ID = "themeResId"
@@ -472,17 +473,34 @@ class ThemingRebrandOverlayTest {
 
     @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpInRegularAndFireThemes() {
+    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpMenuRadiusInRegularAndFireThemes() {
         listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
             listOf(false, true).forEach { fireTheme ->
                 val activity = toggleAwareActivity(TOGGLE_RADIUS, theme, fireTheme)
                 val background = Snackbar.make(activity.findViewById(android.R.id.content), "Message", Snackbar.LENGTH_SHORT)
                     .view.background as MaterialShapeDrawable
                 val shape = background.shapeAppearanceModel
-                val expectedRadius = 16f * activity.resources.displayMetrics.density
+                val menuRadius = resolveDimension(activity, R.attr.daxMenuRadius)
 
+                assertEquals(16f * activity.resources.displayMetrics.density, menuRadius, 0f)
                 listOf(shape.topLeftCornerSize, shape.topRightCornerSize, shape.bottomLeftCornerSize, shape.bottomRightCornerSize)
-                    .forEach { corner -> assertEquals(expectedRadius, corner.getCornerSize(RectF(0f, 0f, 100f, 100f)), 0f) }
+                    .forEach { corner -> assertEquals(menuRadius, corner.getCornerSize(RectF(0f, 0f, 100f, 100f)), 0f) }
+            }
+        }
+    }
+
+    @Test
+    fun whenRadiusToggleIsEnabledThenRebrandSnackbarUsesMenuShapeAppearanceInRegularAndFireThemes() {
+        listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
+            listOf(false, true).forEach { fireTheme ->
+                val activity = toggleAwareActivity(TOGGLE_RADIUS, theme, fireTheme)
+                val snackbarStyle = resolveResourceId(activity, MaterialR.attr.snackbarStyle)
+                val attributes = activity.obtainStyledAttributes(snackbarStyle, intArrayOf(MaterialR.attr.shapeAppearance))
+                val shapeAppearance = attributes.getResourceId(0, 0)
+                attributes.recycle()
+
+                assertEquals(R.style.Widget_DuckDuckGo_Snackbar_Rebrand, snackbarStyle)
+                assertEquals(R.style.ShapeAppearance_DuckDuckGo_Menu, shapeAppearance)
             }
         }
     }

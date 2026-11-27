@@ -25,6 +25,7 @@ import com.duckduckgo.app.onboarding.store.OnboardingStore
 import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_ADDRESS_BAR_POSITION
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_AI_INTRO
+import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_COMPLETED
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_DOWNLOAD_CHOICE
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_END
 import com.duckduckgo.app.pixels.OnboardingPixelName.ONBOARDING_NOTIFICATIONS
@@ -182,6 +183,25 @@ class RealOnboardingPixelSenderTest {
                 "value" to "days",
             ),
             type = Unique(tag = "onboarding_time-limit_reached"),
+        )
+    }
+
+    @Test
+    fun whenFireReachedThenReachedEventWithoutValue() = runTest {
+        whenever(mockAppInstallStore.installTimestamp).thenReturn(System.currentTimeMillis())
+
+        testee.fire(ONBOARDING_COMPLETED, OnboardingPixelAction.Reached)
+
+        verify(mockPixel).fire(
+            ONBOARDING_COMPLETED,
+            mapOf(
+                "installType" to "new",
+                "flow" to "default",
+                "pixelSource" to "phone",
+                "daysSinceInstall" to "0",
+                "event" to "reached",
+            ),
+            type = Unique(tag = "onboarding_completed_reached"),
         )
     }
 
@@ -549,7 +569,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "duckai",
-                "variant" to "search_plus_duckai-chat",
+                "variant_search_experience" to "search_plus_duckai-chat",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "shown",
@@ -584,7 +604,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
-                "variant" to "search_plus_duckai-search",
+                "variant_search_experience" to "search_plus_duckai-search",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "shown",
@@ -1102,7 +1122,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
-                "variant" to "search_plus_duckai-chat",
+                "variant_search_experience" to "search_plus_duckai-chat",
                 "variant_download_reason" to "download_reason_ad-blocking",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
@@ -1124,7 +1144,7 @@ class RealOnboardingPixelSenderTest {
             mapOf(
                 "installType" to "new",
                 "flow" to "default",
-                "variant" to "search_plus_duckai-search",
+                "variant_search_experience" to "search_plus_duckai-search",
                 "pixelSource" to "phone",
                 "daysSinceInstall" to "0",
                 "event" to "shown",

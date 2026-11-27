@@ -62,6 +62,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -551,6 +552,152 @@ class SubscriptionWebViewViewModelTest {
             assertEquals("msgId", response.id)
             assertEquals("getUserSettings", response.method)
             assertEquals("granted", response.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogEnabledThenGetUserSettingsResponseReportsDialogSupported() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.onUserSettingsComputed(
+                id = "msgId",
+                notificationsEnabled = false,
+                isAtLeastApi33 = true,
+                runtimePermissionGranted = false,
+                shouldShowRationale = false,
+            )
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertTrue(response.params.getBoolean("notificationsDeniedDialog"))
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogDisabledThenGetUserSettingsResponseReportsDialogNotSupported() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = false))
+
+        viewModel.commands().test {
+            viewModel.onUserSettingsComputed(
+                id = "msgId",
+                notificationsEnabled = false,
+                isAtLeastApi33 = true,
+                runtimePermissionGranted = false,
+                shouldShowRationale = false,
+            )
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertFalse(response.params.getBoolean("notificationsDeniedDialog"))
+        }
+    }
+
+    @Test
+    fun whenShowNotificationsDeniedDialogThenShowNotificationsDeniedDialogCommandSent() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("""{"days":3}"""))
+            val result = awaitItem() as Command.ShowNotificationsDeniedDialog
+            assertEquals("msgId", result.id)
+            assertEquals(3, result.days)
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogFlagDisabledAndShowNotificationsDeniedDialogThenNoCommandEmitted() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = false))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("""{"days":3}"""))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenShowNotificationsDeniedDialogWithoutDaysThenRespondNotNow() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("showNotificationsDeniedDialog", response.method)
+            assertEquals("notNow", response.params.getString("action"))
+        }
+    }
+
+    @Test
+    fun whenShowNotificationsDeniedDialogWithInvalidDaysThenRespondNotNow() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("""{"days":0}"""))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("notNow", response.params.getString("action"))
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogOpenSettingsThenRespondOpenSettings() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("msgId", response.id)
+            assertEquals("showNotificationsDeniedDialog", response.method)
+            assertEquals("openSettings", response.params.getString("action"))
+            assertEquals(Command.OpenNotificationSettings, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsWithNotificationsEnabledThenSendGrantedEvent() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { true }
+            val event = (awaitItem() as Command.SendJsEvent).event
+            assertEquals("useSubscription", event.featureName)
+            assertEquals("onNotificationsPermissionChanged", event.subscriptionName)
+            assertEquals("granted", event.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsWithNotificationsDisabledThenSendDeniedEvent() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { false }
+            val event = (awaitItem() as Command.SendJsEvent).event
+            assertEquals("denied", event.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsThenEventSentOnlyOnce() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { true }
+            assertTrue(awaitItem() is Command.SendJsEvent)
+            viewModel.onResume { true }
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenResumeWithoutOpenSettingsThenNoEventAndNotificationsNotChecked() = runTest {
+        viewModel.commands().test {
+            viewModel.onResume { throw AssertionError("notifications should not be checked") }
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogNotNowThenRespondNotNow() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogNotNow("msgId")
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("msgId", response.id)
+            assertEquals("showNotificationsDeniedDialog", response.method)
+            assertEquals("notNow", response.params.getString("action"))
         }
     }
 

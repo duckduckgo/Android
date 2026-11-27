@@ -16,15 +16,17 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
-import androidx.core.net.toUri
+import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.tabs.model.TabRepository
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.duckchat.impl.R
 import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
+import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesIntoSet(AppScope::class)
 class ListOpenTabsClientTool @Inject constructor(
@@ -37,7 +39,18 @@ class ListOpenTabsClientTool @Inject constructor(
 
     override val name: String = "listOpenTabs"
     override val version: Int = 1
-    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.ASK
+    override val permissionMode: ClientToolPermissionMode = ClientToolPermissionMode.Ask(
+        promptTitle = R.string.duckAiClientToolListOpenTabsPromptTitle,
+        promptMessage = R.string.duckAiClientToolListOpenTabsPromptMessage,
+        name = R.string.duckAiClientToolListOpenTabsName,
+    )
+
+    override val settingsListing = ClientToolSettingsListing(
+        section = ClientToolSettingsSection.SEE,
+        name = R.string.duckAiClientToolListOpenTabsName,
+        description = R.string.duckAiClientToolListOpenTabsDescription,
+        icon = CommonR.drawable.ic_tabs_24,
+    )
 
     override fun isEnabled(): Boolean = feature.self().isEnabled() && feature.listOpenTabs().isEnabled()
 
@@ -49,11 +62,18 @@ class ListOpenTabsClientTool @Inject constructor(
     ): ClientToolResult {
         val limit = parseLimit(input) ?: return ClientToolResult.Failure(ClientToolErrorCode.INVALID_ARGUMENTS)
 
-        val tabs = JSONArray()
-        tabRepositoryProvider.value.forMode(context.browserMode).getTabs()
-            .asSequence()
-            .filter { tab -> tab.url.let { it != null && it.isHttpOrHttps() && !duckChat.isDuckChatUrl(it.toUri()) } }
+        val visibleTabs = tabRepositoryProvider.value.forMode(context.browserMode).getTabs()
+            .filter { duckChat.isToolVisible(it) }
+        // Over the limit, keep the chat's tab and the most recently used ones (a tab the user or openTab just opened),
+        // but list them in tab order.
+        val keptTabIds = visibleTabs
+            .sortedWith(compareByDescending<TabEntity> { it.tabId == context.chatTabId }.thenByDescending { it.lastAccessTime })
             .take(limit)
+            .mapTo(HashSet()) { it.tabId }
+
+        val tabs = JSONArray()
+        visibleTabs
+            .filter { it.tabId in keptTabIds }
             .forEach { tab ->
                 tabs.put(
                     JSONObject()

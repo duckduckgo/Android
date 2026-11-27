@@ -25,9 +25,11 @@ import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.nativeinput.NewChat
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatDetector
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
@@ -42,10 +44,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -61,6 +65,7 @@ class NewChatHintsViewModel @Inject constructor(
     private val browserMode: BrowserMode,
     private val newChatDetector: NewChatDetector,
     private val pixels: NewChatHintsPixels,
+    private val duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     private val eligible: StateFlow<Boolean?> = eligibility.observeEligible(browserMode).stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -85,7 +90,7 @@ class NewChatHintsViewModel @Inject constructor(
             newChat,
         ) { selectedTab, input, models, isEligible, newChat ->
             val showHints = selectedTab?.tabId == tabId && isEligible && newChat.isGuaranteed && input.isDraftEmpty()
-            if (showHints) order.filter { capableModel(it, models) != null } else emptyList()
+            if (showHints) order.filter { capableModel(it, models.forTab(input)) != null } else emptyList()
         }.distinctUntilChanged()
             .onEach { hints ->
                 if (hints.isEmpty()) return@onEach
@@ -109,10 +114,16 @@ class NewChatHintsViewModel @Inject constructor(
 
     private suspend fun sendCommand(hint: NewChatHint, tabId: String) {
         if (!canAct(tabId)) return
-        val models = modelManager.modelState.value
+        val models = modelManager.modelState.value.forTab(provider.stateForTab(tabId).value)
         val model = capableModel(hint, models) ?: return
         if (model.id != models.selectedModelId) {
-            modelManager.selectModel(model)
+            if (duckChatFeature.resetModelForNewChats().isEnabled()) {
+                commands.send(NewChatHintCommand.PickModel(tabId, model.id))
+                // The widget publishes the pick; acting before it lands would open the chooser for the old model.
+                withTimeoutOrNull(PICK_MODEL_TIMEOUT_MS) { provider.stateForTab(tabId).first { it.newChatModelId == model.id } } ?: return
+            } else {
+                modelManager.selectModel(model)
+            }
             // Selecting a model suspends; the tab, chat, eligibility or promo may have changed meanwhile.
             if (!canAct(tabId)) return
         }
@@ -144,4 +155,8 @@ class NewChatHintsViewModel @Inject constructor(
     }
 
     private fun NativeInputState.isDraftEmpty() = !hasText && !hasAttachments && selectedTool == null
+
+    private companion object {
+        const val PICK_MODEL_TIMEOUT_MS = 1_000L
+    }
 }

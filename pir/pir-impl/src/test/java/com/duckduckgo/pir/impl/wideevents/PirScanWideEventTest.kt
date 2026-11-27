@@ -52,6 +52,7 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_LAS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_POWER_SAVING
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_PROFILE_QUERIES_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_SCAN_WEBVIEW_SIZE_STATE
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_SCHEDULING
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TOTAL_OPT_OUT_JOBS
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEventImpl.Companion.KEY_TOTAL_SCAN_JOBS
@@ -186,10 +187,11 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_SCAN_WEBVIEW_SIZE_STATE to "disabled",
                 KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
-            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2)),
         )
     }
 
@@ -205,7 +207,7 @@ class PirScanWideEventTest {
             metadata = argThat { this[KEY_FREE_SCAN] == "true" },
             cleanupPolicy = any(),
             samplingProbability = any(),
-            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1))),
+            definition = eq(WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2))),
         )
     }
 
@@ -222,6 +224,27 @@ class PirScanWideEventTest {
             name = any(),
             flowEntryPoint = any(),
             metadata = argThat { this[KEY_SCHEDULING] == SCHEDULING_QUEUE },
+            cleanupPolicy = any(),
+            samplingProbability = any(),
+            definition = any(),
+        )
+    }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun whenRunStartedWithScanWebViewSizeEnabledThenScanWebViewSizeStateIsEnabled() = runTest {
+        // Given
+        pirRemoteFeatures.scanWebViewSize().setRawStoredState(Toggle.State(true))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(13L))
+
+        // When
+        runStarted(PirExecutionType.SCHEDULED, 1, 5, 5)
+
+        // Then
+        verify(wideEventClient).flowStart(
+            name = any(),
+            flowEntryPoint = any(),
+            metadata = argThat { this[KEY_SCAN_WEBVIEW_SIZE_STATE] == "enabled" },
             cleanupPolicy = any(),
             samplingProbability = any(),
             definition = any(),
@@ -316,10 +339,11 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "enabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_SCAN_WEBVIEW_SIZE_STATE to "disabled",
                 KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
-            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2)),
         )
         verify(wideEventClient).flowStep(
             wideEventId = 123L,
@@ -368,10 +392,11 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_SCAN_WEBVIEW_SIZE_STATE to "disabled",
                 KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
-            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2)),
         )
     }
 
@@ -399,10 +424,11 @@ class PirScanWideEventTest {
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "disabled",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_SCAN_WEBVIEW_SIZE_STATE to "disabled",
                 KEY_FREE_SCAN to "false",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
-            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2)),
         )
     }
 
@@ -1103,9 +1129,10 @@ class PirScanWideEventTest {
                 KEY_TOTAL_SCAN_JOBS to "0",
                 KEY_WEB_VIEW_COUNT to "0",
                 KEY_SCHEDULING to SCHEDULING_QUEUE,
+                KEY_SCAN_WEBVIEW_SIZE_STATE to "disabled",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = 8.hours, flowStatus = FlowStatus.Unknown),
-            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 1)),
+            definition = WideEventDefinition(version = WideEventDefinition.Version(minor = 0, patch = 2)),
         )
         order.verify(wideEventClient).flowStep(
             wideEventId = 90L,

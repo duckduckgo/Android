@@ -28,6 +28,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.ModelSource
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
@@ -40,6 +41,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -186,7 +189,14 @@ class NewChatHintsPixelsTest {
         feature.newChatHints().setRawStoredState(Toggle.State(enable = false))
         track()
 
-        testee.onPromptSubmitted("tab", isNewChat = true, hasImageAttachment = true, hasFileAttachment = false, selectedTool = "image_generation")
+        testee.onPromptSubmitted(
+            "tab",
+            isNewChat = true,
+            hasImageAttachment = true,
+            hasFileAttachment = false,
+            selectedTool = "image_generation",
+            modelSource = null,
+        )
 
         verify(duckChatPixels).fireNewChatFirstPromptSent(
             hasNewChatHints = false,
@@ -195,6 +205,7 @@ class NewChatHintsPixelsTest {
             hasImageAttachment = true,
             hasFileAttachment = false,
             selectedTool = "image_generation",
+            modelSource = null,
         )
     }
 
@@ -204,24 +215,31 @@ class NewChatHintsPixelsTest {
 
         repeat(2) { submitNewChatPrompt() }
 
-        verify(duckChatPixels, times(1)).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any())
+        verify(duckChatPixels, times(1)).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any(), modelSource = anyOrNull())
     }
 
     @Test
     fun whenAPromptIsSentOutsideANewChatThenNothingIsReportedAndTheNewChatIsDropped() = runTest {
         track()
 
-        testee.onPromptSubmitted("tab", isNewChat = false, hasImageAttachment = false, hasFileAttachment = false, selectedTool = "none")
+        testee.onPromptSubmitted(
+            "tab",
+            isNewChat = false,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+            modelSource = null,
+        )
         submitNewChatPrompt()
 
-        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any())
+        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any(), modelSource = anyOrNull())
     }
 
     @Test
     fun whenAPromptIsSentInAnUncountedNewChatThenNothingIsReported() {
         submitNewChatPrompt()
 
-        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any())
+        verify(duckChatPixels, never()).fireNewChatFirstPromptSent(any(), any(), anyOrNull(), any(), any(), any(), modelSource = anyOrNull())
     }
 
     @Test
@@ -239,6 +257,7 @@ class NewChatHintsPixelsTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             selectedTool = "none",
+            modelSource = null,
         )
     }
 
@@ -256,6 +275,7 @@ class NewChatHintsPixelsTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             selectedTool = "none",
+            modelSource = null,
         )
     }
 
@@ -274,6 +294,7 @@ class NewChatHintsPixelsTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             selectedTool = "none",
+            modelSource = null,
         )
     }
 
@@ -313,9 +334,64 @@ class NewChatHintsPixelsTest {
         runCurrent()
     }
 
-    private fun submitNewChatPrompt() {
-        testee.onPromptSubmitted("tab", isNewChat = true, hasImageAttachment = false, hasFileAttachment = false, selectedTool = "none")
+    @Test
+    fun whenTheCountedNewChatsFirstPromptIsSentThenItReportsTheModelSourceAndReturnsTrue() = runTest {
+        track()
+
+        val isFirstPromptSent = testee.onPromptSubmitted(
+            "tab",
+            isNewChat = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+            modelSource = ModelSource.PICKED,
+        )
+
+        assertTrue(isFirstPromptSent)
+        verify(duckChatPixels).fireNewChatFirstPromptSent(
+            hasNewChatHints = true,
+            hintsShown = false,
+            hintTapped = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+            modelSource = ModelSource.PICKED,
+        )
     }
+
+    @Test
+    fun whenAFollowUpPromptIsSentThenItReturnsFalse() = runTest {
+        track()
+        submitNewChatPrompt()
+
+        assertFalse(submitNewChatPrompt())
+    }
+
+    @Test
+    fun whenAPromptIsSentOutsideANewChatThenItReturnsFalse() = runTest {
+        track()
+
+        val isFirstPromptSent = testee.onPromptSubmitted(
+            "tab",
+            isNewChat = false,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+            modelSource = ModelSource.DEFAULT,
+        )
+
+        assertFalse(isFirstPromptSent)
+    }
+
+    private fun submitNewChatPrompt(): Boolean =
+        testee.onPromptSubmitted(
+            "tab",
+            isNewChat = true,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+            modelSource = null,
+        )
 
     private companion object {
         const val NEW_CHAT_URL = "https://duck.ai/chat?duckai=5"

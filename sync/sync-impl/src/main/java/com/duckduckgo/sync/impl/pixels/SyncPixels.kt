@@ -305,6 +305,7 @@ interface SyncPixels {
         ALREADY_UPGRADED("already_upgraded"),
         ALREADY_PAIRED("already_paired"),
         RECOVERY_CODE_PREPARATION_FAILED("recovery_code_preparation_failed"),
+        RECOVERY_CODE_GENERATION_FAILED("recovery_code_generation_failed"),
         MISSING_3PARTY_CREDENTIAL("missing_3party_credential"),
         UNDECRYPTABLE_3PARTY_CREDENTIAL("undecryptable_3party_credential"),
         ACCOUNT_EXTEND_FAILED("account_extend_failed"),
@@ -317,6 +318,7 @@ interface SyncPixels {
         RELAY_CHANNEL_UNAVAILABLE("relay_channel_unavailable"),
         PROTOCOL_ERROR("protocol_error"),
         UNEXPECTED_FAILURE("unexpected_failure"),
+        DEVICE_AUTH_ERROR("device_auth_error"),
     }
 
     enum class AuthenticationResult(val value: String) {

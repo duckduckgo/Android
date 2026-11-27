@@ -50,7 +50,18 @@ class DuckAiClientToolsDevViewModelTest {
             listOf(
                 FlagRow(BrowserToolsFlag.BROWSER_TOOLS, enabled = false),
                 FlagRow(BrowserToolsFlag.SKIP_PERMISSION_PROMPT, enabled = false),
+                FlagRow(BrowserToolsFlag.REQUEST_ACCESS, enabled = false),
+                FlagRow(BrowserToolsFlag.REQUEST_ACCESS_REMOVE_TOOLS, enabled = false),
                 FlagRow(BrowserToolsFlag.LIST_OPEN_TABS, enabled = true),
+                FlagRow(BrowserToolsFlag.SWITCH_TO_TAB, enabled = false),
+                FlagRow(BrowserToolsFlag.OPEN_TAB, enabled = false),
+                FlagRow(BrowserToolsFlag.BOOKMARK_TAB, enabled = false),
+                FlagRow(BrowserToolsFlag.CLOSE_TABS, enabled = false),
+                FlagRow(BrowserToolsFlag.SEARCH_BOOKMARKS, enabled = false),
+                FlagRow(BrowserToolsFlag.SEARCH_DOWNLOADS, enabled = false),
+                FlagRow(BrowserToolsFlag.READ_TAB_CONTENT, enabled = false),
+                FlagRow(BrowserToolsFlag.SEARCH_HISTORY, enabled = false),
+                FlagRow(BrowserToolsFlag.FIND_IN_PAGE, enabled = false),
             ),
             viewModel.viewState.value.flags,
         )

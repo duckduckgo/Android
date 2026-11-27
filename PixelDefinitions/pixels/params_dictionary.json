@@ -52,7 +52,7 @@
         "enum": ["phone", "tablet"]
     },
     "inputPreviewAction": {
-        "key": "variant",
+        "key": "variant_search_experience",
         "type": "string",
         "description": "Onboarding Duck.ai search/chat branch, chosen at the input-screen preview step. Set on every onboarding pixel fired after the user passes that step; absent for pixels fired before it or for users who never see it.",
         "enum": ["search_plus_duckai-search", "search_plus_duckai-chat"]
@@ -60,7 +60,7 @@
     "onboardingDownloadReasonVariant": {
         "key": "variant_download_reason",
         "type": "string",
-        "description": "Download reason picked on the download-choice screen of the segmented onboarding flow. Set on every onboarding pixel fired after that screen; absent for pixels fired before it and for flows that never show it. Independent of the search/chat branch reported by `variant`, since a run can make both choices.",
+        "description": "Download reason picked on the download-choice screen of the segmented onboarding flow. Set on every onboarding pixel fired after that screen; absent for pixels fired before it and for flows that never show it. Independent of the search/chat branch reported by `variant_search_experience`, since a run can make both choices.",
         "enum": ["download_reason_search", "download_reason_ai-chat", "download_reason_no-ai", "download_reason_ad-blocking"]
     },
     "contextualSuggestionsPageType": {
@@ -96,6 +96,12 @@
         "type": "string",
         "description": "What the user was looking at when the prompt was submitted.",
         "enum": ["ntp", "serp", "website", "duck_ai", "contextual"]
+    },
+    "duckAiModelSource": {
+        "key": "model_source",
+        "type": "string",
+        "description": "Where the model and effort of a new chat's first prompt came from. Sent only with resetModelForNewChats on, on the first prompt of a New Chat on the Duck.ai page or from the contextual sheet's entry input; omitted otherwise. Covers model and effort together; the effort itself is in reasoning_effort. default: the effective new-chat default from a loaded model list, which is the model list's newChatDefault model on its effort when it sends one, else the hardcoded tier default on fast. picked: the user changed the model or effort before sending (picking away and back counts as the starting point). onboarding: the model the onboarding flow opened the chat on. fallback: the effective default couldn't be sent: the server's newChatDefault model or effort was missing or locked so the hardcoded tier default or first accessible model was sent, or the model list hadn't loaded so the hardcoded tier default was sent. user_default and user_default_unavailable aren't sent yet.",
+        "enum": ["default", "user_default", "picked", "onboarding", "fallback", "user_default_unavailable"]
     },
     "duckAiAddressBarMenuPageType": {
         "key": "page_type",
@@ -340,6 +346,12 @@
         "key": "free_scan",
         "type": "boolean",
         "description": "Whether the user is a free (freemium) PIR user."
+    },
+    "pirScanWebViewSizeState": {
+        "key": "scan_webview_size_state",
+        "type": "string",
+        "description": "Whether the scanWebViewSize remote flag was on, laying out PIR scan WebViews at a desktop-width viewport instead of 0x0.",
+        "enum": ["enabled", "disabled"]
     },
     "pirNotificationPromptType": {
         "key": "prompt_type",

@@ -354,4 +354,12 @@ interface DuckChatFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun duckAiWidgetDynamicColors(): Toggle
+
+    /**
+     * @return `true` when every new Duck.ai chat starts on the tier default model, and a pick only applies to the
+     * next chat in the tab it was made in. When `false`, a pick becomes the model for all future chats.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun resetModelForNewChats(): Toggle
 }

@@ -76,6 +76,7 @@ import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.duckchat.api.viewmodel.DuckChatSharedViewModel
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.clienttools.RealDuckAiToolPermissionPrompts
 import com.duckduckgo.duckchat.impl.databinding.FragmentContextualDuckAiWebviewBinding
 import com.duckduckgo.duckchat.impl.feature.AIChatDownloadFeature
 import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
@@ -101,6 +102,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -144,6 +146,9 @@ class DuckChatContextualWebViewFragment :
 
     @Inject
     lateinit var duckChatJSHelper: DuckChatJSHelper
+
+    @Inject
+    lateinit var toolPermissionPrompts: RealDuckAiToolPermissionPrompts
 
     @Inject
     lateinit var subscriptionsJSHelper: SubscriptionsJSHelper
@@ -252,6 +257,7 @@ class DuckChatContextualWebViewFragment :
                 )
             }
         }
+        toolPermissionPrompts.register(this, viewModel.viewState.map { it.tabId }, contextual = true)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -273,6 +279,8 @@ class DuckChatContextualWebViewFragment :
             }
 
             it.webViewClient = webViewClient
+            // A reload or a new page ends the chat that asked, so its waiting tool calls must not run.
+            webViewClient.onPageStartedListener = { cancelPendingClientToolCalls() }
             webViewClient
                 .onPageFinishedListener = { url ->
                 viewModel.onChatPageLoaded(url)
@@ -1020,10 +1028,15 @@ class DuckChatContextualWebViewFragment :
 
     override fun onDestroyView() {
         bottomSheetBehavior.removeBottomSheetCallback(bottomSheetCallback)
+        cancelPendingClientToolCalls()
         super.onDestroyView()
         appCoroutineScope.launch(dispatcherProvider.io()) {
             cookieManager?.flush()
         }
+    }
+
+    private fun cancelPendingClientToolCalls() {
+        duckChatJSHelper.cancelPendingClientToolCalls(viewModel.viewState.value.tabId, contextual = true)
     }
 
     companion object {

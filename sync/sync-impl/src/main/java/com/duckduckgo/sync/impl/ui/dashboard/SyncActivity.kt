@@ -18,10 +18,13 @@ package com.duckduckgo.sync.impl.ui.dashboard
 
 import android.Manifest
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
 import androidx.core.view.isInvisible
@@ -67,6 +70,7 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskOpenNotificationSettings
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSetupSyncDeepLink
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSyncWithDesktop
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
@@ -79,12 +83,15 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.Launc
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.OpenNotificationSettings
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RequestNotificationPermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.NewLoginNotificationsViewState
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.ViewState
@@ -279,6 +286,12 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) {
+        viewModel.onNotificationPermissionResult()
+    }
+
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
         object : SyncedDeviceAdapter.Listener {
             override fun onDeviceClicked(device: ConnectedDevice) {
@@ -293,6 +306,15 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private val autoRestoreListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onAutoRestoreToggleChanged(isChecked)
+    }
+
+    private val newLoginNotificationsListener = object : OnCheckedChangeListener {
+        override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+            // The view state decides what the switch shows. A tap that leaves that state unchanged (turned on while the app
+            // cannot post) emits nothing, so we undo the tap here and let the next state set the switch.
+            binding.includeEnabledView.newLoginNotificationsItem.quietlySetIsChecked(!isChecked, this)
+            viewModel.onNewLoginNotificationsToggled(isChecked, shouldShowNotificationPermissionRationale())
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -312,6 +334,7 @@ class SyncActivity : DuckDuckGoActivity() {
         configureRecoverySection()
         configureDeviceActivityItem()
         configureNewDeviceBanner()
+        configureNewLoginNotificationsCard()
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
@@ -359,12 +382,13 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun renderViewState(viewState: ViewState) {
         binding.root.isInvisible = viewState.isContentHidden
-        binding.notifyMeContainer.isVisible = viewState.showAccount
+        binding.notifyMeContainer.isVisible = viewState.showNotifyMe
         binding.syncHeader.setState(
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
         )
         renderNewDeviceBanner(viewState.newDeviceBanner)
+        renderNewLoginNotifications(viewState.newLoginNotifications)
         renderEnabledState(viewState)
         renderDisabledState(viewState)
     }
@@ -375,6 +399,14 @@ class SyncActivity : DuckDuckGoActivity() {
             if (banner == null) return
             newDeviceBannerTitle.text = banner.title(resources)
             newDeviceBannerBody.text = banner.body(resources)
+        }
+    }
+
+    private fun renderNewLoginNotifications(state: NewLoginNotificationsViewState?) {
+        binding.includeNewLoginNotificationsCard.root.isVisible = state?.showCard == true
+        binding.includeEnabledView.newLoginNotificationsItem.apply {
+            isVisible = state != null
+            if (state != null) quietlySetIsChecked(state.switchOn, newLoginNotificationsListener)
         }
     }
 
@@ -422,6 +454,18 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is AskDeleteServerData -> {
                 askDeleteServerData()
+            }
+
+            is AskOpenNotificationSettings -> {
+                askOpenNotificationSettings()
+            }
+
+            is OpenNotificationSettings -> {
+                startActivity(command.intent)
+            }
+
+            is RequestNotificationPermission -> {
+                if (Build.VERSION.SDK_INT >= 33) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
 
             is AskEditDevice -> {
@@ -668,6 +712,18 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureNewLoginNotificationsCard() {
+        binding.includeNewLoginNotificationsCard.apply {
+            newLoginNotificationsCardEnable.setOnClickListener {
+                viewModel.onEnableNotificationsClicked(shouldShowNotificationPermissionRationale())
+            }
+            newLoginNotificationsCardClose.setOnClickListener { viewModel.onEnableNotificationsCardCloseClicked() }
+        }
+    }
+
+    private fun shouldShowNotificationPermissionRationale(): Boolean =
+        Build.VERSION.SDK_INT >= 33 && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
+
     private fun configureNewDeviceBanner() {
         binding.includeNewDeviceBanner.apply {
             newDeviceBannerReview.setOnClickListener { viewModel.onNewDeviceBannerReviewClicked() }
@@ -762,6 +818,23 @@ class SyncActivity : DuckDuckGoActivity() {
             setPrimaryTextColorStateList(color)
             setOnClickListener { viewModel.onDeleteAccountClicked() }
         }
+    }
+
+    private fun askOpenNotificationSettings() {
+        TextAlertDialogBuilder(this)
+            .setTitle(R.string.syncNewLoginNotificationsSettingsDialogTitle)
+            .setMessage(R.string.syncNewLoginNotificationsSettingsDialogMessage)
+            .setPositiveButton(R.string.syncNewLoginNotificationsSettingsDialogConfirm)
+            .setNegativeButton(CommonR.string.cancel, SECONDARY)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onPositiveButtonClicked() {
+                        viewModel.onOpenNotificationSettingsConfirmed()
+                    }
+                },
+            )
+            .setCancellable(true)
+            .show()
     }
 
     private fun askDeleteServerData() {

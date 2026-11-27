@@ -55,6 +55,10 @@
             </FrameLayout>
 
             <include
+                android:id="@+id/includeNewLoginNotificationsCard"
+                layout="@layout/view_sync_new_login_notifications_card" />
+
+            <include
                 android:id="@+id/includeNewDeviceBanner"
                 layout="@layout/view_sync_new_device_banner" />
 

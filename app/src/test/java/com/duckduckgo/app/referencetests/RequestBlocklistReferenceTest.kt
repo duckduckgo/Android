@@ -75,6 +75,7 @@ import com.duckduckgo.privacy.config.store.features.trackerallowlist.TrackerAllo
 import com.duckduckgo.privacy.config.store.features.trackerallowlist.buildRulesByDomain
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.impl.HttpsUpgradeStep
 import com.duckduckgo.request.interception.impl.RealRequestBlocklist
 import com.duckduckgo.request.interception.impl.RequestBlocklistFeature
 import com.duckduckgo.request.interception.impl.RequestExemptions
@@ -220,9 +221,13 @@ class RequestBlocklistReferenceTest(private val testCase: TestCase) {
 
         testee = WebViewRequestInterceptor(
             trackerDetector = trackerDetector,
-            httpsUpgrader = mockHttpsUpgrader,
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutinesTestRule.testScope,
+                coroutinesTestRule.testDispatcherProvider,
+            ),
             resourceSurrogates = resourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = userAgentProvider,

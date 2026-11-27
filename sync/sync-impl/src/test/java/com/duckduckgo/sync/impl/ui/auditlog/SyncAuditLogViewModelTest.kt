@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl.ui.auditlog
 
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
@@ -34,6 +35,7 @@ import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Status
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.ViewState
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.runTest
@@ -56,6 +58,7 @@ class SyncAuditLogViewModelTest {
     private val stateStore = FakeStateStore()
     private val newLoginNotifier: NewLoginNotifier = mock()
     private val loginAuditLogFeature = FakeLoginAuditLogFeature()
+    private val connectedDevicesRepository = FakeConnectedDevicesRepository()
     private val timeProvider: CurrentTimeProvider = mock<CurrentTimeProvider>().also {
         whenever(it.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
     }
@@ -110,6 +113,67 @@ class SyncAuditLogViewModelTest {
         loader.result.complete(loaded())
 
         assertEquals(Content.EMPTY, testee.viewState.value.content)
+    }
+
+    @Test
+    fun whenLogIsEmptyAndOnlyThisDeviceIsSyncedThenOnlyThisDevice() = runTest {
+        connectedDevicesRepository.count = 1
+        val testee = viewModel()
+
+        loader.result.complete(loaded())
+
+        assertEquals(Content.ONLY_THIS_DEVICE, testee.viewState.value.content)
+    }
+
+    @Test
+    fun whenLogIsEmptyAndOtherDevicesAreSyncedThenEmpty() = runTest {
+        connectedDevicesRepository.count = 2
+        val testee = viewModel()
+
+        loader.result.complete(loaded())
+
+        assertEquals(Content.EMPTY, testee.viewState.value.content)
+    }
+
+    @Test
+    fun whenLogIsEmptyAndDeviceListWasNeverReadThenEmpty() = runTest {
+        connectedDevicesRepository.count = 0
+        val testee = viewModel()
+
+        loader.result.complete(loaded())
+
+        assertEquals(Content.EMPTY, testee.viewState.value.content)
+    }
+
+    @Test
+    fun whenLogHasRowsAndOnlyThisDeviceIsSyncedThenList() = runTest {
+        connectedDevicesRepository.count = 1
+        val testee = viewModel()
+
+        loader.result.complete(loaded(ITEM_1))
+
+        assertEquals(Content.LIST, testee.viewState.value.content)
+    }
+
+    @Test
+    fun whenLoadFailsAndOnlyThisDeviceIsSyncedThenError() = runTest {
+        connectedDevicesRepository.count = 1
+        val testee = viewModel()
+
+        loader.result.complete(SyncAuditLogLoadResult.Failed)
+
+        assertEquals(Content.ERROR, testee.viewState.value.content)
+    }
+
+    @Test
+    fun whenOlderLoadReachesStartOfLogWithNoRowsAndOnlyThisDeviceIsSyncedThenOnlyThisDevice() = runTest {
+        connectedDevicesRepository.count = 1
+        val testee = loadedViewModel(loaded(before = "b1"))
+
+        testee.onNearListEnd()
+        loader.older.complete(loaded(before = null))
+
+        assertEquals(Content.ONLY_THIS_DEVICE, testee.viewState.value.content)
     }
 
     @Test
@@ -457,6 +521,7 @@ class SyncAuditLogViewModelTest {
             stateStore,
             newLoginNotifier,
             loginAuditLogFeature,
+            connectedDevicesRepository,
         )
 
     private fun loadedViewModel(first: SyncAuditLogLoadResult.Loaded, entriesPerPage: Int? = null) =
@@ -495,6 +560,16 @@ class SyncAuditLogViewModelTest {
         override suspend fun isAuditLogEnabled(): Boolean = auditLogEnabled
 
         override suspend fun isNotificationEnabled(): Boolean = auditLogEnabled
+    }
+
+    private class FakeConnectedDevicesRepository : ConnectedDevicesRepository {
+        var count = 2
+
+        override fun getConnectedDevices(reportAccountErrorPixel: Boolean) = error("Device Activity must not fetch the device list")
+
+        override fun latestConnectedDeviceCountFlow(): Flow<Int> = emptyFlow()
+
+        override suspend fun latestConnectedDeviceCount(): Int = count
     }
 
     private class FakeLoader : SyncAuditLogLoader {

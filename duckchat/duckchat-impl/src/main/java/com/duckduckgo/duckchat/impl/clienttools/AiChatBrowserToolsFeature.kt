@@ -33,6 +33,41 @@ interface AiChatBrowserToolsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun listOpenTabs(): Toggle
 
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun switchToTab(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun openTab(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun bookmarkTab(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun closeTabs(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun searchBookmarks(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun searchDownloads(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun readTabContent(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun searchHistory(): Toggle
+
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun findInPage(): Toggle
+
+    /** Advertises the `requestAccess` capability, which asks for several tools in one prompt. */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun requestAccess(): Toggle
+
+    /** Lets the user take tools out of a `requestAccess` prompt for two or more tools before allowing the rest. */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun requestAccessRemoveTools(): Toggle
+
     /** Only honoured in internal builds: lets ASK tools run without a permission prompt. */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
     fun devSkipPermissionPrompt(): Toggle

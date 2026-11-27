@@ -22,13 +22,19 @@ import androidx.core.app.LocaleManagerCompat
 import androidx.core.os.LocaleListCompat
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
+import java.util.Locale
 import javax.inject.Inject
 
-fun interface DeviceLanguages {
+interface DeviceLanguages {
     /**
      * Language tags, the preferred one first.
      */
     fun get(): List<String>
+
+    /**
+     * Name of [languageCode] in the user's language, e.g. "Spanish". Falls back to [languageCode] when unknown.
+     */
+    fun displayName(languageCode: String): String
 }
 
 @ContributesBinding(AppScope::class)
@@ -43,4 +49,11 @@ class RealDeviceLanguages @Inject constructor(
     }
 
     private fun LocaleListCompat.tags(): List<String> = (0 until size()).mapNotNull { get(it)?.toLanguageTag() }
+
+    override fun displayName(languageCode: String): String {
+        val display = Locale.getDefault()
+        return Locale.forLanguageTag(languageCode).getDisplayLanguage(display)
+            .ifBlank { languageCode }
+            .replaceFirstChar { it.titlecase(display) }
+    }
 }

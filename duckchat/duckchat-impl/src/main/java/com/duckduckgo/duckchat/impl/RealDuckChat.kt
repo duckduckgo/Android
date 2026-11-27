@@ -44,6 +44,7 @@ import com.duckduckgo.duckchat.api.DuckChatInputModeState
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.api.InputMode
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessSettingsActivity
 import com.duckduckgo.duckchat.impl.feature.AIChatImageUploadFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -178,6 +179,9 @@ interface DuckChatInternal : DuckChat {
      */
     fun openDuckChatSettings()
 
+    /** Opens the Browser Access settings, where the user manages each browser tool's permission. */
+    fun openBrowserAccessSettings()
+
     /**
      * Closes DuckChat.
      */
@@ -190,6 +194,9 @@ interface DuckChatInternal : DuckChat {
 
     /** Single source of truth for the URL that opens a Duck.ai voice chat. */
     fun getVoiceDuckChatUrl(): String
+
+    /** Opens Duck.ai from [entryPoint] like [openDuckChat], with the tab's next new chat starting on [overrideModelId]. */
+    fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?)
 
     /** Single source of truth for the Duck.ai chat URL shape. */
     fun buildChatUrl(chatId: String): String
@@ -648,6 +655,11 @@ class RealDuckChat @Inject constructor(
         }
     }
 
+    // Unlike openDuckChatSettings this leaves the chat open, so Back returns to the conversation that asked.
+    override fun openBrowserAccessSettings() {
+        context.startActivity(Intent(context, BrowserAccessSettingsActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+    }
+
     override fun closeDuckChat() {
         browserNav.closeDuckChat(context).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -720,9 +732,13 @@ class RealDuckChat @Inject constructor(
     override fun keepSessionIntervalInMinutes() = keepSessionAliveInMinutes
 
     override fun openDuckChat(entryPoint: DuckChatEntryPoint) {
+        openDuckChat(entryPoint, overrideModelId = null)
+    }
+
+    override fun openDuckChat(entryPoint: DuckChatEntryPoint, overrideModelId: String?) {
         logcat { "Duck.ai: openDuckChat" }
         reportDuckChatEntry(entryPoint, opensNewTab = true, hasPrompt = false)
-        openDuckChat(emptyMap())
+        openDuckChat(emptyMap(), launch = DuckChatLaunch.Open(overrideModelId = overrideModelId))
     }
 
     override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {

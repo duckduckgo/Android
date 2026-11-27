@@ -38,5 +38,6 @@ class ReasoningModePickerNativeInputPlugin @Inject constructor() : NativeInputPl
 
     override fun createView(context: Context, host: NativeInputHost): View = ReasoningModePickerView(context).also {
         it.isEditMode = host.isEditSurface()
+        it.host = host
     }
 }

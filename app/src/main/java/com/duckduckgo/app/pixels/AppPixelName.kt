@@ -522,6 +522,7 @@ enum class AppPixelName(override val pixelName: String) : Pixel.PixelName {
     GET_DESKTOP_BROWSER_DISMISSED("m_get_desktop_browser_dismissed"),
 
     AICHAT_VOICE_SESSION_DIGITAL_ASSISTANT_STARTED("m_aichat_voice_session_digital-assistant_started"),
+    DUCK_CHAT_DUCKAI_DAU_TOGGLE_NEVER_ENABLED("m_aichat_duckai_dau_toggle_never_enabled"),
 
     WEBVIEW_SESSION_LARGE_BYTES("webview_session_large_bytes"),
 

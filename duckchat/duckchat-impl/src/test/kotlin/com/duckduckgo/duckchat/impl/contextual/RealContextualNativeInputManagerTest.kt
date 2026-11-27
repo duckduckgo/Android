@@ -39,12 +39,14 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -69,13 +71,42 @@ class RealContextualNativeInputManagerTest {
     private val voiceSearchAvailability: VoiceSearchAvailability = mock {
         whenever(it.observeVoiceSearchAvailability()).thenReturn(voiceSearchAvailable)
     }
-    private val testee = RealContextualNativeInputManager(duckChatInternal, publisher, duckAiFeatureState, voiceSearchAvailability)
+    private val testee =
+        RealContextualNativeInputManager(duckChatInternal, publisher, duckAiFeatureState, voiceSearchAvailability)
 
     @Test
     fun `when onContextualClosed called with blank tabId then publisher is not touched`() {
         testee.onContextualClosed("")
 
         verify(publisher, never()).update(any(), any())
+    }
+
+    @Test
+    fun `when sheet opens then the tab new chat pick is dropped and stays dropped after close`() {
+        val store = FakeStatePublisher()
+        val manager = RealContextualNativeInputManager(duckChatInternal, store, duckAiFeatureState, voiceSearchAvailability)
+        store.update("tab") { it.copy(newChatModelId = "omnibar-model", newChatReasoningMode = "reasoning") }
+
+        manager.onContextualReopened("tab")
+        assertNull(store.state("tab").newChatModelId)
+        assertNull(store.state("tab").newChatReasoningMode)
+
+        manager.onContextualClosed("tab")
+        assertNull(store.state("tab").newChatModelId)
+        assertNull(store.state("tab").newChatReasoningMode)
+    }
+
+    @Test
+    fun `when sheet closes then its unsent new chat pick does not reach the omnibar`() {
+        val store = FakeStatePublisher()
+        val manager = RealContextualNativeInputManager(duckChatInternal, store, duckAiFeatureState, voiceSearchAvailability)
+        manager.onContextualReopened("tab")
+        store.update("tab") { it.copy(newChatModelId = "sheet-model", newChatReasoningMode = "reasoning") }
+
+        manager.onContextualClosed("tab")
+
+        assertNull(store.state("tab").newChatModelId)
+        assertNull(store.state("tab").newChatReasoningMode)
     }
 
     @Test
@@ -144,6 +175,29 @@ class RealContextualNativeInputManagerTest {
             assertTrue(awaitItem())
 
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `when the sheet switches between entry input and running chat then the widget is told which`() {
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChatInternal.isContextualNativeInputEnabled()).thenReturn(true)
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            inputLayout = mockCard().withWidget(widget),
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        testee.onInputMode()
+        testee.onWebViewMode()
+
+        inOrder(widget) {
+            verify(widget).setContextualEntry(true)
+            verify(widget).setContextualEntry(false)
         }
     }
 
@@ -553,5 +607,25 @@ class RealContextualNativeInputManagerTest {
         // createUnsafe bypasses the main-thread assertion so the registry can be driven from the test thread.
         owner.registry = LifecycleRegistry.createUnsafe(owner).apply { currentState = Lifecycle.State.RESUMED }
         return owner
+    }
+
+    private class FakeStatePublisher : NativeInputStatePublisher {
+        private val states = mutableMapOf<String, NativeInputState>()
+
+        fun state(tabId: String): NativeInputState = states[tabId] ?: NativeInputState.zero()
+
+        override fun publish(tabId: String, state: NativeInputState) {
+            states[tabId] = state
+        }
+
+        override fun update(tabId: String, transform: (NativeInputState) -> NativeInputState) {
+            states[tabId] = transform(state(tabId))
+        }
+
+        override fun clearTab(tabId: String) {
+            states.remove(tabId)
+        }
+
+        override fun clearAll() = states.clear()
     }
 }

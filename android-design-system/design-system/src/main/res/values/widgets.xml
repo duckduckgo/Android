@@ -72,7 +72,7 @@
     </style>
 
     <style name="Widget.DuckDuckGo.Snackbar.Rebrand" parent="Widget.DuckDuckGo.Snackbar">
-        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.LargeComponent</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.DuckDuckGo.Menu</item>
     </style>
 
     <style name="Widget.DuckDuckGo.SnackbarButton" parent="Widget.MaterialComponents.Button.TextButton.Snackbar">

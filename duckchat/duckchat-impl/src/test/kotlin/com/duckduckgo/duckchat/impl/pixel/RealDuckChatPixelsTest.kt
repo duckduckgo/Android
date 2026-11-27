@@ -37,6 +37,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.helper.TermsAcceptanceResult
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.models.ModelSource
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_COUNT
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_ALL_CHATS_SELECTED_DAILY
@@ -1092,6 +1093,7 @@ class RealDuckChatPixelsTest {
             hasImageAttachment = true,
             hasFileAttachment = false,
             selectedTool = "web_search",
+            modelSource = null,
         )
 
         advanceUntilIdle()
@@ -1109,6 +1111,33 @@ class RealDuckChatPixelsTest {
     }
 
     @Test
+    fun whenFireNewChatFirstPromptSentWithAModelSourceThenParamsIncludeItsPixelValue() = runTest {
+        testee.fireNewChatFirstPromptSent(
+            hasNewChatHints = true,
+            hintsShown = false,
+            hintTapped = null,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            selectedTool = "none",
+            modelSource = ModelSource.ONBOARDING,
+        )
+
+        advanceUntilIdle()
+
+        val params = mapOf(
+            DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to "true",
+            DuckChatPixelParameters.HINTS_SHOWN to "false",
+            DuckChatPixelParameters.HINT_TAPPED to "none",
+            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to "false",
+            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to "false",
+            DuckChatPixelParameters.SELECTED_TOOL to "none",
+            DuckChatPixelParameters.MODEL_SOURCE to "onboarding",
+        )
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT, params)
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY, params, type = Pixel.PixelType.Daily())
+    }
+
+    @Test
     fun whenFireNewChatFirstPromptSentAfterATapThenHintTappedIsTheHint() = runTest {
         testee.fireNewChatFirstPromptSent(
             hasNewChatHints = true,
@@ -1117,6 +1146,7 @@ class RealDuckChatPixelsTest {
             hasImageAttachment = false,
             hasFileAttachment = false,
             selectedTool = "image_generation",
+            modelSource = null,
         )
 
         advanceUntilIdle()

@@ -16,6 +16,8 @@
 
 package com.duckduckgo.duckchat.impl.clienttools
 
+import androidx.annotation.DrawableRes
+import androidx.annotation.StringRes
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
@@ -27,6 +29,9 @@ interface ClientTool {
     val version: Int
     val permissionMode: ClientToolPermissionMode
 
+    /** How the Browser Access settings screen lists this tool. */
+    val settingsListing: ClientToolSettingsListing
+
     fun isEnabled(): Boolean
 
     fun isValidInput(input: JSONObject): Boolean
@@ -35,19 +40,73 @@ interface ClientTool {
         input: JSONObject,
         context: ClientToolCallContext,
     ): ClientToolResult
+
+    /**
+     * What an [ClientToolPermissionMode.AskEveryTime] prompt shows for this call, such as the URL it acts on.
+     * Called before the prompt, so a target that cannot be resolved fails the call without asking.
+     */
+    suspend fun promptDetail(
+        input: JSONObject,
+        context: ClientToolCallContext,
+    ): ClientToolPromptDetail? = null
 }
 
-enum class ClientToolPermissionMode {
-    ASK,
-    AUTO,
+data class ClientToolSettingsListing(
+    val section: ClientToolSettingsSection,
+    @StringRes val name: Int,
+    @StringRes val description: Int,
+    @DrawableRes val icon: Int,
+)
+
+enum class ClientToolSettingsSection {
+    /** Tools that let Duck.ai read browser data. */
+    SEE,
+
+    /** Tools that let Duck.ai change something in the browser. */
+    DO,
+}
+
+sealed interface ClientToolPromptDetail {
+    data class Shown(val text: String) : ClientToolPromptDetail
+
+    data class Failure(val code: ClientToolErrorCode) : ClientToolPromptDetail
+}
+
+sealed interface ClientToolPermissionMode {
+    data object Auto : ClientToolPermissionMode
+
+    /**
+     * Asks the user before running, with the tool's own prompt copy.
+     * @param name lists the tool, with [promptMessage] under it, in a prompt that asks for several tools at once.
+     */
+    data class Ask(
+        @StringRes val promptTitle: Int,
+        @StringRes val promptMessage: Int,
+        @StringRes val name: Int,
+    ) : ClientToolPermissionMode
+
+    /**
+     * Asks before every call, and the answer covers that call only: never the chat grant, `requestAccess` or Always Allow.
+     * @param promptMessage takes the call's [ClientToolPromptDetail.Shown] text as its only argument.
+     */
+    data class AskEveryTime(
+        @StringRes val promptTitle: Int,
+        @StringRes val promptMessage: Int,
+    ) : ClientToolPermissionMode
 }
 
 /**
  * @param chatTabId the tab the chat belongs to: the Duck.ai tab itself, or the page tab hosting the contextual sheet.
+ * @param chatId the Duck.ai conversation, or null when the page has not started one.
+ * @param contextual whether the chat runs in the contextual sheet rather than a Duck.ai tab.
  */
 data class ClientToolCallContext(
     val chatTabId: String,
     val browserMode: BrowserMode,
+    val chatId: String?,
+    val contextual: Boolean = false,
+    /** The [ClientToolPromptDetail.Shown] text the user allowed, for an [ClientToolPermissionMode.AskEveryTime] tool. */
+    val allowedDetail: String? = null,
 )
 
 sealed interface ClientToolResult {
