@@ -30,7 +30,7 @@ class WebTrackersBlockedAppRepository @Inject constructor(
     private val writer: WebTrackersBlockedWriter,
 ) : WebTrackersBlockedHistory {
 
-    override suspend fun onTrackerBlocked(trackerUrl: String, trackerCompany: String) {
+    override fun onTrackerBlocked(trackerUrl: String, trackerCompany: String) {
         writer.record(trackerUrl = trackerUrl, trackerCompany = trackerCompany)
     }
 

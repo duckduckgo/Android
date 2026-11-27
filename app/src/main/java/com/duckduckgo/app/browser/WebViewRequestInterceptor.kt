@@ -330,7 +330,7 @@ class WebViewRequestInterceptor(
         maliciousSiteBlockerWebViewIntegration.onSiteExempted(url, feed)
     }
 
-    private suspend fun getWebResourceResponse(
+    private fun getWebResourceResponse(
         request: WebResourceRequest,
         documentUrl: Uri,
         webViewClientListener: WebViewClientListener?,
@@ -425,7 +425,7 @@ class WebViewRequestInterceptor(
         return trackingEvent
     }
 
-    private suspend fun recordTrackerBlocked(trackingEvent: TrackingEvent) {
+    private fun recordTrackerBlocked(trackingEvent: TrackingEvent) {
         val trackerCompany = trackingEvent.entity?.displayName ?: "Undefined"
         webTrackersBlockedHistory.onTrackerBlocked(trackerUrl = trackingEvent.trackerUrl, trackerCompany = trackerCompany)
     }
