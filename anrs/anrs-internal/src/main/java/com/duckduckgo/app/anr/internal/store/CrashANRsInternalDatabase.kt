@@ -35,7 +35,7 @@ abstract class CrashANRsInternalDatabase : RoomDatabase() {
     abstract fun crashDao(): InternalCrashDao
 
     companion object {
-        val ALL_MIGRATIONS = emptyArray<Migration>()
+        val ALL_MIGRATIONS = emptyList<Migration>()
     }
 }
 
