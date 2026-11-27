@@ -18,7 +18,6 @@ package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.squareup.moshi.JsonReader
@@ -37,20 +36,18 @@ data class UserDefaultModel(val modelId: String?)
 class UserDefaultModelRepository @Inject constructor(
     private val storageProvider: Lazy<BrowserModeDataProvider<DuckAiBridgeStorage>>,
     private val duckChatFeature: DuckChatFeature,
-    private val duckChat: Lazy<DuckChatInternal>,
 ) {
     fun isUserDefaultEnabled(): Boolean = duckChatFeature.resetModelForNewChats().isEnabled() &&
         duckChatFeature.userDefaultModel().isEnabled() &&
-        duckChat.value.isNativeStorageEnabled()
+        duckChatFeature.duckAiNativeStorage().isEnabled()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun observe(): Flow<UserDefaultModel?> =
         combine(
             duckChatFeature.resetModelForNewChats().enabled(),
             duckChatFeature.userDefaultModel().enabled(),
-        ) { resetEnabled, userDefaultEnabled -> resetEnabled && userDefaultEnabled }
-            .distinctUntilChanged()
-            .flatMapLatest { if (it) duckChat.value.observeNativeStorageEnabled() else flowOf(false) }
+            duckChatFeature.duckAiNativeStorage().enabled(),
+        ) { resetEnabled, userDefaultEnabled, nativeStorageEnabled -> resetEnabled && userDefaultEnabled && nativeStorageEnabled }
             .distinctUntilChanged()
             .flatMapLatest { enabled ->
                 if (enabled) {

@@ -20,7 +20,6 @@ import android.annotation.SuppressLint
 import app.cash.turbine.test
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
-import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
@@ -49,24 +48,20 @@ class UserDefaultModelRepositoryTest {
 
     private val dispatcher = StandardTestDispatcher()
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = dispatcher)
-    private val nativeStorageEnabled = MutableStateFlow(true)
     private val settings = MutableStateFlow<DuckAiBridgeSettingEntity?>(null)
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage> = mock()
     private val regularStorage: DuckAiBridgeStorage = mock()
     private val regularSettings: DuckAiBridgeSettingsDao = mock()
-    private val duckChat: DuckChatInternal = mock()
     private val setGates: List<(Boolean) -> Unit> = listOf(
         { enabled -> feature.resetModelForNewChats().setRawStoredState(State(enable = enabled)) },
         { enabled -> feature.userDefaultModel().setRawStoredState(State(enable = enabled)) },
-        { enabled -> nativeStorageEnabled.value = enabled },
+        { enabled -> feature.duckAiNativeStorage().setRawStoredState(State(enable = enabled)) },
     )
 
-    private val repository = UserDefaultModelRepository(lazy { storageProvider }, feature, lazy { duckChat })
+    private val repository = UserDefaultModelRepository(lazy { storageProvider }, feature)
 
     init {
         setGates.forEach { it(true) }
-        whenever(duckChat.observeNativeStorageEnabled()).thenReturn(nativeStorageEnabled)
-        whenever(duckChat.isNativeStorageEnabled()).thenAnswer { nativeStorageEnabled.value }
         whenever(storageProvider.forMode(BrowserMode.REGULAR)).thenReturn(regularStorage)
         whenever(regularStorage.settings).thenReturn(regularSettings)
         whenever(regularSettings.observe(DEFAULT_MODEL_KEY)).thenReturn(settings)
@@ -161,11 +156,11 @@ class UserDefaultModelRepositoryTest {
         repository.observe().test {
             assertEquals(UserDefaultModel("gpt-6-luna"), awaitItem())
 
-            nativeStorageEnabled.value = false
+            feature.duckAiNativeStorage().setRawStoredState(State(enable = false))
             assertNull(awaitItem())
             settings.value = null
 
-            nativeStorageEnabled.value = true
+            feature.duckAiNativeStorage().setRawStoredState(State(enable = true))
             assertNull(awaitItem())
         }
     }
