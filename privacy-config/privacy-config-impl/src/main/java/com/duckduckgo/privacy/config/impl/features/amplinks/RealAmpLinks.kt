@@ -80,12 +80,17 @@ class RealAmpLinks @Inject constructor(
     }
 
     private fun urlContainsAmpKeyword(url: String): Boolean {
-        val ampKeywords = ampLinksRepository.ampKeywords
+        return ampLinksRepository.ampKeywords.any { url.containsKeyword(it) }
+    }
 
-        ampKeywords.forEach { keyword ->
-            if (url.contains(keyword)) {
-                return true
-            }
+    private fun String.containsKeyword(keyword: String): Boolean {
+        if (keyword.isEmpty()) return false
+        if (!keyword.first().isLetterOrDigit()) return contains(keyword)
+
+        var index = indexOf(keyword)
+        while (index >= 0) {
+            if (index == 0 || !this[index - 1].isLetterOrDigit()) return true
+            index = indexOf(keyword, index + 1)
         }
         return false
     }
