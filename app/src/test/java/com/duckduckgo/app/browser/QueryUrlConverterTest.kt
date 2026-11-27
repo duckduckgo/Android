@@ -487,6 +487,103 @@ class QueryUrlConverterTest {
         assertDuckDuckGoSearchQuery("Visit%20example.com%20or%20test.com%20for%20info", result)
     }
 
+    @Test
+    fun `when url has square brackets in query then url returned unchanged`() {
+        val input = "https://example.com/?ids[]=1&x=2"
+        val result = testee.convertQueryToUrl(input)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when url predictor enabled and url has square brackets in query then url returned unchanged`() {
+        val testee = createTestee(useUrlPredictorEnabled = true)
+        val input = "https://example.com/?ids[]=1&x=2"
+        whenever(queryUrlPredictor.classify(input)).thenReturn(Decision.Navigate(input))
+        val result = testee.convertQueryToUrl(input)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when url has pipe in query then url returned unchanged`() {
+        val input = "https://example.com/?a=1|2"
+        val result = testee.convertQueryToUrl(input)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when url predictor enabled and external url has pipe in query then url returned unchanged`() {
+        val testee = createTestee(useUrlPredictorEnabled = true)
+        val input = "https://example.com/?a=1|2"
+        whenever(queryUrlPredictor.classify(input)).thenReturn(Decision.Navigate(input))
+        val result = testee.convertQueryToUrl(input, extractUrlFromQuery = true)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when query origin is from bookmark and url has square brackets in query then url returned unchanged`() {
+        val input = "https://example.com/?ids[]=1&x=2"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromBookmark)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when query origin is from autocomplete and is nav and url has pipe in query then url returned unchanged`() {
+        val input = "https://example.com/?a=1|2"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when url missing scheme has square brackets in query then http added and query kept`() {
+        val input = "example.com/?ids[]=1&x=2"
+        val result = testee.convertQueryToUrl(input)
+        assertEquals("http://example.com/?ids[]=1&x=2", result)
+    }
+
+    @Test
+    fun `when url has host without dot and file name with dot then url returned unchanged`() {
+        val input = "http://localhost:8793/test.html"
+        val result = testee.convertQueryToUrl(input)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when url has host without dot and another url in query then url returned unchanged`() {
+        val input = "http://intranet/?next=https://other.example/x"
+        val result = testee.convertQueryToUrl(input)
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when url predictor enabled and file url has host then web url extracted and file url not returned`() {
+        val testee = createTestee(useUrlPredictorEnabled = true)
+        val input = "file://example.com/"
+        whenever(queryUrlPredictor.classify(input)).thenReturn(Decision.Navigate(input))
+        val result = testee.convertQueryToUrl(input)
+        assertEquals("http://example.com/", result)
+    }
+
+    @Test
+    fun `when query origin is from autocomplete and is nav and file url has host then web url extracted and file url not returned`() {
+        val input = "file://example.com/"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
+        assertEquals("http://example.com/", result)
+    }
+
+    @Test
+    fun `when url has userinfo then url before userinfo delimiter still extracted`() {
+        val input = "https://trusted.example.com|@other.example/"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
+        assertEquals("https://trusted.example.com", result)
+    }
+
+    @Test
+    fun `when url has userinfo and no characters the url pattern excludes then url returned unchanged`() {
+        val input = "https://user:pass@example.com/"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
+        assertEquals(input, result)
+    }
+
     private fun createTestee(useUrlPredictorEnabled: Boolean): QueryUrlConverter {
         androidBrowserConfigFeature.useUrlPredictor().setRawStoredState(State(useUrlPredictorEnabled))
         val converter = QueryUrlConverter(
