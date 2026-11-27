@@ -32,9 +32,6 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     id: "widgetPromptTitle"
 - tapOn: "Not Now"
-- assertVisible:
-    id: "inputScreenTitle"
-- tapOn: "next"
 - extendedWaitUntil:
     visible:
       id: "importPasswordsTitle"
@@ -47,6 +44,9 @@ appId: com.duckduckgo.mobile.android
     commands:
       - tapOn:
           id: "secondaryCta"
+- assertVisible:
+    id: "inputScreenTitle"
+- tapOn: "next"
 - assertVisible:
     id: "addressBarTitle"
 - tapOn: "next"
