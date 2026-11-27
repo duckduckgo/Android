@@ -18,13 +18,18 @@
 
 
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:initialKeyguardLayout="@layout/search_only_widget_daynight"
     android:initialLayout="@layout/search_only_widget_daynight"
-    android:minWidth="348dp"
-    android:minHeight="40dp"
+    android:minWidth="280dp"
+    android:minHeight="52dp"
     android:minResizeWidth="110dp"
     android:previewImage="@drawable/image_preview_search_only_widget_daynight"
+    android:previewLayout="@layout/search_only_widget_daynight"
     android:resizeMode="horizontal"
+    android:targetCellWidth="4"
+    android:targetCellHeight="1"
     android:description="@string/searchOnlyWidgetDescription"
     android:updatePeriodMillis="86400000"
-    android:widgetCategory="home_screen|keyguard" />
+    android:widgetCategory="home_screen|keyguard|searchbox"
+    tools:targetApi="s" />
