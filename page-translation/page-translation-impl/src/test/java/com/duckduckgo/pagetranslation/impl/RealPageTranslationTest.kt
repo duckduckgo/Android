@@ -17,7 +17,9 @@
 package com.duckduckgo.pagetranslation.impl
 
 import android.webkit.WebView
+import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.pagetranslation.impl.messaging.PageTranslationMessaging
+import com.duckduckgo.pagetranslation.impl.session.TabTranslation
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test
@@ -29,28 +31,29 @@ import org.mockito.kotlin.verify
 class RealPageTranslationTest {
     private val attachedWebView = AttachedWebView()
     private val messaging: PageTranslationMessaging = mock()
-    private val pageTranslation = RealPageTranslation(mock(), attachedWebView, mock(), messaging)
+    private val tabTranslation: TabTranslation = mock()
+    private val pageTranslation = RealPageTranslation(mock(), attachedWebView, mock(), messaging, tabTranslation)
     private val webView: WebView = mock()
 
     @Test
-    fun dropThePreviousWebViewsRequestThenRegisterTheInterfaceOnAttach() {
+    fun endThePreviousWebViewsSessionThenRegisterTheInterfaceOnAttach() {
         pageTranslation.attach(webView)
 
         assertSame(webView, attachedWebView.webView)
-        inOrder(messaging) {
-            verify(messaging).cancel()
+        inOrder(tabTranslation, messaging) {
+            verify(tabTranslation).endSession()
             verify(messaging).register(webView)
         }
     }
 
     @Test
-    fun dropTheRequestWhenTheAttachedWebViewIsDetached() {
+    fun endTheSessionWhenTheAttachedWebViewIsDetached() {
         pageTranslation.attach(webView)
 
         pageTranslation.detach(webView)
 
         assertNull(attachedWebView.webView)
-        verify(messaging, times(2)).cancel()
+        verify(tabTranslation, times(2)).endSession()
     }
 
     @Test
@@ -60,6 +63,13 @@ class RealPageTranslationTest {
         pageTranslation.detach(mock())
 
         assertSame(webView, attachedWebView.webView)
-        verify(messaging, times(1)).cancel()
+        verify(tabTranslation, times(1)).endSession()
+    }
+
+    @Test
+    fun passTheTabsVisibilityToTheTranslation() {
+        pageTranslation.onTabStateChanged(isVisible = true, TabContent.WebPage)
+
+        verify(tabTranslation).setVisible(true)
     }
 }

@@ -22,7 +22,6 @@ import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.offer.ActiveOffer
 import com.duckduckgo.pagetranslation.impl.offer.TranslationOfferSource
-import com.duckduckgo.pagetranslation.impl.translate.TranslateAction
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
@@ -31,17 +30,14 @@ import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
 /**
- * Temporary bindings until the translation session lands. The session change deletes this class.
- * Nothing is offered and translating does nothing.
+ * Temporary binding until language detection lands. The detection change deletes this class.
+ * Nothing is offered.
  */
 @ContributesBinding(FragmentScope::class, binding = binding<TranslationOfferSource>())
-@ContributesBinding(FragmentScope::class, binding = binding<TranslateAction>())
 @SingleIn(FragmentScope::class)
-class TemporarySessionSeams @Inject constructor() : TranslationOfferSource, TranslateAction {
+class TemporarySessionSeams @Inject constructor() : TranslationOfferSource {
 
     override val offer: StateFlow<ActiveOffer?> = MutableStateFlow(null)
-
-    override fun translate(pair: LanguagePair) = Unit
 }
 
 /**
