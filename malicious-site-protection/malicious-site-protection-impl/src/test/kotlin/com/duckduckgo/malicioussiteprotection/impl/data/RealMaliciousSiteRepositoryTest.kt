@@ -22,7 +22,10 @@ import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Ignored
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.async
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -49,6 +52,106 @@ class RealMaliciousSiteRepositoryTest {
         coroutineRule.testDispatcherProvider,
         mockPixel,
     )
+
+    @Test
+    fun concurrentHashPrefixUpdatesDownloadMissingFeedOnce() = runTest {
+        verifyConcurrentUpdatesDownloadOnce(Type.HASH_PREFIXES)
+    }
+
+    @Test
+    fun concurrentFilterUpdatesDownloadMissingFeedOnce() = runTest {
+        verifyConcurrentUpdatesDownloadOnce(Type.FILTER_SET)
+    }
+
+    @Test
+    fun hashPrefixAndFilterUpdatesCanDownloadConcurrently() = runTest {
+        val release = CompletableDeferred<Unit>()
+        var hashStarted = false
+        var filterStarted = false
+        val service = object : MaliciousSiteDatasetService by maliciousSiteDatasetService {
+            override suspend fun getPhishingHashPrefixes(revision: Int): HashPrefixResponse {
+                hashStarted = true
+                release.await()
+                return HashPrefixResponse(emptySet(), emptySet(), 2, false)
+            }
+
+            override suspend fun getPhishingFilterSet(revision: Int): FilterSetResponse {
+                filterStarted = true
+                release.await()
+                return FilterSetResponse(emptySet(), emptySet(), 2, false)
+            }
+        }
+        whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(2))
+        whenever(maliciousSiteDao.getLatestRevision()).thenReturn(emptyList())
+        val subject = RealMaliciousSiteRepository(
+            maliciousSiteDao,
+            maliciousSiteService,
+            service,
+            coroutineRule.testDispatcherProvider,
+            mockPixel,
+        )
+        val hashes = async(start = CoroutineStart.UNDISPATCHED) { subject.loadHashPrefixes(PHISHING) }
+        val filters = async(start = CoroutineStart.UNDISPATCHED) { subject.loadFilters(PHISHING) }
+        assertTrue(hashStarted)
+        assertTrue(filterStarted)
+        release.complete(Unit)
+        assertTrue(hashes.await().isSuccess)
+        assertTrue(filters.await().isSuccess)
+    }
+
+    private suspend fun verifyConcurrentUpdatesDownloadOnce(type: Type) {
+        val entered = CompletableDeferred<Unit>()
+        val release = CompletableDeferred<Unit>()
+        var requests = 0
+        var revisions = emptyList<RevisionEntity>()
+        val service = object : MaliciousSiteDatasetService by maliciousSiteDatasetService {
+            override suspend fun getPhishingHashPrefixes(revision: Int): HashPrefixResponse {
+                requests++
+                entered.complete(Unit)
+                release.await()
+                return HashPrefixResponse(emptySet(), emptySet(), 2, false)
+            }
+
+            override suspend fun getPhishingFilterSet(revision: Int): FilterSetResponse {
+                requests++
+                entered.complete(Unit)
+                release.await()
+                return FilterSetResponse(emptySet(), emptySet(), 2, false)
+            }
+        }
+        whenever(maliciousSiteService.getRevision()).thenReturn(RevisionResponse(2))
+        whenever(maliciousSiteDao.getLatestRevision()).thenAnswer { revisions }
+        whenever(maliciousSiteDao.updateHashPrefixes(any(), any())).thenAnswer {
+            revisions = listOf(RevisionEntity(PHISHING.name, Type.HASH_PREFIXES.name, 2))
+            Unit
+        }
+        whenever(maliciousSiteDao.updateFilters(any())).thenAnswer {
+            revisions = listOf(RevisionEntity(PHISHING.name, Type.FILTER_SET.name, 2))
+            Unit
+        }
+        val subject = RealMaliciousSiteRepository(
+            maliciousSiteDao,
+            maliciousSiteService,
+            service,
+            coroutineRule.testDispatcherProvider,
+            mockPixel,
+        )
+        kotlinx.coroutines.coroutineScope {
+            suspend fun update() = if (type == Type.HASH_PREFIXES) {
+                subject.loadHashPrefixes(PHISHING)
+            } else {
+                subject.loadFilters(PHISHING)
+            }
+            val first = async(start = CoroutineStart.UNDISPATCHED) { update() }
+            entered.await()
+            val second = async(start = CoroutineStart.UNDISPATCHED) { update() }
+            assertEquals(1, requests)
+            release.complete(Unit)
+            assertTrue(first.await().isSuccess)
+            assertTrue(second.await().isSuccess)
+            assertEquals(1, requests)
+        }
+    }
 
     @Test
     fun loadFilters_updatesFiltersWhenNetworkRevisionIsHigher() = runTest {
