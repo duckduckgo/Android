@@ -102,7 +102,7 @@ class NextStepsCheckListViewModelTest {
             telemetry = telemetry,
         )
         testee.commands().onEach { commands.add(it) }.launchIn(coroutineRule.testScope)
-        testee.onViewAttached()
+        testee.onViewAttached(newSection = true)
     }
 
     @Test
@@ -173,12 +173,24 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
-    fun `when the view is attached again then a new impression is reported`() = runTest {
+    fun `when the same section view is attached again then no new impression is reported`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
 
         testee.onViewDetached()
-        testee.onViewAttached()
+        testee.onViewAttached(newSection = false)
+        advanceUntilIdle()
+
+        verify(remoteMessageModel, times(1)).onMessageShown(any())
+    }
+
+    @Test
+    fun `when a new section view is attached then a new impression is reported`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+
+        testee.onViewDetached()
+        testee.onViewAttached(newSection = true)
         advanceUntilIdle()
 
         verify(remoteMessageModel, times(2)).onMessageShown(any())
@@ -386,7 +398,7 @@ class NextStepsCheckListViewModelTest {
 
         testee.onViewDetached()
         syncCheck.completed = true
-        testee.onViewAttached()
+        testee.onViewAttached(newSection = true)
         advanceUntilIdle()
 
         assertTrue(commands.none { it is Command.AnimateItemCompletion })
@@ -421,11 +433,25 @@ class NextStepsCheckListViewModelTest {
     }
 
     @Test
-    fun `when the view is attached again then its items count another impression`() = runTest {
+    fun `when the same section view is attached again then its items do not count another impression`() = runTest {
         activeMessage.value = aMessage(content = nextStepsContent())
         advanceUntilIdle()
         testee.onViewDetached()
-        testee.onViewAttached()
+        testee.onViewAttached(newSection = false)
+        advanceUntilIdle()
+
+        testee.onItemClicked(addWidgetItem.id)
+        advanceUntilIdle()
+
+        verify(pixels).itemCtaClicked(CHECK_LIST, addWidgetItem.id, DAY_0, "1")
+    }
+
+    @Test
+    fun `when a new section view is attached then its items count another impression`() = runTest {
+        activeMessage.value = aMessage(content = nextStepsContent())
+        advanceUntilIdle()
+        testee.onViewDetached()
+        testee.onViewAttached(newSection = true)
         advanceUntilIdle()
 
         testee.onItemClicked(addWidgetItem.id)
@@ -549,7 +575,7 @@ class NextStepsCheckListViewModelTest {
         advanceUntilIdle()
 
         testee.onViewDetached()
-        testee.onViewAttached()
+        testee.onViewAttached(newSection = true)
         advanceUntilIdle()
 
         assertNull(testee.viewState.value.message)
@@ -574,7 +600,7 @@ class NextStepsCheckListViewModelTest {
         addWidgetCheck.completed = true
 
         testee.onViewDetached()
-        testee.onViewAttached()
+        testee.onViewAttached(newSection = true)
         advanceUntilIdle()
 
         assertEquals(3, testee.viewState.value.listItems.size)
