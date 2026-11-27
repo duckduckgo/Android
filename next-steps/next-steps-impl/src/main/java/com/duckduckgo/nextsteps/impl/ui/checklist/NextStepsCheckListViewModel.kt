@@ -114,7 +114,14 @@ class NextStepsCheckListViewModel @Inject constructor(
     private val activeMessage: Flow<RemoteMessage?> = remoteMessageModel.observeActiveMessages()
         .map { message -> message?.takeIf { it.isNextStepsForNewTabPage() } }
 
-    fun onViewAttached() {
+    /**
+     * [newSection] is false when the same section view is attached again, as when the tab pager brings a tab back on screen.
+     * Only a new section view is a new New Tab Page render, so only that one counts another impression.
+     */
+    fun onViewAttached(newSection: Boolean) {
+        if (newSection) {
+            shownMessageId = null
+        }
         sectionJob?.cancel()
         sectionJob = activeMessage
             .combine(refresh) { message, _ -> message }
@@ -135,7 +142,6 @@ class NextStepsCheckListViewModel @Inject constructor(
         sectionJob = null
         pendingCompletion = null
         animatingCompletionItemId = null
-        shownMessageId = null
     }
 
     fun onItemClicked(itemId: String) {
