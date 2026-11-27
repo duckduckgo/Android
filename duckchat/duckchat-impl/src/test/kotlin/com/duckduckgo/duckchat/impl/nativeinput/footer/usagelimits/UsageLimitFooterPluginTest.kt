@@ -437,6 +437,65 @@ class UsageLimitFooterPluginTest {
     }
 
     @Test
+    fun whenExistingChatAndTheNewChatDefaultMovesToTheCtaTargetThenItIsNotTreatedAsAUserSwitch() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(newChatDefault = NewChatDefault(SONNET.id, ReasoningMode.FAST))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            footer.onDisplayed(true)
+
+            modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenNewChatWithoutAPickAndTheNewChatDefaultMovesThenItIsNotTreatedAsAUserSwitch() = runTest {
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(newChatDefault = NewChatDefault(SONNET.id, ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenNewChatPicksTheCtaTargetWhileResetModelForNewChatsOnThenItIsAUserSwitch() = runTest {
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(newChatDefault = NewChatDefault(SONNET.id, ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            inputState.value = inputState.value.copy(newChatModelId = HAIKU.id)
+
+            verify(dismissalStore).markActedOn(snapshot.value!!.notice)
+            assertEquals(
+                listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.ModelSwitched::class),
+                pixelSender.events.map { it::class },
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenWeeklyHandoffIsTappedThenEntriesAreWrittenAndPageIsToldAndSnapshotIsActedOn() = runTest {
         val entries = listOf(UsageCtaPutEntry("duckai.fixedCostWindowBypassResetAtById", """{"day":"x"}"""))
         snapshot.value = reached().copy(cta = UsageCta(UsageCtaId.BYPASS_WEEKLY, null, emptyList(), emptyMap(), entries))

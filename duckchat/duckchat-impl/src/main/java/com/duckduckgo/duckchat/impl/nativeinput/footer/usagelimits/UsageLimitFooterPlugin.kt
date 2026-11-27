@@ -86,8 +86,22 @@ class UsageLimitFooterPlugin @Inject constructor(
         val actedOn: UsageNoticeActedOn?,
         val modelState: ModelState,
         val isNewChat: Boolean,
+        val pickedModelId: String?,
     ) {
         val selectedModelId: String? get() = modelState.selectedModelId
+
+        /**
+         * The model the user switched away from since [previous], or null when nothing changed or the app moved it.
+         * While `resetModelForNewChats` is on, the manager moves the global selection itself (fetch, over-limit default,
+         * reset), and a user's pick lands on the tab instead, so only a new chat's own pick counts as a switch.
+         */
+        fun switchedFrom(previous: Inputs?): String? {
+            val previousModelId = previous?.selectedModelId ?: return null
+            if (selectedModelId == null || selectedModelId == previousModelId) return null
+            if (modelState.newChatDefault == null) return previousModelId
+            val isOwnPick = isNewChat && previous.isNewChat && pickedModelId != null && pickedModelId != previous.pickedModelId
+            return previousModelId.takeIf { isOwnPick }
+        }
 
         /**
          * A new chat already starting on web's over-limit default has no model left to switch to, so the reached
@@ -115,7 +129,7 @@ class UsageLimitFooterPlugin @Inject constructor(
         host: NativeInputFooterHost,
     ): NativeInputFooter {
         val footerView = UsageLimitFooterView(context)
-        var lastSelectedModelId: String? = null
+        var lastInputs: Inputs? = null
         val measurement = measurements.forHost(host) { DuckChatPixelSurface.from(hostContext.value.inputContext) }
         var lastContext: NativeInputFooterContext? = null
         var currentExposure: UsageWarningExposure? = null
@@ -136,7 +150,14 @@ class UsageLimitFooterPlugin @Inject constructor(
                     modelManager.modelState,
                     nativeInputStateProvider.state,
                 ) { snapshot, dismissals, actedOn, modelState, inputState ->
-                    Inputs(snapshot, dismissals, actedOn, modelState.forTab(inputState), isNewChat = inputState.chatId == null)
+                    Inputs(
+                        snapshot,
+                        dismissals,
+                        actedOn,
+                        modelState.forTab(inputState),
+                        isNewChat = inputState.chatId == null,
+                        pickedModelId = inputState.newChatModelId,
+                    )
                 }
             } else {
                 flowOf(null)
@@ -144,13 +165,13 @@ class UsageLimitFooterPlugin @Inject constructor(
         }
 
         val state = combine(inputs, hostContext) { input, footerContext ->
-            val previousModelId = lastSelectedModelId
-            lastSelectedModelId = input?.selectedModelId ?: previousModelId
+            val switchedFromModelId = input?.switchedFrom(lastInputs)
+            if (input?.selectedModelId != null) lastInputs = input
             val previousContext = lastContext
             lastContext = footerContext
             // A prompt is attributed before the focus loss that follows it, even when both arrive in one emission.
             if (previousContext != null && footerContext.promptSubmissions > previousContext.promptSubmissions) measurement.promptSubmitted()
-            if (previousModelId != null && input?.selectedModelId != null && input.selectedModelId != previousModelId) measurement.modelSwitched()
+            if (switchedFromModelId != null) measurement.modelSwitched()
             if (input == null || !footerContext.isInputFocused) measurement.inputSessionEnded()
             val snapshot = input?.snapshot ?: return@combine NativeInputFooterState(visible = false)
             val notice = snapshot.notice
@@ -166,7 +187,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
             val resolvedCta = ctaResolver.resolve(snapshot.cta, input.ctaModelState, host.draft(), input.modelState.isFreeTrialEligible)
-            retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = previousModelId)
+            retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = switchedFromModelId)
 
             val exposure = UsageWarningExposure.of(notice)
             if (isDisplayed && exposure != currentExposure) measurement.cardBecameVisible(exposure)
