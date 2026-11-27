@@ -26,6 +26,7 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.UrlScheme.Companion.http
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -121,7 +122,7 @@ class QueryUrlConverter @Inject constructor(
     }
 
     private fun convertUri(input: String): String {
-        val url = UriString.extractUrl(input, cleanInputQuery = false) ?: input
+        val url = if (isCompleteWebUrl(input)) input else UriString.extractUrl(input, cleanInputQuery = false) ?: input
         val uri = Uri.parse(url).withScheme()
 
         if (requestRewriter.shouldRewriteRequest(uri)) {
@@ -129,6 +130,16 @@ class QueryUrlConverter @Inject constructor(
         }
 
         return uri.toString()
+    }
+
+    // extractUrl keeps only what the web URL pattern matches, so it cuts a valid URL at characters such as `[` or `|` and drops a host
+    // without a dot. Input with whitespace, userinfo or another scheme still needs it: it picks the link out of shared text and turns
+    // file://host into a web URL.
+    private fun isCompleteWebUrl(input: String): Boolean {
+        if (input.any { it.isWhitespace() }) return false
+        val uri = Uri.parse(input).withScheme()
+        val scheme = uri.scheme?.lowercase()
+        return (scheme == http || scheme == https) && !uri.host.isNullOrEmpty() && uri.userInfo == null
     }
 
     private fun cacheRemoteConfig() {
