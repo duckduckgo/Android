@@ -28,7 +28,6 @@ import com.duckduckgo.pagetranslation.impl.messaging.UnitTranslation
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -46,10 +45,14 @@ interface TranslationSession {
 
 interface TranslationSessionFactory {
     /**
-     * Creates a session for the document whose `performance.timeOrigin` is [timeOrigin]. It writes its progress to [state] and,
-     * while [isVisible] is false, waits between batches.
+     * Creates a session for the document whose `performance.timeOrigin` is [timeOrigin]. It reports its progress to
+     * [onStateChanged] and, while [isVisible] is false, waits between batches.
      */
-    fun create(timeOrigin: Double, isVisible: StateFlow<Boolean>, state: MutableStateFlow<TranslationState>): TranslationSession
+    fun create(
+        timeOrigin: Double,
+        isVisible: StateFlow<Boolean>,
+        onStateChanged: (TranslationState) -> Unit,
+    ): TranslationSession
 }
 
 @ContributesBinding(FragmentScope::class)
@@ -65,8 +68,8 @@ class RealTranslationSessionFactory @Inject constructor(
     override fun create(
         timeOrigin: Double,
         isVisible: StateFlow<Boolean>,
-        state: MutableStateFlow<TranslationState>,
-    ): TranslationSession = RealTranslationSession(timeOrigin, messaging, engine, planner, isVisible, state, sessionScope)
+        onStateChanged: (TranslationState) -> Unit,
+    ): TranslationSession = RealTranslationSession(timeOrigin, messaging, engine, planner, isVisible, onStateChanged, sessionScope)
 }
 
 /** Runs on [scope], which must be the main thread's, so that once [end] returns nothing it started can still write. */
@@ -76,15 +79,15 @@ class RealTranslationSession(
     private val engine: TranslationEngine,
     private val planner: TranslationBatchPlanner,
     private val isVisible: StateFlow<Boolean>,
-    private val state: MutableStateFlow<TranslationState>,
+    private val onStateChanged: (TranslationState) -> Unit,
     private val scope: CoroutineScope,
 ) : TranslationSession {
     private var job: Job? = null
 
     override fun translate(pair: LanguagePair) {
-        if (state.value != TranslationState.Idle) return
+        if (job != null) return
 
-        state.value = TranslationState.Translating
+        onStateChanged(TranslationState.Translating)
         job = scope.launch { translatePage(pair) }
     }
 
@@ -101,17 +104,17 @@ class RealTranslationSession(
         for (batch in viewport) {
             val count = translateBatch(pair, batch)
             if (count == null) {
-                state.value = TranslationState.Failed(hasAppliedUnits = written > 0)
+                onStateChanged(TranslationState.Failed(hasAppliedUnits = written > 0))
                 return
             }
             written += count
         }
         if (written == 0) {
-            state.value = TranslationState.Failed(hasAppliedUnits = false)
+            onStateChanged(TranslationState.Failed(hasAppliedUnits = false))
             return
         }
 
-        state.value = TranslationState.Translated
+        onStateChanged(TranslationState.Translated)
         for (batch in rest) translateBatch(pair, batch) ?: return
     }
 

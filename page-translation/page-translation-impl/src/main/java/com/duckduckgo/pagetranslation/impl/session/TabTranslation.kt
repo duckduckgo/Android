@@ -68,7 +68,7 @@ class RealTabTranslation @Inject constructor(
 
     override fun startSession(timeOrigin: Double) {
         endSession()
-        session = sessionFactory.create(timeOrigin, isVisible, _state)
+        session = sessionFactory.create(timeOrigin, isVisible) { _state.value = it }
     }
 
     override fun endSession() {

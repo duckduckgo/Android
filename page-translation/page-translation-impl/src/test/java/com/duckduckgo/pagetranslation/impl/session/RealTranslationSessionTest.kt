@@ -57,7 +57,7 @@ class RealTranslationSessionTest {
         engine,
         RealTranslationBatchPlanner(),
         isVisible,
-        state,
+        { state.value = it },
         CoroutineScope(coroutineRule.testDispatcher),
     )
 

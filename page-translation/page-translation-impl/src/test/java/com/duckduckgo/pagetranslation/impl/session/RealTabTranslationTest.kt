@@ -19,7 +19,6 @@ package com.duckduckgo.pagetranslation.impl.session
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.session.TranslationState.Idle
 import com.duckduckgo.pagetranslation.impl.session.TranslationState.Translated
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -95,21 +94,21 @@ class RealTabTranslationTest {
         override fun create(
             timeOrigin: Double,
             isVisible: StateFlow<Boolean>,
-            state: MutableStateFlow<TranslationState>,
-        ): TranslationSession = FakeTranslationSession(timeOrigin, isVisible, state).also { sessions += it }
+            onStateChanged: (TranslationState) -> Unit,
+        ): TranslationSession = FakeTranslationSession(timeOrigin, isVisible, onStateChanged).also { sessions += it }
     }
 
     private class FakeTranslationSession(
         val timeOrigin: Double,
         val isVisible: StateFlow<Boolean>,
-        private val state: MutableStateFlow<TranslationState>,
+        private val onStateChanged: (TranslationState) -> Unit,
     ) : TranslationSession {
         val translated = mutableListOf<LanguagePair>()
         var isEnded = false
 
         override fun translate(pair: LanguagePair) {
             translated += pair
-            state.value = Translated
+            onStateChanged(Translated)
         }
 
         override fun end() {
