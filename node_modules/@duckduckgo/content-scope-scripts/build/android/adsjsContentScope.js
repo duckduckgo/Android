@@ -10226,7 +10226,7 @@
     const importConfig = {
       trackerLookup: void 0,
       injectName: "android-adsjs",
-      contentScopeScriptsVersion: "23.6.0"
+      contentScopeScriptsVersion: "23.7.0"
     };
     const bundledFeatureNames = typeof importConfig.injectName === "string" ? platformSupport[importConfig.injectName] ?? [] : [];
     const featuresToLoad = isGloballyDisabled(args) ? platformSpecificFeatures : args.site.enabledFeatures || bundledFeatureNames;
