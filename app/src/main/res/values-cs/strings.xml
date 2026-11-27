@@ -984,6 +984,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Přeskočit</string>
 
     <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportYourPasswordsTitle">Importování hesel</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Přenesu je z Googlu nebo jiného správce hesel. Možná budeš muset odemknout telefon nebo se přihlásit.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Importovat hesla</string>
     <string name="preOnboardingImportCompleteTitle">Import je hotový</string>
     <string name="preOnboardingImportCompleteCta">Pokračovat</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importování hesel</string>
