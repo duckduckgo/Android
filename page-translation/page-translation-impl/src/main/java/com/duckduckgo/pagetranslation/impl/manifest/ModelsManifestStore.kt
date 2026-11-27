@@ -25,6 +25,11 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.Companion.LEXICAL_SHORTLIST_FILE
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.Companion.MODEL_FILE
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.Companion.SOURCE_VOCAB_FILE
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.Companion.TARGET_VOCAB_FILE
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.Companion.VOCAB_FILE
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
@@ -167,8 +172,8 @@ class RealModelsManifestStore internal constructor(
 
         val LANGUAGE_CODE = Regex("[a-z]{2,3}")
         val VALID_FILE_SETS = setOf(
-            setOf("model", "lexicalShortlist", "vocab"),
-            setOf("model", "lexicalShortlist", "srcVocab", "trgVocab"),
+            setOf(MODEL_FILE, LEXICAL_SHORTLIST_FILE, VOCAB_FILE),
+            setOf(MODEL_FILE, LEXICAL_SHORTLIST_FILE, SOURCE_VOCAB_FILE, TARGET_VOCAB_FILE),
         )
         val KNOWN_FILE_KEYS = VALID_FILE_SETS.flatten().toSet()
 

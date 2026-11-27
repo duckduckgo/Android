@@ -22,7 +22,7 @@ import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PageTranslationDeviceSupport {
-    /** False on devices translate-kit doesn't ship for, which never fetch the manifest or language packs. */
+    /** False on devices page translation doesn't support, which never load translate-kit or fetch the manifest or language packs. */
     fun isSupported(): Boolean
 }
 

@@ -26,9 +26,11 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.PAIR_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_IF_CORRUPTED
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_OLD
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.UNDO_DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileWorker.Companion.OPERATION_KEY
+import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -48,6 +50,7 @@ class LanguagePackFileWorkerTest {
     private val packDirectory = directories.getPackDirectory(PAIR)
     private val oldDirectory = directories.getOldDirectory(PAIR)
     private val stagingDirectory = directories.getStagingDirectory(PAIR)
+    private val installer = FakeLanguagePackInstaller()
 
     @After
     fun tearDown() {
@@ -138,14 +141,52 @@ class LanguagePackFileWorkerTest {
         assertFalse(oldDirectory.exists())
     }
 
+    @Test
+    fun removeACorruptedPack() = runTest {
+        packDirectory.createWithFile("corrupted")
+        installer.isPackIntact = false
+
+        assertEquals(Result.success(), run(REMOVE_IF_CORRUPTED))
+
+        assertEquals(emptySet<String>(), context.filesDir.resolve("page-translation/packs").list()!!.toSet())
+    }
+
+    @Test
+    fun keepAnIntactPackWhenCheckingForCorruption() = runTest {
+        packDirectory.createWithFile("current")
+
+        assertEquals(Result.success(), run(REMOVE_IF_CORRUPTED))
+
+        assertEquals("current", packDirectory.readFile())
+    }
+
+    @Test
+    fun succeedWithoutChangesWhenCheckingAPairThatIsNotInstalled() = runTest {
+        installer.isPackIntact = false
+
+        assertEquals(Result.success(), run(REMOVE_IF_CORRUPTED))
+
+        assertFalse(packDirectory.exists())
+        assertFalse(oldDirectory.exists())
+    }
+
     private suspend fun run(operation: LanguagePackFileOperation) = TestListenableWorkerBuilder<LanguagePackFileWorker>(context)
         .setInputData(workDataOf(PAIR_KEY to PAIR, OPERATION_KEY to operation.name))
         .build()
         .also {
             it.directories = directories
             it.dispatchers = coroutineRule.testDispatcherProvider
+            it.installer = installer
         }
         .doWork()
+
+    private class FakeLanguagePackInstaller : LanguagePackInstaller {
+        var isPackIntact = true
+
+        override suspend fun install(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File) = error("unused")
+
+        override suspend fun isIntact(packDirectory: File) = isPackIntact
+    }
 
     private fun File.createWithFile(content: String) {
         mkdirs()

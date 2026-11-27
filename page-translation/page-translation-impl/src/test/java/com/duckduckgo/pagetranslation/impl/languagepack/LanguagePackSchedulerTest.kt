@@ -46,6 +46,7 @@ import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWork
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.PAIR_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_IF_CORRUPTED
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE_OLD
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.UNDO_DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileWorker.Companion.OPERATION_KEY
@@ -120,6 +121,16 @@ class LanguagePackSchedulerTest {
         scheduler.download(PAIR)
 
         assertEquals(2, getActiveWork(PAIR).size)
+    }
+
+    @Test
+    fun downloadAgainWhenACorruptionCheckIsQueuedAfterAnUnfinishedDownload() = runTest {
+        scheduler.download(PAIR)
+        scheduler.removeIfCorrupted(PAIR)
+
+        scheduler.download(PAIR)
+
+        assertEquals(2, getActiveWork(PAIR).count { it.isDownload() })
     }
 
     @Test
@@ -293,6 +304,16 @@ class LanguagePackSchedulerTest {
         scheduler.removeLeftoverOldDirectories()
 
         assertEquals(listOf(DELETED_PAIR to REMOVE_OLD), getQueuedOperations())
+    }
+
+    @Test
+    fun queueACorruptionCheckAfterAnUnfinishedDownloadOfThePair() = runTest {
+        scheduler.download(PAIR)
+
+        scheduler.removeIfCorrupted(PAIR)
+
+        assertEquals(listOf(BLOCKED), getActiveWork(PAIR).filterNot { it.isDownload() }.map { it.state })
+        assertEquals(listOf(PAIR to REMOVE_IF_CORRUPTED), getQueuedOperations())
     }
 
     private fun getActiveWork(pair: String): List<WorkInfo> = getAllWork(pair).filterNot { it.state.isFinished }
