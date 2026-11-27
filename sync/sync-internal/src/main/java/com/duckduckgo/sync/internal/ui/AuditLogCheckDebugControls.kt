@@ -22,6 +22,7 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogChecker
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationSetting
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.store.SyncStore
@@ -35,6 +36,7 @@ class AuditLogCheckDebugControls @Inject constructor(
     private val stateStore: AuditLogCheckStateStore,
     private val syncStore: SyncStore,
     private val loginAuditLogFeature: LoginAuditLogFeature,
+    private val notificationSetting: NewLoginNotificationSetting,
     private val notificationPermission: NewLoginNotificationPermission,
     private val newLoginNotifier: NewLoginNotifier,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -62,6 +64,9 @@ class AuditLogCheckDebugControls @Inject constructor(
         if (!syncStore.isSignedIn()) return "Not signed in: no notification posted."
         if (!loginAuditLogFeature.isNotificationEnabled()) {
             return "No notification posted: turn on both flags, loginAuditLog and loginNotification."
+        }
+        if (!notificationSetting.isEnabled()) {
+            return "No notification posted: \"Notify on New Connections\" is off in Sync settings. Turn it on, then try again."
         }
         if (!notificationPermission.canPost()) {
             return "No notification posted: DuckDuckGo can't post this notification. Allow notifications for the app and its " +
