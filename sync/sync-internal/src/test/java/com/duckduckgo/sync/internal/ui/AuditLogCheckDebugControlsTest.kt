@@ -24,6 +24,7 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogChecker
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationSetting
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.store.SyncStore
@@ -49,6 +50,7 @@ class AuditLogCheckDebugControlsTest {
     private val syncStore: SyncStore = mock { on { isSignedIn() } doReturn true }
 
     private val loginAuditLogFeature: LoginAuditLogFeature = mock { onBlocking { isNotificationEnabled() } doReturn true }
+    private val notificationSetting: NewLoginNotificationSetting = mock { onBlocking { isEnabled() } doReturn true }
     private val notificationPermission: NewLoginNotificationPermission = mock { onBlocking { canPost() } doReturn true }
     private val newLoginNotifier: NewLoginNotifier = mock()
     private val currentTimeProvider: CurrentTimeProvider = mock { on { currentTimeMillis() } doReturn NOW.toEpochMilli() }
@@ -58,6 +60,7 @@ class AuditLogCheckDebugControlsTest {
         stateStore,
         syncStore,
         loginAuditLogFeature,
+        notificationSetting,
         notificationPermission,
         newLoginNotifier,
         currentTimeProvider,
@@ -225,6 +228,17 @@ class AuditLogCheckDebugControlsTest {
         val text = controls.showTestNotification()
 
         assertTrue(text, text.startsWith("No notification posted: turn on both flags, loginAuditLog and loginNotification."))
+        assertEquals(AuditLogCheckState(), stateStore.state)
+        verify(newLoginNotifier, never()).onCheckFinished(any())
+    }
+
+    @Test
+    fun whenShowTestNotificationWithSettingOffThenPostsNothingAndSaysWhereToTurnItOn() = runTest {
+        whenever(notificationSetting.isEnabled()).thenReturn(false)
+
+        val text = controls.showTestNotification()
+
+        assertTrue(text, text.startsWith("No notification posted: \"Notify on New Connections\" is off in Sync settings."))
         assertEquals(AuditLogCheckState(), stateStore.state)
         verify(newLoginNotifier, never()).onCheckFinished(any())
     }
