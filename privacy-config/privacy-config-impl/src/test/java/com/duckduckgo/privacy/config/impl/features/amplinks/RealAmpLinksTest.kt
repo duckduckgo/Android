@@ -120,6 +120,20 @@ class RealAmpLinksTest {
     }
 
     @Test
+    fun whenAmpPathIsNestedInAnEncodedUrlThenUrlIsTreatedAsCloakedAmpLink() {
+        val url = "https://example.com/redirect?u=https%3A%2F%2Fsite.com%2Famp%2Fpage"
+
+        assertTrue(testee.extractCanonicalFromAmpLink(url) is AmpLinkType.CloakedAmpLink)
+    }
+
+    @Test
+    fun whenKeywordFollowsAnEncodedLetterThenUrlIsNotTreatedAsAmpLink() {
+        val url = "https://example.com/authorize?consent=%41amp%2Fpage"
+
+        assertNull(testee.extractCanonicalFromAmpLink(url))
+    }
+
+    @Test
     fun whenKeywordListContainsEmptyKeywordThenPlainUrlIsNotTreatedAsAmpLink() {
         ampKeywords.add(0, "")
 

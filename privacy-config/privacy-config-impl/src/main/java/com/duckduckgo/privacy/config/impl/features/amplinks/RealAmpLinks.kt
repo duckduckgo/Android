@@ -83,13 +83,18 @@ class RealAmpLinks @Inject constructor(
         return ampLinksRepository.ampKeywords.any { url.containsKeyword(it) }
     }
 
+    // Separators percent-encoded inside a nested URL (e.g. u=https%3A%2F%2Fsite.com%2Famp%2F) still delimit a keyword.
+    private fun String.endsWithEncodedSeparatorBefore(index: Int): Boolean {
+        return index >= 3 && ENCODED_SEPARATORS.any { regionMatches(index - 3, it, 0, 3, ignoreCase = true) }
+    }
+
     private fun String.containsKeyword(keyword: String): Boolean {
         if (keyword.isEmpty()) return false
         if (!keyword.first().isLetterOrDigit()) return contains(keyword)
 
         var index = indexOf(keyword)
         while (index >= 0) {
-            if (index == 0 || !this[index - 1].isLetterOrDigit()) return true
+            if (index == 0 || !this[index - 1].isLetterOrDigit() || endsWithEncodedSeparatorBefore(index)) return true
             index = indexOf(keyword, index + 1)
         }
         return false
@@ -134,5 +139,9 @@ class RealAmpLinks @Inject constructor(
             }
         }
         return null
+    }
+
+    private companion object {
+        val ENCODED_SEPARATORS = listOf("%2F", "%3D", "%26", "%3F", "%2E", "%5F")
     }
 }
