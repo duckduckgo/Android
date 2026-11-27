@@ -367,6 +367,12 @@ interface DeviceShieldPixels {
 
     fun reportTunnelThreadStopTimeout()
 
+    /**
+     * Fired when the tunnel thread is still alive after the total join bound expires while stopping it.
+     * The native context is then leaked rather than destroyed under the running thread.
+     */
+    fun reportTunnelThreadJoinBoundExceeded()
+
     fun reportTunnelThreadAbnormalCrash()
 
     fun reportVpnAlwaysOnTriggered()
@@ -870,6 +876,11 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportTunnelThreadStopTimeout() {
         tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT_DAILY)
         firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_STOP_TIMEOUT)
+    }
+
+    override fun reportTunnelThreadJoinBoundExceeded() {
+        tryToFireDailyPixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_JOIN_BOUND_EXCEEDED_DAILY)
+        firePixel(DeviceShieldPixelNames.ATP_REPORT_TUNNEL_THREAD_JOIN_BOUND_EXCEEDED)
     }
 
     override fun reportTunnelThreadAbnormalCrash() {

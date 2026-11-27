@@ -1,0 +1,9 @@
+{
+    "m_atp_ev_apptp_tunnel_thread_join_bound_exceeded": {
+        "description": "Fired when the AppTP tunnel thread is still alive 15 seconds after being told to stop. The native context is leaked and detached instead of destroyed, and the VPN operation fails.",
+        "owners": ["aitorvs"],
+        "triggers": ["exception"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

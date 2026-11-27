@@ -35,7 +35,13 @@
             {
                 "key": "feature.data.ext.failure_reason",
                 "description": "Phase that failed. Only present on FAILURE events.",
-                "enum": ["null_tunnel_failed", "network_stack_prepare_failed", "tunnel_establish_failed", "network_stack_start_failed"]
+                "enum": [
+                    "null_tunnel_failed",
+                    "network_stack_prepare_failed",
+                    "tunnel_establish_failed",
+                    "network_stack_start_failed",
+                    "network_stack_stop_failed"
+                ]
             },
             {
                 "key": "feature.data.ext.restart_duration_ms_bucketed",
