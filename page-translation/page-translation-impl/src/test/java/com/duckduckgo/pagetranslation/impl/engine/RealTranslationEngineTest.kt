@@ -174,6 +174,16 @@ class RealTranslationEngineTest {
     }
 
     @Test
+    fun stopTranslatingWithALoadedModelOncePageTranslationIsOff() = runEngineTest {
+        install(ES_EN)
+        call { engine.translate(ES_EN, listOf(plain("hola")), visible) }
+        library.isLibraryAvailable = false
+
+        assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("adiós")), visible) })
+        assertEquals(listOf(true), library.translators.map { it.isClosed })
+    }
+
+    @Test
     fun failWithoutAnInstalledPack() = runEngineTest {
         assertEquals(BatchTranslation.Failed, call { engine.translate(ES_EN, listOf(plain("hola")), visible) })
         assertEquals(emptyList<ModelSpec>(), library.loadedSpecs)

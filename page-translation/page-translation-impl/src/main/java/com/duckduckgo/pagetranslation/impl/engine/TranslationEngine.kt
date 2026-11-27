@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
+import java.io.File
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.minutes
 
@@ -146,19 +147,32 @@ class RealTranslationEngine @Inject constructor(
     private fun getTranslator(pair: LanguagePair): Translator? {
         val packDirectory = directories.getPackDirectory(pair.key)
 
-        // a pack deleted while its translator is loaded must not keep translating
-        loadedTranslator?.takeIf { it.pair == pair && packDirectory.exists() }?.let { return it.translator }
+        // a loaded translator must stop translating once page translation is turned off or its pack is deleted
+        val canTranslate = library.init() && packDirectory.exists()
+        loadedTranslator?.takeIf { canTranslate && it.pair == pair }?.let { return it.translator }
 
         unloadTranslator()
-        if (!library.init() || !packDirectory.exists()) return null
+        if (!canTranslate) return null
 
         val packVersion = PackVersion(pair, packDirectory.lastModified())
         if (packVersion == failedPackVersion) return null
 
+        return try {
+            library.loadTranslator(createModelSpec(pair, packDirectory)).also { loadedTranslator = LoadedTranslator(pair, it) }
+        } catch (e: IllegalArgumentException) {
+            logcat(ERROR) { "Page translation language pack failed to load: ${e.asLog()}" }
+            failedPackVersion = packVersion
+            scheduler.removeIfCorrupted(pair.key)
+            null
+        }
+    }
+
+    private fun createModelSpec(pair: LanguagePair, packDirectory: File): ModelSpec {
         // an installed file is named after its manifest key, with the extension that tells translate-kit its format
         val files = packDirectory.listFiles().orEmpty().associateBy { it.nameWithoutExtension }
         fun path(key: String) = (files[key] ?: packDirectory.resolve(key)).path
-        val spec = ModelSpec(
+
+        return ModelSpec(
             sourceLang = pair.source,
             targetLang = pair.target,
             modelPath = path(MODEL_FILE),
@@ -170,15 +184,6 @@ class RealTranslationEngine @Inject constructor(
             shortlistPath = path(LEXICAL_SHORTLIST_FILE),
             numWorkers = 1,
         )
-
-        return try {
-            library.loadTranslator(spec).also { loadedTranslator = LoadedTranslator(pair, it) }
-        } catch (e: IllegalArgumentException) {
-            logcat(ERROR) { "Page translation language pack failed to load: ${e.asLog()}" }
-            failedPackVersion = packVersion
-            scheduler.removeIfCorrupted(pair.key)
-            null
-        }
     }
 
     private fun translateUnits(translator: Translator, units: List<TranslationUnit>): List<String?> {

@@ -41,9 +41,14 @@ interface TranslateKitLibrary {
      */
     fun init(): Boolean
 
+    /**
+     * Decompresses [compressedFile] into [outputFile], which only appears once it's complete. Throws [IOException] when the input
+     * isn't valid zstd, but some corruption decodes to wrong bytes, so check [outputFile] against its expected hash.
+     */
     @Throws(IOException::class)
     fun decompressZstd(compressedFile: File, outputFile: File)
 
+    /** Detects the language of [text]. Act on [LanguageResult.language] only when [LanguageResult.isReliable] is true. */
     fun detectLanguage(text: String): LanguageResult
 
     /** Throws [IllegalArgumentException] when the language pack's files can't be loaded. */
