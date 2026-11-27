@@ -56,7 +56,6 @@ class QueryUrlConverter @Inject constructor(
     @Volatile
     private var useUrlPredictor: Boolean = false
 
-    // Starts enabled, like the toggle's default, so a URL converted before the remote config is read still loads as given.
     @Volatile
     private var loadCompleteWebUrlAsGiven: Boolean = true
 
