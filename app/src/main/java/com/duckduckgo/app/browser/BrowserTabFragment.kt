@@ -2373,7 +2373,14 @@ class BrowserTabFragment :
     // The platform keeps only the first call, so later tabs and content changes are no-ops.
     private fun reportFullyDrawnIfSelected() {
         if (isFullyDrawnReported()) return
-        if (viewModel.liveSelectedTab.value?.tabId == tabId) activity?.reportFullyDrawn()
+        if (viewModel.liveSelectedTab.value?.tabId != tabId) return
+        try {
+            activity?.reportFullyDrawn()
+        } catch (e: SecurityException) {
+            // Some Android 9 OEM builds broadcast to all users from inside reportFullyDrawn without the
+            // required permission and throw back into the app. The report is diagnostic only, so drop it.
+            logcat(WARN) { "reportFullyDrawn rejected by the platform: ${e.asLog()}" }
+        }
     }
 
     private fun isFullyDrawnReported(): Boolean = (activity as? ComponentActivity)?.fullyDrawnReporter?.isFullyDrawnReported == true
