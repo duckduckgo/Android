@@ -25,6 +25,8 @@ import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
 import com.duckduckgo.duckchat.store.impl.DuckAiMigrationPrefs
 import com.duckduckgo.duckchat.store.impl.DuckAiNativeStorageDeletionListener
 import com.duckduckgo.duckchat.store.impl.DuckAiNativeStoragePixels
+import com.duckduckgo.duckchat.store.impl.DuckAiUserDefaultModelSetting
+import com.duckduckgo.duckchat.store.impl.DuckAiUserDefaultModelSetting.Companion.USER_DEFAULT_MODEL_KEY
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
@@ -48,7 +50,14 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
     private val pixels: DuckAiNativeStoragePixels,
     private val deletionListener: DuckAiNativeStorageDeletionListener,
     private val browserMode: BrowserMode,
+    private val userDefaultModelSetting: DuckAiUserDefaultModelSetting,
 ) : ContentScopeJsMessageHandlersPlugin {
+
+    private fun hasReadOnlyUserDefault(): Boolean =
+        browserMode == BrowserMode.FIRE && userDefaultModelSetting.isUserDefaultEnabled()
+
+    private fun getRegularUserDefault(): String? =
+        storageProvider.forMode(BrowserMode.REGULAR).settings.get(USER_DEFAULT_MODEL_KEY)?.value
 
     override fun getJsMessageHandler(): JsMessageHandler =
         object : JsMessageHandler {
@@ -81,7 +90,11 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "getEntry" -> {
                         val key = jsMessage.params.optString("key")
                         try {
-                            val value = if (key.isBlank()) null else settingsDao.get(key)?.value
+                            val value = when {
+                                key.isBlank() -> null
+                                key == USER_DEFAULT_MODEL_KEY && hasReadOnlyUserDefault() -> getRegularUserDefault()
+                                else -> settingsDao.get(key)?.value
+                            }
                             jsMessage.id?.let { id ->
                                 jsMessaging.onResponse(
                                     JsCallbackData(
@@ -109,7 +122,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "putEntry" -> {
                         val key = jsMessage.params.optString("key")
                         val value = jsMessage.params.optString("value")
-                        if (key.isNotBlank()) {
+                        if (key.isNotBlank() && !(key == USER_DEFAULT_MODEL_KEY && hasReadOnlyUserDefault())) {
                             logcat { "DuckAiNativeStorage: putEntry" }
                             try {
                                 settingsDao.upsert(DuckAiBridgeSettingEntity(key = key, value = value))
@@ -122,6 +135,13 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                         try {
                             val obj = JSONObject()
                             settingsDao.getAll().forEach { obj.put(it.key, it.value) }
+                            if (!obj.has(USER_DEFAULT_MODEL_KEY) && hasReadOnlyUserDefault()) {
+                                try {
+                                    getRegularUserDefault()?.let { obj.put(USER_DEFAULT_MODEL_KEY, it) }
+                                } catch (e: Exception) {
+                                    pixels.reportSettingsGetError()
+                                }
+                            }
                             jsMessage.id?.let { id ->
                                 jsMessaging.onResponse(
                                     JsCallbackData(
@@ -149,6 +169,7 @@ class DuckAiNativeStorageJsMessageHandler @Inject constructor(
                     "replaceAllEntries" -> {
                         val settingsObj = jsMessage.params.optJSONObject("entries") ?: return
                         val entities = settingsObj.keys().asSequence()
+                            .filterNot { it == USER_DEFAULT_MODEL_KEY && hasReadOnlyUserDefault() }
                             .map { k -> DuckAiBridgeSettingEntity(key = k, value = settingsObj.getString(k)) }
                             .toList()
                         if (entities.isNotEmpty()) {
