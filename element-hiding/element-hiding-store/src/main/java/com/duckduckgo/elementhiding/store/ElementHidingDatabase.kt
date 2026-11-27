@@ -31,4 +31,4 @@ abstract class ElementHidingDatabase : RoomDatabase() {
     abstract fun elementHidingDao(): ElementHidingDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()

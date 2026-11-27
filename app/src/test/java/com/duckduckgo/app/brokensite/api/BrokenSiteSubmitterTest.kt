@@ -2,6 +2,8 @@ package com.duckduckgo.app.brokensite.api
 
 import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.brokensite.FakeFeatureTogglesInventory
+import com.duckduckgo.app.brokensite.TestBlockListFeature
 import com.duckduckgo.app.pixels.AppPixelName.BROKEN_SITE_REPORT
 import com.duckduckgo.app.pixels.AppPixelName.PROTECTION_TOGGLE_BROKEN_SITE_REPORT
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -12,9 +14,7 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.app.trackerdetection.TdsMetadataProvider
 import com.duckduckgo.app.trackerdetection.blocklist.BlockList.Cohorts.TREATMENT
 import com.duckduckgo.app.trackerdetection.blocklist.BlockListPixelsPlugin
-import com.duckduckgo.app.trackerdetection.blocklist.FakeFeatureTogglesInventory
 import com.duckduckgo.app.trackerdetection.blocklist.RealBlockListExperiment
-import com.duckduckgo.app.trackerdetection.blocklist.TestBlockListFeature
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteLastSentReport

@@ -23,8 +23,10 @@ package com.duckduckgo.app.trackerdetection
 interface WebTrackersBlockedHistory {
     /**
      * Records that a request to [trackerUrl], attributed to [trackerCompany], was blocked.
+     *
+     * Only queues the entry and does no I/O, so it is safe to call on the WebView request path.
      */
-    suspend fun onTrackerBlocked(trackerUrl: String, trackerCompany: String)
+    fun onTrackerBlocked(trackerUrl: String, trackerCompany: String)
 
     /**
      * How many trackers were blocked in the last 7 days.

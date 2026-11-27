@@ -16,11 +16,16 @@
 
 package com.duckduckgo.sync.internal.ui
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckResult
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckResult.FailureReason
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogChecker
+import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationSetting
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.store.SyncStore
 import kotlinx.coroutines.flow.Flow
@@ -30,8 +35,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Instant
 
@@ -41,7 +49,22 @@ class AuditLogCheckDebugControlsTest {
     private val checker = FakeChecker()
     private val syncStore: SyncStore = mock { on { isSignedIn() } doReturn true }
 
-    private val controls = AuditLogCheckDebugControls(checker, stateStore, syncStore)
+    private val loginAuditLogFeature: LoginAuditLogFeature = mock { onBlocking { isNotificationEnabled() } doReturn true }
+    private val notificationSetting: NewLoginNotificationSetting = mock { onBlocking { isEnabled() } doReturn true }
+    private val notificationPermission: NewLoginNotificationPermission = mock { onBlocking { canPost() } doReturn true }
+    private val newLoginNotifier: NewLoginNotifier = mock()
+    private val currentTimeProvider: CurrentTimeProvider = mock { on { currentTimeMillis() } doReturn NOW.toEpochMilli() }
+
+    private val controls = AuditLogCheckDebugControls(
+        checker,
+        stateStore,
+        syncStore,
+        loginAuditLogFeature,
+        notificationSetting,
+        notificationPermission,
+        newLoginNotifier,
+        currentTimeProvider,
+    )
 
     @Test
     fun whenNoUnseenLoginsThenCountIsZero() = runTest {
@@ -161,6 +184,77 @@ class AuditLogCheckDebugControlsTest {
         assertEquals(AuditLogCheckState(cursor = "c1", pendingLogins = listOf(LAPTOP)), stateStore.state)
     }
 
+    @Test
+    fun whenShowTestNotificationThenAddsATestLoginAfterTheOthersAndPostsAsForANewLogin() = runTest {
+        stateStore.state = AuditLogCheckState(cursor = "c1", pendingLogins = listOf(LAPTOP))
+
+        val text = controls.showTestNotification()
+
+        val pending = stateStore.state.pendingLogins
+        assertEquals(2, pending.size)
+        assertEquals(LAPTOP, pending.first())
+        assertEquals("Test device", pending.last().deviceName)
+        assertEquals(NOW, pending.last().occurredAt)
+        assertEquals("c1", stateStore.state.cursor)
+        verify(newLoginNotifier).onCheckFinished(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0))
+        assertTrue(text, text.startsWith("Test notification posted."))
+        assertTrue(text, text.contains("Unseen logins: 2"))
+    }
+
+    @Test
+    fun whenShowTestNotificationTwiceThenEachTimeAddsItsOwnTestLogin() = runTest {
+        controls.showTestNotification()
+        controls.showTestNotification()
+
+        val ids = stateStore.state.pendingLogins.map { it.entryId }
+        assertEquals(2, ids.distinct().size)
+    }
+
+    @Test
+    fun whenShowTestNotificationWhileSignedOutThenPostsNothingAndSaysWhy() = runTest {
+        whenever(syncStore.isSignedIn()).thenReturn(false)
+
+        val text = controls.showTestNotification()
+
+        assertEquals("Not signed in: no notification posted.", text)
+        assertEquals(AuditLogCheckState(), stateStore.state)
+        verify(newLoginNotifier, never()).onCheckFinished(any())
+    }
+
+    @Test
+    fun whenShowTestNotificationWithNotificationFlagOffThenPostsNothingAndNamesTheFlags() = runTest {
+        whenever(loginAuditLogFeature.isNotificationEnabled()).thenReturn(false)
+
+        val text = controls.showTestNotification()
+
+        assertTrue(text, text.startsWith("No notification posted: turn on both flags, loginAuditLog and loginNotification."))
+        assertEquals(AuditLogCheckState(), stateStore.state)
+        verify(newLoginNotifier, never()).onCheckFinished(any())
+    }
+
+    @Test
+    fun whenShowTestNotificationWithSettingOffThenPostsNothingAndSaysWhereToTurnItOn() = runTest {
+        whenever(notificationSetting.isEnabled()).thenReturn(false)
+
+        val text = controls.showTestNotification()
+
+        assertTrue(text, text.startsWith("No notification posted: \"Notify on New Connections\" is off in Sync settings."))
+        assertEquals(AuditLogCheckState(), stateStore.state)
+        verify(newLoginNotifier, never()).onCheckFinished(any())
+    }
+
+    @Test
+    fun whenShowTestNotificationWithoutNotificationPermissionThenPostsNothingAndSaysWhereToAllowIt() = runTest {
+        whenever(notificationPermission.canPost()).thenReturn(false)
+
+        val text = controls.showTestNotification()
+
+        assertTrue(text, text.startsWith("No notification posted: DuckDuckGo can't post this notification."))
+        assertTrue(text, text.contains("New synced devices"))
+        assertEquals(AuditLogCheckState(), stateStore.state)
+        verify(newLoginNotifier, never()).onCheckFinished(any())
+    }
+
     private class FakeStateStore : AuditLogCheckStateStore {
         var state = AuditLogCheckState()
 
@@ -185,6 +279,7 @@ class AuditLogCheckDebugControlsTest {
     }
 
     private companion object {
+        val NOW: Instant = Instant.parse("2026-11-26T12:00:00Z")
         val LAPTOP_AT: Instant = Instant.parse("2026-11-11T10:00:00Z")
         val PHONE_AT: Instant = Instant.parse("2026-11-11T11:00:00Z")
         val LAPTOP = PendingLogin(entryId = "e1", deviceId = "d1", deviceName = "Work laptop", occurredAt = LAPTOP_AT)

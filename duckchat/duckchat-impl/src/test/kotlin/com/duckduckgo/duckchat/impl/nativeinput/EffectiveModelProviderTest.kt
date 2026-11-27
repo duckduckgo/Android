@@ -95,6 +95,21 @@ class EffectiveModelProviderTest {
     }
 
     @Test
+    fun whenTabPickedAModelForItsNewChatThenThePickIsEffective() = runTest {
+        publish(NativeInputState.zero().copy(newChatModelId = "recovery-model"))
+
+        assertEquals("recovery-model", testee.resolvedModelId())
+    }
+
+    @Test
+    fun whenTabWithAChatHasANewChatPickThenTheChatModelStaysEffective() = runTest {
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
+        publish(NativeInputState.zero().copy(chatId = "chat-1", newChatModelId = "recovery-model"))
+
+        assertEquals("chat-model", testee.resolvedModelId())
+    }
+
+    @Test
     fun whenActiveChatHasModelThenChatModelIsEffective() = runTest {
         chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
         publish(NativeInputState.zero().copy(chatId = "chat-1"))

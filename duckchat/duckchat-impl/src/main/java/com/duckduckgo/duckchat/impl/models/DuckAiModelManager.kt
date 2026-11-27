@@ -18,11 +18,14 @@ package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.DuckAiUsageLimitsRepository
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
@@ -39,6 +42,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -64,6 +68,8 @@ data class ModelState(
      * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
      * */
     val chatScopedReasoningMode: ReasoningMode? = null,
+    /** Where a new chat starts while `resetModelForNewChats` is on; null while it is off. */
+    val newChatDefault: NewChatDefault? = null,
 ) {
     /**
      * Models not loaded yet count as supported, so the entry points are not hidden while they fetch.
@@ -77,11 +83,13 @@ interface DuckAiModelManager {
 
     suspend fun fetchModels()
 
+    /** Ignored while `resetModelForNewChats` is on, where the pick belongs to the tab's next chat instead. */
     suspend fun selectModel(model: AIChatModel)
 
     /**
      * Switches to the first accessible image-capable model unless the selected one already is.
-     * Returns false when no such model exists.
+     * Returns false when no such model exists. While `resetModelForNewChats` is on, only reports whether one
+     * exists and leaves the selection alone, since the tab picks the model for its next new chat.
      */
     suspend fun ensureImageCapableModelSelected(): Boolean
 
@@ -91,6 +99,7 @@ interface DuckAiModelManager {
      */
     suspend fun selectProvider(provider: ModelProvider)
 
+    /** Ignored while `resetModelForNewChats` is on, like [selectModel]. */
     suspend fun selectReasoningMode(mode: ReasoningMode)
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
@@ -110,6 +119,8 @@ class RealDuckAiModelManager @Inject constructor(
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val duckChatPixels: Lazy<DuckChatPixels>,
     private val cookiesManager: CookieManagerProvider,
+    private val usageLimitsRepository: DuckAiUsageLimitsRepository,
+    private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiModelManager {
@@ -124,6 +135,12 @@ class RealDuckAiModelManager @Inject constructor(
     // consistent view of the previous state.
     private val stateMutex = Mutex()
     private var selectionRevision = 0L
+
+    // The new-chat default's inputs, kept so a usage-limits change can re-derive it without a fetch.
+    // The models stay in endpoint order so the first-accessible fallback matches a fetch. Guarded by stateMutex.
+    private var endpointModels: List<AIChatModel> = emptyList()
+    private var remoteNewChatDefault: RemoteNewChatDefault? = null
+    private var overLimitDefault: OverLimitNewChatDefault? = null
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -156,6 +173,16 @@ class RealDuckAiModelManager @Inject constructor(
             }
     }
 
+    // Started by fetchModels, since the over-limit default is ignored until models load. The usage snapshot is
+    // only rewritten when the page runs, so the reset is checked whenever the default is derived, including on each fetch.
+    private val overLimitDefaultObserver = appCoroutineScope.launch(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        if (!resetsModelForNewChats()) return@launch
+        usageLimitsRepository.usageLimits(BrowserMode.REGULAR)
+            .map { it?.newChatDefault }
+            .distinctUntilChanged()
+            .collect { overLimit -> applyOverLimitDefault(overLimit) }
+    }
+
     /**
      * Earlier versions persisted the inferred default as if the user had picked it, which pinned most
      * of the install base to [PINNED_DEFAULT_MODEL_ID] and stopped later server-side default changes
@@ -172,6 +199,10 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     private suspend fun restoreCachedSelection() {
+        if (resetsModelForNewChats()) {
+            selectHardcodedDefaultWhileModelsMissing()
+            return
+        }
         val cachedModel = dataStore.getSelectedModel()
         val cachedReasoningRaw = dataStore.getSelectedReasoningMode()
         if (cachedModel == null) {
@@ -193,6 +224,7 @@ class RealDuckAiModelManager @Inject constructor(
 
     override suspend fun fetchModels() {
         subscriptionChangeObserver.start()
+        overLimitDefaultObserver.start()
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
@@ -217,36 +249,97 @@ class RealDuckAiModelManager @Inject constructor(
                         !it.isAccessible && !isSubscriptionEligible
                     }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
+                val resetForNewChats = resetsModelForNewChats()
                 stateMutex.withLock {
-                    // Selection is resolved before sorting so the derived default keeps following
-                    // endpoint order, and only the picker's display order changes.
-                    val selectedModelId = resolveSelection(models)
-                    val displayModels = models.sortLabelledFirst()
-                    val selectedModel = models.find { it.id == selectedModelId }
-                    val available = ReasoningResolver.availableModes(
-                        supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
-                        effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
-                        isEligible = isSubscriptionEligible,
-                    )
-                    val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
-
-                    _modelState.value = _modelState.value.copy(
-                        models = displayModels,
-                        selectedModelId = selectedModelId,
-                        selectedModelShortName = selectedModel?.shortName,
+                    val fetched = _modelState.value.copy(
+                        models = models.sortLabelledFirst(),
                         userTier = userTier,
                         isSubscriptionEligible = isSubscriptionEligible,
                         isFreeTrialEligible = isFreeTrialEligible,
                         attachmentLimits = attachmentLimits,
-                        selectedReasoningMode = nextReasoningMode,
-                        availableReasoningModes = available,
                     )
-                    logcat { "Duck.ai Model Manager: fetched ${displayModels.size} models, tier=$userTier, selected=$selectedModelId" }
+                    _modelState.value = if (resetForNewChats) {
+                        endpointModels = models
+                        remoteNewChatDefault = response.newChatDefault
+                        fetched.withNewChatDefault()
+                    } else {
+                        // Selection is resolved on the endpoint order so the derived default keeps following
+                        // it, and only the picker's display order changes.
+                        val selectedModelId = resolveSelection(models)
+                        val selectedModel = models.find { it.id == selectedModelId }
+                        val available = ReasoningResolver.availableModes(
+                            supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
+                            effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+                            isEligible = isSubscriptionEligible,
+                        )
+                        fetched.copy(
+                            selectedModelId = selectedModelId,
+                            selectedModelShortName = selectedModel?.shortName,
+                            selectedReasoningMode = validateAndPersistReasoningMode(fetched.selectedReasoningMode, available),
+                            availableReasoningModes = available,
+                            newChatDefault = null,
+                        )
+                    }
+                    logcat {
+                        "Duck.ai Model Manager: fetched ${models.size} models, tier=$userTier, selected=${_modelState.value.selectedModelId}"
+                    }
                 }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to fetch models: ${e.message}" }
+                if (resetsModelForNewChats()) stateMutex.withLock { selectHardcodedDefaultWhileModelsMissing() }
             }
         }
+    }
+
+    /**
+     * Selects the new-chat default from the last fetch: the over-limit default until its reset and while its model is accessible,
+     * else the server's, then the tier default, then the first accessible model. Callers hold [stateMutex].
+     */
+    private fun ModelState.withNewChatDefault(): ModelState {
+        val newChatDefault = NewChatDefaults.preferred(
+            userTier,
+            remoteNewChatDefault,
+            overLimitDefault,
+            endpointModels,
+            nowMillis = currentTimeProvider.currentTimeMillis(),
+        )
+        val selectedModelId = NewChatDefaults.modelId(userTier, newChatDefault, endpointModels)
+        val selectedModel = endpointModels.find { it.id == selectedModelId }
+        val available = ReasoningResolver.availableModes(
+            supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
+            effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+            isEligible = isSubscriptionEligible,
+        )
+        return copy(
+            selectedModelId = selectedModelId,
+            selectedModelShortName = selectedModel?.shortName,
+            selectedReasoningMode = NewChatDefaults.reasoningMode(newChatDefault, selectedModelId, available),
+            availableReasoningModes = available,
+            newChatDefault = newChatDefault,
+        )
+    }
+
+    /** Before a fetch the hardcoded default stands, and with the flag off there is no new-chat default to move. */
+    private suspend fun applyOverLimitDefault(overLimit: OverLimitNewChatDefault?) = stateMutex.withLock {
+        overLimitDefault = overLimit
+        if (endpointModels.isEmpty() || _modelState.value.newChatDefault == null) return@withLock
+        _modelState.value = _modelState.value.withNewChatDefault()
+        logcat { "Duck.ai Model Manager: over-limit default ${overLimit?.modelId}, selected=${_modelState.value.selectedModelId}" }
+    }
+
+    /**
+     * Without a model list a new chat would go out with no model and the page would choose one, so the
+     * tier default is sent unchecked until a fetch succeeds. Callers hold [stateMutex].
+     */
+    private suspend fun selectHardcodedDefaultWhileModelsMissing() {
+        if (_modelState.value.models.isNotEmpty()) return
+        val newChatDefault = NewChatDefaults.preferred(resolveUserTier(), remote = null)
+        _modelState.value = _modelState.value.copy(
+            selectedModelId = newChatDefault.modelId,
+            selectedReasoningMode = newChatDefault.mode,
+            newChatDefault = newChatDefault,
+        )
+        logcat { "Duck.ai Model Manager: models not loaded, selected hardcoded default ${newChatDefault.modelId}" }
     }
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {
@@ -296,12 +389,21 @@ class RealDuckAiModelManager @Inject constructor(
         return models.firstOrNull { it.isAccessible }?.id
     }
 
+    /**
+     * With this on, the global selection is always the tier default and picks live on the tab, so nothing
+     * here reads or writes the persisted pick: turning it off brings back the user's last-used model.
+     */
+    private suspend fun resetsModelForNewChats(): Boolean = withContext(dispatcherProvider.io()) {
+        duckChatFeature.value.resetModelForNewChats().isEnabled()
+    }
+
     private companion object {
         const val MAX_LABEL_LENGTH = 40
         const val PINNED_DEFAULT_MODEL_ID = "gpt-5.4-mini"
     }
 
     override suspend fun selectModel(model: AIChatModel) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 selectionRevision++
@@ -320,6 +422,9 @@ class RealDuckAiModelManager @Inject constructor(
     override suspend fun ensureImageCapableModelSelected(): Boolean = withContext(dispatcherProvider.io()) {
         val revision = stateMutex.withLock { selectionRevision }
         if (_modelState.value.models.isEmpty()) fetchModels()
+        if (resetsModelForNewChats()) {
+            return@withContext _modelState.value.models.any { it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION) }
+        }
         stateMutex.withLock {
             if (selectionRevision != revision) return@withLock false
             val state = _modelState.value
@@ -334,6 +439,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun selectProvider(provider: ModelProvider) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 selectionRevision++
@@ -371,6 +477,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun selectReasoningMode(mode: ReasoningMode) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 val match = _modelState.value.availableReasoningModes.firstOrNull { it.mode == mode }

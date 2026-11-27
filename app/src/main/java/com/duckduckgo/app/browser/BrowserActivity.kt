@@ -415,6 +415,9 @@ open class BrowserActivity : DuckDuckGoActivity() {
     // the first time it shows the native input (see BrowserTabFragment.consumeDuckAiForceImageGeneration).
     private var pendingDuckChatForceImageGeneration: Boolean = false
 
+    // Same one-shot as above, for a launch that starts the new chat on a chosen model.
+    private var pendingDuckChatOverrideModelId: String? = null
+
     private val startBookmarksActivityForResult =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
             if (result.resultCode == RESULT_OK) {
@@ -1132,6 +1135,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             val files = intent.clipData?.let { clip -> (0 until clip.itemCount).mapNotNull { clip.getItemAt(it).uri } }.orEmpty()
             val sourceTabId = intent.getStringExtra(SOURCE_TAB_ID_EXTRA)
             pendingDuckChatForceImageGeneration = intent.getBooleanExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, false)
+            pendingDuckChatOverrideModelId = intent.getStringExtra(DUCK_CHAT_OVERRIDE_MODEL_ID)
             val entryPoint = intent.getStringExtra(DUCK_CHAT_ENTRY_POINT_EXTRA)?.let { runCatching { DuckChatEntryPoint.valueOf(it) }.getOrNull() }
             val duckChatUrl = intent.getStringExtra(DUCK_CHAT_URL)
             // Only in-app launches animate, so a widget or another app beside the browser doesn't.
@@ -1504,6 +1508,10 @@ open class BrowserActivity : DuckDuckGoActivity() {
     fun consumeDuckChatForceImageGeneration(): Boolean =
         pendingDuckChatForceImageGeneration.also { pendingDuckChatForceImageGeneration = false }
 
+    /** The model the Duck.ai tab being opened should start its new chat on, if any. One-shot, like [consumeDuckChatForceImageGeneration]. */
+    fun consumeDuckChatOverrideModelId(): String? =
+        pendingDuckChatOverrideModelId.also { pendingDuckChatOverrideModelId = null }
+
     fun closeDuckChatFullScreen() {
         isDuckChatVisible = false
         currentTab?.closeCurrentTab()
@@ -1703,6 +1711,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             duckChatForceImageGeneration: Boolean = false,
             duckChatVoice: Boolean = false,
             openDuckChatHistory: Boolean = false,
+            duckChatOverrideModelId: String? = null,
             deletedTabCount: Int = 0,
             launchingAppPackage: String? = null,
             nativeInputLaunch: NativeInputLaunch? = null,
@@ -1728,6 +1737,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
             intent.putExtra(DUCK_CHAT_FORCE_IMAGE_GENERATION, duckChatForceImageGeneration)
             intent.putExtra(DUCK_CHAT_VOICE, duckChatVoice)
             intent.putExtra(OPEN_DUCK_CHAT_HISTORY, openDuckChatHistory)
+            intent.putExtra(DUCK_CHAT_OVERRIDE_MODEL_ID, duckChatOverrideModelId)
             intent.putExtra(DELETED_TAB_COUNT_EXTRA, deletedTabCount)
             intent.putExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA, nativeInputLaunch?.name)
             intent.putExtra(LAUNCH_REQUIRES_REGULAR_MODE, launchSource.requiresRegularMode)
@@ -1776,6 +1786,7 @@ open class BrowserActivity : DuckDuckGoActivity() {
         private const val DUCK_CHAT_FORCE_IMAGE_GENERATION = "DUCK_CHAT_FORCE_IMAGE_GENERATION"
         private const val DUCK_CHAT_VOICE = "DUCK_CHAT_VOICE"
         private const val NATIVE_INPUT_LAUNCH_ACTION_EXTRA = "NATIVE_INPUT_LAUNCH_ACTION_EXTRA"
+        private const val DUCK_CHAT_OVERRIDE_MODEL_ID = "DUCK_CHAT_OVERRIDE_MODEL_ID"
 
         private const val MAX_ACTIVE_TABS = 40
         private const val KEY_TAB_PAGER_STATE = "tabPagerState"

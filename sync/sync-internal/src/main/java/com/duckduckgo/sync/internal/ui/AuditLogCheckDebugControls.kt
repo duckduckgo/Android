@@ -16,18 +16,30 @@
 
 package com.duckduckgo.sync.internal.ui
 
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckResult
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogChecker
+import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationSetting
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.store.SyncStore
 import logcat.logcat
+import java.time.Instant
+import java.util.UUID
 import javax.inject.Inject
 
 class AuditLogCheckDebugControls @Inject constructor(
     private val checker: AuditLogChecker,
     private val stateStore: AuditLogCheckStateStore,
     private val syncStore: SyncStore,
+    private val loginAuditLogFeature: LoginAuditLogFeature,
+    private val notificationSetting: NewLoginNotificationSetting,
+    private val notificationPermission: NewLoginNotificationPermission,
+    private val newLoginNotifier: NewLoginNotifier,
+    private val currentTimeProvider: CurrentTimeProvider,
 ) {
 
     suspend fun unseenCount(): String = "Unseen logins: ${stateStore.read().pendingLogins.size}"
@@ -45,6 +57,33 @@ class AuditLogCheckDebugControls @Inject constructor(
         val count = stateStore.read().pendingLogins.size
         stateStore.update { it.copy(pendingLogins = emptyList()) }
         return log("Marked $count as seen.\n\n${unseenCount()}")
+    }
+
+    // The test login is never in the server log, so Device Activity shows no row for it, but opening it still clears it.
+    suspend fun showTestNotification(): String {
+        if (!syncStore.isSignedIn()) return "Not signed in: no notification posted."
+        if (!loginAuditLogFeature.isNotificationEnabled()) {
+            return "No notification posted: turn on both flags, loginAuditLog and loginNotification."
+        }
+        if (!notificationSetting.isEnabled()) {
+            return "No notification posted: \"Notify on New Connections\" is off in Sync settings. Turn it on, then try again."
+        }
+        if (!notificationPermission.canPost()) {
+            return "No notification posted: DuckDuckGo can't post this notification. Allow notifications for the app and its " +
+                "\"New synced devices\" channel in system settings, then try again."
+        }
+        val testLogin = PendingLogin(
+            entryId = "test-notification-${UUID.randomUUID()}",
+            deviceId = "test-notification-device",
+            deviceName = "Test device",
+            occurredAt = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis()),
+        )
+        stateStore.update { it.copy(pendingLogins = it.pendingLogins + testLogin) }
+        newLoginNotifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0))
+        return log(
+            "Test notification posted. It added a \"Test device\" login to the unseen list, so the Sync settings banner shows " +
+                "it too. Opening Device Activity or Mark all as seen removes it.\n\n${unseenCount()}",
+        )
     }
 
     private fun describe(result: AuditLogCheckResult): String = when (result) {

@@ -45,6 +45,7 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_FIRST_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_SUBMIT_PROMPT
 import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KEY
 import com.duckduckgo.duckchat.impl.attention.DuckAiResponseAttentionTracker
+import com.duckduckgo.duckchat.impl.clienttools.AiChatBrowserToolsFeature
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionGate
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
@@ -163,12 +164,13 @@ class RealDuckChatJSHelperTest {
 
     private val fakeClientTool = FakeClientTool(name = "listOpenTabs", enabled = false)
     private val allowingPermissionGate: ClientToolPermissionGate = mock {
-        onBlocking { decide(any(), any()) } doReturn ClientToolPermissionDecision.ALLOWED
+        onBlocking { decide(any(), any(), anyOrNull()) } doReturn ClientToolPermissionDecision.ALLOWED
     }
     private val clientToolsExecutor = RealClientToolsExecutor(
         tools = FakeClientToolPluginPoint(fakeClientTool),
         permissionGate = allowingPermissionGate,
         duckAiHostProvider = FakeDuckAiHostProvider(),
+        browserToolsFeature = FakeFeatureToggleFactory.create(AiChatBrowserToolsFeature::class.java),
     )
 
     private val testee = RealDuckChatJSHelper(
@@ -242,6 +244,34 @@ class RealDuckChatJSHelperTest {
         )
 
         assertNull(result)
+    }
+
+    @Test
+    fun whenOpenAIChatSettingsWithBrowserPermissionsSectionThenOpenBrowserAccess() = runTest {
+        openAIChatSettings(JSONObject().put("section", "browserPermissions"))
+
+        verify(mockDuckChat).openBrowserAccessSettings()
+        verify(mockDuckChat, never()).openDuckChatSettings()
+    }
+
+    @Test
+    fun whenOpenAIChatSettingsWithoutSectionThenOpenSettings() = runTest {
+        openAIChatSettings(null)
+
+        verify(mockDuckChat).openDuckChatSettings()
+        verify(mockDuckChat, never()).openBrowserAccessSettings()
+    }
+
+    @Test
+    fun whenOpenAIChatSettingsWithUnknownSectionThenOpenSettings() = runTest {
+        openAIChatSettings(JSONObject().put("section", "somethingNew"))
+
+        verify(mockDuckChat).openDuckChatSettings()
+        verify(mockDuckChat, never()).openBrowserAccessSettings()
+    }
+
+    private suspend fun openAIChatSettings(data: JSONObject?) {
+        testee.processJsCallbackMessage("aiChat", "openAIChatSettings", null, data, pageContext = viewModel.updatedPageContext)
     }
 
     @Test
@@ -504,6 +534,32 @@ class RealDuckChatJSHelperTest {
         assertEquals("executeClientTool", result.method)
         assertEquals("""{"callId":"c1","ok":true,"value":{"echo":{}}}""", result.params.toString())
         assertEquals("tab-1", fakeClientTool.calls.single().second.chatTabId)
+    }
+
+    @Test
+    fun whenExecuteClientToolFromContextualSheetThenTheCallIsMarkedContextual() = runTest {
+        fakeClientTool.enabled = true
+        val params = JSONObject("""{"callId":"c1","capability":{"name":"listOpenTabs","version":1},"input":{}}""")
+
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "executeClientTool",
+            "1",
+            params,
+            mode = Mode.CONTEXTUAL,
+            tabId = "tab-1",
+            pageUrl = "https://duck.ai/chat",
+        )
+        testee.processJsCallbackMessage("aiChat", "executeClientTool", "2", params, tabId = "tab-1", pageUrl = "https://duck.ai/chat")
+
+        assertEquals(listOf(true, false), fakeClientTool.calls.map { it.second.contextual })
+    }
+
+    @Test
+    fun whenCancelPendingClientToolCallsThenTheTabsWaitingCallsAreCancelled() {
+        testee.cancelPendingClientToolCalls("tab-1", contextual = false)
+
+        verify(allowingPermissionGate).cancelPending("tab-1", false)
     }
 
     @Test

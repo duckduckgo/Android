@@ -88,6 +88,14 @@ class AppBrowserNavTest {
     }
 
     @Test
+    fun whenOpenDuckChatWithOverrideModelThenIntentCarriesIt() {
+        val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.Open(overrideModelId = "plus1"))
+
+        assertEquals("plus1", intent.getStringExtra("DUCK_CHAT_OVERRIDE_MODEL_ID"))
+        assertNull(intent.getStringExtra(NATIVE_INPUT_LAUNCH_ACTION_EXTRA))
+    }
+
+    @Test
     fun whenOpenDuckChatWithCameraCaptureThenIntentCarriesCameraCaptureAndDoesNotForceImageGeneration() {
         val intent = testee.openDuckChat(context, duckChatUrl = DUCK_AI_URL, launch = DuckChatLaunch.CameraCapture())
 

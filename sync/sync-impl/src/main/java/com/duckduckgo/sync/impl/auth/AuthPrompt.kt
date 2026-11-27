@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.auth
 
 import androidx.annotation.StringRes
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 
 /**
  * A prompt the UI has to show. It is answered at most once; later answers are ignored.
@@ -50,7 +51,7 @@ sealed interface AuthPrompt {
         /**
          * Callback to dispatch when authentication failed.
          */
-        fun onError(reason: String)
+        fun onError(failureReason: FailureReason, reason: String)
     }
 
     /**

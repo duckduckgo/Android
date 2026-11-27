@@ -43,10 +43,10 @@ import com.duckduckgo.duckchat.impl.ReportMetric.USER_DID_TAP_KEYBOARD_RETURN_KE
 import com.duckduckgo.duckchat.impl.SubscriptionFunnelSource
 import com.duckduckgo.duckchat.impl.helper.DuckChatTermsOfServiceHandler
 import com.duckduckgo.duckchat.impl.metric.DuckAiMetricCollector
+import com.duckduckgo.duckchat.impl.models.ModelSource
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_BROWSER_MENU_IS_ENABLED_DAILY
-import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_DUCKAI_DAU_TOGGLE_NEVER_ENABLED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_IS_ENABLED_DAILY
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName.DUCK_CHAT_EXPERIMENTAL_ADDRESS_BAR_SETTING_OFF
@@ -141,6 +141,12 @@ enum class DuckChatPixelSurface(val value: String) {
             NativeInputState.InputContext.DUCK_AI_CONTEXTUAL -> CONTEXTUAL_CHAT
         }
     }
+}
+
+enum class AttachmentEntryPoint(val pixelValue: String) {
+    ATTACHMENT_MENU("attachment_menu"),
+    NEW_CHAT_HINT("new_chat_hint"),
+    SHARE("share"),
 }
 
 enum class DuckChatPixelPageType(val value: String) {
@@ -249,6 +255,7 @@ interface DuckChatPixels {
         tabId: String?,
         pageType: DuckChatPixelPageType,
         addressBarEntryPoint: DuckChatEntryPoint?,
+        modelSource: ModelSource?,
     )
 
     /** Prompt submitted while the unified input is in a Duck.ai chat context. Fires alongside [firePromptSubmitted]. */
@@ -293,9 +300,9 @@ interface DuckChatPixels {
     fun fireImageAttached(source: String, surface: DuckChatPixelSurface)
     fun fireImageValidationFailed(reason: String, surface: DuckChatPixelSurface)
     fun fireImageRemoved(surface: DuckChatPixelSurface)
-    fun fireFileAttached(surface: DuckChatPixelSurface)
+    fun fireFileAttached(surface: DuckChatPixelSurface, entryPoint: AttachmentEntryPoint)
     fun fireFileRemoved(surface: DuckChatPixelSurface)
-    fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface)
+    fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface, entryPoint: AttachmentEntryPoint)
     fun fireVoiceTapped(surface: DuckChatPixelSurface)
     fun fireVoiceSearchTapped(surface: DuckChatPixelSurface)
     fun fireStopGenerationTapped(surface: DuckChatPixelSurface)
@@ -335,6 +342,7 @@ interface DuckChatPixels {
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         selectedTool: String,
+        modelSource: ModelSource?,
     )
 
     /** Once per New Chat; [hints] is the row in display order, which is shuffled per tab. */
@@ -1085,6 +1093,7 @@ class RealDuckChatPixels @Inject constructor(
         tabId: String?,
         pageType: DuckChatPixelPageType,
         addressBarEntryPoint: DuckChatEntryPoint?,
+        modelSource: ModelSource?,
     ) {
         fireCountAndDaily(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_PROMPT_SUBMITTED_COUNT,
@@ -1100,6 +1109,7 @@ class RealDuckChatPixels @Inject constructor(
                 put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
                 modelId?.let { put(DuckChatPixelParameters.MODEL_ID, it) }
                 reasoningEffort?.let { put(DuckChatPixelParameters.REASONING_EFFORT, it) }
+                modelSource?.let { put(DuckChatPixelParameters.MODEL_SOURCE, it.pixelValue) }
                 put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
                 put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
                 put(DuckChatPixelParameters.HAS_TEXT, hasText.toString())
@@ -1263,10 +1273,13 @@ class RealDuckChatPixels @Inject constructor(
         ),
     )
 
-    override fun fireFileAttached(surface: DuckChatPixelSurface) = fireCountAndDaily(
+    override fun fireFileAttached(surface: DuckChatPixelSurface, entryPoint: AttachmentEntryPoint) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
-        surfaceParams(surface),
+        mapOf(
+            DuckChatPixelParameters.SURFACE to surface.value,
+            DuckChatPixelParameters.ENTRY_POINT to entryPoint.pixelValue,
+        ),
     )
 
     override fun fireFileRemoved(surface: DuckChatPixelSurface) = fireCountAndDaily(
@@ -1302,12 +1315,17 @@ class RealDuckChatPixels @Inject constructor(
         surfaceParams(surface),
     )
 
-    override fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface) = fireCountAndDaily(
+    override fun fireFileValidationFailed(
+        reason: String,
+        surface: DuckChatPixelSurface,
+        entryPoint: AttachmentEntryPoint,
+    ) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_DAILY,
         mapOf(
             DuckChatPixelParameters.FILE_VALIDATION_REASON to reason,
             DuckChatPixelParameters.SURFACE to surface.value,
+            DuckChatPixelParameters.ENTRY_POINT to entryPoint.pixelValue,
         ),
     )
 
@@ -1464,17 +1482,19 @@ class RealDuckChatPixels @Inject constructor(
         hasImageAttachment: Boolean,
         hasFileAttachment: Boolean,
         selectedTool: String,
+        modelSource: ModelSource?,
     ) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_COUNT,
         DuckChatPixelName.DUCK_CHAT_NEW_CHAT_FIRST_PROMPT_SENT_DAILY,
-        mapOf(
-            DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED to hasNewChatHints.toString(),
-            DuckChatPixelParameters.HINTS_SHOWN to hintsShown.toString(),
-            DuckChatPixelParameters.HINT_TAPPED to (hintTapped?.pixelValue() ?: "none"),
-            DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT to hasImageAttachment.toString(),
-            DuckChatPixelParameters.HAS_FILE_ATTACHMENT to hasFileAttachment.toString(),
-            DuckChatPixelParameters.SELECTED_TOOL to selectedTool,
-        ),
+        buildMap {
+            put(DuckChatPixelParameters.NEW_CHAT_HINTS_ENABLED, hasNewChatHints.toString())
+            put(DuckChatPixelParameters.HINTS_SHOWN, hintsShown.toString())
+            put(DuckChatPixelParameters.HINT_TAPPED, hintTapped?.pixelValue() ?: "none")
+            put(DuckChatPixelParameters.HAS_IMAGE_ATTACHMENT, hasImageAttachment.toString())
+            put(DuckChatPixelParameters.HAS_FILE_ATTACHMENT, hasFileAttachment.toString())
+            put(DuckChatPixelParameters.SELECTED_TOOL, selectedTool)
+            modelSource?.let { put(DuckChatPixelParameters.MODEL_SOURCE, it.pixelValue) }
+        },
     )
 
     override fun fireNewChatHintsShown(hints: List<NewChatHint>) {
@@ -1605,7 +1625,6 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_KEYBOARD_RETURN_PRESSED("m_aichat_duckai_keyboard_return_pressed"),
     DUCK_CHAT_USER_ACCEPTED_TERMS_AND_CONDITIONS("m_aichat_duckai_accepted_terms_and_conditions"),
     DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION("m_aichat_experimental_omnibar_daily_retention"),
-    DUCK_CHAT_DUCKAI_DAU_TOGGLE_NEVER_ENABLED("m_aichat_duckai_dau_toggle_never_enabled"),
     DUCK_CHAT_SETTINGS_NEW_CHAT_TAB_TAPPED("m_aichat_settings_menu_new_chat_tab_tapped"),
     DUCK_CHAT_OMNIBAR_NEW_CHAT_TAPPED("m_aichat_omnibar_new_chat_button_tapped"),
     DUCK_CHAT_OMNIBAR_SIDEBAR_TAPPED("m_aichat_omnibar_sidebar_button_tapped"),
@@ -1919,6 +1938,7 @@ object DuckChatPixelParameters {
     // Unified Input pixels
     const val SELECTED_TOOL = "selected_tool"
     const val MODEL_ID = "model_id"
+    const val MODEL_SOURCE = "model_source"
     const val REASONING_EFFORT = "reasoning_effort"
     const val EFFORT_LEVEL = "effort_level"
     const val HAS_IMAGE_ATTACHMENT = "has_image_attachment"
@@ -1929,6 +1949,7 @@ object DuckChatPixelParameters {
     const val ATTACHMENT_SOURCE = "source"
     const val FILE_VALIDATION_REASON = "reason"
     const val SURFACE = "surface"
+    const val ENTRY_POINT = "entry_point"
     const val OUTCOME = "outcome"
     const val SUBMIT_METHOD = "submit_method"
     const val TOS_DISCLAIMER_SHOWN = "tos_disclaimer_shown"
@@ -2034,7 +2055,6 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_SUBMIT_PRESSED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_EXPERIMENTAL_OMNIBAR_FLOATING_RETURN_PRESSED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_EXPERIMENTAL_OMNIBAR_DAILY_RETENTION.pixelName to PixelParameter.removeAtb(),
-            DUCK_CHAT_DUCKAI_DAU_TOGGLE_NEVER_ENABLED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_SETTINGS_MENU_OPEN.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_DUCK_AI_SETTINGS_TAPPED.pixelName to PixelParameter.removeAtb(),
             DUCK_CHAT_TAB_SWITCHER_OPENED.pixelName to PixelParameter.removeAtb(),

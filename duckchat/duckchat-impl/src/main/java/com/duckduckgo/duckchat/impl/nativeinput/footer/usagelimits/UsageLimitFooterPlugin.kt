@@ -20,23 +20,30 @@ import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.UserTier
+import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.ModelSelection
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningCta
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -46,7 +53,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
@@ -65,6 +74,8 @@ class UsageLimitFooterPlugin @Inject constructor(
     private val messageMapper: UsageLimitFooterMessageMapper,
     private val ctaResolver: UsageLimitCtaResolver,
     private val modelManager: DuckAiModelManager,
+    private val nativeInputStateProvider: NativeInputStateProvider,
+    @RegularMode private val chatStore: DuckAiChatStore,
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckChatFeature: DuckChatFeature,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -80,9 +91,38 @@ class UsageLimitFooterPlugin @Inject constructor(
         val snapshot: UsageLimitsSnapshot?,
         val dismissals: Map<UsageWindow, UsageNoticeDismissal>,
         val actedOn: UsageNoticeActedOn?,
-        val selectedModelId: String?,
-        val isFreeTrialEligible: Boolean,
-    )
+        val modelState: ModelState,
+        val selection: ModelSelection,
+        val chatModelId: String?,
+    ) {
+        val selectedModelId: String? get() = modelState.selectedModelId
+        val isNewChat: Boolean get() = selection.isNewChat
+
+        /** The model the active chat sends on: a new chat's selection, or the model an existing chat was saved with. */
+        private val activeModelId: String?
+            get() = if (isNewChat) selectedModelId else chatModelId
+
+        /**
+         * Web names an over-limit default only while free models are still usable, and web offers no switch away from
+         * one, so a reached notice on a chat already on a usable model would block it with no way out. Only applies
+         * while `resetModelForNewChats` is on.
+         */
+        val isOnModelAllowedOverLimit: Boolean
+            get() {
+                val overLimitModelId = snapshot?.newChatDefault?.modelId ?: return false
+                if (modelState.newChatDefault == null) return false
+                val model = modelState.models.firstOrNull { it.id == activeModelId } ?: return false
+                return model.id == overLimitModelId || model.requiredTier == UserTier.FREE
+            }
+
+        /**
+         * What the CTA targets are looked up against. While `resetModelForNewChats` is on, the global selection is the
+         * new-chat default, not the model an existing chat is on, so an existing chat uses the page's own targets,
+         * which web keys to the chat it shows.
+         */
+        val ctaModelState: ModelState
+            get() = if (!isNewChat && modelState.newChatDefault != null) modelState.copy(selectedModelId = null) else modelState
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun createFooter(
@@ -91,7 +131,7 @@ class UsageLimitFooterPlugin @Inject constructor(
         host: NativeInputFooterHost,
     ): NativeInputFooter {
         val footerView = UsageLimitFooterView(context)
-        var lastSelectedModelId: String? = null
+        var lastInputs: Inputs? = null
         val measurement = measurements.forHost(host) { DuckChatPixelSurface.from(hostContext.value.inputContext) }
         var lastContext: NativeInputFooterContext? = null
         var currentExposure: UsageWarningExposure? = null
@@ -103,6 +143,21 @@ class UsageLimitFooterPlugin @Inject constructor(
             }
         }.distinctUntilChanged()
 
+        // Watches only the active chat's row, and starts with no model so the footer is not held back while it loads.
+        val chatModel: Flow<Pair<String?, String?>> = nativeInputStateProvider.state.map { it.chatId }.distinctUntilChanged()
+            .flatMapLatest { chatId ->
+                if (chatId == null) {
+                    flowOf(null to null)
+                } else {
+                    chatStore.getChatFlow(chatId).map { chatId to it?.model }.onStart { emit(chatId to null) }
+                }
+            }
+            .distinctUntilChanged()
+        // The two arrive on separate flows, so a chat switch can briefly pair the new chat with the old chat's model.
+        val activeChat = combine(nativeInputStateProvider.state, chatModel) { inputState, (chatId, model) ->
+            inputState to model.takeIf { chatId == inputState.chatId }
+        }.distinctUntilChanged()
+
         val inputs = activeBrowserMode.flatMapLatest { browserMode ->
             if (browserMode != null) {
                 combine(
@@ -110,8 +165,17 @@ class UsageLimitFooterPlugin @Inject constructor(
                     dismissalStore.dismissals,
                     dismissalStore.actedOn,
                     modelManager.modelState,
-                ) { snapshot, dismissals, actedOn, modelState ->
-                    Inputs(snapshot, dismissals, actedOn, modelState.selectedModelId, modelState.isFreeTrialEligible)
+                    activeChat,
+                ) { snapshot, dismissals, actedOn, modelState, (inputState, chatModelId) ->
+                    val tabModelState = modelState.forTab(inputState)
+                    Inputs(
+                        snapshot,
+                        dismissals,
+                        actedOn,
+                        tabModelState,
+                        selection = ModelSelection.of(tabModelState, inputState),
+                        chatModelId = chatModelId,
+                    )
                 }
             } else {
                 flowOf(null)
@@ -119,13 +183,13 @@ class UsageLimitFooterPlugin @Inject constructor(
         }
 
         val state = combine(inputs, hostContext) { input, footerContext ->
-            val previousModelId = lastSelectedModelId
-            lastSelectedModelId = input?.selectedModelId ?: previousModelId
+            val switchedFromModelId = input?.selection?.switchedFrom(lastInputs?.selection)
+            if (input?.selectedModelId != null) lastInputs = input
             val previousContext = lastContext
             lastContext = footerContext
             // A prompt is attributed before the focus loss that follows it, even when both arrive in one emission.
             if (previousContext != null && footerContext.promptSubmissions > previousContext.promptSubmissions) measurement.promptSubmitted()
-            if (previousModelId != null && input?.selectedModelId != null && input.selectedModelId != previousModelId) measurement.modelSwitched()
+            if (switchedFromModelId != null) measurement.modelSwitched()
             if (input == null || !footerContext.isInputFocused) measurement.inputSessionEnded()
             val snapshot = input?.snapshot ?: return@combine NativeInputFooterState(visible = false)
             val notice = snapshot.notice
@@ -137,11 +201,11 @@ class UsageLimitFooterPlugin @Inject constructor(
             ) {
                 return@combine NativeInputFooterState(visible = false)
             }
-            if (input.actedOn?.applies(notice) == true) return@combine NativeInputFooterState(visible = false)
+            if (input.actedOn?.applies(notice) == true || input.isOnModelAllowedOverLimit) return@combine NativeInputFooterState(visible = false)
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
-            val resolvedCta = ctaResolver.resolve(snapshot.cta, modelManager.modelState.value, host.draft(), input.isFreeTrialEligible)
-            retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = previousModelId)
+            val resolvedCta = ctaResolver.resolve(snapshot.cta, input.ctaModelState, host.draft(), input.modelState.isFreeTrialEligible)
+            retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = switchedFromModelId)
 
             val exposure = UsageWarningExposure.of(notice)
             if (isDisplayed && exposure != currentExposure) measurement.cardBecameVisible(exposure)

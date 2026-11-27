@@ -34,6 +34,8 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -150,11 +152,14 @@ class RecoveryCodeViewModel @Inject constructor(
             when (val result = syncAccountRepository.getRecoveryCode()) {
                 is Success<AuthCode> -> {
                     syncSetupWideEvent.onRecoveryCodeShown()
+                    syncSetupWideEvent.onStep(SetupStep.RECOVERY_CODE_SHOWN)
+                    syncSetupWideEvent.onSucceeded()
                     _viewState.update { it.copy(recoveryCode = result.data.rawCode) }
                 }
 
                 is Error -> {
                     syncSetupWideEvent.onRecoveryCodeGenerationFailed()
+                    syncSetupWideEvent.onFailed(SetupFailureReason.RECOVERY_CODE_GENERATION_FAILED)
                     _commands.send(Command.ShowError(R.string.sync_simplified_error_dialog_recovery_code_body, result.reason))
                 }
             }
@@ -170,6 +175,7 @@ class RecoveryCodeViewModel @Inject constructor(
                     }
 
                     is Error -> {
+                        syncSetupWideEvent.onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
                         _commands.send(Command.ShowError(R.string.sync_simplified_error_dialog_create_account_body))
                     }
                 }

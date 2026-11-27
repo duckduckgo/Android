@@ -606,6 +606,11 @@
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
     </style>
 
+    <style name="ShapeAppearance.DuckDuckGo.Menu" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">?attr/daxMenuRadius</item>
+    </style>
+
     <style name="TabSwitcher.Widget.Toolbar" parent="Widget.DuckDuckGo.ToolbarTheme">
         <item name="actionButtonStyle">@style/TabSwitcher.ActionButton</item>
         <item name="android:actionButtonStyle">@style/TabSwitcher.ActionButton</item>

@@ -23,6 +23,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.ConflatedJob
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import dev.zacsweers.metro.ContributesIntoSet
@@ -51,6 +52,7 @@ class DuckAiWidgetUpdater @Inject constructor(
     private val context: Context,
     private val chats: DuckAiChatsWidgetChats,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver, PrivacyConfigCallbackPlugin {
 
     private var observeJob = ConflatedJob()
@@ -69,9 +71,10 @@ class DuckAiWidgetUpdater @Inject constructor(
     }
 
     fun startObservingIfNeeded() {
-        if (observeJob.isActive || widgetIds().isEmpty()) return
+        if (observeJob.isActive) return
 
-        observeJob += appCoroutineScope.launch {
+        observeJob += appCoroutineScope.launch(dispatcherProvider.io()) {
+            if (widgetIds().isEmpty()) return@launch
             chats.observeChats().collect {
                 if (widgetIds().isEmpty()) {
                     cancel()
@@ -88,11 +91,13 @@ class DuckAiWidgetUpdater @Inject constructor(
     }
 
     private fun refresh() {
-        val ids = widgetIds().takeIf { it.isNotEmpty() } ?: return
-        val intent = Intent(context, DuckAiWidgetProvider::class.java).apply {
-            action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+        appCoroutineScope.launch(dispatcherProvider.io()) {
+            val ids = widgetIds().takeIf { it.isNotEmpty() } ?: return@launch
+            val intent = Intent(context, DuckAiWidgetProvider::class.java).apply {
+                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids)
+            }
+            context.sendBroadcast(intent)
         }
-        context.sendBroadcast(intent)
     }
 }

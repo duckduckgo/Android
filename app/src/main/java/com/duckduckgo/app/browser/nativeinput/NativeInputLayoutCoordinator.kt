@@ -231,7 +231,7 @@ class NativeInputLayoutCoordinator(
 
     fun configureContentOffset(widgetView: View, isBottom: Boolean, navBarInsetPx: Int = 0) {
         this.navBarInsetPx = navBarInsetPx
-        data class Target(val view: View, val basePadding: Padding)
+        data class Target(val view: View, val basePadding: Padding, val restorePadding: Padding = basePadding)
 
         // Drop any prior session's applied inset before snapshotting. Otherwise a leftover top/bottom
         // padding (incomplete close, or ShowKeyboard → showNativeInput after a tab swipe) becomes the
@@ -242,15 +242,23 @@ class NativeInputLayoutCoordinator(
         val newTabContent: View? = rootView.findViewById<View?>(R.id.newTabPage)
             ?: rootView.findViewById(R.id.includeNewBrowserTab)
         // newTabPage has no XML padding — any top/bottom here is from a prior offset session. Zero it
-        // so the snapshot can't inherit a dirty baseline. Leave browserLayout alone: its bottom padding
-        // is owned by BottomOmnibarBrowserContainerLayoutBehavior.
+        // so the snapshot can't inherit a dirty baseline.
         newTabContent?.setPadding(newTabContent.paddingLeft, 0, newTabContent.paddingRight, 0)
 
+        // With the widget at the bottom the offset is the absolute overlap, so browserLayout's bottom padding
+        // (set by BottomOmnibarBrowserContainerLayoutBehavior) is dropped for the session. The behavior only
+        // reacts to omnibar changes, so it can't re-apply it on close: hand the original back on reset.
+        val browserLayout = rootView.findViewById<View?>(R.id.browserLayout)
+        val browserRestorePadding = browserLayout?.snapshotPadding()
+        if (isBottom && browserLayout != null) {
+            browserLayout.setPadding(browserLayout.paddingLeft, browserLayout.paddingTop, browserLayout.paddingRight, 0)
+        }
+
         val targets =
-            listOfNotNull(
-                rootView.findViewById(R.id.browserLayout),
-                newTabContent,
-            ).map { Target(it, it.snapshotPadding()) }
+            listOfNotNull(browserLayout, newTabContent).map { view ->
+                val base = view.snapshotPadding()
+                Target(view, base, restorePadding = browserRestorePadding.takeIf { view === browserLayout } ?: base)
+            }
         if (targets.isEmpty()) return
         val anchor = widgetView.findViewById(R.id.inputModeWidgetCard) ?: widgetView
         val footer = widgetView.findViewById<View?>(R.id.nativeInputFooter)
@@ -351,7 +359,7 @@ class NativeInputLayoutCoordinator(
 
         fun applyOffset() {
             if (!widgetView.isShown) {
-                targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
+                targets.forEach { applyPadding(it.view, it.restorePadding, deltaTop = 0, deltaBottom = 0) }
                 clearNtpScrollArtifacts()
                 return
             }
@@ -391,7 +399,7 @@ class NativeInputLayoutCoordinator(
 
         reapplyContentOffset = { applyOffset() }
         resetContentOffset = {
-            targets.forEach { applyPadding(it.view, it.basePadding, deltaTop = 0, deltaBottom = 0) }
+            targets.forEach { applyPadding(it.view, it.restorePadding, deltaTop = 0, deltaBottom = 0) }
             clearNtpScrollArtifacts()
         }
         widgetView.post { applyOffset() }
@@ -462,7 +470,7 @@ class NativeInputLayoutCoordinator(
             isContentReflowSuspended = false
             isReflowSuspendRequested = false
             targets.forEach { target ->
-                applyPadding(target.view, target.basePadding, deltaTop = 0, deltaBottom = 0)
+                applyPadding(target.view, target.restorePadding, deltaTop = 0, deltaBottom = 0)
             }
             clearNtpScrollArtifacts()
             widgetView.removeOnAttachStateChangeListener(attachListener)

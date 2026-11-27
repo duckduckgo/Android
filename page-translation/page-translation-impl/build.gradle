@@ -40,7 +40,9 @@ dependencies {
     implementation AndroidX.appCompat
     implementation AndroidX.core.ktx
     implementation AndroidX.dataStore.preferences
+    implementation AndroidX.fragment.ktx
     implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
     implementation KotlinX.coroutines.core
     implementation Square.okHttp3.okHttp
 
@@ -59,4 +61,12 @@ dependencies {
     testImplementation Testing.robolectric
 
     ksp project(':codegen-ksp')
+}
+
+android {
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }

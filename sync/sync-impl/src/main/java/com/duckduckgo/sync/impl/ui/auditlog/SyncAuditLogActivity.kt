@@ -33,7 +33,6 @@ import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
-import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.ActivitySyncAuditLogBinding
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Command
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Content
@@ -130,15 +129,11 @@ class SyncAuditLogActivity : DuckDuckGoActivity() {
     private fun render(state: ViewState) {
         val content = state.content
         binding.loadingIndicator.isVisible = content == Content.LOADING
-        binding.syncAuditLogList.isVisible = content == Content.LIST
-        binding.messageText.isVisible = content == Content.EMPTY || content == Content.ERROR
-        when (content) {
-            Content.EMPTY -> binding.messageText.setText(R.string.syncAuditLogEmpty)
-            Content.ERROR -> binding.messageText.setText(R.string.syncAuditLogError)
-            Content.LOADING, Content.LIST -> Unit
-        }
+        binding.syncAuditLogList.isVisible = content != Content.LOADING
         // onScrolled runs only when the visible range changes, so a page that adds rows below the screen would not trigger it.
-        adapter.submitRows(state.rows, state.footer) { binding.syncAuditLogList.post { checkListEnd() } }
+        adapter.submitRows(state.rows, state.footer, content) {
+            binding.syncAuditLogList.post { checkListEnd() }
+        }
     }
 
     private companion object {

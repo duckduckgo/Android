@@ -29,11 +29,14 @@ import com.duckduckgo.common.ui.view.button.DaxButtonSecondary
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.NewChatDefault
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.FakeUsageWarningPixelSender
@@ -44,11 +47,14 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarnin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -59,6 +65,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doAnswer
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -77,10 +85,17 @@ class UsageLimitFooterPluginTest {
     private val snapshot = MutableStateFlow<UsageLimitsSnapshot?>(null)
     private val dismissals = MutableStateFlow<Map<UsageWindow, UsageNoticeDismissal>>(emptyMap())
     private val actedOn = MutableStateFlow<UsageNoticeActedOn?>(null)
-    private val modelState = MutableStateFlow(ModelState(models = listOf(SONNET, HAIKU), selectedModelId = SONNET.id, isSubscriptionEligible = true))
+    private val modelState =
+        MutableStateFlow(ModelState(models = listOf(SONNET, HAIKU, TERRA), selectedModelId = SONNET.id, isSubscriptionEligible = true))
     private val repository: DuckAiUsageLimitsRepository = mock()
     private val dismissalStore: UsageNoticeDismissalStore = mock()
     private val modelManager: DuckAiModelManager = mock()
+    private val inputState = MutableStateFlow(NativeInputState.zero())
+    private val nativeInputStateProvider: NativeInputStateProvider = mock { on { state } doReturn inputState }
+    private val chats = MutableStateFlow<List<DuckAiChat>>(emptyList())
+    private val chatStore: DuckAiChatStore = mock {
+        on { getChatFlow(any()) } doAnswer { call -> chats.map { list -> list.firstOrNull { it.chatId == call.getArgument<String>(0) } } }
+    }
     private val settingsDao: DuckAiBridgeSettingsDao = mock()
     private val storage: DuckAiBridgeStorage = mock()
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage> = mock()
@@ -108,6 +123,8 @@ class UsageLimitFooterPluginTest {
             messageMapper = UsageLimitFooterMessageMapper(),
             ctaResolver = UsageLimitCtaResolver(),
             modelManager = modelManager,
+            nativeInputStateProvider = nativeInputStateProvider,
+            chatStore = chatStore,
             storageProvider = storageProvider,
             duckChatFeature = feature,
             currentTimeProvider = currentTimeProvider,
@@ -320,6 +337,19 @@ class UsageLimitFooterPluginTest {
     }
 
     @Test
+    fun whenNewChatAlreadyPickedTheCandidateThenNoticeShowsWithoutButton() = runTest {
+        inputState.value = inputState.value.copy(newChatModelId = HAIKU.id)
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            assertEquals(android.view.View.GONE, footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta).visibility)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenCtaHasNoUsableCandidateThenNoticeShowsWithoutButton() = runTest {
         snapshot.value = approaching(75).copy(cta = switchCta("unknown-model"))
         val footer = testee.createFooter(context, hostContext, host)
@@ -346,6 +376,229 @@ class UsageLimitFooterPluginTest {
             assertTrue(awaitItem().visible)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenNewChatStartsOnTheOverLimitDefaultThenReachedCardHidesAndComposerIsOpen() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            val state = awaitItem()
+            assertFalse(state.visible)
+            assertFalse(state.blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatIsPickedOntoAnAdvancedModelThenReachedCardBlocks() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        inputState.value = NativeInputState.zero().copy(newChatModelId = TERRA.id)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatIsPickedOntoAnotherFreeModelThenReachedCardHides() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        inputState.value = NativeInputState.zero().copy(newChatModelId = SONNET.id)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            val state = awaitItem()
+            assertFalse(state.visible)
+            assertFalse(state.blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenExistingChatIsOnAFreeModelThenReachedCardHides() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        chats.value = listOf(chat("chat", SONNET.id))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            val state = awaitItem()
+            assertFalse(state.visible)
+            assertFalse(state.blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenExistingChatIsSavedBackOnAFreeModelThenReachedCardHides() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        chats.value = listOf(chat("chat", TERRA.id))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+
+            chats.value = listOf(chat("chat", SONNET.id))
+
+            assertFalse(awaitItem().visible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenExistingChatIsNotInTheStoreThenReachedCardBlocks() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoOverLimitDefaultIsNamedThenAFreeModelStillBlocks() = runTest {
+        snapshot.value = reached()
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenExistingChatIsOnTheOverLimitModelThenReachedCardBlocks() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        chats.value = listOf(chat("chat", TERRA.id))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenExistingChatWhileOnTheOverLimitDefaultThenSwitchUsesThePageTargets() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        chats.value = listOf(chat("chat", TERRA.id))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta).performClick()
+
+            assertEquals(listOf(HAIKU.id), host.selectedModelIds)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenResetModelForNewChatsOffThenOverLimitModelStillBlocks() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = null)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenExistingChatAndTheNewChatDefaultMovesToTheCtaTargetThenItIsNotTreatedAsAUserSwitch() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(newChatDefault = NewChatDefault(SONNET.id, ReasoningMode.FAST))
+        chats.value = listOf(chat("chat", TERRA.id))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            footer.onDisplayed(true)
+
+            modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenNewChatWithoutAPickAndTheNewChatDefaultMovesThenItIsNotTreatedAsAUserSwitch() = runTest {
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(newChatDefault = NewChatDefault(SONNET.id, ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenNewChatPicksTheCtaTargetWhileResetModelForNewChatsOnThenItIsAUserSwitch() = runTest {
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(newChatDefault = NewChatDefault(SONNET.id, ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            inputState.value = inputState.value.copy(newChatModelId = HAIKU.id)
+
+            verify(dismissalStore).markActedOn(snapshot.value!!.notice)
+            assertEquals(
+                listOf(UsageWarningEvent.Shown::class, UsageWarningEvent.ModelSwitched::class),
+                pixelSender.events.map { it::class },
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatPickIsClearedBeforeTheChatOpensThenItIsNotTreatedAsAUserSwitch() = runTest {
+        snapshot.value = approaching(75).copy(cta = switchCta(SONNET.id))
+        modelState.value = modelState.value.copy(newChatDefault = NewChatDefault(SONNET.id, ReasoningMode.FAST))
+        inputState.value = inputState.value.copy(newChatModelId = TERRA.id)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            inputState.value = inputState.value.copy(newChatModelId = null)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
     }
 
     @Test
@@ -620,6 +873,26 @@ class UsageLimitFooterPluginTest {
         )
     }
 
+    @Test
+    fun whenPromptIsSentOnAPickedModelThenEnteringTheChatDoesNotActOnTheSwitchCta() = runTest {
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id)
+        inputState.value = inputState.value.copy(newChatModelId = SONNET.id)
+        snapshot.value = approaching(75).copy(cta = switchCta(HAIKU.id))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            hostContext.value = duckAiContext(promptSubmissions = 1)
+            hostContext.value = duckAiContext(isInputFocused = false, promptSubmissions = 1)
+            inputState.value = inputState.value.copy(chatId = "chat-1", newChatModelId = null)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(dismissalStore, never()).markActedOn(any())
+    }
+
     private fun switchCta(vararg modelIds: String) =
         UsageCta(UsageCtaId.SWITCH_TO_CHEAPER, modelId = null, modelIds = modelIds.toList(), byModelId = emptyMap(), putEntries = emptyList())
 
@@ -648,6 +921,12 @@ class UsageLimitFooterPluginTest {
         ),
         cta = null,
     )
+
+    private fun reachedWithOverLimitDefault(modelId: String) =
+        reached().copy(newChatDefault = OverLimitNewChatDefault(modelId, reasoningEffort = null, resetsAtMillis = RESETS_AT))
+
+    private fun chat(chatId: String, modelId: String) =
+        DuckAiChat(chatId = chatId, title = "", model = modelId, lastEdit = "", pinned = false)
 
     private fun duckAiContext(
         isEditing: Boolean = false,
@@ -682,6 +961,15 @@ class UsageLimitFooterPluginTest {
                 displayName = "Haiku",
                 shortName = "Haiku",
                 accessTier = listOf("free"),
+                isAccessible = true,
+            )
+        val TERRA =
+            AIChatModel(
+                id = "gpt-5-6-terra",
+                name = "Terra",
+                displayName = "Terra",
+                shortName = "Terra",
+                accessTier = listOf("plus", "pro"),
                 isAccessible = true,
             )
     }

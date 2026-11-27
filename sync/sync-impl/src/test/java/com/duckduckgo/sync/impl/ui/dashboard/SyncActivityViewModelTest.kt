@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui.dashboard
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.lifecycle.viewModelScope
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
@@ -48,10 +49,17 @@ import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step.NONE
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step.OPEN_SETTINGS
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step.REQUEST_PERMISSION
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationSetting
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import com.duckduckgo.sync.impl.auditlog.RealLoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -70,13 +78,16 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.Launc
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowPreviousSessionReady
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.NewLoginNotificationsViewState
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -132,6 +143,8 @@ class SyncActivityViewModelTest {
 
     private val auditLogStateStore = FakeStateStore()
     private val newLoginNotifier: NewLoginNotifier = mock()
+    private val notificationPermission = FakeNotificationPermission()
+    private val notificationSetting = FakeNotificationSetting()
 
     private lateinit var testee: SyncActivityViewModel
 
@@ -155,6 +168,8 @@ class SyncActivityViewModelTest {
             loginAuditLogFeature = RealLoginAuditLogFeature(fakeSyncFeature, coroutineTestRule.testDispatcherProvider),
             auditLogStateStore = auditLogStateStore,
             newLoginNotifier = newLoginNotifier,
+            newLoginNotificationPermission = notificationPermission,
+            newLoginNotificationSetting = notificationSetting,
         )
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
@@ -724,7 +739,7 @@ class SyncActivityViewModelTest {
 
     @Test
     fun whenAddAnotherDeviceVerificationFailsThenShowError() = runViewModelTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         testee.commands().test {
             testee.onAddAnotherDevice()
@@ -2043,6 +2058,285 @@ class SyncActivityViewModelTest {
     }
 
     @Test
+    fun whenNotificationsOnAndAppCanPostThenSwitchOnAndNoCard() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = true, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationsOnAndAppCannotPostThenSwitchOffAndCardShown() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = true), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAppCannotPostAndCardDismissedThenNoCard() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+        notificationSetting.cardDismissed = true
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserTurnedNotificationsOffThenSwitchOffAndNoCard() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+        notificationSetting.enabled = false
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationStateNotLoadedYetThenNotifyMeHidden() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationSetting.loadGate = CompletableDeferred()
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertTrue(state.showAccount)
+            assertFalse(state.showNotifyMe)
+            assertNull(state.newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncStateNotEmittedYetThenNotificationSettingsStillLoad() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        whenever(syncStateMonitor.syncState()).thenReturn(MutableSharedFlow())
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = true, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationSettingsShownThenNotifyMeHidden() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().showNotifyMe)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoginNotificationFlagOffThenNotifyMeShown() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            assertTrue(expectMostRecentItem().showNotifyMe)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoginNotificationFlagOffThenNoNotificationSettings() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutThenNoNotificationSettings() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignsInWhileOpenThenNotificationSettingsShown() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+        val syncStates = MutableStateFlow(SyncState.OFF)
+        whenever(syncStateMonitor.syncState()).thenReturn(syncStates)
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newLoginNotifications)
+
+            givenAuthenticatedUser()
+            syncStates.value = SyncState.READY
+
+            assertNotNull(expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOffThenSettingStoredOffAndSwitchOff() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            testee.onNewLoginNotificationsToggled(enabled = false, shouldShowRationale = false)
+
+            assertFalse(notificationSetting.enabled)
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOffWhileAppCannotPostThenCardHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            testee.onNewLoginNotificationsToggled(enabled = false, shouldShowRationale = false)
+
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOnAndAppCanPostThenSettingStoredOnAndNoCommand() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationSetting.enabled = false
+
+        testee.commands().test {
+            testee.onNewLoginNotificationsToggled(enabled = true, shouldShowRationale = false)
+
+            assertTrue(notificationSetting.enabled)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOnAndPermissionCanBeRequestedThenRequestPermission() = runViewModelTest {
+        notificationSetting.enabled = false
+        notificationPermission.canPost = false
+        notificationPermission.step = REQUEST_PERMISSION
+
+        testee.commands().test {
+            testee.onNewLoginNotificationsToggled(enabled = true, shouldShowRationale = true)
+
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+            assertTrue(notificationSetting.enabled)
+            assertEquals(true, notificationPermission.lastRationale)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOnAndSettingsNeededThenAskBeforeOpeningSettings() = runViewModelTest {
+        notificationPermission.canPost = false
+        notificationPermission.step = OPEN_SETTINGS
+
+        testee.commands().test {
+            testee.onNewLoginNotificationsToggled(enabled = true, shouldShowRationale = false)
+
+            assertEquals(Command.AskOpenNotificationSettings, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenNotificationSettingsConfirmedThenOpenSettings() = runViewModelTest {
+        testee.commands().test {
+            testee.onOpenNotificationSettingsConfirmed()
+
+            assertEquals(Command.OpenNotificationSettings(notificationPermission.intent), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCardButtonClickedAndPermissionCanBeRequestedThenRequestPermission() = runViewModelTest {
+        notificationPermission.canPost = false
+        notificationPermission.step = REQUEST_PERMISSION
+
+        testee.commands().test {
+            testee.onEnableNotificationsClicked(shouldShowRationale = true)
+
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+            assertEquals(true, notificationPermission.lastRationale)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCardButtonClickedAndSettingsNeededThenOpenSettingsWithoutAsking() = runViewModelTest {
+        notificationPermission.canPost = false
+        notificationPermission.step = OPEN_SETTINGS
+
+        testee.commands().test {
+            testee.onEnableNotificationsClicked(shouldShowRationale = false)
+
+            assertEquals(Command.OpenNotificationSettings(notificationPermission.intent), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPermissionGrantedThenSwitchOnAndCardHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = true), expectMostRecentItem().newLoginNotifications)
+
+            notificationPermission.canPost = true
+            testee.onNotificationPermissionResult()
+
+            assertEquals(NewLoginNotificationsViewState(switchOn = true, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCardClosedThenDismissStoredAndCardHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            testee.onEnableNotificationsCardCloseClicked()
+
+            assertTrue(notificationSetting.cardDismissed)
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenProcessSetupDeepLinkWithV2UrlAndDeviceAuthNotEnrolledThenNoCommandIsSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
         val url = SyncBarcodeUrl(
@@ -2090,6 +2384,43 @@ class SyncActivityViewModelTest {
         deviceName = name,
         occurredAt = Instant.parse("2026-11-19T10:00:00Z").plusSeconds(n.toLong()),
     )
+
+    private class FakeNotificationPermission : NewLoginNotificationPermission {
+        var canPost = true
+        var step = NONE
+        var lastRationale: Boolean? = null
+        val intent = Intent("settings")
+
+        override suspend fun canPost(): Boolean = canPost
+
+        override suspend fun nextStep(shouldShowRationale: Boolean): Step {
+            lastRationale = shouldShowRationale
+            return if (canPost) NONE else step
+        }
+
+        override suspend fun settingsIntent(): Intent = intent
+    }
+
+    private class FakeNotificationSetting : NewLoginNotificationSetting {
+        var enabled = true
+        var cardDismissed = false
+        var loadGate: CompletableDeferred<Unit>? = null
+
+        override suspend fun isEnabled(): Boolean {
+            loadGate?.await()
+            return enabled
+        }
+
+        override suspend fun setEnabled(enabled: Boolean) {
+            this.enabled = enabled
+        }
+
+        override suspend fun isCardDismissed(): Boolean = cardDismissed
+
+        override suspend fun dismissCard() {
+            cardDismissed = true
+        }
+    }
 
     private class FakeStateStore : AuditLogCheckStateStore {
         val state = MutableStateFlow(AuditLogCheckState())

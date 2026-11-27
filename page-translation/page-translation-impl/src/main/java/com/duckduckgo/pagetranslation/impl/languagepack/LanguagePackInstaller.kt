@@ -24,6 +24,7 @@ import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationMo
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifestStore
 import com.duckduckgo.pagetranslation.impl.translatekit.TranslateKitLibrary
 import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dev.zacsweers.metro.ContributesBinding
@@ -31,7 +32,6 @@ import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
-import logcat.asLog
 import logcat.logcat
 import java.io.File
 import java.io.IOException
@@ -44,6 +44,9 @@ interface LanguagePackInstaller {
      * [stagingDirectory], when the pack isn't installed.
      */
     suspend fun install(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean
+
+    /** True when every file of the pack in [packDirectory] still matches the manifest entry [install] saved with it. */
+    suspend fun isIntact(packDirectory: File): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -59,13 +62,8 @@ class RealLanguagePackInstaller @Inject constructor(
         packDirectory: File,
     ): Boolean = withContext(dispatchers.io()) {
         val isInstalled = try {
-            translateKit.init()
-            installFiles(pair, model, stagingDirectory, packDirectory)
+            translateKit.init() && installFiles(pair, model, stagingDirectory, packDirectory)
         } catch (_: IOException) {
-            false
-        } catch (e: IllegalStateException) {
-            // translate-kit throws it when its native library fails to initialize
-            logcat(ERROR) { "TranslateKit failed to initialize: ${e.asLog()}" }
             false
         }
 
@@ -79,11 +77,23 @@ class RealLanguagePackInstaller @Inject constructor(
         isInstalled
     }
 
+    override suspend fun isIntact(packDirectory: File): Boolean = withContext(dispatchers.io()) {
+        val model = try {
+            adapter.fromJson(packDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).readText())
+        } catch (_: IOException) {
+            null
+        } catch (_: JsonDataException) {
+            null
+        } ?: return@withContext false
+
+        model.files.all { (key, file) -> packDirectory.resolve(file.getInstalledFileName(key)).matches(file.decompressedSize, file.decompressedHash) }
+    }
+
     private suspend fun installFiles(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File): Boolean {
         for ((key, file) in model.files) {
             currentCoroutineContext().ensureActive()
             val compressedFile = stagingDirectory.resolve(key + COMPRESSED_FILE_SUFFIX)
-            val decompressedFile = stagingDirectory.resolve(key)
+            val decompressedFile = stagingDirectory.resolve(file.getInstalledFileName(key))
 
             if (!compressedFile.matches(file.bytes, file.sha256)) return false
             currentCoroutineContext().ensureActive()

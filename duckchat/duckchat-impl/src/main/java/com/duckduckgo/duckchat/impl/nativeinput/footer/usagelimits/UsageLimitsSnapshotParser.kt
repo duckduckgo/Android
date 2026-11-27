@@ -41,7 +41,20 @@ class UsageLimitsSnapshotParser @Inject constructor(
             return null
         }
         val notice = parseNotice(root.optJSONObject(NOTICE)) ?: return null
-        return UsageLimitsSnapshot(notice = notice, cta = parseCta(root.optJSONObject(CTA)))
+        return UsageLimitsSnapshot(
+            notice = notice,
+            cta = parseCta(root.optJSONObject(CTA)),
+            newChatDefault = if (notice.reached) parseNewChatDefault(root.optJSONObject(NEW_CHAT_DEFAULT), notice.resetsAtMillis) else null,
+        )
+    }
+
+    private fun parseNewChatDefault(json: JSONObject?, resetsAtMillis: Long): OverLimitNewChatDefault? {
+        val modelId = json?.optNonBlankString(MODEL_ID) ?: return null
+        return OverLimitNewChatDefault(
+            modelId = modelId,
+            reasoningEffort = json.optNonBlankString(REASONING_EFFORT),
+            resetsAtMillis = resetsAtMillis,
+        )
     }
 
     private fun parseNotice(json: JSONObject?): UsageNotice? {
@@ -117,6 +130,8 @@ class UsageLimitsSnapshotParser @Inject constructor(
     private companion object {
         const val NOTICE = "notice"
         const val CTA = "cta"
+        const val NEW_CHAT_DEFAULT = "newChatDefault"
+        const val REASONING_EFFORT = "reasoningEffort"
         const val ID = "id"
         const val WINDOW = "window"
         const val PERCENT_USED = "percentUsed"

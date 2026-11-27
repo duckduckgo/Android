@@ -30,10 +30,14 @@ import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.NewChatDefault
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.FakeUsageWarningPixelSender
@@ -55,6 +59,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
@@ -73,6 +78,8 @@ class HighUsageModelFooterPluginTest {
     )
     private val modelState = MutableStateFlow(ModelState())
     private val modelManager: DuckAiModelManager = mock()
+    private val inputState = MutableStateFlow(NativeInputState.zero())
+    private val nativeInputStateProvider: NativeInputStateProvider = mock { on { state } doReturn inputState }
     private val feature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val hostContext = MutableStateFlow(duckAiContext())
     private val host = FakeNativeInputFooterHost()
@@ -99,6 +106,22 @@ class HighUsageModelFooterPluginTest {
             assertFalse(awaitItem().visible)
 
             modelState.value = highUsageModel()
+
+            assertTrue(awaitItem().visible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatPickIsAHighUsageModelThenFooterShows() = runTest {
+        val opus = AIChatModel("claude-opus-4-8", "opus", "Opus", "Opus 4.8", listOf("free"), isAccessible = true)
+        modelState.value = ModelState(models = listOf(opus), selectedModelId = "other", selectedModelShortName = "Other")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertFalse(awaitItem().visible)
+
+            inputState.value = inputState.value.copy(newChatModelId = opus.id)
 
             assertTrue(awaitItem().visible)
             cancelAndIgnoreRemainingEvents()
@@ -326,8 +349,70 @@ class HighUsageModelFooterPluginTest {
         }
     }
 
+    @Test
+    fun whenPromptIsSentOnAPickedHighUsageModelThenEnteringTheChatIsNotReportedAsASwitch() = runTest {
+        val opus = AIChatModel("claude-opus-4-8", "opus", "Opus", "Opus 4.8", listOf("free"), isAccessible = true)
+        modelState.value = ModelState(models = listOf(opus), selectedModelId = "other", selectedModelShortName = "Other")
+        inputState.value = inputState.value.copy(newChatModelId = opus.id)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            hostContext.value = duckAiContext(promptSubmissions = 1)
+            hostContext.value = duckAiContext(isInputFocused = false, promptSubmissions = 1)
+            inputState.value = inputState.value.copy(chatId = "chat-1", newChatModelId = null)
+
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndTheManagerMovesTheSelectionThenItIsNotReportedAsASwitch() = runTest {
+        modelState.value = highUsageModel().copy(newChatDefault = NewChatDefault("claude-opus-4-8", ReasoningMode.FAST))
+        inputState.value = inputState.value.copy(chatId = "chat-1")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            modelState.value = ModelState(
+                selectedModelId = "gpt-6-luna",
+                selectedModelShortName = "6 Luna",
+                newChatDefault = NewChatDefault("gpt-6-luna", ReasoningMode.FAST),
+            )
+
+            assertFalse(awaitItem().visible)
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndANewChatPicksAnotherModelThenModelSwitchedIsReported() = runTest {
+        val sonnet = AIChatModel("claude-sonnet-4-6", "sonnet", "Sonnet", "Sonnet", listOf("free"), isAccessible = true)
+        modelState.value = highUsageModel().copy(models = listOf(sonnet), newChatDefault = NewChatDefault("claude-opus-4-8", ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            inputState.value = inputState.value.copy(newChatModelId = sonnet.id)
+
+            assertFalse(awaitItem().visible)
+            val exposure = UsageWarningExposure.ofHighUsageModel("claude-opus-4-8")
+            assertEquals(listOf(UsageWarningEvent.Shown(exposure), UsageWarningEvent.ModelSwitched(exposure)), pixelSender.events)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     private fun plugin(dismissalStore: HighUsageModelNoticeDismissalStore) = HighUsageModelFooterPlugin(
         modelManager = modelManager,
+        nativeInputStateProvider = nativeInputStateProvider,
         duckChatFeature = feature,
         resolver = HighUsageModelNoticeResolver(),
         dismissalStore = dismissalStore,

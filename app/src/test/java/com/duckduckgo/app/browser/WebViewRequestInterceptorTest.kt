@@ -31,11 +31,12 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Ignored
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.TrackerStatsWriter
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -43,6 +44,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerType
 import com.duckduckgo.app.trackerdetection.model.TrackingEvent
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
@@ -53,10 +55,15 @@ import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.privacy.config.impl.features.gpc.RealGpc.Companion.GPC_HEADER
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.request.interception.impl.HttpsUpgradeStep
 import com.duckduckgo.request.interception.impl.RequestExemptions
 import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
 import com.duckduckgo.user.agent.api.UserAgentProvider
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -71,7 +78,9 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doThrow
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -104,6 +113,7 @@ class WebViewRequestInterceptorTest {
     private val mockMaliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration = mock()
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockTrackerStatsWriter: TrackerStatsWriter = mock()
+    private val mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
     private val webView: WebView = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
 
@@ -113,9 +123,13 @@ class WebViewRequestInterceptorTest {
 
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
-            httpsUpgrader = mockHttpsUpgrader,
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutineTestRule.testScope,
+                coroutineTestRule.testDispatcherProvider,
+            ),
             resourceSurrogates = mockResourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = mockUserAgentProvider,
@@ -136,6 +150,7 @@ class WebViewRequestInterceptorTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             trackerStatsWriter = mockTrackerStatsWriter,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
     }
 
@@ -190,7 +205,7 @@ class WebViewRequestInterceptorTest {
 
         advanceUntilIdle()
 
-        verify(mockTrackerStatsWriter).recordBlockedHistory(
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(
             trackerUrl = "tracker.com",
             trackerCompany = "Tracker Inc",
         )
@@ -265,9 +280,13 @@ class WebViewRequestInterceptorTest {
         fakeAndroidBrowserConfigFeature.checkMaliciousAfterHttpsUpgrade().setRawStoredState(State(false))
         testee = WebViewRequestInterceptor(
             trackerDetector = mockTrackerDetector,
-            httpsUpgrader = mockHttpsUpgrader,
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutineTestRule.testScope,
+                coroutineTestRule.testDispatcherProvider,
+            ),
             resourceSurrogates = mockResourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = mockUserAgentProvider,
@@ -288,6 +307,7 @@ class WebViewRequestInterceptorTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             trackerStatsWriter = mockTrackerStatsWriter,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
         testee.shouldIntercept(
             request = mockRequest,
@@ -355,6 +375,7 @@ class WebViewRequestInterceptorTest {
     @Test
     fun whenUrlShouldNotBeUpgradedThenUpgraderNotInvoked() = runTest {
         whenever(mockRequest.url).thenReturn(validUri())
+        whenever(mockRequest.isForMainFrame).thenReturn(true)
         whenever(mockHttpsUpgrader.shouldUpgrade(any())).thenReturn(false)
         testee.shouldIntercept(
             request = mockRequest,
@@ -549,6 +570,88 @@ class WebViewRequestInterceptorTest {
         )
 
         verify(mockWebViewClientListener).surrogateDetected(availableSurrogate)
+    }
+
+    @Test
+    fun whenUrlIsUpgradedThenNotificationPrecedesHeadersAndReload() = runTest {
+        configureShouldUpgrade()
+        val listener: WebViewClientListener = mock()
+        val headers = mutableMapOf("existing" to "value")
+        whenever(mockRequest.requestHeaders).thenReturn(headers)
+        whenever(mockGpc.getHeaders(validUri().toString())).thenReturn(mapOf("Sec-GPC" to "1"))
+
+        testee.shouldIntercept(request = mockRequest, documentUri = null, webView = webView, webViewClientListener = listener)
+
+        advanceUntilIdle()
+        inOrder(listener, mockGpc, webView, mockPrivacyProtectionCountDao) {
+            verify(listener).upgradedToHttps()
+            verify(mockGpc).getHeaders(validUri().toString())
+            verify(webView).loadUrl(validHttpsUri().toString(), headers)
+            verify(mockPrivacyProtectionCountDao).incrementUpgradeCount()
+        }
+        assertEquals("1", headers["Sec-GPC"])
+    }
+
+    @Test
+    fun whenCancelledWhileReloadIsPendingThenUpgradeIsNotRecorded() = runTest {
+        configureShouldUpgrade()
+        val mainDispatcher = StandardTestDispatcher(testScheduler)
+        val controlledDispatchers: DispatcherProvider = mock()
+        whenever(controlledDispatchers.main()).thenReturn(mainDispatcher)
+        whenever(controlledDispatchers.io()).thenReturn(mainDispatcher)
+        testee = WebViewRequestInterceptor(
+            trackerDetector = mockTrackerDetector,
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutineTestRule.testScope,
+                controlledDispatchers,
+            ),
+            resourceSurrogates = mockResourceSurrogates,
+            requestRewriteDecision = RequestRewriteDecision(
+                gpc = mockGpc,
+                userAgentProvider = mockUserAgentProvider,
+            ),
+            adClickManager = mockAdClickManager,
+            cloakedCnameDetector = mockCloakedCnameDetector,
+            requestFilterer = mockRequestFilterer,
+            requestExemptions = RequestExemptions(
+                requestBlocklist = mockRequestBlocklist,
+                contentBlocking = mockContentBlocking,
+                trackerAllowlist = mockTrackerAllowlist,
+                userAllowListRepository = mockUserAllowListRepository,
+            ),
+            duckPlayer = mockDuckPlayer,
+            maliciousSiteBlockerWebViewIntegration = mockMaliciousSiteBlockerWebViewIntegration,
+            dispatchers = controlledDispatchers,
+            appCoroutineScope = coroutineTestRule.testScope,
+            androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
+            isMainProcess = true,
+            trackerStatsWriter = mockTrackerStatsWriter,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
+        )
+        val caller = launch(start = CoroutineStart.UNDISPATCHED) {
+            testee.shouldIntercept(request = mockRequest, documentUri = null, webView = webView, webViewClientListener = null)
+        }
+        caller.cancelAndJoin()
+        advanceUntilIdle()
+        verify(webView, never()).loadUrl(eq(validHttpsUri().toString()), any())
+        verify(mockPrivacyProtectionCountDao, never()).incrementUpgradeCount()
+    }
+
+    @Test
+    fun whenUpgradeReloadFailsThenUpgradeIsNotRecorded() = runTest {
+        configureShouldUpgrade()
+        val failure = IllegalStateException("reload failed")
+        doThrow(failure).whenever(webView).loadUrl(eq(validHttpsUri().toString()), any())
+        try {
+            testee.shouldIntercept(request = mockRequest, documentUri = null, webView = webView, webViewClientListener = null)
+            throw AssertionError("Expected reload failure")
+        } catch (caught: IllegalStateException) {
+            assertEquals(failure, caught)
+        }
+        advanceUntilIdle()
+        verify(mockPrivacyProtectionCountDao, never()).incrementUpgradeCount()
     }
 
     @Test
@@ -772,7 +875,7 @@ class WebViewRequestInterceptorTest {
             documentUrl = "foo.com".toUri(),
         )
 
-        verify(mockTrackerStatsWriter).recordBlockedHistory(any(), any())
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(any(), any())
     }
 
     @Test
@@ -791,7 +894,7 @@ class WebViewRequestInterceptorTest {
         )
 
         val captor = argumentCaptor<String>()
-        verify(mockTrackerStatsWriter).recordBlockedHistory(captor.capture(), any())
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(captor.capture(), any())
         assertEquals("uncloaked-host.com", captor.firstValue)
     }
 
@@ -906,7 +1009,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockTrackerStatsWriter).recordBlockedHistory(
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(
             trackerUrl = "uncloaked-host.com",
             trackerCompany = "Tracker Inc",
         )

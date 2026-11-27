@@ -23,6 +23,7 @@ data class ExecuteClientToolRequest(
     val name: String,
     val version: Long,
     val input: JSONObject,
+    val chatId: String?,
 )
 
 sealed interface ParsedExecuteClientToolRequest {
@@ -35,17 +36,22 @@ sealed interface ParsedExecuteClientToolRequest {
     data class Malformed(override val callId: String?) : ParsedExecuteClientToolRequest
 
     companion object {
-        private val CALL_ID_PATTERN = Regex("^[A-Za-z0-9_.:-]{1,128}$")
+        private val IDENTIFIER_PATTERN = Regex("^[A-Za-z0-9_.:-]{1,128}$")
         private val CAPABILITY_NAME_PATTERN = Regex("^[A-Za-z0-9_.:-]{1,64}$")
 
         fun parse(params: JSONObject?): ParsedExecuteClientToolRequest {
             val rawCallId = params?.opt("callId") as? String
-            val callId = rawCallId?.takeIf { CALL_ID_PATTERN.matches(it) } ?: return Malformed(rawCallId)
+            val callId = rawCallId?.takeIf { IDENTIFIER_PATTERN.matches(it) } ?: return Malformed(rawCallId)
             val capability = params.opt("capability") as? JSONObject ?: return Malformed(callId)
             val name = (capability.opt("name") as? String)?.takeIf { CAPABILITY_NAME_PATTERN.matches(it) } ?: return Malformed(callId)
             val version = (capability.opt("version") as? Number)?.toWholeLong()?.takeIf { it > 0 } ?: return Malformed(callId)
             val input = params.opt("input") as? JSONObject ?: return Malformed(callId)
-            return Valid(ExecuteClientToolRequest(callId, name, version, input))
+            val chatId = when (val rawChatId = params.opt("chatId")) {
+                null, JSONObject.NULL -> null
+                is String -> rawChatId.takeIf { IDENTIFIER_PATTERN.matches(it) } ?: return Malformed(callId)
+                else -> return Malformed(callId)
+            }
+            return Valid(ExecuteClientToolRequest(callId, name, version, input, chatId))
         }
     }
 }

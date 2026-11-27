@@ -21,14 +21,17 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.ModelSelection
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -54,6 +57,7 @@ import javax.inject.Inject
 )
 class HighUsageModelFooterPlugin @Inject constructor(
     private val modelManager: DuckAiModelManager,
+    private val nativeInputStateProvider: NativeInputStateProvider,
     private val duckChatFeature: DuckChatFeature,
     private val resolver: HighUsageModelNoticeResolver,
     private val dismissalStore: HighUsageModelNoticeDismissalStore,
@@ -75,7 +79,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
         val usageWarningsEnabled = duckChatFeature.duckAiUsageWarnings().enabled()
         val measurement = measurements.forHost(host) { DuckChatPixelSurface.from(hostContext.value.inputContext) }
         var lastContext: NativeInputFooterContext? = null
-        var lastSelectedModelId: String? = null
+        var lastSelection: ModelSelection? = null
         var currentExposure: UsageWarningExposure? = null
         var isDisplayed = false
 
@@ -108,21 +112,22 @@ class HighUsageModelFooterPlugin @Inject constructor(
             }
 
         val state = combine(
-            modelManager.modelState,
+            combine(modelManager.modelState, nativeInputStateProvider.state) { modelState, inputState ->
+                val tabModelState = modelState.forTab(inputState)
+                tabModelState to ModelSelection.of(tabModelState, inputState)
+            },
             hostContext,
             persistedDismissedModelIds,
             locallyDismissedModelIds,
             usageWarningsEnabled,
-        ) { modelState, footerContext, persistedDismissedModelIds, localDismissedModelIds, usageWarningsEnabled ->
+        ) { (modelState, selection), footerContext, persistedDismissedModelIds, localDismissedModelIds, usageWarningsEnabled ->
             val previousContext = lastContext
             lastContext = footerContext
-            val previousModelId = lastSelectedModelId
-            lastSelectedModelId = modelState.selectedModelId ?: previousModelId
+            val previousSelection = lastSelection
+            if (selection.selectedModelId != null) lastSelection = selection
             // A prompt is attributed before the focus loss that follows it, even when both arrive in one emission.
             if (previousContext != null && footerContext.promptSubmissions > previousContext.promptSubmissions) measurement.promptSubmitted()
-            if (previousModelId != null && modelState.selectedModelId != null && modelState.selectedModelId != previousModelId) {
-                measurement.modelSwitched()
-            }
+            if (selection.switchedFrom(previousSelection) != null) measurement.modelSwitched()
             if (usageWarningsEnabled && persistedDismissedModelIds != null) {
                 resolver.resolve(modelState, footerContext, persistedDismissedModelIds + localDismissedModelIds)
             } else {

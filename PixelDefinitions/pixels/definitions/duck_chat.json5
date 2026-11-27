@@ -742,11 +742,35 @@
         ]
     },
     "m_aichat_duckai_dau_toggle_never_enabled": {
-        "description": "Fired once per Duck.ai DAU day for users who have never enabled the Duck.ai native input field. Used to identify heavy Duck.ai users who haven't discovered the feature.",
+        "description": "Fired once per Duck.ai DAU day for users whose Duck.ai native input field setting was never written (never turned on or off). Used to identify heavy Duck.ai users who haven't discovered the feature. Since the address bar picker records a Search only choice as the setting turned off (duckAiToggleMigration.pickerSearchOnlyWritesSetting), those users stop firing this pixel, which breaks the trend the week that ships.",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "picker_was_shown",
+                "type": "boolean",
+                "description": "Whether the address bar picker is marked as shown: confirmed with either option, displayed twice, or skipped by Quick Setup."
+            },
+            {
+                "key": "picker_display_count",
+                "type": "string",
+                "description": "How many times the address bar picker was displayed, bucketed. Read with picker_was_shown: 1 with picker_was_shown=true means Search only was confirmed on the first display while that answer was not recorded (older app versions, or pickerSearchOnlyWritesSetting off); 1 with picker_was_shown=false means it was displayed once and not answered.",
+                "enum": ["0", "1", "2_plus"]
+            },
+            {
+                "key": "is_reinstall",
+                "type": "boolean",
+                "description": "Whether the app detected this install as a reinstall."
+            },
+            {
+                "key": "app_stage",
+                "type": "string",
+                "description": "The user's onboarding stage when the pixel fires.",
+                "enum": ["new", "dax_onboarding", "established"]
+            }
+        ]
     },
     "m_aichat_contextual_fire_button_tapped": {
         "description": "User tapped the fire button in the contextual Duck.ai sheet",
@@ -1135,17 +1159,35 @@
     },
     "m_aichat_unified_input_file_attached_count": {
         "description": "User attached a file in the Unified Input",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "unifiedInputSurface"]
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
+            }
+        ]
     },
     "m_aichat_unified_input_file_attached_daily": {
         "description": "(Daily Pixel) User attached a file in the Unified Input",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "unifiedInputSurface"]
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
+            }
+        ]
     },
     "m_aichat_unified_input_file_removed_count": {
         "description": "User removed an attached file from the Unified Input",
@@ -1291,7 +1333,7 @@
     },
     "m_aichat_unified_input_file_validation_failed_count": {
         "description": "A file the user attempted to attach in the Unified Input failed validation",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -1302,12 +1344,18 @@
                 "type": "string",
                 "description": "Why the file validation failed",
                 "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
+            },
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
             }
         ]
     },
     "m_aichat_unified_input_file_validation_failed_daily": {
         "description": "(Daily Pixel) A file the user attempted to attach in the Unified Input failed validation",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -1318,6 +1366,12 @@
                 "type": "string",
                 "description": "Why the file validation failed",
                 "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
+            },
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
             }
         ]
     },
@@ -1380,7 +1434,8 @@
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
             "duckAiEntrySource",
-            "firstPromptNewInstall"
+            "firstPromptNewInstall",
+            "duckAiModelSource"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1415,7 +1470,8 @@
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
             "duckAiEntrySource",
-            "firstPromptNewInstall"
+            "firstPromptNewInstall",
+            "duckAiModelSource"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {
@@ -2137,7 +2193,8 @@
                 "type": "string",
                 "description": "Which tool was selected when the prompt was sent",
                 "enum": ["none", "image_generation", "web_search"]
-            }
+            },
+            "duckAiModelSource"
         ]
     },
     "aichat_new_chat_hints_shown": {

@@ -19,6 +19,7 @@ package com.duckduckgo.sync.impl.ui.auditlog
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.common.utils.CurrentTimeProvider
+import com.duckduckgo.sync.impl.ConnectedDevicesRepository
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
@@ -50,12 +51,14 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     private val stateStore: AuditLogCheckStateStore,
     private val newLoginNotifier: NewLoginNotifier,
     private val loginAuditLogFeature: LoginAuditLogFeature,
+    private val connectedDevicesRepository: ConnectedDevicesRepository,
 ) : ViewModel() {
 
     data class ViewState(
         val rows: List<SyncAuditLogRow> = emptyList(),
         val status: Status = Status.LOADING,
         val hasMore: Boolean = true,
+        val onlyThisDevice: Boolean = false,
     ) {
         val content: Content
             get() = when {
@@ -63,6 +66,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
                 status == Status.LOADING -> Content.LOADING
                 status == Status.FAILED -> Content.ERROR
                 hasMore -> Content.LIST
+                onlyThisDevice -> Content.ONLY_THIS_DEVICE
                 else -> Content.EMPTY
             }
 
@@ -77,7 +81,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
 
     enum class Status { IDLE, LOADING, FAILED }
 
-    enum class Content { LOADING, ERROR, EMPTY, LIST }
+    enum class Content { LOADING, ERROR, EMPTY, ONLY_THIS_DEVICE, LIST }
 
     enum class Footer { NONE, LOADING, ERROR }
 
@@ -146,6 +150,8 @@ class SyncAuditLogViewModel @AssistedInject constructor(
             is SyncAuditLogLoadResult.Loaded -> {
                 session = Session(monitor, result)
                 markSeen(monitor, newestEntryId = result.pages.entries.firstOrNull()?.id)
+                val onlyThisDevice = connectedDevicesRepository.latestConnectedDeviceCount() == 1
+                _viewState.update { it.copy(onlyThisDevice = onlyThisDevice) }
                 onLoaded(result, monitor.unseenIds(result.pages.entries, result.items))
             }
         }

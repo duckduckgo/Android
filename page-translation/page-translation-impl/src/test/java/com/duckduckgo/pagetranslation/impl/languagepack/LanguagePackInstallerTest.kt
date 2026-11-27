@@ -57,7 +57,8 @@ class LanguagePackInstallerTest {
     @Before
     fun setUp() = runTest {
         whenever(store.readManifest()).thenReturn(manifestOf(MODEL))
-        doAnswer { it.getArgument<File>(1).writeText(DECOMPRESSED.getValue(it.getArgument<File>(1).name)) }
+        whenever(translateKit.init()).thenReturn(true)
+        doAnswer { it.getArgument<File>(1).writeText(DECOMPRESSED.getValue(it.getArgument<File>(1).nameWithoutExtension)) }
             .whenever(translateKit).decompressZstd(any(), any())
 
         stagingDirectory.mkdirs()
@@ -69,9 +70,9 @@ class LanguagePackInstallerTest {
         assertTrue(installer.install(PAIR, MODEL, stagingDirectory, packDirectory))
 
         assertFalse(stagingDirectory.exists())
-        assertEquals(setOf("model", "vocab", MANIFEST_ENTRY_FILE_NAME), packDirectory.list()!!.toSet())
-        assertEquals(DECOMPRESSED["model"], packDirectory.resolve("model").readText())
-        assertEquals(DECOMPRESSED["vocab"], packDirectory.resolve("vocab").readText())
+        assertEquals(setOf("model.bin", "vocab.spm", MANIFEST_ENTRY_FILE_NAME), packDirectory.list()!!.toSet())
+        assertEquals(DECOMPRESSED["model"], packDirectory.resolve("model.bin").readText())
+        assertEquals(DECOMPRESSED["vocab"], packDirectory.resolve("vocab.spm").readText())
         assertEquals(MODEL, adapter.fromJson(packDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).readText()))
     }
 
@@ -118,9 +119,48 @@ class LanguagePackInstallerTest {
 
     @Test
     fun failWhenTranslateKitFailsToInitialize() = runTest {
-        doThrow(IllegalStateException()).whenever(translateKit).init()
+        whenever(translateKit.init()).thenReturn(false)
 
         assertNotInstalled(MODEL)
+    }
+
+    @Test
+    fun reportAnInstalledPackAsIntact() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+
+        assertTrue(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithAChangedFileAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve("vocab.spm").writeText("vocab-corrupted!!!")
+
+        assertFalse(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithAMissingFileAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve("model.bin").delete()
+
+        assertFalse(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithoutItsManifestEntryAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).delete()
+
+        assertFalse(installer.isIntact(packDirectory))
+    }
+
+    @Test
+    fun reportAPackWithAnUnreadableManifestEntryAsCorrupted() = runTest {
+        installer.install(PAIR, MODEL, stagingDirectory, packDirectory)
+        packDirectory.resolve(MANIFEST_ENTRY_FILE_NAME).writeText("""{"version": 3}""")
+
+        assertFalse(installer.isIntact(packDirectory))
     }
 
     private suspend fun assertNotInstalled(model: TranslationModel) {
@@ -142,14 +182,14 @@ class LanguagePackInstallerTest {
         val DECOMPRESSED = mapOf("model" to "model-decompressed", "vocab" to "vocab-decompressed")
 
         val MODEL_FILE = ModelFile(
-            path = "fr-en/model.zst",
+            path = "fr-en/3.0/base-memory/model.fren.intgemm.alphas.bin.zst",
             bytes = 16,
             sha256 = "b950802ff3b0fd35c94ed5e6476c410e037b214f2be846c6b9d63a5a7197e6a7",
             decompressedSize = 18,
             decompressedHash = "1E25871B30516E0F9D34E009470CA69E6C8BEDC1FBB0174237E21238ACCEF2A9",
         )
         val VOCAB_FILE = ModelFile(
-            path = "fr-en/vocab.zst",
+            path = "fr-en/3.0/base-memory/vocab.fren.spm.zst",
             bytes = 16,
             sha256 = "ac5bb24d7f47b8d8aa83bc1480de723af28c5a2ff520a3be7b8dbe54496fd0a3",
             decompressedSize = 18,

@@ -224,6 +224,54 @@ interface SyncPixels {
         THIRD_PARTY("3party"),
     }
 
+    enum class SetupMode(val value: String) {
+        SINGLE_DEVICE("single_device"),
+        MULTI_DEVICE("multi_device"),
+        RECOVERY("recovery"),
+    }
+
+    enum class ConnectMethod(val value: String) {
+        SHOW_CODE("show_code"),
+        SCAN_CODE("scan_code"),
+        PASTE_CODE("paste_code"),
+        LINK("link"),
+    }
+
+    enum class SetupStep(val value: String) {
+        STARTED("started"),
+        CHOICE_SCREEN("choice_screen"),
+        DEVICE_AUTH("device_auth"),
+        PREPARING_CODE("preparing_code"),
+        CODE_SCREEN("code_screen"),
+        CODE_ENTRY("code_entry"),
+        CODE_ACCEPTED_BY_OTHER_DEVICE("code_accepted_by_other_device"),
+        CONFIRMATION_SCREEN("confirmation_screen"),
+        WAITING_FOR_CONFIRMATION("waiting_for_confirmation"),
+        SYNC_CONFIRMATION("sync_confirmation"),
+        PREPARING_SYNC("preparing_sync"),
+        HOST_AWAITING_JOINER("host_awaiting_joiner"),
+        ACCOUNT_CREATED("account_created"),
+        SYNC_THIS_DEVICE_OFFER("sync_this_device_offer"),
+        RESTORE_OFFER("restore_offer"),
+        ERROR_SCREEN("error_screen"),
+        RECOVERY_CODE_SHOWN("recovery_code_shown"),
+        SUCCESS_SCREEN_SHOWN("success_screen_shown"),
+    }
+
+    enum class SetupCancellationReason(val value: String) {
+        USER_CLOSED("user_closed"),
+        USER_CLOSED_SYNC_THIS_DEVICE_FALLBACK("user_closed_sync_this_device_fallback"),
+        DEVICE_AUTH_CANCELLED("device_auth_cancelled"),
+        DEVICE_AUTH_UNAVAILABLE("device_auth_unavailable"),
+        CODE_REJECTED("code_rejected"),
+        SYNC_CONFIRMATION_DENIED("sync_confirmation_denied"),
+        ACCOUNT_SWITCH_DECLINED("account_switch_declined"),
+        ACCOUNT_SWITCH_BLOCKED("account_switch_blocked"),
+        PEER_LEFT("peer_left"),
+        ALREADY_PAIRED("already_paired"),
+        ALREADY_UPGRADED("already_upgraded"),
+    }
+
     /**
      * Why a setup was cancelled, per the "Cancellation" telemetry. Based on the v2 protocol state at
      * the moment of cancellation: [SCANNING_CANCELLED] before the exchange engages a peer,
@@ -257,6 +305,7 @@ interface SyncPixels {
         ALREADY_UPGRADED("already_upgraded"),
         ALREADY_PAIRED("already_paired"),
         RECOVERY_CODE_PREPARATION_FAILED("recovery_code_preparation_failed"),
+        RECOVERY_CODE_GENERATION_FAILED("recovery_code_generation_failed"),
         MISSING_3PARTY_CREDENTIAL("missing_3party_credential"),
         UNDECRYPTABLE_3PARTY_CREDENTIAL("undecryptable_3party_credential"),
         ACCOUNT_EXTEND_FAILED("account_extend_failed"),
@@ -269,6 +318,7 @@ interface SyncPixels {
         RELAY_CHANNEL_UNAVAILABLE("relay_channel_unavailable"),
         PROTOCOL_ERROR("protocol_error"),
         UNEXPECTED_FAILURE("unexpected_failure"),
+        DEVICE_AUTH_ERROR("device_auth_error"),
     }
 
     enum class AuthenticationResult(val value: String) {

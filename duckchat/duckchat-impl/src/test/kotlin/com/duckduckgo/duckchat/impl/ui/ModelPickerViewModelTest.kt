@@ -46,6 +46,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
@@ -367,6 +368,35 @@ class ModelPickerViewModelTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndModelTappedInNewChatThenPickGoesToTheTabNotTheGlobalSelection() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val model = freeModel("f")
+
+        testee.modelChanges.test {
+            testee.onModelTapped(model, PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+            runCurrent()
+
+            assertEquals(PickerModelChange.PickNewChatModel("f"), awaitItem())
+            verify(modelManager, never()).selectModel(any())
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatPickIsSetThenChipAndTickFollowIt() = runTest {
+        val global = freeModel("global", shortName = "Global")
+        val picked = freeModel("picked", shortName = "Picked")
+        stateFlow.value = ModelState(models = listOf(global, picked), selectedModelId = "global", selectedModelShortName = "Global")
+
+        nativeInputState.value = nativeInputState.value.copy(newChatModelId = "picked")
+        runCurrent()
+
+        assertEquals("picked", testee.effectiveModelId.value)
+        assertEquals("Picked", testee.chipLabel.value)
+        assertEquals("picked", testee.selectedModelIdForMenu())
+    }
+
+    @Test
     fun whenAccessibleModelTappedWithDifferentIdThenModelSelectedPixelFired() = runTest {
         whenever(modelManager.getSelectedModelId()).thenReturn("current")
         val model = freeModel("new")
@@ -386,6 +416,34 @@ class ModelPickerViewModelTest {
         runCurrent()
 
         verify(duckChatPixels, never()).fireModelSelected(any(), any())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndTheTabsPickIsTappedAgainThenModelSelectedPixelNotFired() = runTest {
+        givenNewChatPick(global = "global", picked = "picked")
+
+        testee.onModelTapped(freeModel("picked"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels, never()).fireModelSelected(any(), any())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndAModelOtherThanTheTabsPickIsTappedThenModelSelectedPixelFired() = runTest {
+        givenNewChatPick(global = "global", picked = "picked")
+
+        testee.onModelTapped(freeModel("global"), PickerSurface.MODEL_PICKER_ADDRESS_BAR)
+        runCurrent()
+
+        verify(duckChatPixels).fireModelSelected(eq("global"), any())
+    }
+
+    private fun TestScope.givenNewChatPick(global: String, picked: String) {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(modelManager.getSelectedModelId()).thenReturn(global)
+        stateFlow.value = ModelState(models = listOf(freeModel(global), freeModel(picked)), selectedModelId = global)
+        nativeInputState.value = nativeInputState.value.copy(newChatModelId = picked)
+        runCurrent()
     }
 
     @Test

@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import com.duckduckgo.app.statistics.wideevents.CleanupPolicy
 import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
+import com.duckduckgo.app.statistics.wideevents.WideEventDefinition
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -35,14 +36,17 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.pir.impl.store.PirSchedulingRepository
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_FLOW_TIMEOUT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.COMPLETION_INTERVAL_BUCKETS
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.DEFINITION_VERSION
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.ENTRY_POINT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.INTERVAL_TOTAL_DURATION
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_BATTERY_OPTIMIZATIONS
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_BROKER_COUNT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_FOREGROUND_RUN_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_FREE_SCAN
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_NOTIFICATIONS_PERMISSION_GRANTED
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_POWER_SAVING
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_PROFILE_QUERIES_COUNT
+import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_SCAN_WEBVIEW_SIZE_STATE
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_SCHEDULED_RUN_COUNT
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_TOTAL_SCAN_JOBS
 import com.duckduckgo.pir.impl.wideevents.PirInitialScanCompletionWideEventImpl.Companion.KEY_TOTAL_SCAN_JOBS_AT_FINISH
@@ -59,6 +63,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -142,6 +147,7 @@ class PirInitialScanCompletionWideEventTest {
         batteryOptimizationsEnabled: Boolean = false,
         notificationsPermissionGranted: Boolean = true,
         isTrackerBlockingEnabled: Boolean = false,
+        isFreeScan: Boolean = false,
     ) {
         testee.onRunStarted(
             executionType = executionType,
@@ -154,6 +160,7 @@ class PirInitialScanCompletionWideEventTest {
             batteryOptimizationsEnabled = batteryOptimizationsEnabled,
             notificationsPermissionGranted = notificationsPermissionGranted,
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
+            isFreeScan = isFreeScan,
         )
     }
 
@@ -185,6 +192,7 @@ class PirInitialScanCompletionWideEventTest {
             batteryOptimizationsEnabled = false,
             notificationsPermissionGranted = true,
             isTrackerBlockingEnabled = true,
+            isFreeScan = true,
         )
 
         verify(wideEventClient).flowStart(
@@ -200,8 +208,11 @@ class PirInitialScanCompletionWideEventTest {
                 KEY_VPN_CONNECTION_STATE to "connected",
                 KEY_NOTIFICATIONS_PERMISSION_GRANTED to "true",
                 KEY_TRACKER_BLOCKING_STATE to "enabled",
+                KEY_FREE_SCAN to "true",
+                KEY_SCAN_WEBVIEW_SIZE_STATE to "disabled",
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(duration = COMPLETION_FLOW_TIMEOUT, flowStatus = FlowStatus.Unknown),
+            definition = WideEventDefinition(version = DEFINITION_VERSION),
         )
         verify(wideEventClient).intervalStart(
             wideEventId = 42L,
@@ -212,6 +223,17 @@ class PirInitialScanCompletionWideEventTest {
         assertEquals(42L, dataStore.initialScanCompletionFlowId)
         assertEquals(1, dataStore.initialScanCompletionForegroundRunCount)
         assertEquals(0, dataStore.initialScanCompletionScheduledRunCount)
+    }
+
+    @Test
+    fun whenManualInitialRunStartedWithSubscriptionThenFreeScanIsFalse() = runTest {
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(42L))
+
+        runStarted(isFreeScan = false)
+
+        val metadataCaptor = argumentCaptor<Map<String, String>>()
+        verify(wideEventClient).flowStart(any(), any(), metadataCaptor.capture(), any(), any(), any())
+        assertEquals("false", metadataCaptor.firstValue[KEY_FREE_SCAN])
     }
 
     @Test

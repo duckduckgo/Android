@@ -89,7 +89,7 @@ interface ContextualNativeInputManager {
      * Called when the contextual sheet is closed (e.g. STATE_HIDDEN). Reverts the per-tab
      * [NativeInputState] back to a browser-context default so other observers (like StartChatView
      * in the main widget) don't keep reading the DUCK_AI_CONTEXTUAL/DUCK_AI values the contextual
-     * widget wrote during its lifetime.
+     * widget wrote during its lifetime. The sheet's unsent new-chat pick is dropped with them.
      */
     fun onContextualClosed(tabId: String)
 
@@ -98,6 +98,8 @@ interface ContextualNativeInputManager {
      * per-tab [NativeInputState] to the contextual (DUCK_AI) values that [onContextualClosed] reverted,
      * so the widget's plugin controls (attach, model picker, tools — gated on toggleSelection == DUCK_AI)
      * reappear. Without this the reused widget keeps the browser/search state and renders without them.
+     *
+     * The sheet starts its new chat on the default model, so the tab's new-chat pick is dropped.
      */
     fun onContextualReopened(tabId: String)
 }
@@ -165,6 +167,8 @@ class RealContextualNativeInputManager @Inject constructor(
             it.copy(
                 inputContext = browser,
                 toggleSelection = NativeInputState.defaultToggleFor(browser),
+                newChatModelId = null,
+                newChatReasoningMode = null,
             )
         }
     }
@@ -176,12 +180,15 @@ class RealContextualNativeInputManager @Inject constructor(
             it.copy(
                 inputContext = contextual,
                 toggleSelection = NativeInputState.defaultToggleFor(contextual),
+                newChatModelId = null,
+                newChatReasoningMode = null,
             )
         }
     }
 
     override fun onWebViewMode() {
         lastMode = Mode.WEBVIEW
+        widget?.setContextualEntry(false)
         if (isNativeInputEnabled) {
             setInputVisible(true)
             // WEBVIEW mode means a chat is in progress.
@@ -194,6 +201,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onInputMode() {
         lastMode = Mode.INPUT
+        widget?.setContextualEntry(true)
         if (isContextualNativeInputEnabled) {
             // The unified input widget is the composer for the initial sheet.
             setInputVisible(true)

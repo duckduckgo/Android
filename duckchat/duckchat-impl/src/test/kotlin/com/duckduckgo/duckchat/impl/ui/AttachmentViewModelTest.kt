@@ -39,6 +39,7 @@ import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.RealNativeInputStateStore
+import com.duckduckgo.duckchat.impl.pixel.AttachmentEntryPoint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUsage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -240,6 +241,24 @@ class AttachmentViewModelTest {
         val mimeTypes = viewModel.attachmentState.value.acceptedMimeTypes
         assertTrue(mimeTypes.contains("application/pdf"))
         assertTrue(mimeTypes.contains("text/plain"))
+    }
+
+    @Test
+    fun whenNewChatPickDoesNotSupportImageUploadThenImageUploadFollowsThePickNotTheGlobalModel() = runTest {
+        whenever(duckChatInternal.isImageUploadEnabled()).thenReturn(true)
+        val global = aModel(id = "global", supportsImageUpload = true)
+        val picked = aModel(id = "picked", supportsImageUpload = false)
+        modelStateFlow.value = ModelState(models = listOf(global, picked), selectedModelId = "global")
+        assertTrue(viewModel.attachmentState.value.supportsImageUpload)
+
+        nativeInputStateStore.publish(
+            "tab-duckai",
+            NativeInputState.zero().copy(inputContext = NativeInputState.InputContext.DUCK_AI, newChatModelId = "picked"),
+        )
+        selectedTabFlow.value = TabEntity(tabId = "tab-duckai", position = 0)
+        advanceUntilIdle()
+
+        assertFalse(viewModel.attachmentState.value.supportsImageUpload)
     }
 
     @Test
@@ -517,7 +536,7 @@ class AttachmentViewModelTest {
     fun whenProcessFileReturnsNullThenFileNotAdded() = runTest {
         val uri: Uri = mock()
 
-        viewModel.onFilesPicked(listOf(uri))
+        viewModel.onFilesPicked(listOf(uri), AttachmentEntryPoint.ATTACHMENT_MENU)
         advanceUntilIdle()
 
         assertTrue(viewModel.attachmentState.value.files.isEmpty())
@@ -1157,7 +1176,7 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment())
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileAttached(any())
+        verify(duckChatPixels).fireFileAttached(any(), any())
     }
 
     @Test
@@ -1165,7 +1184,7 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment())
         advanceUntilIdle()
 
-        verify(duckChatPixels, never()).fireFileValidationFailed(any(), any())
+        verify(duckChatPixels, never()).fireFileValidationFailed(any(), any(), any())
     }
 
     @Test
@@ -1176,8 +1195,8 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment(sizeBytes = maxBytes + 1))
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed(eq("size_exceeded"), any())
-        verify(duckChatPixels, never()).fireFileAttached(any())
+        verify(duckChatPixels).fireFileValidationFailed(eq("size_exceeded"), any(), any())
+        verify(duckChatPixels, never()).fireFileAttached(any(), any())
     }
 
     @Test
@@ -1191,8 +1210,8 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment())
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed(eq("count_exceeded"), any())
-        verify(duckChatPixels, never()).fireFileAttached(any())
+        verify(duckChatPixels).fireFileValidationFailed(eq("count_exceeded"), any(), any())
+        verify(duckChatPixels, never()).fireFileAttached(any(), any())
     }
 
     @Test
@@ -1202,19 +1221,75 @@ class AttachmentViewModelTest {
         addFiles(aFileAttachment(pageCount = 11))
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed(eq("page_count_exceeded"), any())
-        verify(duckChatPixels, never()).fireFileAttached(any())
+        verify(duckChatPixels).fireFileValidationFailed(eq("page_count_exceeded"), any(), any())
+        verify(duckChatPixels, never()).fireFileAttached(any(), any())
     }
 
     @Test
     fun whenProcessFileReturnsNullThenValidationFailedPixelFiredWithOther() = runTest {
         val uri: Uri = mock()
 
-        viewModel.onFilesPicked(listOf(uri))
+        viewModel.onFilesPicked(listOf(uri), AttachmentEntryPoint.ATTACHMENT_MENU)
         advanceUntilIdle()
 
-        verify(duckChatPixels).fireFileValidationFailed(eq("other"), any())
-        verify(duckChatPixels, never()).fireFileAttached(any())
+        verify(duckChatPixels).fireFileValidationFailed(eq("other"), any(), any())
+        verify(duckChatPixels, never()).fireFileAttached(any(), any())
+    }
+
+    @Test
+    fun whenFilePickedFromNewChatHintThenFileAttachedPixelHasNewChatHintEntryPoint() = runTest {
+        addFiles(aFileAttachment(), entryPoint = AttachmentEntryPoint.NEW_CHAT_HINT)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileAttached(any(), eq(AttachmentEntryPoint.NEW_CHAT_HINT))
+    }
+
+    @Test
+    fun whenFilePickedFromAttachmentMenuThenFileAttachedPixelHasAttachmentMenuEntryPoint() = runTest {
+        addFiles(aFileAttachment(), entryPoint = AttachmentEntryPoint.ATTACHMENT_MENU)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileAttached(any(), eq(AttachmentEntryPoint.ATTACHMENT_MENU))
+    }
+
+    @Test
+    fun whenFileFromNewChatHintExceedsSizeLimitThenValidationFailedPixelHasNewChatHintEntryPoint() = runTest {
+        val maxBytes = 5L * 1024 * 1024
+        val limits = FileLimits(maxFileSizeBytes = maxBytes, maxTotalFileSizeBytes = 100L * 1024 * 1024)
+        modelStateFlow.value = ModelState(attachmentLimits = AttachmentLimits(files = limits))
+        addFiles(aFileAttachment(sizeBytes = maxBytes + 1), entryPoint = AttachmentEntryPoint.NEW_CHAT_HINT)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileValidationFailed(eq("size_exceeded"), any(), eq(AttachmentEntryPoint.NEW_CHAT_HINT))
+    }
+
+    @Test
+    fun whenProcessFileReturnsNullForNewChatHintThenValidationFailedPixelHasNewChatHintEntryPoint() = runTest {
+        viewModel.onFilesPicked(listOf(mock()), AttachmentEntryPoint.NEW_CHAT_HINT)
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileValidationFailed(eq("other"), any(), eq(AttachmentEntryPoint.NEW_CHAT_HINT))
+    }
+
+    @Test
+    fun whenFileSharedIntoDuckAiThenFileAttachedPixelHasShareEntryPoint() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/doc.pdf", providerPackage = "com.other.app")
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileAttached(any(), eq(AttachmentEntryPoint.SHARE))
+    }
+
+    @Test
+    fun whenSharedFileFailsProcessingThenValidationFailedPixelHasShareEntryPoint() = runTest {
+        val uri = givenSharedPdf("content://com.other.app.provider/doc.pdf", providerPackage = "com.other.app")
+        fileAttachmentProcessor.givenProcessFileReturns(uri, null)
+
+        viewModel.addAttachments("tab-1", textSelection = null, files = listOf(uri))
+        advanceUntilIdle()
+
+        verify(duckChatPixels).fireFileValidationFailed(eq("other"), any(), eq(AttachmentEntryPoint.SHARE))
     }
 
     private fun givenImageDecodes(): Uri {
@@ -1244,11 +1319,11 @@ class AttachmentViewModelTest {
         viewModel.imageAttachments.value += newImages
     }
 
-    private fun addFiles(vararg attachments: FileAttachment) {
+    private fun addFiles(vararg attachments: FileAttachment, entryPoint: AttachmentEntryPoint = AttachmentEntryPoint.ATTACHMENT_MENU) {
         for (attachment in attachments) {
             val uri: Uri = mock()
             fileAttachmentProcessor.givenProcessFileReturns(uri, attachment)
-            viewModel.onFilesPicked(listOf(uri))
+            viewModel.onFilesPicked(listOf(uri), entryPoint)
         }
     }
 

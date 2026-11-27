@@ -36,11 +36,13 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class PirFreemiumSettingViewModelTest {
@@ -75,6 +77,7 @@ class PirFreemiumSettingViewModelTest {
         testee.viewState.test {
             assertEquals(START_FREE_SCAN, expectMostRecentItem().cta)
         }
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(START_FREE_SCAN)
     }
 
     @Test
@@ -87,6 +90,7 @@ class PirFreemiumSettingViewModelTest {
         testee.viewState.test {
             assertEquals(VIEW_SCAN_RESULTS, expectMostRecentItem().cta)
         }
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(VIEW_SCAN_RESULTS)
     }
 
     @Test
@@ -98,6 +102,7 @@ class PirFreemiumSettingViewModelTest {
         testee.viewState.test {
             assertEquals(VIEW_SCAN_RESULTS, expectMostRecentItem().cta)
         }
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(VIEW_SCAN_RESULTS)
     }
 
     @Test
@@ -110,7 +115,7 @@ class PirFreemiumSettingViewModelTest {
         testee.viewState.test {
             assertNull(expectMostRecentItem().cta)
         }
-        verify(pixelSender, never()).reportFreemiumSettingsEntryPointImpression()
+        verify(pixelSender, never()).reportFreemiumSettingsEntryPointImpression(any())
     }
 
     @Test
@@ -173,7 +178,11 @@ class PirFreemiumSettingViewModelTest {
         testee.viewState.test {
             assertEquals(VIEW_SCAN_RESULTS, expectMostRecentItem().cta)
         }
-        verify(pixelSender, times(1)).reportFreemiumSettingsEntryPointImpression()
+        inOrder(pixelSender) {
+            verify(pixelSender).reportFreemiumSettingsEntryPointImpression(START_FREE_SCAN)
+            verify(pixelSender).reportFreemiumSettingsEntryPointImpression(VIEW_SCAN_RESULTS)
+        }
+        verifyNoMoreInteractions(pixelSender)
     }
 
     @Test
@@ -184,7 +193,8 @@ class PirFreemiumSettingViewModelTest {
         testee.onResume(lifecycleOwner)
         testee.onResume(lifecycleOwner)
 
-        verify(pixelSender, times(1)).reportFreemiumSettingsEntryPointImpression()
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(START_FREE_SCAN)
+        verifyNoMoreInteractions(pixelSender)
     }
 
     @Test

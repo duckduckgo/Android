@@ -26,8 +26,12 @@ sealed interface DuckChatLaunch {
      * Opens `duckChatUrl`, or a new chat when it is null.
      *
      * @param origin where the launch comes from.
+     * @param overrideModelId when set, the new tab's native input starts its next new chat on this model.
      */
-    data class Open(val origin: DuckChatLaunchOrigin = DuckChatLaunchOrigin.IN_APP) : DuckChatLaunch
+    data class Open(
+        val origin: DuckChatLaunchOrigin = DuckChatLaunchOrigin.IN_APP,
+        val overrideModelId: String? = null,
+    ) : DuckChatLaunch
 
     /**
      * Opens a new tab whose native input starts in image generation mode.

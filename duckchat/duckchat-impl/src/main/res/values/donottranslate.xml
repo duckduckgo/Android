@@ -48,13 +48,6 @@
     <!-- Foreground service notification shown while a response the user left is generating -->
     <string name="duckAiRespondingNotificationTitle">Duck.ai is responding…</string>
     <string name="duckAiRespondingNotificationChannelName">Duck.ai responses in progress</string>
-    <!-- Duck.ai widget: copy not final yet -->
-    <string name="duckAiWidgetLabel">Duck.ai and Recent Chats</string>
-    <string name="duckAiWidgetDescription">Start a private chat with Duck.ai or pick up recent chats.</string>
-    <string name="duckAiWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai home-screen widget">Chat privately</string>
-    <string name="duckAiWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the home-screen widget">Voice</string>
-    <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Image</string>
-    <string name="duckAiWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the home-screen widget">Camera</string>
 
     <!-- Duck.ai pasted text -->
     <string name="duckAiPastedTextContentDescription">Pasted text</string>
@@ -64,4 +57,62 @@
     <string name="duckAiPastedTextCounter" instruction="Character counter. First placeholder is the characters used, second is the maximum allowed">%1$d/%2$d</string>
     <string name="duckAiPromptTooLong" instruction="Error under the Duck.ai input when the message is too long. First placeholder is the characters used, second is the maximum allowed">Please try a shorter message. %1$d/%2$d</string>
 
+    <!-- Duck.ai client tool permission prompt -->
+    <string name="duckAiClientToolPromptAllowInChat">Allow in This Chat</string>
+    <string name="duckAiClientToolPromptDontAllow">Don’t Allow</string>
+    <string name="duckAiClientToolPromptAllowOnce">Allow Once</string>
+    <string name="duckAiClientToolRequestAccessPromptTitle">Allow Duck.ai to do the following:</string>
+    <string name="duckAiClientToolRequestAccessPromptMessage">Duck.ai can take these actions without asking again in this chat.</string>
+    <string name="duckAiClientToolListOpenTabsName">List Open Tabs</string>
+    <string name="duckAiClientToolListOpenTabsDescription">See the title and address of each open tab.</string>
+    <string name="duckAiClientToolListOpenTabsPromptTitle">Allow Duck.ai to see your open tabs?</string>
+    <string name="duckAiClientToolListOpenTabsPromptMessage">It will see the title and address of each open tab.</string>
+    <string name="duckAiClientToolOpenTabName">Open Tab</string>
+    <string name="duckAiClientToolOpenTabDescription">Open a page in a new tab.</string>
+    <string name="duckAiClientToolSwitchToTabName">Switch to Tab</string>
+    <string name="duckAiClientToolSwitchToTabDescription">Bring one of your open tabs to the front.</string>
+    <string name="duckAiClientToolBookmarkTabName">Bookmark Page</string>
+    <string name="duckAiClientToolBookmarkTabDescription">Bookmark pages and add bookmark folders.</string>
+    <string name="duckAiClientToolOpenTabPromptTitle">Allow Duck.ai to open this page?</string>
+    <string name="duckAiClientToolOpenTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will open %1$s in a new tab.</string>
+    <string name="duckAiClientToolBookmarkTabPromptTitle">Allow Duck.ai to bookmark this page?</string>
+    <string name="duckAiClientToolBookmarkTabPromptMessage" instruction="Placeholder is the full address of the page, such as https://example.com/travel/paris">It will add %1$s to your bookmarks.</string>
+    <string name="duckAiClientToolCloseTabsName">Close Tabs</string>
+    <string name="duckAiClientToolCloseTabsDescription">Close tabs when asked.</string>
+    <string name="duckAiClientToolCloseTabsPromptTitle">Allow Duck.ai to close tabs?</string>
+    <string name="duckAiClientToolCloseTabsPromptMessage">It will close the tabs you asked it to close.</string>
+    <string name="duckAiClientToolSearchBookmarksName">Search Bookmarks</string>
+    <string name="duckAiClientToolSearchBookmarksDescription">Search your bookmarks and their folders.</string>
+    <string name="duckAiClientToolSearchBookmarksPromptTitle">Allow Duck.ai to search your bookmarks?</string>
+    <string name="duckAiClientToolSearchBookmarksPromptMessage">It will see the title, address and folder of the bookmarks it finds.</string>
+    <string name="duckAiClientToolSearchDownloadsName">Search Downloads</string>
+    <string name="duckAiClientToolSearchDownloadsDescription">Search the names of files you’ve downloaded.</string>
+    <string name="duckAiClientToolSearchDownloadsPromptTitle">Allow Duck.ai to search your downloads?</string>
+    <string name="duckAiClientToolSearchDownloadsPromptMessage">It will see the name and download date of the files it finds.</string>
+    <string name="duckAiClientToolReadTabContentName">Read Tab Content</string>
+    <string name="duckAiClientToolReadTabContentDescription">Read the text of a page you have open.</string>
+    <string name="duckAiClientToolReadTabContentPromptTitle">Allow Duck.ai to read your open tabs?</string>
+    <string name="duckAiClientToolReadTabContentPromptMessage">It will see the text of the pages it reads.</string>
+    <string name="duckAiClientToolFindInPageName">Find in Page</string>
+    <string name="duckAiClientToolFindInPageDescription">Find words or phrases in a page you have open.</string>
+    <string name="duckAiClientToolFindInPagePromptTitle">Allow Duck.ai to search the text of your open tabs?</string>
+    <string name="duckAiClientToolFindInPagePromptMessage">It will see each match and the text around it.</string>
+    <string name="duckAiClientToolSearchHistoryName">Search History</string>
+    <string name="duckAiClientToolSearchHistoryDescription">Search the pages you’ve visited.</string>
+    <string name="duckAiClientToolSearchHistoryPromptTitle">Allow Duck.ai to search your history?</string>
+    <string name="duckAiClientToolSearchHistoryPromptMessage">It will see the title, address and visit date of the pages it finds.</string>
+
+    <!-- Browser Access settings -->
+    <string name="duckAiBrowserAccessTitle">Browser Access</string>
+    <string name="duckAiBrowserAccessDescription">Choose what Duck.ai can see and do in your browser.</string>
+    <string name="duckAiBrowserAccessIntro">Choose what actions Duck.ai can take in the browser, and whether it can act without asking for permission each time. These settings apply to every site and chat.</string>
+    <string name="duckAiBrowserAccessSeeSection">What Duck.ai Can See</string>
+    <string name="duckAiBrowserAccessDoSection">What Duck.ai Can Do</string>
+    <string name="duckAiBrowserAccessAlwaysAsk">Always Ask</string>
+    <string name="duckAiBrowserAccessAlwaysAllow">Always Allow</string>
+    <string name="duckAiBrowserAccessNeverAllow">Never Allow</string>
+    <string name="duckAiBrowserAccessResetAll">Reset All</string>
+    <string name="duckAiBrowserAccessResetAllDialogTitle">Reset browser access?</string>
+    <string name="duckAiBrowserAccessResetAllDialogMessage">Duck.ai will go back to asking before it uses these features.</string>
+    <string name="duckAiBrowserAccessResetAllDialogConfirm">Reset</string>
 </resources>

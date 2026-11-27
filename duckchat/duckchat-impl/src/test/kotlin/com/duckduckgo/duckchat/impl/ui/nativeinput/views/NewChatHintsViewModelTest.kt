@@ -29,6 +29,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.ChatState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -46,6 +47,8 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
@@ -66,6 +69,7 @@ import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -80,6 +84,7 @@ class NewChatHintsViewModelTest {
     private val eligible = MutableStateFlow(true)
     private val duckChatPixels: DuckChatPixels = mock()
     private val commands = NewChatHintCommands()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val selectedTab = MutableStateFlow<TabEntity?>(TabEntity("tab"))
     private val tabs = MutableStateFlow(listOf(TabEntity("tab", url = NEW_CHAT_URL)))
     private val tabRepository: TabRepository = mock {
@@ -120,6 +125,7 @@ class NewChatHintsViewModelTest {
     ) = NewChatHintsViewModel(
         provider, modelManager, duckChat, commands, tabRepository, usage, eligibility, browserMode,
         NewChatDetector(provider, chatStateStore, voiceSessions, tabRepository, duckChat, chatStore, coroutineRule.testDispatcherProvider), pixels,
+        duckChatFeature,
     )
 
     @Before
@@ -283,6 +289,22 @@ class NewChatHintsViewModelTest {
             assertEquals(NewChatHintCommand.OpenDocuments("tab", listOf("application/pdf")), awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndDocumentsHintIsTappedThenTheTabPicksTheCapableModelBeforeOpeningPicker() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val unsupported = model().copy(id = "text", supportedFileTypes = emptyList())
+        models.value = ModelState(models = listOf(unsupported, model().copy(id = "files")), selectedModelId = "text")
+        commands.commandsFor { "tab" }.test {
+            val tap = launch { viewModel().onHintTapped(NewChatHint.DOCUMENTS, position = 1, "tab") }
+            assertEquals(NewChatHintCommand.PickModel("tab", "files"), awaitItem())
+            stateStore.update("tab") { it.copy(newChatModelId = "files") }
+            assertEquals(NewChatHintCommand.OpenDocuments("tab", listOf("application/pdf")), awaitItem())
+            tap.join()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify(modelManager, never()).selectModel(any())
     }
 
     @Test
@@ -705,7 +727,14 @@ class NewChatHintsViewModelTest {
         testee.onHintTapped(NewChatHint.PHOTO, position = 1, "tab")
         testee.onHintTapped(NewChatHint.DOCUMENTS, position = 2, "tab")
 
-        pixels.onPromptSubmitted("tab", isNewChat = true, hasImageAttachment = false, hasFileAttachment = true, selectedTool = "none")
+        pixels.onPromptSubmitted(
+            "tab",
+            isNewChat = true,
+            hasImageAttachment = false,
+            hasFileAttachment = true,
+            selectedTool = "none",
+            modelSource = null,
+        )
 
         verify(duckChatPixels).fireNewChatFirstPromptSent(
             hasNewChatHints = eq(true),
@@ -714,6 +743,7 @@ class NewChatHintsViewModelTest {
             hasImageAttachment = eq(false),
             hasFileAttachment = eq(true),
             selectedTool = eq("none"),
+            modelSource = isNull(),
         )
     }
 

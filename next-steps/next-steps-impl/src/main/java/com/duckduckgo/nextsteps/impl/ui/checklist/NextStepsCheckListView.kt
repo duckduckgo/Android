@@ -77,6 +77,7 @@ class NextStepsCheckListView @JvmOverloads constructor(
     private val conflatedStateJob = ConflatedJob()
     private val conflatedCommandJob = ConflatedJob()
     private var completionAnimationRunning = false
+    private var attachedBefore = false
 
     init {
         val horizontalPadding = resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4)
@@ -95,7 +96,8 @@ class NextStepsCheckListView @JvmOverloads constructor(
 
         val lifecycleOwner = findViewTreeLifecycleOwner()!!
         lifecycleOwner.lifecycle.addObserver(viewModel)
-        viewModel.onViewAttached()
+        viewModel.onViewAttached(newSection = !attachedBefore)
+        attachedBefore = true
         conflatedStateJob += lifecycleOwner.lifecycleScope.launch {
             lifecycleOwner.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 viewModel.viewState.collect { render(it) }

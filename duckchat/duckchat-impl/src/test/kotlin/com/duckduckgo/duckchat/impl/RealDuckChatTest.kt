@@ -2124,6 +2124,15 @@ class RealDuckChatTest {
     }
 
     @Test
+    fun whenOpenDuckChatWithOverrideModelThenOpensWithItOnTheLaunch() = runTest {
+        testee.openDuckChat(DuckChatEntryPoint.SUBSCRIPTION_ONBOARDING, overrideModelId = "plus1")
+        coroutineRule.testScope.advanceUntilIdle()
+
+        verify(mockBrowserNav).openDuckChat(any(), any(), any(), eq(DuckChatLaunch.Open(overrideModelId = "plus1")))
+        verify(mockContext).startActivity(mockIntent)
+    }
+
+    @Test
     fun whenOpenDuckChatImageGenerationAndNoAccessibleImageCapableModelThenDoesNotForceImageGenerationButStillOpens() = runTest {
         whenever(mockDuckAiModelManager.ensureImageCapableModelSelected()).thenReturn(false)
 

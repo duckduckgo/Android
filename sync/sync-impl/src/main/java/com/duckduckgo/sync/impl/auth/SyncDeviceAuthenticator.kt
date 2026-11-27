@@ -23,6 +23,8 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationResult
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -41,6 +43,7 @@ interface SyncDeviceAuthenticator {
 class RealSyncDeviceAuthenticator @Inject constructor(
     private val authenticator: DeviceAuthenticator,
     private val syncPixels: SyncPixels,
+    private val syncSetupWideEvent: SyncSetupWideEvent,
 ) : SyncDeviceAuthenticator {
     override val currentPrompt: StateFlow<AuthPrompt?>
         get() = authenticator.currentPrompt
@@ -50,10 +53,17 @@ class RealSyncDeviceAuthenticator @Inject constructor(
         request: Request,
         onEvent: (Event) -> Unit,
     ): Response {
-        val response = authenticator.authenticate(request, onEvent)
+        val response = authenticator.authenticate(request) { event ->
+            if (event == Event.VerificationShown) {
+                syncSetupWideEvent.onStep(SetupStep.DEVICE_AUTH)
+                syncSetupWideEvent.onUpdate { it.copy(deviceAuthShown = true) }
+            }
+            onEvent(event)
+        }
         response.toPixelResult()?.let { result ->
             syncPixels.fireSetupAuthenticationResult(result, source)
         }
+        syncSetupWideEvent.onUpdate { it.copy(deviceAuthDenial = response.denial) }
         return response
     }
 

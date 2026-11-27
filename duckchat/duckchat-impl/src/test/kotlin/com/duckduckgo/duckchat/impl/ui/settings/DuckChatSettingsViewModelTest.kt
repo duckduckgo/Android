@@ -23,6 +23,7 @@ import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.clienttools.AiChatBrowserToolsFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -73,6 +74,7 @@ class DuckChatSettingsViewModelTest {
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val serpSettingsDataProvider: SerpSettingsDataProvider = mock()
     private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics = mock()
+    private val browserToolsFeature = FakeFeatureToggleFactory.create(AiChatBrowserToolsFeature::class.java)
 
     @Before
     fun setUp() =
@@ -99,6 +101,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
         }
 
@@ -181,6 +184,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -204,6 +208,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -227,6 +232,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -250,6 +256,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -273,6 +280,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -296,6 +304,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -320,6 +329,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -345,6 +355,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -411,6 +422,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.duckChatSearchAISettingsClicked()
@@ -510,6 +522,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -533,6 +546,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -554,6 +568,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -578,6 +593,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -602,6 +618,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -671,6 +688,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -736,6 +754,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -794,6 +813,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -867,6 +887,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -916,6 +937,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -943,6 +965,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -970,6 +993,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -997,6 +1021,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1020,6 +1045,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1042,6 +1068,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1102,6 +1129,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1124,6 +1152,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1149,6 +1178,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1174,6 +1204,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1198,6 +1229,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1222,6 +1254,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1246,6 +1279,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1270,6 +1304,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1294,6 +1329,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1316,6 +1352,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1405,6 +1442,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {
@@ -1431,6 +1469,7 @@ class DuckChatSettingsViewModelTest {
                 duckChatFeature = duckChatFeature,
                 serpSettingsDataProvider = serpSettingsDataProvider,
                 subscriptionOnboardingExperimentMetrics = subscriptionOnboardingExperimentMetrics,
+                browserToolsFeature = browserToolsFeature,
             )
 
             testee.viewState.test {

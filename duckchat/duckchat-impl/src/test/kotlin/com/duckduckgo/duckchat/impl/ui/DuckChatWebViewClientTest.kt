@@ -48,6 +48,19 @@ class DuckChatWebViewClientTest {
     }
 
     @Test
+    fun whenOnPageStartedCalledThenListenerInvoked() = runTest {
+        val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
+        whenever(pluginPoint.getPlugins()).thenReturn(emptyList())
+        val duckChatWebViewClient = DuckChatWebViewClient(pluginPoint)
+        var started = 0
+        duckChatWebViewClient.onPageStartedListener = { started++ }
+
+        duckChatWebViewClient.onPageStarted(mock(), "https://duck.ai/chat", null)
+
+        assertEquals(1, started)
+    }
+
+    @Test
     fun whenOnPageFinishedCalledThenListenerInvokedWithUrl() = runTest {
         val pluginPoint: PluginPoint<JsInjectorPlugin> = mock()
         whenever(pluginPoint.getPlugins()).thenReturn(emptyList())

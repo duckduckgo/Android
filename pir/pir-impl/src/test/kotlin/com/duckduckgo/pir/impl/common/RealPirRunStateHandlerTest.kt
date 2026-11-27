@@ -205,11 +205,13 @@ class RealPirRunStateHandlerTest {
                 BrokerScanStarted(
                     broker = testBroker,
                     eventTimeInMillis = testEventTimeInMillis,
+                    isFreeScan = true,
                 )
             testee.handleState(state)
 
             verify(mockPixelSender).reportScanStarted(
                 brokerUrl = testBroker.url,
+                isFreeScan = true,
             )
             verify(mockEventsRepository).saveBrokerScanLog(
                 PirBrokerScanLog(

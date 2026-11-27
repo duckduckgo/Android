@@ -114,6 +114,15 @@ interface DuckChatJSHelper {
 
     fun clearTabContextPromptEvent()
 
+    /**
+     * Settles client tool calls of the chat in [tabId], hosted in the contextual sheet when [contextual], still waiting for permission as
+     * `cancelled`; call when its chat page goes away.
+     */
+    fun cancelPendingClientToolCalls(
+        tabId: String,
+        contextual: Boolean,
+    )
+
     fun consumeTabContextPromptOnHandoff(
         method: String,
         browserMode: BrowserMode,
@@ -241,7 +250,11 @@ class RealDuckChatJSHelper @Inject constructor(
             }
 
             METHOD_OPEN_AI_CHAT_SETTINGS -> {
-                duckChat.openDuckChatSettings()
+                // An unknown section falls back to the settings top, as the web expects.
+                when (data?.optString(SECTION)) {
+                    SECTION_BROWSER_PERMISSIONS -> duckChat.openBrowserAccessSettings()
+                    else -> duckChat.openDuckChatSettings()
+                }
                 null
             }
 
@@ -306,7 +319,7 @@ class RealDuckChatJSHelper @Inject constructor(
 
             METHOD_EXECUTE_CLIENT_TOOL ->
                 id?.let {
-                    val reply = clientToolsExecutor.execute(data, pageUrl, tabId, browserMode)
+                    val reply = clientToolsExecutor.execute(data, pageUrl, tabId, browserMode, contextual = mode == Mode.CONTEXTUAL)
                     JsCallbackData(reply, featureName, method, it)
                 }
 
@@ -482,6 +495,13 @@ class RealDuckChatJSHelper @Inject constructor(
     override fun clearTabContextPromptEvent() {
         if (!duckChatFeature.chatTabAttachments().isEnabled()) return
         pendingTabContextStore.clear()
+    }
+
+    override fun cancelPendingClientToolCalls(
+        tabId: String,
+        contextual: Boolean,
+    ) {
+        clientToolsExecutor.cancelPendingCalls(tabId, contextual)
     }
 
     override fun consumeTabContextPromptOnHandoff(
@@ -911,6 +931,8 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val METHOD_OPEN_AI_CHAT = "openAIChat"
         const val METHOD_CLOSE_AI_CHAT = "closeAIChat"
         private const val METHOD_OPEN_AI_CHAT_SETTINGS = "openAIChatSettings"
+        private const val SECTION = "section"
+        private const val SECTION_BROWSER_PERMISSIONS = "browserPermissions"
         private const val METHOD_RESPONSE_STATE = "responseState"
         private const val METHOD_HIDE_CHAT_INPUT = "hideChatInput"
         private const val METHOD_SHOW_CHAT_INPUT = "showChatInput"

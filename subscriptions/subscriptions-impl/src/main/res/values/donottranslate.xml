@@ -40,6 +40,15 @@
     </plurals>
     <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
 
+    <!-- Notifications Denied Dialog -->
+    <string name="subscriptionNotificationsDeniedDialogTitle">Get Notified About Your Trial?</string>
+    <plurals name="subscriptionNotificationsDeniedDialogMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">If you turn on notifications in Settings, we\'ll send you a notification 1 day before your free trial ends.</item>
+        <item quantity="other" instruction="Placeholder is the number of days before the free trial ends">If you turn on notifications in Settings, we\'ll send you a notification %1$d days before your free trial ends.</item>
+    </plurals>
+    <string name="subscriptionNotificationsDeniedDialogNotNow">Not Now</string>
+    <string name="subscriptionNotificationsDeniedDialogOpenSettings">Open Settings</string>
+
     <!-- Subscription Onboarding (English only, not translated) -->
     <string name="subscriptionOnboardingWelcomeTitle">Protections unlocked!</string>
     <string name="subscriptionOnboardingWelcomeDescription">Start using your premium protections today.</string>
