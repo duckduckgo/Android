@@ -696,7 +696,7 @@ class RealPirRunStateHandler @Inject constructor(
                          * - We store the new extracted profiles (if profile query is not deprecated) and refresh the ones we already have.
                          * - Update the corresponding ScanJobRecord
                          * For every stored extractedProfile that reappears in the results and whose opt-out was previously
-                         * REMOVED, we revert it back to REQUESTED and report a reappearance pixel.
+                         * REMOVED, we revert it back to NOT_EXECUTED so the opt-out runs again, and report a reappearance pixel.
                          * For every stored extractedProfile marked REMOVED although a profile with the same identifier was
                          * found, we report a pixel: other platforms match on the identifier alone and would have kept it.
                          */
