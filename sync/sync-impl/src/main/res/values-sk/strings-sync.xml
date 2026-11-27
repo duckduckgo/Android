@@ -214,6 +214,7 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Na synchronizovanie naskenuj QR kód</string>
     <string name="sync_simplified_scanner_camera_header_body">Otvor <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pre počítač</annotation></b>\n<annotation type="gap">\n</annotation>a prejdi do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizovať s iným zariadením</annotation></string>
+    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Otvor <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pre počítač</annotation></b>\n<annotation type="gap">\n</annotation>prejdi do <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Rozumiem</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo potrebuje prístup k tvojmu fotoaparátu.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Na skenovanie QR kódu je potrebné povolenie na prístup k fotoaparátu.</string>
@@ -223,6 +224,7 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Zadaj kód pre Sync</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Otvor svoju druhú <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplikáciu DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Prejdi do časti <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizácia s iným zariadením</annotation> › <annotation type="highlight">Skopírovať textový kód</annotation></string>
+    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Otvor ďalšiu <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplikáciu DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>prejdi do <b><annotation type="url">%1$s</annotation></b> a skopíruj textový kód.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Vzorový kód:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Vložiť kód synchronizácie</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Žiaľ, vložený kód je neplatný.</string>
@@ -231,6 +233,7 @@
     <string name="sync_simplified_qr_code_screen_title">Kód QR</string>
     <string name="sync_simplified_qr_code_header_headline">Naskenuj z iného zariadenia</string>
     <string name="sync_simplified_qr_code_header_body">Na inom zariadení otvor <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>a prejdi do <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchronizácia s iným zariadením</annotation> a naskenuj tento kód:</string>
+    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Otvor ďalší <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>prejdi do <b><annotation type="url">%1$s</annotation></b> a naskenuj tento kód:</string>
     <string name="sync_simplified_qr_code_copy_button">Kopírovať textový kód</string>
     <string name="sync_simplified_qr_code_share_button">Zdieľať</string>
     <string name="sync_simplified_qr_code_copied_message">Kód obnovy bol skopírovaný</string>
