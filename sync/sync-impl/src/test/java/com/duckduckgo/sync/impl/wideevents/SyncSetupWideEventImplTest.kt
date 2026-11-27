@@ -23,6 +23,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.Clipboard
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
@@ -45,12 +46,14 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel
 import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
+import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.CameraAccess
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel
 import com.duckduckgo.sync.store.SyncStore
@@ -1316,6 +1319,35 @@ class SyncSetupWideEventImplTest {
 
         assertEquals("preparing_sync", payload["last_step"])
         assertFalse(payload.getValue("steps").contains("error_screen"))
+    }
+
+    @Test
+    fun `empty paste followed by valid pairing sends the successful outcome`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        val clipboard = mock<Clipboard> {
+            on { pasteFromClipboard() } doAnswer { "" }
+        }
+        val reader = ReadSyncCodeViewModel(
+            entryPoint = SyncEntryPoint.ADD_DEVICE,
+            launchSource = "other",
+            clipboard = clipboard,
+            syncPixels = mock(),
+            codeDispatcher = mock(),
+            setupEvent = wideEvent,
+        )
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        reader.onCodeEntryShown()
+
+        reader.pasteSyncCode()
+        advanceUntilIdle()
+        process(RouteDecision.V2InProgress(SyncCodeType.LINKING, flowOf(DispatchOutcome.LoggedIn(SetupPath.PAIRING))))
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(eq(1L), eq(FlowStatus.Success), any())
+        verify(wideEventClient).flowFinish(any(), any(), any())
+        assertEquals("paste_code", payload["connect_method"])
+        assertFalse(payload.containsKey("status_reason"))
     }
 
     private suspend fun TestScope.startV2Session() {

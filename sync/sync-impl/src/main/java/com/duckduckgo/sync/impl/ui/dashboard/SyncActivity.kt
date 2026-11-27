@@ -197,7 +197,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 handlePairingResult(output.result)
             }
 
-            is RecoverSyncedDataContract.Output.Dismissed -> Unit
+            is RecoverSyncedDataContract.Output.Dismissed -> viewModel.onPairingDismissed()
         }
     }
 
@@ -623,7 +623,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun configureRecoverDataCta() {
         binding.includeDisabledView.recoverDataItem.setOnClickListener {
-            viewModel.onRecoverYourSyncedData()
+            viewModel.onRecoverYourSyncedData(launchSource)
         }
     }
 

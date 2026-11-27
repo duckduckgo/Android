@@ -370,7 +370,8 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onRecoverYourSyncedData() {
+    fun onRecoverYourSyncedData(launchSource: String) {
+        syncSetupWideEvent.onFlowStarted(launchSource, SetupMode.RECOVERY)
         syncPixels.fireRecoverSyncDataTapped()
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {

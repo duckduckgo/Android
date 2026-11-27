@@ -29,7 +29,6 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
-import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
@@ -87,7 +86,6 @@ class ReadSyncCodeViewModel @AssistedInject constructor(
             if (code.isBlank()) {
                 setupEvent.onPairingSessionReset()
                 setupEvent.onUpdate { it.copy(connectMethod = ConnectMethod.PASTE_CODE) }
-                setupEvent.onCancelled(SetupCancellationReason.CODE_REJECTED)
                 syncPixels.fireSyncSetupCodePastedParseFailure(screenType, SetupFailureReason.UNRECOGNIZED_CODE)
                 _commands.send(Command.ShowMessage(R.string.sync_simplified_scanner_manual_entry_invalid_code_message))
             } else {
