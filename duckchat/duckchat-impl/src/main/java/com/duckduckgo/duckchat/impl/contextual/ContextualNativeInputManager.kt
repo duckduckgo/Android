@@ -57,6 +57,7 @@ data class NativeInputPrompt(
     val imagesJson: JSONArray?,
     val filesJson: JSONArray?,
     val selectionsJson: JSONArray? = null,
+    val pastedJson: JSONArray? = null,
 )
 
 interface ContextualNativeInputManager {
@@ -263,6 +264,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 val imagesJson = widget.getImageAttachmentsJson()
                 val filesJson = widget.getFileAttachmentsJson()
                 val selectionsJson = widget.getTextSelectionsJson()
+                val pastedJson = widget.getPastedTextsJson()
                 val modelId = widget.getSelectedModelId()
                 val reasoningEffort = widget.getResolvedReasoningEffort()
                 val selectedTool = widget.getSelectedTool()
@@ -275,7 +277,7 @@ class RealContextualNativeInputManager @Inject constructor(
                 // which, based on its own state, not on the native caller.
                 widget.onPromptSubmitted()
                 onPromptSubmitted(
-                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson),
+                    NativeInputPrompt(prompt, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson, pastedJson),
                 )
                 widget.clearSelectedTool()
                 widget.text = ""

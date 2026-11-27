@@ -411,6 +411,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
             filesJson = entry.filesJson,
             pageContextSerialized = entryPageContext,
             selectionsJson = entrySelections,
+            pastedJson = entry.pastedJson,
             carriesTermsConsent = entryCarriesTermsConsent,
         )
     }
@@ -424,10 +425,22 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         imagesJson: JSONArray? = null,
         filesJson: JSONArray? = null,
         selectionsJson: JSONArray? = null,
+        pastedJson: JSONArray? = null,
     ) {
         val attachedContext = pageContextState.attachedPage.takeIf { _viewState.value.showContext }
         selectionsJson?.length()?.takeIf { it > 0 }?.let { duckChatPixels.reportContextualPromptSubmittedWithSelections(it) }
-        submitPrompt(prompt, followUpPrefill, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, attachedContext, selectionsJson)
+        submitPrompt(
+            prompt = prompt,
+            followUpPrefill = followUpPrefill,
+            modelId = modelId,
+            reasoningEffort = reasoningEffort,
+            selectedTool = selectedTool,
+            imagesJson = imagesJson,
+            filesJson = filesJson,
+            pageContextSerialized = attachedContext,
+            selectionsJson = selectionsJson,
+            pastedJson = pastedJson,
+        )
     }
 
     private fun submitPrompt(
@@ -440,6 +453,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         filesJson: JSONArray? = null,
         pageContextSerialized: String?,
         selectionsJson: JSONArray? = null,
+        pastedJson: JSONArray? = null,
         carriesTermsConsent: Boolean = true,
     ) {
         val expectedTabId = _viewState.value.tabId
@@ -482,6 +496,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                         filesJson,
                         resolvedContext.takeIf { isPageContextRequestCurrent(attachmentRequest) },
                         selectionsJson,
+                        pastedJson,
                         carriesTermsConsent,
                     )
 
@@ -577,6 +592,7 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
         filesJson: JSONArray? = null,
         pageContext: JSONObject?,
         selectionsJson: JSONArray? = null,
+        pastedJson: JSONArray? = null,
         carriesTermsConsent: Boolean = true,
     ): SubscriptionEventData {
         // The unified input widget is the source of truth for model/reasoning/tool/attachments when it
@@ -606,6 +622,9 @@ class DuckChatContextualWebViewViewModel @Inject constructor(
                         }
                         if (filesJson != null) {
                             put("files", filesJson)
+                        }
+                        if (pastedJson != null) {
+                            put("textPasted", pastedJson)
                         }
                     },
                 )

@@ -108,6 +108,7 @@ class NativeInputCallbacks(
         imagesJson: JSONArray?,
         filesJson: JSONArray?,
         selectionsJson: JSONArray?,
+        pastedJson: JSONArray?,
     ) -> Unit,
     val onChatSuggestionSelected: (String) -> Unit,
     val duckAiEntryPointResolver: (DuckChatEntryPoint) -> DuckChatEntryPoint = { it },
@@ -942,6 +943,7 @@ class RealNativeInputManager @Inject constructor(
                     val imagesJson = widget.getImageAttachmentsJson()
                     val filesJson = widget.getFileAttachmentsJson()
                     val selectionsJson = widget.getTextSelectionsJson()
+                    val pastedJson = widget.getPastedTextsJson()
                     widget.text = ""
                     widget.clearAttachments()
                     callbacks.onDuckAiChatSubmitted(
@@ -952,6 +954,7 @@ class RealNativeInputManager @Inject constructor(
                         imagesJson,
                         filesJson,
                         selectionsJson,
+                        pastedJson,
                     )
                     widget.clearSelectedTool()
                     widget.onPromptSubmitted()

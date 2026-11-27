@@ -1485,7 +1485,7 @@ class BrowserTabFragment :
                     }
                 },
                 onSearchSubmitted = { query -> onUserSubmittedText(query) },
-                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson ->
+                onDuckAiChatSubmitted = { query, modelId, reasoningEffort, selectedTool, imagesJson, filesJson, selectionsJson, pastedJson ->
                     viewModel.onDuckAiChatPromptSubmitted()
                     contentScopeScripts.sendSubscriptionEvent(
                         SubscriptionEventData(
@@ -1513,6 +1513,9 @@ class BrowserTabFragment :
                                         }
                                         if (filesJson != null) {
                                             put("files", filesJson)
+                                        }
+                                        if (pastedJson != null) {
+                                            put("textPasted", pastedJson)
                                         }
                                     },
                                 )

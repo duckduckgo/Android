@@ -87,7 +87,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
 
         with(binding.editPromptInputCard.widget) {
             configureForEdit(sessionId)
-            adoptEditAttachments(payload.images, payload.files)
+            adoptEditAttachments(payload.images, payload.files, payload.pastedTexts)
             text = payload.prompt
             onChatSent = { submit(sessionId) }
             // configureForEdit's own widget setup runs on attach; focusing before that leaves the
@@ -123,6 +123,7 @@ class EditPromptActivity : DuckDuckGoActivity() {
                 prompt = binding.editPromptInputCard.widget.text,
                 images = binding.editPromptInputCard.widget.getImageAttachmentsJson().toSubmittedImages(),
                 files = binding.editPromptInputCard.widget.getFileAttachmentsJson().toSubmittedFiles(),
+                pastedTexts = binding.editPromptInputCard.widget.getPastedTextsJson().toPastedTexts(),
             ),
         )
         duckChatPixels.fireEditPromptSubmitted()
@@ -166,6 +167,11 @@ class EditPromptActivity : DuckDuckGoActivity() {
             val json = getJSONObject(index)
             SubmittedImage(data = json.getString("data"), format = json.getString("format"))
         }
+    }
+
+    private fun JSONArray?.toPastedTexts(): List<String> {
+        if (this == null) return emptyList()
+        return (0 until length()).map { index -> getJSONObject(index).getString("content") }
     }
 
     // Mirrors the shape AttachmentViewModel.getFileAttachmentsJson() produces: {"data", "fileName", "mimeType"}.

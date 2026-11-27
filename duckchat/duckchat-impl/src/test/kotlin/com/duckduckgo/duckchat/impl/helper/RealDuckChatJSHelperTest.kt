@@ -3451,6 +3451,104 @@ class RealDuckChatJSHelperTest {
     }
 
     @Test
+    fun whenGetAIChatNativePromptWithPastedTextsThenQueryCarriesTextPastedInOrder() = runTest {
+        val pending = PendingNativePrompt(
+            prompt = "test prompt",
+            modelId = null,
+            reasoningEffort = null,
+            pastedTexts = listOf("line one\n\"quoted\"", "second"),
+        )
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(pending)
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        val pasted = result!!.params.getJSONObject("query").getJSONArray("textPasted")
+        assertEquals(2, pasted.length())
+        assertEquals("line one\n\"quoted\"", pasted.getJSONObject(0).getString("content"))
+        assertEquals("second", pasted.getJSONObject(1).getString("content"))
+    }
+
+    @Test
+    fun whenGetAIChatNativePromptWithNoPastedTextsThenTextPastedKeyAbsent() = runTest {
+        whenever(mockPendingNativePromptStore.consume()).thenReturn(PendingNativePrompt("test prompt", null, null))
+
+        val result = testee.processJsCallbackMessage("aiChat", "getAIChatNativePrompt", "123", null, pageContext = viewModel.updatedPageContext)
+
+        assertFalse(result!!.params.getJSONObject("query").has("textPasted"))
+    }
+
+    @Test
+    fun whenEditPromptHasTextPastedThenParsedPayloadCarriesThePastes() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val data = JSONObject("""{"prompt": "p", "textPasted": [{"content": "one"}, {"content": "two"}], "hasResponsesToLose": false}""")
+
+        testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        val captor = argumentCaptor<EditPromptPayload>()
+        verify(mockEditPromptSessionStore).open(captor.capture())
+        assertEquals(listOf("one", "two"), captor.firstValue.pastedTexts)
+    }
+
+    @Test
+    fun whenEditPromptHasMalformedTextPastedThenOnlyThePastesAreDropped() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val data = JSONObject(
+            """{"prompt": "p", "images": [{"data": "img", "format": "png"}], "textPasted": "not-an-array", "hasResponsesToLose": false}""",
+        )
+
+        testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        val captor = argumentCaptor<EditPromptPayload>()
+        verify(mockEditPromptSessionStore).open(captor.capture())
+        assertEquals("p", captor.firstValue.prompt)
+        assertEquals(listOf(SubmittedImage(data = "img", format = "png")), captor.firstValue.images)
+        assertEquals(emptyList<String>(), captor.firstValue.pastedTexts)
+    }
+
+    @Test
+    fun whenEditPromptHasMalformedTextPastedEntriesThenOnlyValidEntriesAreKept() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(EditPromptResult.Cancelled)
+        val data = JSONObject("""{"prompt": "p", "textPasted": [{"content": 5}, "x", {}, {"content": "ok"}], "hasResponsesToLose": false}""")
+
+        testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        val captor = argumentCaptor<EditPromptPayload>()
+        verify(mockEditPromptSessionStore).open(captor.capture())
+        assertEquals(listOf("ok"), captor.firstValue.pastedTexts)
+    }
+
+    @Test
+    fun whenEditPromptSubmittedWithPastedTextsThenReplyCarriesTextPasted() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(
+            EditPromptResult.Submitted(prompt = "edited", images = emptyList(), files = emptyList(), pastedTexts = listOf("kept")),
+        )
+        val data = JSONObject("""{"prompt": "p", "textPasted": [{"content": "kept"}, {"content": "removed"}], "hasResponsesToLose": false}""")
+
+        val result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        val pasted = result!!.params.getJSONArray("textPasted")
+        assertEquals(1, pasted.length())
+        assertEquals("kept", pasted.getJSONObject(0).getString("content"))
+    }
+
+    @Test
+    fun whenEditPromptSubmittedWithoutPastedTextsThenReplyTextPastedIsEmpty() = runTest {
+        whenever(mockEditPromptSessionStore.open(any())).thenReturn("session-1")
+        whenever(mockEditPromptSessionStore.await("session-1")).thenReturn(
+            EditPromptResult.Submitted(prompt = "edited", images = emptyList(), files = emptyList()),
+        )
+        val data = JSONObject("""{"prompt": "p", "textPasted": [{"content": "removed"}], "hasResponsesToLose": false}""")
+
+        val result = testee.processJsCallbackMessage("aiChat", "editPrompt", "123", data, tabId = "tab-1")
+
+        assertEquals(0, result!!.params.getJSONArray("textPasted").length())
+    }
+
+    @Test
     fun whenGetAIChatNativeHandoffDataAndVoiceSessionActiveThenForceEndNativeVoiceSession() = runTest {
         val tabId = "test-tab-id"
         whenever(mockVoiceSessionStateManager.isVoiceSessionActive(tabId)).thenReturn(true)

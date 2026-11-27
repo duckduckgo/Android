@@ -110,6 +110,13 @@ interface DuckChatFeature {
     fun nativeInputNavBar(): Toggle
 
     /**
+     * @return `true` when a long plain-text paste into the native Duck.ai input becomes a pasted-text attachment.
+     * If the remote feature is not present defaults to `internal`.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun nativeInputPastedText(): Toggle
+
+    /**
      * @return `true` when the Input Screen onboarding wide event should be sent
      * If the remote feature is not present defaults to `internal`
      */

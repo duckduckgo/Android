@@ -49,6 +49,14 @@
     <string name="duckAiRespondingNotificationTitle">Duck.ai is responding…</string>
     <string name="duckAiRespondingNotificationChannelName">Duck.ai responses in progress</string>
 
+    <!-- Duck.ai pasted text -->
+    <string name="duckAiPastedTextContentDescription">Pasted text</string>
+    <string name="duckAiPastedTextRemoveContentDescription">Remove pasted text</string>
+    <string name="duckAiPastedTextEditTitle" instruction="Title of the sheet where the user edits a pasted text attachment">Edit Text</string>
+    <string name="duckAiPastedTextViewTitle" instruction="Title of the sheet showing a pasted text attachment that cannot be edited">Pasted Text</string>
+    <string name="duckAiPastedTextCounter" instruction="Character counter. First placeholder is the characters used, second is the maximum allowed">%1$d/%2$d</string>
+    <string name="duckAiPromptTooLong" instruction="Error under the Duck.ai input when the message is too long. First placeholder is the characters used, second is the maximum allowed">Please try a shorter message. %1$d/%2$d</string>
+
     <!-- Duck.ai client tool permission prompt -->
     <string name="duckAiClientToolPromptAllowInChat">Allow in This Chat</string>
     <string name="duckAiClientToolPromptDontAllow">Don’t Allow</string>

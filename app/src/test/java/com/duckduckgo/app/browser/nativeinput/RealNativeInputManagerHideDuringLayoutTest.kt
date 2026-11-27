@@ -119,7 +119,7 @@ class RealNativeInputManagerHideDuringLayoutTest {
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
-                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
                 onDuckAiQuerySubmitted = { _, _, _ -> },
                 onClearAutocomplete = {},

@@ -36,6 +36,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
@@ -46,6 +47,9 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PastedText
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PromptLength
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PromptLimits
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.TextSelectionAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
@@ -89,6 +93,7 @@ class AttachmentViewModel @Inject constructor(
     private val textSelectionRepository: TextSelectionRepository,
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder,
     private val selectionJourney: DuckAiSelectionJourneyWideEvent,
+    duckChatFeature: DuckChatFeature,
 ) : ViewModel() {
 
     var textSelectionsTabId: String? = null
@@ -105,6 +110,9 @@ class AttachmentViewModel @Inject constructor(
         val files: List<FileAttachment> = emptyList(),
         val pageContext: PageContextAttachment? = null,
         val textSelections: List<TextSelectionAttachment> = emptyList(),
+        val pastedTexts: List<PastedText> = emptyList(),
+        val promptLength: PromptLength? = null,
+        val promptLengthError: String? = null,
         val textSelectionLimitError: String? = null,
         val imageLimitError: String? = null,
         val fileLimitError: String? = null,
@@ -116,8 +124,8 @@ class AttachmentViewModel @Inject constructor(
         val supportsImageUpload: Boolean = false,
         val supportedFileTypes: List<String> = emptyList(),
     ) {
-        val hasAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty() || pageContext != null || textSelections.isNotEmpty()
-        val hasStandaloneAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty()
+        val hasAttachments: Boolean get() = hasStandaloneAttachments || pageContext != null || textSelections.isNotEmpty()
+        val hasStandaloneAttachments: Boolean get() = images.isNotEmpty() || files.isNotEmpty() || pastedTexts.isNotEmpty()
         val acceptedMimeTypes: List<String> get() {
             val types = mutableListOf<String>()
             if (supportedFileTypes.isNotEmpty()) types.addAll(supportedFileTypes)
@@ -132,6 +140,10 @@ class AttachmentViewModel @Inject constructor(
     private val _pageContextAttachment = MutableStateFlow<PageContextAttachment?>(null)
     private val _textSelections = MutableStateFlow<List<TextSelectionAttachment>>(emptyList())
     private val _textSelectionLimitReached = MutableStateFlow(false)
+    private val _pastedTexts = MutableStateFlow<List<PastedText>>(emptyList())
+    private val typedLength = MutableStateFlow(0)
+    private val pastedTextEnabled: StateFlow<Boolean> = duckChatFeature.nativeInputPastedText().enabled()
+        .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val isDuckAiModeFlow: StateFlow<Boolean> = nativeInputStateProvider.state
         .map { it.inputContext != NativeInputState.InputContext.BROWSER }
@@ -157,7 +169,10 @@ class AttachmentViewModel @Inject constructor(
         },
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesUsed) { imgSent, filesUsed -> Pair(imgSent, filesUsed) },
         isDuckAiModeFlow,
-    ) { (images, files, pageContext, selections, selectionLimitReached), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
+        combine(_pastedTexts, typedLength, pastedTextEnabled, ::Triple),
+    ) { (images, files, pageContext, selections, selectionLimitReached), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode,
+        (pastes, typed, pasteEnabled),
+        ->
         val conversationFilesSent = conversationFilesUsed.count
         val conversationFileSizeSentBytes = conversationFilesUsed.sizeBytes
         val model = modelState.models.find { it.id == modelState.selectedModelId }
@@ -169,11 +184,21 @@ class AttachmentViewModel @Inject constructor(
         val totalImages = currentImageCount + if (isDuckAiMode) conversationImagesSent else 0
         val totalFiles = files.size + if (isDuckAiMode) conversationFilesSent else 0
         val totalFileSizeBytes = files.sumOf { it.sizeBytes } + if (isDuckAiMode) conversationFileSizeSentBytes else 0L
+        val promptLength = if (pasteEnabled) {
+            PromptLimits.evaluate(typed, pastes, hasImage = images.isNotEmpty(), maxCharactersWithImage = imageLimits.maxInputCharsWithAttachments)
+        } else {
+            null
+        }
         AttachmentState(
             images = images,
             files = files,
             pageContext = pageContext,
             textSelections = selections,
+            pastedTexts = pastes,
+            promptLength = promptLength,
+            promptLengthError = promptLength?.takeIf { it.isOverLimit }?.let {
+                context.getString(R.string.duckAiPromptTooLong, it.count, it.limit)
+            },
             textSelectionLimitError = computeTextSelectionLimitError(selectionLimitReached),
             imageLimitError = computeImageLimitError(currentImageCount, totalImages, imageLimits),
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
@@ -208,6 +233,7 @@ class AttachmentViewModel @Inject constructor(
     fun adopt(
         images: List<SubmittedImage>,
         files: List<SubmittedFile>,
+        pastedTexts: List<String> = emptyList(),
     ) {
         viewModelScope.launch {
             // Base64 decode + bitmap decode of full attachment payloads is real work — off the
@@ -241,6 +267,7 @@ class AttachmentViewModel @Inject constructor(
             val toRecycle = imageAttachments.value
             imageAttachments.value = adoptedImages
             _fileAttachments.value = adoptedFiles
+            _pastedTexts.value = pastedTexts.map { PastedText(id = UUID.randomUUID().toString(), content = it) }
             viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
         }
     }
@@ -444,6 +471,34 @@ class AttachmentViewModel @Inject constructor(
         return textSelectionPayloadBuilder.toJson(selections)
     }
 
+    fun onTextInserted(text: CharSequence): Boolean {
+        if (!pastedTextEnabled.value || !PromptLimits.convertsToPastedText(text)) return false
+        _pastedTexts.update { it + PastedText(id = UUID.randomUUID().toString(), content = text.toString()) }
+        return true
+    }
+
+    fun updatePastedText(id: String, content: String) {
+        _pastedTexts.update { list -> list.map { if (it.id == id) it.copy(content = content) else it } }
+    }
+
+    fun removePastedText(id: String) {
+        _pastedTexts.update { list -> list.filter { it.id != id } }
+    }
+
+    fun setTypedLength(length: Int) {
+        typedLength.value = length
+    }
+
+    fun getPastedTexts(): List<PastedText> = _pastedTexts.value
+
+    fun getPastedTextsJson(): JSONArray? {
+        val pastes = _pastedTexts.value
+        if (pastes.isEmpty()) return null
+        return JSONArray().apply {
+            pastes.forEach { put(JSONObject().put("content", it.content)) }
+        }
+    }
+
     fun setPageContext(attachment: PageContextAttachment) {
         _pageContextAttachment.value = attachment
     }
@@ -460,6 +515,7 @@ class AttachmentViewModel @Inject constructor(
         _fileAttachments.value = emptyList()
         _pageContextAttachment.value = null
         _textSelections.value = emptyList()
+        _pastedTexts.value = emptyList()
         viewModelScope.launch { toRecycle.forEach { it.bitmap.recycle() } }
     }
 

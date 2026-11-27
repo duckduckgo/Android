@@ -30,6 +30,7 @@ data class EditPromptPayload(
     val prompt: String,
     val images: List<SubmittedImage>,
     val files: List<SubmittedFile>,
+    val pastedTexts: List<String> = emptyList(),
 )
 
 sealed interface EditPromptResult {
@@ -37,6 +38,7 @@ sealed interface EditPromptResult {
         val prompt: String,
         val images: List<SubmittedImage>,
         val files: List<SubmittedFile>,
+        val pastedTexts: List<String> = emptyList(),
     ) : EditPromptResult
 
     data object Cancelled : EditPromptResult

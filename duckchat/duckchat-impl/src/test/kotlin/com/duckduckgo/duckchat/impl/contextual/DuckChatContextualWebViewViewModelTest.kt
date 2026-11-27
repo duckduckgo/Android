@@ -491,6 +491,39 @@ class DuckChatContextualWebViewViewModelTest {
     }
 
     @Test
+    fun `onPromptSent with pasted texts includes textPasted in the query`() = runTest {
+        testee.onSheetOpened("tab-1")
+        val pasted = JSONArray().apply { put(JSONObject().apply { put("content", "long paste") }) }
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onPromptSent("Explain", pastedJson = pasted)
+
+            val event = expectMostRecentItem()
+            assertEquals(pasted, event.params.getJSONObject("query").getJSONArray("textPasted"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `entry prompt with pasted texts carries textPasted once web app is ready`() = runTest {
+        val pasted = JSONArray().apply { put(JSONObject().apply { put("content", "long paste") }) }
+        val prompt = NativeInputPrompt("hello", "model-1", "high", null, null, null, pastedJson = pasted)
+        whenever(contextualEntryPromptStore.consume("tab-1")).thenReturn(ContextualEntryPrompt("tab-1", prompt, null))
+        (duckChat as FakeDuckChat).nextUrl = "https://duckduckgo.com/?ia=chat"
+
+        testee.onSheetOpened("tab-1")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        testee.subscriptionEventDataFlow.test {
+            testee.onWebAppReady()
+
+            val event = awaitItem()
+            assertEquals(pasted, event.params.getJSONObject("query").getJSONArray("textPasted"))
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun `removePageContext hides the attached context`() = runTest {
         testee.onSheetOpened("tab-1")
         testee.onPageContextReceived("tab-1", serializedPageData)

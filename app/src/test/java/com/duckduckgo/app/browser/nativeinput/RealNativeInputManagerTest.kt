@@ -639,7 +639,7 @@ class RealNativeInputManagerTest {
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
-                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
                 onClearAutocomplete = {},
                 onStopTapped = {},
@@ -693,7 +693,7 @@ class RealNativeInputManagerTest {
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
-                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
                 onClearAutocomplete = {},
                 onStopTapped = {},
@@ -950,7 +950,7 @@ class RealNativeInputManagerTest {
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
-                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
                 onClearAutocomplete = {},
                 onStopTapped = {},
@@ -1317,7 +1317,7 @@ class RealNativeInputManagerTest {
             callbacks = NativeInputCallbacks(
                 onSearchTextChanged = {},
                 onSearchSubmitted = {},
-                onDuckAiChatSubmitted = { _, _, _, _, _, _, _ -> },
+                onDuckAiChatSubmitted = { _, _, _, _, _, _, _, _ -> },
                 onChatSuggestionSelected = {},
                 onDuckAiQuerySubmitted = { query, entryPoint, voice ->
                     onVoiceFlag(voice)
