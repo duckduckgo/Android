@@ -63,7 +63,7 @@ class SelectedTextDuckAiActivity : DuckDuckGoActivity() {
     private fun extractSelection(intent: Intent?): String? {
         if (intent == null) return null
 
-        val textSelection = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+        val textSelection = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)?.toString()
         if (!textSelection.isNullOrBlank()) return textSelection
 
         logcat(LogPriority.WARN) { "SelectedTextDuckAiActivity launched with unexpected intent format" }

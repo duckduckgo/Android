@@ -25,7 +25,7 @@ import logcat.logcat
 
 val Intent.intentText: String?
     get() {
-        return data?.toString() ?: getStringExtra(Intent.EXTRA_TEXT)
+        return data?.toString() ?: getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
     }
 
 fun Intent.sanitize() {
