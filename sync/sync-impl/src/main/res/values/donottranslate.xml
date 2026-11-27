@@ -23,6 +23,7 @@
     <string name="syncAuditLogError">Device activity is temporarily unavailable.</string>
     <string name="syncAuditLogLoadMoreError">Older activity is temporarily unavailable. Tap to retry.</string>
     <string name="syncAuditLogEmpty">You have no recent activity.</string>
+    <string name="syncAuditLogOnlyThisDevice">Only this device is synced</string>
     <string name="syncAuditLogSynced">Synced</string>
     <string name="syncAuditLogRemoved">Removed</string>
     <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity. First placeholder is how long ago it happened, for example 3 days ago. Second placeholder is Synced or Removed">%1$s · %2$s</string>
