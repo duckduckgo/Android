@@ -61,6 +61,10 @@ dependencies {
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
 
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation Testing.junit4
+
     ksp project(':codegen-ksp')
     ksp AndroidX.room.compiler
 }
@@ -78,4 +82,13 @@ android {
     room {
         schemaDirectory("$projectDir/schemas")
     }
+}
+
+fulladleModuleConfig {
+    // The only instrumented test here is a manual benchmark annotated @Ignore, so Flank has nothing to run.
+    enabled.set(false)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
 }

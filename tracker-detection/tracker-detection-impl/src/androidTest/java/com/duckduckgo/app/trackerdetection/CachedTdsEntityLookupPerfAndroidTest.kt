@@ -62,7 +62,7 @@ import java.io.File
  *      command below, then revert. JUnit honors @Ignore even when --tests targets
  *      the class directly.
  *
- *     ./gradlew :app:connectedPlayDebugAndroidTest \
+ *     ./gradlew :tracker-detection-impl:connectedDebugAndroidTest \
  *         -Pandroid.testInstrumentationRunnerArguments.class=com.duckduckgo.app.trackerdetection.CachedTdsEntityLookupPerfAndroidTest
  *
  * Output is emitted to logcat under tag "EntityLookupPerf"; capture with:
