@@ -22,8 +22,8 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.EmailConfirmationStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
+import com.duckduckgo.pir.impl.common.PirGatedActionDelayProvider
 import com.duckduckgo.pir.impl.common.PirJob
-import com.duckduckgo.pir.impl.common.PirJobConstants.GATED_ACTION_PUSH_DELAY_MS
 import com.duckduckgo.pir.impl.common.PirJobConstants.OPT_OUT_FILL_FORM_PUSH_DELAY_MS
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaSolved
@@ -72,6 +72,7 @@ import kotlin.reflect.KClass
 class ExecuteBrokerStepActionEventHandler @Inject constructor(
     private val pirRunStateHandler: PirRunStateHandler,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val gatedActionDelayProvider: PirGatedActionDelayProvider,
 ) : EventHandler {
     override val event: KClass<out Event> = ExecuteBrokerStepAction::class
 
@@ -153,7 +154,7 @@ class ExecuteBrokerStepActionEventHandler @Inject constructor(
                 var pushDelay = 0L
                 // Adding a delay here similar to macOS - to ensure the site completes loading before executing anything.
                 if (actionToExecute is Click || actionToExecute is Expectation) {
-                    pushDelay = GATED_ACTION_PUSH_DELAY_MS
+                    pushDelay = gatedActionDelayProvider.getGatedActionDelayMs()
                 }
 
                 // Adding a temporary delay to potentially workaround captcha for optouts

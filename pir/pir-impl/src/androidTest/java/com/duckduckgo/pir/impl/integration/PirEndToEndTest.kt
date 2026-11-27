@@ -33,6 +33,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanSt
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealBrokerStepsParser
 import com.duckduckgo.pir.impl.common.RealEmailDataResolver
+import com.duckduckgo.pir.impl.common.RealPirGatedActionDelayProvider
 import com.duckduckgo.pir.impl.common.RealPirRunStateHandler
 import com.duckduckgo.pir.impl.common.RealPirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.RealPirWorkDistributor
@@ -257,7 +258,12 @@ class PirEndToEndTest {
 
         fakePixel = FakePixel()
         fakeNetworkProtectionState = FakeNetworkProtectionState()
-        pixelSender = RealPirPixelSender(fakePixel, fakeNetworkProtectionState, FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java))
+        pixelSender = RealPirPixelSender(
+            fakePixel,
+            fakeNetworkProtectionState,
+            FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
+            gatedActionDelayProvider(),
+        )
         fakePirWebViewDataCleaner = FakeWebViewDataCleaner()
 
         pirRepository = RealPirRepository(
@@ -336,7 +342,10 @@ class PirEndToEndTest {
             dispatcherProvider = dispatcherProvider,
         )
 
-        val pirWorkDistributor = RealPirWorkDistributor(FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java))
+        val pirWorkDistributor = RealPirWorkDistributor(
+            pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
+            gatedActionDelayProvider = gatedActionDelayProvider(),
+        )
 
         pirScan = RealPirScan(
             repository = pirRepository,
@@ -848,7 +857,7 @@ class PirEndToEndTest {
             JsActionSuccessEventHandler(pirRunStateHandler, fakeTimeProvider),
             BrokerStepCompletedEventHandler(pirRunStateHandler, fakeTimeProvider),
             BrokerActionFailedEventHandler(pirRunStateHandler, fakeTimeProvider),
-            ExecuteBrokerStepActionEventHandler(pirRunStateHandler, fakeTimeProvider),
+            ExecuteBrokerStepActionEventHandler(pirRunStateHandler, fakeTimeProvider, gatedActionDelayProvider()),
             ExecuteBrokerStepEventHandler(fakeTimeProvider, pirRunStateHandler),
             ConditionExpectationSucceededEventHandler(pirRunStateHandler, fakeTimeProvider),
             EmailReceivedEventHandler(pirRunStateHandler, fakeTimeProvider),
@@ -1098,6 +1107,11 @@ class PirEndToEndTest {
         override fun clearFirstScanResult() = Unit
         override fun reset() = Unit
     }
+
+    private fun gatedActionDelayProvider() = RealPirGatedActionDelayProvider(
+        pirRemoteFeatures = FakeFeatureToggleFactory.create(PirRemoteFeatures::class.java),
+        dispatcherProvider = dispatcherProvider,
+    )
 
     private object NoOpPirScanScheduler : PirScanScheduler {
         override fun scheduleScans() = Unit

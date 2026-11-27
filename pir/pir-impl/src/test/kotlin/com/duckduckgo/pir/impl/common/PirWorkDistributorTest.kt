@@ -52,7 +52,7 @@ class PirWorkDistributorTest {
     fun setUp() {
         whenever(mockPirRemoteFeatures.workQueueScheduling()).thenReturn(mockWorkQueueToggle)
         whenever(mockWorkQueueToggle.isEnabled()).thenReturn(true)
-        testee = RealPirWorkDistributor(mockPirRemoteFeatures)
+        testee = RealPirWorkDistributor(mockPirRemoteFeatures, FakePirGatedActionDelayProvider())
     }
 
     private val testProfileQuery = ProfileQuery(

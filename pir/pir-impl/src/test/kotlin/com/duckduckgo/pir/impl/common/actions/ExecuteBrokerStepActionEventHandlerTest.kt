@@ -23,6 +23,7 @@ import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.ScanStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
+import com.duckduckgo.pir.impl.common.FakePirGatedActionDelayProvider
 import com.duckduckgo.pir.impl.common.PirJob.RunType
 import com.duckduckgo.pir.impl.common.PirRunStateHandler
 import com.duckduckgo.pir.impl.common.PirRunStateHandler.PirRunState.BrokerOptOutStageCaptchaSolved
@@ -73,6 +74,7 @@ class ExecuteBrokerStepActionEventHandlerTest {
     private lateinit var testee: ExecuteBrokerStepActionEventHandler
     private val mockPirRunStateHandler: PirRunStateHandler = mock()
     private val mockCurrentTimeProvider: CurrentTimeProvider = mock()
+    private val fakeGatedActionDelayProvider = FakePirGatedActionDelayProvider()
 
     private val testCurrentTimeInMillis = 10000L
     private val testStageStartMs = 8000L
@@ -138,6 +140,7 @@ class ExecuteBrokerStepActionEventHandlerTest {
         testee = ExecuteBrokerStepActionEventHandler(
             mockPirRunStateHandler,
             mockCurrentTimeProvider,
+            fakeGatedActionDelayProvider,
         )
         whenever(mockCurrentTimeProvider.currentTimeMillis()).thenReturn(testCurrentTimeInMillis)
     }
@@ -551,7 +554,7 @@ class ExecuteBrokerStepActionEventHandlerTest {
     }
 
     @Test
-    fun whenClickActionThen10SecondDelay() = runTest {
+    fun whenClickActionThen3SecondDelay() = runTest {
         val action = BrokerAction.Click(id = "action-click", elements = emptyList(), selector = null)
         val scanStep = ScanStep(
             broker = testBroker,
@@ -576,12 +579,12 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val result = testee.invoke(state, event)
 
         val sideEffect = result.sideEffect as PushJsAction
-        assertEquals(10_000L, sideEffect.pushDelay)
+        assertEquals(3_000L, sideEffect.pushDelay)
         assertEquals(PirStage.FILL_FORM, result.nextState.stageStatus.currentStage)
     }
 
     @Test
-    fun whenExpectationActionThen10SecondDelay() = runTest {
+    fun whenExpectationActionThen3SecondDelay() = runTest {
         val action = BrokerAction.Expectation(id = "action-expect", expectations = emptyList())
         val scanStep = ScanStep(
             broker = testBroker,
@@ -606,8 +609,37 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val result = testee.invoke(state, event)
 
         val sideEffect = result.sideEffect as PushJsAction
-        assertEquals(10_000L, sideEffect.pushDelay)
+        assertEquals(3_000L, sideEffect.pushDelay)
         assertEquals(PirStage.SUBMIT, result.nextState.stageStatus.currentStage)
+    }
+
+    @Test
+    fun whenClickActionAndDelayConfiguredRemotelyThenUsesConfiguredDelay() = runTest {
+        fakeGatedActionDelayProvider.delayMs = 7_000L
+        val action = BrokerAction.Click(id = "action-click", elements = emptyList(), selector = null)
+        val scanStep = ScanStep(
+            broker = testBroker,
+            step = ScanStepActions(
+                stepType = "scan",
+                actions = listOf(action),
+                scanType = "initial",
+            ),
+        )
+        val state = State(
+            runType = RunType.MANUAL,
+            brokerStep = scanStep,
+            profileQuery = testProfileQuery,
+            currentActionIndex = 0,
+            stageStatus = PirStageStatus(
+                currentStage = PirStage.OTHER,
+                stageStartMs = 0,
+            ),
+        )
+        val event = ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery))
+
+        val result = testee.invoke(state, event)
+
+        assertEquals(7_000L, (result.sideEffect as PushJsAction).pushDelay)
     }
 
     @Test
