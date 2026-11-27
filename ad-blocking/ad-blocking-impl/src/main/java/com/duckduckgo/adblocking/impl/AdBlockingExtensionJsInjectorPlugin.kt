@@ -18,7 +18,11 @@ package com.duckduckgo.adblocking.impl
 
 import android.webkit.WebView
 import androidx.annotation.UiThread
+import androidx.core.net.toUri
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.app.browser.Domain
+import com.duckduckgo.app.browser.UriString
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.browser.api.JsInjectorPlugin
@@ -41,12 +45,18 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
     repository: AdBlockingExtensionRepository,
     private val domainMatcher: AdBlockingExtensionDomainMatcher,
     private val contingencyMessageHandler: ContingencyMessageHandler,
+    private val feature: AdBlockingExtensionFeature,
     @AppCoroutineScope appScope: CoroutineScope,
 ) : JsInjectorPlugin {
 
     private val payload: StateFlow<String?> = repository
         .scriptletsFlow()
-        .map(::buildScript)
+        .map { buildScript(it, experimental = false) }
+        .stateIn(appScope, SharingStarted.Eagerly, initialValue = null)
+
+    private val experimentPayload: StateFlow<String?> = repository
+        .scriptletsFlow()
+        .map { buildScript(it, experimental = true) }
         .stateIn(appScope, SharingStarted.Eagerly, initialValue = null)
 
     @UiThread
@@ -57,6 +67,10 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
         activeExperiments: List<Toggle>,
     ) {
         contingencyMessageHandler.cancelPendingShow()
+        if (isExperimentDomain(url)) {
+            injectExperiment(webView, activeExperiments)
+            return
+        }
         if (!statusChecker.canInject()) {
             logcat { "Status checker rejected injection, skipping" }
             return
@@ -78,10 +92,47 @@ class AdBlockingExtensionJsInjectorPlugin @Inject constructor(
         contingencyMessageHandler.onPageLoaded(webView, url)
     }
 
-    private fun buildScript(scriptlets: List<Scriptlet>): String? =
+    // Experiment sites ignore the user setting, so only the kill switch and contingency mode apply.
+    private fun injectExperiment(webView: WebView, activeExperiments: List<Toggle>) {
+        if (!feature.self().isEnabled() || feature.enableContingencyMode().isEnabled()) {
+            logcat { "Kill-switch off or contingency mode on, skipping experiment" }
+            return
+        }
+        val inTreatment = activeExperiments.any {
+            it.featureName().name == EXPERIMENT_NAME && it.getRawStoredState()?.assignedCohort?.name == TREATMENT_COHORT
+        }
+        if (!inTreatment) {
+            logcat { "Not in $EXPERIMENT_NAME $TREATMENT_COHORT, skipping experiment" }
+            return
+        }
+        val script = experimentPayload.value ?: run {
+            logcat { "Empty experiment payload, skipping" }
+            return
+        }
+        logcat { "Injecting experiment script" }
+        webView.evaluateJavascript("javascript:$script", null)
+    }
+
+    private fun isExperimentDomain(url: String?): Boolean {
+        val uri = url?.toUri() ?: return false
+        return EXPERIMENT_DOMAINS.any { UriString.sameOrSubdomain(uri, it) }
+    }
+
+    private fun buildScript(scriptlets: List<Scriptlet>, experimental: Boolean): String? =
         scriptlets
-            .filter { it.name in ALLOWED_SCRIPTLET_NAMES }
+            .filter { it.name in ALLOWED_SCRIPTLET_NAMES && it.name.endsWith("/ublock-experimental.js") == experimental }
             .takeUnless { it.isEmpty() }
             ?.sortedBy { it.name }
             ?.joinToString(separator = "\n") { it.content }
+
+    private companion object {
+        const val EXPERIMENT_NAME = "contentScopeExperiment12"
+        const val TREATMENT_COHORT = "treatment"
+        val EXPERIMENT_DOMAINS = listOf(
+            Domain("pornhub.com"),
+            Domain("xvideos.com"),
+            Domain("xhamster.com"),
+            Domain("xnxx.com"),
+        )
+    }
 }

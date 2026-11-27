@@ -20,6 +20,9 @@ import android.net.Uri
 import android.webkit.WebView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
+import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
+import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.feature.toggles.api.Toggle.State.Cohort
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -70,14 +73,34 @@ class AdBlockingExtensionJsInjectorPluginTest {
         on { matches(any<String>()) } doReturn true
     }
 
+    private var killSwitchOn = true
+    private var contingencyModeOn = false
+    private val feature: AdBlockingExtensionFeature = mock {
+        on { self() } doAnswer { toggle(killSwitchOn) }
+        on { enableContingencyMode() } doAnswer { toggle(contingencyModeOn) }
+    }
+
+    private val experimentalScriptlets = listOf(
+        Scriptlet(name = "scriptlets/main/ublock-experimental.js", content = "console.log('e')"),
+        Scriptlet(name = isolatedName, content = "console.log('a')"),
+    )
+
     private val plugin by lazy {
         AdBlockingExtensionJsInjectorPlugin(
             statusChecker = statusChecker,
             repository = repository,
             domainMatcher = mockDomainMatcher,
             contingencyMessageHandler = contingencyMessageHandler,
+            feature = feature,
             appScope = testScope,
         )
+    }
+
+    private fun toggle(enabled: Boolean): Toggle = mock { on { isEnabled() } doReturn enabled }
+
+    private fun experiment(name: String = "contentScopeExperiment12", cohort: String?): Toggle = mock {
+        on { featureName() } doReturn Toggle.FeatureName(parentName = "contentScopeExperiments", name = name)
+        on { getRawStoredState() } doReturn Toggle.State(assignedCohort = cohort?.let { Cohort(name = it, weight = 1) })
     }
 
     @After
@@ -254,5 +277,81 @@ class AdBlockingExtensionJsInjectorPluginTest {
         plugin.onPageFinished(webView, url = url, site = null)
 
         verify(contingencyMessageHandler).onPageLoaded(webView, url)
+    }
+
+    @Test
+    fun whenTreatmentOnExperimentSiteThenOnlyExperimentalScriptletsAreInjectedEvenIfSettingIsOff() {
+        canInject = false
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://www.xvideos.com/video", null, listOf(experiment(cohort = "treatment")))
+
+        verify(webView).evaluateJavascript(eq("javascript:console.log('e')"), isNull())
+    }
+
+    @Test
+    fun whenControlOnExperimentSiteThenNoInjection() {
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://pornhub.com/", null, listOf(experiment(cohort = "control")))
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenNotEnrolledOnExperimentSiteThenNoInjection() {
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://pornhub.com/", null, emptyList())
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenTreatmentOfAnotherExperimentOnExperimentSiteThenNoInjection() {
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://pornhub.com/", null, listOf(experiment(name = "contentScopeExperiment3", cohort = "treatment")))
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenKillSwitchOffThenNoExperimentInjection() {
+        killSwitchOn = false
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://xhamster.com/", null, listOf(experiment(cohort = "treatment")))
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenContingencyModeOnThenNoExperimentInjection() {
+        contingencyModeOn = true
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://xnxx.com/", null, listOf(experiment(cohort = "treatment")))
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
+    }
+
+    @Test
+    fun whenTreatmentOnYouTubeThenOnlyFilterScriptletsAreInjected() {
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://youtube.com/page", null, listOf(experiment(cohort = "treatment")))
+
+        verify(webView).evaluateJavascript(eq("javascript:console.log('a')"), isNull())
+    }
+
+    @Test
+    fun whenTreatmentOnYouTubeWithSettingOffThenNoInjection() {
+        canInject = false
+        scriptletsFlow.value = experimentalScriptlets
+
+        plugin.onPageStarted(webView, "https://youtube.com/page", null, listOf(experiment(cohort = "treatment")))
+
+        verify(webView, never()).evaluateJavascript(any(), isNull())
     }
 }
