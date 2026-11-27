@@ -214,7 +214,6 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Scanează codul QR pentru sincronizare</string>
     <string name="sync_simplified_scanner_camera_header_body">Deschide <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pentru desktop</annotation></b>\n<annotation type="gap">\n</annotation>și accesează <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizează cu un alt dispozitiv</annotation></string>
-    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Deschide <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo pentru desktop</annotation></b>\n<annotation type="gap">\n</annotation>accesează <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Am înțeles</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo are nevoie de acces la cameră.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Sunt necesare permisiuni pentru cameră pentru a scana codul QR.</string>
@@ -224,7 +223,6 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Completează codul de sincronizare</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Deschide celălalt <annotation type="icon">￼</annotation> <b><annotation type="highlight">browser DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Accesează <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizează cu un alt dispozitiv</annotation> › <annotation type="highlight">Copiază codul text</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Deschide o altă <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplicație DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>accesează <b><annotation type="url">%1$s</annotation></b> și copiază codul text.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Exemplu de cod:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Lipește codul de sincronizare</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Ne pare rău, codul lipit este incorect.</string>
@@ -233,7 +231,6 @@
     <string name="sync_simplified_qr_code_screen_title">Cod QR</string>
     <string name="sync_simplified_qr_code_header_headline">Scanează de pe un alt dispozitiv</string>
     <string name="sync_simplified_qr_code_header_body">Pe un alt dispozitiv, deschide <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>și accesează <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizează cu un alt dispozitiv</annotation> și scanează acest cod:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Deschide o altă <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>accesează <b><annotation type="url">%1$s</annotation></b> și scanează acest cod:</string>
     <string name="sync_simplified_qr_code_copy_button">Copiază codul text</string>
     <string name="sync_simplified_qr_code_share_button">Distribuie</string>
     <string name="sync_simplified_qr_code_copied_message">Codul de recuperare a fost copiat</string>

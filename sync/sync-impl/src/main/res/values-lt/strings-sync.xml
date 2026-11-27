@@ -214,7 +214,6 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Nuskaitykite QR kodą, kad sinchronizuotumėte</string>
     <string name="sync_simplified_scanner_camera_header_body">Atidarykite <annotation type="icon">￼</annotation> <b><annotation type="highlight">„DuckDuckGo“ kompiuteriui</annotation></b>\n<annotation type="gap">\n</annotation>ir eikite į <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinchronizuoti su kitu įrenginiu</annotation></string>
-    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Atidaryk <annotation type="icon">￼</annotation> <b><annotation type="highlight">„DuckDuckGo“ kompiuteriui</annotation></b>\n<annotation type="gap">\n</annotation>eik į <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Supratau</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">„DuckDuckGo“ reikia pasiekti jūsų kamerą.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">QR kodui nuskaityti reikia leidimo naudoti kamerą.</string>
@@ -224,7 +223,6 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Įveskite sinchronizavimo kodą</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Atverkite kitoje <annotation type="icon">￼</annotation> <b><annotation type="highlight">programoje „DuckDuckGo“</annotation></b>\n<annotation type="gap">\n</annotation>Eikite į <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinchronizuoti su kitu įrenginiu</annotation> › <annotation type="highlight">Kopijuoti tekstinį kodą</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Atidarykite kitą <annotation type="icon">￼</annotation> <b><annotation type="highlight">„DuckDuckGo“ programėlę</annotation></b>\n<annotation type="gap">\n</annotation>eikite į <b><annotation type="url">%1$s</annotation></b> ir nukopijuokite tekstinį kodą.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Kodo pavyzdys:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Įklijuoti sinchronizavimo kodą</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Deja, įklijuotas kodas yra netinkamas.</string>
@@ -233,7 +231,6 @@
     <string name="sync_simplified_qr_code_screen_title">QR kodas</string>
     <string name="sync_simplified_qr_code_header_headline">Nuskaityti iš kito įrenginio</string>
     <string name="sync_simplified_qr_code_header_body">Kitame įrenginyje atidarykite <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ir eikite į <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinchronizuoti su kitu įrenginiu</annotation> ir nuskaityk šį kodą:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Atidaryk kitą <annotation type="icon">￼</annotation> <b><annotation type="highlight">„DuckDuckGo“</annotation></b>\n<annotation type="gap">\n</annotation>eik į <b><annotation type="url">%1$s</annotation></b> ir nuskaityk šį kodą:</string>
     <string name="sync_simplified_qr_code_copy_button">Kopijuoti teksto kodą</string>
     <string name="sync_simplified_qr_code_share_button">Bendrinti</string>
     <string name="sync_simplified_qr_code_copied_message">Atkūrimo kodas nukopijuotas</string>

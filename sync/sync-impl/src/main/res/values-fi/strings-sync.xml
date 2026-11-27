@@ -214,7 +214,6 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Skannaa QR-koodi synkronointia varten</string>
     <string name="sync_simplified_scanner_camera_header_body">Avaa <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-työpöytäsovellus</annotation></b>\n<annotation type="gap">\n</annotation>ja siirry kohtaan <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronoi toisen laitteen kanssa</annotation></string>
-    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Avaa <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-työpöytäsovellus</annotation></b>\n<annotation type="gap">\n</annotation>siirry osoitteeseen <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Selvä</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo tarvitsee kamerasi käyttöoikeuden.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">QR-koodin skannaamiseen tarvitaan kameran käyttöoikeudet.</string>
@@ -224,7 +223,6 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Lisää synkronointikoodi</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Avaa toinen <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-sovelluksesi</annotation></b>\n<annotation type="gap">\n</annotation>Siirry kohtaan <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronoi toisen laitteen kanssa</annotation> › <annotation type="highlight">Kopioi tekstikoodi</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Avaa toinen <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-sovellus</annotation></b>\n<annotation type="gap">\n</annotation>siirry osoitteeseen <b><annotation type="url">%1$s</annotation></b> ja kopioi tekstikoodi.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Esimerkkikoodi:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Liitä synkronointikoodi</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Liittämäsi koodi ei kelpaa.</string>
@@ -233,7 +231,6 @@
     <string name="sync_simplified_qr_code_screen_title">QR-koodi</string>
     <string name="sync_simplified_qr_code_header_headline">Skannaa toiselta laitteelta</string>
     <string name="sync_simplified_qr_code_header_body">Avaa toisella laitteella <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ja siirry kohtaan <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synkronoi toisen laitteen kanssa</annotation> ja skannaa tämä koodi:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Avaa toisella laitteella <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>siirry osoitteeseen <b><annotation type="url">%1$s</annotation></b> ja skannaa tämä koodi:</string>
     <string name="sync_simplified_qr_code_copy_button">Kopioi tekstikoodi</string>
     <string name="sync_simplified_qr_code_share_button">Jaa</string>
     <string name="sync_simplified_qr_code_copied_message">Palautuskoodi kopioitu</string>

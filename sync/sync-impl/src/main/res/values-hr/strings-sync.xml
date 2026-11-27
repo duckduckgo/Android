@@ -214,7 +214,6 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Skeniraj QR kôd za sinkronizaciju</string>
     <string name="sync_simplified_scanner_camera_header_body">Otvori <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo za računala</annotation></b>\n<annotation type="gap">\n</annotation>i idi na <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinkroniziraj s drugim uređajem</annotation></string>
-    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Otvori <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo za računala</annotation></b>\n<annotation type="gap">\n</annotation>idi na <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Shvaćam</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo treba pristupiti tvojoj kameri.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Dopuštenja za kameru potrebna su za skeniranje QR kôda.</string>
@@ -224,7 +223,6 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Unesi kôd za sinkronizaciju</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Otvori svoju drugu <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplikaciju DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Idi na <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinkroniziraj s drugim uređajem</annotation> › <annotation type="highlight">Kopiraj tekstualni kôd</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Otvori drugu <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplikaciju DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>idi na <b><annotation type="url">%1$s</annotation></b> i kopiraj tekstualni kôd.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Primjer kôda:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Zalijepi kôd za sinkronizaciju</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Nažalost, zalijepljeni je kôd nevažeći.</string>
@@ -233,7 +231,6 @@
     <string name="sync_simplified_qr_code_screen_title">QR kôd</string>
     <string name="sync_simplified_qr_code_header_headline">Skeniraj s drugog uređaja</string>
     <string name="sync_simplified_qr_code_header_body">Na drugom uređaju otvori <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>i idi na <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sinkroniziraj s drugim uređajem</annotation> i skeniraj ovaj kôd:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Otvori drugi <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>idi na <b><annotation type="url">%1$s</annotation></b> i skeniraj ovaj kôd:</string>
     <string name="sync_simplified_qr_code_copy_button">Kopiraj tekstnu šifru</string>
     <string name="sync_simplified_qr_code_share_button">Podijeli</string>
     <string name="sync_simplified_qr_code_copied_message">Šifra za oporavak je kopirana</string>

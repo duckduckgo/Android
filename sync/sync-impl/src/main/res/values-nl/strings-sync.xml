@@ -214,7 +214,6 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Scan de QR code om te synchroniseren</string>
     <string name="sync_simplified_scanner_camera_header_body">Open <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo voor desktop</annotation></b>\n<annotation type="gap">\n</annotation>en ga naar <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchroniseren met een ander apparaat</annotation></string>
-    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Open <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo voor desktop</annotation></b>\n<annotation type="gap">\n</annotation>ga naar <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Ik snap het</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">DuckDuckGo heeft toegang tot je camera nodig.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">Cameratoestemming is vereist om de QR-code te scannen.</string>
@@ -224,7 +223,6 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Voer de synchronisatiecode in</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Open je andere <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-app</annotation></b>\n<annotation type="gap">\n</annotation>Ga naar <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchroniseren met een ander apparaat</annotation> › <annotation type="highlight">Tekstcode kopiëren</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Open een andere <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo-app</annotation></b>\n<annotation type="gap">\n</annotation>ga naar <b><annotation type="url">%1$s</annotation></b> en kopieer de tekstcode.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Voorbeeldcode:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Synchronisatiecode plakken</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Sorry, de geplakte code is ongeldig.</string>
@@ -233,7 +231,6 @@
     <string name="sync_simplified_qr_code_screen_title">QR-code</string>
     <string name="sync_simplified_qr_code_header_headline">Scan vanaf een ander apparaat</string>
     <string name="sync_simplified_qr_code_header_body">Open <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b> op een ander apparaat\n<annotation type="gap">\n</annotation>en ga naar <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Synchroniseren met een ander apparaat</annotation> en scan deze code:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Open een andere <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>ga naar <b><annotation type="url">%1$s</annotation></b> en scan deze code:</string>
     <string name="sync_simplified_qr_code_copy_button">Tekstcode kopiëren</string>
     <string name="sync_simplified_qr_code_share_button">Delen</string>
     <string name="sync_simplified_qr_code_copied_message">Herstelcode gekopieerd</string>

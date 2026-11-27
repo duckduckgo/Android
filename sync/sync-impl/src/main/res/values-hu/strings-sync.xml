@@ -214,7 +214,6 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Olvasd be a QR-kódot a szinkronizáláshoz</string>
     <string name="sync_simplified_scanner_camera_header_body">Nyisd meg a <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b>\n<annotation type="gap">\n</annotation>alkalmazást, és lépj a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Szinkronizálás másik eszközzel</annotation> menüpontra</string>
-    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Nyisd meg a <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo for Desktop</annotation></b> alkalmazást\n<annotation type="gap">\n</annotation>lépj a megnyitandó <b><annotation type="url">%1$s</annotation></b> URL-re</string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Értem</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">A DuckDuckGónak hozzá kell férnie a kamerádhoz.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">A QR-kód beolvasásához kamera-hozzáférési engedély szükséges.</string>
@@ -224,7 +223,6 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Add meg a szinkronizálási kódot</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Nyisd meg a másik <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo alkalmazást</annotation></b>\n<annotation type="gap">\n</annotation>Lépj a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Szinkronizálás másik eszközzel</annotation> › <annotation type="highlight">Szöveges kód másolása</annotation> menüpontra</string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Nyisd meg a másik <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo alkalmazást</annotation></b>\n<annotation type="gap">\n</annotation>lépj a <b><annotation type="url">%1$s</annotation></b> címre, és másold ki a szöveges kódot.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Példakód:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Szinkronizálási kód beillesztése</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Sajnáljuk, a beillesztett kód érvénytelen.</string>
@@ -233,7 +231,6 @@
     <string name="sync_simplified_qr_code_screen_title">QR-kód</string>
     <string name="sync_simplified_qr_code_header_headline">Beolvasás másik eszközről</string>
     <string name="sync_simplified_qr_code_header_body">Egy másik eszközön nyisd meg a <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>alkalmazást, és lépj a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Szinkronizálás másik eszközzel</annotation> menüpontra, majd olvasd be ezt a kódot:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Nyisd meg a másik <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b> alkalmazást\n<annotation type="gap">\n</annotation>lépj a megnyitandó <b><annotation type="url">%1$s</annotation></b> URL-re, és olvasd be ezt a kódot:</string>
     <string name="sync_simplified_qr_code_copy_button">Szöveges kód másolása</string>
     <string name="sync_simplified_qr_code_share_button">Megosztás</string>
     <string name="sync_simplified_qr_code_copied_message">Helyreállítási kód másolva</string>

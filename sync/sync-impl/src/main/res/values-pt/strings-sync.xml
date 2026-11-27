@@ -214,7 +214,6 @@
     <!-- Scanner screen: camera tab -->
     <string name="sync_simplified_scanner_camera_header_headline">Lê o código QR para sincronizar</string>
     <string name="sync_simplified_scanner_camera_header_body">Abre o <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo para computador</annotation></b>\n<annotation type="gap">\n</annotation>e acede a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizar com outro dispositivo</annotation></string>
-    <string name="sync_simplified_scanner_camera_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Abre o <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo para computador</annotation></b>\n<annotation type="gap">\n</annotation>e acede a <b><annotation type="url">%1$s</annotation></b></string>
     <string name="sync_simplified_scanner_camera_primary_button_v2">Entendido</string>
     <string name="sync_simplified_scanner_no_permission_headline_v2">O DuckDuckGo precisa de aceder à tua câmara.</string>
     <string name="sync_simplified_scanner_no_permission_body_v2">São necessárias permissões da câmara para ler o código QR.</string>
@@ -224,7 +223,6 @@
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_header_headline">Introduz o código de sincronização</string>
     <string name="sync_simplified_scanner_manual_entry_header_body">Abre a tua outra <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplicação DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>Acede a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizar com outro dispositivo</annotation> › <annotation type="highlight">Copiar código de texto</annotation></string>
-    <string name="sync_simplified_scanner_manual_entry_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Abre outra <annotation type="icon">￼</annotation> <b><annotation type="highlight">aplicação DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>acede a <b><annotation type="url">%1$s</annotation></b> e copia o código de texto.</string>
     <string name="sync_simplified_scanner_manual_entry_example_code_label">Código de exemplo:</string>
     <string name="sync_simplified_scanner_manual_entry_primary_button">Colar código de sincronização</string>
     <string name="sync_simplified_scanner_manual_entry_invalid_code_message">Desculpa, o código colado é inválido.</string>
@@ -233,7 +231,6 @@
     <string name="sync_simplified_qr_code_screen_title">Código QR</string>
     <string name="sync_simplified_qr_code_header_headline">Lê a partir de outro dispositivo</string>
     <string name="sync_simplified_qr_code_header_body">Noutro dispositivo, abre o <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>e acede a <annotation type="highlight">Sync &amp; Backup</annotation> › <annotation type="highlight">Sincronizar com outro dispositivo</annotation> e lê este código:</string>
-    <string name="sync_simplified_qr_code_header_body_pairing_url" instruction="Placeholder is a short web address like duck.com/pair">Abre outra <annotation type="icon">￼</annotation> <b><annotation type="highlight">DuckDuckGo</annotation></b>\n<annotation type="gap">\n</annotation>acede a <b><annotation type="url">%1$s</annotation></b> e lê este código:</string>
     <string name="sync_simplified_qr_code_copy_button">Copiar código de texto</string>
     <string name="sync_simplified_qr_code_share_button">Partilhar</string>
     <string name="sync_simplified_qr_code_copied_message">Código de recuperação copiado</string>
