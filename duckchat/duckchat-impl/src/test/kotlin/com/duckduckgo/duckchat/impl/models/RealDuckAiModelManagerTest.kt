@@ -804,6 +804,18 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenResetModelForNewChatsAndOverLimitDefaultArrivesAfterAFailedFetchThenTierDefaultStays() = runTest {
+        givenResetModelForNewChatsWithServerDefault()
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenThrow(RuntimeException("offline"))
+        testee.fetchModels()
+
+        usageLimits.value = overLimitSnapshot("first")
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+    }
+
+    @Test
     fun whenResetModelForNewChatsAndOverLimitDefaultThenModelSourceIsDefaultUnlessPicked() = runTest {
         givenResetModelForNewChatsWithServerDefault()
         testee.fetchModels()
