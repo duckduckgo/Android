@@ -128,7 +128,6 @@ class WebViewRequestInterceptorTest {
                 coroutineTestRule.testDispatcherProvider,
             ),
             resourceSurrogates = mockResourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = mockUserAgentProvider,
@@ -285,7 +284,6 @@ class WebViewRequestInterceptorTest {
                 coroutineTestRule.testDispatcherProvider,
             ),
             resourceSurrogates = mockResourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = mockUserAgentProvider,
@@ -606,7 +604,6 @@ class WebViewRequestInterceptorTest {
                 controlledDispatchers,
             ),
             resourceSurrogates = mockResourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = mockUserAgentProvider,

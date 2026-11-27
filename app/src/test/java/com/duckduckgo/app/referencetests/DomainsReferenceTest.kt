@@ -186,7 +186,6 @@ class DomainsReferenceTest(private val testCase: TestCase) {
                 coroutinesTestRule.testDispatcherProvider,
             ),
             resourceSurrogates = resourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = userAgentProvider,

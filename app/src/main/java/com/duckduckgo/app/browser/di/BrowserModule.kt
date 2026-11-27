@@ -66,7 +66,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -179,7 +178,6 @@ class BrowserModule {
         resourceSurrogates: ResourceSurrogates,
         trackerDetector: TrackerDetector,
         httpsUpgradeStep: HttpsUpgradeStep,
-        privacyProtectionCountDao: PrivacyProtectionCountDao,
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
@@ -197,7 +195,6 @@ class BrowserModule {
             resourceSurrogates,
             trackerDetector,
             httpsUpgradeStep,
-            privacyProtectionCountDao,
             adClickManager,
             cloakedCnameDetector,
             requestFilterer,
