@@ -370,6 +370,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProt
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.pagetranslation.api.PageTranslation
+import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -2161,6 +2162,7 @@ class BrowserTabFragment :
         removeContextualSheetIfWaitingForHide()
         if (view != null) binding.swipeUpNewChatIndicator.reset()
         nativeInputManager.onTabVisibilityChanged(false)
+        updatePageTranslationTabState()
         pdfDownloadTooltipPopup?.dismiss()
         pdfDownloadTooltipPopup = null
         dismissDownloadFragment()
@@ -2400,7 +2402,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabRootLayout.show()
         binding.browserLayout.gone()
         webViewContainer.gone()
-        omnibar.setViewMode(ViewMode.NewTab)
+        setOmnibarViewMode(ViewMode.NewTab)
         webView?.stopLoading()
         webView?.onPause()
         webView?.hide()
@@ -2426,7 +2428,7 @@ class BrowserTabFragment :
         sslErrorView.gone()
         maliciousWarningView.gone()
         hidePdf()
-        omnibar.setViewMode(ViewMode.Browser(viewModel.url))
+        setOmnibarViewMode(ViewMode.Browser(viewModel.url))
         browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
@@ -2478,7 +2480,7 @@ class BrowserTabFragment :
         pdfFragment.documentUri(cachedFileUri)
 
         binding.swipeRefreshContainer.isEnabled = false
-        omnibar.setViewMode(ViewMode.Pdf(url))
+        setOmnibarViewMode(ViewMode.Pdf(url))
         browserNavigationBarIntegration.configureBrowserViewMode()
     }
 
@@ -2517,7 +2519,7 @@ class BrowserTabFragment :
         maliciousWarningView.gone()
         renderRedirectSuggestion(viewModel.browserViewState.value?.redirectSuggestion)
         hidePdf()
-        omnibar.setViewMode(ViewMode.Error)
+        setOmnibarViewMode(ViewMode.Error)
         webView?.onPause()
         webView?.hide()
         errorView.errorMessage.text = getString(errorType.errorId, url).html(requireContext())
@@ -2553,7 +2555,7 @@ class BrowserTabFragment :
 
     private fun showDuckAI(browserViewState: BrowserViewState) {
         renderBrowserMenu(viewState = browserViewState, omnibarViewMode = ViewMode.DuckAI)
-        omnibar.setViewMode(ViewMode.DuckAI)
+        setOmnibarViewMode(ViewMode.DuckAI)
         browserNavigationBarIntegration.configureDuckAIViewMode()
         val forceImageGeneration = !nativeInputManager.isNativeInputShown() &&
             (browserActivity?.consumeDuckChatForceImageGeneration() ?: false)
@@ -2583,7 +2585,7 @@ class BrowserTabFragment :
         sslErrorView.gone()
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
-        omnibar.setViewMode(ViewMode.MaliciousSiteWarning)
+        setOmnibarViewMode(ViewMode.MaliciousSiteWarning)
         webView?.onPause()
         webView?.hide()
         webView?.stopLoading()
@@ -2683,7 +2685,7 @@ class BrowserTabFragment :
         newBrowserTab.newTabRootLayout.gone()
         webView?.onPause()
         webView?.hide()
-        omnibar.setViewMode(ViewMode.SSLWarning)
+        setOmnibarViewMode(ViewMode.SSLWarning)
         errorView.errorLayout.gone()
         binding.browserLayout.gone()
         maliciousWarningView.gone()
@@ -3266,7 +3268,7 @@ class BrowserTabFragment :
                 if (omnibar.viewMode == DuckAI) {
                     nativeInputManager.hideNativeInput()
                 }
-                omnibar.setViewMode(Browser(it.url))
+                setOmnibarViewMode(Browser(it.url))
                 sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
 
@@ -5373,14 +5375,27 @@ class BrowserTabFragment :
     }
 
     private fun updateNativeInputTabVisibility() {
-        nativeInputManager.onTabVisibilityChanged(
-            isNativeInputTabVisible(
-                isResumed = isResumed,
-                isHidden = isHidden,
-                isSelected = viewModel.liveSelectedTab.value?.tabId == tabId,
-                isCustomTab = isActiveCustomTab(),
-            ),
-        )
+        nativeInputManager.onTabVisibilityChanged(isTabVisible())
+        updatePageTranslationTabState()
+    }
+
+    private fun isTabVisible(): Boolean = isNativeInputTabVisible(
+        isResumed = isResumed,
+        isHidden = isHidden,
+        isSelected = viewModel.liveSelectedTab.value?.tabId == tabId,
+        isCustomTab = isActiveCustomTab(),
+    )
+
+    private fun updatePageTranslationTabState() {
+        // a tab can be hidden before its view is created
+        if (!this::omnibar.isInitialized) return
+
+        pageTranslation.onTabStateChanged(isTabVisible(), omnibar.viewMode.toTabContent())
+    }
+
+    private fun setOmnibarViewMode(viewMode: ViewMode) {
+        omnibar.setViewMode(viewMode)
+        updatePageTranslationTabState()
     }
 
     fun requestNativeInputFocus() {
@@ -5392,6 +5407,7 @@ class BrowserTabFragment :
         removeContextualSheetIfWaitingForHide()
         if (view != null) binding.swipeUpNewChatIndicator.reset()
         nativeInputManager.onTabVisibilityChanged(false)
+        updatePageTranslationTabState()
         viewModel.onViewHidden()
         webViewClient.onTabBackgrounded()
         downloadMessagesJob.cancel()
@@ -6775,7 +6791,7 @@ class BrowserTabFragment :
             binding.browserLayout.gone()
             webViewContainer.gone()
 
-            omnibar.setViewMode(ViewMode.NewTab)
+            setOmnibarViewMode(ViewMode.NewTab)
             omnibar.isScrollingEnabled = false
 
             browserNavigationBarIntegration.configureNewTabViewMode()
@@ -7053,3 +7069,9 @@ private class JsOrientationHandler {
 
 internal fun isNativeInputTabVisible(isResumed: Boolean, isHidden: Boolean, isSelected: Boolean, isCustomTab: Boolean): Boolean =
     isResumed && !isHidden && (isSelected || isCustomTab)
+
+internal fun ViewMode.toTabContent(): TabContent = when (this) {
+    is ViewMode.Browser, is ViewMode.CustomTab -> TabContent.WebPage
+    is ViewMode.Pdf -> TabContent.Pdf
+    ViewMode.Error, ViewMode.SSLWarning, ViewMode.MaliciousSiteWarning, ViewMode.NewTab, ViewMode.DuckAI -> TabContent.Other
+}
