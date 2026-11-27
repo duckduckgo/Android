@@ -18,8 +18,11 @@ package com.duckduckgo.mobile.android.vpn.ui.onboarding
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Color
 import android.net.VpnService
 import android.os.Bundle
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -30,6 +33,7 @@ import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
+import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -80,8 +84,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
     @Suppress("DEPRECATION")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        theme.applyStyle(R.style.ThemeOverlay_AppTP_OnboardingStatusBar, true)
-        enableTransparentEdgeToEdge()
+        enableEdgeToEdgeWithHeaderColouredStatusBar()
 
         setContentView(binding.root)
         configureUI()
@@ -89,8 +92,32 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    private fun enableEdgeToEdgeWithHeaderColouredStatusBar() {
+        // The layout-w600dp page header is transparent, so on wide screens the activity surface sits under the status bar.
+        val statusBarColor = getColorFromAttr(
+            if (resources.configuration.screenWidthDp >= WIDE_LAYOUT_MIN_WIDTH_DP) {
+                com.duckduckgo.mobile.android.R.attr.daxColorSurface
+            } else {
+                com.duckduckgo.mobile.android.R.attr.appTPHeaderBackground
+            },
+        )
+        val isDarkTheme = isDarkThemeEnabled()
+        val statusBarStyle = if (isDarkTheme) {
+            SystemBarStyle.dark(statusBarColor)
+        } else {
+            SystemBarStyle.light(statusBarColor, statusBarColor)
+        }
+        val navigationBarStyle = if (isDarkTheme) {
+            SystemBarStyle.dark(Color.TRANSPARENT)
+        } else {
+            SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+        }
+        enableEdgeToEdge(statusBarStyle = statusBarStyle, navigationBarStyle = navigationBarStyle)
+        applyDisplayCutoutMode(resources.configuration.orientation)
+    }
+
     private fun configureEdgeToEdgeInsets() {
-        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.onboardingRoot)
+        edgeToEdgeHandler.applyStatusBarAndHorizontalInsets(binding.onboardingRoot, installScrim = false)
         edgeToEdgeHandler.applyNavigationBarInsetsAsMargin(binding.onboardingNextCta)
     }
 
@@ -309,6 +336,7 @@ class VpnOnboardingActivity : DuckDuckGoActivity() {
 
     companion object {
         private const val REQUEST_ASK_VPN_PERMISSION = 101
+        private const val WIDE_LAYOUT_MIN_WIDTH_DP = 600
         private const val FAQ_WEBSITE = "https://help.duckduckgo.com/duckduckgo-help-pages/p-app-tracking-protection/what-is-app-tracking-protection/"
     }
 }
