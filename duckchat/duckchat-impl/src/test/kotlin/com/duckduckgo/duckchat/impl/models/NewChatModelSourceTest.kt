@@ -248,13 +248,6 @@ class NewChatModelSourceTest {
     }
 
     @Test
-    fun whenUserDefaultIsMalformedThenUserDefaultUnavailable() {
-        val global = globalSelection(UserTier.FREE, listOf(luna), userDefault = UserDefaultModel(null))
-
-        assertEquals(ModelSource.USER_DEFAULT_UNAVAILABLE, sourceFor(global))
-    }
-
-    @Test
     fun whenOverLimitModelDiffersFromUserDefaultThenUserDefaultUnavailable() {
         val global = globalSelection(
             UserTier.FREE,

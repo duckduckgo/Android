@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.map
 import okio.Buffer
 import javax.inject.Inject
 
-data class UserDefaultModel(val modelId: String?)
+data class UserDefaultModel(val modelId: String)
 
 @ContributesBinding(AppScope::class)
 class UserDefaultModelRepository @Inject constructor(
@@ -58,7 +58,7 @@ class UserDefaultModelRepository @Inject constructor(
                     storageProvider.value.forMode(BrowserMode.REGULAR).settings
                         .observe(DuckAiUserDefaultModelSetting.USER_DEFAULT_MODEL_KEY)
                         .distinctUntilChanged()
-                        .map { entry -> entry?.let { UserDefaultModel(decode(it.value)) } }
+                        .map { entry -> entry?.let { decode(it.value) }?.let(::UserDefaultModel) }
                         .distinctUntilChanged()
                 } else {
                     flowOf(null)

@@ -90,7 +90,7 @@ class UserDefaultModelRepositoryTest {
     }
 
     @Test
-    fun presentMalformedAndBlankValuesAreDistinguishedFromDeletion() = runTest(dispatcher) {
+    fun malformedAndBlankValuesAreTreatedAsNoUserDefault() = runTest(dispatcher) {
         val unusableValues = listOf(
             "gpt-6-luna",
             "",
@@ -111,7 +111,7 @@ class UserDefaultModelRepositoryTest {
         )
         for (rawValue in unusableValues) {
             settings.value = entry(rawValue)
-            assertEquals("Stored value: $rawValue", UserDefaultModel(null), repository.observe().first())
+            assertNull("Stored value: $rawValue", repository.observe().first())
         }
 
         settings.value = null
