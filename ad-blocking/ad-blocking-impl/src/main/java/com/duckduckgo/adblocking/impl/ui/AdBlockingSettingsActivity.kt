@@ -126,7 +126,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
 
     private fun render(state: AdBlockingSettingsViewModel.ViewState) {
         binding.blockAdsToggle.quietlySetIsChecked(state.isEnabled, blockAdsToggleListener)
-        binding.adBlockingDescription.isVisible = state.showConsentDescription != null && !state.isContingencyMode
+        binding.adBlockingDescription.isVisible = state.showConsentDescription == true && !state.isContingencyMode
         binding.blockAdsToggle.isVisible = !state.disabledUntilRelaunch && !state.isContingencyMode
         binding.blockAdsToggleUntilRelaunch.isVisible = state.disabledUntilRelaunch && !state.isContingencyMode
         if (state.disabledUntilRelaunch) {
@@ -143,7 +143,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
             },
         )
         binding.segmentSkipModeEntry.isVisible = state.segmentSkipMode != null
-        binding.segmentSkipDescription.isVisible = state.segmentSkipMode != null
+        binding.segmentSkipDescription.isVisible = state.segmentSkipMode != null && state.showSegmentSkipConsent
         state.segmentSkipMode?.let { binding.segmentSkipModeEntry.setSecondaryText(getString(it.labelRes())) }
         if (state.isContingencyMode) {
             binding.contingencyModeItem.show()
