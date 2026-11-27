@@ -65,7 +65,7 @@ fun DaxDestructivePrimaryButton(
     DaxButton(
         text = text,
         onClick = onClick,
-        size = size,
+        dimensions = DaxButtonDimensions.standard(size),
         colors = DaxDestructivePrimaryButtonDefaults.colors(),
         rippleConfiguration = DaxDestructivePrimaryButtonDefaults.rippleConfiguration(),
         leadingIconPainter = leadingIconPainter,

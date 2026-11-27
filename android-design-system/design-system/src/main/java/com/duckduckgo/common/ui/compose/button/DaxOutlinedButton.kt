@@ -66,7 +66,7 @@ internal fun DaxOutlinedButton(
     DaxButton(
         text = text,
         onClick = onClick,
-        size = size,
+        dimensions = DaxButtonDimensions.standard(size),
         colors = colors,
         modifier = modifier,
         leadingIconPainter = leadingIconPainter,

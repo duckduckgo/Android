@@ -65,7 +65,7 @@ fun DaxGhostButton(
     DaxButton(
         text = text,
         onClick = onClick,
-        size = size,
+        dimensions = DaxButtonDimensions.standard(size),
         colors = DaxGhostButtonDefaults.colors(),
         rippleConfiguration = DaxGhostButtonDefaults.rippleConfiguration(),
         leadingIconPainter = leadingIconPainter,

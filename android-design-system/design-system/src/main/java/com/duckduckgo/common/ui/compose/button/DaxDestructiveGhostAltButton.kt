@@ -65,7 +65,7 @@ fun DaxDestructiveGhostAltButton(
     DaxButton(
         text = text,
         onClick = onClick,
-        size = size,
+        dimensions = DaxButtonDimensions.standard(size),
         colors = DaxDestructiveGhostAltButtonDefaults.colors(),
         rippleConfiguration = DaxDestructiveGhostAltButtonDefaults.rippleConfiguration(),
         leadingIconPainter = leadingIconPainter,

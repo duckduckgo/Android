@@ -93,7 +93,6 @@ fun DaxOnboardingDialog(
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
-        useNativeCtaInsets = true,
         showScrollbar = true,
         contentKey = contentKey,
         title = AnnotatedString(title),
@@ -145,7 +144,6 @@ fun DaxOnboardingDialog(
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
-        useNativeCtaInsets = true,
         showScrollbar = true,
         contentKey = contentKey,
         title = AnnotatedString(title),
@@ -195,7 +193,6 @@ fun DaxOnboardingDialog(
     content: (@Composable DaxOnboardingDialogContentScope.() -> Unit)? = null,
 ) {
     DaxOnboardingDialogCore(
-        useNativeCtaInsets = true,
         showScrollbar = true,
         contentKey = contentKey,
         title = AnnotatedString(title),
