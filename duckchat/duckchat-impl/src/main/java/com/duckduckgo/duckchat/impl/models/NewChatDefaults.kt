@@ -19,13 +19,21 @@ package com.duckduckgo.duckchat.impl.models
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
 
-/** The model and effort a new chat starts on before checking them against the models endpoint. */
-data class NewChatDefault(val modelId: String, val mode: ReasoningMode)
+/** The preferred model and effort for a new chat, with the outcome of any stored user default. */
+data class NewChatDefault(
+    val modelId: String,
+    val mode: ReasoningMode,
+    val userDefaultOutcome: UserDefaultOutcome = UserDefaultOutcome.NONE,
+)
+
+enum class UserDefaultOutcome {
+    NONE,
+    APPLIED,
+    UNAVAILABLE,
+}
 
 /**
- * Where a new chat starts when `resetModelForNewChats` is on: the over-limit default web sends while the user is
- * over their limit, else the models endpoint's `newChatDefault`, with the hardcoded tier default as the fallback
- * when the endpoint sends none or has not loaded.
+ * Where a new chat starts when `resetModelForNewChats` is on.
  */
 internal object NewChatDefaults {
 
@@ -36,8 +44,8 @@ internal object NewChatDefaults {
     }
 
     /**
-     * [overLimit] until its reset and while its model is accessible in [models], else the [preferred] server or tier
-     * default. The reset is checked against the wall clock here rather than timed, since a timer stops while the device sleeps.
+     * An accessible [overLimit] model until its reset, then an accessible [userDefault] model, then the server or tier default.
+     * The reset is checked against the wall clock here rather than timed, since a timer stops while the device sleeps.
      */
     fun preferred(
         tier: UserTier,
@@ -45,11 +53,23 @@ internal object NewChatDefaults {
         overLimit: OverLimitNewChatDefault?,
         models: List<AIChatModel>,
         nowMillis: Long,
+        userDefault: UserDefaultModel? = null,
     ): NewChatDefault {
         val overLimitModelId = overLimit?.takeIf { nowMillis < it.resetsAtMillis }
             ?.modelId?.takeIf { id -> models.any { it.id == id && it.isAccessible } }
-            ?: return preferred(tier, remote)
-        return newChatDefault(overLimitModelId, overLimit.reasoningEffort)
+        if (overLimitModelId != null) {
+            val default = newChatDefault(overLimitModelId, overLimit.reasoningEffort)
+            if (userDefault == null) return default
+            val outcome = if (overLimitModelId == userDefault.modelId) UserDefaultOutcome.APPLIED else UserDefaultOutcome.UNAVAILABLE
+            return default.copy(userDefaultOutcome = outcome)
+        }
+        val server = preferred(tier, remote)
+        if (userDefault == null || models.isEmpty()) return server
+        val userModelId = userDefault.modelId
+        if (userModelId != null && models.any { it.id == userModelId && it.isAccessible }) {
+            return NewChatDefault(userModelId, server.modeFor(userModelId) ?: ReasoningMode.FAST, UserDefaultOutcome.APPLIED)
+        }
+        return server.copy(userDefaultOutcome = UserDefaultOutcome.UNAVAILABLE)
     }
 
     private fun newChatDefault(modelId: String, reasoningEffort: String?): NewChatDefault {
@@ -68,7 +88,9 @@ internal object NewChatDefaults {
         preferred: NewChatDefault,
         selectedModelId: String?,
         available: List<AvailableReasoningMode>,
-    ): ReasoningMode? = reasoningMode(preferred.mode.takeIf { selectedModelId == preferred.modelId }, available)
+    ): ReasoningMode? = reasoningMode(preferred.modeFor(selectedModelId), available)
+
+    private fun NewChatDefault.modeFor(selectedModelId: String?): ReasoningMode? = mode.takeIf { selectedModelId == modelId }
 
     /** [preferred] while [available] offers it, else fast, else the first accessible mode. */
     fun reasoningMode(

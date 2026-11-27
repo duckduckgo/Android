@@ -120,6 +120,7 @@ class RealDuckAiModelManager @Inject constructor(
     private val duckChatPixels: Lazy<DuckChatPixels>,
     private val cookiesManager: CookieManagerProvider,
     private val usageLimitsRepository: DuckAiUsageLimitsRepository,
+    private val userDefaultModelRepository: UserDefaultModelRepository,
     private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
@@ -136,11 +137,12 @@ class RealDuckAiModelManager @Inject constructor(
     private val stateMutex = Mutex()
     private var selectionRevision = 0L
 
-    // The new-chat default's inputs, kept so a usage-limits change can re-derive it without a fetch.
+    // The new-chat default's inputs, kept so a usage-limits or setting change can re-derive it without a fetch.
     // The models stay in endpoint order so the first-accessible fallback matches a fetch. Guarded by stateMutex.
     private var endpointModels: List<AIChatModel> = emptyList()
     private var remoteNewChatDefault: RemoteNewChatDefault? = null
     private var overLimitDefault: OverLimitNewChatDefault? = null
+    private var userDefaultModel: UserDefaultModel? = null
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -181,6 +183,10 @@ class RealDuckAiModelManager @Inject constructor(
             .map { it?.newChatDefault }
             .distinctUntilChanged()
             .collect { overLimit -> applyOverLimitDefault(overLimit) }
+    }
+
+    private val userDefaultObserver = appCoroutineScope.launch(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        userDefaultModelRepository.observe().collect { userDefault -> applyUserDefault(userDefault) }
     }
 
     /**
@@ -227,6 +233,7 @@ class RealDuckAiModelManager @Inject constructor(
         overLimitDefaultObserver.start()
         withContext(dispatcherProvider.io()) {
             try {
+                if (userDefaultModelRepository.isUserDefaultEnabled()) userDefaultObserver.start()
                 val userTier = resolveUserTier()
                 val response = fetchModelsResponse()
                 val isSubscriptionEligible = runCatching {
@@ -292,16 +299,17 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     /**
-     * Selects the new-chat default from the last fetch: the over-limit default until its reset and while its model is accessible,
-     * else the server's, then the tier default, then the first accessible model. Callers hold [stateMutex].
+     * Applies the latest defaults to the cached models. Callers hold [stateMutex].
      */
     private fun ModelState.withNewChatDefault(): ModelState {
+        if (userDefaultModel != null && !userDefaultModelRepository.isUserDefaultEnabled()) userDefaultModel = null
         val newChatDefault = NewChatDefaults.preferred(
             userTier,
             remoteNewChatDefault,
             overLimitDefault,
             endpointModels,
             nowMillis = currentTimeProvider.currentTimeMillis(),
+            userDefault = userDefaultModel,
         )
         val selectedModelId = NewChatDefaults.modelId(userTier, newChatDefault, endpointModels)
         val selectedModel = endpointModels.find { it.id == selectedModelId }
@@ -325,6 +333,21 @@ class RealDuckAiModelManager @Inject constructor(
         if (endpointModels.isEmpty() || _modelState.value.newChatDefault == null) return@withLock
         _modelState.value = _modelState.value.withNewChatDefault()
         logcat { "Duck.ai Model Manager: over-limit default ${overLimit?.modelId}, selected=${_modelState.value.selectedModelId}" }
+    }
+
+    private suspend fun applyUserDefault(userDefault: UserDefaultModel?) = stateMutex.withLock {
+        val state = _modelState.value
+        if (!userDefaultModelRepository.isUserDefaultEnabled()) {
+            userDefaultModel = null
+            val current = state.newChatDefault
+            if (current != null && current.userDefaultOutcome != UserDefaultOutcome.NONE) {
+                _modelState.value = state.copy(newChatDefault = current.copy(userDefaultOutcome = UserDefaultOutcome.NONE))
+            }
+            return@withLock
+        }
+        userDefaultModel = userDefault
+        if (endpointModels.isEmpty() || state.newChatDefault == null) return@withLock
+        _modelState.value = state.withNewChatDefault()
     }
 
     /**

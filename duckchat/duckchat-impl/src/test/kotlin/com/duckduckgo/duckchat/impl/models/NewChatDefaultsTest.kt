@@ -156,6 +156,48 @@ class NewChatDefaultsTest {
     }
 
     @Test
+    fun whenUserModelAccessibleThenItWinsAndInheritsEffortOnlyIfItIsAlsoTheServerModel() {
+        val differentModel = withUserDefault(UserDefaultModel(luna.id))
+        val sameModel = withUserDefault(UserDefaultModel(terra.id))
+
+        assertEquals(NewChatDefault(luna.id, FAST, UserDefaultOutcome.APPLIED), differentModel)
+        assertEquals(FAST, NewChatDefaults.reasoningMode(differentModel, luna.id, modes(NONE, LOW)))
+        assertEquals(NewChatDefault(terra.id, EXTENDED_REASONING, UserDefaultOutcome.APPLIED), sameModel)
+        assertEquals(EXTENDED_REASONING, NewChatDefaults.reasoningMode(sameModel, terra.id, modes(NONE, LOW, HIGH)))
+    }
+
+    @Test
+    fun whenUserModelMissingLockedOrMalformedThenServerModelWinsAndUserDefaultIsUnavailable() {
+        val models = listOf(luna.copy(isAccessible = false), terra)
+
+        listOf(luna.id, "gone", null).forEach { modelId ->
+            assertEquals(
+                NewChatDefault(terra.id, EXTENDED_REASONING, UserDefaultOutcome.UNAVAILABLE),
+                withUserDefault(UserDefaultModel(modelId), models = models),
+            )
+        }
+    }
+
+    @Test
+    fun whenOverLimitModelIsUsableThenItWinsAndUserDefaultIsAppliedOnlyIfItMatches() {
+        val overLimit = OverLimitNewChatDefault(luna.id, "low", resetsAtMillis = 1L)
+
+        assertEquals(NewChatDefault(luna.id, REASONING), withUserDefault(null, overLimit = overLimit))
+        assertEquals(
+            NewChatDefault(luna.id, REASONING, UserDefaultOutcome.APPLIED),
+            withUserDefault(UserDefaultModel(luna.id), overLimit = overLimit),
+        )
+        assertEquals(
+            NewChatDefault(luna.id, REASONING, UserDefaultOutcome.UNAVAILABLE),
+            withUserDefault(UserDefaultModel(terra.id), overLimit = overLimit),
+        )
+        assertEquals(
+            NewChatDefault(terra.id, EXTENDED_REASONING, UserDefaultOutcome.APPLIED),
+            withUserDefault(UserDefaultModel(terra.id), overLimit = overLimit.copy(resetsAtMillis = 0L)),
+        )
+    }
+
+    @Test
     fun whenOverLimitModelAccessibleThenItWinsOverTheServerDefault() {
         val default = overLimit("gpt-6-luna", effort = "low", models = listOf(terra, luna), server = "gpt-5.6-terra")
 
@@ -355,6 +397,19 @@ class NewChatDefaultsTest {
 
     private fun server(modelId: String, effort: String? = null) =
         NewChatDefaults.preferred(UserTier.FREE, RemoteNewChatDefault(modelId = modelId, reasoningEffort = effort))
+
+    private fun withUserDefault(
+        userDefault: UserDefaultModel?,
+        models: List<AIChatModel> = listOf(luna, terra),
+        overLimit: OverLimitNewChatDefault? = null,
+    ) = NewChatDefaults.preferred(
+        tier = UserTier.PLUS,
+        remote = RemoteNewChatDefault(modelId = terra.id, reasoningEffort = "high"),
+        overLimit = overLimit,
+        models = models,
+        nowMillis = 0L,
+        userDefault = userDefault,
+    )
 
     private fun overLimit(
         modelId: String?,
