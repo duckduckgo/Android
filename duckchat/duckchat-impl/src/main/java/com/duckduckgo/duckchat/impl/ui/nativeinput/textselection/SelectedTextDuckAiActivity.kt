@@ -22,6 +22,7 @@ import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.DuckChatLaunch
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
+import com.duckduckgo.common.utils.extensions.getTextExtra
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import logcat.LogPriority
@@ -63,7 +64,7 @@ class SelectedTextDuckAiActivity : DuckDuckGoActivity() {
     private fun extractSelection(intent: Intent?): String? {
         if (intent == null) return null
 
-        val textSelection = intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)
+        val textSelection = intent.getTextExtra(Intent.EXTRA_PROCESS_TEXT)
         if (!textSelection.isNullOrBlank()) return textSelection
 
         logcat(LogPriority.WARN) { "SelectedTextDuckAiActivity launched with unexpected intent format" }
