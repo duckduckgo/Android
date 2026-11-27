@@ -35,11 +35,9 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -176,18 +174,13 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     // Started by fetchModels, since the over-limit default is ignored until models load. The usage snapshot is
-    // only rewritten when the page runs, so the timer is what moves new chats back once the limit resets.
+    // only rewritten when the page runs, so the reset is checked whenever the default is derived, including on each fetch.
     private val overLimitDefaultObserver = appCoroutineScope.launch(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
         if (!resetsModelForNewChats()) return@launch
         usageLimitsRepository.usageLimits(BrowserMode.REGULAR)
             .map { it?.newChatDefault }
             .distinctUntilChanged()
-            .collectLatest { overLimit ->
-                applyOverLimitDefault(overLimit)
-                if (overLimit == null) return@collectLatest
-                delay(overLimit.resetsAtMillis - currentTimeProvider.currentTimeMillis())
-                applyOverLimitDefault(null)
-            }
+            .collect { overLimit -> applyOverLimitDefault(overLimit) }
     }
 
     /**
@@ -299,11 +292,17 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     /**
-     * Selects the new-chat default from the last fetch: the over-limit default while its model is accessible,
+     * Selects the new-chat default from the last fetch: the over-limit default until its reset and while its model is accessible,
      * else the server's, then the tier default, then the first accessible model. Callers hold [stateMutex].
      */
     private fun ModelState.withNewChatDefault(): ModelState {
-        val newChatDefault = NewChatDefaults.preferred(userTier, remoteNewChatDefault, overLimitDefault, endpointModels)
+        val newChatDefault = NewChatDefaults.preferred(
+            userTier,
+            remoteNewChatDefault,
+            overLimitDefault,
+            endpointModels,
+            nowMillis = currentTimeProvider.currentTimeMillis(),
+        )
         val selectedModelId = NewChatDefaults.modelId(userTier, newChatDefault, endpointModels)
         val selectedModel = endpointModels.find { it.id == selectedModelId }
         val available = ReasoningResolver.availableModes(

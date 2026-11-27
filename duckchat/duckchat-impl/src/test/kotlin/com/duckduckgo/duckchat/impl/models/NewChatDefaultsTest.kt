@@ -182,6 +182,13 @@ class NewChatDefaultsTest {
     }
 
     @Test
+    fun whenOverLimitResetHasPassedThenServerDefault() {
+        val default = overLimit("gpt-6-luna", models = listOf(terra, luna), server = "gpt-5.6-terra", resetsAtMillis = 0L)
+
+        assertEquals(NewChatDefault("gpt-5.6-terra", FAST), default)
+    }
+
+    @Test
     fun whenNoOverLimitDefaultThenServerDefault() {
         assertEquals(NewChatDefault("other", FAST), overLimit(modelId = null, models = listOf(other), server = "other"))
     }
@@ -354,11 +361,13 @@ class NewChatDefaultsTest {
         effort: String? = null,
         models: List<AIChatModel>,
         server: String? = null,
+        resetsAtMillis: Long = 1L,
     ) = NewChatDefaults.preferred(
         tier = UserTier.PLUS,
         remote = server?.let { RemoteNewChatDefault(modelId = it) },
-        overLimit = modelId?.let { OverLimitNewChatDefault(it, effort, resetsAtMillis = 0L) },
+        overLimit = modelId?.let { OverLimitNewChatDefault(it, effort, resetsAtMillis) },
         models = models,
+        nowMillis = 0L,
     )
 
     private fun modelId(tier: UserTier, models: List<AIChatModel>, preferred: NewChatDefault = NewChatDefaults.preferred(tier, null)) =
