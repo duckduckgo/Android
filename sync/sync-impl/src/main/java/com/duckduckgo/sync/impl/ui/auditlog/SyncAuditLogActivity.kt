@@ -130,15 +130,17 @@ class SyncAuditLogActivity : DuckDuckGoActivity() {
     private fun render(state: ViewState) {
         val content = state.content
         binding.loadingIndicator.isVisible = content == Content.LOADING
-        binding.syncAuditLogList.isVisible = content == Content.LIST
+        binding.syncAuditLogList.isVisible = content == Content.LIST || content == Content.ONLY_THIS_DEVICE
         binding.messageText.isVisible = content == Content.EMPTY || content == Content.ERROR
         when (content) {
             Content.EMPTY -> binding.messageText.setText(R.string.syncAuditLogEmpty)
             Content.ERROR -> binding.messageText.setText(R.string.syncAuditLogError)
-            Content.LOADING, Content.LIST -> Unit
+            Content.LOADING, Content.LIST, Content.ONLY_THIS_DEVICE -> Unit
         }
         // onScrolled runs only when the visible range changes, so a page that adds rows below the screen would not trigger it.
-        adapter.submitRows(state.rows, state.footer) { binding.syncAuditLogList.post { checkListEnd() } }
+        adapter.submitRows(state.rows, state.footer, onlyThisDevice = content == Content.ONLY_THIS_DEVICE) {
+            binding.syncAuditLogList.post { checkListEnd() }
+        }
     }
 
     private companion object {

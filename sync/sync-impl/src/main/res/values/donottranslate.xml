@@ -23,6 +23,7 @@
     <string name="syncAuditLogError">Device activity is temporarily unavailable.</string>
     <string name="syncAuditLogLoadMoreError">Older activity is temporarily unavailable. Tap to retry.</string>
     <string name="syncAuditLogEmpty">You have no recent activity.</string>
+    <string name="syncAuditLogOnlyThisDevice">Only this device is synced</string>
     <string name="syncAuditLogSynced">Synced</string>
     <string name="syncAuditLogRemoved">Removed</string>
     <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity. First placeholder is how long ago it happened, for example 3 days ago. Second placeholder is Synced or Removed">%1$s · %2$s</string>
@@ -67,4 +68,10 @@
         <item quantity="one">%1$d year ago</item>
         <item quantity="other">%1$d years ago</item>
     </plurals>
+    <string name="syncNewLoginNotificationsTitle">Notify on New Connections</string>
+    <string name="syncNewLoginNotificationsDescription">Get notified whenever a new device is added to Sync &amp; Backup.</string>
+    <string name="syncNewLoginNotificationsEnable">Enable Notifications</string>
+    <string name="syncNewLoginNotificationsSettingsDialogTitle">Requires notification permission for DuckDuckGo</string>
+    <string name="syncNewLoginNotificationsSettingsDialogMessage">Enable notifications for DuckDuckGo in system Settings to turn on New Device Notifications.</string>
+    <string name="syncNewLoginNotificationsSettingsDialogConfirm">Go to Settings…</string>
 </resources>

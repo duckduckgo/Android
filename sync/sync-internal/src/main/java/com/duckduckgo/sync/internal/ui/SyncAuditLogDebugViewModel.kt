@@ -89,6 +89,8 @@ class SyncAuditLogDebugViewModel @Inject constructor(
 
     fun onMarkAllAuditLoginsSeenClicked() = runUnseenLoginsAction { auditLogCheckDebugControls.markAllAsSeen() }
 
+    fun onShowTestNotificationClicked() = runUnseenLoginsAction { auditLogCheckDebugControls.showTestNotification() }
+
     fun onSimulateLoginClicked() = runOtherDevicesAction { otherDevicesDebugTool.simulateLogin() }
 
     // A real sync, so the post-sync audit log check runs and posts the new login notification ("Find unseen" does not post it).

@@ -17,10 +17,11 @@
 package com.duckduckgo.request.filterer.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.request.filterer.store.ALL_MIGRATIONS
 import com.duckduckgo.request.filterer.store.RealRequestFiltererFeatureToggleRepository
@@ -42,11 +43,15 @@ object RequestFiltererModule {
 
     @SingleIn(AppScope::class)
     @Provides
-    fun provideRequestFiltererDatabase(context: Context): RequestFiltererDatabase {
-        return Room.databaseBuilder(context, RequestFiltererDatabase::class.java, "request_filterer.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideRequestFiltererDatabase(databaseProvider: DatabaseProvider): RequestFiltererDatabase {
+        return databaseProvider.buildRoomDatabase(
+            RequestFiltererDatabase::class.java,
+            "request_filterer.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleIn(AppScope::class)

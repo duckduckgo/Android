@@ -71,6 +71,7 @@ class SyncAuditLogDebugActivity : DuckDuckGoActivity() {
         }
         binding.findUnseenAuditEntriesButton.setOnClickListener { viewModel.onFindUnseenAuditEntriesClicked() }
         binding.markAllAuditLoginsSeenButton.setOnClickListener { viewModel.onMarkAllAuditLoginsSeenClicked() }
+        binding.showTestNotificationButton.setOnClickListener { viewModel.onShowTestNotificationClicked() }
         binding.simulateLoginButton.setOnClickListener { viewModel.onSimulateLoginClicked() }
         binding.syncNowButton.setOnClickListener { viewModel.onSyncNowClicked() }
     }
