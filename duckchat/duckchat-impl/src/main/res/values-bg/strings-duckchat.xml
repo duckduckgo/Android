@@ -408,12 +408,4 @@
     <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Анализиране на файлове</string>
     <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Въпроси за снимки</string>
     <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Създаване на изображение</string>
-
-    <!-- Duck.ai home-screen widget -->
-    <string name="duckAiWidgetLabel" instruction="Name of the Duck.ai home-screen widget, shown in the Android widget picker">Duck.ai и последни чатове</string>
-    <string name="duckAiWidgetDescription" instruction="Short description of the Duck.ai home-screen widget, shown in the Android widget picker">Започнете поверителен чат с Duck.ai или продължете някой от последните чатове.</string>
-    <string name="duckAiWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai home-screen widget">Поверителен чат</string>
-    <string name="duckAiWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the home-screen widget">Глас</string>
-    <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Изображение</string>
-    <string name="duckAiWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the home-screen widget">Камера</string>
 </resources>
