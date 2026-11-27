@@ -16,9 +16,7 @@
 
 package com.duckduckgo.pagetranslation.impl.temporary
 
-import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.menu.SessionState
 import com.duckduckgo.pagetranslation.impl.menu.TranslationMenuSource
@@ -54,15 +52,4 @@ class TemporarySessionSeams @Inject constructor() : TranslationOfferSource, Tran
     override fun showOriginal() = Unit
 
     override fun translate(pair: LanguagePair) = Unit
-}
-
-/**
- * Temporary binding until the language pack downloads land. The downloads change deletes this class.
- * Nothing is installed.
- */
-@ContributesBinding(AppScope::class)
-class TemporaryLanguagePacks @Inject constructor() : LanguagePacks {
-    override fun isInstalled(pair: LanguagePair): Boolean = false
-
-    override fun sizeBytes(pair: LanguagePair): Long? = null
 }

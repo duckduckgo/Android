@@ -24,6 +24,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.kotlin.mock
@@ -144,7 +145,7 @@ class VisibleTabHolderTest {
     }
 
     @Test
-    fun whenRowTappedOnEnabledTranslateThenTranslatesThePair() {
+    fun whenRowTappedOnEnabledTranslateThenTranslatesThePair() = runTest {
         tab().onTabStateChanged(isVisible = true, TabContent.WebPage)
 
         holder.onRowTapped()
@@ -153,7 +154,7 @@ class VisibleTabHolderTest {
     }
 
     @Test
-    fun whenRowTappedWhileDownloadingThenNothingHappens() {
+    fun whenRowTappedWhileDownloadingThenNothingHappens() = runTest {
         tab(FakeSource(state = SessionState.Downloading)).onTabStateChanged(isVisible = true, TabContent.WebPage)
 
         holder.onRowTapped()

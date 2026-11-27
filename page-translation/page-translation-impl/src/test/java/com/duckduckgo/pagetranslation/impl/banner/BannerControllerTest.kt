@@ -16,8 +16,10 @@
 
 package com.duckduckgo.pagetranslation.impl.banner
 
-import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDirectories
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownload
 import com.duckduckgo.pagetranslation.impl.offer.ActiveOffer
 import com.duckduckgo.pagetranslation.impl.offer.TranslationOfferSource
 import com.duckduckgo.pagetranslation.impl.translate.LanguagePackDownloadPrompt
@@ -31,6 +33,7 @@ import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
@@ -42,15 +45,24 @@ import org.mockito.kotlin.whenever
 @OptIn(ExperimentalCoroutinesApi::class)
 class BannerControllerTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val pair = LanguagePair("es", "en")
     private val first = ActiveOffer(pair, document = 1)
     private val second = ActiveOffer(pair, document = 2)
     private val offers = MutableStateFlow<ActiveOffer?>(null)
     private val offerSource: TranslationOfferSource = mock { on { offer } doReturn offers }
-    private val languagePacks: LanguagePacks = mock()
+    private val directories: LanguagePackDirectories = mock()
     private val translateAction: TranslateAction = mock()
     private val downloadPrompt: LanguagePackDownloadPrompt = mock()
-    private val testee = BannerController(offerSource, RealTranslateRequest(languagePacks, translateAction, downloadPrompt), TIMEOUT)
+    private val languagePackDownload: LanguagePackDownload = mock()
+    private val testee =
+        BannerController(
+            offerSource,
+            RealTranslateRequest(directories, translateAction, downloadPrompt, languagePackDownload, coroutineRule.testDispatcherProvider),
+            TIMEOUT,
+        )
 
     private fun TestScope.showFirst() {
         start()
@@ -155,7 +167,12 @@ class BannerControllerTest {
 
     @Test
     fun whenTimeoutIsInfiniteThenNeverDismissed() = runTest {
-        val noAutoDismiss = BannerController(offerSource, RealTranslateRequest(languagePacks, translateAction, downloadPrompt), Long.MAX_VALUE)
+        val noAutoDismiss =
+            BannerController(
+                offerSource,
+                RealTranslateRequest(directories, translateAction, downloadPrompt, languagePackDownload, coroutineRule.testDispatcherProvider),
+                Long.MAX_VALUE,
+            )
         backgroundScope.launch { noAutoDismiss.run() }
         noAutoDismiss.setOnScreen(true)
         offers.value = first
@@ -208,7 +225,7 @@ class BannerControllerTest {
 
     @Test
     fun whenTranslateTappedAndPackInstalledThenTranslates() = runTest {
-        whenever(languagePacks.isInstalled(pair)).thenReturn(true)
+        whenever(directories.getInstalledPairs()).thenReturn(setOf(pair.key))
         start()
         offers.value = first
         runCurrent()
@@ -221,7 +238,7 @@ class BannerControllerTest {
 
     @Test
     fun whenTranslateTappedAndPackMissingThenRequestsDownload() = runTest {
-        whenever(languagePacks.isInstalled(pair)).thenReturn(false)
+        whenever(directories.getInstalledPairs()).thenReturn(emptySet())
         start()
         offers.value = first
         runCurrent()
@@ -234,6 +251,7 @@ class BannerControllerTest {
 
     @Test
     fun whenTranslateTappedThenBannerIsDismissed() = runTest {
+        whenever(directories.getInstalledPairs()).thenReturn(setOf(pair.key))
         start()
         offers.value = first
         runCurrent()
