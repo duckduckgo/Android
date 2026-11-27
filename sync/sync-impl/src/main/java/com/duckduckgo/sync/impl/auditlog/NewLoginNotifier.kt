@@ -123,14 +123,22 @@ class RealNewLoginNotifier @Inject constructor(
     private fun buildNotification(deviceCount: Int, alert: Boolean): Notification =
         NotificationCompat.Builder(context, SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID)
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
-            .setContentTitle(context.resources.getQuantityString(R.plurals.syncNewLoginNotificationTitle, deviceCount))
-            .setContentText(context.resources.getQuantityString(R.plurals.syncNewLoginNotificationBody, deviceCount, deviceCount))
+            .setContentTitle(
+                context.getString(if (deviceCount == 1) R.string.syncNewLoginNotificationTitleOne else R.string.syncNewLoginNotificationTitleMany),
+            )
+            .setContentText(notificationBody(deviceCount))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_STATUS)
             .setOnlyAlertOnce(!alert)
             .setContentIntent(deviceActivityIntent())
             .setAutoCancel(true)
             .build()
+
+    private fun notificationBody(deviceCount: Int): String = if (deviceCount == 1) {
+        context.getString(R.string.syncNewLoginNotificationBodyOne)
+    } else {
+        context.resources.getQuantityString(R.plurals.syncNewLoginNotificationBodyMany, deviceCount, deviceCount)
+    }
 
     private fun deviceActivityIntent(): PendingIntent? {
         val intent = globalActivityStarter.startIntent(context, SyncAuditLogScreenParams(openedFromNotification = true)) ?: return null

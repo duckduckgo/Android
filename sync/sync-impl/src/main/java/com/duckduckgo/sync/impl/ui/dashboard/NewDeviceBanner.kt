@@ -44,7 +44,7 @@ data class NewDeviceBanner(
 
 fun NewDeviceBanner.title(resources: Resources): String {
     val deviceCount = deviceNames.size + moreCount
-    return resources.getQuantityString(R.plurals.syncNewDeviceBannerTitle, deviceCount)
+    return resources.getString(if (deviceCount == 1) R.string.syncNewDeviceBannerTitleOne else R.string.syncNewDeviceBannerTitleMany)
 }
 
 fun NewDeviceBanner.body(resources: Resources): String {
