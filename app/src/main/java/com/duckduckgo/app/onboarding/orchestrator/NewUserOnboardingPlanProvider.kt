@@ -593,6 +593,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     ),
                 )
                 addAll(widgetSteps(ctx))
+                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(
                     inputScreenStep(
                         ctx = ctx,
@@ -600,7 +601,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         background = OnboardingBackground.Horizon,
                     ),
                 )
-                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(
                     inputScreenPreviewStep(
@@ -659,8 +659,8 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     ),
                 )
                 addAll(widgetSteps(ctx))
-                add(duckAiStateStep(ctx, duckAiStateChoice))
                 addAll(passwordImportSteps(ctx, showPasswordImport))
+                add(duckAiStateStep(ctx, duckAiStateChoice))
                 add(addressBarPositionStep())
                 add(inputScreenPreviewStep(ctx = ctx, isSearchDefault = true))
             },
@@ -688,6 +688,7 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                     ),
                 )
                 addAll(widgetSteps(ctx))
+                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(
                     inputScreenStep(
                         ctx = ctx,
@@ -695,7 +696,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                         background = OnboardingBackground.Horizon,
                     ),
                 )
-                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(
                     inputScreenPreviewStep(

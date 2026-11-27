@@ -1852,9 +1852,9 @@ class NewUserOnboardingPlanProviderTest {
         NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE,
     )
 
-    private fun assertPasswordImportStepsRightBeforeAddressBarStep(ids: List<String>) {
-        val addressBar = ids.indexOf(NewUserOnboardingStepIds.ADDRESS_BAR_POSITION)
-        assertEquals(passwordImportStepIds, ids.subList(addressBar - passwordImportStepIds.size, addressBar))
+    private fun assertPasswordImportStepsRightAfterWidgetSteps(ids: List<String>) {
+        val afterWidget = ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET) + 1
+        assertEquals(passwordImportStepIds, ids.subList(afterWidget, afterWidget + passwordImportStepIds.size))
     }
 
     private suspend fun segmentedPlanStepIds(reason: DownloadReasonSelection, variant: OnboardingPasswordImportVariant?): List<String> {
@@ -1873,8 +1873,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenSegmentedSearchPathInPasswordImportTreatmentThenImportStepsPrecedeAddressBarStep() = runTest {
-        assertPasswordImportStepsRightBeforeAddressBarStep(
+    fun whenSegmentedSearchPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
             segmentedPlanStepIds(DownloadReasonSelection.SEARCH, OnboardingPasswordImportVariant.TREATMENT),
         )
     }
@@ -1890,8 +1890,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenSegmentedAiPathInPasswordImportTreatmentThenImportStepsPrecedeAddressBarStep() = runTest {
-        assertPasswordImportStepsRightBeforeAddressBarStep(
+    fun whenSegmentedAiPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
             segmentedPlanStepIds(DownloadReasonSelection.AI_CHAT, OnboardingPasswordImportVariant.TREATMENT),
         )
     }
@@ -1907,8 +1907,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenSegmentedNoAiPathInPasswordImportTreatmentThenImportStepsPrecedeAddressBarStep() = runTest {
-        assertPasswordImportStepsRightBeforeAddressBarStep(
+    fun whenSegmentedNoAiPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
             segmentedPlanStepIds(DownloadReasonSelection.NO_AI, OnboardingPasswordImportVariant.TREATMENT),
         )
     }
@@ -1924,8 +1924,8 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
-    fun whenSegmentedBlockAdsPathInPasswordImportTreatmentThenImportStepsPrecedeAddressBarStep() = runTest {
-        assertPasswordImportStepsRightBeforeAddressBarStep(
+    fun whenSegmentedBlockAdsPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
             segmentedPlanStepIds(DownloadReasonSelection.BLOCK_ADS, OnboardingPasswordImportVariant.TREATMENT),
         )
     }
