@@ -1,7 +1,0 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="dev.verifyandroid.clipboardbridge">
-    <uses-sdk android:minSdkVersion="26" android:targetSdkVersion="35" />
-    <application android:debuggable="true" android:allowBackup="false" android:label="Verification clipboard bridge"
-        android:theme="@android:style/Theme.Material.Light.NoActionBar">
-        <activity android:name=".BridgeActivity" android:exported="true" android:noHistory="true" />
-    </application>
-</manifest>

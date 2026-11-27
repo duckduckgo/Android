@@ -650,8 +650,6 @@ cmd_web() {
   esac
 }
 
-cmd_clipboard() { python3 "$HERE/clipboard.py" "$@"; }
-
 cmd_logcat() { local d; d="$(evidence_dir)"; a logcat -d > "$d/logcat-$(date +%H%M%S).txt"; echo "$d"; }
 
 # Undoes only what the run did: stops recordings, removes its own adb forwards, and stops emulators
@@ -677,7 +675,7 @@ cmd_cleanup() {
 }
 
 case "${1:-}" in
-  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|layout|windows|text|checked|rows|shot|record|launch|restart|open|reset|web|probe|clipboard|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
+  devices|use|on|each|boot|build|install|doctor|tap|type|key|scroll|where|assert|wait|ui|layout|windows|text|checked|rows|shot|record|launch|restart|open|reset|web|probe|logcat|cleanup) c="$1"; shift; "cmd_$c" "$@" ;;
   *) cat >&2 <<EOF
 usage: verify.sh devices                      attached devices and AVDs on this machine
        verify.sh use <serial>...              choose the device(s) to verify on
@@ -697,8 +695,6 @@ usage: verify.sh devices                      attached devices and AVDs on this 
        verify.sh web targets | eval '<js>' [url-regex] | tap '<css selector>' | type '<text>'
        verify.sh reset                        clear app data and skip onboarding (emulators this run booted)
        verify.sh probe <host,...> [mode] [ms] connect to hosts as another app (App Tracking Protection)
-       verify.sh clipboard test|copy <source-emulator> <target-emulator>
-       verify.sh clipboard clear <emulator-serial>...   clear synthetic clipboard text
        verify.sh logcat
 EOF
      exit 2 ;;

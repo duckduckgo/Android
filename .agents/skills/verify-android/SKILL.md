@@ -215,9 +215,6 @@ screen with its text, interactions and state (checked, focused, selected), tappa
 | `$V reset` | Clears app data and skips onboarding to the New Tab Page; only on an emulator this run booted |
 | `$V open <url>` | Opens a URL in the app the way another app's link does |
 | `$V probe <host,...> [mode] [timeout_ms]` | Connects to each host from the probe app, another app App Tracking Protection can block, and prints its outcome per host (features/app-tracking-protection.md) |
-| `$V clipboard test <source> <target>` | Checks guest clipboard transfer in both directions between distinct emulators, then restores their original text |
-| `$V clipboard copy <source> <target>` | Copies the actual Android clipboard through a foreground helper and checks destination readback without printing its contents |
-| `$V clipboard clear <serial>...` | Clears the synthetic clipboard text on explicit emulators |
 
 Recipes reach their starting point through the Common paths in [features/README.md](features/README.md):
 the browser menu, Settings, AI Features, the developer screens, the tab switcher, a Duck.ai chat. When an
@@ -269,11 +266,6 @@ Proof standards:
 - Look at every PNG you cite; for web content pair it with a `web eval` read of the same state.
 - Report the commit from `doctor` with the evidence path. For a PR, `$P publish` the attempt or compare folder and paste `$P pr-summary` of it, as Publishing it in a PR says, not paths or local screenshots. An entry point you could not drive is reported as not verified, with the failing command and its exit code.
 - Use synthetic data only and keep captures on this machine.
-
-Clipboard commands accept emulator serials only and support one text item. The helper has no network
-permission and uses private files, which each operation removes. It briefly opens its own activity,
-then returns to the app. `test` restores text, not clipboard metadata. The helper stays installed;
-remove only `dev.verifyandroid.clipboardbridge` when finished with a helper installed for this run.
 
 ## Cleanup
 
