@@ -20,6 +20,7 @@ import androidx.core.net.toUri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.TdsDomainEntity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import org.junit.Assert.assertEquals
@@ -28,6 +29,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import java.util.concurrent.Callable
 
 @RunWith(AndroidJUnit4::class)
 class CachedTdsEntityLookupParityTest {
@@ -56,7 +58,13 @@ class CachedTdsEntityLookupParityTest {
     }
 
     private val legacy = TdsEntityLookup(entityDao, domainEntityDao)
-    private val cached = CachedTdsEntityLookup(entityDao, domainEntityDao).also { it.refresh() }
+    private val database: TrackerDetectionDatabase = mock<TrackerDetectionDatabase>().also { db ->
+        whenever(db.tdsEntityDao()).thenReturn(entityDao)
+        whenever(db.tdsDomainEntityDao()).thenReturn(domainEntityDao)
+        whenever(db.runInTransaction(any<Callable<Any?>>())).thenAnswer { it.getArgument<Callable<Any?>>(0).call() }
+    }
+
+    private val cached = CachedTdsEntityLookup(database).also { it.refresh() }
 
     private val goldenHosts = listOf(
         "http://tracker.com",
