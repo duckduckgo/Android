@@ -16,6 +16,7 @@
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical">
@@ -26,11 +27,12 @@
         app:fullWidth="true" />
 
     <com.duckduckgo.common.ui.view.text.DaxTextView
+        android:id="@+id/syncAuditLogMessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/keyline_4"
-        android:text="@string/syncAuditLogOnlyThisDevice"
         app:textType="primary"
+        tools:text="@string/syncAuditLogOnlyThisDevice"
         app:typography="body1" />
 
 </LinearLayout>

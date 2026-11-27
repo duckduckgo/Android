@@ -22,6 +22,7 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -32,13 +33,16 @@ import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogEntryBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogErrorBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogHeaderBinding
 import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogLoadingBinding
-import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogOnlyThisDeviceBinding
+import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogMessageBinding
+import com.duckduckgo.sync.impl.databinding.ItemSyncAuditLogUnavailableBinding
 import com.duckduckgo.sync.impl.iconRes
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.Entry
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.Header
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.LoadMoreFailed
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.LoadingMore
-import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.OnlyThisDevice
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.Message
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogListItem.Unavailable
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Content
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Footer
 import com.duckduckgo.mobile.android.R as CommonR
 
@@ -47,7 +51,8 @@ sealed interface SyncAuditLogListItem {
     data class Entry(val row: SyncAuditLogRow) : SyncAuditLogListItem
     data object LoadingMore : SyncAuditLogListItem
     data object LoadMoreFailed : SyncAuditLogListItem
-    data object OnlyThisDevice : SyncAuditLogListItem
+    data class Message(@StringRes val text: Int) : SyncAuditLogListItem
+    data object Unavailable : SyncAuditLogListItem
 }
 
 class SyncAuditLogAdapter(
@@ -57,15 +62,16 @@ class SyncAuditLogAdapter(
     fun submitRows(
         rows: List<SyncAuditLogRow>,
         footer: Footer,
-        onlyThisDevice: Boolean,
+        content: Content,
         onCommitted: () -> Unit,
     ) {
-        val footerItem = when (footer) {
-            Footer.NONE -> null
-            Footer.LOADING -> LoadingMore
-            Footer.ERROR -> LoadMoreFailed
+        val body = when (content) {
+            Content.LOADING -> emptyList()
+            Content.ERROR -> listOf(Unavailable)
+            Content.EMPTY -> listOf(Message(R.string.syncAuditLogEmpty))
+            Content.ONLY_THIS_DEVICE -> listOf(Message(R.string.syncAuditLogOnlyThisDevice))
+            Content.LIST -> rows.map(::Entry) + listOfNotNull(footer.toItem())
         }
-        val body = if (onlyThisDevice) listOf(OnlyThisDevice) else rows.map(::Entry) + listOfNotNull(footerItem)
         submitList(listOf(Header) + body) { onCommitted() }
     }
 
@@ -74,7 +80,8 @@ class SyncAuditLogAdapter(
         is Entry -> R.layout.item_sync_audit_log_entry
         LoadingMore -> R.layout.item_sync_audit_log_loading
         LoadMoreFailed -> R.layout.item_sync_audit_log_error
-        OnlyThisDevice -> R.layout.item_sync_audit_log_only_this_device
+        is Message -> R.layout.item_sync_audit_log_message
+        Unavailable -> R.layout.item_sync_audit_log_unavailable
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -86,15 +93,25 @@ class SyncAuditLogAdapter(
             R.layout.item_sync_audit_log_error -> StaticViewHolder(
                 ItemSyncAuditLogErrorBinding.inflate(inflater, parent, false).root.apply { setOnClickListener { onRetryClicked() } },
             )
-            R.layout.item_sync_audit_log_only_this_device -> StaticViewHolder(
-                ItemSyncAuditLogOnlyThisDeviceBinding.inflate(inflater, parent, false).root,
+            R.layout.item_sync_audit_log_message -> MessageViewHolder(ItemSyncAuditLogMessageBinding.inflate(inflater, parent, false))
+            R.layout.item_sync_audit_log_unavailable -> StaticViewHolder(
+                ItemSyncAuditLogUnavailableBinding.inflate(inflater, parent, false).root,
             )
             else -> error("Unknown view type: $viewType")
         }
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        if (holder is EntryViewHolder) holder.bind((getItem(position) as Entry).row)
+        when (holder) {
+            is EntryViewHolder -> holder.bind((getItem(position) as Entry).row)
+            is MessageViewHolder -> holder.binding.syncAuditLogMessage.setText((getItem(position) as Message).text)
+        }
+    }
+
+    private fun Footer.toItem(): SyncAuditLogListItem? = when (this) {
+        Footer.NONE -> null
+        Footer.LOADING -> LoadingMore
+        Footer.ERROR -> LoadMoreFailed
     }
 }
 
@@ -106,6 +123,8 @@ private object ItemCallback : DiffUtil.ItemCallback<SyncAuditLogListItem>() {
 }
 
 private class StaticViewHolder(view: View) : ViewHolder(view)
+
+private class MessageViewHolder(val binding: ItemSyncAuditLogMessageBinding) : ViewHolder(binding.root)
 
 private class EntryViewHolder(private val binding: ItemSyncAuditLogEntryBinding) : ViewHolder(binding.root) {
 
