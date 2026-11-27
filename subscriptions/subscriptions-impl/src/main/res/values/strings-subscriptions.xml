@@ -199,7 +199,7 @@
     <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Withdraw from Contract</string>
     <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">You can withdraw and get a full refund until %1$s</string>
     <string name="subscriptionWithdrawDialogTitle">Withdraw from your subscription?</string>
-    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Your %1$s subscription will end right away and you\'ll be refunded %2$s to your original payment method within 14 days.\n\nVPN, Personal Information Removal and advanced Duck.ai models stop working once you confirm.</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Your %1$s subscription will end right away and you\'ll be refunded %2$s to your original payment method within 14 days.\n\nOnce you confirm, you will lose access to the VPN, Identity Theft Restoration, and advanced Duck.ai models.</string>
     <string name="subscriptionWithdrawDialogConfirm">Confirm Withdrawal</string>
     <string name="subscriptionWithdrawDialogKeep">Keep Subscription</string>
     <string name="subscriptionStatusNotSubscribed">Not Subscribed</string>
