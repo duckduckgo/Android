@@ -147,11 +147,11 @@ class SyncSetupWideEventImpl @Inject constructor(
     }
 
     override fun onFlowStarted(launchSource: String, setupMode: SetupMode) = enqueue {
-        finishOpenEvent()
-        if (!isEventEnabled()) return@enqueue
         val isUnified = isUnifiedEventEnabled()
         // Without the unified event, we keep sending only the back up attempts the event has always covered.
         if (!isUnified && setupMode != SetupMode.SINGLE_DEVICE) return@enqueue
+        finishOpenEvent()
+        if (!isEventEnabled()) return@enqueue
 
         val flowId = startFlow(launchSource) ?: return@enqueue
         val unified = if (isUnified) createUnifiedData(setupMode) else null
