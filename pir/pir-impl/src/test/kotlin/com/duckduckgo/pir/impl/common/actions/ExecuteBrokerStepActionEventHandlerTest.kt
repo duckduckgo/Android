@@ -551,7 +551,7 @@ class ExecuteBrokerStepActionEventHandlerTest {
     }
 
     @Test
-    fun whenClickActionThen10SecondDelay() = runTest {
+    fun whenClickActionThen3SecondDelay() = runTest {
         val action = BrokerAction.Click(id = "action-click", elements = emptyList(), selector = null)
         val scanStep = ScanStep(
             broker = testBroker,
@@ -576,12 +576,12 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val result = testee.invoke(state, event)
 
         val sideEffect = result.sideEffect as PushJsAction
-        assertEquals(10_000L, sideEffect.pushDelay)
+        assertEquals(3_000L, sideEffect.pushDelay)
         assertEquals(PirStage.FILL_FORM, result.nextState.stageStatus.currentStage)
     }
 
     @Test
-    fun whenExpectationActionThen10SecondDelay() = runTest {
+    fun whenExpectationActionThen3SecondDelay() = runTest {
         val action = BrokerAction.Expectation(id = "action-expect", expectations = emptyList())
         val scanStep = ScanStep(
             broker = testBroker,
@@ -606,7 +606,7 @@ class ExecuteBrokerStepActionEventHandlerTest {
         val result = testee.invoke(state, event)
 
         val sideEffect = result.sideEffect as PushJsAction
-        assertEquals(10_000L, sideEffect.pushDelay)
+        assertEquals(3_000L, sideEffect.pushDelay)
         assertEquals(PirStage.SUBMIT, result.nextState.stageStatus.currentStage)
     }
 

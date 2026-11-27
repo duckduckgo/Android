@@ -24,7 +24,7 @@ object PirJobConstants {
      * Fixed delay applied before pushing Click and Expectation actions to the page, giving the
      * site time to finish loading (mirrors macOS).
      */
-    const val GATED_ACTION_PUSH_DELAY_MS = 10_000L
+    const val GATED_ACTION_PUSH_DELAY_MS = 3_000L
 
     /**
      * Fixed delay applied before pushing FillForm actions during opt-out and email-confirmation
