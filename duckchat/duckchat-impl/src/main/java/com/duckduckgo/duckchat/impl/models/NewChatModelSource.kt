@@ -18,8 +18,6 @@ package com.duckduckgo.duckchat.impl.models
 
 /**
  * Where the model and effort of a new chat's first prompt came from, as reported in `model_source`.
- * [USER_DEFAULT] and [USER_DEFAULT_UNAVAILABLE] match the pixel definition but aren't sent until Duck.ai
- * has a user default setting.
  */
 enum class ModelSource(val pixelValue: String) {
     DEFAULT("default"),
@@ -62,14 +60,16 @@ internal fun modelSourceFor(
     return if (sentModelId != startModelId || sentReasoningEffort != startEffort) ModelSource.PICKED else startSource
 }
 
-/**
- * [ModelSource.DEFAULT] while the global selection is still the effective new-chat default, the server's or
- * else the hardcoded one. Before a fetch has set that default, the hardcoded one stands in.
- */
 private fun ModelState.globalSource(): ModelSource {
+    if (models.isEmpty()) return ModelSource.FALLBACK
     val default = newChatDefault ?: NewChatDefaults.preferred(userTier, remote = null)
-    val isDefault = models.isNotEmpty() &&
-        selectedModelId == default.modelId &&
-        (availableReasoningModes.isEmpty() || selectedReasoningMode == default.mode)
-    return if (isDefault) ModelSource.DEFAULT else ModelSource.FALLBACK
+    return when (default.userDefaultOutcome) {
+        UserDefaultOutcome.APPLIED -> ModelSource.USER_DEFAULT
+        UserDefaultOutcome.UNAVAILABLE -> ModelSource.USER_DEFAULT_UNAVAILABLE
+        UserDefaultOutcome.NONE -> {
+            val isDefault = selectedModelId == default.modelId &&
+                (availableReasoningModes.isEmpty() || selectedReasoningMode == default.mode)
+            if (isDefault) ModelSource.DEFAULT else ModelSource.FALLBACK
+        }
+    }
 }
