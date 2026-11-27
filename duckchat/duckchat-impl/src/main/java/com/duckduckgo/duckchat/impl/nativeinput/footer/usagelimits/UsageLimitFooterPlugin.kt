@@ -20,6 +20,7 @@ import android.content.Context
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -28,6 +29,7 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
@@ -40,6 +42,8 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarnin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
+import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,7 +53,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
@@ -69,6 +75,7 @@ class UsageLimitFooterPlugin @Inject constructor(
     private val ctaResolver: UsageLimitCtaResolver,
     private val modelManager: DuckAiModelManager,
     private val nativeInputStateProvider: NativeInputStateProvider,
+    @RegularMode private val chatStore: DuckAiChatStore,
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckChatFeature: DuckChatFeature,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -87,6 +94,7 @@ class UsageLimitFooterPlugin @Inject constructor(
         val modelState: ModelState,
         val isNewChat: Boolean,
         val pickedModelId: String?,
+        val chatModelId: String?,
     ) {
         val selectedModelId: String? get() = modelState.selectedModelId
 
@@ -103,14 +111,21 @@ class UsageLimitFooterPlugin @Inject constructor(
             return previousModelId.takeIf { isOwnPick }
         }
 
+        /** The model the active chat sends on: a new chat's selection, or the model an existing chat was saved with. */
+        private val activeModelId: String?
+            get() = if (isNewChat) selectedModelId else chatModelId
+
         /**
-         * A new chat already starting on web's over-limit default has no model left to switch to, so the reached
-         * notice would block it with no way out. Only true while `resetModelForNewChats` applied that default.
+         * Web names an over-limit default only while free models are still usable, and web offers no switch away from
+         * one, so a reached notice on a chat already on a usable model would block it with no way out. Only applies
+         * while `resetModelForNewChats` is on.
          */
-        val isOnOverLimitDefault: Boolean
+        val isOnModelAllowedOverLimit: Boolean
             get() {
                 val overLimitModelId = snapshot?.newChatDefault?.modelId ?: return false
-                return isNewChat && modelState.newChatDefault?.modelId == overLimitModelId && selectedModelId == overLimitModelId
+                if (modelState.newChatDefault == null) return false
+                val model = modelState.models.firstOrNull { it.id == activeModelId } ?: return false
+                return model.id == overLimitModelId || model.requiredTier == UserTier.FREE
             }
 
         /**
@@ -141,6 +156,12 @@ class UsageLimitFooterPlugin @Inject constructor(
             }
         }.distinctUntilChanged()
 
+        // Starts with no chats so the footer is not held back while the store loads.
+        val chats = chatStore.getChatsFlow().map<List<DuckAiChat>, List<DuckAiChat>?> { it }.onStart { emit(null) }
+        val activeChat = combine(nativeInputStateProvider.state, chats) { inputState, chats ->
+            inputState to inputState.chatId?.let { chatId -> chats?.firstOrNull { it.chatId == chatId }?.model }
+        }.distinctUntilChanged()
+
         val inputs = activeBrowserMode.flatMapLatest { browserMode ->
             if (browserMode != null) {
                 combine(
@@ -148,8 +169,8 @@ class UsageLimitFooterPlugin @Inject constructor(
                     dismissalStore.dismissals,
                     dismissalStore.actedOn,
                     modelManager.modelState,
-                    nativeInputStateProvider.state,
-                ) { snapshot, dismissals, actedOn, modelState, inputState ->
+                    activeChat,
+                ) { snapshot, dismissals, actedOn, modelState, (inputState, chatModelId) ->
                     Inputs(
                         snapshot,
                         dismissals,
@@ -157,6 +178,7 @@ class UsageLimitFooterPlugin @Inject constructor(
                         modelState.forTab(inputState),
                         isNewChat = inputState.chatId == null,
                         pickedModelId = inputState.newChatModelId,
+                        chatModelId = chatModelId,
                     )
                 }
             } else {
@@ -183,7 +205,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             ) {
                 return@combine NativeInputFooterState(visible = false)
             }
-            if (input.actedOn?.applies(notice) == true || input.isOnOverLimitDefault) return@combine NativeInputFooterState(visible = false)
+            if (input.actedOn?.applies(notice) == true || input.isOnModelAllowedOverLimit) return@combine NativeInputFooterState(visible = false)
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
             val resolvedCta = ctaResolver.resolve(snapshot.cta, input.ctaModelState, host.draft(), input.modelState.isFreeTrialEligible)
