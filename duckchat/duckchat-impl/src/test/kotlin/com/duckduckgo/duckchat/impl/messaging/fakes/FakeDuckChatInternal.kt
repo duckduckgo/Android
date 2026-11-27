@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 
 /**
@@ -181,6 +182,7 @@ class FakeDuckChatInternal(
 
     override fun isStandaloneMigrationEnabled(): Boolean = false
     override fun isNativeStorageEnabled(): Boolean = false
+    override fun observeNativeStorageEnabled(): Flow<Boolean> = flowOf(false)
     override fun isNativeChatInputEnabled(): Boolean = false
 
     override fun isContextualNativeInputEnabled(): Boolean = false

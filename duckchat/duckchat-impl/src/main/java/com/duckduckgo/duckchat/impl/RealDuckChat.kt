@@ -316,6 +316,8 @@ interface DuckChatInternal : DuckChat {
      */
     fun isNativeStorageEnabled(): Boolean
 
+    fun observeNativeStorageEnabled(): Flow<Boolean>
+
     /**
      * Returns whether the Duck.ai native chat input integration is enabled.
      * True only when the [nativeChatInput] toggle is enabled (and the widget is not suppressed).
@@ -534,7 +536,7 @@ class RealDuckChat @Inject constructor(
     private var isContextualModeEnabled: Boolean = false
     private var contextualMenuAllChatsEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
-    private var duckAiNativeStorage: Boolean = false
+    private val duckAiNativeStorage = MutableStateFlow(false)
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
     private var isContextualNativeInputEnabled: Boolean = false
@@ -614,7 +616,9 @@ class RealDuckChat @Inject constructor(
     override fun isContextualMenuAllChatsEnabled(): Boolean = contextualMenuAllChatsEnabled
 
     override fun isAutomaticContextAttachmentEnabled(): Boolean = isAutomaticContextAttachmentEnabled
-    override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage
+    override fun isNativeStorageEnabled(): Boolean = duckAiNativeStorage.value
+
+    override fun observeNativeStorageEnabled(): Flow<Boolean> = duckAiNativeStorage.asStateFlow()
 
     override fun isNativeChatInputEnabled(): Boolean = isNativeChatInputEnabled
 
@@ -1058,7 +1062,7 @@ class RealDuckChat @Inject constructor(
     private fun cacheConfig() {
         appCoroutineScope.launch(dispatchers.io()) {
             val featureEnabled = duckChatFeature.self().isEnabled()
-            duckAiNativeStorage = duckChatFeature.duckAiNativeStorage().isEnabled()
+            duckAiNativeStorage.value = duckChatFeature.duckAiNativeStorage().isEnabled()
             isDuckChatFeatureEnabled = featureEnabled
             _showSettings.value = featureEnabled
             isDuckAiInBrowserEnabled = duckChatFeature.duckAiButtonInBrowser().isEnabled()
