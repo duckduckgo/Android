@@ -107,12 +107,19 @@ both devices; do not infer the protocol from the screen's appearance. Create Hos
 Reinstall" before leaving the recovery screen. Keep Joiner signed out. Give Host a distinct test name
 through "Edit Name" if the emulators have the same model name.
 
-Clipboard transfer is a prerequisite: the two Android clipboards are separate. Use emulator clipboard
-sharing through the desktop, or another clipboard bridge verified on these AVDs. Check the transfer with
-harmless text before opening the pairing session. A successful desktop copy alone does not prove the text
-reached Joiner's Android clipboard. If no working bridge is available, report the missing capability;
-do not substitute a recovery code, deep link, `simulateLogin`, or direct repository call for this path.
-There is currently no clipboard-transfer command in `verify.sh`.
+Clipboard transfer is a prerequisite: the two Android clipboards are separate. The foreground helper
+reads and writes the actual Android clipboard without printing its contents. It briefly opens its own
+activity, then returns to the app. Check harmless text before opening the pairing session:
+
+```bash
+$V clipboard test "$SYNC_HOST_SERIAL" "$SYNC_JOINER_SERIAL"
+```
+
+This restores the original clipboard text, not its metadata. It supports one text item and explicit
+emulator serials only. A desktop copy or emulator-controller clipboard readback does not establish
+that app-copied text can leave the Android guest. If the helper cannot read or transfer the real copied
+code, report the missing capability. Do not substitute recovery, a deep link, `simulateLogin`, or a
+repository call.
 
 ### Pair and verify
 
@@ -123,7 +130,13 @@ There is currently no clipboard-transfer command in `verify.sh`.
 3. On Host, open "Sync With Another Device". If the scanner opens, tap `id:showQrCodeButton`
    ("Show QR Code"). Wait for the QR code and `id:copyCodeButton` ("Copy Text Code").
 4. On Host, tap `id:copyCodeButton`, then transfer that clipboard value to Joiner's Android clipboard
-   using the bridge checked during setup. Keep Host's pairing screen open. The copied value is the full
+   using the bridge checked during setup:
+
+   ```bash
+   $V clipboard copy "$SYNC_HOST_SERIAL" "$SYNC_JOINER_SERIAL"
+   ```
+
+   Keep Host's pairing screen open. The copied value is the full
    pairing URL; `qrCodeText` can show a different representation. Do not reconstruct the value from that
    label, print it, or include it in proof details or shell command logs.
 5. On Joiner, tap `id:pasteCodeButton`. Handle the confirmation dialogs on the device that displays
@@ -147,7 +160,9 @@ In `finally`, stop both recordings even if pairing fails. Delete the fresh stagi
 "Turn Off Sync & Backup" with server-data deletion enabled, or use the `deleteAccount` debug fallback
 on a signed-in device. Confirm deletion succeeded; clearing local app data does not delete the account.
 Remove any remaining local test state within the reset permissions above, and clear both emulator
-clipboards and the desktop clipboard used for transfer. Report cleanup failures.
+clipboards with `$V clipboard clear "$SYNC_HOST_SERIAL" "$SYNC_JOINER_SERIAL"`, and clear the desktop
+clipboard if used. The helper remains installed; remove only `dev.verifyandroid.clipboardbridge` when
+finished with it. Report cleanup failures.
 
 `verify.sh on` can drive this coordinated recipe by hand. `prove.py` currently runs a proof on one selected
 device; selecting two devices does not make it coordinate their pairing. Keep evidence for both roles and
@@ -156,6 +171,14 @@ driven end to end. Only claim copy/paste pairing after a live run; camera QR sca
 
 ## Gotchas
 
+- `verify.sh tap` reads one layout and does not wait for its target. Wait for each new screen's control
+  before tapping it. Android can show camera and notification prompts in succession; grant the test
+  notification permission during the approved reset, as `verify.sh reset` does, and handle the camera
+  prompt before Show QR Code. Repeated camera denial can use `permission_deny_and_dont_ask_again_button`.
+- The Sync device name includes the manufacturer on these AVDs. Read the name beside "This device"
+  instead of assuming it equals `ro.product.model`.
+- Opening bookmarks after Sync starts can show "Download Missing Icons?". Select "Not Now"
+  (`faviconsPromptSecondaryCta`) before checking the list or editing a bookmark.
 - The recovery code, user id and device ids show on screen, in `$V text` and in `readLog`. Videos and `ui.log` keep them, and `publish` uploads every screenshot, which `pr-summary` then shows as a thumbnail (behind DuckDuckGo sign-in). So take no shot of `RecoveryCodeActivity`, keep ids out of check names and details, and keep the account staging-only, empty of real data and deleted at the end.
 - A build from Android Studio's Run button doesn't pass the two auth flags, so turning on Sync or opening Passwords shows a `BiometricPrompt`. Install a `$V build`. The flags don't skip Android's lock screen after a cold boot: an AVD with a PIN stays at `RUNNING_LOCKED` (`dumpsys user`) until someone unlocks it.
 - The background worker's sync is skipped ("petition to sync debounced") when the last sync was 10 minutes ago or less (whole minutes), so `runBackgroundSync` right after setup finds nothing. Send `expireSyncDebounce` first.
