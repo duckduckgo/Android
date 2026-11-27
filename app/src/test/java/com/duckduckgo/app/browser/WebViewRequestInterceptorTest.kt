@@ -31,11 +31,12 @@ import com.duckduckgo.app.browser.webview.MaliciousSiteBlockerWebViewIntegration
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.Ignored
 import com.duckduckgo.app.browser.webview.RealMaliciousSiteBlockerWebViewIntegration.IsMaliciousViewData.MaliciousSite
 import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
+import com.duckduckgo.app.privacy.db.TrackerStatsWriter
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.surrogates.ResourceSurrogates
 import com.duckduckgo.app.surrogates.SurrogateResponse
 import com.duckduckgo.app.trackerdetection.CloakedCnameDetector
-import com.duckduckgo.app.trackerdetection.api.TrackerStatsWriter
+import com.duckduckgo.app.trackerdetection.WebTrackersBlockedHistory
 import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.app.trackerdetection.model.TdsEntity
 import com.duckduckgo.app.trackerdetection.model.TrackerStatus
@@ -112,6 +113,7 @@ class WebViewRequestInterceptorTest {
     private val mockMaliciousSiteBlockerWebViewIntegration: MaliciousSiteBlockerWebViewIntegration = mock()
     private val fakeAndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
     private val mockTrackerStatsWriter: TrackerStatsWriter = mock()
+    private val mockWebTrackersBlockedHistory: WebTrackersBlockedHistory = mock()
     private val webView: WebView = mock()
     private val mockWebBackForwardList: WebBackForwardList = mock()
 
@@ -148,6 +150,7 @@ class WebViewRequestInterceptorTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             trackerStatsWriter = mockTrackerStatsWriter,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
     }
 
@@ -202,7 +205,7 @@ class WebViewRequestInterceptorTest {
 
         advanceUntilIdle()
 
-        verify(mockTrackerStatsWriter).recordBlockedHistory(
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(
             trackerUrl = "tracker.com",
             trackerCompany = "Tracker Inc",
         )
@@ -304,6 +307,7 @@ class WebViewRequestInterceptorTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             trackerStatsWriter = mockTrackerStatsWriter,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
         testee.shouldIntercept(
             request = mockRequest,
@@ -624,6 +628,7 @@ class WebViewRequestInterceptorTest {
             androidBrowserConfigFeature = fakeAndroidBrowserConfigFeature,
             isMainProcess = true,
             trackerStatsWriter = mockTrackerStatsWriter,
+            webTrackersBlockedHistory = mockWebTrackersBlockedHistory,
         )
         val caller = launch(start = CoroutineStart.UNDISPATCHED) {
             testee.shouldIntercept(request = mockRequest, documentUri = null, webView = webView, webViewClientListener = null)
@@ -870,7 +875,7 @@ class WebViewRequestInterceptorTest {
             documentUrl = "foo.com".toUri(),
         )
 
-        verify(mockTrackerStatsWriter).recordBlockedHistory(any(), any())
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(any(), any())
     }
 
     @Test
@@ -889,7 +894,7 @@ class WebViewRequestInterceptorTest {
         )
 
         val captor = argumentCaptor<String>()
-        verify(mockTrackerStatsWriter).recordBlockedHistory(captor.capture(), any())
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(captor.capture(), any())
         assertEquals("uncloaked-host.com", captor.firstValue)
     }
 
@@ -1004,7 +1009,7 @@ class WebViewRequestInterceptorTest {
             webViewClientListener = null,
         )
 
-        verify(mockTrackerStatsWriter).recordBlockedHistory(
+        verify(mockWebTrackersBlockedHistory).onTrackerBlocked(
             trackerUrl = "uncloaked-host.com",
             trackerCompany = "Tracker Inc",
         )

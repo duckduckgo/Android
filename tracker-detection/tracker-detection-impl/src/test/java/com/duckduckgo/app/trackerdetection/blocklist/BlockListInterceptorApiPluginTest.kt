@@ -33,7 +33,6 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
-import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import com.squareup.moshi.Moshi
 import org.junit.Assert.*
 import org.junit.Before
@@ -67,16 +66,11 @@ class BlockListInterceptorApiPluginTest {
             featureName = "blockList",
         ).build().create(TestBlockListFeature::class.java)
 
-        inventory = RealFeatureTogglesInventory(
-            setOf(
-                FakeFeatureTogglesInventory(
-                    features = listOf(
-                        testBlockListFeature.tdsNextExperimentTest(),
-                        testBlockListFeature.tdsNextExperimentAnotherTest(),
-                    ),
-                ),
+        inventory = FakeFeatureTogglesInventory(
+            features = listOf(
+                testBlockListFeature.tdsNextExperimentTest(),
+                testBlockListFeature.tdsNextExperimentAnotherTest(),
             ),
-            coroutineRule.testDispatcherProvider,
         )
 
         interceptor = BlockListInterceptorApiPlugin(
@@ -313,6 +307,8 @@ class FakeFeatureTogglesInventory(private val features: List<Toggle>) : FeatureT
     override suspend fun getAll(): List<Toggle> {
         return features
     }
+
+    override suspend fun getAllTogglesForParent(name: String): List<Toggle> = getAll().filter { it.featureName().parentName == name }
 }
 
 private interface FakeApiService {

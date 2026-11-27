@@ -19,7 +19,6 @@ package com.duckduckgo.app.trackerdetection
 import android.content.Context
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LifecycleOwner
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.app.lifecycle.PirProcessLifecycleObserver
@@ -34,6 +33,7 @@ import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
 import com.duckduckgo.app.trackerdetection.model.TdsMetadata
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.tracker.detection.impl.R
 import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesIntoSet
 import dev.zacsweers.metro.binding

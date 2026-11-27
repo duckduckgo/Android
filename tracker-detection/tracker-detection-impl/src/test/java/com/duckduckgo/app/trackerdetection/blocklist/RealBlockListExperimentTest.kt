@@ -22,7 +22,6 @@ import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.duckduckgo.feature.toggles.impl.RealFeatureTogglesInventory
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -40,8 +39,7 @@ class RealBlockListExperimentTest {
     private val featureInventory = CountingInventory(
         listOf(feature.nonMatchingFeatureName(), feature.tdsNextExperimentTest(), feature.tdsNextExperimentAnotherTest()),
     )
-    private val inventory = RealFeatureTogglesInventory(setOf(featureInventory), coroutineRule.testDispatcherProvider)
-    private val experiment = RealBlockListExperiment(inventory, BlockListPixelsPlugin(inventory))
+    private val experiment = RealBlockListExperiment(featureInventory, BlockListPixelsPlugin(featureInventory))
 
     @Test
     fun `activeExperiment is the first enabled tds experiment`() = runTest {
@@ -77,5 +75,7 @@ class RealBlockListExperimentTest {
             getAllCalls++
             return toggles
         }
+
+        override suspend fun getAllTogglesForParent(name: String): List<Toggle> = getAll().filter { it.featureName().parentName == name }
     }
 }

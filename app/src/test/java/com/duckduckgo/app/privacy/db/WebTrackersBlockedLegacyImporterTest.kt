@@ -14,12 +14,16 @@
  * limitations under the License.
  */
 
-package com.duckduckgo.app.trackerdetection.db
+package com.duckduckgo.app.privacy.db
 
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.app.global.db.AppDatabase
+import com.duckduckgo.app.trackerdetection.db.LegacyAppDbImport
+import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
+import com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.common.test.CoroutineTestRule
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runCurrent

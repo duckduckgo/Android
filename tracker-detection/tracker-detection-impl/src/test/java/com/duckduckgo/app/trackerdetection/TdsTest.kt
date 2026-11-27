@@ -16,11 +16,14 @@
 
 package com.duckduckgo.app.trackerdetection
 
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.browser.R
+import com.duckduckgo.tracker.detection.impl.R
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(AndroidJUnit4::class)
 class TdsTest {
 
     /**

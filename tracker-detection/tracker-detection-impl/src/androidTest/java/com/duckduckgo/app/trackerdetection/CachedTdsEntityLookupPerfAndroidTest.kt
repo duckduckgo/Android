@@ -22,12 +22,12 @@ import android.util.Log
 import androidx.room.Room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.trackerdetection.api.ActionJsonAdapter
 import com.duckduckgo.app.trackerdetection.api.TdsJson
 import com.duckduckgo.app.trackerdetection.db.TdsDomainEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
+import com.duckduckgo.tracker.detection.impl.R
 import com.squareup.moshi.Moshi
 import okio.buffer
 import okio.source
@@ -41,7 +41,7 @@ import java.io.File
 /**
  * On-device microbenchmark comparing [TdsEntityLookup] (DB-walking) against
  * [CachedTdsEntityLookup] (map-walking) on a real Room database seeded with the
- * production tracker dataset bundled in the app at app/src/main/res/raw/tds.json
+ * production tracker dataset bundled at tracker-detection/tracker-detection-impl/src/main/res/raw/tds.json
  * (R.raw.tds).
  *
  * The two impls share the same `EntityLookup` surface — they differ only in how
@@ -62,7 +62,7 @@ import java.io.File
  *      command below, then revert. JUnit honors @Ignore even when --tests targets
  *      the class directly.
  *
- *     ./gradlew :app:connectedPlayDebugAndroidTest \
+ *     ./gradlew :tracker-detection-impl:connectedDebugAndroidTest \
  *         -Pandroid.testInstrumentationRunnerArguments.class=com.duckduckgo.app.trackerdetection.CachedTdsEntityLookupPerfAndroidTest
  *
  * Output is emitted to logcat under tag "EntityLookupPerf"; capture with:
