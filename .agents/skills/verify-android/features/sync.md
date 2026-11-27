@@ -6,6 +6,7 @@ The user turns on Sync from Settings > Sync & Backup: with no second device, "Sy
 
 - `sync-entry` Settings > "Sync & Backup" opens `SyncActivity`, reading "Keep DuckDuckGo in sync!" with the switch off ("Off").
 - `sync-setup-this-device` the switch opens `SyncThisDeviceActivity`; "Sync This Device Only" creates the account with no device-auth prompt (the build skips it) and opens `RecoveryCodeActivity`: "<device name> has been added to Sync & Backup.", the recovery code, "Restore on App Reinstall" on. Turning that switch off shows no dialog. "Done" lands on Sync settings, "DuckDuckGo is in sync.", label "On", this device under My Devices.
+- `sync-pair-copy-paste` two emulators pair through "Copy Text Code" on Host and "Enter Code" > "Paste Sync Code" on Joiner. Both list the peer, and a test bookmark syncs between them. See [Two-device pairing through copy and paste](#two-device-pairing-through-copy-and-paste).
 - `sync-audit-flags-off` with `loginAuditLog` and `loginNotification` off, the check after a sync logs `check result Disabled`, and Sync settings have no Device Activity row.
 - `sync-audit-first-check` the first check on an account logs `check result Initialised` and finds nothing: older entries are not counted.
 - `sync-device-activity-empty` with `loginAuditLog` on, Sync settings show a "Device Activity" row; with no other device it opens "You have no recent activity.".
@@ -76,6 +77,82 @@ Sync settings (`com.duckduckgo.sync.impl.ui.dashboard.SyncActivity`), `EditDevic
 - **Background.** `simulateLogin` again, `$V key home`, `expireSyncDebounce`, mark, `runBackgroundSync`: logcat has `Sync-Engine: petition to sync now trigger: BACKGROUND_SYNC`, `petition to sync accepted, syncing now`, then `Checked(newLogins=1, renamedLogins=0, logouts=0)`. `status` ends with "Unseen logins: 1" (Device Activity cleared the first one).
 - **Logouts.** `logOutOthers`, mark, `$V restart`: `Checked(newLogins=0, renamedLogins=0, logouts=2)`. `readLog` has two `LOGOUT` entries with the devices' names.
 - **Turn off and delete.** Sync settings, `$V scroll up 3` (Gotchas: the last row) and `$V tap id:deleteAccountItem`: the sheet "Turn Off Sync & Backup?" with `deleteServerDataSwitch` on (the only device) and `turnOffAndDeleteButton`. Tap it: "You Can’t Undo This Action." with "Cancel" and "Permanently Delete" (no ids; tap by text). `$V tap "text:Permanently Delete"`: after about 3 s, `headlineText` "Keep DuckDuckGo in sync!", `label` "Off". Second view: `status` reads `signedIn=false`. If the UI path fails, `deleteAccount`.
+
+## Two-device pairing through copy and paste
+
+Use this recipe for joining an existing Android Sync account through manual code entry. Host is the
+emulator displaying the linking QR code; Joiner is the emulator pasting its text equivalent. This exercises
+copy, paste and the real pairing exchange, not camera scanning or recovery-code restore.
+
+### Setup
+
+Select two distinct emulators using the device-choice rules in [the verification skill](../SKILL.md#choose-the-device).
+Ask which second AVD to boot if only one has been selected. Follow the empty-data, staging and reset
+preconditions above on both devices. Use a fresh account and fake bookmarks only.
+
+```bash
+V=.agents/skills/verify-android/verify.sh
+SYNC_HOST_SERIAL='<host-serial>'
+SYNC_JOINER_SERIAL='<joiner-serial>'
+$V use "$SYNC_HOST_SERIAL" "$SYNC_JOINER_SERIAL"
+$V build
+$V each install
+$V each doctor
+```
+
+Send debug broadcasts with the target's explicit serial. Set `useStaging` on both, then confirm `status`
+reports staging and `signedIn=false` on each. Set and record the feature flags required by the change on
+both devices; do not infer the protocol from the screen's appearance. Create Host's account using the
+"Turn on, flags off" UI path above, with the flags appropriate to this run. Disable "Restore on App
+Reinstall" before leaving the recovery screen. Keep Joiner signed out. Give Host a distinct test name
+through "Edit Name" if the emulators have the same model name.
+
+Clipboard transfer is a prerequisite: the two Android clipboards are separate. Use emulator clipboard
+sharing through the desktop, or another clipboard bridge verified on these AVDs. Check the transfer with
+harmless text before opening the pairing session. A successful desktop copy alone does not prove the text
+reached Joiner's Android clipboard. If no working bridge is available, report the missing capability;
+do not substitute a recovery code, deep link, `simulateLogin`, or direct repository call for this path.
+There is currently no clipboard-transfer command in `verify.sh`.
+
+### Pair and verify
+
+1. Start a separate recording for each device with `$V on "$SYNC_HOST_SERIAL" record start host-pairing.mp4`
+   and `$V on "$SYNC_JOINER_SERIAL" record start joiner-pairing.mp4`. Scope every subsequent command with `on`.
+2. On Joiner, open Settings > "Sync & Backup" > "Sync With Another Device". Select "Enter Code" and
+   wait for `id:pasteCodeButton` ("Paste Sync Code"). Leave this screen ready before copying the code.
+3. On Host, open "Sync With Another Device". If the scanner opens, tap `id:showQrCodeButton`
+   ("Show QR Code"). Wait for the QR code and `id:copyCodeButton` ("Copy Text Code").
+4. On Host, tap `id:copyCodeButton`, then transfer that clipboard value to Joiner's Android clipboard
+   using the bridge checked during setup. Keep Host's pairing screen open. The copied value is the full
+   pairing URL; `qrCodeText` can show a different representation. Do not reconstruct the value from that
+   label, print it, or include it in proof details or shell command logs.
+5. On Joiner, tap `id:pasteCodeButton`. Handle the confirmation dialogs on the device that displays
+   them. In the v2 flow, "Sync New Device?" uses "Sync Now" to approve the peer. Check both screens
+   for pending confirmation rather than waiting on only one. Do not close or restart either app while
+   the exchange is active. Record a timeout or rejection as its own outcome, not successful pairing.
+6. Complete the success screens. If a recovery screen appears, disable "Restore on App Reinstall"
+   before "Done". Return to Sync settings on both devices. Check "DuckDuckGo is in sync." and verify
+   each device list contains this device and the peer. Confirm Joiner's `status` reports `signedIn=true`.
+7. Through the browser UI, add a uniquely named fake bookmark for a DDG test page on Host. Wait for
+   that bookmark to appear in Joiner's bookmarks, then edit its title on Joiner and verify the new title
+   appears on Host. Use a bounded wait and record it in the proof; a device-list entry alone does not
+   establish that data sync works.
+8. Capture the final device lists and bookmark checks on both devices. Stop both recordings with
+   `$V on <serial> record stop`. Keep linking codes, recovery codes and identifiers out of published
+   images and check details. Inspect recordings and layout sidecars for those values before publication.
+
+### Cleanup and coverage
+
+In `finally`, stop both recordings even if pairing fails. Delete the fresh staging account through
+"Turn Off Sync & Backup" with server-data deletion enabled, or use the `deleteAccount` debug fallback
+on a signed-in device. Confirm deletion succeeded; clearing local app data does not delete the account.
+Remove any remaining local test state within the reset permissions above, and clear both emulator
+clipboards and the desktop clipboard used for transfer. Report cleanup failures.
+
+`verify.sh on` can drive this coordinated recipe by hand. `prove.py` currently runs a proof on one selected
+device; selecting two devices does not make it coordinate their pairing. Keep evidence for both roles and
+report any manual clipboard transfer. This recipe has been checked against source but has not yet been
+driven end to end. Only claim copy/paste pairing after a live run; camera QR scanning remains separate.
 
 ## Gotchas
 
