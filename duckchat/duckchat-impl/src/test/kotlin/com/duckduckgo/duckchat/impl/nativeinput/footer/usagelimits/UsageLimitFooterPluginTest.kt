@@ -409,6 +409,22 @@ class UsageLimitFooterPluginTest {
     }
 
     @Test
+    fun whenExistingChatWhileOnTheOverLimitDefaultThenSwitchUsesThePageTargets() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id).copy(cta = switchCta(HAIKU.id))
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            footer.view.findViewById<DaxButtonSecondary>(R.id.usageLimitFooterCta).performClick()
+
+            assertEquals(listOf(HAIKU.id), host.selectedModelIds)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenResetModelForNewChatsOffThenOverLimitModelStillBlocks() = runTest {
         snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
         modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = null)

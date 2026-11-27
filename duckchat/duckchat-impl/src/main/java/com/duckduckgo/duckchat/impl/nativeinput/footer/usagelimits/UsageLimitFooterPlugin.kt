@@ -98,6 +98,14 @@ class UsageLimitFooterPlugin @Inject constructor(
                 val overLimitModelId = snapshot?.newChatDefault?.modelId ?: return false
                 return isNewChat && modelState.newChatDefault?.modelId == overLimitModelId && selectedModelId == overLimitModelId
             }
+
+        /**
+         * What the CTA targets are looked up against. While `resetModelForNewChats` is on, the global selection is the
+         * new-chat default, not the model an existing chat is on, so an existing chat uses the page's own targets,
+         * which web keys to the chat it shows.
+         */
+        val ctaModelState: ModelState
+            get() = if (!isNewChat && modelState.newChatDefault != null) modelState.copy(selectedModelId = null) else modelState
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -157,7 +165,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             if (input.actedOn?.applies(notice) == true || input.isOnOverLimitDefault) return@combine NativeInputFooterState(visible = false)
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
-            val resolvedCta = ctaResolver.resolve(snapshot.cta, input.modelState, host.draft(), input.modelState.isFreeTrialEligible)
+            val resolvedCta = ctaResolver.resolve(snapshot.cta, input.ctaModelState, host.draft(), input.modelState.isFreeTrialEligible)
             retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = previousModelId)
 
             val exposure = UsageWarningExposure.of(notice)
