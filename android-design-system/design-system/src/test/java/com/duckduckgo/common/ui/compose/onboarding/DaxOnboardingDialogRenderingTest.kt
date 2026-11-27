@@ -112,6 +112,39 @@ class DaxOnboardingDialogRenderingTest {
     }
 
     @Test
+    fun replacementHostStateReceivesTheUnchangedContentHeight() {
+        val hostState = mutableStateOf(state)
+        showDialog { hostState.value }
+        val originalHeight = compose.runOnIdle { state.contentHeightPx }
+        assertTrue(originalHeight > 0)
+
+        val replacementState = DaxOnboardingDialogHostState()
+        compose.runOnIdle { hostState.value = replacementState }
+        frames()
+
+        assertEquals(originalHeight, compose.runOnIdle { replacementState.contentHeightPx })
+    }
+
+    @Test
+    fun disablingAnimationSnapsAnInProgressSettledResize() {
+        showDialog()
+        val small = cardBounds().height
+        compose.runOnIdle { animate.value = true }
+        frames()
+        compose.runOnIdle { contentHeight.value = 160.dp }
+        frames()
+        advance(120)
+        val large = small + 112f
+        assertTrue(cardBounds().height > small)
+        assertTrue(cardBounds().height < large)
+
+        compose.runOnIdle { animate.value = false }
+        frames()
+
+        assertEquals(large, cardBounds().height, 1f)
+    }
+
+    @Test
     fun settledGrowAndShrinkAnimateThePaintedCardWithItsLayoutBounds() {
         showDialog()
         val small = cardBounds()
@@ -760,7 +793,7 @@ class DaxOnboardingDialogRenderingTest {
         return spans[1].count().toFloat()
     }
 
-    private fun showDialog() {
+    private fun showDialog(hostState: () -> DaxOnboardingDialogHostState = { state }) {
         compose.setContent {
             DuckDuckGoTheme(isDarkTheme = false) {
                 OnboardingTheme {
@@ -783,7 +816,7 @@ class DaxOnboardingDialogRenderingTest {
                                     contentKey = contentKey.value,
                                     title = title.value,
                                     modifier = Modifier.width(280.dp).testTag("dialog"),
-                                    state = state,
+                                    state = hostState(),
                                     animate = animate.value,
                                     tail = tail.value,
                                     tailExtended = tailExtended.value,
