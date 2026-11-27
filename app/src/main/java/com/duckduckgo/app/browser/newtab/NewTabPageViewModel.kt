@@ -119,6 +119,7 @@ class NewTabPageViewModel @AssistedInject constructor(
     private data class ViewStateSnapshot(
         val favourites: List<Favorite>,
         val remoteMessage: RemoteMessage?,
+        val hiddenForThisTab: Boolean,
     )
 
     sealed class Command {
@@ -169,8 +170,9 @@ class NewTabPageViewModel @AssistedInject constructor(
                 if (favorites.isNotEmpty()) {
                     syncEngine.triggerSync(FEATURE_READ)
                 }
-                val message = activeMessage.takeUnless { !nextStepsAllowed && it?.content is Content.ActionableItems }
-                ViewStateSnapshot(favorites, message)
+                val hiddenForThisTab = !nextStepsAllowed && activeMessage?.content is Content.ActionableItems
+                val message = activeMessage.takeUnless { hiddenForThisTab }
+                ViewStateSnapshot(favorites, message, hiddenForThisTab)
             }
                 .flowOn(dispatchers.io())
                 .onEach { snapshot ->
@@ -178,7 +180,9 @@ class NewTabPageViewModel @AssistedInject constructor(
                     // holding a claim, and re-checks on the next render when refused.
                     val remoteMessage = snapshot.remoteMessage
                     val message = remoteMessage?.takeIf { promptsCoordinator.tryClaim(PromptType.NTP_CARD) }
-                    if (remoteMessage == null) {
+                    // A card hidden only for this tab is still active and may be on screen in another tab,
+                    // so releasing here would start the quiet gap and hide it everywhere.
+                    if (remoteMessage == null && !snapshot.hiddenForThisTab) {
                         promptsCoordinator.onClaimDone(PromptType.NTP_CARD)
                     }
 
