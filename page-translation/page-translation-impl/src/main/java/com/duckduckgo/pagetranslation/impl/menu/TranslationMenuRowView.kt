@@ -103,12 +103,17 @@ class TranslationMenuRowView @JvmOverloads constructor(
                 show(context.getString(R.string.pageTranslationMenuTranslatePage, language), viewState.enabled)
             }
             TranslationMenuViewState.InProgress -> show(context.getString(R.string.pageTranslationMenuTranslating), enabled = false)
-            TranslationMenuViewState.ShowOriginal -> show(context.getString(R.string.pageTranslationMenuShowOriginalPage), enabled = true)
+            TranslationMenuViewState.ShowOriginal -> show(
+                context.getString(R.string.pageTranslationMenuShowOriginalPage),
+                enabled = true,
+                showDot = true,
+            )
         }
     }
 
-    private fun show(label: String, enabled: Boolean) {
+    private fun show(label: String, enabled: Boolean, showDot: Boolean = false) {
         menuItem.label(label)
         menuItem.isEnabled = enabled
+        menuItem.showDotIndicator = showDot
     }
 }

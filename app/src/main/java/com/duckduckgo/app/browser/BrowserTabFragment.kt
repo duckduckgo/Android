@@ -3271,7 +3271,7 @@ class BrowserTabFragment :
                 if (omnibar.viewMode == DuckAI) {
                     nativeInputManager.hideNativeInput()
                 }
-                omnibar.setViewMode(Browser(it.url))
+                omnibar.setViewMode(omnibar.viewMode.afterDuckAiFullScreenDisabled(it.url))
                 sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
 
@@ -7071,4 +7071,13 @@ internal fun ViewMode.toTabContent(): TabContent = when (this) {
     is Pdf -> TabContent.Pdf
     ViewMode.NewTab, ViewMode.DuckAI, ViewMode.Error, ViewMode.SSLWarning, ViewMode.MaliciousSiteWarning -> TabContent.Other
     is Browser, is CustomTab -> TabContent.WebPage
+}
+
+/**
+ * The mode after the tab navigated to a non Duck.ai url. This runs on every such navigation, so it must not turn
+ * a mode that is not a web page (error, warning, new tab, PDF) into [Browser].
+ */
+internal fun ViewMode.afterDuckAiFullScreenDisabled(url: String): ViewMode = when (this) {
+    ViewMode.Error, ViewMode.SSLWarning, ViewMode.MaliciousSiteWarning, ViewMode.NewTab, is Pdf -> this
+    is Browser, is CustomTab, ViewMode.DuckAI -> Browser(url)
 }

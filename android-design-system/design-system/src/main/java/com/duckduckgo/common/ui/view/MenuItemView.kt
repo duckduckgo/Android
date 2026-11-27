@@ -74,6 +74,8 @@ constructor(
         setSize(MenuItemViewSize.getMenuItemSize(attrSizeValue))
         binding.dotIndicator.isVisible = attributes.getBoolean(R.styleable.MenuItemView_showDotIndicator, false)
         updateContentDescription()
+        binding.icon.setEnabledOpacity(isEnabled)
+        binding.label.setEnabledOpacity(isEnabled)
         attributes.recycle()
     }
 
