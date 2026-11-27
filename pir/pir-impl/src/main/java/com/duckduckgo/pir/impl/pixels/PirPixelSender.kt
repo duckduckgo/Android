@@ -332,7 +332,7 @@ interface PirPixelSender {
      * @param actionId The ID of the action, to disambiguate between multiple actions in the same opt out attempt
      * @param durationMs The duration of the attempt in milliseconds
      */
-    fun reportEmailConfirmationAttemptSuccess(
+    suspend fun reportEmailConfirmationAttemptSuccess(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
@@ -349,7 +349,7 @@ interface PirPixelSender {
      * @param actionId The ID of the action, to disambiguate between multiple actions in the same opt out attempt
      * @param durationMs The duration of the attempt in milliseconds
      */
-    fun reportEmailConfirmationAttemptFailed(
+    suspend fun reportEmailConfirmationAttemptFailed(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
@@ -918,6 +918,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PATTERN to (emailPattern ?: ""),
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_GATED_ACTION_DELAY to gatedActionDelayProvider.getGatedActionDelayMs().toString(),
         )
         fire(PIR_OPTOUT_SUBMIT_SUCCESS, params)
     }
@@ -945,6 +946,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_GATED_ACTION_DELAY to gatedActionDelayProvider.getGatedActionDelayMs().toString(),
         )
 
         fire(PIR_OPTOUT_SUBMIT_FAILURE, params)
@@ -1017,7 +1019,7 @@ class RealPirPixelSender @Inject constructor(
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_START, params)
     }
 
-    override fun reportEmailConfirmationAttemptSuccess(
+    override suspend fun reportEmailConfirmationAttemptSuccess(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
@@ -1031,11 +1033,12 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_GATED_ACTION_DELAY to gatedActionDelayProvider.getGatedActionDelayMs().toString(),
         )
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS, params)
     }
 
-    override fun reportEmailConfirmationAttemptFailed(
+    override suspend fun reportEmailConfirmationAttemptFailed(
         brokerUrl: String,
         brokerVersion: String,
         attemptNumber: Int,
@@ -1049,6 +1052,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_ACTION_ID to actionId,
             PARAM_DURATION to durationMs.toString(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_GATED_ACTION_DELAY to gatedActionDelayProvider.getGatedActionDelayMs().toString(),
         )
         fire(PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED, params)
     }

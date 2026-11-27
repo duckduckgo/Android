@@ -5,6 +5,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirGatedActionDelayMs",
             "pirScanWebViewSizeState",
             "appVersion",
             {
@@ -58,6 +59,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirGatedActionDelayMs",
             "pirScanWebViewSizeState",
             "appVersion",
             {
@@ -2002,6 +2004,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirGatedActionDelayMs",
             "pirScanWebViewSizeState",
             "appVersion",
             {
@@ -2043,6 +2046,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirGatedActionDelayMs",
             "pirScanWebViewSizeState",
             "appVersion",
             {

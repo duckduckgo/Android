@@ -324,6 +324,7 @@ class RealPirPixelSenderTest {
         assert(params["pattern"] == "pattern-abc")
         assert(params["vpn_connection_state"] == "disconnected")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["gated_action_delay_ms"] == "3000")
     }
 
     @Test
@@ -383,6 +384,7 @@ class RealPirPixelSenderTest {
         assert(params["action_type"] == "fillform")
         assert(params["vpn_connection_state"] == "connected")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["gated_action_delay_ms"] == "3000")
     }
 
     @Test
@@ -521,6 +523,7 @@ class RealPirPixelSenderTest {
         assert(params["action_id"] == "action-4")
         assert(params["duration"] == "1500")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["gated_action_delay_ms"] == "3000")
     }
 
     @Test
@@ -548,6 +551,7 @@ class RealPirPixelSenderTest {
         assert(params["action_id"] == "action-5")
         assert(params["duration"] == "1000")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["gated_action_delay_ms"] == "3000")
     }
 
     @Test
