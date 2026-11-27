@@ -78,6 +78,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
             pixels,
             deletionListener,
             BrowserMode.REGULAR,
+            mock(),
         )
     }
     private val handler by lazy { handlerPlugin.getJsMessageHandler() }
@@ -92,6 +93,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
             pixels,
             deletionListener,
             BrowserMode.FIRE,
+            mock(),
         )
             .getJsMessageHandler()
 
@@ -1018,6 +1020,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
             pixels,
             deletionListener,
             BrowserMode.REGULAR,
+            mock(),
         ).getJsMessageHandler()
     }
 

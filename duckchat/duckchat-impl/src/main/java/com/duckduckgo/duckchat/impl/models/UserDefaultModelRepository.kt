@@ -18,9 +18,12 @@ package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
+import com.duckduckgo.duckchat.store.impl.DuckAiUserDefaultModelSetting
 import com.squareup.moshi.JsonReader
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -33,11 +36,12 @@ import javax.inject.Inject
 
 data class UserDefaultModel(val modelId: String?)
 
+@ContributesBinding(AppScope::class)
 class UserDefaultModelRepository @Inject constructor(
     private val storageProvider: Lazy<BrowserModeDataProvider<DuckAiBridgeStorage>>,
     private val duckChatFeature: DuckChatFeature,
-) {
-    fun isUserDefaultEnabled(): Boolean = duckChatFeature.resetModelForNewChats().isEnabled() &&
+) : DuckAiUserDefaultModelSetting {
+    override fun isUserDefaultEnabled(): Boolean = duckChatFeature.resetModelForNewChats().isEnabled() &&
         duckChatFeature.userDefaultModel().isEnabled() &&
         duckChatFeature.duckAiNativeStorage().isEnabled()
 
@@ -52,7 +56,7 @@ class UserDefaultModelRepository @Inject constructor(
             .flatMapLatest { enabled ->
                 if (enabled) {
                     storageProvider.value.forMode(BrowserMode.REGULAR).settings
-                        .observe(DEFAULT_MODEL_KEY)
+                        .observe(DuckAiUserDefaultModelSetting.USER_DEFAULT_MODEL_KEY)
                         .distinctUntilChanged()
                         .map { entry -> entry?.let { UserDefaultModel(decode(it.value)) } }
                         .distinctUntilChanged()
@@ -67,8 +71,6 @@ class UserDefaultModelRepository @Inject constructor(
     }
 
     private companion object {
-        const val DEFAULT_MODEL_KEY = "defaultDuckaiModel"
-
         // Moshi's reader also accepts unescaped control characters and certain non-JSON escapes in strings.
         val JSON_STRING = Regex("""[ \t\r\n]*"(?:[^"\\\x00-\x1F]|\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4}))*+"[ \t\r\n]*""")
     }

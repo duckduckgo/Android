@@ -73,6 +73,7 @@ class GetChatIntegrationTest {
             pixels = mock(),
             deletionListener = mock(),
             browserMode = BrowserMode.REGULAR,
+            userDefaultModelSetting = mock(),
         )
         handler = handlerPlugin.getJsMessageHandler()
     }
