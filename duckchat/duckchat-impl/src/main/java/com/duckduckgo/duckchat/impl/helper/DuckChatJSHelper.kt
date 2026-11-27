@@ -724,6 +724,9 @@ class RealDuckChatJSHelper @Inject constructor(
                                 },
                             )
                         }
+                        if (pending.pastedTexts.isNotEmpty()) {
+                            put(TEXT_PASTED, pending.pastedTexts.toPastedTextsJsonArray())
+                        }
                     },
                 )
             }
@@ -748,6 +751,7 @@ class RealDuckChatJSHelper @Inject constructor(
             prompt = data?.optString(EDIT_PROMPT) ?: "",
             images = data?.optJSONArray(EDIT_IMAGES).toSubmittedImages(),
             files = data?.optJSONArray(EDIT_FILES).toSubmittedFiles(),
+            pastedTexts = data?.optJSONArray(TEXT_PASTED).toPastedTexts(),
         )
         val sessionId = editPromptSessionStore.open(payload)
         activeEditSessionId.set(sessionId)
@@ -768,6 +772,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(EDIT_PROMPT, result.prompt)
                 put(EDIT_IMAGES, result.images.toSubmittedImagesJsonArray())
                 put(EDIT_FILES, result.files.toSubmittedFilesJsonArray())
+                put(TEXT_PASTED, result.pastedTexts.toPastedTextsJsonArray())
             }
             EditPromptResult.Cancelled -> JSONObject().apply { put(EDIT_CANCELLED, true) }
         }
@@ -794,6 +799,15 @@ class RealDuckChatJSHelper @Inject constructor(
                 )
             }
         }
+    }
+
+    private fun JSONArray?.toPastedTexts(): List<String> {
+        val array = this ?: return emptyList()
+        return (0 until array.length()).mapNotNull { index -> array.optJSONObject(index)?.opt("content") as? String }
+    }
+
+    private fun List<String>.toPastedTextsJsonArray(): JSONArray = JSONArray().also { array ->
+        forEach { array.put(JSONObject().put("content", it)) }
     }
 
     private fun List<SubmittedImage>.toSubmittedImagesJsonArray(): JSONArray = JSONArray().also { array ->
@@ -922,6 +936,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val EDIT_PROMPT = "prompt"
         private const val EDIT_IMAGES = "images"
         private const val EDIT_FILES = "files"
+        private const val TEXT_PASTED = "textPasted"
         private const val EDIT_CANCELLED = "cancelled"
         private const val METHOD_TOGGLE_PAGE_CONTEXT = "togglePageContextTelemetry"
         private const val METHOD_VOICE_SESSION_STARTED = "voiceSessionStarted"

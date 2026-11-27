@@ -201,12 +201,13 @@ interface NativeInputWidget {
     fun configureContextual(tabId: String)
     fun configureForEdit(sessionId: String)
     fun setFooterSuppressed(suppressed: Boolean)
-    fun adoptEditAttachments(images: List<SubmittedImage>, files: List<SubmittedFile>)
+    fun adoptEditAttachments(images: List<SubmittedImage>, files: List<SubmittedFile>, pastedTexts: List<String>)
     fun isWidgetBottom(): Boolean
     fun setWidgetPosition(isBottom: Boolean)
     fun setWidgetRootView(view: View)
 
     fun getTextSelectionsJson(): JSONArray?
+    fun getPastedTextsJson(): JSONArray?
     fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>)
 
     /**
@@ -398,6 +399,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
     // applied by applyPendingAttachmentState().
     private var pendingAdoptedImages: List<SubmittedImage> = emptyList()
     private var pendingAdoptedFiles: List<SubmittedFile> = emptyList()
+    private var pendingAdoptedPastedTexts: List<String> = emptyList()
 
     // True when this widget instance hosts the contextual sheet. Set in configureContextual();
     // never reset. Used to prevent the shared per-tab NativeInputStateProvider from leaking
@@ -1496,6 +1498,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
 
     override fun getTextSelectionsJson(): JSONArray? = attachmentViewModel?.getTextSelectionsJson()
 
+    override fun getPastedTextsJson(): JSONArray? = attachmentViewModel?.getPastedTextsJson()
+
     override fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>) {
         val viewModel = attachmentViewModel
         if (viewModel == null) {
@@ -1528,6 +1532,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
         val files = attachmentViewModel?.getFileAttachments()?.map {
             PendingNativeFile(base64Data = it.base64Data, fileName = it.fileName, mimeType = it.mimeType)
         } ?: emptyList()
+        val pastedTexts = attachmentViewModel?.getPastedTexts()?.map { it.content } ?: emptyList()
         // Only the Duck.ai tab shows the ToS footer. A chat sent from elsewhere (the search-only address bar) has not
         // shown the terms, so it must not accept them.
         viewModel.storePendingPrompt(
@@ -1537,6 +1542,7 @@ class NativeInputModeWidget @JvmOverloads constructor(
             getSelectedTool(),
             images,
             files,
+            pastedTexts,
             carriesTermsConsent = isChatTabSelected(),
         )
         attachmentViewModel?.clearAttachmentsForNewChat()
@@ -1627,10 +1633,12 @@ class NativeInputModeWidget @JvmOverloads constructor(
     override fun adoptEditAttachments(
         images: List<SubmittedImage>,
         files: List<SubmittedFile>,
+        pastedTexts: List<String>,
     ) {
         pendingAdoptedImages = images
         pendingAdoptedFiles = files
-        attachmentViewModel?.adopt(images, files)
+        pendingAdoptedPastedTexts = pastedTexts
+        attachmentViewModel?.adopt(images, files, pastedTexts)
     }
 
     /**
@@ -1643,8 +1651,8 @@ class NativeInputModeWidget @JvmOverloads constructor(
         pendingAttachmentsTabId?.let { tabId ->
             if (pendingTextSelection != null || pendingFiles.isNotEmpty()) addAttachments(tabId, pendingTextSelection, pendingFiles)
         }
-        if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles)) {
-            viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles)
+        if (hasPendingAdoptedAttachments(pendingAdoptedImages, pendingAdoptedFiles, pendingAdoptedPastedTexts)) {
+            viewModel.adopt(pendingAdoptedImages, pendingAdoptedFiles, pendingAdoptedPastedTexts)
         }
     }
 
@@ -2161,7 +2169,8 @@ internal fun shouldShowInputControls(
 internal fun hasPendingAdoptedAttachments(
     pendingImages: List<SubmittedImage>,
     pendingFiles: List<SubmittedFile>,
-): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty()
+    pendingPastedTexts: List<String>,
+): Boolean = pendingImages.isNotEmpty() || pendingFiles.isNotEmpty() || pendingPastedTexts.isNotEmpty()
 
 internal fun shouldLaunchCameraCapture(
     isDuckAiMode: Boolean,

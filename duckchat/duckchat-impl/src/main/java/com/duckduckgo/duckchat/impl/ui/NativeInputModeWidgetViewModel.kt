@@ -783,9 +783,10 @@ class NativeInputModeWidgetViewModel @Inject constructor(
         selectedTool: String? = null,
         images: List<PendingNativeImage> = emptyList(),
         files: List<PendingNativeFile> = emptyList(),
+        pastedTexts: List<String> = emptyList(),
         carriesTermsConsent: Boolean = true,
     ) {
-        pendingNativePromptStore.store(query, modelId, reasoningEffort, selectedTool, images, files, carriesTermsConsent)
+        pendingNativePromptStore.store(query, modelId, reasoningEffort, selectedTool, images, files, pastedTexts, carriesTermsConsent)
     }
 
     fun configureContextual(tabId: String) {

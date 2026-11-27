@@ -30,6 +30,7 @@ import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.AttachmentLimits
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
@@ -43,6 +44,7 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ConversationFileUs
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.LimitsHandler
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PageContextAttachment
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PromptLength
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedFile
 import com.duckduckgo.duckchat.impl.ui.nativeinput.edit.SubmittedImage
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachment
@@ -51,6 +53,8 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -137,9 +141,16 @@ class AttachmentViewModelTest {
     private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val textSelectionPayloadBuilder: TextSelectionPayloadBuilder = mock()
 
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+
     @Before
     fun setUp() {
-        viewModel = AttachmentViewModel(
+        duckChatFeature.nativeInputPastedText().setRawStoredState(Toggle.State(enable = false))
+        viewModel = buildViewModel()
+    }
+
+    private fun buildViewModel(): AttachmentViewModel =
+        AttachmentViewModel(
             duckChatInternal = duckChatInternal,
             dispatchers = coroutineRule.testDispatcherProvider,
             modelManager = modelManager,
@@ -152,7 +163,12 @@ class AttachmentViewModelTest {
             textSelectionRepository = textSelectionRepository,
             textSelectionPayloadBuilder = textSelectionPayloadBuilder,
             selectionJourney = selectionJourney,
+            duckChatFeature = duckChatFeature,
         )
+
+    private fun enablePastedText() {
+        duckChatFeature.nativeInputPastedText().setRawStoredState(Toggle.State(enable = true))
+        viewModel = buildViewModel()
     }
 
     private fun selectDuckAiTab(tabId: String = "tab-duckai") {
@@ -1423,6 +1439,126 @@ class AttachmentViewModelTest {
         advanceUntilIdle()
 
         assertTrue(firstRoundBitmap.isRecycled)
+    }
+
+    @Test
+    fun whenPastedTextDisabledThenLongInsertionStaysInline() = runTest {
+        assertFalse(viewModel.onTextInserted("a".repeat(5_000)))
+
+        assertTrue(viewModel.getPastedTexts().isEmpty())
+        assertNull(viewModel.attachmentState.value.promptLength)
+    }
+
+    @Test
+    fun whenLongTextInsertedThenItBecomesAStandaloneAttachment() = runTest {
+        enablePastedText()
+
+        assertTrue(viewModel.onTextInserted("a".repeat(4_000)))
+        advanceUntilIdle()
+
+        val state = viewModel.attachmentState.value
+        assertEquals(1, state.pastedTexts.size)
+        assertTrue(state.hasAttachments)
+        assertTrue(state.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenShortTextInsertedThenItStaysInline() = runTest {
+        enablePastedText()
+
+        assertFalse(viewModel.onTextInserted("a".repeat(3_999)))
+        advanceUntilIdle()
+
+        assertFalse(viewModel.attachmentState.value.hasAttachments)
+    }
+
+    @Test
+    fun whenPastedTextsAddedThenJsonKeepsPasteOrder() = runTest {
+        enablePastedText()
+        val first = "first\n" + "a".repeat(4_000)
+        val second = "second " + "b".repeat(4_000)
+
+        viewModel.onTextInserted(first)
+        viewModel.onTextInserted(second)
+
+        val json = viewModel.getPastedTextsJson()!!
+        assertEquals(2, json.length())
+        assertEquals(first, json.getJSONObject(0).getString("content"))
+        assertEquals(second, json.getJSONObject(1).getString("content"))
+        assertEquals(setOf("content"), json.getJSONObject(0).keys().asSequence().toSet())
+    }
+
+    @Test
+    fun whenNoPastedTextsThenJsonIsNull() = runTest {
+        assertNull(viewModel.getPastedTextsJson())
+    }
+
+    @Test
+    fun whenPastedTextEditedThenContentAndLengthFollow() = runTest {
+        enablePastedText()
+        viewModel.onTextInserted("a".repeat(4_000))
+        val id = viewModel.getPastedTexts().first().id
+
+        viewModel.updatePastedText(id, "short")
+
+        assertEquals("short", viewModel.getPastedTexts().single().content)
+        assertEquals(5, viewModel.attachmentState.value.promptLength?.count)
+    }
+
+    @Test
+    fun whenPastedTextRemovedThenItLeavesThePayload() = runTest {
+        enablePastedText()
+        viewModel.onTextInserted("a".repeat(4_000))
+
+        viewModel.removePastedText(viewModel.getPastedTexts().first().id)
+
+        assertNull(viewModel.getPastedTextsJson())
+    }
+
+    @Test
+    fun whenAttachmentsClearedThenPastedTextsCleared() = runTest {
+        enablePastedText()
+        viewModel.onTextInserted("a".repeat(4_000))
+
+        viewModel.clearAttachments()
+
+        assertTrue(viewModel.getPastedTexts().isEmpty())
+        assertFalse(viewModel.attachmentState.value.hasAttachments)
+    }
+
+    @Test
+    fun whenPastedTextsAdoptedThenTheyRoundTripToJson() = runTest {
+        viewModel.adopt(images = emptyList(), files = emptyList(), pastedTexts = listOf("one", "two"))
+        advanceUntilIdle()
+
+        val json = viewModel.getPastedTextsJson()!!
+        assertEquals(listOf("one", "two"), (0 until json.length()).map { json.getJSONObject(it).getString("content") })
+        assertTrue(viewModel.attachmentState.value.hasStandaloneAttachments)
+    }
+
+    @Test
+    fun whenTypedAndPastedTextExceedLimitThenPromptIsOverLimitWithError() = runTest {
+        whenever(context.getString(com.duckduckgo.duckchat.impl.R.string.duckAiPromptTooLong, 16_001, 16_000)).thenReturn("Too long")
+        enablePastedText()
+        viewModel.onTextInserted("a".repeat(12_000))
+
+        viewModel.setTypedLength(4_001)
+        advanceUntilIdle()
+
+        val state = viewModel.attachmentState.value
+        assertEquals(PromptLength(count = 16_001, limit = 16_000), state.promptLength)
+        assertEquals("Too long", state.promptLengthError)
+    }
+
+    @Test
+    fun whenTypedTextAloneExceedsLimitThenPromptIsOverLimit() = runTest {
+        enablePastedText()
+
+        viewModel.setTypedLength(16_001)
+        advanceUntilIdle()
+
+        assertTrue(viewModel.attachmentState.value.promptLength!!.isOverLimit)
+        assertFalse(viewModel.attachmentState.value.hasAttachments)
     }
 
     private fun validPngBase64(): String {

@@ -27,20 +27,25 @@ class NativeInputModeWidgetPendingAttachmentsTest {
 
     @Test
     fun `no pending attachments to apply when both lists are empty`() {
-        assertFalse(hasPendingAdoptedAttachments(pendingImages = emptyList(), pendingFiles = emptyList()))
+        assertFalse(hasPendingAdoptedAttachments(pendingImages = emptyList(), pendingFiles = emptyList(), pendingPastedTexts = emptyList()))
     }
 
     @Test
     fun `pending attachments to apply when an image is queued`() {
         val images = listOf(SubmittedImage(data = "base64", format = "png"))
 
-        assertTrue(hasPendingAdoptedAttachments(pendingImages = images, pendingFiles = emptyList()))
+        assertTrue(hasPendingAdoptedAttachments(pendingImages = images, pendingFiles = emptyList(), pendingPastedTexts = emptyList()))
     }
 
     @Test
     fun `pending attachments to apply when a file is queued`() {
         val files = listOf(SubmittedFile(data = "base64", fileName = "report.pdf", mimeType = "application/pdf"))
 
-        assertTrue(hasPendingAdoptedAttachments(pendingImages = emptyList(), pendingFiles = files))
+        assertTrue(hasPendingAdoptedAttachments(pendingImages = emptyList(), pendingFiles = files, pendingPastedTexts = emptyList()))
+    }
+
+    @Test
+    fun `pending attachments to apply when a pasted text is queued`() {
+        assertTrue(hasPendingAdoptedAttachments(pendingImages = emptyList(), pendingFiles = emptyList(), pendingPastedTexts = listOf("pasted")))
     }
 }

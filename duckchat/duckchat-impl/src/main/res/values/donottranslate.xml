@@ -56,4 +56,12 @@
     <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Image</string>
     <string name="duckAiWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the home-screen widget">Camera</string>
 
+    <!-- Duck.ai pasted text -->
+    <string name="duckAiPastedTextContentDescription">Pasted text</string>
+    <string name="duckAiPastedTextRemoveContentDescription">Remove pasted text</string>
+    <string name="duckAiPastedTextEditTitle" instruction="Title of the sheet where the user edits a pasted text attachment">Edit Text</string>
+    <string name="duckAiPastedTextViewTitle" instruction="Title of the sheet showing a pasted text attachment that cannot be edited">Pasted Text</string>
+    <string name="duckAiPastedTextCounter" instruction="Character counter. First placeholder is the characters used, second is the maximum allowed">%1$d/%2$d</string>
+    <string name="duckAiPromptTooLong" instruction="Error under the Duck.ai input when the message is too long. First placeholder is the characters used, second is the maximum allowed">Please try a shorter message. %1$d/%2$d</string>
+
 </resources>

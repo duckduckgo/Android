@@ -22,11 +22,19 @@ import android.content.res.Configuration
 import android.graphics.Rect
 import android.graphics.Typeface
 import android.net.Uri
+import android.text.Editable
+import android.text.InputFilter
+import android.text.TextUtils
+import android.text.TextWatcher
+import android.view.ActionMode
 import android.view.Gravity
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewTreeObserver
 import android.webkit.ValueCallback
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.HorizontalScrollView
 import android.widget.ImageView
@@ -35,6 +43,7 @@ import android.widget.PopupWindow
 import android.widget.ScrollView
 import android.widget.TextView
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
@@ -56,6 +65,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommand
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintCommands
 import com.duckduckgo.duckchat.impl.ui.AttachmentViewModel
+import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.PastedText
 import com.duckduckgo.duckchat.impl.ui.nativeinput.file.FileAttachmentsContainerView
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
@@ -98,6 +108,34 @@ class AttachmentView(
     private var pageContextContainer: PageContextAttachmentView? = null
     private var textSelectionsContainer: TextSelectionAttachmentsContainerView? = null
     private var limitErrorView: TextView? = null
+    private var pastedTextsContainer: LinearLayout? = null
+    private var renderedPastedTexts: List<PastedText>? = null
+    private var inputField: EditText? = null
+    private var typedLengthWatcher: TextWatcher? = null
+    private var textActionMode: ActionMode? = null
+    private val textActionModeTracker = object : ActionMode.Callback {
+        override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
+            textActionMode = mode
+            return true
+        }
+
+        override fun onPrepareActionMode(mode: ActionMode, menu: Menu): Boolean = false
+        override fun onActionItemClicked(mode: ActionMode, item: MenuItem): Boolean = false
+        override fun onDestroyActionMode(mode: ActionMode) {
+            if (textActionMode === mode) textActionMode = null
+        }
+    }
+    private val pasteFilter = InputFilter { source, start, end, dest, dstart, dend ->
+        if (dest is Editable && acceptsPastedText() && viewModel?.onTextInserted(source.subSequence(start, end)) == true) {
+            post { textActionMode?.finish() }
+            dest.subSequence(dstart, dend)
+        } else {
+            null
+        }
+    }
+
+    private val isDuckAiInput: Boolean
+        get() = isEditMode || isContextual || lastNativeInputState?.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI
 
     init {
         addView(buildAttachButton())
@@ -113,6 +151,7 @@ class AttachmentView(
         viewModel = vm
         val container = rootView?.findViewById<FrameLayout>(R.id.attachmentsContainer) ?: return
         setupContainerViews(container, vm)
+        bindInputField(vm)
         attachmentRequestJob?.cancel()
         attachmentRequestJob = newChatHintCommands.commandsFor { host?.tabId() }
             .onEach { command ->
@@ -132,6 +171,19 @@ class AttachmentView(
             }
             .launchIn(scope)
     }
+
+    private fun bindInputField(vm: AttachmentViewModel) {
+        val field = generateSequence(parent) { it.parent }.filterIsInstance<NativeInputModeWidget>().firstOrNull()?.inputField ?: return
+        inputField = field
+        if (pasteFilter !in field.filters) field.filters += pasteFilter
+        field.customInsertionActionModeCallback = textActionModeTracker
+        field.customSelectionActionModeCallback = textActionModeTracker
+        vm.setTypedLength(field.length())
+        typedLengthWatcher?.let { field.removeTextChangedListener(it) }
+        typedLengthWatcher = field.doAfterTextChanged { vm.setTypedLength(it?.length ?: 0) }
+    }
+
+    private fun acceptsPastedText(): Boolean = !isEditMode && isDuckAiInput && lastNativeInputState?.isChatStreaming != true
 
     private fun updateButtonVisibility() {
         val show = shouldShowAttachButton(
@@ -212,6 +264,10 @@ class AttachmentView(
         }
         row.addView(filesContainer)
         fileAttachmentsContainer = filesContainer
+
+        val pastes = LinearLayout(context).apply { orientation = LinearLayout.HORIZONTAL }
+        row.addView(pastes)
+        pastedTextsContainer = pastes
     }
 
     private fun buildLimitErrorView(parent: LinearLayout): TextView {
@@ -230,7 +286,8 @@ class AttachmentView(
         syncFiles(state)
         syncPageContext(state)
         syncTextSelections(state)
-        val errorMessage = effectiveLimitError(
+        syncPastedTexts(state)
+        val errorMessage = state.promptLengthError ?: effectiveLimitError(
             imageLimitError = state.imageLimitError
                 ?: state.fileLimitError
                 ?: state.fileSizeError
@@ -246,8 +303,7 @@ class AttachmentView(
     }
 
     private fun updateContainerVisibility(container: FrameLayout) {
-        val isDuckAi = isEditMode || isContextual || lastNativeInputState?.toggleSelection == NativeInputState.ToggleSelection.DUCK_AI
-        container.isVisible = hasAttachmentsOrError && isDuckAi && lastNativeInputState?.isChatStreaming != true
+        container.isVisible = hasAttachmentsOrError && isDuckAiInput && lastNativeInputState?.isChatStreaming != true
     }
 
     private fun syncImages(imagesView: ImageAttachmentsContainerView, state: AttachmentViewModel.AttachmentState) {
@@ -279,6 +335,35 @@ class AttachmentView(
             view.render(state.textSelections)
             if (isNewAttachment) showLastTextSelection()
         }
+    }
+
+    private fun syncPastedTexts(state: AttachmentViewModel.AttachmentState) {
+        val container = pastedTextsContainer ?: return
+        if (state.pastedTexts == renderedPastedTexts) return
+        renderedPastedTexts = state.pastedTexts
+        container.removeAllViews()
+        state.pastedTexts.forEach { paste -> container.addView(buildPastedTextChip(container, paste)) }
+    }
+
+    private fun buildPastedTextChip(parent: LinearLayout, paste: PastedText): View =
+        LayoutInflater.from(context).inflate(R.layout.view_file_attachment_item, parent, false).apply {
+            contentDescription = context.getString(R.string.duckAiPastedTextContentDescription)
+            findViewById<ImageView>(R.id.fileIcon).setImageResource(R.drawable.file_txt_color_24)
+            findViewById<DaxTextView>(R.id.fileName).apply {
+                ellipsize = TextUtils.TruncateAt.END
+                text = paste.title
+            }
+            findViewById<View>(R.id.fileRemove).apply {
+                contentDescription = context.getString(R.string.duckAiPastedTextRemoveContentDescription)
+                setOnClickListener { viewModel?.removePastedText(paste.id) }
+            }
+            setOnClickListener { showPastedText(paste) }
+        }
+
+    private fun showPastedText(paste: PastedText) {
+        val vm = viewModel ?: return
+        val onSave: ((String) -> Unit)? = if (isEditMode) null else { content -> vm.updatePastedText(paste.id, content) }
+        showPastedTextSheet(context, paste, vm.attachmentState.value.promptLength, onSave)
     }
 
     private fun showLastTextSelection() {
@@ -317,7 +402,7 @@ class AttachmentView(
         updateButtonVisibility()
         host?.attachmentChanged(
             hasStandaloneAttachments = state.hasStandaloneAttachments,
-            limitExceeded = !isEditMode && (
+            limitExceeded = state.promptLength?.isOverLimit == true || !isEditMode && (
                 state.imageLimitError != null ||
                     state.fileLimitError != null ||
                     state.fileSizeError != null ||
@@ -337,6 +422,14 @@ class AttachmentView(
         attachmentRequestJob?.cancel()
         attachmentRequestJob = null
         lastNativeInputState = null
+        inputField?.let { field ->
+            field.filters = field.filters.filterNot { it === pasteFilter }.toTypedArray()
+            field.customInsertionActionModeCallback = null
+            field.customSelectionActionModeCallback = null
+            typedLengthWatcher?.let { field.removeTextChangedListener(it) }
+        }
+        inputField = null
+        typedLengthWatcher = null
         dismissPopup()
     }
 

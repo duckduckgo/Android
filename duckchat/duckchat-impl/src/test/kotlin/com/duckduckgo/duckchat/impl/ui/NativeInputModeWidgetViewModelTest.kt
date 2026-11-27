@@ -812,7 +812,7 @@ class NativeInputModeWidgetViewModelTest {
 
         viewModel.storePendingPrompt("hello", null, null, carriesTermsConsent = false)
 
-        verify(pendingNativePromptStore).store("hello", null, null, null, emptyList(), emptyList(), false)
+        verify(pendingNativePromptStore).store("hello", null, null, null, emptyList(), emptyList(), emptyList(), false)
     }
 
     @Test
