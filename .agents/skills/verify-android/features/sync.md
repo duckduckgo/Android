@@ -146,9 +146,11 @@ repository call.
 6. Complete the success screens. If a recovery screen appears, disable "Restore on App Reinstall"
    before "Done". Return to Sync settings on both devices. Check "DuckDuckGo is in sync." and verify
    each device list contains this device and the peer. Confirm Joiner's `status` reports `signedIn=true`.
-7. Through the browser UI, add a uniquely named fake bookmark for a DDG test page on Host. Wait for
-   that bookmark to appear in Joiner's bookmarks, then edit its title on Joiner and verify the new title
-   appears on Host. Use a bounded wait and record it in the proof; a device-list entry alone does not
+7. Through the browser UI, add a uniquely named fake bookmark for a DDG test page on Host.
+   Open Joiner's Bookmarks and wait for
+   that bookmark to appear. Edit its title on Joiner and wait for its data-change sync to finish. Reopen
+   Host's Bookmarks to trigger the normal feature-read sync, then verify the new title appears.
+   Use a bounded wait and record it in the proof; a device-list entry alone does not
    establish that data sync works.
 8. Capture the final device lists and bookmark checks on both devices. Stop both recordings with
    `$V on <serial> record stop`. Keep linking codes, recovery codes and identifiers out of published
@@ -166,8 +168,9 @@ finished with it. Report cleanup failures.
 
 `verify.sh on` can drive this coordinated recipe by hand. `prove.py` currently runs a proof on one selected
 device; selecting two devices does not make it coordinate their pairing. Keep evidence for both roles and
-report any manual clipboard transfer. This recipe has been checked against source but has not yet been
-driven end to end. Only claim copy/paste pairing after a live run; camera QR scanning remains separate.
+report any manual clipboard transfer. This recipe was driven on two API 37 emulators on 2026-11-27
+with staging and the unified setup flag enabled. Pairing, peer lists, and bookmark changes in both directions passed. Camera QR scanning and
+recovery-code restore remain separate checks.
 
 ## Gotchas
 
@@ -179,6 +182,10 @@ driven end to end. Only claim copy/paste pairing after a live run; camera QR sca
   instead of assuming it equals `ro.product.model`.
 - Opening bookmarks after Sync starts can show "Download Missing Icons?". Select "Not Now"
   (`faviconsPromptSecondaryCta`) before checking the list or editing a bookmark.
+- Bookmarks opened through the internal View Bookmarks caller return a selected URL to that caller.
+  Edit through the item overflow instead. The overflow is `trailingIconContainer` in `android layout --full`;
+  the current "More options for bookmark" label points at the favicon. Reopen the receiving Bookmarks
+  screen after a remote edit. An already-open list does not continuously poll for remote changes.
 - The recovery code, user id and device ids show on screen, in `$V text` and in `readLog`. Videos and `ui.log` keep them, and `publish` uploads every screenshot, which `pr-summary` then shows as a thumbnail (behind DuckDuckGo sign-in). So take no shot of `RecoveryCodeActivity`, keep ids out of check names and details, and keep the account staging-only, empty of real data and deleted at the end.
 - A build from Android Studio's Run button doesn't pass the two auth flags, so turning on Sync or opening Passwords shows a `BiometricPrompt`. Install a `$V build`. The flags don't skip Android's lock screen after a cold boot: an AVD with a PIN stays at `RUNNING_LOCKED` (`dumpsys user`) until someone unlocks it.
 - The background worker's sync is skipped ("petition to sync debounced") when the last sync was 10 minutes ago or less (whole minutes), so `runBackgroundSync` right after setup finds nothing. Send `expireSyncDebounce` first.
