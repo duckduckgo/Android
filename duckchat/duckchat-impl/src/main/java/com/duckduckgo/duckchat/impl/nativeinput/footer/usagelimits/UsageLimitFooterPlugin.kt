@@ -37,12 +37,12 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.ModelSelection
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningCta
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
-import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
 import kotlinx.coroutines.CoroutineScope
@@ -92,24 +92,11 @@ class UsageLimitFooterPlugin @Inject constructor(
         val dismissals: Map<UsageWindow, UsageNoticeDismissal>,
         val actedOn: UsageNoticeActedOn?,
         val modelState: ModelState,
-        val isNewChat: Boolean,
-        val pickedModelId: String?,
+        val selection: ModelSelection,
         val chatModelId: String?,
     ) {
         val selectedModelId: String? get() = modelState.selectedModelId
-
-        /**
-         * The model the user switched away from since [previous], or null when nothing changed or the app moved it.
-         * While `resetModelForNewChats` is on, the manager moves the global selection itself (fetch, over-limit default,
-         * reset), and a user's pick lands on the tab instead, so only a new chat's own pick counts as a switch.
-         */
-        fun switchedFrom(previous: Inputs?): String? {
-            val previousModelId = previous?.selectedModelId ?: return null
-            if (selectedModelId == null || selectedModelId == previousModelId) return null
-            if (modelState.newChatDefault == null) return previousModelId
-            val isOwnPick = isNewChat && previous.isNewChat && pickedModelId != null && pickedModelId != previous.pickedModelId
-            return previousModelId.takeIf { isOwnPick }
-        }
+        val isNewChat: Boolean get() = selection.isNewChat
 
         /** The model the active chat sends on: a new chat's selection, or the model an existing chat was saved with. */
         private val activeModelId: String?
@@ -156,10 +143,19 @@ class UsageLimitFooterPlugin @Inject constructor(
             }
         }.distinctUntilChanged()
 
-        // Starts with no chats so the footer is not held back while the store loads.
-        val chats = chatStore.getChatsFlow().map<List<DuckAiChat>, List<DuckAiChat>?> { it }.onStart { emit(null) }
-        val activeChat = combine(nativeInputStateProvider.state, chats) { inputState, chats ->
-            inputState to inputState.chatId?.let { chatId -> chats?.firstOrNull { it.chatId == chatId }?.model }
+        // Watches only the active chat's row, and starts with no model so the footer is not held back while it loads.
+        val chatModel: Flow<Pair<String?, String?>> = nativeInputStateProvider.state.map { it.chatId }.distinctUntilChanged()
+            .flatMapLatest { chatId ->
+                if (chatId == null) {
+                    flowOf(null to null)
+                } else {
+                    chatStore.getChatFlow(chatId).map { chatId to it?.model }.onStart { emit(chatId to null) }
+                }
+            }
+            .distinctUntilChanged()
+        // The two arrive on separate flows, so a chat switch can briefly pair the new chat with the old chat's model.
+        val activeChat = combine(nativeInputStateProvider.state, chatModel) { inputState, (chatId, model) ->
+            inputState to model.takeIf { chatId == inputState.chatId }
         }.distinctUntilChanged()
 
         val inputs = activeBrowserMode.flatMapLatest { browserMode ->
@@ -171,13 +167,13 @@ class UsageLimitFooterPlugin @Inject constructor(
                     modelManager.modelState,
                     activeChat,
                 ) { snapshot, dismissals, actedOn, modelState, (inputState, chatModelId) ->
+                    val tabModelState = modelState.forTab(inputState)
                     Inputs(
                         snapshot,
                         dismissals,
                         actedOn,
-                        modelState.forTab(inputState),
-                        isNewChat = inputState.chatId == null,
-                        pickedModelId = inputState.newChatModelId,
+                        tabModelState,
+                        selection = ModelSelection.of(tabModelState, inputState),
                         chatModelId = chatModelId,
                     )
                 }
@@ -187,7 +183,7 @@ class UsageLimitFooterPlugin @Inject constructor(
         }
 
         val state = combine(inputs, hostContext) { input, footerContext ->
-            val switchedFromModelId = input?.switchedFrom(lastInputs)
+            val switchedFromModelId = input?.selection?.switchedFrom(lastInputs?.selection)
             if (input?.selectedModelId != null) lastInputs = input
             val previousContext = lastContext
             lastContext = footerContext

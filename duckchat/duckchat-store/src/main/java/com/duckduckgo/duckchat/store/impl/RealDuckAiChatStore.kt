@@ -19,6 +19,7 @@ package com.duckduckgo.duckchat.store.impl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatEntity
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -82,6 +83,12 @@ interface DuckAiChatStore {
     /** Reactive equivalent of [getChats]. Re-emits on insert/update/delete via Room's Flow contract. */
     fun getChatsFlow(): Flow<List<DuckAiChat>>
 
+    /**
+     * Reactive equivalent of [getChatById]: parses only [chatId]'s row, so prefer it over [getChatsFlow] when one chat is
+     * watched. Emits `null` while the chat is missing or malformed.
+     */
+    fun getChatFlow(chatId: String): Flow<DuckAiChat?>
+
     /** Deletes the chat with [chatId] and its associated files. Returns true if the chat existed, false if not found. */
     suspend fun deleteChat(chatId: String): Boolean
 
@@ -144,6 +151,9 @@ class RealDuckAiChatStore(
 
     override fun getChatsFlow(): Flow<List<DuckAiChat>> =
         chatsDao.getAllAsFlow().map { entities -> entities.mapNotNull { it.toDuckAiChat() } }
+
+    override fun getChatFlow(chatId: String): Flow<DuckAiChat?> =
+        chatsDao.getByIdAsFlow(chatId).map { it?.toDuckAiChat() }.flowOn(dispatchers.io())
 
     override suspend fun deleteChat(chatId: String): Boolean =
         withContext(dispatchers.io()) {

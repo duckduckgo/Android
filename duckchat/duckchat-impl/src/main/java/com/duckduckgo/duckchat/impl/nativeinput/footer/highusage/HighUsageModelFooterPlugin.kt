@@ -31,6 +31,7 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterPlugin
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.ModelSelection
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningExposure
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.UsageWarningMeasurements
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
@@ -78,7 +79,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
         val usageWarningsEnabled = duckChatFeature.duckAiUsageWarnings().enabled()
         val measurement = measurements.forHost(host) { DuckChatPixelSurface.from(hostContext.value.inputContext) }
         var lastContext: NativeInputFooterContext? = null
-        var lastSelectedModelId: String? = null
+        var lastSelection: ModelSelection? = null
         var currentExposure: UsageWarningExposure? = null
         var isDisplayed = false
 
@@ -111,21 +112,22 @@ class HighUsageModelFooterPlugin @Inject constructor(
             }
 
         val state = combine(
-            combine(modelManager.modelState, nativeInputStateProvider.state) { modelState, inputState -> modelState.forTab(inputState) },
+            combine(modelManager.modelState, nativeInputStateProvider.state) { modelState, inputState ->
+                val tabModelState = modelState.forTab(inputState)
+                tabModelState to ModelSelection.of(tabModelState, inputState)
+            },
             hostContext,
             persistedDismissedModelIds,
             locallyDismissedModelIds,
             usageWarningsEnabled,
-        ) { modelState, footerContext, persistedDismissedModelIds, localDismissedModelIds, usageWarningsEnabled ->
+        ) { (modelState, selection), footerContext, persistedDismissedModelIds, localDismissedModelIds, usageWarningsEnabled ->
             val previousContext = lastContext
             lastContext = footerContext
-            val previousModelId = lastSelectedModelId
-            lastSelectedModelId = modelState.selectedModelId ?: previousModelId
+            val previousSelection = lastSelection
+            if (selection.selectedModelId != null) lastSelection = selection
             // A prompt is attributed before the focus loss that follows it, even when both arrive in one emission.
             if (previousContext != null && footerContext.promptSubmissions > previousContext.promptSubmissions) measurement.promptSubmitted()
-            if (previousModelId != null && modelState.selectedModelId != null && modelState.selectedModelId != previousModelId) {
-                measurement.modelSwitched()
-            }
+            if (selection.switchedFrom(previousSelection) != null) measurement.modelSwitched()
             if (usageWarningsEnabled && persistedDismissedModelIds != null) {
                 resolver.resolve(modelState, footerContext, persistedDismissedModelIds + localDismissedModelIds)
             } else {
