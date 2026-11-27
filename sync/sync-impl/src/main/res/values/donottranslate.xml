@@ -32,10 +32,11 @@
         <item quantity="other">New synced devices</item>
     </plurals>
     <string name="syncNewDeviceBannerBody" instruction="Message in Sync settings. Placeholder is one device name, or a list of device names">This phone has synced with %1$s.</string>
-    <string name="syncNewDeviceBannerLastName" instruction="Joins the last device name to a list. First placeholder is the earlier device names, separated by commas. Second placeholder is the last device name">%1$s and %2$s</string>
-    <plurals name="syncNewDeviceBannerMore" instruction="Ends a list of device names. Placeholder 1 is the device names, separated by commas. Placeholder 2 is how many more devices synced">
-        <item quantity="one">%1$s and %2$d more</item>
-        <item quantity="other">%1$s and %2$d more</item>
+    <string name="syncNewDeviceBannerTwoNames" instruction="Joins exactly two device names, for example Laptop and Phone. Each placeholder is one device name">%1$s and %2$s</string>
+    <string name="syncNewDeviceBannerLastName" instruction="Joins the last device name to a list of 3 to 8 names, for example Laptop, Phone, and Tablet. First placeholder is the earlier device names, separated by commas. Second placeholder is the last device name. Use the comma before and only if your language uses it in lists">%1$s, and %2$s</string>
+    <plurals name="syncNewDeviceBannerMore" instruction="Ends a list of 8 device names, for example A, B, C, D, E, F, G, H, and 3 more. Placeholder 1 is the 8 device names, separated by commas. Placeholder 2 is how many more devices synced. Use the comma before and only if your language uses it in lists">
+        <item quantity="one">%1$s, and %2$d more</item>
+        <item quantity="other">%1$s, and %2$d more</item>
     </plurals>
     <string name="syncNewDeviceBannerReview">Review Activity</string>
     <string name="syncNewLoginNotificationChannelName">New synced devices</string>
