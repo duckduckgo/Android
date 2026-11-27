@@ -52,8 +52,6 @@ import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
 import com.duckduckgo.app.browser.WebViewErrorResponse.BAD_URL
 import com.duckduckgo.app.browser.WebViewErrorResponse.CONNECTION
 import com.duckduckgo.app.browser.WebViewErrorResponse.OMITTED
-import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_CRASH
-import com.duckduckgo.app.browser.WebViewPixelName.WEB_RENDERER_GONE_KILLED
 import com.duckduckgo.app.browser.applinks.AppLinkFeature
 import com.duckduckgo.app.browser.applinks.AppSchemeInterceptionFeature
 import com.duckduckgo.app.browser.certificates.rootstore.CertificateValidationState
@@ -156,6 +154,7 @@ class BrowserWebViewClient @Inject constructor(
     private val pageLoadTimeoutPixels: PageLoadTimeoutPixels,
     private val pageLoadFeature: PageLoadFeature,
     private val appLinkFeature: AppLinkFeature,
+    private val renderProcessGoneReporter: RenderProcessGoneReporter,
 ) : WebViewClient() {
     var webViewClientListener: WebViewClientListener? = null
     var clientProvider: ClientBrandHintProvider? = null
@@ -994,11 +993,7 @@ class BrowserWebViewClient @Inject constructor(
     ): Boolean {
         logcat(WARN) { "onRenderProcessGone. Did it crash? ${detail?.didCrash()}" }
         val didCrash = detail?.didCrash() == true
-        if (didCrash) {
-            pixel.fire(WEB_RENDERER_GONE_CRASH)
-        } else {
-            pixel.fire(WEB_RENDERER_GONE_KILLED)
-        }
+        renderProcessGoneReporter.onRenderProcessGone(didCrash)
 
         // Not url-scoped, and not gated on the cycle: a dead renderer ends whatever load it was running.
         navigationId?.let { loadNavigationId ->
