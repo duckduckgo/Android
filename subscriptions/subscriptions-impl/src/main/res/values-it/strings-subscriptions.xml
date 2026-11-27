@@ -200,7 +200,7 @@
     <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Recedi dal contratto</string>
     <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Puoi recedere e ottenere un rimborso completo entro il %1$s</string>
     <string name="subscriptionWithdrawDialogTitle">Vuoi annullare l\'abbonamento?</string>
-    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Il tuo abbonamento %1$s terminerà subito e riceverai un rimborso di %2$s sul metodo di pagamento originale entro 14 giorni.\n\nVPN, Personal Information Removal e i modelli avanzati di Duck.ai smetteranno di funzionare dopo la conferma.</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Il tuo abbonamento %1$s terminerà subito e riceverai un rimborso di %2$s sul metodo di pagamento originale entro 14 giorni.\n\nUna volta confermato, perderai l\'accesso a VPN, Identity Theft Restoration e ai modelli avanzati di Duck.ai.</string>
     <string name="subscriptionWithdrawDialogConfirm">Conferma prelievo</string>
     <string name="subscriptionWithdrawDialogKeep">Mantieni l\'abbonamento</string>
     <string name="subscriptionStatusNotSubscribed">Non abbonato</string>

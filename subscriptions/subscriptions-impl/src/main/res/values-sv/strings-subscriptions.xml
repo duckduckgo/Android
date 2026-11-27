@@ -200,7 +200,7 @@
     <string name="subscriptionSettingWithdraw" instruction="Subscription settings option to use the legal right of withdrawal: cancel the subscription within 14 days of purchase and get a full refund">Frånträda avtalet</string>
     <string name="subscriptionSettingWithdrawDeadline" instruction="Placeholder is the last date the user can withdraw, e.g. October 15, 2026">Du kan ångra dig och få full återbetalning fram till %1$s</string>
     <string name="subscriptionWithdrawDialogTitle">Avsluta din prenumeration?</string>
-    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Din %1$s -prenumeration avslutas direkt och du får %2$s återbetalat till din ursprungliga betalningsmetod inom 14 dagar.\n\nVPN, Personal Information Removal och avancerade Duck.ai-modeller slutar fungera när du bekräftar.</string>
+    <string name="subscriptionWithdrawDialogMessage" instruction="First placeholder is the subscription tier name, e.g. Plus or Pro. Second placeholder is the refund amount with currency, e.g. €9.99">Din %1$s -prenumeration avslutas direkt och du får %2$s återbetalat till din ursprungliga betalningsmetod inom 14 dagar.\n\nNär du har bekräftat förlorar du åtkomsten till VPN, Identity Theft Restoration och avancerade Duck.ai-modeller.</string>
     <string name="subscriptionWithdrawDialogConfirm">Bekräfta uttag</string>
     <string name="subscriptionWithdrawDialogKeep">Behåll abonnemang</string>
     <string name="subscriptionStatusNotSubscribed">Inte prenumererad</string>
