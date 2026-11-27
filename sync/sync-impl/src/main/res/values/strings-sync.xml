@@ -369,10 +369,8 @@
     <string name="syncAuditLogSynced" instruction="Action shown before a device name in a list of device activity: the device synced with this Sync account">Synced</string>
     <string name="syncAuditLogRemoved" instruction="Action shown before a device name in a list of device activity: the device was removed from this Sync account">Removed</string>
     <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity, for example Removed · iPhone. First placeholder is Synced or Removed. Second placeholder is the device name. Keep Synced or Removed first: a long device name is cut at the end of the line">%1$s · %2$s</string>
-    <plurals name="syncNewDeviceBannerTitle" instruction="Title of a message in Sync settings. The number is how many new devices synced with this account. Do not show the number">
-        <item quantity="one">New synced device</item>
-        <item quantity="other">New synced devices</item>
-    </plurals>
+    <string name="syncNewDeviceBannerTitleOne" instruction="Title of a message in Sync settings when one new device synced with this account">New synced device</string>
+    <string name="syncNewDeviceBannerTitleMany" instruction="Title of a message in Sync settings when two or more new devices synced with this account">New synced devices</string>
     <string name="syncNewDeviceBannerBody" instruction="Message in Sync settings. Placeholder is one device name, or a list of device names">This phone has synced with %1$s.</string>
     <string name="syncNewDeviceBannerTwoNames" instruction="Joins exactly two device names, for example Laptop and Phone. Each placeholder is one device name">%1$s and %2$s</string>
     <string name="syncNewDeviceBannerLastName" instruction="Joins the last device name to a list of 3 to 8 names, for example Laptop, Phone, and Tablet. First placeholder is the earlier device names, separated by commas. Second placeholder is the last device name. Use the comma before and only if your language uses it in lists">%1$s, and %2$s</string>
@@ -382,12 +380,11 @@
     </plurals>
     <string name="syncNewDeviceBannerReview" instruction="Button on a message about new synced devices. Opens a screen that lists recent device activity">Review Activity</string>
     <string name="syncNewLoginNotificationChannelName" instruction="Name of a notification category in Android system settings. The app uses it to tell the user that a new device synced with this account">New synced devices</string>
-    <plurals name="syncNewLoginNotificationTitle" instruction="Title of a phone notification. The number is how many new devices synced with this account. Do not show the number">
-        <item quantity="one">New synced device</item>
-        <item quantity="other">New synced devices</item>
-    </plurals>
-    <plurals name="syncNewLoginNotificationBody" instruction="Text of a phone notification. The number is how many new devices synced with this account">
-        <item quantity="one">This phone has synced with another device</item>
+    <string name="syncNewLoginNotificationTitleOne" instruction="Title of a phone notification when one new device synced with this account">New synced device</string>
+    <string name="syncNewLoginNotificationTitleMany" instruction="Title of a phone notification when two or more new devices synced with this account">New synced devices</string>
+    <string name="syncNewLoginNotificationBodyOne" instruction="Text of a phone notification when one new device synced with this account">This phone has synced with another device</string>
+    <plurals name="syncNewLoginNotificationBodyMany" instruction="Text of a phone notification. Used only for two or more devices. The placeholder is how many new devices synced with this account">
+        <item quantity="one">This phone has synced with %1$d devices</item>
         <item quantity="other">This phone has synced with %1$d devices</item>
     </plurals>
     <string name="syncAuditLogJustNow">Just now</string>
