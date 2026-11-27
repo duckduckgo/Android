@@ -18,10 +18,12 @@ package com.duckduckgo.duckchat.impl.models
 
 import android.webkit.CookieManager
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.DuckAiUsageLimitsRepository
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
@@ -32,6 +34,9 @@ import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageWindow
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
+import com.duckduckgo.duckchat.store.impl.DuckAiBridgeStorage
+import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingEntity
+import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
@@ -43,6 +48,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -60,9 +66,11 @@ import org.mockito.kotlin.doSuspendableAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.spy
 import org.mockito.kotlin.stub
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import kotlin.coroutines.Continuation
 
@@ -81,12 +89,21 @@ class RealDuckAiModelManagerTest {
 
     private val entitlementFlow = MutableSharedFlow<Set<Entitlement>>()
     private val subscriptionStatusFlow = MutableStateFlow(SubscriptionStatus.UNKNOWN)
-    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java, ioDispatcher = coroutineRule.testDispatcher)
     private val duckChatPixels: DuckChatPixels = mock()
     private val usageLimits = MutableStateFlow<UsageLimitsSnapshot?>(null)
     private val usageLimitsRepository: DuckAiUsageLimitsRepository = mock {
         whenever(it.usageLimits(any())).thenReturn(usageLimits)
     }
+    private val userDefaultSetting = MutableStateFlow<DuckAiBridgeSettingEntity?>(null)
+    private val settings: DuckAiBridgeSettingsDao = mock {
+        whenever(it.observe(USER_DEFAULT_KEY)).thenReturn(userDefaultSetting)
+    }
+    private val storage: DuckAiBridgeStorage = mock { whenever(it.settings).thenReturn(settings) }
+    private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage> = mock {
+        whenever(it.forMode(BrowserMode.REGULAR)).thenReturn(storage)
+    }
+    private val userDefaultModelRepository = spy(UserDefaultModelRepository(lazy { storageProvider }, duckChatFeature))
     private val currentTimeProvider: CurrentTimeProvider = mock {
         whenever(it.currentTimeMillis()).thenReturn(NOW_MILLIS)
     }
@@ -95,6 +112,8 @@ class RealDuckAiModelManagerTest {
 
     @Before
     fun setUp() {
+        duckChatFeature.duckAiNativeStorage().setRawStoredState(Toggle.State(enable = true))
+        duckChatFeature.userDefaultModel().setRawStoredState(Toggle.State(enable = false))
         whenever(subscriptions.getEntitlements()).thenReturn(entitlementFlow)
         whenever(subscriptions.getSubscriptionStatusFlow()).thenReturn(subscriptionStatusFlow)
         whenever(duckAiHostProvider.getHost()).thenReturn("duck.ai")
@@ -112,6 +131,7 @@ class RealDuckAiModelManagerTest {
             duckChatPixels = lazy { duckChatPixels },
             cookiesManager = cookiesManager,
             usageLimitsRepository = usageLimitsRepository,
+            userDefaultModelRepository = userDefaultModelRepository,
             currentTimeProvider = currentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
@@ -737,6 +757,95 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
+    fun whenUserDefaultChangesOrIsDeletedThenOnlyUnpickedNewChatsUpdateWithoutFetching() = runTest {
+        duckChatFeature.userDefaultModel().setRawStoredState(Toggle.State(enable = true))
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+        runCurrent()
+        assertEquals("server-model", testee.getSelectedModelId())
+        val pickedTab = NativeInputState.zero().copy(newChatModelId = "server-model", newChatReasoningMode = "extended_reasoning")
+
+        userDefaultSetting.value = userDefaultEntry("gpt-6-luna")
+        runCurrent()
+
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.FAST, UserDefaultOutcome.APPLIED), testee.modelState.value.newChatDefault)
+        assertEquals("gpt-6-luna", testee.getSelectedModelId())
+        assertEquals("server-model", testee.modelState.value.forTab(pickedTab).selectedModelId)
+        assertEquals(ReasoningMode.EXTENDED_REASONING, testee.modelState.value.forTab(pickedTab).selectedReasoningMode)
+
+        userDefaultSetting.value = null
+        runCurrent()
+
+        assertEquals(NewChatDefault("server-model", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+        assertEquals("server-model", testee.getSelectedModelId())
+        verify(modelsService, times(1)).getModels(any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenUserDefaultLoadedBeforeModelsThenHardcodedDefaultStandsUntilModelsLoad() = runTest {
+        duckChatFeature.userDefaultModel().setRawStoredState(Toggle.State(enable = true))
+        userDefaultSetting.value = userDefaultEntry("first")
+        givenResetModelForNewChatsWithServerDefault()
+        val response = CompletableDeferred<AIChatModelsResponse>()
+        modelsService.stub { onBlocking { getModels(any(), anyOrNull(), anyOrNull()) } doSuspendableAnswer { response.await() } }
+
+        val fetch = async { testee.fetchModels() }
+        runCurrent()
+
+        assertEquals(1, userDefaultSetting.subscriptionCount.value)
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+        assertEquals("gpt-6-luna", testee.getSelectedModelId())
+
+        response.complete(serverDefaultResponse(RemoteNewChatDefault(modelId = "server-model")))
+        fetch.await()
+
+        assertEquals("first", testee.getSelectedModelId())
+        assertEquals(UserDefaultOutcome.APPLIED, testee.modelState.value.newChatDefault?.userDefaultOutcome)
+    }
+
+    @Test
+    fun whenUserDefaultFlagOffThenStoredDefaultIgnoredAndOverLimitStillWins() = runTest {
+        userDefaultSetting.value = userDefaultEntry("first")
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+        runCurrent()
+        assertEquals("server-model", testee.getSelectedModelId())
+
+        usageLimits.value = overLimitSnapshot("gpt-6-luna", effort = "low")
+        userDefaultSetting.value = userDefaultEntry("server-model")
+        runCurrent()
+
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.REASONING), testee.modelState.value.newChatDefault)
+        assertEquals("gpt-6-luna", testee.getSelectedModelId())
+        verify(userDefaultModelRepository, never()).observe()
+        verifyNoInteractions(storageProvider)
+    }
+
+    @Test
+    fun whenUserDefaultFlagTurnsOffThenOutcomeClearsAndNextFetchDiscardsTheSetting() = runTest {
+        duckChatFeature.userDefaultModel().setRawStoredState(Toggle.State(enable = true))
+        userDefaultSetting.value = userDefaultEntry("first")
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+        runCurrent()
+        assertEquals("first", testee.getSelectedModelId())
+        assertEquals(UserDefaultOutcome.APPLIED, testee.modelState.value.newChatDefault?.userDefaultOutcome)
+
+        duckChatFeature.userDefaultModel().setRawStoredState(Toggle.State(enable = false))
+        runCurrent()
+
+        assertEquals("first", testee.getSelectedModelId())
+        assertEquals(UserDefaultOutcome.NONE, testee.modelState.value.newChatDefault?.userDefaultOutcome)
+        assertEquals(0, userDefaultSetting.subscriptionCount.value)
+
+        testee.fetchModels()
+
+        assertEquals(NewChatDefault("server-model", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+        assertEquals("server-model", testee.getSelectedModelId())
+        assertEquals(userDefaultEntry("first"), userDefaultSetting.value)
+    }
+
+    @Test
     fun whenResetModelForNewChatsAndOverLimitDefaultArrivesThenNewChatsStartOnIt() = runTest {
         givenResetModelForNewChatsWithServerDefault()
         testee.fetchModels()
@@ -861,6 +970,8 @@ class RealDuckAiModelManagerTest {
         cta = null,
         newChatDefault = OverLimitNewChatDefault(modelId, effort, resetsAtMillis),
     )
+
+    private fun userDefaultEntry(modelId: String) = DuckAiBridgeSettingEntity(key = USER_DEFAULT_KEY, value = "\"$modelId\"")
 
     /** The first accessible model differs from both the tier default and the server's model, so a leak would show. */
     private fun serverDefaultResponse(newChatDefault: RemoteNewChatDefault?) = AIChatModelsResponse(
@@ -2386,5 +2497,6 @@ class RealDuckAiModelManagerTest {
 
     private companion object {
         const val NOW_MILLIS = 1_000_000L
+        const val USER_DEFAULT_KEY = "defaultDuckaiModel"
     }
 }

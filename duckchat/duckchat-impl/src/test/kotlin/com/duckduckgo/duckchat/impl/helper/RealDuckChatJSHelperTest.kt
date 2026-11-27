@@ -57,6 +57,7 @@ import com.duckduckgo.duckchat.impl.feature.DuckAiChatHistoryFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.DUCK_CHAT_FEATURE_NAME
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper.Companion.METHOD_GET_PAGE_CONTEXT
+import com.duckduckgo.duckchat.impl.models.UserDefaultModelRepository
 import com.duckduckgo.duckchat.impl.nativeinput.ChatStateStore
 import com.duckduckgo.duckchat.impl.nativeinput.NewChatHintsUsage
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -206,6 +207,7 @@ class RealDuckChatJSHelperTest {
         tabSessions = tabSessions,
         newChatHintsUsage = newChatHintsUsage,
         clientToolsExecutor = clientToolsExecutor,
+        userDefaultModelSetting = UserDefaultModelRepository(lazy { mock() }, mockDuckChatFeature),
     )
 
     init {
@@ -674,6 +676,50 @@ class RealDuckChatJSHelperTest {
         )
 
         assertFalse(result!!.params.getBoolean("supportsNativeUsageWarnings"))
+    }
+
+    @Test
+    fun whenUserDefaultIsEnabledInRegularModeThenSendDefaultModelSettingCapability() = runTest {
+        assertTrue(defaultModelSettingConfig().getBoolean("supportsDefaultModelSetting"))
+    }
+
+    @Test
+    fun whenUserDefaultToggleIsOffThenOmitDefaultModelSettingCapability() = runTest {
+        assertFalse(defaultModelSettingConfig(userDefaultEnabled = false).has("supportsDefaultModelSetting"))
+    }
+
+    @Test
+    fun whenResetModelForNewChatsToggleIsOffThenOmitDefaultModelSettingCapability() = runTest {
+        assertFalse(defaultModelSettingConfig(resetEnabled = false).has("supportsDefaultModelSetting"))
+    }
+
+    @Test
+    fun whenNativeStorageIsOffThenOmitDefaultModelSettingCapability() = runTest {
+        assertFalse(defaultModelSettingConfig(nativeStorageEnabled = false).has("supportsDefaultModelSetting"))
+    }
+
+    @Test
+    fun whenInFireModeThenOmitDefaultModelSettingCapability() = runTest {
+        assertFalse(defaultModelSettingConfig(browserMode = BrowserMode.FIRE).has("supportsDefaultModelSetting"))
+    }
+
+    private suspend fun defaultModelSettingConfig(
+        userDefaultEnabled: Boolean = true,
+        resetEnabled: Boolean = true,
+        nativeStorageEnabled: Boolean = true,
+        browserMode: BrowserMode = BrowserMode.REGULAR,
+    ): JSONObject {
+        mockDuckChatFeature.userDefaultModel().setRawStoredState(Toggle.State(enable = userDefaultEnabled))
+        mockDuckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = resetEnabled))
+        mockDuckChatFeature.duckAiNativeStorage().setRawStoredState(Toggle.State(enable = nativeStorageEnabled))
+
+        return testee.processJsCallbackMessage(
+            "aiChat",
+            "getAIChatNativeConfigValues",
+            "123",
+            null,
+            browserMode = browserMode,
+        )!!.params
     }
 
     @Test

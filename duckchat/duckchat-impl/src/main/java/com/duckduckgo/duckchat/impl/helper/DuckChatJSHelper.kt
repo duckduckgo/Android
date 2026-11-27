@@ -68,6 +68,7 @@ import com.duckduckgo.duckchat.impl.voice.VoiceSessionStateManager
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiResponseWaitWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import com.duckduckgo.duckchat.store.impl.DuckAiUserDefaultModelSetting
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -176,6 +177,7 @@ class RealDuckChatJSHelper @Inject constructor(
     private val tabSessions: DuckAiTabSessionRepository,
     private val newChatHintsUsage: NewChatHintsUsage,
     private val clientToolsExecutor: ClientToolsExecutor,
+    private val userDefaultModelSetting: DuckAiUserDefaultModelSetting,
 ) : DuckChatJSHelper {
 
     private val registerOpenedJob = ConflatedJob()
@@ -570,11 +572,13 @@ class RealDuckChatJSHelper @Inject constructor(
                 false
             }
         }
-        val supportsNativeUsageWarnings = withContext(dispatcherProvider.io()) {
-            browserMode != BrowserMode.FIRE &&
+        val (supportsNativeUsageWarnings, supportsDefaultModelSetting) = withContext(dispatcherProvider.io()) {
+            val usageWarnings = browserMode != BrowserMode.FIRE &&
                 duckChat.isNativeChatInputEnabled() &&
                 duckChat.isNativeStorageEnabled() &&
                 duckChatFeature.duckAiUsageWarnings().isEnabled()
+            val defaultModelSetting = browserMode == BrowserMode.REGULAR && userDefaultModelSetting.isUserDefaultEnabled()
+            usageWarnings to defaultModelSetting
         }
         val supportsHomePageChatSuggestions = supportsHomePageChatSuggestions(browserMode)
         val jsonPayload =
@@ -596,6 +600,7 @@ class RealDuckChatJSHelper @Inject constructor(
                 put(SUPPORTS_PAGE_CONTEXT, duckChat.isDuckChatContextualModeEnabled() && mode == Mode.CONTEXTUAL)
                 put(SUPPORTS_NATIVE_STORAGE, duckChat.isNativeStorageEnabled())
                 put(SUPPORTS_NATIVE_USAGE_WARNINGS, supportsNativeUsageWarnings)
+                if (supportsDefaultModelSetting) put(SUPPORTS_DEFAULT_MODEL_SETTING, true)
                 put(
                     SUPPORTS_MULTIPLE_PAGE_CONTEXT,
                     duckChat.isDuckChatContextualModeEnabled() &&
@@ -969,6 +974,7 @@ class RealDuckChatJSHelper @Inject constructor(
         private const val SUPPORTS_MULTIPLE_PAGE_CONTEXT = "supportsMultipleContexts"
         private const val SUPPORTS_NATIVE_STORAGE = "supportsNativeStorage"
         private const val SUPPORTS_NATIVE_USAGE_WARNINGS = "supportsNativeUsageWarnings"
+        private const val SUPPORTS_DEFAULT_MODEL_SETTING = "supportsDefaultModelSetting"
         private const val SUPPORTS_SUBSCRIPTION = "supportsSubscription"
         private const val SUPPORTS_HOMEPAGE_CHAT_SUGGESTIONS = "supportsHomePageChatSuggestions"
         private const val SUPPORTS_BONUS_OFFER = "supportsBonusOffer"
