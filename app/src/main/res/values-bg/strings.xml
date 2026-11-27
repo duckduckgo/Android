@@ -948,6 +948,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Пропускане</string>
 
     <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportYourPasswordsTitle">Импортирайте паролите си</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Ще ги прехвърля от Google или от друг мениджър на пароли. Може да се наложи да отключите телефона си или да влезете в профила си.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Импортиране на пароли</string>
     <string name="preOnboardingImportCompleteTitle">Импортирането е завършено</string>
     <string name="preOnboardingImportCompleteCta">Продължаване</string>
     <string name="preOnboardingImportCompleteParsingTitle">Импортиране на пароли</string>
