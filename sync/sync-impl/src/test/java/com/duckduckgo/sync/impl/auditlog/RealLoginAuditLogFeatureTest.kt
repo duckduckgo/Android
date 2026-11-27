@@ -16,8 +16,11 @@
 
 package com.duckduckgo.sync.impl.auditlog
 
+import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.FakeToggleStore
+import com.duckduckgo.feature.toggles.api.FeatureToggles
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.sync.impl.SyncFeature
 import kotlinx.coroutines.test.runTest
@@ -36,7 +39,17 @@ class RealLoginAuditLogFeatureTest {
     private val testee = RealLoginAuditLogFeature(syncFeature, coroutineTestRule.testDispatcherProvider)
 
     @Test
-    fun whenFlagsNotSetThenBothDisabledByDefault() = runTest {
+    fun whenInternalBuildAndFlagsNotSetThenBothEnabled() = runTest {
+        val testee = RealLoginAuditLogFeature(syncFeatureFor(BuildFlavor.INTERNAL), coroutineTestRule.testDispatcherProvider)
+
+        assertTrue(testee.isAuditLogEnabled())
+        assertTrue(testee.isNotificationEnabled())
+    }
+
+    @Test
+    fun whenPlayBuildAndFlagsNotSetThenBothDisabled() = runTest {
+        val testee = RealLoginAuditLogFeature(syncFeatureFor(BuildFlavor.PLAY), coroutineTestRule.testDispatcherProvider)
+
         assertFalse(testee.isAuditLogEnabled())
         assertFalse(testee.isNotificationEnabled())
     }
@@ -72,6 +85,14 @@ class RealLoginAuditLogFeatureTest {
         assertTrue(testee.isAuditLogEnabled())
         assertTrue(testee.isNotificationEnabled())
     }
+
+    private fun syncFeatureFor(flavor: BuildFlavor): SyncFeature =
+        FeatureToggles.Builder()
+            .store(FakeToggleStore())
+            .featureName("sync")
+            .flavorNameProvider { flavor.name }
+            .build()
+            .create(SyncFeature::class.java)
 
     private fun setFlags(auditLog: Boolean, notification: Boolean) {
         syncFeature.loginAuditLog().setRawStoredState(State(enable = auditLog))
