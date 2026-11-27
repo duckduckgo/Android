@@ -19,6 +19,7 @@ package com.duckduckgo.app.browser
 import android.annotation.SuppressLint
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.app.browser.omnibar.LoadCompleteWebUrlAsGivenFeature
 import com.duckduckgo.app.browser.omnibar.QueryOrigin
 import com.duckduckgo.app.browser.omnibar.QueryUrlConverter
 import com.duckduckgo.app.browser.omnibar.QueryUrlPredictor
@@ -58,6 +59,7 @@ class QueryUrlConverterTest {
     private val variantManager: VariantManager = mock()
     private val mockAppReferrer: AppReferrer = mock()
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature = FakeFeatureToggleFactory.create(AndroidBrowserConfigFeature::class.java)
+    private val loadCompleteWebUrlAsGivenFeature = FakeFeatureToggleFactory.create(LoadCompleteWebUrlAsGivenFeature::class.java)
     private val queryUrlPredictor: QueryUrlPredictor = mock()
     private val mockDeviceInfo: DeviceInfo = mock()
     private val requestRewriter =
@@ -584,14 +586,26 @@ class QueryUrlConverterTest {
         assertEquals(input, result)
     }
 
-    private fun createTestee(useUrlPredictorEnabled: Boolean): QueryUrlConverter {
+    @Test
+    fun `when load complete web url as given disabled and url has pipe in query then url is extracted`() {
+        val testee = createTestee(useUrlPredictorEnabled = false, loadCompleteWebUrlAsGivenEnabled = false)
+        val result = testee.convertQueryToUrl("https://example.com/?a=1|2")
+        assertEquals("https://example.com/?a=1", result)
+    }
+
+    private fun createTestee(
+        useUrlPredictorEnabled: Boolean,
+        loadCompleteWebUrlAsGivenEnabled: Boolean = true,
+    ): QueryUrlConverter {
         androidBrowserConfigFeature.useUrlPredictor().setRawStoredState(State(useUrlPredictorEnabled))
+        loadCompleteWebUrlAsGivenFeature.self().setRawStoredState(State(loadCompleteWebUrlAsGivenEnabled))
         val converter = QueryUrlConverter(
             requestRewriter,
             androidBrowserConfigFeature,
             coroutineTestRule.testScope,
             coroutineTestRule.testDispatcherProvider,
             queryUrlPredictor,
+            loadCompleteWebUrlAsGivenFeature,
         )
         return converter
     }

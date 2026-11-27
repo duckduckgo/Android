@@ -50,10 +50,15 @@ class QueryUrlConverter @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val queryUrlPredictor: QueryUrlPredictor,
+    private val loadCompleteWebUrlAsGivenFeature: LoadCompleteWebUrlAsGivenFeature,
 ) : OmnibarEntryConverter, PrivacyConfigCallbackPlugin {
 
     @Volatile
     private var useUrlPredictor: Boolean = false
+
+    // Starts enabled, like the toggle's default, so a URL converted before the remote config is read still loads as given.
+    @Volatile
+    private var loadCompleteWebUrlAsGiven: Boolean = true
 
     init {
         cacheRemoteConfig()
@@ -122,7 +127,7 @@ class QueryUrlConverter @Inject constructor(
     }
 
     private fun convertUri(input: String): String {
-        val url = if (isCompleteWebUrl(input)) input else UriString.extractUrl(input, cleanInputQuery = false) ?: input
+        val url = if (loadCompleteWebUrlAsGiven && isCompleteWebUrl(input)) input else UriString.extractUrl(input, cleanInputQuery = false) ?: input
         val uri = Uri.parse(url).withScheme()
 
         if (requestRewriter.shouldRewriteRequest(uri)) {
@@ -145,6 +150,7 @@ class QueryUrlConverter @Inject constructor(
     private fun cacheRemoteConfig() {
         coroutineScope.launch(dispatcherProvider.io()) {
             useUrlPredictor = androidBrowserConfigFeature.useUrlPredictor().isEnabled()
+            loadCompleteWebUrlAsGiven = loadCompleteWebUrlAsGivenFeature.self().isEnabled()
         }
     }
 
