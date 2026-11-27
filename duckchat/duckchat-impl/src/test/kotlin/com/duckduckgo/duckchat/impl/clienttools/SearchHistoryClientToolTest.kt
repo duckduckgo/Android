@@ -264,6 +264,17 @@ class SearchHistoryClientToolTest {
         assertEquals("https://duckduckgo.com/", results.getJSONObject(1).getString("url"))
     }
 
+    @Test
+    fun whenTitleAndUrlTooLongThenCutToContractLimits() = runTest {
+        val path = "/" + "p".repeat(2000)
+        givenHistory(page("https://user:secret@example.com$path?q=1#top", "t".repeat(300), "2026-10-27T09:00:00"))
+
+        val result = success(testee.execute(JSONObject(), context)).getJSONArray("results").getJSONObject(0)
+
+        assertEquals("t".repeat(256), result.getString("title"))
+        assertEquals("https://example.com$path".take(1280), result.getString("url"))
+    }
+
     private suspend fun urls(input: String): List<String> {
         val results = success(testee.execute(JSONObject(input), context)).getJSONArray("results")
         return (0 until results.length()).map { results.getJSONObject(it).getString("url") }
