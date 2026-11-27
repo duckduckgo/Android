@@ -343,6 +343,18 @@ class AuditLogDeviceNameResolverTest {
     }
 
     @Test
+    fun whenDeviceHasNoLegacyNameThenNoLegacyPixel() = runTest {
+        resolver.resolve(
+            listOf(
+                entry("e2", LOGIN, device("b").copy(deviceName = "")),
+                entry("e1", LOGIN, device("a").copy(deviceName = null)),
+            ),
+        )
+
+        verify(auditLogPixels, never()).fireUndecryptable(AuditLogUndecryptableReason.LEGACY_NAME_TYPE_DECRYPT_ERROR)
+    }
+
+    @Test
     fun whenThirdPartyLegacyNameCannotBeReadWithoutThirdPartyCredentialThenNoPixel() = runTest {
         whenever(syncStore.scopedPassword).thenReturn(null)
 

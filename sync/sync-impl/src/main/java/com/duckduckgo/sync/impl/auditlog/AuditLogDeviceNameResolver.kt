@@ -133,7 +133,7 @@ class RealAuditLogDeviceNameResolver @Inject constructor(
 
         val legacy = deviceFieldDecryptor.decrypt(entry.device)
         if (legacy is Result.Success) return ResolvedDeviceName(legacy.data.name, legacy.data.type, LEGACY)
-        if (canReadLegacyFields(entry.device.credentialId)) failures += LEGACY_NAME_TYPE_DECRYPT_ERROR
+        if (!entry.device.deviceName.isNullOrEmpty() && canReadLegacyFields(entry.device.credentialId)) failures += LEGACY_NAME_TYPE_DECRYPT_ERROR
 
         val placeholder = DecryptedDevice.placeholder(entry.device.deviceId.orEmpty(), entry.device.credentialId)
         return ResolvedDeviceName(placeholder.name, placeholder.type, PLACEHOLDER)
