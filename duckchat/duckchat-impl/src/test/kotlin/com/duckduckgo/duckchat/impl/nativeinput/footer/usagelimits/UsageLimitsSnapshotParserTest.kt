@@ -193,6 +193,40 @@ class UsageLimitsSnapshotParserTest {
         assertTrue(cta.byModelId.isEmpty())
     }
 
+    @Test
+    fun whenReachedWithNewChatDefaultThenItIsParsedWithTheNoticeReset() {
+        val snapshot = testee.parse(withNewChatDefault(reached = true, """{"modelId":"gpt-6-luna","reasoningEffort":"low"}"""))!!
+
+        assertEquals(OverLimitNewChatDefault("gpt-6-luna", "low", FUTURE_MILLIS), snapshot.newChatDefault)
+    }
+
+    @Test
+    fun whenNotReachedThenNewChatDefaultIsIgnored() {
+        val snapshot = testee.parse(withNewChatDefault(reached = false, """{"modelId":"gpt-6-luna"}"""))!!
+
+        assertNull(snapshot.newChatDefault)
+    }
+
+    @Test
+    fun whenNewChatDefaultHasNoModelIdThenItIsIgnored() {
+        listOf("""{}""", """{"modelId":""}""", """{"modelId":"  "}""", """{"modelId":null,"reasoningEffort":"low"}""", "null").forEach {
+            assertNull(it, testee.parse(withNewChatDefault(reached = true, it))!!.newChatDefault)
+        }
+    }
+
+    @Test
+    fun whenNewChatDefaultEffortIsUnknownOrMissingThenKeptAsSent() {
+        val unknown = testee.parse(withNewChatDefault(reached = true, """{"modelId":"m","reasoningEffort":"turbo"}"""))!!
+        val missing = testee.parse(withNewChatDefault(reached = true, """{"modelId":"m"}"""))!!
+
+        assertEquals("turbo", unknown.newChatDefault?.reasoningEffort)
+        assertNull(missing.newChatDefault?.reasoningEffort)
+    }
+
+    private fun withNewChatDefault(reached: Boolean, newChatDefaultJson: String) =
+        """{"notice":{"id":"dailyReached","window":"daily","percentUsed":100,"resetsAt":"$FUTURE","reached":$reached},""" +
+            """"newChatDefault":$newChatDefaultJson}"""
+
     private fun notice(noticeJson: String) = """{"notice":$noticeJson}"""
 
     private fun withCta(ctaJson: String) =

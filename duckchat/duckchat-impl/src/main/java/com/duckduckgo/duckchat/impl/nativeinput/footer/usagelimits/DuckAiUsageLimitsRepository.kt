@@ -59,7 +59,7 @@ class RealDuckAiUsageLimitsRepository @Inject constructor(
     private fun UsageLimitsSnapshot?.describe(): String {
         if (this == null) return "no notice"
         return "notice=${notice.id.jsonId} window=${notice.window.jsonId} percent=${notice.percentUsed} " +
-            "reached=${notice.reached} cta=${cta?.id?.jsonId ?: "none"}"
+            "reached=${notice.reached} cta=${cta?.id?.jsonId ?: "none"} newChatDefault=${newChatDefault?.modelId ?: "none"}"
     }
 
     companion object {

@@ -36,6 +36,8 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.NewChatDefault
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.FakeUsageWarningPixelSender
@@ -365,6 +367,47 @@ class HighUsageModelFooterPluginTest {
             cancelAndIgnoreRemainingEvents()
         }
         assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndTheManagerMovesTheSelectionThenItIsNotReportedAsASwitch() = runTest {
+        modelState.value = highUsageModel().copy(newChatDefault = NewChatDefault("claude-opus-4-8", ReasoningMode.FAST))
+        inputState.value = inputState.value.copy(chatId = "chat-1")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            modelState.value = ModelState(
+                selectedModelId = "gpt-6-luna",
+                selectedModelShortName = "6 Luna",
+                newChatDefault = NewChatDefault("gpt-6-luna", ReasoningMode.FAST),
+            )
+
+            assertFalse(awaitItem().visible)
+            cancelAndIgnoreRemainingEvents()
+        }
+        assertFalse(pixelSender.events.any { it is UsageWarningEvent.ModelSwitched })
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndANewChatPicksAnotherModelThenModelSwitchedIsReported() = runTest {
+        val sonnet = AIChatModel("claude-sonnet-4-6", "sonnet", "Sonnet", "Sonnet", listOf("free"), isAccessible = true)
+        modelState.value = highUsageModel().copy(models = listOf(sonnet), newChatDefault = NewChatDefault("claude-opus-4-8", ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().visible)
+            footer.onDisplayed(true)
+
+            inputState.value = inputState.value.copy(newChatModelId = sonnet.id)
+
+            assertFalse(awaitItem().visible)
+            val exposure = UsageWarningExposure.ofHighUsageModel("claude-opus-4-8")
+            assertEquals(listOf(UsageWarningEvent.Shown(exposure), UsageWarningEvent.ModelSwitched(exposure)), pixelSender.events)
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     private fun plugin(dismissalStore: HighUsageModelNoticeDismissalStore) = HighUsageModelFooterPlugin(

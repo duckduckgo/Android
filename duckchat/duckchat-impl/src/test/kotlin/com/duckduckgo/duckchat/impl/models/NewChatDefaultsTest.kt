@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningEffort.NONE
 import com.duckduckgo.duckchat.impl.models.ReasoningMode.EXTENDED_REASONING
 import com.duckduckgo.duckchat.impl.models.ReasoningMode.FAST
 import com.duckduckgo.duckchat.impl.models.ReasoningMode.REASONING
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
@@ -152,6 +153,67 @@ class NewChatDefaultsTest {
 
         assertEquals(FAST, NewChatDefaults.reasoningMode(default, "gpt-6-luna", modes(NONE, LOW)))
         assertEquals(REASONING, NewChatDefaults.reasoningMode(default, "other", modes(LOW, HIGH)))
+    }
+
+    @Test
+    fun whenOverLimitModelAccessibleThenItWinsOverTheServerDefault() {
+        val default = overLimit("gpt-6-luna", effort = "low", models = listOf(terra, luna), server = "gpt-5.6-terra")
+
+        assertEquals(NewChatDefault("gpt-6-luna", REASONING), default)
+        assertEquals("gpt-6-luna", modelId(UserTier.PLUS, listOf(terra, luna), default))
+    }
+
+    @Test
+    fun whenOverLimitModelLockedOrMissingThenServerDefault() {
+        val locked = overLimit("gpt-6-luna", models = listOf(terra, luna.copy(isAccessible = false)), server = "other")
+        val missing = overLimit("gone", models = listOf(terra, other), server = "other")
+
+        assertEquals(NewChatDefault("other", FAST), locked)
+        assertEquals(NewChatDefault("other", FAST), missing)
+    }
+
+    @Test
+    fun whenOverLimitModelUnusableAndNoServerDefaultThenTierDefaultElseFirstAccessible() {
+        val tier = overLimit("gone", models = listOf(other, terra))
+
+        assertEquals(NewChatDefault("gpt-5.6-terra", FAST), tier)
+        assertEquals("gpt-5.6-terra", modelId(UserTier.PLUS, listOf(other, terra), tier))
+        assertEquals("other", modelId(UserTier.PLUS, listOf(other, terra.copy(isAccessible = false)), tier))
+    }
+
+    @Test
+    fun whenOverLimitResetHasPassedThenServerDefault() {
+        val default = overLimit("gpt-6-luna", models = listOf(terra, luna), server = "gpt-5.6-terra", resetsAtMillis = 0L)
+
+        assertEquals(NewChatDefault("gpt-5.6-terra", FAST), default)
+    }
+
+    @Test
+    fun whenNoOverLimitDefaultThenServerDefault() {
+        assertEquals(NewChatDefault("other", FAST), overLimit(modelId = null, models = listOf(other), server = "other"))
+    }
+
+    @Test
+    fun whenOverLimitEffortSupportedThenUsedElseFastElseFirstAccessible() {
+        val models = listOf(terra, other)
+        val high = overLimit("other", effort = "high", models = models)
+        val unknown = overLimit("other", effort = "turbo", models = models)
+        val missing = overLimit("other", models = models)
+
+        assertEquals(EXTENDED_REASONING, NewChatDefaults.reasoningMode(high, "other", modes(LOW, HIGH)))
+        assertEquals(FAST, NewChatDefaults.reasoningMode(unknown, "other", modes(NONE, LOW, HIGH)))
+        assertEquals(FAST, NewChatDefaults.reasoningMode(missing, "other", modes(NONE, LOW, HIGH)))
+        assertEquals(REASONING, NewChatDefaults.reasoningMode(missing, "other", modes(LOW, HIGH)))
+    }
+
+    @Test
+    fun whenOverLimitDefaultIsTheGlobalSelectionThenTabPickStillWins() {
+        val state = modelState(luna).copy(newChatDefault = overLimit("gpt-6-luna", effort = "low", models = listOf(luna, terra)))
+
+        val tab = state.forTab(NativeInputState.zero().copy(newChatModelId = terra.id))
+
+        assertEquals("gpt-5.6-terra", tab.selectedModelId)
+        assertEquals(FAST, tab.selectedReasoningMode)
     }
 
     @Test
@@ -293,6 +355,20 @@ class NewChatDefaultsTest {
 
     private fun server(modelId: String, effort: String? = null) =
         NewChatDefaults.preferred(UserTier.FREE, RemoteNewChatDefault(modelId = modelId, reasoningEffort = effort))
+
+    private fun overLimit(
+        modelId: String?,
+        effort: String? = null,
+        models: List<AIChatModel>,
+        server: String? = null,
+        resetsAtMillis: Long = 1L,
+    ) = NewChatDefaults.preferred(
+        tier = UserTier.PLUS,
+        remote = server?.let { RemoteNewChatDefault(modelId = it) },
+        overLimit = modelId?.let { OverLimitNewChatDefault(it, effort, resetsAtMillis) },
+        models = models,
+        nowMillis = 0L,
+    )
 
     private fun modelId(tier: UserTier, models: List<AIChatModel>, preferred: NewChatDefault = NewChatDefaults.preferred(tier, null)) =
         NewChatDefaults.modelId(tier, preferred, models)

@@ -383,6 +383,22 @@ class RealDuckAiChatStoreTest {
     }
 
     @Test
+    fun `getChatFlow emits the chat and null once it is deleted or malformed`() = runTest {
+        val json = """{"chatId":"abc","title":"Test","model":"gpt-5-mini","lastEdit":"2026-04-01T21:31:54.260Z","pinned":false}"""
+        val source = MutableStateFlow<DuckAiBridgeChatEntity?>(DuckAiBridgeChatEntity("abc", json))
+        whenever(chatsDao.getByIdAsFlow("abc")).thenReturn(source)
+
+        val flow = store.getChatFlow("abc")
+        assertEquals("gpt-5-mini", flow.firstOrNull()?.model)
+
+        source.value = DuckAiBridgeChatEntity("abc", "not json")
+        assertNull(flow.firstOrNull())
+
+        source.value = null
+        assertNull(flow.firstOrNull())
+    }
+
+    @Test
     fun `getChatsFlow re-emits after deletions`() = runTest {
         val json1 = """{"chatId":"abc","title":"A","model":"m","lastEdit":"2026-04-01T00:00:00.000Z","pinned":false}"""
         val json2 = """{"chatId":"def","title":"B","model":"m","lastEdit":"2026-04-02T00:00:00.000Z","pinned":false}"""
