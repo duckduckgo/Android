@@ -21,10 +21,11 @@ import android.content.Context
 import android.net.Uri
 import android.view.View
 import android.webkit.ValueCallback
-import com.duckduckgo.anvil.annotations.ContributesActivePluginPoint
+import com.duckduckgo.codegen.annotations.ContributesActivePluginPoint
 import com.duckduckgo.common.utils.plugins.ActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 
 /**
  * Communication surface from a plugin back to the host widget. Plugins use it to act on the host
@@ -87,6 +88,12 @@ interface NativeInputHost {
 
     /** The user picked a model during the FE model-change recovery flow. */
     fun changeModelSubmitted(modelId: String)
+
+    /** The user picked [modelId] for the next new chat in this tab. */
+    fun pickNewChatModel(modelId: String)
+
+    /** The user picked [mode] for the next new chat in this tab. */
+    fun pickNewChatReasoningMode(mode: ReasoningMode)
 
     /** Ask the host to run the camera capture flow; the activity owns the result plumbing. */
     fun requestCameraCapture(callback: ValueCallback<Array<Uri>>)

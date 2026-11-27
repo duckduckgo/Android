@@ -24,8 +24,8 @@ import com.duckduckgo.feature.toggles.api.RemoteFeatureStoreNamed
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN

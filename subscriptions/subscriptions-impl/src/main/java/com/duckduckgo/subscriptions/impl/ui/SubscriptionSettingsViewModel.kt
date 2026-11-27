@@ -17,24 +17,28 @@
 package com.duckduckgo.subscriptions.impl.ui
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.icu.text.DateFormat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
+import com.duckduckgo.subscriptions.impl.CurrentPurchase
 import com.duckduckgo.subscriptions.impl.R
 import com.duckduckgo.subscriptions.impl.SubscriptionTier
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PLUS_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_MONTHLY_PRO_PLANS
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
+import com.duckduckgo.subscriptions.impl.UndoCancellationResult
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
@@ -42,14 +46,22 @@ import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore.Companion.MAX_COMPLETED_ENTRY_POINT_VIEWS
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.DismissWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.FinishSignOut
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToActivationScreen
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToEditEmailScreen
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPlayStoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Monthly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.SubscriptionDuration.Yearly
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.ViewState.Ready
+import com.duckduckgo.subscriptions.impl.withdrawal.SubscriptionWithdrawal
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalEligibility
+import com.duckduckgo.subscriptions.impl.withdrawal.WithdrawalResult
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -59,8 +71,12 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import logcat.logcat
+import java.math.BigDecimal
+import java.text.NumberFormat
+import java.util.Currency
 import java.util.Date
 import javax.inject.Inject
 
@@ -75,6 +91,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val onboardingStore: SubscriptionOnboardingStore,
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
     private val currentTimeProvider: CurrentTimeProvider,
+    private val subscriptionWithdrawal: SubscriptionWithdrawal,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -82,6 +99,12 @@ class SubscriptionSettingsViewModel @Inject constructor(
 
     private val _viewState = MutableStateFlow<ViewState>(ViewState.Loading)
     val viewState = _viewState.asStateFlow()
+
+    private var withdrawalOption: WithdrawalOption? = null
+    private var withdrawalEligibilityRequested = false
+    private var withdrawalInProgress = false
+    private var undoCancellationInProgress = false
+    private var undoCancellationShownReported = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -91,10 +114,56 @@ class SubscriptionSettingsViewModel @Inject constructor(
             .onEach {
                 emitChanges()
             }.launchIn(viewModelScope)
+
+        subscriptionsManager.currentPurchaseState
+            .onEach { onPurchaseStateChanged(it) }
+            .launchIn(viewModelScope)
     }
 
     override fun onResume(owner: LifecycleOwner) {
-        viewModelScope.launch { emitChanges() }
+        viewModelScope.launch {
+            emitChanges()
+            refreshIfCancelled()
+        }
+    }
+
+    private suspend fun refreshIfCancelled() {
+        if (undoCancellationInProgress) return
+        val subscription = subscriptionsManager.getSubscription() ?: return
+        if (!canUndoCancellation(subscription)) return
+        runCatching { subscriptionsManager.refreshSubscriptionData() }
+        emitChanges()
+    }
+
+    private fun canUndoCancellation(subscription: Subscription): Boolean {
+        return subscriptionsFeature.undoSubscriptionCancellationAllLanguages().isEnabled() &&
+            subscription.status == NOT_AUTO_RENEWABLE &&
+            subscription.platform == "google"
+    }
+
+    fun onKeepSubscriptionClicked(activity: Activity) {
+        if (undoCancellationInProgress) return
+        undoCancellationInProgress = true
+        val isFreeTrial = (viewState.value as? Ready)?.activeOffers?.contains(ActiveOfferType.TRIAL) == true
+        pixelSender.reportSubscriptionSettingsUndoCancellationClick(isFreeTrial)
+        viewModelScope.launch {
+            if (subscriptionsManager.undoSubscriptionCancellation(activity) == UndoCancellationResult.NotEligible) {
+                undoCancellationInProgress = false
+                command.send(GoToPlayStoreSubscription)
+            }
+        }
+    }
+
+    private suspend fun onPurchaseStateChanged(purchase: CurrentPurchase) {
+        if (!undoCancellationInProgress) return
+        when (purchase) {
+            is CurrentPurchase.Failure -> {
+                undoCancellationInProgress = false
+                command.send(GoToPlayStoreSubscription)
+            }
+            is CurrentPurchase.Success, CurrentPurchase.Canceled, CurrentPurchase.Waiting -> undoCancellationInProgress = false
+            else -> Unit
+        }
     }
 
     private suspend fun emitChanges() {
@@ -165,8 +234,98 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 pendingTierNameResId = pendingTierNameResId,
                 effectiveTier = effectiveTier,
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
+                withdrawal = withdrawalOption.takeIf { subscriptionWithdrawal.isWithdrawable(subscription) },
+                showUndoCancellation = canUndoCancellation(subscription),
             ),
         )
+
+        reportUndoCancellationShownIfNeeded(subscription)
+        loadWithdrawalOptionIfNeeded(subscription)
+    }
+
+    private fun reportUndoCancellationShownIfNeeded(subscription: Subscription) {
+        if (undoCancellationShownReported || !canUndoCancellation(subscription)) return
+        undoCancellationShownReported = true
+        pixelSender.reportSubscriptionSettingsUndoCancellationShown(subscription.activeOffers.contains(ActiveOfferType.TRIAL))
+    }
+
+    private fun completedWithdrawalState(success: WithdrawalResult.Success): CompletedWithdrawalState {
+        val requestedAtMillis = success.requestedAtMillis ?: currentTimeProvider.currentTimeMillis()
+        return CompletedWithdrawalState(
+            date = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(requestedAtMillis)),
+            refundAmount = success.refund?.let { formatAmount(it.amount, it.currency) },
+        )
+    }
+
+    private suspend fun loadWithdrawalOptionIfNeeded(subscription: Subscription) {
+        if (!subscriptionWithdrawal.isWithdrawable(subscription) || withdrawalEligibilityRequested) return
+        withdrawalEligibilityRequested = true
+
+        val eligibility = subscriptionWithdrawal.getEligibility() ?: return
+        val option = eligibility.toWithdrawalOption(subscription)
+        withdrawalOption = option
+        _viewState.update { state -> if (state is Ready) state.copy(withdrawal = option) else state }
+    }
+
+    private fun WithdrawalEligibility.toWithdrawalOption(subscription: Subscription): WithdrawalOption {
+        return WithdrawalOption(
+            deadline = DateFormat.getInstanceForSkeleton("ddMMMMyyyy").format(Date(eligibleUntil)),
+            refundAmount = formatAmount(refundAmount, refundCurrency),
+            tierNameResId = getPendingTierNameResId(subscription.tier),
+        )
+    }
+
+    private fun formatAmount(amount: BigDecimal, currencyCode: String): String {
+        val code = currencyCode.uppercase()
+        return runCatching {
+            NumberFormat.getCurrencyInstance().apply { currency = Currency.getInstance(code) }.format(amount)
+        }.getOrElse { "${amount.toPlainString()} $code" }
+    }
+
+    fun onWithdrawClicked() {
+        val option = (_viewState.value as? Ready)?.withdrawal ?: return
+        pixelSender.reportSubscriptionSettingsWithdrawalClick()
+        pixelSender.reportSubscriptionSettingsWithdrawalDialogShown()
+        viewModelScope.launch {
+            command.send(ShowWithdrawalDialog(tierNameResId = option.tierNameResId, refundAmount = option.refundAmount))
+        }
+    }
+
+    fun onWithdrawalConfirmed() {
+        if (withdrawalInProgress) return
+        withdrawalInProgress = true
+        pixelSender.reportSubscriptionSettingsWithdrawalDialogConfirmClick()
+
+        viewModelScope.launch {
+            val result = subscriptionWithdrawal.withdraw()
+            if (result == WithdrawalResult.Failed) {
+                command.send(ShowWithdrawalDialogError)
+            } else {
+                withdrawalOption = null
+                val completedWithdrawal = (result as? WithdrawalResult.Success)?.let { completedWithdrawalState(it) }
+                _viewState.update { state ->
+                    if (state is Ready) {
+                        state.copy(
+                            withdrawal = null,
+                            completedWithdrawal = completedWithdrawal,
+                            onboardingEntryPoint = state.onboardingEntryPoint.takeIf { completedWithdrawal == null },
+                        )
+                    } else {
+                        state
+                    }
+                }
+                command.send(DismissWithdrawalDialog)
+            }
+            withdrawalInProgress = false
+        }
+    }
+
+    fun onWithdrawalDialogDismissed() {
+        pixelSender.reportSubscriptionSettingsWithdrawalDialogDismissed()
+    }
+
+    fun onWithdrawalHelpLinkClicked() {
+        viewModelScope.launch { command.send(GoToWithdrawalHelp) }
     }
 
     private val completedEntryPointAllowed: Boolean by lazy {
@@ -278,9 +437,25 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object GoToActivationScreen : Command()
         data class GoToPortal(val url: String) : Command()
         data object LaunchOnboarding : Command()
+        data class ShowWithdrawalDialog(val tierNameResId: Int, val refundAmount: String) : Command()
+        data object GoToWithdrawalHelp : Command()
+        data object DismissWithdrawalDialog : Command()
+        data object ShowWithdrawalDialogError : Command()
+        data object GoToPlayStoreSubscription : Command()
     }
 
     data class OnboardingEntryPoint(val percentage: Int)
+
+    data class CompletedWithdrawalState(
+        val date: String,
+        val refundAmount: String?,
+    )
+
+    data class WithdrawalOption(
+        val deadline: String,
+        val refundAmount: String,
+        val tierNameResId: Int,
+    )
 
     sealed class ViewState {
         data object Loading : ViewState()
@@ -303,6 +478,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val pendingTierNameResId: Int? = null,
             val effectiveTier: SubscriptionTier,
             val onboardingEntryPoint: OnboardingEntryPoint? = null,
+            val withdrawal: WithdrawalOption? = null,
+            val completedWithdrawal: CompletedWithdrawalState? = null,
+            val showUndoCancellation: Boolean = false,
         ) : ViewState()
     }
 

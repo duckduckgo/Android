@@ -23,7 +23,7 @@ import com.duckduckgo.pir.impl.store.PirRepository
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 

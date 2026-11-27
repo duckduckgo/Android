@@ -19,8 +19,8 @@ package com.duckduckgo.autofill.impl.configuration
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration.AutofillJsConfigType
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import javax.inject.Inject
@@ -29,7 +29,7 @@ interface AutofillJavascriptLoader {
     suspend fun getAutofillJavascript(): String
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class DefaultAutofillJavascriptLoader @Inject constructor(
     private val filenameProvider: AutofillJavascriptEnvironmentConfiguration,

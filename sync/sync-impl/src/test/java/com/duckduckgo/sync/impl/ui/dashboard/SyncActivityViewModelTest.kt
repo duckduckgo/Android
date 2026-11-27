@@ -17,6 +17,8 @@
 package com.duckduckgo.sync.impl.ui.dashboard
 
 import android.annotation.SuppressLint
+import android.content.Intent
+import androidx.lifecycle.viewModelScope
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.app.clipboard.ClipboardInteractor
@@ -45,7 +47,19 @@ import com.duckduckgo.sync.impl.SyncAccountRepository.AuthCode
 import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.SyncFeatureToggle
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
+import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step.NONE
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step.OPEN_SETTINGS
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step.REQUEST_PERMISSION
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationSetting
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
+import com.duckduckgo.sync.impl.auditlog.PendingLogin
+import com.duckduckgo.sync.impl.auditlog.RealLoginAuditLogFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
@@ -57,24 +71,34 @@ import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTu
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchDeviceActivity
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchLearnMore
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowPreviousSessionReady
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.NewLoginNotificationsViewState
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncDeviceListItem.SyncedDevice
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -87,8 +111,10 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.lang.String.format
+import java.time.Instant
 import kotlin.reflect.KClass
 
 @SuppressLint("DenyListedApi")
@@ -109,11 +135,16 @@ class SyncActivityViewModelTest {
     private val syncSetupWideEvent: SyncSetupWideEvent = mock()
     private val syncAutoRestoreManager: SyncAutoRestoreManager = mock()
     private val syncAutoRestore: SyncAutoRestore = mock()
-
-    private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
     private val fakeSyncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
+    private val fakeSettingsPageFeature = FakeFeatureToggleFactory.create(SettingsPageFeature::class.java)
+
     private val stateFlow = MutableStateFlow(SyncState.READY)
+
+    private val auditLogStateStore = FakeStateStore()
+    private val newLoginNotifier: NewLoginNotifier = mock()
+    private val notificationPermission = FakeNotificationPermission()
+    private val notificationSetting = FakeNotificationSetting()
 
     private lateinit var testee: SyncActivityViewModel
 
@@ -134,7 +165,11 @@ class SyncActivityViewModelTest {
             syncAutoRestoreManager = syncAutoRestoreManager,
             syncAutoRestore = syncAutoRestore,
             appCoroutineScope = coroutineTestRule.testScope,
-            syncFeature = fakeSyncFeature,
+            loginAuditLogFeature = RealLoginAuditLogFeature(fakeSyncFeature, coroutineTestRule.testDispatcherProvider),
+            auditLogStateStore = auditLogStateStore,
+            newLoginNotifier = newLoginNotifier,
+            newLoginNotificationPermission = notificationPermission,
+            newLoginNotificationSetting = notificationSetting,
         )
         whenever(syncStateMonitor.syncState()).thenReturn(emptyFlow())
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(true)
@@ -143,8 +178,18 @@ class SyncActivityViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(false)
     }
 
+    // Collecting viewState() starts the periodic device refresh, which loops on the test scheduler until the ViewModel is cleared.
+    // runTest drains that scheduler when the body returns, so we cancel the ViewModel's scope first or the test never finishes.
+    private fun runViewModelTest(testBody: suspend TestScope.() -> Unit) = runTest {
+        try {
+            testBody()
+        } finally {
+            testee.viewModelScope.cancel()
+        }
+    }
+
     @Test
-    fun whenUserSignedInThenDeviceSyncViewStateIsEnabled() = runTest {
+    fun whenUserSignedInThenDeviceSyncViewStateIsEnabled() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -155,7 +200,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserSignedInThenShowAccount() = runTest {
+    fun whenUserSignedInThenShowAccount() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -168,7 +213,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserSignedInThenLoginQRCodeIsNotNull() = runTest {
+    fun whenUserSignedInThenLoginQRCodeIsNotNull() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -181,7 +226,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserHasMultipleConnectedDevicesThenShowDevices() = runTest {
+    fun whenUserHasMultipleConnectedDevicesThenShowDevices() = runViewModelTest {
         givenAuthenticatedUser()
 
         val connectedDevices = listOf(connectedDevice, connectedDevice)
@@ -195,21 +240,23 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreatedThenSyncSettingsShownPixelFired() = runTest {
-        verify(syncPixels).fireSyncSettingsShown()
+    fun whenScreenOpenedThenSyncSettingsShownPixelFiredWithLaunchSource() = runViewModelTest {
+        testee.onScreenOpened(launchSource = "typed_url_duck_com")
+
+        verify(syncPixels).fireSyncSettingsShown("typed_url_duck_com")
     }
 
     @Test
-    fun whenSyncThisDeviceThenBackupThisDeviceTappedPixelFired() = runTest {
+    fun whenSyncThisDeviceThenBackupThisDeviceTappedPixelFired() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
 
-        testee.onSyncThisDevice()
+        testee.onSyncThisDevice(launchSource = "other")
 
         verify(syncPixels).fireBackupThisDeviceTapped()
     }
 
     @Test
-    fun whenRecoverYourSyncedDataThenRecoverSyncDataTappedPixelFired() = runTest {
+    fun whenRecoverYourSyncedDataThenRecoverSyncDataTappedPixelFired() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
 
         testee.onRecoverYourSyncedData()
@@ -218,7 +265,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runTest {
+    fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         testee.onSyncWithAnotherDevice()
 
@@ -229,7 +276,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncWithAnotherDeviceWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
+    fun whenSyncWithAnotherDeviceWithoutDeviceAuthenticationThenNoCommandSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
@@ -240,7 +287,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncWithAnotherDeviceAndCanRestoreThenShowPreviousSessionReady() = runTest {
+    fun whenSyncWithAnotherDeviceAndCanRestoreThenShowPreviousSessionReady() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
         testee.onSyncWithAnotherDevice()
 
@@ -253,7 +300,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScanAnotherDeviceQRCodeThenEmitCommandAddAnotherDevice() = runTest {
+    fun whenScanAnotherDeviceQRCodeThenEmitCommandAddAnotherDevice() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         testee.onAddAnotherDevice()
 
@@ -264,7 +311,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScanAnotherDeviceQRCodeWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
+    fun whenScanAnotherDeviceQRCodeWithoutDeviceAuthenticationThenNoCommandSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
@@ -275,53 +322,327 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runTest {
+    fun whenLaunchedFromPromotionAndNotSignedInThenLaunchCreateAccountFlow() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
             awaitItem().assertCommandType(IntroCreateAccount::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
+    fun whenJoiningExistingAccountAndNotSignedInThenEmitCommandSyncWithAnotherDevice() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
 
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
+            awaitItem().assertCommandType(Command.SyncWithAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoiningExistingAccountAndCreateAccountDisabledThenEmitCommandSyncWithAnotherDevice() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
+            awaitItem().assertCommandType(Command.SyncWithAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoiningExistingAccountAndSetupFlowsDisabledThenContentIsShown() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndNotSignedInThenBackupThisDeviceTappedPixelNotFired() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
+
+        verify(syncPixels, never()).fireBackupThisDeviceTapped()
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndCreateAccountDisabledThenNoCommandSent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceThenIntroCreateAccountDoesNotRequireAuth() = runTest {
-        givenImprovedSyncFlowDisabled()
+    fun whenLaunchedFromPromotionAndSetupFlowsDisabledThenContentIsShown() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            assertEquals(IntroCreateAccount(isAuthRequired = false, isImprovedSyncFlow = false), awaitItem())
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceWithImprovedFlowThenIntroCreateAccountRequiresAuth() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenLaunchedFromPromotionAndSignedInThenEmitCommandAddAnotherDevice() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
         testee.commands().test {
-            testee.onSyncThisDevice()
-            assertEquals(IntroCreateAccount(isAuthRequired = true, isImprovedSyncFlow = true), awaitItem())
+            testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
+            awaitItem().assertCommandType(Command.AddAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceWithImprovedFlowThenDoesNotAuthenticate() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenAskedToSyncWithDesktopAndSignedInThenEmitCommandAskSyncWithDesktop() = runViewModelTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.processSourceDeepLink(
+                launchSource = "promotion_bookmark_multi_device_added_dialog",
+                joinExistingAccount = false,
+                offerDesktopApp = true,
+            )
+            awaitItem().assertCommandType(Command.AskSyncWithDesktop::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAskedToSyncWithDesktopAndNotSignedInThenEmitCommandIntroCreateAccount() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(
+                launchSource = "promotion_bookmark_multi_device_added_dialog",
+                joinExistingAccount = false,
+                offerDesktopApp = true,
+            )
+            awaitItem().assertCommandType(IntroCreateAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromBookmarkAddedMultiDevicePromotionAndSignedInThenEmitCommandAddAnotherDevice() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.commands().test {
+            testee.processSourceDeepLink(
+                launchSource = "promotion_bookmark_multi_device_added_dialog",
+                joinExistingAccount = false,
+                offerDesktopApp = false,
+            )
+            awaitItem().assertCommandType(Command.AddAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncWithDesktopSelectedThenEmitCommandAddAnotherDevice() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+
+        testee.commands().test {
+            testee.onSyncWithDesktopSelected()
+            awaitItem().assertCommandType(Command.AddAnotherDevice::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoDesktopAppSelectedThenEmitCommandLaunchSyncGetOnOtherPlatforms() = runViewModelTest {
+        testee.onNoDesktopAppSelected()
+        testee.commands().test {
+            assertEquals("promotion_bookmark_added_dialog", (awaitItem() as LaunchSyncGetOnOtherPlatforms).source.value)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndNotSignedInThenFirstViewStateHidesContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
+
+        testee.viewState().test {
+            assertTrue(awaitItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndScreenExitsThenContentIsShown() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
+        testee.onScreenExit()
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCachedAsSignedInThenFlowStartShowsContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        assertFalse(testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenCachedAsSignedOutThenFlowStartHidesContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        assertTrue(testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenSignInStateNotCachedThenFlowStartHidesContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(null)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        assertTrue(testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenJoiningExistingAccountThenFlowStartShowsContent() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        assertFalse(testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false))
+    }
+
+    @Test
+    fun whenCachedAsSignedInThenFirstViewStateShowsContent() = runViewModelTest {
+        whenever(syncAccountRepository.cachedIsSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.processSourceDeepLink(launchSource = "promotion_bookmarks_multi_device", joinExistingAccount = false, offerDesktopApp = false)
+
+        testee.viewState().test {
+            assertFalse(awaitItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOfferingDesktopAppAndSignedInThenContentIsShown() = runViewModelTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.processSourceDeepLink(
+            launchSource = "promotion_bookmark_multi_device_added_dialog",
+            joinExistingAccount = false,
+            offerDesktopApp = true,
+        )
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenJoiningExistingAccountThenContentIsShownForAuthentication() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        givenSetupFlowsAllowed()
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+
+        testee.processSourceDeepLink(launchSource = "promotion_ai_chat", joinExistingAccount = true, offerDesktopApp = false)
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenedWithoutDeepLinkThenContentIsShown() = runViewModelTest {
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLaunchedFromPromotionAndSignedInThenContentIsShownForAuthentication() = runViewModelTest {
+        givenUserHasDeviceAuthentication(true)
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        testee.processSourceDeepLink(launchSource = "promotion_passwords", joinExistingAccount = false, offerDesktopApp = false)
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().isContentHidden)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceThenLaunchCreateAccountFlow() = runViewModelTest {
+        testee.commands().test {
+            testee.onSyncThisDevice(launchSource = "other")
+            awaitItem().assertCommandType(IntroCreateAccount::class)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncThisDeviceThenDoesNotAuthenticate() = runViewModelTest {
+        testee.commands().test {
+            testee.onSyncThisDevice(launchSource = "other")
             awaitItem()
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
@@ -329,21 +650,10 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncThisDeviceWithImprovedFlowAndWithoutDeviceAuthenticationThenLaunchCreateAccountFlow() = runTest {
-        givenImprovedSyncFlowEnabled()
-        givenUserHasDeviceAuthentication(false)
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            awaitItem().assertCommandType(IntroCreateAccount::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncThisDeviceAndCanRestoreThenShowPreviousSessionReady() = runTest {
+    fun whenSyncThisDeviceAndCanRestoreThenShowPreviousSessionReady() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             val command = awaitItem()
             command.assertCommandType(ShowPreviousSessionReady::class)
             assertEquals(SyncEntryPoint.SYNC_NEW_ACCOUNT, (command as ShowPreviousSessionReady).syncEntryPoint)
@@ -352,250 +662,84 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncThisDeviceThenOnFlowStartedCalled() = runTest {
+    fun whenSyncThisDeviceThenOnFlowStartedCalled() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(source = null)
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = "other")
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceWithSourceThenOnFlowStartedCalledWithSource() = runTest {
+    fun whenSyncThisDeviceWithSourceThenOnFlowStartedCalledWithSource() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         testee.commands().test {
-            testee.onSyncThisDevice(source = "settings")
+            testee.onSyncThisDevice(launchSource = "promotion_passwords")
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(source = "settings")
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = "promotion_passwords")
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceWithoutDeviceAuthThenOnDeviceAuthNotEnrolledCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
-
-        testee.onSyncThisDevice()
-
-        verify(syncSetupWideEvent).onFlowStarted(source = null)
-        verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
-    }
-
-    @Test
-    fun whenAddAnotherDeviceWithoutDeviceAuthThenOnDeviceAuthNotEnrolledCalled() = runTest {
+    fun whenAddAnotherDeviceWithoutDeviceAuthThenSetupWideEventNotTouched() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.onAddAnotherDevice()
 
-        verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
+        verifyNoInteractions(syncSetupWideEvent)
     }
 
     @Test
-    fun whenEnrollmentPromptShownThenOnEnrollDeviceAuthDialogShownCalled() = runTest {
-        givenUserHasDeviceAuthentication(false)
-
-        testee.onAddAnotherDevice()
-
-        verify(syncSetupWideEvent).onEnrollDeviceAuthDialogShown()
-    }
-
-    @Test
-    fun whenSyncThisDeviceWithoutDeviceAuthThenThisDeviceSyncIdle() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
-
-        testee.viewState().test {
-            testee.onSyncThisDevice()
-            assertFalse(expectMostRecentItem().isThisDeviceSyncing)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenSyncThisDeviceAuthenticatedThenOnUserAuthSuccessCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-
-        testee.onSyncThisDevice()
-
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceWithinGracePeriodThenOnUserAuthSuccessCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Allowed.WithinGracePeriod
-
-        testee.onSyncThisDevice()
-
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceAndAuthNotRequiredForBuildThenOnUserAuthSuccessCalled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Allowed.NotRequiredForBuild
-
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            awaitItem().assertCommandType(IntroCreateAccount::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenAddAnotherDeviceAuthenticatedThenOnUserAuthSuccessNotCalled() = runTest {
-        givenUserHasDeviceAuthentication(true)
-
-        testee.onAddAnotherDevice()
-
-        verify(syncSetupWideEvent, never()).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceVerificationDismissedThenNoCommandSentAndFlowCancelled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
-
-        testee.viewState().test {
-            testee.onSyncThisDevice()
-            assertFalse(expectMostRecentItem().isThisDeviceSyncing)
-            cancelAndIgnoreRemainingEvents()
-        }
-        testee.commands().test {
-            expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthCancelled()
-    }
-
-    @Test
-    fun whenSyncThisDeviceVerificationFailsThenShowErrorAndFlowCancelled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        deviceAuthenticator.response = Response.Failed("reason")
-
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            val command = awaitItem()
-            command.assertCommandType(Command.ShowError::class)
-            assertEquals("reason", (command as Command.ShowError).reason)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthCancelled()
-    }
-
-    @Test
-    fun whenSyncWithAnotherDeviceAndCanRestoreWithImprovedFlowThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenSyncWithAnotherDeviceAndCanRestoreThenShowPreviousSessionReadyWithoutAuthenticating() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
             testee.onSyncWithAnotherDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = true), awaitItem())
+            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceAndCanRestoreWithImprovedFlowThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenSyncThisDeviceAndCanRestoreThenShowPreviousSessionReadyWithoutAuthenticating() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
-            testee.onSyncThisDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = true), awaitItem())
+            testee.onSyncThisDevice(launchSource = "other")
+            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenRecoverSyncedDataAndCanRestoreWithImprovedFlowThenShowPreviousSessionReadyWithoutAuthenticating() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenRecoverSyncedDataAndCanRestoreThenShowPreviousSessionReadyWithoutAuthenticating() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
             testee.onRecoverYourSyncedData()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = true), awaitItem())
+            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncWithAnotherDeviceAndCanRestoreWithoutImprovedFlowThenAuthenticateBeforeShowPreviousSessionReady() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
-
-        testee.commands().test {
-            testee.onSyncWithAnotherDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE, isAuthRequired = false), awaitItem())
-            assertEquals(1, deviceAuthenticator.requests.size)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncThisDeviceAndCanRestoreWithoutImprovedFlowThenAuthenticateBeforeShowPreviousSessionReady() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
-
-        testee.commands().test {
-            testee.onSyncThisDevice()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = false), awaitItem())
-            assertEquals(1, deviceAuthenticator.requests.size)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenRecoverSyncedDataAndCanRestoreWithoutImprovedFlowThenAuthenticateBeforeShowPreviousSessionReady() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
-
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            assertEquals(ShowPreviousSessionReady(SyncEntryPoint.RECOVER_SYNCED_DATA, isAuthRequired = false), awaitItem())
-            assertEquals(1, deviceAuthenticator.requests.size)
-            cancelAndIgnoreRemainingEvents()
-        }
-        verify(syncSetupWideEvent).onUserAuthSuccess()
-    }
-
-    @Test
-    fun whenSyncWithAnotherDeviceAndCanRestoreWithoutImprovedFlowAndVerificationDismissedThenFlowCancelled() = runTest {
-        givenImprovedSyncFlowDisabled()
-        whenever(syncAutoRestore.canRestore()).thenReturn(true)
+    fun whenSyncWithAnotherDeviceVerificationDismissedThenSetupWideEventNotTouched() = runViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
 
         testee.onSyncWithAnotherDevice()
 
-        verify(syncSetupWideEvent).onUserAuthCancelled()
+        verifyNoInteractions(syncSetupWideEvent)
     }
 
     @Test
-    fun whenSyncWithAnotherDeviceVerificationDismissedThenSetupWideEventNotTouched() = runTest {
-        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
-
-        testee.onSyncWithAnotherDevice()
-
-        verify(syncSetupWideEvent, never()).onUserAuthCancelled()
-    }
-
-    @Test
-    fun whenAddAnotherDeviceVerificationFailsThenShowError() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+    fun whenAddAnotherDeviceVerificationFailsThenShowError() = runViewModelTest {
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         testee.commands().test {
             testee.onAddAnotherDevice()
@@ -607,30 +751,30 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenViewModelCreatedThenAuthPromptsExposeAuthenticatorPrompts() = runTest {
+    fun whenViewModelCreatedThenAuthPromptsExposeAuthenticatorPrompts() = runViewModelTest {
         assertEquals(deviceAuthenticator.currentPrompt, testee.authPrompts)
     }
 
     @Test
-    fun whenConnectionCancelledThenOnFlowCancelledCalled() = runTest {
+    fun whenConnectionCancelledThenOnFlowCancelledCalled() = runViewModelTest {
         testee.onConnectionCancelled()
 
         verify(syncSetupWideEvent).onFlowCancelled()
     }
 
     @Test
-    fun whenSyncThisDeviceThenThisDeviceSyncInProgress() = runTest {
+    fun whenSyncThisDeviceThenThisDeviceSyncInProgress() = runViewModelTest {
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenSyncThisDeviceCanceledThenThisDeviceSyncIdle() = runTest {
+    fun whenSyncThisDeviceCanceledThenThisDeviceSyncIdle() = runViewModelTest {
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
 
             testee.onSyncThisDeviceCanceled()
@@ -641,11 +785,22 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSkipRestoreClearFailsThenThisDeviceSyncIdle() = runTest {
+    fun whenContinueSetupAfterSkipRestoreThenLaunchOriginalFlowWithoutAuth() = runViewModelTest {
+        whenever(syncAutoRestoreManager.clearAutoRestoreData()).thenReturn(Result.Success(Unit))
+
+        testee.commands().test {
+            testee.onContinueSetupAfterSkipRestore(SyncEntryPoint.SYNC_NEW_ACCOUNT)
+            assertEquals(LaunchOriginalFlow(SyncEntryPoint.SYNC_NEW_ACCOUNT, isAuthRequired = false), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSkipRestoreClearFailsThenThisDeviceSyncIdle() = runViewModelTest {
         whenever(syncAutoRestoreManager.clearAutoRestoreData()).thenReturn(Result.Error(reason = "error"))
 
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
 
             testee.onContinueSetupAfterSkipRestore(SyncEntryPoint.SYNC_NEW_ACCOUNT)
@@ -656,8 +811,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenRecoverDataThenRecoverDataCommandSent() = runTest {
-        givenUserHasDeviceAuthentication(true)
+    fun whenRecoverDataThenRecoverDataCommandSent() = runViewModelTest {
         testee.onRecoverYourSyncedData()
 
         testee.commands().test {
@@ -667,41 +821,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenRecoverDataWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(false)
-
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            expectNoEvents()
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataThenIntroRecoverSyncDataDoesNotRequireAuth() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            assertEquals(IntroRecoverSyncData(isAuthRequired = false), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataWithImprovedFlowThenIntroRecoverSyncDataRequiresAuth() = runTest {
-        givenImprovedSyncFlowEnabled()
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            assertEquals(IntroRecoverSyncData(isAuthRequired = true), awaitItem())
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataWithImprovedFlowThenDoesNotAuthenticate() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenRecoverDataThenDoesNotAuthenticate() = runViewModelTest {
         testee.commands().test {
             testee.onRecoverYourSyncedData()
             awaitItem()
@@ -711,19 +831,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenRecoverDataWithImprovedFlowAndWithoutDeviceAuthenticationThenRecoverDataCommandSent() = runTest {
-        givenImprovedSyncFlowEnabled()
-        givenUserHasDeviceAuthentication(false)
-        testee.commands().test {
-            testee.onRecoverYourSyncedData()
-            awaitItem().assertCommandType(IntroRecoverSyncData::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenRecoverDataWithImprovedFlowThenManualRecoveryShownPixelFired() = runTest {
-        givenImprovedSyncFlowEnabled()
+    fun whenRecoverDataThenManualRecoveryShownPixelFired() = runViewModelTest {
         testee.commands().test {
             testee.onRecoverYourSyncedData()
             awaitItem()
@@ -733,7 +841,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenRecoverSyncedDataAndCanRestoreThenShowPreviousSessionReady() = runTest {
+    fun whenRecoverSyncedDataAndCanRestoreThenShowPreviousSessionReady() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
         testee.onRecoverYourSyncedData()
 
@@ -746,7 +854,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffSyncConfirmedThenLogoutLocalDevice() = runTest {
+    fun whenTurnOffSyncConfirmedThenLogoutLocalDevice() = runViewModelTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
 
@@ -756,7 +864,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffSyncConfirmedThenPixelFired() = runTest {
+    fun whenTurnOffSyncConfirmedThenPixelFired() = runViewModelTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
 
@@ -766,7 +874,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffSyncConfirmedFailsThenErrorShown() = runTest {
+    fun whenTurnOffSyncConfirmedFailsThenErrorShown() = runViewModelTest {
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
 
         testee.commands().test {
@@ -778,7 +886,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenLogoutSuccessThenUpdateViewState() = runTest {
+    fun whenLogoutSuccessThenUpdateViewState() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
@@ -794,7 +902,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenLogoutErrorThenUpdateViewState() = runTest {
+    fun whenLogoutErrorThenUpdateViewState() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
@@ -809,7 +917,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffSyncCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
+    fun whenTurnOffSyncCancelledThenDeviceSyncViewStateIsEnabled() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -821,22 +929,8 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountClickedWithDeviceAuthenticationThenAskDeleteAccount() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenUserHasDeviceAuthentication(true)
-
-        testee.onDeleteAccountClicked()
-
-        testee.commands().test {
-            awaitItem().assertCommandType(Command.AskDeleteAccount::class)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDeleteAccountClickedWithImprovedFlowAndOnlyThisDeviceThenAskTurnOffSync() = runTest {
+    fun whenDeleteAccountClickedAndOnlyThisDeviceThenAskTurnOffSync() = runViewModelTest {
         givenAuthenticatedUser()
-        givenImprovedSyncFlowEnabled()
         givenUserHasDeviceAuthentication(true)
 
         testee.viewState().test {
@@ -850,9 +944,8 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountClickedWithImprovedFlowAndMultipleDevicesThenAskTurnOffSync() = runTest {
+    fun whenDeleteAccountClickedAndMultipleDevicesThenAskTurnOffSync() = runViewModelTest {
         givenAuthenticatedUser()
-        givenImprovedSyncFlowEnabled()
         givenUserHasDeviceAuthentication(true)
         val otherDevice = connectedDevice.copy(thisDevice = false, deviceId = "otherDeviceId")
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(listOf(connectedDevice, otherDevice)))
@@ -868,7 +961,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffAndDeleteServerDataClickedThenAskDeleteServerData() = runTest {
+    fun whenTurnOffAndDeleteServerDataClickedThenAskDeleteServerData() = runViewModelTest {
         testee.commands().test {
             testee.onTurnOffAndDeleteServerDataClicked()
             awaitItem().assertCommandType(Command.AskDeleteServerData::class)
@@ -877,7 +970,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenTurnOffThisDeviceClickedThenAskTurnOffThisDevice() = runTest {
+    fun whenTurnOffThisDeviceClickedThenAskTurnOffThisDevice() = runViewModelTest {
         testee.commands().test {
             testee.onTurnOffThisDeviceClicked(connectedDevice)
             assertEquals(Command.AskTurnOffThisDevice(connectedDevice), awaitItem())
@@ -886,29 +979,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenImprovedSyncFlowEnabledAndSignedInThenViewStateReflectsImprovedFlow() = runTest {
-        givenAuthenticatedUser()
-        givenImprovedSyncFlowEnabled()
-
-        testee.viewState().test {
-            assertTrue(expectMostRecentItem().isImprovedSyncFlow)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenImprovedSyncFlowDisabledAndSignedInThenViewStateReflectsLegacyFlow() = runTest {
-        givenImprovedSyncFlowDisabled()
-        givenAuthenticatedUser()
-
-        testee.viewState().test {
-            assertFalse(expectMostRecentItem().isImprovedSyncFlow)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun whenDeleteAccountClickedWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
+    fun whenDeleteAccountClickedWithoutDeviceAuthenticationThenNoCommandSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
@@ -919,7 +990,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountSuccessThenUpdateViewState() = runTest {
+    fun whenDeleteServerDataConfirmedAndSuccessThenUpdateViewState() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.deleteAccount()).thenReturn(Result.Success(true))
@@ -927,7 +998,7 @@ class SyncActivityViewModelTest {
         testee.viewState().test {
             var viewState = expectMostRecentItem()
             assertTrue(viewState.showAccount)
-            testee.onDeleteAccountConfirmed()
+            testee.onDeleteServerDataConfirmed()
             viewState = awaitItem()
             assertFalse(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
@@ -935,12 +1006,12 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountErrorThenUpdateViewState() = runTest {
+    fun whenDeleteServerDataConfirmedAndErrorThenUpdateViewState() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.deleteAccount()).thenReturn(Result.Error(reason = "error"))
 
-        testee.onDeleteAccountConfirmed()
+        testee.onDeleteServerDataConfirmed()
 
         testee.viewState().test {
             val viewState = awaitItem()
@@ -950,30 +1021,32 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDeleteAccountConfirmedThenDeleteAccount() = runTest {
+    fun whenDeleteServerDataConfirmedThenDeleteAccount() = runViewModelTest {
         whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(connectedDevice)
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
         whenever(syncAccountRepository.deleteAccount()).thenReturn(Result.Success(true))
 
-        testee.onDeleteAccountConfirmed()
+        testee.onDeleteServerDataConfirmed()
 
+        verify(syncPixels).fireDeleteServerDataConfirmationConfirmed()
         verify(syncAccountRepository).deleteAccount()
     }
 
     @Test
-    fun whenDeleteAccountCancelledThenDeviceSyncViewStateIsEnabled() = runTest {
+    fun whenDeleteServerDataCancelledThenDeviceSyncViewStateIsEnabled() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
-            testee.onDeleteAccountCancelled()
+            testee.onDeleteServerDataCancelled()
             val viewState = expectMostRecentItem()
             assertTrue(viewState.showAccount)
             cancelAndIgnoreRemainingEvents()
         }
+        verify(syncPixels).fireDeleteServerDataConfirmationDismissed()
     }
 
     @Test
-    fun whenOnEditDeviceClickedWithDeviceAuthenticationThenAskEditDevice() = runTest {
+    fun whenOnEditDeviceClickedWithDeviceAuthenticationThenAskEditDevice() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
 
         testee.onEditDeviceClicked(connectedDevice)
@@ -987,7 +1060,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnEditDeviceClickedWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
+    fun whenOnEditDeviceClickedWithoutDeviceAuthenticationThenNoCommandSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
@@ -998,7 +1071,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveDeviceConfirmedThenRemoveDevice() = runTest {
+    fun whenOnRemoveDeviceConfirmedThenRemoveDevice() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
@@ -1009,7 +1082,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveDeviceSucceedsThenDeviceIsRemovedWithoutRefetch() = runTest {
+    fun whenOnRemoveDeviceSucceedsThenDeviceIsRemovedWithoutRefetch() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
@@ -1020,7 +1093,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveDeviceSucceedsThenReturnUpdateDevices() = runTest {
+    fun whenOnRemoveDeviceSucceedsThenReturnUpdateDevices() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Success(true))
@@ -1036,7 +1109,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenStaleDeviceFetchCompletesAfterRemovalThenRemovedDeviceDoesNotReappear() = runTest {
+    fun whenStaleDeviceFetchCompletesAfterRemovalThenRemovedDeviceDoesNotReappear() = runViewModelTest {
         givenAuthenticatedUser()
 
         val otherDevice = connectedDevice.copy(thisDevice = false, deviceId = "otherDeviceId")
@@ -1064,7 +1137,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnRemoveDeviceFailsThenDeviceRemainsInList() = runTest {
+    fun whenOnRemoveDeviceFailsThenDeviceRemainsInList() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.logout(deviceId)).thenReturn(Result.Error(reason = "error"))
@@ -1079,7 +1152,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnDeviceEditedThenUpdateDevice() = runTest {
+    fun whenOnDeviceEditedThenUpdateDevice() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Success(true))
@@ -1096,7 +1169,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnDeviceEditedFailsThenDeviceRemainsInList() = runTest {
+    fun whenOnDeviceEditedFailsThenDeviceRemainsInList() = runViewModelTest {
         givenAuthenticatedUser()
 
         whenever(syncAccountRepository.renameDevice(any())).thenReturn(Result.Error(reason = "error"))
@@ -1111,7 +1184,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runTest {
+    fun whenUserClicksOnSaveRecoveryCodeThenEmitCheckIfUserHasPermissionCommand() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
@@ -1124,7 +1197,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnSaveRecoveryCodeWithoutDeviceAuthenticationThenNoCommandSent() = runTest {
+    fun whenUserClicksOnSaveRecoveryCodeWithoutDeviceAuthenticationThenNoCommandSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
@@ -1135,7 +1208,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runTest {
+    fun whenGenerateRecoveryCodeThenGenerateFileAndEmitSuccessCommand() = runViewModelTest {
         val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         whenever(recoveryPDF.generateAndStoreRecoveryCodePDF(any(), eq(authCodeToUse.rawCode))).thenReturn(TestSyncFixtures.pdfFile())
@@ -1149,7 +1222,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserClicksOnCopyRecoveryCodeWithoutDeviceAuthenticationThenCodeIsNotCopied() = runTest {
+    fun whenUserClicksOnCopyRecoveryCodeWithoutDeviceAuthenticationThenCodeIsNotCopied() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
         val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
@@ -1160,7 +1233,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenCopyRecoveryCodeAuthenticatedThenCodeIsCopiedToClipboard() = runTest {
+    fun whenCopyRecoveryCodeAuthenticatedThenCodeIsCopiedToClipboard() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
@@ -1171,7 +1244,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenCopyRecoveryCodeAuthenticatedAndSystemShowsNoNotificationThenEmitShowMessageCommand() = runTest {
+    fun whenCopyRecoveryCodeAuthenticatedAndSystemShowsNoNotificationThenEmitShowMessageCommand() = runViewModelTest {
         val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         whenever(clipboardInteractor.copyToClipboard(any(), any())).thenReturn(false)
@@ -1186,7 +1259,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenCopyRecoveryCodeAuthenticatedAndSystemShowsNotificationThenNoMessageShown() = runTest {
+    fun whenCopyRecoveryCodeAuthenticatedAndSystemShowsNotificationThenNoMessageShown() = runViewModelTest {
         val authCodeToUse = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "something else")
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Success(authCodeToUse))
         whenever(clipboardInteractor.copyToClipboard(any(), any())).thenReturn(true)
@@ -1199,7 +1272,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenCopyRecoveryCodeAuthenticatedAndGettingRecoveryCodeFailsThenEmitShowErrorCommand() = runTest {
+    fun whenCopyRecoveryCodeAuthenticatedAndGettingRecoveryCodeFailsThenEmitShowErrorCommand() = runViewModelTest {
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error(reason = "error"))
 
         testee.commands().test {
@@ -1210,14 +1283,14 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnDeviceConnectedThenFetchRemoteDevices() = runTest {
+    fun whenOnDeviceConnectedThenFetchRemoteDevices() = runViewModelTest {
         givenAuthenticatedUser()
 
         val connectedDevices = listOf(connectedDevice, connectedDevice)
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Result.Success(connectedDevices))
 
         testee.viewState().test {
-            testee.onSyncThisDevice()
+            testee.onSyncThisDevice(launchSource = "other")
             assertTrue(expectMostRecentItem().isThisDeviceSyncing)
 
             testee.onDeviceConnected()
@@ -1230,7 +1303,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenOnDevicesUpdatedThenViewStateReflectsRefreshedDevices() = runTest {
+    fun whenOnDevicesUpdatedThenViewStateReflectsRefreshedDevices() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -1247,7 +1320,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncStateIsDisabledThenViewStateChanges() = runTest {
+    fun whenSyncStateIsDisabledThenViewStateChanges() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -1261,7 +1334,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncStateIsEnabledThenViewStateChanges() = runTest {
+    fun whenSyncStateIsEnabledThenViewStateChanges() = runViewModelTest {
         givenAuthenticatedUser()
         stateFlow.value = SyncState.OFF
 
@@ -1276,7 +1349,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncStateIsInProgressEnabledThenViewStateDoesNotChange() = runTest {
+    fun whenSyncStateIsInProgressEnabledThenViewStateDoesNotChange() = runViewModelTest {
         givenAuthenticatedUser()
 
         testee.viewState().test {
@@ -1289,7 +1362,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserSignedAndSetupFlowsDisabledThenAllSetupFlowsDisabledViewState() = runTest {
+    fun whenUserSignedAndSetupFlowsDisabledThenAllSetupFlowsDisabledViewState() = runViewModelTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
         whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
         givenAuthenticatedUser()
@@ -1303,7 +1376,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserSignedAndCreateAccountDisabledThenOnlySignInFlowDisabledViewState() = runTest {
+    fun whenUserSignedAndCreateAccountDisabledThenOnlySignInFlowDisabledViewState() = runViewModelTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
         whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
         givenAuthenticatedUser()
@@ -1317,7 +1390,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSetupFlowsDisabledThenAllSetupFlowsDisabledViewState() = runTest {
+    fun whenSetupFlowsDisabledThenAllSetupFlowsDisabledViewState() = runViewModelTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(false)
         whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(true)
 
@@ -1330,7 +1403,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenCreateAccountDisabledThenOnlySignInFlowDisabledViewState() = runTest {
+    fun whenCreateAccountDisabledThenOnlySignInFlowDisabledViewState() = runViewModelTest {
         whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
         whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(false)
 
@@ -1343,7 +1416,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncNotSupportedThenEmitCommandShowDeviceUnsupported() = runTest {
+    fun whenSyncNotSupportedThenEmitCommandShowDeviceUnsupported() = runViewModelTest {
         whenever(syncAccountRepository.isSyncSupported()).thenReturn(false)
 
         testee.commands().test {
@@ -1353,7 +1426,210 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenLearnMoreClickedThenEmitLaunchLearnMoreCommand() = runTest {
+    fun whenSignedInAndAuditLogEnabledThenShowDeviceActivity() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+
+        testee.viewState().test {
+            assertTrue(expectMostRecentItem().showDeviceActivity)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedInAndAuditLogDisabledThenHideDeviceActivity() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().showDeviceActivity)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutAndAuditLogEnabledThenHideDeviceActivity() = runViewModelTest {
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().showDeviceActivity)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenDeviceActivityClickedThenLaunchDeviceActivity() = runViewModelTest {
+        testee.onDeviceActivityClicked()
+
+        testee.commands().test {
+            assertEquals(LaunchDeviceActivity, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedInWithPendingLoginsAndNotificationsEnabledThenShowNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertEquals(listOf("Laptop"), expectMostRecentItem().newDeviceBanner?.deviceNames)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNoPendingLoginsThenHideNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoginNotificationFlagOffThenHideNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(false))
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAuditLogFlagOffThenHideNewDeviceBanner() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(false))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(true))
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutThenHideNewDeviceBanner() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignsInWhileOpenThenBannerShowsNewLogins() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+        val syncStates = MutableStateFlow(SyncState.OFF)
+        whenever(syncStateMonitor.syncState()).thenReturn(syncStates)
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+
+            givenAuthenticatedUser()
+            syncStates.value = SyncState.READY
+            auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+            assertEquals(listOf("Laptop"), expectMostRecentItem().newDeviceBanner?.deviceNames)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPendingLoginsAddedWhileOpenThenBannerUpdates() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newDeviceBanner)
+
+            auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+            assertEquals(listOf("Laptop"), expectMostRecentItem().newDeviceBanner?.deviceNames)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPendingLoginsClearedElsewhereThenBannerHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNotNull(expectMostRecentItem().newDeviceBanner)
+
+            auditLogStateStore.state.value = AuditLogCheckState()
+
+            assertNull(expectMostRecentItem().newDeviceBanner)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewDeviceBannerReviewClickedThenLaunchDeviceActivity() = runViewModelTest {
+        testee.onNewDeviceBannerReviewClicked()
+
+        testee.commands().test {
+            assertEquals(LaunchDeviceActivity, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewDeviceBannerClosedThenOnlyShownLoginsAreCleared() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(cursor = "after-1", pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNotNull(expectMostRecentItem().newDeviceBanner)
+            auditLogStateStore.foundDuringClose = pendingLogin(2, "Phone")
+
+            testee.onNewDeviceBannerCloseClicked()
+
+            assertEquals(listOf(pendingLogin(2, "Phone")), auditLogStateStore.state.value.pendingLogins)
+            assertEquals("after-1", auditLogStateStore.state.value.cursor)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewDeviceBannerClosedThenNotificationIsCancelled() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        auditLogStateStore.state.value = AuditLogCheckState(pendingLogins = listOf(pendingLogin(1, "Laptop")))
+
+        testee.viewState().test {
+            assertNotNull(expectMostRecentItem().newDeviceBanner)
+
+            testee.onNewDeviceBannerCloseClicked()
+
+            verify(newLoginNotifier).cancel()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewDeviceBannerClosedWithNoBannerThenStoreUntouched() = runViewModelTest {
+        testee.onNewDeviceBannerCloseClicked()
+
+        assertEquals(0, auditLogStateStore.updateCount)
+        verify(newLoginNotifier, never()).cancel()
+    }
+
+    @Test
+    fun whenLearnMoreClickedThenEmitLaunchLearnMoreCommand() = runViewModelTest {
         testee.onLearnMoreClicked()
 
         testee.commands().test {
@@ -1363,7 +1639,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenLearnMoreClickedThenCommandContainsCorrectUrl() = runTest {
+    fun whenLearnMoreClickedThenCommandContainsCorrectUrl() = runViewModelTest {
         testee.onLearnMoreClicked()
 
         testee.commands().test {
@@ -1377,7 +1653,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenClickedToGetAppOnOtherPlatformsClickedInEnabledStateThenEmitCommand() = runTest {
+    fun whenClickedToGetAppOnOtherPlatformsClickedInEnabledStateThenEmitCommand() = runViewModelTest {
         testee.onGetOnOtherPlatformsClickedWhenSyncEnabled()
         testee.commands().test {
             awaitItem().also {
@@ -1388,7 +1664,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenClickedToGetAppOnOtherPlatformsClickedInDisabledStateThenEmitCommand() = runTest {
+    fun whenClickedToGetAppOnOtherPlatformsClickedInDisabledStateThenEmitCommand() = runViewModelTest {
         testee.onGetOnOtherPlatformsClickedWhenSyncDisabled()
         testee.commands().test {
             awaitItem().also {
@@ -1399,7 +1675,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDesktopBrowserFeatureEnabledAndSignedOutThenViewStateShowsNewDesktopBrowserSetting() = runTest {
+    fun whenDesktopBrowserFeatureEnabledAndSignedOutThenViewStateShowsNewDesktopBrowserSetting() = runViewModelTest {
         fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(true))
 
         testee.viewState().test {
@@ -1410,7 +1686,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDesktopBrowserFeatureDisabledAndSignedOutThenViewStateDoesNotShowNewDesktopBrowserSetting() = runTest {
+    fun whenDesktopBrowserFeatureDisabledAndSignedOutThenViewStateDoesNotShowNewDesktopBrowserSetting() = runViewModelTest {
         fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(false))
 
         testee.viewState().test {
@@ -1421,7 +1697,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDesktopBrowserFeatureEnabledAndSignedInThenViewStateShowsNewDesktopBrowserSetting() = runTest {
+    fun whenDesktopBrowserFeatureEnabledAndSignedInThenViewStateShowsNewDesktopBrowserSetting() = runViewModelTest {
         fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(true))
         givenAuthenticatedUser()
 
@@ -1433,7 +1709,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenDesktopBrowserFeatureDisabledAndSignedInThenViewStateDoesNotShowNewDesktopBrowserSetting() = runTest {
+    fun whenDesktopBrowserFeatureDisabledAndSignedInThenViewStateDoesNotShowNewDesktopBrowserSetting() = runViewModelTest {
         fakeSettingsPageFeature.newDesktopBrowserSettingEnabled().setRawStoredState(State(false))
         givenAuthenticatedUser()
 
@@ -1445,7 +1721,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenUserSignedOutThenAutoRestoreToggleIsHidden() = runTest {
+    fun whenUserSignedOutThenAutoRestoreToggleIsHidden() = runViewModelTest {
         testee.viewState().test {
             val viewState = expectMostRecentItem()
             assertFalse(viewState.showAutoRestoreToggle)
@@ -1454,7 +1730,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenAutoRestoreAvailableThenViewStateShowsToggle() = runTest {
+    fun whenAutoRestoreAvailableThenViewStateShowsToggle() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         givenAuthenticatedUser()
@@ -1467,7 +1743,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenAutoRestoreNotAvailableThenViewStateHidesToggle() = runTest {
+    fun whenAutoRestoreNotAvailableThenViewStateHidesToggle() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(false)
         givenAuthenticatedUser()
 
@@ -1479,7 +1755,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenAutoRestoreEnabledThenViewStateReflectsEnabled() = runTest {
+    fun whenAutoRestoreEnabledThenViewStateReflectsEnabled() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         givenAuthenticatedUser()
@@ -1492,7 +1768,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenAutoRestoreDisabledThenViewStateReflectsDisabled() = runTest {
+    fun whenAutoRestoreDisabledThenViewStateReflectsDisabled() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
         givenAuthenticatedUser()
@@ -1505,7 +1781,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenAutoRestoreToggleChangedThenUpdatesViewStateOnly() = runTest {
+    fun whenAutoRestoreToggleChangedThenUpdatesViewStateOnly() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         givenAuthenticatedUser()
@@ -1522,7 +1798,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncStateReEmitsAfterToggleChangedThenPendingToggleStatePreserved() = runTest {
+    fun whenSyncStateReEmitsAfterToggleChangedThenPendingToggleStatePreserved() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         givenAuthenticatedUser()
@@ -1537,14 +1813,14 @@ class SyncActivityViewModelTest {
             // (state unchanged) we expect no new emission.
             stateFlow.value = IN_PROGRESS
             stateFlow.value = READY
-            advanceUntilIdle()
+            runCurrent()
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenScreenExitsWithAutoRestoreEnabledThenSavesPayloadAndSetsPreference() = runTest {
+    fun whenScreenExitsWithAutoRestoreEnabledThenSavesPayloadAndSetsPreference() = runViewModelTest {
         val authCode = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "rawCode")
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
@@ -1564,7 +1840,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScreenExitsWithAutoRestoreEnabledButGetRecoveryCodeFailsThenPreferenceNotWritten() = runTest {
+    fun whenScreenExitsWithAutoRestoreEnabledButGetRecoveryCodeFailsThenPreferenceNotWritten() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
         givenAuthenticatedUser()
@@ -1583,7 +1859,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScreenExitsWithAutoRestoreDisabledThenClearsPayloadAndSetsPreference() = runTest {
+    fun whenScreenExitsWithAutoRestoreDisabledThenClearsPayloadAndSetsPreference() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         givenAuthenticatedUser()
@@ -1601,7 +1877,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScreenExitsTwiceWithAutoRestoreEnabledThenSavesPayloadOnlyOnce() = runTest {
+    fun whenScreenExitsTwiceWithAutoRestoreEnabledThenSavesPayloadOnlyOnce() = runViewModelTest {
         val authCode = AuthCode(qrCode = jsonRecoveryKeyEncoded, rawCode = "rawCode")
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
@@ -1622,7 +1898,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScreenExitsTwiceWithAutoRestoreDisabledThenClearsPayloadOnlyOnce() = runTest {
+    fun whenScreenExitsTwiceWithAutoRestoreDisabledThenClearsPayloadOnlyOnce() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         givenAuthenticatedUser()
@@ -1641,7 +1917,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScreenExitsAndFeatureWasUnavailableThenNoStorageOperations() = runTest {
+    fun whenScreenExitsAndFeatureWasUnavailableThenNoStorageOperations() = runViewModelTest {
         // Feature unavailable at load time — autoRestoreAvailable captured as false
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(false)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
@@ -1661,7 +1937,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenScreenExitsWithNoNetChangeToToggleThenNoStorageOperations() = runTest {
+    fun whenScreenExitsWithNoNetChangeToToggleThenNoStorageOperations() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(false)
         givenAuthenticatedUser()
@@ -1682,7 +1958,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSignedOutThenSignedBackInThenAutoRestoreToggleIsVisible() = runTest {
+    fun whenSignedOutThenSignedBackInThenAutoRestoreToggleIsVisible() = runViewModelTest {
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
         whenever(syncAutoRestoreManager.isRestoreOnReinstallEnabled()).thenReturn(true)
         givenAuthenticatedUser()
@@ -1704,7 +1980,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenAutoRestorePreferenceWrittenDuringSetupThenResubscribingToViewStateShowsCorrectToggleState() = runTest {
+    fun whenAutoRestorePreferenceWrittenDuringSetupThenResubscribingToViewStateShowsCorrectToggleState() = runViewModelTest {
         // Simulate the race: account created (signed-in state fires) before the setup screen writes
         // the preference. The first viewState() collection reads 'false' from DataStore.
         whenever(syncAutoRestoreManager.isAutoRestoreAvailable()).thenReturn(true)
@@ -1727,7 +2003,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenProcessSetupDeepLinkWithV1ExchangeUrlThenAskSetupSyncDeepLinkIsSent() = runTest {
+    fun whenProcessSetupDeepLinkWithV1ExchangeUrlThenAskSetupSyncDeepLinkIsSent() = runViewModelTest {
         val url = SyncBarcodeUrl(webSafeB64EncodedCode = "code").asUrl()
         whenever(syncAccountRepository.parseSyncAuthCode(url)).thenReturn(SyncAuthCode.Exchange(mock()))
 
@@ -1739,7 +2015,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenProcessSetupDeepLinkWithV1ConnectUrlThenNoCommandIsSent() = runTest {
+    fun whenProcessSetupDeepLinkWithV1ConnectUrlThenNoCommandIsSent() = runViewModelTest {
         val url = SyncBarcodeUrl(webSafeB64EncodedCode = "code").asUrl()
         whenever(syncAccountRepository.parseSyncAuthCode(url)).thenReturn(SyncAuthCode.Unknown("code"))
 
@@ -1751,7 +2027,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenProcessSetupDeepLinkWithV2UrlAndDeviceAuthEnrolledThenDeepLinkIntoSetupIsSent() = runTest {
+    fun whenProcessSetupDeepLinkWithV2UrlAndDeviceAuthEnrolledThenDeepLinkIntoSetupIsSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
         val url = SyncBarcodeUrl(
             webSafeB64EncodedCode = "code",
@@ -1768,7 +2044,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenProcessSetupDeepLinkWithV2UrlThenAuthenticateWithDeepLinkPrompt() = runTest {
+    fun whenProcessSetupDeepLinkWithV2UrlThenAuthenticateWithDeepLinkPrompt() = runViewModelTest {
         val url = SyncBarcodeUrl(
             webSafeB64EncodedCode = "code",
             protocolVersion = SyncBarcodeUrl.ProtocolVersion.V2,
@@ -1782,7 +2058,286 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenProcessSetupDeepLinkWithV2UrlAndDeviceAuthNotEnrolledThenNoCommandIsSent() = runTest {
+    fun whenNotificationsOnAndAppCanPostThenSwitchOnAndNoCard() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = true, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationsOnAndAppCannotPostThenSwitchOffAndCardShown() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = true), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenAppCannotPostAndCardDismissedThenNoCard() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+        notificationSetting.cardDismissed = true
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserTurnedNotificationsOffThenSwitchOffAndNoCard() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+        notificationSetting.enabled = false
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationStateNotLoadedYetThenNotifyMeHidden() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationSetting.loadGate = CompletableDeferred()
+
+        testee.viewState().test {
+            val state = expectMostRecentItem()
+            assertTrue(state.showAccount)
+            assertFalse(state.showNotifyMe)
+            assertNull(state.newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSyncStateNotEmittedYetThenNotificationSettingsStillLoad() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        whenever(syncStateMonitor.syncState()).thenReturn(MutableSharedFlow())
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = true, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationSettingsShownThenNotifyMeHidden() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertFalse(expectMostRecentItem().showNotifyMe)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoginNotificationFlagOffThenNotifyMeShown() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            assertTrue(expectMostRecentItem().showNotifyMe)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenLoginNotificationFlagOffThenNoNotificationSettings() = runViewModelTest {
+        givenAuthenticatedUser()
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(false))
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSignedOutThenNoNotificationSettings() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenUserSignsInWhileOpenThenNotificationSettingsShown() = runViewModelTest {
+        givenLoginNotificationsEnabled()
+        val syncStates = MutableStateFlow(SyncState.OFF)
+        whenever(syncStateMonitor.syncState()).thenReturn(syncStates)
+
+        testee.viewState().test {
+            assertNull(expectMostRecentItem().newLoginNotifications)
+
+            givenAuthenticatedUser()
+            syncStates.value = SyncState.READY
+
+            assertNotNull(expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOffThenSettingStoredOffAndSwitchOff() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+
+        testee.viewState().test {
+            testee.onNewLoginNotificationsToggled(enabled = false, shouldShowRationale = false)
+
+            assertFalse(notificationSetting.enabled)
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOffWhileAppCannotPostThenCardHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            testee.onNewLoginNotificationsToggled(enabled = false, shouldShowRationale = false)
+
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOnAndAppCanPostThenSettingStoredOnAndNoCommand() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationSetting.enabled = false
+
+        testee.commands().test {
+            testee.onNewLoginNotificationsToggled(enabled = true, shouldShowRationale = false)
+
+            assertTrue(notificationSetting.enabled)
+            expectNoEvents()
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOnAndPermissionCanBeRequestedThenRequestPermission() = runViewModelTest {
+        notificationSetting.enabled = false
+        notificationPermission.canPost = false
+        notificationPermission.step = REQUEST_PERMISSION
+
+        testee.commands().test {
+            testee.onNewLoginNotificationsToggled(enabled = true, shouldShowRationale = true)
+
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+            assertTrue(notificationSetting.enabled)
+            assertEquals(true, notificationPermission.lastRationale)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSwitchTurnedOnAndSettingsNeededThenAskBeforeOpeningSettings() = runViewModelTest {
+        notificationPermission.canPost = false
+        notificationPermission.step = OPEN_SETTINGS
+
+        testee.commands().test {
+            testee.onNewLoginNotificationsToggled(enabled = true, shouldShowRationale = false)
+
+            assertEquals(Command.AskOpenNotificationSettings, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenOpenNotificationSettingsConfirmedThenOpenSettings() = runViewModelTest {
+        testee.commands().test {
+            testee.onOpenNotificationSettingsConfirmed()
+
+            assertEquals(Command.OpenNotificationSettings(notificationPermission.intent), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCardButtonClickedAndPermissionCanBeRequestedThenRequestPermission() = runViewModelTest {
+        notificationPermission.canPost = false
+        notificationPermission.step = REQUEST_PERMISSION
+
+        testee.commands().test {
+            testee.onEnableNotificationsClicked(shouldShowRationale = true)
+
+            assertEquals(Command.RequestNotificationPermission, awaitItem())
+            assertEquals(true, notificationPermission.lastRationale)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCardButtonClickedAndSettingsNeededThenOpenSettingsWithoutAsking() = runViewModelTest {
+        notificationPermission.canPost = false
+        notificationPermission.step = OPEN_SETTINGS
+
+        testee.commands().test {
+            testee.onEnableNotificationsClicked(shouldShowRationale = false)
+
+            assertEquals(Command.OpenNotificationSettings(notificationPermission.intent), awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenPermissionGrantedThenSwitchOnAndCardHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = true), expectMostRecentItem().newLoginNotifications)
+
+            notificationPermission.canPost = true
+            testee.onNotificationPermissionResult()
+
+            assertEquals(NewLoginNotificationsViewState(switchOn = true, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenCardClosedThenDismissStoredAndCardHides() = runViewModelTest {
+        givenAuthenticatedUser()
+        givenLoginNotificationsEnabled()
+        notificationPermission.canPost = false
+
+        testee.viewState().test {
+            testee.onEnableNotificationsCardCloseClicked()
+
+            assertTrue(notificationSetting.cardDismissed)
+            assertEquals(NewLoginNotificationsViewState(switchOn = false, showCard = false), expectMostRecentItem().newLoginNotifications)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenProcessSetupDeepLinkWithV2UrlAndDeviceAuthNotEnrolledThenNoCommandIsSent() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
         val url = SyncBarcodeUrl(
             webSafeB64EncodedCode = "code",
@@ -1797,7 +2352,7 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenProcessSetupDeepLinkWithMalformedUrlThenNoCommandIsSent() = runTest {
+    fun whenProcessSetupDeepLinkWithMalformedUrlThenNoCommandIsSent() = runViewModelTest {
         testee.commands().test {
             testee.processSetupDeepLink("not-a-sync-url")
             expectNoEvents()
@@ -1818,12 +2373,77 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.getConnectedDevices()).thenReturn(Success(listOf(connectedDevice)))
     }
 
-    private fun givenImprovedSyncFlowEnabled() {
-        fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(true))
+    private fun givenLoginNotificationsEnabled() {
+        fakeSyncFeature.loginAuditLog().setRawStoredState(State(true))
+        fakeSyncFeature.loginNotification().setRawStoredState(State(true))
     }
 
-    private fun givenImprovedSyncFlowDisabled() {
-        fakeSyncFeature.canUseImprovedSyncFlow().setRawStoredState(State(false))
+    private fun pendingLogin(n: Int, name: String) = PendingLogin(
+        entryId = "entry-$n",
+        deviceId = "device-$n",
+        deviceName = name,
+        occurredAt = Instant.parse("2026-11-19T10:00:00Z").plusSeconds(n.toLong()),
+    )
+
+    private class FakeNotificationPermission : NewLoginNotificationPermission {
+        var canPost = true
+        var step = NONE
+        var lastRationale: Boolean? = null
+        val intent = Intent("settings")
+
+        override suspend fun canPost(): Boolean = canPost
+
+        override suspend fun nextStep(shouldShowRationale: Boolean): Step {
+            lastRationale = shouldShowRationale
+            return if (canPost) NONE else step
+        }
+
+        override suspend fun settingsIntent(): Intent = intent
+    }
+
+    private class FakeNotificationSetting : NewLoginNotificationSetting {
+        var enabled = true
+        var cardDismissed = false
+        var loadGate: CompletableDeferred<Unit>? = null
+
+        override suspend fun isEnabled(): Boolean {
+            loadGate?.await()
+            return enabled
+        }
+
+        override suspend fun setEnabled(enabled: Boolean) {
+            this.enabled = enabled
+        }
+
+        override suspend fun isCardDismissed(): Boolean = cardDismissed
+
+        override suspend fun dismissCard() {
+            cardDismissed = true
+        }
+    }
+
+    private class FakeStateStore : AuditLogCheckStateStore {
+        val state = MutableStateFlow(AuditLogCheckState())
+        var updateCount = 0
+            private set
+
+        var foundDuringClose: PendingLogin? = null
+
+        override suspend fun read(): AuditLogCheckState = state.value
+
+        override suspend fun update(transform: (AuditLogCheckState) -> AuditLogCheckState?) {
+            updateCount++
+            foundDuringClose?.let { found -> state.value = state.value.copy(pendingLogins = state.value.pendingLogins + found) }
+            foundDuringClose = null
+            transform(state.value)?.let { state.value = it }
+        }
+
+        override fun pendingLogins(): Flow<List<PendingLogin>> = state.map { it.pendingLogins }
+    }
+
+    private fun givenSetupFlowsAllowed() {
+        whenever(syncFeatureToggle.allowSetupFlows()).thenReturn(true)
+        whenever(syncFeatureToggle.allowCreateAccount()).thenReturn(true)
     }
 
     private fun givenUserHasDeviceAuthentication(hasDeviceAuthentication: Boolean) {

@@ -17,10 +17,11 @@
 package com.duckduckgo.autofill.impl.di
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillFragmentResultsPlugin
 import com.duckduckgo.autofill.api.InternalTestUserChecker
+import com.duckduckgo.autofill.api.promotion.BookmarksImportScreenPromotionPlugin
+import com.duckduckgo.autofill.api.promotion.PasswordsImportScreenPromotionPlugin
 import com.duckduckgo.autofill.api.promotion.PasswordsScreenPromotionPlugin
 import com.duckduckgo.autofill.impl.encoding.UrlUnicodeNormalizer
 import com.duckduckgo.autofill.impl.urlmatcher.AutofillDomainNameUrlMatcher
@@ -39,28 +40,29 @@ import com.duckduckgo.autofill.store.feature.RealAutofillDefaultStateDecider
 import com.duckduckgo.autofill.store.targets.DomainTargetAppDao
 import com.duckduckgo.autofill.store.targets.DomainTargetAppsDatabase
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import com.duckduckgo.autofill.store.ALL_MIGRATIONS as AutofillMigrations
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class AutofillModule {
 
     @Provides
     fun provideInternalTestUserStore(applicationContext: Context): InternalTestUserStore = RealInternalTestUserStore(applicationContext)
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provide(): LastUpdatedTimeProvider = RealLastUpdatedTimeProvider()
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideAutofillPrefsStore(
         context: Context,
@@ -86,7 +88,7 @@ class AutofillModule {
     fun provideAutofillUrlMatcher(unicodeNormalizer: UrlUnicodeNormalizer): AutofillUrlMatcher = AutofillDomainNameUrlMatcher(unicodeNormalizer)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAutofillDatabase(databaseProvider: DatabaseProvider): AutofillDatabase {
         return databaseProvider.buildRoomDatabase(
             AutofillDatabase::class.java,
@@ -99,7 +101,7 @@ class AutofillModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesCredentialsSyncDao(
         database: AutofillDatabase,
     ): CredentialsSyncMetadataDao {
@@ -107,7 +109,7 @@ class AutofillModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesAutofillEngagementDb(databaseProvider: DatabaseProvider): AutofillEngagementDatabase {
         return databaseProvider.buildRoomDatabase(
             AutofillEngagementDatabase::class.java,
@@ -119,7 +121,7 @@ class AutofillModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideDomainTargetAppsDatabase(databaseProvider: DatabaseProvider): DomainTargetAppsDatabase {
         return databaseProvider.buildRoomDatabase(
             DomainTargetAppsDatabase::class.java,
@@ -131,7 +133,7 @@ class AutofillModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesDomainTargetAppsDao(
         database: DomainTargetAppsDatabase,
     ): DomainTargetAppDao {
@@ -147,3 +149,9 @@ interface UnusedAutofillResultPlugin
 
 @ContributesPluginPoint(scope = ActivityScope::class, boundType = PasswordsScreenPromotionPlugin::class)
 private interface PasswordsScreenPromotionPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = PasswordsImportScreenPromotionPlugin::class)
+private interface PasswordsImportScreenPromotionPluginPoint
+
+@ContributesPluginPoint(scope = AppScope::class, boundType = BookmarksImportScreenPromotionPlugin::class)
+private interface BookmarksImportScreenPromotionPluginPoint

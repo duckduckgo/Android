@@ -18,7 +18,7 @@ package com.duckduckgo.duckchat.impl.ui.nativeinput.plugins
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.impl.R

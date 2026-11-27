@@ -17,7 +17,7 @@
 package com.duckduckgo.app.browser.state
 
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
@@ -27,7 +27,7 @@ import javax.inject.Inject
  * A `recreate()` fires onClose+onOpen as if the app reopened; launch-time handling consumes this to
  * tell that recreate apart from a real app launch or resume, so it doesn't re-run launch behaviour.
  */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ModeSwitchRecreateSignal @Inject constructor() {
     private val pending = AtomicBoolean(false)
 

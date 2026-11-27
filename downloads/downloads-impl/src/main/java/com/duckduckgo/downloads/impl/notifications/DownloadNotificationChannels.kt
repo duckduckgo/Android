@@ -20,10 +20,10 @@ import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.impl.FileDownloadNotificationChannelType
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DownloadNotificationChannels @Inject constructor() : NotificationPlugin {
     override fun getChannels(): List<Channel> {
         return listOf(

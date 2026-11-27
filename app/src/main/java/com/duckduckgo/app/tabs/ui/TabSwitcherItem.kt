@@ -21,6 +21,7 @@ import com.duckduckgo.app.tabs.model.TabEntity
 sealed class TabSwitcherItem(val id: String) {
     sealed class Tab(val tabEntity: TabEntity) : TabSwitcherItem(tabEntity.tabId) {
         abstract val title: String
+        open val isRichDuckAiCard: Boolean = false
 
         data class NormalTab(
             private val entity: TabEntity,
@@ -33,12 +34,14 @@ sealed class TabSwitcherItem(val id: String) {
             val isSelected: Boolean,
             val isDuckAi: Boolean = false,
             override val title: String = "",
+            override val isRichDuckAiCard: Boolean = false,
         ) : Tab(entity)
 
         data class DuckAiTab(
             private val entity: TabEntity,
             val isActive: Boolean,
             override val title: String = "",
+            override val isRichDuckAiCard: Boolean = false,
         ) : Tab(entity)
 
         val isNewTabPage: Boolean

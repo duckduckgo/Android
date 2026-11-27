@@ -16,16 +16,13 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.savedsites.internal'
     lintOptions {
         baseline file("lint-baseline.xml")
@@ -35,34 +32,31 @@ android {
 
 dependencies {
     implementation project(path: ':autofill-api')
-    implementation project(':internal-features-api')
     implementation project(path: ':browser-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':design-system')
+    implementation project(':di')
+    implementation project(':internal-features-api')
     implementation project(path: ':navigation-api')
     implementation project(':saved-sites-api')
     implementation project(':saved-sites-impl')
     implementation project(':test-seeder-api')
-
-    ksp project(path: ':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
-    implementation project(':di')
-    implementation project(path: ':common-utils')
-
+    implementation "androidx.appcompat:appcompat:_"
+    implementation "androidx.constraintlayout:constraintlayout:_"
+    implementation "com.google.android.material:material:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.fragment.ktx
+    implementation AndroidX.lifecycle.process
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.process
-    implementation Google.dagger
-    implementation AndroidX.fragment.ktx
 
-    implementation "com.squareup.logcat:logcat:_"
-    implementation "androidx.appcompat:appcompat:_"
-    implementation "com.google.android.material:material:_"
-    implementation "androidx.constraintlayout:constraintlayout:_"
-    implementation project(path: ':design-system')
-
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+
+    ksp project(path: ':codegen-ksp')
 }

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+    <LinearLayout
+        style="@style/Widget.DuckDuckGo.Dialog.Content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="@dimen/dialogImageSize"
+            android:layout_height="@dimen/dialogImageSize"
+            android:layout_gravity="center_horizontal"
+            android:background="@drawable/background_dialog_icon_circular"
+            android:importantForAccessibility="no"
+            android:padding="@dimen/rebrandDialogIconInset"
+            app:srcCompat="@drawable/ic_ddg_logo" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_4"
+            android:text="@string/duckAiClientToolRequestAccessPromptTitle"
+            app:textType="primary"
+            app:typography="h2" />
+
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:text="@string/duckAiClientToolRequestAccessPromptMessage"
+            app:textType="secondary"
+            app:typography="body1" />
+
+        <!-- Capped so only the list scrolls; the outer scroll is for screens too short for the rest. -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_2">
+
+            <androidx.core.widget.NestedScrollView
+                android:id="@+id/browserToolsPermissionsToolsScroll"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:scrollbars="vertical"
+                app:layout_constrainedHeight="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_max="@dimen/duckAiBrowserToolsPermissionsListMaxHeight"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/browserToolsPermissionsTools"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+            </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/browserToolsPermissionsAllow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:text="@string/duckAiClientToolPromptAllowInChat" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/browserToolsPermissionsDontAllow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/duckAiClientToolPromptDontAllow" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

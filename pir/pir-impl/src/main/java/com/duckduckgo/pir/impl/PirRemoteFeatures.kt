@@ -16,7 +16,7 @@
 
 package com.duckduckgo.pir.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -26,8 +26,9 @@ import com.duckduckgo.feature.toggles.api.Toggle.InternalAlwaysEnabled
 import com.duckduckgo.pir.api.PirFeature
 import com.duckduckgo.pir.api.dashboard.PirFeatureState
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -75,12 +76,40 @@ interface PirRemoteFeatures {
      */
     @DefaultValue(DefaultFeatureValue.INTERNAL)
     fun freemium(): Toggle
+
+    /**
+     * When enabled, completing onboarding on the dashboard asks for the notification permission
+     * (after explaining why) so the user can be told when the initial scan completes.
+     */
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun notificationPermissionPrompt(): Toggle
+
+    /**
+     * Kill-switch for broker-specific user agents. When disabled, every broker runs with the
+     * default PIR user agent, ignoring the user agent set in its broker JSON.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun customWebViewUserAgent(): Toggle
+
+    /**
+     * Kill-switch for matching the WebView's client hints (`Sec-CH-UA*`) to a broker-specific user agent.
+     * When disabled, the WebView keeps its own client hints even when a broker sets its user agent.
+     */
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun customWebViewUserAgentClientHints(): Toggle
+
+    /**
+     * When enabled, detached scan WebViews are laid out 1024 CSS px wide at the screen's aspect ratio instead of 0×0,
+     * so responsive broker pages render the content that extraction reads.
+     */
+    @DefaultValue(DefaultFeatureValue.FALSE)
+    fun scanWebViewSize(): Toggle
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirFeature::class,
+    binding = binding<PirFeature>(),
 )
 class PirRemoteFeatureImpl @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,

@@ -18,15 +18,16 @@ package com.duckduckgo.autofill.impl.ui.credential.management.importpassword.goo
 
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
 /**
- * Importing from another app moves our app to the background, which would otherwise make the passwords screen
- * ask for device auth again when the user comes back. Activity-scoped so the suppression never leaves the screen that started the import.
+ * Importing from another app moves our app to the background, and importing through one of our own screens stops the
+ * passwords screen. Either would otherwise make the passwords screen ask for device auth again when the user comes back.
+ * Activity-scoped so the suppression never leaves the screen that started the import.
  */
 interface ExternalImportAuthSuppressor {
     /**
@@ -43,7 +44,7 @@ interface ExternalImportAuthSuppressor {
     fun consumeSuppression(): Boolean
 }
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class RealExternalImportAuthSuppressor @Inject constructor(
     private val timeProvider: TimeProvider,

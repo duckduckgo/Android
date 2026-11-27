@@ -59,7 +59,7 @@ class AiConfigCheckerTest {
         write(".claude/rules/maestro-ui-tests.md", "---\npaths:\n  - \".maestro/**\"\n---\n# Maestro\n")
         write(".claude/docs/contributions.md", "# Contributions\n")
         write(".claude/docs/dagger-scopes.md", "# Dagger scopes\n")
-        write(".claude/skills/do-thing/SKILL.md", "---\nname: do-thing\ndescription: Use when doing the thing.\n---\n# Do thing\n")
+        write(".agents/skills/do-thing/SKILL.md", "---\nname: do-thing\ndescription: Use when doing the thing.\n---\n# Do thing\n")
     }
 
     private fun check(): List<Violation> = AiConfigChecker(repo).check()
@@ -197,7 +197,7 @@ class AiConfigCheckerTest {
     @Test
     fun `skill without description is reported`() {
         validRepo()
-        write(".claude/skills/do-thing/SKILL.md", "---\nname: do-thing\n---\n# Do thing\n")
+        write(".agents/skills/do-thing/SKILL.md", "---\nname: do-thing\n---\n# Do thing\n")
         val violations = check()
         assertTrue(
             violations.any { it.message.contains("Skill missing `description:`") },
@@ -208,7 +208,7 @@ class AiConfigCheckerTest {
     @Test
     fun `skill without name is reported`() {
         validRepo()
-        write(".claude/skills/do-thing/SKILL.md", "---\ndescription: Use when doing the thing.\n---\n# Do thing\n")
+        write(".agents/skills/do-thing/SKILL.md", "---\ndescription: Use when doing the thing.\n---\n# Do thing\n")
         val violations = check()
         assertTrue(violations.any { it.message.contains("Skill missing `name:`") }, "got: $violations")
     }

@@ -62,6 +62,10 @@ data class WideEventEntity(
     val isFirstDailyOccurrence: Boolean = false,
     @ColumnInfo(name = "app_version")
     val appVersion: String,
+    @ColumnInfo(name = "path", defaultValue = "[]")
+    val path: List<String> = emptyList(),
+    @ColumnInfo(name = "last_path_step")
+    val lastPathStep: String? = null,
 ) {
     data class MetadataEntry(
         @Json(name = "key")
@@ -91,6 +95,8 @@ data class WideEventEntity(
         abstract val metadata: Map<String, String>
 
         data class OnProcessStart(
+            @Json(name = "ownerProcessName")
+            val ownerProcessName: String,
             @Json(name = "ignore_if_interval_timeout_present")
             val ignoreIfIntervalTimeoutPresent: Boolean,
             @Json(name = "status")
@@ -118,7 +124,17 @@ data class WideEventEntity(
         val timeout: Duration?,
         @Json(name = "buckets")
         val buckets: List<Duration>?,
+        @Json(name = "rounding")
+        val rounding: BucketRounding,
     )
+
+    enum class BucketRounding {
+        @Json(name = "round_down")
+        ROUND_DOWN,
+
+        @Json(name = "round_up")
+        ROUND_UP,
+    }
 }
 
 @ProvidedTypeConverter
@@ -162,6 +178,10 @@ class WideEventEntityTypeConverters @Inject constructor(
         )
     }
 
+    private val stringListAdapter: JsonAdapter<List<String>> by lazy {
+        moshi.adapter(Types.newParameterizedType(List::class.java, String::class.java))
+    }
+
     private val cleanupPolicyAdapter: JsonAdapter<WideEventEntity.CleanupPolicy> by lazy {
         moshi.adapter(WideEventEntity.CleanupPolicy::class.java)
     }
@@ -186,6 +206,12 @@ class WideEventEntityTypeConverters @Inject constructor(
 
     @TypeConverter
     fun toWideEventStepList(value: String): List<WideEventEntity.WideEventStep> = wideEventStepListAdapter.fromJson(value) ?: emptyList()
+
+    @TypeConverter
+    fun fromStringList(value: List<String>): String = stringListAdapter.toJson(value)
+
+    @TypeConverter
+    fun toStringList(value: String): List<String> = stringListAdapter.fromJson(value) ?: emptyList()
 
     @TypeConverter
     fun fromWideEventStatus(status: WideEventEntity.WideEventStatus?): String? = status?.statusCode

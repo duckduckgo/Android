@@ -21,8 +21,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -33,7 +33,7 @@ interface AutofillServiceStore {
     suspend fun updateDefaultAutofillProvider(isDefault: Boolean)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAutofillServiceStore @Inject constructor(
     @AutofillServiceDataStore private val store: DataStore<Preferences>,

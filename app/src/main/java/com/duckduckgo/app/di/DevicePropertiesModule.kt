@@ -32,17 +32,17 @@ import com.duckduckgo.common.utils.playstore.PlayStoreUtils
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.experiments.api.VariantManager
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DevicePropertiesModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesAppProperties(
         appContext: Context,
         variantManager: VariantManager,
@@ -58,7 +58,7 @@ object DevicePropertiesModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providesUserBrowserProperties(
         themingDataStore: ThemingDataStore,
         savedSitesRepository: SavedSitesRepository,

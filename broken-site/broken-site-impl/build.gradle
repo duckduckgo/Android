@@ -16,79 +16,61 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.brokensite.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     lint {
         baseline = file("lint-baseline.xml")
     }
 }
 
 dependencies {
-    testImplementation project(':feature-toggles-test')
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
-    implementation project(path: ':broken-site-api')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':di')
-    implementation project(path: ':design-system')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':statistics-api')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':broken-site-api')
     implementation project(path: ':broken-site-store')
+    implementation project(path: ':browser-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
     implementation project(path: ':data-store-api')
-
-    implementation AndroidX.core.ktx
-
+    implementation project(path: ':design-system')
+    implementation project(path: ':di')
+    implementation project(path: ':statistics-api')
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.appCompat
-    implementation Google.android.material
     implementation AndroidX.constraintLayout
-
-    implementation AndroidX.lifecycle.viewModelKtx
-    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.core.ktx
+    implementation AndroidX.dataStore.preferences
     implementation AndroidX.lifecycle.commonJava8
     implementation AndroidX.lifecycle.liveDataKtx
-    implementation AndroidX.work.runtimeKtx
-    testImplementation AndroidX.work.testing
-
-    implementation KotlinX.coroutines.core
-    testImplementation (KotlinX.coroutines.test) {
-        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
-        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
-    }
-
-    implementation Google.dagger
-    implementation "com.squareup.logcat:logcat:_"
-
-    // Room
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-
-    implementation Square.retrofit2.converter.moshi
+    implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
+    implementation KotlinX.coroutines.core
     implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.converter.moshi
 
-    implementation AndroidX.dataStore.preferences
-
-    // Testing dependencies
+    testImplementation project(path: ':common-test')
+    testImplementation project(':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
+    testImplementation AndroidX.work.testing
     testImplementation CashApp.turbine
-    testImplementation project(path: ':common-test')
+    testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
+        // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
+    }
+    testImplementation Testing.junit4
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }

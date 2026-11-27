@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -32,102 +32,91 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    testImplementation 'junit:junit:4.13.1'
-    implementation project(path: ':anvil-annotations')
-
-    implementation project(path: ':di')
-    implementation project(path: ':cookies-api')
-    implementation project(path: ':browser-mode-api')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':design-system')
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':navigation-api')
+    implementation project(':attributed-metrics-api')
     implementation project(path: ':browser-api')
-    implementation project(path: ':feedback-api')
-    implementation project(path: ':js-messaging-api')
-    implementation project(path: ':user-agent-api')
-    implementation project(path: ':subscriptions-api')
-    implementation project(path: ':settings-api')
-    implementation project(path: ':network-protection-api')
-    implementation project(path: ':internal-features-api')
-    implementation project(path: ':macos-api')
-    implementation project(path: ':windows-api')
-    implementation project(path: ':downloads-api')
-    implementation project(path: ':statistics-api')
-    implementation project(':privacy-config-api') // remote feature flag
-    implementation project(':data-store-api')
-    implementation project(':remote-messaging-api') // remote feature flag
-    implementation project(':survey-api')
-    implementation project(':vpn-api')
+    implementation project(path: ':browser-mode-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
     implementation project(':content-scope-scripts-api')
+    implementation project(path: ':cookies-api')
+    implementation project(':data-store-api')
+    implementation project(path: ':design-system')
+    implementation project(path: ':di')
+    implementation project(path: ':downloads-api')
     implementation project(':duckchat-api')
+    implementation project(path: ':feedback-api')
+    implementation project(path: ':internal-features-api')
+    implementation project(path: ':js-messaging-api')
+    implementation project(path: ':navigation-api')
+    implementation project(path: ':network-protection-api')
     implementation project(':onboarding-api')
     implementation project(':pir-api')
-    implementation project(':attributed-metrics-api')
+    implementation(project(':privacy-config-api')) {
+        because 'remote feature flag'
+    }
     implementation project(':privacy-dashboard-api')
-
-    implementation AndroidX.appCompat
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.work.runtimeKtx
-    implementation Google.android.material
-
+    implementation(project(':remote-messaging-api')) {
+        because 'remote feature flag'
+    }
+    implementation project(path: ':settings-api')
+    implementation project(path: ':statistics-api')
+    implementation project(path: ':subscriptions-api')
+    implementation project(':survey-api')
+    implementation project(path: ':user-agent-api')
+    implementation project(':verified-installation-api')
+    implementation project(':vpn-api')
+    implementation "com.airbnb.android:lottie:_"
     implementation "com.android.billingclient:billing:_"
     implementation "com.android.billingclient:billing-ktx:_"
     implementation "com.squareup.logcat:logcat:_"
-    implementation "com.airbnb.android:lottie:_"
-
-    implementation Google.dagger
+    implementation "io.jsonwebtoken:jjwt-api:_"
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
     implementation AndroidX.core.ktx
     implementation AndroidX.fragment.ktx
-    implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.constraintLayout
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.okHttp3.okHttp
+    implementation AndroidX.lifecycle.viewModelKtx
     implementation AndroidX.security.crypto
+    implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
+    implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.converter.moshi
 
-    implementation "io.jsonwebtoken:jjwt-api:_"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:_"
     runtimeOnly("io.jsonwebtoken:jjwt-orgjson:_") {
         exclude(group: 'org.json', module: 'json') // provided by Android natively
     }
 
-    // Testing dependencies
-    testImplementation project(':feature-toggles-test')
     testImplementation project(path: ':common-test')
     testImplementation project(path: ':data-store-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
+    testImplementation "androidx.test:runner:_"
+    testImplementation 'app.cash.turbine:turbine:_'
+    testImplementation 'junit:junit:4.13.1'
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
-    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
-    testImplementation Testing.robolectric
-    testImplementation 'app.cash.turbine:turbine:_'
-    testImplementation project(path: ':common-test')
+    testImplementation AndroidX.work.testing
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation AndroidX.work.testing
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.subscriptions.impl'
 }

@@ -40,9 +40,9 @@ import kotlin.reflect.KClass
  * Apply this annotation to your actual handler class:
  *
  * ```
- * @ContributesMultibinding(
+ * @ContributesIntoSet(
  *     scope = ActivityScope::class,
- *     boundType = PirWebJsMessageHandler::class,
+ *     binding = binding<PirWebJsMessageHandler>(),
  * )
  * ```
  */

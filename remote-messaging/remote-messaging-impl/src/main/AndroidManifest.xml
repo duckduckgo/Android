@@ -21,6 +21,12 @@
         <activity
             android:name="com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivity"
             android:exported="false" />
+        <activity
+            android:name="com.duckduckgo.remote.messaging.impl.systemsettings.SystemSettingsActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <receiver
             android:name=".newtab.SharePromoLinkBroadCastReceiver"
             android:exported="false" />

@@ -1,4 +1,12 @@
 apply plugin: 'com.diffplug.spotless'
+apply plugin: 'com.squareup.sort-dependencies'
+
+tasks.named('spotlessCheck') {
+    dependsOn 'checkSortDependencies'
+}
+tasks.named('spotlessApply') {
+    dependsOn 'sortDependencies'
+}
 
 spotless {
     ratchetFrom 'origin/develop'

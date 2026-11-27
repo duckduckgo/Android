@@ -20,7 +20,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.lang.*
 import javax.inject.*
 

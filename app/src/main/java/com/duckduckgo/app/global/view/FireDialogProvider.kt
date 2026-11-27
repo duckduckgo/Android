@@ -20,12 +20,12 @@ import com.duckduckgo.dataclearing.api.fire.FireDialog
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider
 import com.duckduckgo.dataclearing.api.fire.FireDialogProvider.FireDialogOrigin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @ContributesBinding(scope = AppScope::class)
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class FireDialogProviderImpl @Inject constructor() : FireDialogProvider {
     override suspend fun createFireDialog(
         origin: FireDialogOrigin,

@@ -23,18 +23,21 @@ import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration3To4
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration4To5
 import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration5To6
+import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration6To7
+import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration7To8
+import com.duckduckgo.app.statistics.wideevents.db.migration.WideEventsMigration8To9
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class WideEventDatabaseModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideWideEventDatabase(
         context: Context,
         wideEventEntityTypeConverters: WideEventEntityTypeConverters,
@@ -52,6 +55,9 @@ class WideEventDatabaseModule {
                 WideEventsMigration3To4,
                 WideEventsMigration4To5,
                 WideEventsMigration5To6(appBuildConfig.versionName),
+                WideEventsMigration6To7,
+                WideEventsMigration7To8,
+                WideEventsMigration8To9,
             )
             .fallbackToDestructiveMigration()
             .enableMultiInstanceInvalidation()
@@ -59,6 +65,6 @@ class WideEventDatabaseModule {
             .build()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideWideEventDao(db: WideEventDatabase): WideEventDao = db.wideEventDao()
 }

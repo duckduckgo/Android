@@ -39,10 +39,8 @@ class DuckAiFeatureStateReporterPluginTest {
     @get:Rule
     val coroutineTestRule = CoroutineTestRule()
 
-    private val nativeInputFieldEnabled = MutableStateFlow(false)
     private val showContextualMode = MutableStateFlow(false)
     private val duckAiFeatureState: DuckAiFeatureState = mock<DuckAiFeatureState>().also {
-        whenever(it.nativeInputFieldEnabled).thenReturn(nativeInputFieldEnabled)
         whenever(it.showContextualMode).thenReturn(showContextualMode)
     }
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
@@ -62,7 +60,7 @@ class DuckAiFeatureStateReporterPluginTest {
         assertEquals(
             mapOf(
                 DUCK_AI_INPUT_MODE to "search_only",
-                DUCK_AI_NATIVE_INPUT to "0",
+                DUCK_AI_NATIVE_INPUT to "1",
                 DUCK_AI_CONTEXTUAL to "0",
             ),
             testee.featureStateParams(),
@@ -76,7 +74,6 @@ class DuckAiFeatureStateReporterPluginTest {
             onBlocking { isDuckChatUserEnabled() } doReturn true
             onBlocking { isInputScreenUserSettingEnabled() } doReturn true
         }
-        nativeInputFieldEnabled.value = true
         showContextualMode.value = true
 
         assertEquals(
@@ -100,7 +97,7 @@ class DuckAiFeatureStateReporterPluginTest {
         val params = testee.featureStateParams()
 
         assertEquals("search_and_duck_ai", params[DUCK_AI_INPUT_MODE])
-        assertEquals("0", params[DUCK_AI_NATIVE_INPUT])
+        assertEquals("1", params[DUCK_AI_NATIVE_INPUT])
         assertEquals("0", params[DUCK_AI_CONTEXTUAL])
     }
 
@@ -115,21 +112,6 @@ class DuckAiFeatureStateReporterPluginTest {
 
         duckChatFeature.self().setRawStoredState(State(enable = false))
         assertEquals("search_only", testee.featureStateParams()[DUCK_AI_INPUT_MODE])
-    }
-
-    @Test
-    fun `when the input surface changes the mode is unaffected`() {
-        duckChatFeature.self().setRawStoredState(State(enable = true))
-        duckChatFeatureRepository.stub {
-            onBlocking { isDuckChatUserEnabled() } doReturn true
-            onBlocking { isInputScreenUserSettingEnabled() } doReturn true
-        }
-        nativeInputFieldEnabled.value = true
-
-        val params = testee.featureStateParams()
-
-        assertEquals("search_and_duck_ai", params[DUCK_AI_INPUT_MODE])
-        assertEquals("1", params[DUCK_AI_NATIVE_INPUT])
     }
 
     @Test

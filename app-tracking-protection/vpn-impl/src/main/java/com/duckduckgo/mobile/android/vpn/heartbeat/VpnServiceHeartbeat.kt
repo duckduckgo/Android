@@ -28,18 +28,19 @@ import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.REV
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.SELF_STOP
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason.UNKNOWN
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.*
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class,
+    binding = binding<VpnServiceCallbacks>(),
 )
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class VpnServiceHeartbeat @Inject constructor(
     private val vpnDatabase: VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,

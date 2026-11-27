@@ -28,9 +28,9 @@ import com.duckduckgo.app.browser.webview.WebViewCompatFeatureSettings
 import com.duckduckgo.browser.api.webviewcompat.WebViewCompatWrapper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -59,7 +59,7 @@ interface WebViewCompatTestHelper {
 }
 
 @ContributesBinding(FragmentScope::class)
-@SingleInstanceIn(FragmentScope::class)
+@SingleIn(FragmentScope::class)
 class RealWebViewCompatTestHelper @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val webViewCompatFeature: WebViewCompatFeature,

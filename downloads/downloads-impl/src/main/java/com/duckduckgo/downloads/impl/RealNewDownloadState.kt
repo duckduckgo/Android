@@ -21,8 +21,9 @@ import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.NewDownloadState
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,9 +39,9 @@ interface InternalNewDownloadState : NewDownloadState {
     fun onNewDownloadAcknowledged()
 }
 
-@ContributesBinding(AppScope::class, boundType = NewDownloadState::class)
-@ContributesBinding(AppScope::class, boundType = InternalNewDownloadState::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<NewDownloadState>())
+@ContributesBinding(AppScope::class, binding = binding<InternalNewDownloadState>())
+@SingleIn(AppScope::class)
 class RealNewDownloadState @Inject constructor(
     sharedPreferencesProvider: SharedPreferencesProvider,
 ) : InternalNewDownloadState {

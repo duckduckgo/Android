@@ -17,15 +17,20 @@
 package com.duckduckgo.sync.impl.auth
 
 import androidx.annotation.StringRes
+import androidx.biometric.BiometricPrompt
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Enroll
 import com.duckduckgo.sync.impl.auth.AuthPrompt.Verify
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Denial
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Denial.Reason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -126,11 +131,99 @@ interface DeviceAuthenticator {
         /**
          * Verification ended with an error.
          */
-        data class Failed(val reason: String) : Response
+        data class Failed(val failureReason: FailureReason, val reason: String) : Response
+    }
+
+    /**
+     * Why authentication didn't let the user proceed. [subReason] is the detail behind [reason], from a fixed list.
+     */
+    data class Denial(val reason: Reason, val subReason: String) {
+        enum class Reason {
+            Canceled,
+            Unavailable,
+            Error,
+        }
+    }
+
+    /**
+     * Why the system ended verification with an error. [ERROR_USER_CANCELED][BiometricPrompt.ERROR_USER_CANCELED] isn't one:
+     * a dismissed prompt is reported as a cancellation instead.
+     */
+    enum class FailureReason(val value: String) {
+        NegativeButton("negative_button"),
+        SystemCanceled("system_canceled"),
+        Lockout("lockout"),
+        LockoutPermanent("lockout_permanent"),
+        NoBiometrics("no_biometrics"),
+        NoDeviceCredential("no_device_credential"),
+        HwUnavailable("hw_unavailable"),
+        HwNotPresent("hw_not_present"),
+        UnableToProcess("unable_to_process"),
+        Timeout("timeout"),
+        NoSpace("no_space"),
+        Vendor("vendor"),
+        SecurityUpdateRequired("security_update_required"),
+        Other("other"),
+        ;
+
+        companion object {
+            fun fromBiometricErrorCode(errorCode: Int): FailureReason = when (errorCode) {
+                BiometricPrompt.ERROR_NEGATIVE_BUTTON -> NegativeButton
+                BiometricPrompt.ERROR_CANCELED -> SystemCanceled
+                BiometricPrompt.ERROR_LOCKOUT -> Lockout
+                BiometricPrompt.ERROR_LOCKOUT_PERMANENT -> LockoutPermanent
+                BiometricPrompt.ERROR_NO_BIOMETRICS -> NoBiometrics
+                BiometricPrompt.ERROR_NO_DEVICE_CREDENTIAL -> NoDeviceCredential
+                BiometricPrompt.ERROR_HW_UNAVAILABLE -> HwUnavailable
+                BiometricPrompt.ERROR_HW_NOT_PRESENT -> HwNotPresent
+                BiometricPrompt.ERROR_UNABLE_TO_PROCESS -> UnableToProcess
+                BiometricPrompt.ERROR_TIMEOUT -> Timeout
+                BiometricPrompt.ERROR_NO_SPACE -> NoSpace
+                BiometricPrompt.ERROR_VENDOR -> Vendor
+                BiometricPrompt.ERROR_SECURITY_UPDATE_REQUIRED -> SecurityUpdateRequired
+                else -> Other
+            }
+        }
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = DeviceAuthenticator::class)
+/**
+ * Why this response doesn't let the user proceed, or null when it does.
+ */
+val Response.denial: Denial?
+    get() = when (this) {
+        is Response.Allowed -> null
+        is Response.Cancelled.VerificationDismissed -> Denial(Reason.Canceled, subReason = SUB_REASON_USER_CANCELED)
+        is Response.Cancelled.EnrollmentClosed -> Denial(Reason.Unavailable, subReason = SUB_REASON_NO_SCREEN_LOCK)
+        is Response.Failed -> Denial(failureReason.toDenialReason(), subReason = failureReason.value)
+    }
+
+private fun FailureReason.toDenialReason(): Reason = when (this) {
+    FailureReason.NegativeButton,
+    FailureReason.SystemCanceled,
+    -> Reason.Canceled
+
+    FailureReason.Lockout,
+    FailureReason.LockoutPermanent,
+    FailureReason.NoBiometrics,
+    FailureReason.NoDeviceCredential,
+    -> Reason.Unavailable
+
+    FailureReason.HwUnavailable,
+    FailureReason.HwNotPresent,
+    FailureReason.UnableToProcess,
+    FailureReason.Timeout,
+    FailureReason.NoSpace,
+    FailureReason.Vendor,
+    FailureReason.SecurityUpdateRequired,
+    FailureReason.Other,
+    -> Reason.Error
+}
+
+private const val SUB_REASON_USER_CANCELED = "user_canceled"
+private const val SUB_REASON_NO_SCREEN_LOCK = "no_screen_lock"
+
+@ContributesBinding(AppScope::class, binding = binding<DeviceAuthenticator>())
 class RealDeviceAuthenticator @Inject constructor(
     private val deviceAuthChecker: SupportedDeviceAuthChecker,
     private val gracePeriod: DeviceAuthorizationGracePeriod,
@@ -206,7 +299,7 @@ class RealDeviceAuthenticator @Inject constructor(
             }
 
             is VerifyResponse.Error -> {
-                Response.Failed(result.reason)
+                Response.Failed(result.failureReason, result.reason)
             }
         }
     }
@@ -241,7 +334,7 @@ class RealDeviceAuthenticator @Inject constructor(
 
         override fun onCancelled() = resume(VerifyResponse.Cancelled)
 
-        override fun onError(reason: String) = resume(VerifyResponse.Error(reason))
+        override fun onError(failureReason: FailureReason, reason: String) = resume(VerifyResponse.Error(failureReason, reason))
 
         private fun resume(result: VerifyResponse) {
             if (continuation.isActive) continuation.resume(result)
@@ -274,6 +367,6 @@ class RealDeviceAuthenticator @Inject constructor(
     private sealed interface VerifyResponse {
         data object Verified : VerifyResponse
         data object Cancelled : VerifyResponse
-        data class Error(val reason: String) : VerifyResponse
+        data class Error(val failureReason: FailureReason, val reason: String) : VerifyResponse
     }
 }

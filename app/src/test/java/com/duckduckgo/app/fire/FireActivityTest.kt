@@ -46,6 +46,14 @@ class FireActivityTest {
     }
 
     @Test
+    fun whenFireActivityIntentBuiltWithQueryThenQueryIsKept() {
+        val intent = FireActivity.fireActivityIntent(context, notifyDataCleared = true, deletedTabCount = 0, query = "https://example.com")
+
+        val extras = intent.extras!!
+        assertTrue(extras.keySet().any { extras.getString(it) == "https://example.com" })
+    }
+
+    @Test
     fun whenFireActivityIntentBuiltThenTargetsFireActivity() {
         val intent = FireActivity.fireActivityIntent(context, notifyDataCleared = false, deletedTabCount = 0)
 

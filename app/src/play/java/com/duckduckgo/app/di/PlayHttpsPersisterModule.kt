@@ -24,12 +24,12 @@ import com.duckduckgo.httpsupgrade.impl.HttpsDataPersister
 import com.duckduckgo.httpsupgrade.impl.di.HttpsPersisterModule
 import com.duckduckgo.httpsupgrade.store.HttpsBloomFilterSpecDao
 import com.duckduckgo.httpsupgrade.store.PlayHttpsEmbeddedDataPersister
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 
-@Module
+@BindingContainer
 @ContributesTo(
     scope = AppScope::class,
     replaces = [HttpsPersisterModule::class],

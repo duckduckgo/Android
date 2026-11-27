@@ -21,8 +21,9 @@ import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.store.PirDatabase
 import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -36,10 +37,10 @@ interface PirSecureStorageDatabaseFactory {
     suspend fun getDatabase(): PirDatabase?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirSecureStorageDatabaseFactory::class,
+    binding = binding<PirSecureStorageDatabaseFactory>(),
 )
 class RealPirSecureStorageDatabaseFactory @Inject constructor(
     private val context: Context,

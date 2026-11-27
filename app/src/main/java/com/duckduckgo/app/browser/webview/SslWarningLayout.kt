@@ -23,7 +23,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.webkit.SslErrorHandler
 import android.widget.FrameLayout
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.SSLErrorType
 import com.duckduckgo.app.browser.SSLErrorType.WRONG_HOST
@@ -32,6 +31,7 @@ import com.duckduckgo.app.browser.databinding.ViewSslWarningBinding
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.Advance
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.LeaveSite
 import com.duckduckgo.app.browser.webview.SslWarningLayout.Action.Proceed
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -39,8 +39,8 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.extensions.applyBoldSpanTo
 import com.duckduckgo.common.utils.extensions.html
 import com.duckduckgo.common.utils.extractDomain
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
-import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 @InjectWith(ViewScope::class)

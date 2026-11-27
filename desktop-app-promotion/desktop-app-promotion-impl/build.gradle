@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -24,42 +24,33 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.desktopapppromotion.impl'
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
-
-    implementation project(':desktop-app-promotion-api')
-
-    implementation project(':di')
     implementation project(':browser-api')
-    implementation project(':design-system')
-    implementation project(':navigation-api')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
+    implementation project(':design-system')
+    implementation project(':desktop-app-promotion-api')
+    implementation project(':di')
+    implementation project(':navigation-api')
     implementation project(':statistics-api')
-
     implementation "com.squareup.logcat:logcat:_"
-
     implementation AndroidX.appCompat
-    implementation AndroidX.core.ktx
     implementation AndroidX.constraintLayout
+    implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
     implementation Google.android.material
     implementation KotlinX.coroutines.android
 
-    // Dagger
-    implementation Google.dagger
-
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation CashApp.turbine
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
 }

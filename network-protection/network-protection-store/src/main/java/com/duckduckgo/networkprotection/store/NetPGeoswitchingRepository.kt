@@ -29,6 +29,9 @@ interface NetPGeoswitchingRepository {
 
     suspend fun setUserPreferredLocation(userPreferredLocation: UserPreferredLocation)
 
+    /** Deletes every NetP preference except the user's preferred location, in a single synchronous write. */
+    suspend fun clearAllPreferencesExceptUserPreferredLocation()
+
     fun getLocations(): List<NetPGeoswitchingLocation>
 
     fun getLocationsFlow(): Flow<List<NetPGeoswitchingLocation>>
@@ -59,6 +62,12 @@ class RealNetPGeoswitchingRepository constructor(
         withContext(dispatcherProvider.io()) {
             networkProtectionPrefs.putString(KEY_PREFERRED_COUNTRY, userPreferredLocation.countryCode)
             networkProtectionPrefs.putString(KEY_PREFERRED_CITY, userPreferredLocation.cityName)
+        }
+    }
+
+    override suspend fun clearAllPreferencesExceptUserPreferredLocation() {
+        withContext(dispatcherProvider.io()) {
+            networkProtectionPrefs.clearKeepingStrings(setOf(KEY_PREFERRED_COUNTRY, KEY_PREFERRED_CITY))
         }
     }
 

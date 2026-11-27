@@ -430,6 +430,17 @@ class SharedPreferencesDuckChatDataStoreTest {
     }
 
     @Test
+    fun `when getLastUsedTogglePosition default then return null`() = runTest {
+        assertNull(testee.getLastUsedTogglePosition())
+    }
+
+    @Test
+    fun `when setLastUsedTogglePosition then getLastUsedTogglePosition returns value`() = runTest {
+        testee.setLastUsedTogglePosition("DUCK_AI")
+        assertEquals("DUCK_AI", testee.getLastUsedTogglePosition())
+    }
+
+    @Test
     fun `when setLastUsedTogglePosition then observeLastUsedTogglePosition receives update`() = runTest {
         val results = mutableListOf<String?>()
         val job = launch {

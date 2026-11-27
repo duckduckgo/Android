@@ -23,19 +23,18 @@ import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.RealChatSuggestionsStore
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class, replaces = [RealChatSuggestionsReader::class])
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class DelegatingChatSuggestionsReader @Inject constructor(
     private val nativeReader: ChatSuggestionsNativeReader,
-    // Typed as RealChatSuggestionsReader (not ChatSuggestionsReader) to prevent Anvil
-    // from treating this field as a competing binding for the ChatSuggestionsReader interface.
+    // Typed as the concrete RealChatSuggestionsReader because the ChatSuggestionsReader interface resolves to
+    // this delegating class itself (it replaces RealChatSuggestionsReader).
     private val webViewReader: RealChatSuggestionsReader,
     private val store: DuckAiChatStore,
     private val feature: DuckChatFeature,
@@ -53,7 +52,7 @@ class DelegatingChatSuggestionsReader @Inject constructor(
         if (activeReader != null && activeReader !== reader) tearDown()
         activeReader = reader
         logcat { "DuckAI chat suggestions: using ${if (reader === nativeReader) "native store" else "WebView"} reader" }
-        pixels.get().reportNativeStorageReaderUsed(native = reader === nativeReader)
+        pixels.value.reportNativeStorageReaderUsed(native = reader === nativeReader)
         val result = reader.fetchSuggestions(query)
         suggestionsStore.setHasChatSuggestions(result.isNotEmpty())
         return@withContext result

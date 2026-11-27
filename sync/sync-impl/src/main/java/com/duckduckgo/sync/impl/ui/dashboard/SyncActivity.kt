@@ -18,40 +18,42 @@ package com.duckduckgo.sync.impl.ui.dashboard
 
 import android.Manifest
 import android.content.res.ColorStateList
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.widget.CompoundButton
 import android.widget.CompoundButton.OnCheckedChangeListener
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.core.app.ActivityCompat
 import androidx.core.os.BundleCompat
 import androidx.core.view.isGone
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.view.plusAssign
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.withStarted
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.spans.DuckDuckGoClickableSpan
 import com.duckduckgo.common.ui.view.addClickableSpan
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE_SECONDARY
-import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.button.ButtonType.SECONDARY
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
-import com.duckduckgo.di.DaggerMap
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.settings.api.SettingsWebViewScreenWithParams
 import com.duckduckgo.sync.api.SyncActivityFromSetupUrl
-import com.duckduckgo.sync.api.SyncActivityWithAnotherDevice
+import com.duckduckgo.sync.api.SyncActivityStartSyncFlow
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
 import com.duckduckgo.sync.api.SyncMessagePlugin
 import com.duckduckgo.sync.api.SyncSettingsPlugin
@@ -63,27 +65,33 @@ import com.duckduckgo.sync.impl.databinding.ActivitySyncBinding
 import com.duckduckgo.sync.impl.promotion.SyncDesktopAppPromotionLauncher
 import com.duckduckgo.sync.impl.ui.DeviceUnsupportedActivity
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogScreenParams
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AddAnotherDevice
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskDeleteServerData
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskOpenNotificationSettings
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSetupSyncDeepLink
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskSyncWithDesktop
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffSync
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskTurnOffThisDevice
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.CheckIfUserHasStoragePermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.DeepLinkIntoSetup
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroCreateAccount
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.IntroRecoverSyncData
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchDeviceActivity
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchLearnMore
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchOriginalFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.LaunchSyncGetOnOtherPlatforms
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.OpenNotificationSettings
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RecoveryCodePDFSuccess
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.RequestNotificationPermission
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowDeviceUnsupported
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowError
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowMessage
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.ShowPreviousSessionReady
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.SyncWithAnotherDevice
+import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.NewLoginNotificationsViewState
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.CreateAccountFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.SetupFlows.SignInFlow
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.ViewState
@@ -107,23 +115,23 @@ import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
-@ContributeToActivityStarter(SyncActivityWithEmptyParams::class)
-@ContributeToActivityStarter(SyncActivityWithSourceParams::class)
+@ContributeToActivityStarter(SyncActivityWithEmptyParams::class, screenName = "sync")
+@ContributeToActivityStarter(SyncActivityStartSyncFlow::class)
+@ContributeToActivityStarter(SyncActivityStartSyncFlowInternal::class)
 @ContributeToActivityStarter(SyncActivityFromSetupUrl::class)
-@ContributeToActivityStarter(SyncActivityWithAnotherDevice::class)
 class SyncActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivitySyncBinding>()
 
     private val viewModel by bindViewModel<SyncActivityViewModel>()
 
     @Inject
-    lateinit var syncSettingsPlugin: DaggerMap<Int, SyncSettingsPlugin>
+    lateinit var syncSettingsPlugin: Map<Int, SyncSettingsPlugin>
 
     @Inject
     lateinit var syncDesktopAppPromotionLauncher: SyncDesktopAppPromotionLauncher
 
     @Inject
-    lateinit var syncMessagesPlugin: DaggerSet<SyncMessagePlugin>
+    lateinit var syncMessagesPlugin: Set<SyncMessagePlugin>
 
     @Inject
     lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
@@ -140,15 +148,17 @@ class SyncActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var authPromptRenderer: AuthPromptRenderer
 
+    private val startSyncFlowParams: SyncActivityStartSyncFlowInternal?
+        get() = intent.getActivityParams(SyncActivityStartSyncFlowInternal::class.java)
+            ?: intent.getActivityParams(SyncActivityStartSyncFlow::class.java)?.let { params ->
+                SyncActivityStartSyncFlowInternal(source = params.source, joinExistingAccount = params.joinExistingAccount)
+            }
+
     private val launchSource
-        get() = intent.getActivityParams(SyncActivityWithSourceParams::class.java)?.source
-            ?: intent.getActivityParams(SyncActivityWithAnotherDevice::class.java)?.source
+        get() = startSyncFlowParams?.source ?: LAUNCH_SOURCE_OTHER
 
     private val syncSetupUrl
         get() = intent.getActivityParams(SyncActivityFromSetupUrl::class.java)?.url
-
-    private val isAnotherDeviceSync
-        get() = intent.getActivityParams(SyncActivityWithAnotherDevice::class.java) != null
 
     private val backUpNewAccountLauncher = registerForActivityResult(
         SyncThisDeviceContract(),
@@ -205,7 +215,8 @@ class SyncActivity : DuckDuckGoActivity() {
             is PreviousSessionReadyContract.Output.Resume -> {
                 processSyncCodeLauncher.launch(
                     ProcessSyncCodeContract.Input(
-                        source = SyncCodeSource.Restored(output.recoveryCode),
+                        codeSource = SyncCodeSource.Restored(output.recoveryCode),
+                        launchSource = launchSource,
                     ),
                 )
             }
@@ -275,6 +286,12 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private val notificationPermissionLauncher = registerForActivityResult(
+        RequestPermission(),
+    ) {
+        viewModel.onNotificationPermissionResult()
+    }
+
     private val syncedDeviceAdapter = SyncedDeviceAdapter(
         object : SyncedDeviceAdapter.Listener {
             override fun onDeviceClicked(device: ConnectedDevice) {
@@ -289,6 +306,15 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private val autoRestoreListener = OnCheckedChangeListener { _, isChecked ->
         viewModel.onAutoRestoreToggleChanged(isChecked)
+    }
+
+    private val newLoginNotificationsListener = object : OnCheckedChangeListener {
+        override fun onCheckedChanged(buttonView: CompoundButton, isChecked: Boolean) {
+            // The view state decides what the switch shows. A tap that leaves that state unchanged (turned on while the app
+            // cannot post) emits nothing, so we undo the tap here and let the next state set the switch.
+            binding.includeEnabledView.newLoginNotificationsItem.quietlySetIsChecked(!isChecked, this)
+            viewModel.onNewLoginNotificationsToggled(isChecked, shouldShowNotificationPermissionRationale())
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -306,19 +332,33 @@ class SyncActivity : DuckDuckGoActivity() {
         configureBookmarksSection()
         configureWarningMessages()
         configureRecoverySection()
+        configureDeviceActivityItem()
+        configureNewDeviceBanner()
+        configureNewLoginNotificationsCard()
         configureGetOnOtherPlatformsItem()
         configureDataExpirationNotice()
         configureDataDeletionItem()
         configureTurnOffSyncResultListener()
+        configureSyncWithDesktopResultListener()
 
         observeViewModel()
         authPromptRenderer.bind(viewModel.authPrompts)
 
         if (savedInstanceState == null) {
+            viewModel.onScreenOpened(launchSource)
             val setupUrl = syncSetupUrl
+            val startSyncFlow = startSyncFlowParams
             when {
                 setupUrl != null -> viewModel.processSetupDeepLink(setupUrl)
-                isAnotherDeviceSync -> viewModel.onSyncWithAnotherDevice()
+                startSyncFlow != null -> {
+                    // The Sync flow opens only after a background check, so we hide the settings to stop them from flashing until it does.
+                    // We can't rely solely on the view state for that, because it arrives asynchronously and misses the first frame.
+                    binding.root.isInvisible = viewModel.processSourceDeepLink(
+                        launchSource = launchSource,
+                        joinExistingAccount = startSyncFlow.joinExistingAccount,
+                        offerDesktopApp = startSyncFlow.offerDesktopApp,
+                    )
+                }
             }
         }
     }
@@ -341,13 +381,33 @@ class SyncActivity : DuckDuckGoActivity() {
     }
 
     private fun renderViewState(viewState: ViewState) {
-        binding.notifyMeContainer.isVisible = viewState.showAccount
+        binding.root.isInvisible = viewState.isContentHidden
+        binding.notifyMeContainer.isVisible = viewState.showNotifyMe
         binding.syncHeader.setState(
             isSyncEnabled = viewState.showAccount,
             isDuckAiAvailable = viewState.aiChatSyncEnabled,
         )
+        renderNewDeviceBanner(viewState.newDeviceBanner)
+        renderNewLoginNotifications(viewState.newLoginNotifications)
         renderEnabledState(viewState)
         renderDisabledState(viewState)
+    }
+
+    private fun renderNewDeviceBanner(banner: NewDeviceBanner?) {
+        binding.includeNewDeviceBanner.apply {
+            root.isVisible = banner != null
+            if (banner == null) return
+            newDeviceBannerTitle.text = banner.title(resources)
+            newDeviceBannerBody.text = banner.body(resources)
+        }
+    }
+
+    private fun renderNewLoginNotifications(state: NewLoginNotificationsViewState?) {
+        binding.includeNewLoginNotificationsCard.root.isVisible = state?.showCard == true
+        binding.includeEnabledView.newLoginNotificationsItem.apply {
+            isVisible = state != null
+            if (state != null) quietlySetIsChecked(state.switchOn, newLoginNotificationsListener)
+        }
     }
 
     private fun renderEnabledState(viewState: ViewState) {
@@ -357,13 +417,7 @@ class SyncActivity : DuckDuckGoActivity() {
             getOnOtherPlatformsItem.setState(
                 isNewDesktopBrowserAvailable = viewState.newDesktopBrowserSettingEnabled,
             )
-            deleteAccountItem.setPrimaryTextResource(
-                if (viewState.isImprovedSyncFlow) {
-                    R.string.sync_simplified_settings_turn_off_item
-                } else {
-                    R.string.sync_simplified_settings_delete_account_item
-                },
-            )
+            deviceActivitySection.isVisible = viewState.showDeviceActivity
             restoreOnReinstallItem.isVisible = viewState.showAutoRestoreToggle
             if (viewState.showAutoRestoreToggle) {
                 restoreOnReinstallItem.quietlySetIsChecked(viewState.autoRestoreEnabled, autoRestoreListener)
@@ -398,25 +452,34 @@ class SyncActivity : DuckDuckGoActivity() {
                 )
             }
 
-            is AskDeleteAccount -> {
-                showDeleteAccountDialog()
-            }
-
             is AskDeleteServerData -> {
                 askDeleteServerData()
             }
 
+            is AskOpenNotificationSettings -> {
+                askOpenNotificationSettings()
+            }
+
+            is OpenNotificationSettings -> {
+                startActivity(command.intent)
+            }
+
+            is RequestNotificationPermission -> {
+                if (Build.VERSION.SDK_INT >= 33) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+
             is AskEditDevice -> {
                 editDeviceLauncher.launch(
-                    EditDeviceContract.Input(
-                        device = command.device,
-                        isImprovedSyncFlow = command.isImprovedSyncFlow,
-                    ),
+                    EditDeviceContract.Input(device = command.device),
                 )
             }
 
             is AskSetupSyncDeepLink -> {
                 askSetupSyncDeepLink(command.syncBarcodeUrl)
+            }
+
+            is AskSyncWithDesktop -> {
+                lifecycleScope.launch { withStarted { askSyncWithDesktop() } }
             }
 
             is AskTurnOffSync -> {
@@ -443,7 +506,8 @@ class SyncActivity : DuckDuckGoActivity() {
                 }
                 processSyncCodeLauncher.launch(
                     ProcessSyncCodeContract.Input(
-                        source = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
+                        codeSource = SyncCodeSource.DeepLink(command.barcodeSyncUrl.asUrl(), syncEntryPoint),
+                        launchSource = launchSource,
                     ),
                 )
             }
@@ -452,8 +516,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 backUpNewAccountLauncher.launch(
                     SyncThisDeviceContract.Input(
                         launchSource = launchSource,
-                        isAuthRequired = command.isAuthRequired,
-                        isImprovedSyncFlow = command.isImprovedSyncFlow,
+                        isAuthRequired = true,
                     ),
                 )
             }
@@ -462,9 +525,13 @@ class SyncActivity : DuckDuckGoActivity() {
                 recoverSyncedDataLauncher.launch(
                     RecoverSyncedDataContract.Input(
                         launchSource = launchSource,
-                        isAuthRequired = command.isAuthRequired,
+                        isAuthRequired = true,
                     ),
                 )
+            }
+
+            is LaunchDeviceActivity -> {
+                globalActivityStarter.start(this, SyncAuditLogScreenParams())
             }
 
             is LaunchLearnMore -> {
@@ -483,8 +550,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         backUpNewAccountLauncher.launch(
                             SyncThisDeviceContract.Input(
                                 launchSource = launchSource,
-                                isAuthRequired = false,
-                                isImprovedSyncFlow = command.isImprovedSyncFlow,
+                                isAuthRequired = command.isAuthRequired,
                             ),
                         )
                     }
@@ -505,7 +571,7 @@ class SyncActivity : DuckDuckGoActivity() {
                         recoverSyncedDataLauncher.launch(
                             RecoverSyncedDataContract.Input(
                                 launchSource = launchSource,
-                                isAuthRequired = false,
+                                isAuthRequired = command.isAuthRequired,
                             ),
                         )
                     }
@@ -535,10 +601,7 @@ class SyncActivity : DuckDuckGoActivity() {
 
             is ShowPreviousSessionReady -> {
                 restoreSavedAccountLauncher.launch(
-                    PreviousSessionReadyContract.Input(
-                        syncEntryPoint = command.syncEntryPoint,
-                        isAuthRequired = command.isAuthRequired,
-                    ),
+                    PreviousSessionReadyContract.Input(syncEntryPoint = command.syncEntryPoint),
                 )
             }
 
@@ -643,6 +706,31 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureDeviceActivityItem() {
+        binding.includeEnabledView.deviceActivityItem.setOnClickListener {
+            viewModel.onDeviceActivityClicked()
+        }
+    }
+
+    private fun configureNewLoginNotificationsCard() {
+        binding.includeNewLoginNotificationsCard.apply {
+            newLoginNotificationsCardEnable.setOnClickListener {
+                viewModel.onEnableNotificationsClicked(shouldShowNotificationPermissionRationale())
+            }
+            newLoginNotificationsCardClose.setOnClickListener { viewModel.onEnableNotificationsCardCloseClicked() }
+        }
+    }
+
+    private fun shouldShowNotificationPermissionRationale(): Boolean =
+        Build.VERSION.SDK_INT >= 33 && ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.POST_NOTIFICATIONS)
+
+    private fun configureNewDeviceBanner() {
+        binding.includeNewDeviceBanner.apply {
+            newDeviceBannerReview.setOnClickListener { viewModel.onNewDeviceBannerReviewClicked() }
+            newDeviceBannerClose.setOnClickListener { viewModel.onNewDeviceBannerCloseClicked() }
+        }
+    }
+
     private fun configureRecoverySection() {
         binding.includeEnabledView.apply {
             restoreOnReinstallItem.setOnCheckedChangeListener(autoRestoreListener)
@@ -708,6 +796,21 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
+    private fun configureSyncWithDesktopResultListener() {
+        supportFragmentManager.setFragmentResultListener(SyncWithDesktopBottomSheetDialog.REQUEST_KEY, this) { _, bundle ->
+            val choice = BundleCompat.getSerializable(
+                bundle,
+                SyncWithDesktopBottomSheetDialog.RESULT_KEY_CHOICE,
+                SyncWithDesktopBottomSheetDialog.Choice::class.java,
+            )
+            when (choice) {
+                SyncWithDesktopBottomSheetDialog.Choice.SyncWithDesktop -> viewModel.onSyncWithDesktopSelected()
+                SyncWithDesktopBottomSheetDialog.Choice.NoDesktopApp -> viewModel.onNoDesktopAppSelected()
+                null -> Unit
+            }
+        }
+    }
+
     private fun configureDataDeletionItem() {
         val color = ColorStateList.valueOf(getColorFromAttr(CommonR.attr.daxColorDestructive))
         binding.includeEnabledView.deleteAccountItem.apply {
@@ -717,24 +820,16 @@ class SyncActivity : DuckDuckGoActivity() {
         }
     }
 
-    private fun showDeleteAccountDialog() {
+    private fun askOpenNotificationSettings() {
         TextAlertDialogBuilder(this)
-            .setTitle(R.string.sync_simplified_settings_delete_server_data_dialog_title)
-            .setMessage(getString(R.string.sync_simplified_settings_delete_server_data_dialog_body))
-            .setPositiveButton(R.string.sync_simplified_settings_delete_server_data_dialog_primary_button, DESTRUCTIVE)
-            .setNegativeButton(R.string.sync_simplified_settings_delete_server_data_dialog_secondary_button, GHOST_ALT)
+            .setTitle(R.string.syncNewLoginNotificationsSettingsDialogTitle)
+            .setMessage(R.string.syncNewLoginNotificationsSettingsDialogMessage)
+            .setPositiveButton(R.string.syncNewLoginNotificationsSettingsDialogConfirm)
+            .setNegativeButton(CommonR.string.cancel, SECONDARY)
             .addEventListener(
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
-                        viewModel.onDeleteAccountConfirmed()
-                    }
-
-                    override fun onNegativeButtonClicked() {
-                        viewModel.onDeleteAccountCancelled()
-                    }
-
-                    override fun onDialogCancelled() {
-                        viewModel.onDeleteAccountCancelled()
+                        viewModel.onOpenNotificationSettingsConfirmed()
                     }
                 },
             )
@@ -789,6 +884,14 @@ class SyncActivity : DuckDuckGoActivity() {
             .show()
     }
 
+    private fun askSyncWithDesktop() {
+        if (supportFragmentManager.findFragmentByTag(SyncWithDesktopBottomSheetDialog.TAG) != null) return
+
+        SyncWithDesktopBottomSheetDialog
+            .newInstance()
+            .show(supportFragmentManager, SyncWithDesktopBottomSheetDialog.TAG)
+    }
+
     private fun askTurnOffSync(command: AskTurnOffSync) {
         if (supportFragmentManager.findFragmentByTag(TurnOffSyncBottomSheetDialog.TAG) != null) return
 
@@ -822,5 +925,9 @@ class SyncActivity : DuckDuckGoActivity() {
             .setMessage(getString(error.message) + "\n" + error.reason)
             .setPositiveButton(R.string.sync_simplified_error_dialog_primary_button)
             .show()
+    }
+
+    companion object {
+        const val LAUNCH_SOURCE_OTHER = "other"
     }
 }

@@ -18,7 +18,7 @@ package com.duckduckgo.feedback.impl.ui.negative.brokensite
 
 import android.os.Bundle
 import androidx.core.view.doOnNextLayout
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.FragmentScope

@@ -54,6 +54,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedRespon
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ScrollResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -303,6 +304,42 @@ class JsActionSuccessEventHandlerTest {
                 ),
             )
         val event = JsActionSuccess(pirSuccessResponse = expectationResponse)
+
+        val result = testee.invoke(state, event)
+
+        val expectedState =
+            state.copy(
+                currentActionIndex = testCurrentActionIndex + 1,
+                actionRetryCount = 0,
+            )
+        assertEquals(expectedState, result.nextState)
+        assertEquals(
+            ExecuteBrokerStepAction(UserProfile(userProfile = testProfileQuery)),
+            result.nextEvent,
+        )
+        assertNull(result.sideEffect)
+    }
+
+    @Test
+    fun whenScrollResponseWithScanStepThenReturnsNextActionEvent() = runTest {
+        val scrollResponse =
+            ScrollResponse(
+                actionID = "scroll-1",
+                actionType = "scroll",
+            )
+        val state =
+            State(
+                runType = RunType.MANUAL,
+                brokerStep = setupBrokerStep(scrollResponse.actionID),
+                profileQuery = testProfileQuery,
+                currentActionIndex = testCurrentActionIndex,
+                actionRetryCount = testActionRetryCount,
+                stageStatus = PirStageStatus(
+                    currentStage = PirStage.OTHER,
+                    stageStartMs = 0,
+                ),
+            )
+        val event = JsActionSuccess(pirSuccessResponse = scrollResponse)
 
         val result = testee.invoke(state, event)
 

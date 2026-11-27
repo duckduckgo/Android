@@ -21,8 +21,8 @@ import android.content.SharedPreferences
 import android.net.Uri
 import androidx.core.content.edit
 import androidx.core.net.toUri
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.common.utils.replaceQueryParameters
@@ -49,12 +49,11 @@ import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActiveOrWaiting
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionsWebViewActivityWithParams
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -86,7 +85,7 @@ class RealSubscriptions @Inject constructor(
     override fun getEntitlementStatus(): Flow<List<Product>> {
         return subscriptionsManager.entitlements.map { list ->
             withContext(dispatcherProvider.io()) {
-                if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                if (subscriptionsFeature.value.duckAiPlus().isEnabled().not()) {
                     list.filterNot { entitlement -> entitlement == DuckAiPlus }
                 } else {
                     list
@@ -100,7 +99,7 @@ class RealSubscriptions @Inject constructor(
         val isActive = subscriptionsManager.subscriptionStatus().isActiveOrWaiting()
         val isEligible = subscriptionsManager.getSubscriptionOffer().isNotEmpty()
 
-        if (!subscriptionsFeature.get().allowPurchase().isEnabled()) {
+        if (!subscriptionsFeature.value.allowPurchase().isEnabled()) {
             return isActive
         }
 
@@ -162,9 +161,9 @@ class RealSubscriptions @Inject constructor(
     }
 
     private fun optimizedPaywallFeaturePage(uri: Uri): String? {
-        if (!subscriptionsFeature.get().performanceOptimizedPaywalls().isEnabled()) return null
+        if (!subscriptionsFeature.value.performanceOptimizedPaywalls().isEnabled()) return null
         val path = uri.path ?: return null
-        return paywallPathProvider.get().getFeaturePage(path)
+        return paywallPathProvider.value.getFeaturePage(path)
     }
 
     override suspend fun isFreeTrialEligible(): Boolean {
@@ -184,7 +183,7 @@ class RealSubscriptions @Inject constructor(
             .mapNotNull { feature -> Product.entries.firstOrNull { it.value == feature } }
             .let {
                 withContext(dispatcherProvider.io()) {
-                    if (subscriptionsFeature.get().duckAiPlus().isEnabled().not()) {
+                    if (subscriptionsFeature.value.duckAiPlus().isEnabled().not()) {
                         it.filterNot { feature -> feature == DuckAiPlus }
                     } else {
                         it
@@ -291,8 +290,18 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendAuthTokenRefreshWideEvent(): Toggle
 
+    /**
+     * When enabled, refreshAccessToken(force = false) returns the stored access token without
+     * rotating if that token is still usable. When disabled, every call rotates (previous behaviour).
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun skipValidAccessTokenRefresh(): Toggle
+
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionSwitchWideEvent(): Toggle
+
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun sendSubscriptionUndoCancellationWideEvent(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun sendSubscriptionRestoreWideEvent(): Toggle
@@ -340,20 +349,26 @@ interface SubscriptionsFeature {
      * When enabled, a local reminder notification can be scheduled by the subscription page
      * to fire ahead of the subscription's expiry/renewal date.
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun subscriptionExpirationReminderNotification(): Toggle
 
     /**
      * Kill switch for `getUserSettings` JS message
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun userSettingsMessaging(): Toggle
 
     /**
      * Kill switch for the `requestNotificationsPermission` JS message
      */
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
     fun notificationsPermissionMessaging(): Toggle
+
+    /**
+     * Kill switch for the notifications denied dialog JS messaging
+     */
+    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.TRUE)
+    fun notificationsDeniedDialogMessaging(): Toggle
 
     /**
      * When enabled, the Partnerships Hub entry point is shown in Settings.
@@ -396,6 +411,51 @@ interface SubscriptionsFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun subscriptionConcurrentExperiments(): Toggle
 
+    /**
+     * Kill-switch for checking subscription page messages against the committed back/forward entry as well as the
+     * WebView url.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun bridgeOriginCheck(): Toggle
+
+    /**
+     * When enabled, eligible Stripe subscribers can withdraw from their subscription
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun subscriptionWithdrawal(): Toggle
+
+    /**
+     * When enabled, Stripe subscribers see Stripe products on the plans page and plan changes are redirected to Stripe
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun stripeTierOptions(): Toggle
+
+    /**
+     * When enabled, Stripe products are fetched for the subscription's country
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun stripeTierOptionsByCountry(): Toggle
+
+    /**
+     * When enabled, Play subscribers in any language see an option to undo a cancellation
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
+    fun undoSubscriptionCancellationAllLanguages(): Toggle
+
+    /**
+     * When enabled, the app keeps a backup refresh token and tries it before the Play Store when the backend
+     * rejects the main refresh token.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun backupRefreshToken(): Toggle
+
+    /**
+     * When enabled, the main process connects the Play Billing client before querying purchases for a store login
+     * (token refresh recovery and restore from the Play Store), instead of giving up when the client is not connected yet.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun connectBillingBeforeQueryingPurchases(): Toggle
+
     enum class PerformanceOptimizedPaywallsCohorts(override val cohortName: String) : CohortName {
         CONTROL("control"),
         TREATMENT("treatment"),
@@ -403,7 +463,7 @@ interface SubscriptionsFeature {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @RemoteFeatureStoreNamed(SubscriptionsFeature::class)
 class SubscriptionsFeatureStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,

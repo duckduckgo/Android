@@ -18,7 +18,7 @@ package com.duckduckgo.networkprotection.impl.configuration
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.VPNExcludedDomainsFallback.DnsEntry
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface VPNExcludedDomainsFallback {

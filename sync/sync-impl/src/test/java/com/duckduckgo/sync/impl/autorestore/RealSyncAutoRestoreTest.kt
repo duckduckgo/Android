@@ -16,13 +16,10 @@
 
 package com.duckduckgo.sync.impl.autorestore
 
-import android.annotation.SuppressLint
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.AccountInfo
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
@@ -33,19 +30,18 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import com.duckduckgo.sync.impl.Result as SyncResult
 
-@SuppressLint("DenyListedApi")
 class RealSyncAutoRestoreTest {
 
     @get:Rule
     val coroutineTestRule: CoroutineTestRule = CoroutineTestRule()
 
-    private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
     private val manager: SyncAutoRestoreManager = mock()
     private val syncAccountRepository: SyncAccountRepository = mock()
     private val syncPixels: SyncPixels = mock()
@@ -54,10 +50,9 @@ class RealSyncAutoRestoreTest {
 
     @Before
     fun setup() = runTest {
-        configureAutoRestoreEnabled(true)
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(AccountInfo())
         testee = RealSyncAutoRestore(
             manager = manager,
-            syncFeature = syncFeature,
             syncAccountRepository = syncAccountRepository,
             syncPixels = syncPixels,
             appScope = coroutineTestRule.testScope,
@@ -66,23 +61,7 @@ class RealSyncAutoRestoreTest {
     }
 
     @Test
-    fun whenFeatureFlagDisabledThenCanRestoreReturnsFalse() = runTest {
-        configureAutoRestoreEnabled(false)
-
-        assertFalse(testee.canRestore())
-    }
-
-    @Test
-    fun whenFeatureFlagEnabledButNoStoredKeyThenCanRestoreReturnsFalse() = runTest {
-        configureAutoRestoreEnabled(true)
-        configureRetrieveSuccess(payload = null)
-
-        assertFalse(testee.canRestore())
-    }
-
-    @Test
-    fun whenFeatureFlagEnabledAndKeyExistsThenCanRestoreReturnsTrue() = runTest {
-        configureAutoRestoreEnabled(true)
+    fun whenKeyExistsThenCanRestoreReturnsTrue() = runTest {
         configureRetrieveSuccess(payload = RestorePayload(recoveryCode = "recovery_key", deviceId = null))
 
         assertTrue(testee.canRestore())
@@ -90,25 +69,13 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenStorageRetrievalReturnsNullThenCanRestoreReturnsFalse() = runTest {
-        configureAutoRestoreEnabled(true)
         configureRetrieveSuccess(payload = null)
 
         assertFalse(testee.canRestore())
     }
 
     @Test
-    fun whenFeatureFlagDisabledThenRestoreSyncAccountDoesNotCallProcessCode() = runTest {
-        configureAutoRestoreEnabled(false)
-        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = "code", deviceId = null))
-
-        testee.restoreSyncAccount()
-
-        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
-    }
-
-    @Test
     fun whenRestoreSyncAccountCalledThenRetrievesKeyAndCallsProcessCode() = runTest {
-        configureAutoRestoreEnabled(true)
         val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
         val deviceId = "device-abc-123"
         configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = deviceId))
@@ -130,6 +97,19 @@ class RealSyncAutoRestoreTest {
         testee.restoreSyncAccount()
 
         verify(manager).saveAutoRestoreData(recoveryCodeString, deviceId)
+    }
+
+    @Test
+    fun whenRestoredWithoutADeviceIdThenSavesTheDeviceIdItSignedInWith() = runTest {
+        val recoveryCodeString = "eyJyZWNvdmVyeSI6eyJwcmltYXJ5X2tleSI6ImFiYzEyMyIsInVzZXJfaWQiOiJ1c2VyMTIzIn19"
+        configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = null))
+        configureProcessCodeResult(SyncResult.Success(true))
+        whenever(syncAccountRepository.getAccountInfo()).thenReturn(AccountInfo(deviceId = "new-device-id", isSignedIn = true))
+
+        testee.restoreSyncAccount()
+
+        verify(syncAccountRepository).processCode(any(), isNull())
+        verify(manager).saveAutoRestoreData(recoveryCodeString, "new-device-id")
     }
 
     @Test
@@ -183,7 +163,6 @@ class RealSyncAutoRestoreTest {
 
     @Test
     fun whenParseSyncAuthCodeThrowsThenRestoreSyncAccountDoesNotCrash() = runTest {
-        configureAutoRestoreEnabled(true)
         val recoveryCodeString = "invalid_not_base64"
         configureRetrieveSuccess(payload = RestorePayload(recoveryCode = recoveryCodeString, deviceId = "device-123"))
         whenever(syncAccountRepository.parseSyncAuthCode(recoveryCodeString)).thenThrow(RuntimeException("Parse error"))
@@ -191,20 +170,6 @@ class RealSyncAutoRestoreTest {
         testee.restoreSyncAccount()
 
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
-    }
-
-    @Test
-    fun whenRestoreSyncAccountCalledButFFDisabledThenDoesNotAccessStorage() = runTest {
-        configureAutoRestoreEnabled(false)
-
-        testee.restoreSyncAccount()
-
-        verify(manager, never()).retrieveRecoveryPayload()
-        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
-    }
-
-    private fun configureAutoRestoreEnabled(enabled: Boolean) {
-        syncFeature.syncAutoRestore().setRawStoredState(State(enable = enabled))
     }
 
     private suspend fun configureRetrieveSuccess(payload: RestorePayload?) {

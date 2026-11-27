@@ -61,6 +61,7 @@ import com.duckduckgo.app.privacy.model.HttpsStatus
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.app.tabs.model.TabEntity
 import com.duckduckgo.app.trackerdetection.model.Entity
@@ -75,7 +76,6 @@ import com.duckduckgo.common.test.InstantSchedulersRule
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.feature.toggles.api.Toggle
@@ -167,14 +167,11 @@ class CtaViewModelTest {
 
     private val fakeContextualOnboardingTimeLimit = FakeContextualOnboardingTimeLimit()
 
+    private val fakeSyncAfterDeviceTransferPrompt = FakeSyncAfterDeviceTransferPrompt()
+
     private val mockAppTheme: AppTheme = mock { on { isLightModeEnabled() } doReturn true }
 
     private val mockDeviceInfo: DeviceInfo = mock()
-
-    private val showInputScreenFlow = MutableStateFlow(true)
-    private val mockDuckAiFeatureState: DuckAiFeatureState = mock {
-        on { showInputScreen } doReturn showInputScreenFlow
-    }
 
     private val requiredDaxOnboardingCtas: List<CtaId> = listOf(
         CtaId.DAX_INTRO,
@@ -248,9 +245,9 @@ class CtaViewModelTest {
             linearOnboardingOrchestrator = mock<LinearOnboardingOrchestrator> {
                 on { state } doReturn MutableStateFlow(LinearOnboardingState.NotStarted)
             },
-            duckAiFeatureState = mockDuckAiFeatureState,
             onboardingPixelSender = mockOnboardingPixelSender,
             contextualOnboardingTimeLimit = fakeContextualOnboardingTimeLimit,
+            syncAfterDeviceTransferPrompt = fakeSyncAfterDeviceTransferPrompt,
         )
     }
 
@@ -1152,7 +1149,7 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenDuckAiOnboardingFlowAndDuckAiEndNotShownThenRefreshCtaOnHomeSuppressedEvenIfSubscriptionAvailable() = runTest {
+    fun whenDuckAiOnboardingFlowAndDuckAiEndNotShownThenRefreshCtaOnHomeShowsDuckAiEndEvenIfSubscriptionAvailable() = runTest {
         givenDaxOnboardingActive()
         givenDuckAiOnboardingFlowArmed()
         whenever(mockDismissedCtaDao.exists(CtaId.DAX_DUCK_AI_FIRE_BUTTON)).thenReturn(true)
@@ -1167,7 +1164,7 @@ class CtaViewModelTest {
             detectedRefreshPatterns = detectedRefreshPatterns,
             brokenSitePromptUrl = null,
         )
-        assertNull(value)
+        assertTrue(value is DaxDuckAiEndBubbleCta)
     }
 
     @Test
@@ -1471,7 +1468,6 @@ class CtaViewModelTest {
     fun whenDuckAiOnboardingFlowEndedThenDuckAiEndCtaNotReturnedOnHome() = runTest {
         givenOnboardingEndedByTimeLimit()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         val value = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1482,6 +1478,119 @@ class CtaViewModelTest {
 
         assertNull(value)
     }
+
+    @Test
+    fun whenSyncSuggestionIsDueAndNoOnboardingDialogThenNewTabShowsTheSyncSuggestion() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        val value = refreshHomeCta()
+
+        assertTrue(value is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionIsNotDueThenNewTabShowsNoCta() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = false
+
+        assertNull(refreshHomeCta())
+    }
+
+    @Test
+    fun whenSyncSuggestionIsDueAndAnOnboardingDialogIsDueThenTheOnboardingDialogWins() = runTest {
+        givenDaxOnboardingActive()
+        whenever(mockDismissedCtaDao.exists(CtaId.DAX_INTRO)).thenReturn(false)
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        assertTrue(refreshHomeCta() is DaxTryASearchBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionIsDueAndTipsAreHiddenThenItStillShows() = runTest {
+        givenDaxOnboardingCompleted()
+        whenever(mockSettingsDataStore.hideTips).thenReturn(true)
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        assertTrue(refreshHomeCta() is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionIsDueOnAWebPageThenItIsNotShown() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+
+        val value = testee.refreshCta(
+            coroutineRule.testDispatcher,
+            isBrowserShowing = true,
+            site = site(url = "http://www.cnn.com", trackerCount = 1),
+            detectedRefreshPatterns = detectedRefreshPatterns,
+            brokenSitePromptUrl = null,
+        )
+
+        assertFalse(value is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionDismissedThenItIsDismissedForGoodWithoutOnboardingSideEffects() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onUserDismissedCta(cta, viaCloseBtn = true)
+
+        assertTrue(fakeSyncAfterDeviceTransferPrompt.dismissed)
+        assertNull(refreshHomeCta())
+        verify(mockDismissedCtaDao, never()).insert(any())
+        verifyNoInteractions(mockPixel)
+        verifyNoInteractions(mockOnboardingPixelSender)
+    }
+
+    @Test
+    fun whenSyncSuggestionShownThenOnlyItsOnceEverShownPixelIsSentAndItStaysDue() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onCtaShown(cta)
+
+        verify(mockDismissedCtaDao, never()).insert(any())
+        verify(mockPixel).enqueueFire(DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+        verifyNoMoreInteractions(mockPixel)
+        verifyNoInteractions(mockOnboardingPixelSender)
+        assertTrue(refreshHomeCta() is SyncAfterDeviceTransferBubbleCta)
+    }
+
+    @Test
+    fun whenSyncSuggestionAcceptedThenItIsNotDismissed() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onUserClickCtaOkButton(cta)
+
+        assertFalse(fakeSyncAfterDeviceTransferPrompt.dismissed)
+    }
+
+    @Test
+    fun whenSyncSuggestionAcceptedThenOnlyItsOnceEverClickPixelIsSent() = runTest {
+        givenDaxOnboardingCompleted()
+        fakeSyncAfterDeviceTransferPrompt.due = true
+        val cta = refreshHomeCta()!!
+
+        testee.onUserClickCtaOkButton(cta)
+
+        verify(mockPixel).enqueueFire(DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
+        verifyNoMoreInteractions(mockPixel)
+        verifyNoInteractions(mockOnboardingPixelSender)
+    }
+
+    private suspend fun refreshHomeCta(): Cta? = testee.refreshCta(
+        coroutineRule.testDispatcher,
+        isBrowserShowing = false,
+        detectedRefreshPatterns = detectedRefreshPatterns,
+        brokenSitePromptUrl = null,
+    )
 
     private suspend fun givenOnboardingEndedByTimeLimit() {
         givenUserIsEstablished()
@@ -1933,13 +2042,12 @@ class CtaViewModelTest {
         verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
-    // region DAX_DUCK_AI_END home bubble (nativeInputField path)
+    // region DAX_DUCK_AI_END home bubble
 
     @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaThenHomeCtaIsBrandDesignBubble() = runTest {
+    fun whenCanShowDuckAiEndCtaThenHomeCtaIsBrandDesignBubble() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         val cta = testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -1955,7 +2063,6 @@ class CtaViewModelTest {
     fun whenCanShowDuckAiEndCtaOnSegmentedAiPathThenHomeCtaCarriesTheAiPath() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
         whenever(mockOnboardingStore.getSegmentedPathWithAiInput()).thenReturn(DownloadReasonSelection.AI_CHAT)
 
         val cta = testee.refreshCta(
@@ -1972,26 +2079,9 @@ class CtaViewModelTest {
     }
 
     @Test
-    fun whenInputScreenEnabledAndCanShowDuckAiEndCtaThenHomeCtaIsNullSoLegacyInputScreenFlowOwnsIt() = runTest {
+    fun whenCanShowDuckAiEndCtaThenInputScreenUserSettingEnabledJustInTime() = runTest {
         givenDaxOnboardingActive()
         givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = true
-
-        val cta = testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        assertNull(cta)
-    }
-
-    @Test
-    fun whenNativeInputActiveAndCanShowDuckAiEndCtaThenInputScreenUserSettingEnabledJustInTime() = runTest {
-        givenDaxOnboardingActive()
-        givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = false
 
         testee.refreshCta(
             coroutineRule.testDispatcher,
@@ -2001,23 +2091,6 @@ class CtaViewModelTest {
         )
 
         verify(mockDuckChat).setInputScreenUserSetting(true)
-    }
-
-    @Test
-    fun whenInputScreenEnabledAndCanShowDuckAiEndCtaThenGetHomeCtaDoesNotApplyInputScreenUserSetting() = runTest {
-        givenDaxOnboardingActive()
-        givenCanShowDuckAiEndCta()
-        showInputScreenFlow.value = true
-
-        testee.refreshCta(
-            coroutineRule.testDispatcher,
-            isBrowserShowing = false,
-            detectedRefreshPatterns = detectedRefreshPatterns,
-            brokenSitePromptUrl = null,
-        )
-
-        // The legacy input-screen path applies the toggle in prepareAndMarkDuckAiEndCtaForInputScreen, not here.
-        verify(mockDuckChat, never()).setInputScreenUserSetting(any())
     }
 
     @Test

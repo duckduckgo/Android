@@ -23,16 +23,16 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.lifecycle.coroutineScope
 import androidx.lifecycle.findViewTreeLifecycleOwner
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.subscriptions.impl.auth.AuthClient
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
 import com.duckduckgo.subscriptions.internal.SubsSettingPlugin
 import com.duckduckgo.subscriptions.internal.databinding.SubsSimpleViewBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -73,7 +73,7 @@ class InvalidateV2TokensView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class InvalidateV2TokensViewPlugin @Inject constructor() : SubsSettingPlugin {
     override fun getView(context: Context): View {
         return InvalidateV2TokensView(context)

@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.crypto.SyncLib
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**
@@ -37,7 +37,16 @@ data class DecryptedDevice(
     val deviceId: String,
     val name: String,
     val type: String?,
-)
+) {
+    companion object {
+        /** Shown when a device's name cannot be decrypted. Used by the device list and the audit log, so both show the same thing. */
+        fun placeholder(deviceId: String, credentialId: String?): DecryptedDevice = DecryptedDevice(
+            deviceId = deviceId,
+            name = ThirdPartyDeviceListDecryptor.FALLBACK_NAME,
+            type = if (credentialId == CREDENTIAL_ID_3PARTY) ThirdPartyDeviceListDecryptor.FALLBACK_TYPE_3PARTY else null,
+        )
+    }
+}
 
 @ContributesBinding(AppScope::class)
 class RealDeviceFieldDecryptor @Inject constructor(

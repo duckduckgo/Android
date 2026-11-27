@@ -26,11 +26,12 @@ import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.request.interception.api.RequestBlocklist
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
@@ -38,9 +39,9 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, RequestBlocklist::class)
-@ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<RequestBlocklist>())
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
 class RealRequestBlocklist @Inject constructor(
     private val requestBlocklistFeature: RequestBlocklistFeature,
     private val dispatchers: DispatcherProvider,

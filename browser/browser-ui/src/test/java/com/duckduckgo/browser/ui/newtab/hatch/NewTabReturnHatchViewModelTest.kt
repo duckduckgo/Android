@@ -18,6 +18,7 @@ package com.duckduckgo.browser.ui.newtab.hatch
 
 import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.Event
 import app.cash.turbine.test
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -81,7 +82,6 @@ class NewTabReturnHatchViewModelTest {
 
     // Starts false so each test controls the idle-return rising edge that captures the snapshot.
     private val afterIdleReturnFlow = MutableStateFlow(false)
-    private val nativeInputEnabledFlow = MutableStateFlow(true)
     private val navBarEnabledFlow = MutableStateFlow(false)
     private val providerSettings = MutableStateFlow<AfterInactivitySettings>(newTabPageSettings(returnToLastTabShortcutEnabled = true))
     private val fakeNewTabReturnHatchFeature = FakeFeatureToggleFactory.create(
@@ -97,7 +97,6 @@ class NewTabReturnHatchViewModelTest {
         whenever(mockFireTabRepository.flowTabs).thenReturn(fireTabsFlow)
         whenever(mockNtpAfterIdleManager.isAfterIdleReturn).thenReturn(afterIdleReturnFlow)
         whenever(mockAfterInactivitySettingsDataProvider.settings).thenReturn(providerSettings)
-        whenever(mockDuckChat.observeNativeInputFieldUserSettingEnabled()).thenReturn(nativeInputEnabledFlow)
         whenever(mockDuckChat.observeNativeInputNavBarEnabled()).thenReturn(navBarEnabledFlow)
         whenever(mockDuckChatInputModeState.inputModeCapability).thenReturn(inputModeCapabilityFlow)
         fakeNewTabReturnHatchFeature.afterInactivityEntry().setRawStoredState(Toggle.State(enable = true))
@@ -154,6 +153,92 @@ class NewTabReturnHatchViewModelTest {
             returnFromIdleWith(null)
 
             assertFalse(expectMostRecentItem().shouldShow)
+        }
+    }
+
+    @Test
+    fun whenNotReturningFromIdleThenViewStateIsNotSettled() = runTest {
+        testee.viewState.test {
+            assertFalse(expectMostRecentItem().isIdleReturnSettled)
+        }
+    }
+
+    @Test
+    fun whenReturnFromIdleWithTabThenShownStateIsSettled() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+
+            val state = expectMostRecentItem()
+            assertTrue(state.shouldShow)
+            assertTrue(state.isIdleReturnSettled)
+        }
+    }
+
+    @Test
+    fun whenReturnFromIdleWithNoTabThenHiddenStateIsSettled() = runTest {
+        testee.viewState.test {
+            returnFromIdleWith(null)
+
+            val state = expectMostRecentItem()
+            assertFalse(state.shouldShow)
+            assertTrue(state.isIdleReturnSettled)
+        }
+    }
+
+    @Test
+    fun whenReturnFromIdleWithTabThenNoHiddenStateIsReportedSettled() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+
+            val settled = cancelAndConsumeRemainingEvents()
+                .filterIsInstance<Event.Item<NewTabReturnHatchViewModel.ViewState>>()
+                .map { it.value }
+                .filter { it.isIdleReturnSettled }
+            assertTrue(settled.isNotEmpty())
+            assertTrue(settled.all { it.shouldShow })
+        }
+    }
+
+    @Test
+    fun whenIdleReturnEndsThenViewStateIsNoLongerSettled() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+            afterIdleReturnFlow.value = false
+
+            assertFalse(expectMostRecentItem().isIdleReturnSettled)
+        }
+    }
+
+    @Test
+    fun whenReturnToLastTabDisabledThenHiddenStateIsSettled() = runTest {
+        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
+        providerSettings.value = newTabPageSettings(returnToLastTabShortcutEnabled = false)
+
+        testee.viewState.test {
+            returnFromIdleWith(tab)
+
+            val state = expectMostRecentItem()
+            assertFalse(state.shouldShow)
+            assertTrue(state.isIdleReturnSettled)
+        }
+    }
+
+    @Test
+    fun whenReturnFromIdleWithFireTabThenStateIsSettled() = runTest {
+        val tab = TabEntity(tabId = "fire1", url = "https://example.com", title = "Example")
+        fireTabsFlow.value = listOf(tab)
+        whenever(mockResolver.resolve()).thenReturn(EscapeHatchTarget(tab.tabId, BrowserMode.FIRE))
+
+        testee.viewState.test {
+            afterIdleReturnFlow.value = true
+
+            assertTrue(expectMostRecentItem().isIdleReturnSettled)
         }
     }
 
@@ -393,8 +478,7 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenNativeInputEnabledThenShowTabsButtonIsTrue() = runTest {
-        nativeInputEnabledFlow.value = true
+    fun whenSearchAndDuckAiThenShowTabsButtonIsTrue() = runTest {
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 
         testee.viewState.test {
@@ -404,19 +488,7 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenNativeInputDisabledThenShowTabsButtonIsFalse() = runTest {
-        nativeInputEnabledFlow.value = false
-        val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
-
-        testee.viewState.test {
-            returnFromIdleWith(tab)
-            assertFalse(expectMostRecentItem().showTabsButton)
-        }
-    }
-
-    @Test
     fun whenNavBarFeatureEnabledInSearchAndDuckAiThenShowTabsButtonIsFalse() = runTest {
-        nativeInputEnabledFlow.value = true
         inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_AND_DUCK_AI
         navBarEnabledFlow.value = true
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
@@ -428,8 +500,7 @@ class NewTabReturnHatchViewModelTest {
     }
 
     @Test
-    fun whenNativeInputEnabledButSearchOnlyThenShowTabsButtonIsFalse() = runTest {
-        nativeInputEnabledFlow.value = true
+    fun whenSearchOnlyThenShowTabsButtonIsFalse() = runTest {
         inputModeCapabilityFlow.value = NativeInputState.InputMode.SEARCH_ONLY
         val tab = TabEntity(tabId = "tab1", url = "https://example.com", title = "Example")
 

@@ -18,11 +18,11 @@ package com.duckduckgo.pir.impl.dashboard
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPirDashboardUrlProvider @Inject constructor() : PirDashboardUrlProvider {
     override fun getUrl(): String = PirDashboardWebConstants.DEFAULT_WEB_UI_URL

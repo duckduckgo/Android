@@ -19,7 +19,7 @@ package com.duckduckgo.experiments.impl.reinstalls
 import android.content.Context
 import android.content.SharedPreferences
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface BackupServiceDataStore {

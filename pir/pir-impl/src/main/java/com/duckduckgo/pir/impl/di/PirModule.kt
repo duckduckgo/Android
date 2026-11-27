@@ -22,9 +22,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.common.BrokerJsonTypes
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
-import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.ScanStepActions
 import com.duckduckgo.pir.impl.common.CaptchaResolver
 import com.duckduckgo.pir.impl.common.NativeBrokerActionHandler
 import com.duckduckgo.pir.impl.common.RealNativeBrokerActionHandler
@@ -48,6 +47,7 @@ import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ExtractedRespon
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.FillFormResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.GetCaptchaInfoResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.NavigateResponse
+import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.ScrollResponse
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse.SolveCaptchaResponse
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.store.PirDataStore
@@ -57,34 +57,34 @@ import com.duckduckgo.pir.impl.store.RealPirDataStore
 import com.duckduckgo.pir.impl.store.RealPirFreemiumDataStore
 import com.duckduckgo.pir.impl.store.RealPirRepository
 import com.duckduckgo.pir.impl.store.secure.PirSecureStorageDatabaseFactory
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.adapters.PolymorphicJsonAdapterFactory
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Named
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class PirModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePirDataStore(
         sharedPreferencesProvider: SharedPreferencesProvider,
     ): PirDataStore = RealPirDataStore(sharedPreferencesProvider)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePirFreemiumDataStore(
         sharedPreferencesProvider: SharedPreferencesProvider,
     ): PirFreemiumDataStore = RealPirFreemiumDataStore(sharedPreferencesProvider)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun providePirRepository(
         pirDataStore: PirDataStore,
         dispatcherProvider: DispatcherProvider,
@@ -142,7 +142,7 @@ class PirModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Named("pir")
     fun providePirMoshi(moshi: Moshi): Moshi {
         return moshi.newBuilder()
@@ -151,23 +151,13 @@ class PirModule {
                     .withSubtype(SolveCaptcha::class.java, "solveCaptcha")
                     .withSubtype(UserProfile::class.java, "userProfile"),
             ).add(
-                PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, "actionType")
-                    .withSubtype(BrokerAction.Extract::class.java, "extract")
-                    .withSubtype(BrokerAction.Expectation::class.java, "expectation")
-                    .withSubtype(BrokerAction.Click::class.java, "click")
-                    .withSubtype(BrokerAction.ExecuteScript::class.java, "executeScript")
-                    .withSubtype(BrokerAction.FillForm::class.java, "fillForm")
-                    .withSubtype(BrokerAction.Navigate::class.java, "navigate")
-                    .withSubtype(BrokerAction.GetCaptchaInfo::class.java, "getCaptchaInfo")
-                    .withSubtype(BrokerAction.SolveCaptcha::class.java, "solveCaptcha")
-                    .withSubtype(BrokerAction.EmailConfirmation::class.java, "emailConfirmation")
-                    .withSubtype(BrokerAction.Condition::class.java, "condition")
-                    .withSubtype(BrokerAction.GenerateEmail::class.java, "generateEmail")
-                    .withSubtype(BrokerAction.GetEmailData::class.java, "getEmailData"),
+                BrokerJsonTypes.actionSubtypes.entries.fold(
+                    PolymorphicJsonAdapterFactory.of(BrokerAction::class.java, BrokerJsonTypes.ACTION_TYPE_KEY),
+                ) { factory, (label, subtype) -> factory.withSubtype(subtype, label) },
             ).add(
-                PolymorphicJsonAdapterFactory.of(BrokerStepActions::class.java, "stepType")
-                    .withSubtype(ScanStepActions::class.java, "scan")
-                    .withSubtype(OptOutStepActions::class.java, "optOut"),
+                BrokerJsonTypes.stepSubtypes.entries.fold(
+                    PolymorphicJsonAdapterFactory.of(BrokerStepActions::class.java, BrokerJsonTypes.STEP_TYPE_KEY),
+                ) { factory, (label, subtype) -> factory.withSubtype(subtype, label) },
             ).add(
                 PolymorphicJsonAdapterFactory.of(PirSuccessResponse::class.java, "actionType")
                     .withSubtype(NavigateResponse::class.java, "navigate")
@@ -178,7 +168,8 @@ class PirModule {
                     .withSubtype(ExecuteScriptResponse::class.java, "executeScript")
                     .withSubtype(ExpectationResponse::class.java, "expectation")
                     .withSubtype(FillFormResponse::class.java, "fillForm")
-                    .withSubtype(ConditionResponse::class.java, "condition"),
+                    .withSubtype(ConditionResponse::class.java, "condition")
+                    .withSubtype(ScrollResponse::class.java, "scroll"),
             )
             .add(KotlinJsonAdapterFactory())
             .build()

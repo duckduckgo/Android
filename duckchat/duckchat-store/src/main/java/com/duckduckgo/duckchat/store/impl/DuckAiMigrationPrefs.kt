@@ -18,10 +18,10 @@ package com.duckduckgo.duckchat.store.impl
 
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DuckAiMigrationPrefs @Inject constructor(
     sharedPreferencesProvider: SharedPreferencesProvider,
 ) {

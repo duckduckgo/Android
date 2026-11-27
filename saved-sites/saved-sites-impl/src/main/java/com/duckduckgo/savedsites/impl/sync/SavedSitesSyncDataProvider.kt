@@ -27,20 +27,20 @@ import com.duckduckgo.savedsites.impl.sync.algorithm.isDeleted
 import com.duckduckgo.sync.api.SyncCrypto
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.BOOKMARKS
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataProvider>())
 class SavedSitesSyncDataProvider @Inject constructor(
     private val repository: SavedSitesRepository,
     private val syncSavedSitesRepository: SyncSavedSitesRepository,
     private val savedSitesSyncStore: SavedSitesSyncStore,
     private val syncCrypto: SyncCrypto,
     private val savedSitesFormFactorSyncMigration: SavedSitesFormFactorSyncMigration,
-    private val bookmarksSyncLocalValidationFeature: BookmarksSyncLocalValidationFeature,
 ) : SyncableDataProvider {
     override fun getType(): SyncableType = BOOKMARKS
 
@@ -221,8 +221,6 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     private fun isValid(syncSavedSite: SyncSavedSitesRequestEntry): Boolean {
-        if (bookmarksSyncLocalValidationFeature.self().isEnabled().not()) return true // no validation required
-
         val titleLength = syncSavedSite.title?.length ?: 0
         val urlLength = syncSavedSite.page?.url?.length ?: 0
 
@@ -230,8 +228,6 @@ class SavedSitesSyncDataProvider @Inject constructor(
     }
 
     private fun fixFolderIfNecessary(folder: BookmarkFolder): BookmarkFolder {
-        if (bookmarksSyncLocalValidationFeature.self().isEnabled().not()) return folder
-
         val fixedName = folder.name.take(MAX_FOLDER_TITLE_LENGTH)
         return folder.copy(name = fixedName)
     }

@@ -24,7 +24,7 @@ import com.duckduckgo.cookies.api.DuckDuckGoCookieManager
 import com.duckduckgo.cookies.api.RemoveCookiesStrategy
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat

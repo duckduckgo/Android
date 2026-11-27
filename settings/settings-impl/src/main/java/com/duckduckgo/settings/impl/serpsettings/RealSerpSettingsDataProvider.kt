@@ -23,8 +23,8 @@ import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName
 import com.duckduckgo.settings.impl.serpsettings.pixel.fireSerpSettingsCountAndDaily
 import com.duckduckgo.settings.impl.serpsettings.store.SerpSettingsDataStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOn
@@ -34,7 +34,7 @@ import org.json.JSONObject
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSerpSettingsDataProvider @Inject constructor(
     private val serpSettingsDataStore: SerpSettingsDataStore,
     private val dispatcherProvider: DispatcherProvider,

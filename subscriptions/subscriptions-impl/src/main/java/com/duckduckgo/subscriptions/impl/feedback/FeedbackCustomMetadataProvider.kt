@@ -24,7 +24,7 @@ import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.VPN
 import com.duckduckgo.subscriptions.impl.repository.isActive
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject

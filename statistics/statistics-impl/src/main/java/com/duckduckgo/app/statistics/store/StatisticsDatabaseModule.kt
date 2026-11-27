@@ -19,16 +19,16 @@ package com.duckduckgo.app.statistics.store
 import android.content.Context
 import androidx.room.Room
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class StatisticsDatabaseModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideStatisticsDatabase(context: Context): StatisticsDatabase =
         Room
             .databaseBuilder(
@@ -40,12 +40,12 @@ class StatisticsDatabaseModule {
             .build()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideDailyPixelFiredDao(db: StatisticsDatabase): DailyPixelFiredDao =
         db.dailyPixelFiredDao()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideUniquePixelFiredDao(db: StatisticsDatabase): UniquePixelFiredDao =
         db.uniquePixelFiredDao()
 }

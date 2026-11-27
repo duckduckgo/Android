@@ -16,9 +16,9 @@
 
 package com.duckduckgo.feature.toggles.codegen
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
@@ -390,7 +390,7 @@ class ContributesActivePluginPointCodeGeneratorTest {
     fun `explicit featureName on plugin point generates sentinel class`() {
         // The sentinel is used by sibling-module plugins to validate parentFeatureName at :app
         // compile time. Its mere existence (loadable class) proves the codegen emitted it.
-        Class.forName("com.duckduckgo.anvil.generated.ActivePluginPointRegistry_pluginPointExplicit")
+        Class.forName("com.duckduckgo.codegen.generated.ActivePluginPointRegistry_pluginPointExplicit")
     }
 
     @Test

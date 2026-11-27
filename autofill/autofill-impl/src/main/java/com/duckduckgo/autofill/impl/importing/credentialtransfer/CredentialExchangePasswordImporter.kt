@@ -26,7 +26,7 @@ import com.duckduckgo.credentialexchange.api.CredentialExchangeFailure
 import com.duckduckgo.credentialexchange.api.CredentialExchangeResult
 import com.duckduckgo.credentialexchange.api.ExchangedCredential
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

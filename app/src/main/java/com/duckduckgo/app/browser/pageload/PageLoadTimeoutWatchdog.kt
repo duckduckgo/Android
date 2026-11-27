@@ -21,9 +21,9 @@ import com.duckduckgo.app.browser.pageload.PageLoadTimeoutWatchdog.Phase
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -95,6 +95,11 @@ interface PageLoadTimeoutWatchdog {
     fun onNavigatedAway()
 
     /**
+     * The main-frame request was handed to the download listener, so no page is going to load.
+     */
+    fun onDownloadStarted()
+
+    /**
      * The tab is no longer visible. The clock stops, and a load that is still pending is not timed out while backgrounded.
      */
     fun onBackgrounded()
@@ -137,6 +142,8 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     private var committed = false
     private var pendingRedirectUrl: String? = null
     private var loadedUrl: String? = null
+    private var pageDisplayed = false
+    private var userInitiatedArm = false
     private var userInitiatedLoadPending = false
     private var timedOutAt = 0L
     private var backgrounded = false
@@ -146,7 +153,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         when {
             !url.isWeb() -> disarm()
             !userInitiated && isLoaded(url) -> Unit
-            else -> arm(url, committed = false)
+            else -> arm(url, committed = false, userInitiated = userInitiated)
         }
     }
 
@@ -161,7 +168,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
                 this.url = url
                 pendingRedirectUrl = url
             }
-            state == State.IDLE -> arm(url, committed = false)
+            state == State.IDLE -> arm(url, committed = false, userInitiated = false)
             else -> Unit
         }
     }
@@ -175,7 +182,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         when (state) {
             State.IDLE -> {
                 val userInitiated = consumeUserInitiatedLoad()
-                if (url.isWeb() && (userInitiated || !isLoaded(url))) arm(url, committed = true)
+                if (url.isWeb() && (userInitiated || !isLoaded(url))) arm(url, committed = true, userInitiated = userInitiated)
             }
             State.ARMED -> if (isCurrent(url)) {
                 this.url = url
@@ -193,6 +200,8 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
 
     override fun onNavigatedAway() = disarm()
 
+    override fun onDownloadStarted() = disarm()
+
     override fun onBackgrounded() {
         backgrounded = true
         watchJob.cancel()
@@ -204,8 +213,9 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         if (state == State.ARMED) startWatching()
     }
 
-    private fun arm(url: String, committed: Boolean) {
+    private fun arm(url: String, committed: Boolean, userInitiated: Boolean) {
         loadedUrl = null
+        userInitiatedArm = userInitiated
         state = State.ARMED
         this.url = url
         this.committed = committed
@@ -232,6 +242,7 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
         }
         disarm()
         loadedUrl = url
+        pageDisplayed = true
     }
 
     private fun consumeUserInitiatedLoad(): Boolean = userInitiatedLoadPending.also { userInitiatedLoadPending = false }
@@ -258,6 +269,10 @@ class RealPageLoadTimeoutWatchdog @AssistedInject constructor(
     }
 
     private fun timeOut() {
+        if (pageDisplayed && !committed && !userInitiatedArm) {
+            disarm()
+            return
+        }
         state = State.TIMED_OUT
         val phase = if (committed) Phase.COMMITTED_NO_CONTENT else Phase.NOT_COMMITTED
         timedOutAt = currentTimeProvider.elapsedRealtime()

@@ -23,7 +23,7 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**
@@ -35,6 +35,12 @@ import javax.inject.Inject
 @WorkerThread
 interface DeviceFieldEncryptor {
     fun encrypt(name: String, type: String): Result<EncryptedDeviceFields>
+
+    /**
+     * 3party encryption with a main encryption key the caller already holds, for when [SyncStore]
+     * does not carry the 3party credential yet (the 3party → ddg upgrade login).
+     */
+    fun encryptThirdParty(name: String, type: String, mainEncryptionKey: ByteArray): Result<EncryptedDeviceFields>
 }
 
 data class EncryptedDeviceFields(
@@ -51,7 +57,7 @@ class RealDeviceFieldEncryptor @Inject constructor(
 
     override fun encrypt(name: String, type: String): Result<EncryptedDeviceFields> {
         return when (syncStore.credentialId) {
-            CREDENTIAL_ID_3PARTY -> encryptThirdParty(name, type)
+            CREDENTIAL_ID_3PARTY -> encryptThirdPartyWithStoredKey(name, type)
             CREDENTIAL_ID_DDG, null -> encryptDdg(name, type)
             else -> Error(reason = "DeviceFieldEncryptor: unknown credential_id=${syncStore.credentialId}")
         }
@@ -71,19 +77,25 @@ class RealDeviceFieldEncryptor @Inject constructor(
         }.getOrElse { it.asLoggedError("DeviceFieldEncryptor: ddg encrypt failed") }
     }
 
-    private fun encryptThirdParty(name: String, type: String): Result<EncryptedDeviceFields> {
+    private fun encryptThirdPartyWithStoredKey(name: String, type: String): Result<EncryptedDeviceFields> {
         val scopedPassword = syncStore.scopedPassword?.raw ?: return Error(reason = "DeviceFieldEncryptor: scopedPassword missing")
         val userId = syncStore.userId ?: return Error(reason = "DeviceFieldEncryptor: userId missing")
-        return runCatching {
-            val mainEncryptionKey = syncJweCrypto.hkdfDeriveBytes(
+        val mainEncryptionKey = runCatching {
+            syncJweCrypto.hkdfDeriveBytes(
                 scopedPassword,
                 userId.toByteArray(Charsets.UTF_8),
                 HKDF_INFO_MAIN_ENCRYPTION_KEY,
                 MAIN_ENCRYPTION_KEY_LENGTH_BYTES,
             )
-            val encryptedName = syncJweCrypto.jweEncryptSymmetric(name.toByteArray(Charsets.UTF_8), mainEncryptionKey)
-            val encryptedType = syncJweCrypto.jweEncryptSymmetric(type.toByteArray(Charsets.UTF_8), mainEncryptionKey)
-            Success(EncryptedDeviceFields(encryptedName, encryptedType))
+        }.getOrElse { return it.asLoggedError("DeviceFieldEncryptor: 3party key derivation failed") }
+        return encryptThirdParty(name, type, mainEncryptionKey)
+    }
+
+    override fun encryptThirdParty(name: String, type: String, mainEncryptionKey: ByteArray): Result<EncryptedDeviceFields> {
+        return runCatching {
+            fun encrypt(value: String) =
+                syncJweCrypto.jweEncryptSymmetric(value.toByteArray(Charsets.UTF_8), mainEncryptionKey, kid = CREDENTIAL_ID_3PARTY)
+            Success(EncryptedDeviceFields(encrypt(name), encrypt(type)))
         }.getOrElse { it.asLoggedError("DeviceFieldEncryptor: 3party encrypt failed") }
     }
 }

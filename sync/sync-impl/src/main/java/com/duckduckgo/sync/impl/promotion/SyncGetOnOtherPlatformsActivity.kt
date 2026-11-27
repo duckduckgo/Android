@@ -23,8 +23,8 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -129,4 +129,7 @@ enum class SyncGetOnOtherPlatformsLaunchSource(val value: String) {
     SOURCE_ACTIVATING("activating"),
     SOURCE_SYNC_DISABLED("not_activated"),
     SOURCE_SYNC_ENABLED("activated"),
+    SOURCE_PROMOTION_BOOKMARKS("promotion_bookmarks"),
+    SOURCE_PROMOTION_PASSWORDS("promotion_passwords"),
+    SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG("promotion_bookmark_added_dialog"),
 }

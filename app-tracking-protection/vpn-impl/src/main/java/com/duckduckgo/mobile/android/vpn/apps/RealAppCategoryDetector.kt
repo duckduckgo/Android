@@ -20,7 +20,7 @@ import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.exclusion.AppCategory
 import com.duckduckgo.mobile.android.vpn.exclusion.AppCategoryDetector
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

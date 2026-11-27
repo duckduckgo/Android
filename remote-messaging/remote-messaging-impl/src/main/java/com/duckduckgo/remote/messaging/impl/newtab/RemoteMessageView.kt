@@ -32,10 +32,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.show
@@ -43,6 +44,7 @@ import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.mobile.android.app.tracking.ui.AppTrackingProtectionScreens.AppTrackerOnboardingActivityWithEmptyParamsParams
@@ -64,7 +66,6 @@ import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Comman
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SharePromoLinkRMF
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.Command.SubmitUrl
 import com.duckduckgo.remote.messaging.impl.newtab.RemoteMessageViewModel.ViewState
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import logcat.LogPriority.WARN
@@ -96,6 +97,9 @@ class RemoteMessageView @JvmOverloads constructor(
 
     @Inject
     lateinit var appBuildConfig: AppBuildConfig
+
+    @Inject
+    lateinit var addWidgetLauncher: AddWidgetLauncher
 
     private val binding: ViewRemoteMessageBinding by viewBinding()
 
@@ -147,6 +151,7 @@ class RemoteMessageView @JvmOverloads constructor(
             is SharePromoLinkRMF -> launchSharePromoRMFPageChooser(command.url, command.shareTitle)
             is SubmitUrl -> submitUrl(command.url)
             is Command.LaunchDefaultCredentialProvider -> launchDefaultCredentialProvider()
+            is Command.LaunchAddWidget -> addWidgetLauncher.launchAddWidget(context, command.widgetType)
         }
     }
 

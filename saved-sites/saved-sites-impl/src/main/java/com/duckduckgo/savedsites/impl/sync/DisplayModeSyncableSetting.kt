@@ -21,14 +21,15 @@ import com.duckduckgo.savedsites.store.FavoritesDisplayMode
 import com.duckduckgo.savedsites.store.SavedSitesSettingsStore
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.duckduckgo.sync.settings.api.SyncableSetting
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableSetting>())
 class DisplayModeSyncableSetting @Inject constructor(
     private val savedSitesSettingsStore: SavedSitesSettingsStore,
     private val syncSettingsListener: SyncSettingsListener,

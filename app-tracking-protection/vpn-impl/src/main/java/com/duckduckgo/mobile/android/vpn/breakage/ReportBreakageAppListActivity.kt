@@ -33,8 +33,8 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
@@ -52,7 +52,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(OpenVpnReportBreakageFrom::class)
@@ -62,10 +61,10 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
     lateinit var deviceShieldPixels: DeviceShieldPixels
 
     @Inject
-    lateinit var appFeedbackContract: Provider<AppFeedbackContract>
+    lateinit var appFeedbackContract: () -> AppFeedbackContract
 
     @Inject
-    lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+    lateinit var reportBreakageContract: () -> ReportBreakageContract
 
     @Inject
     @AppTpBreakageCategories
@@ -93,13 +92,13 @@ class ReportBreakageAppListActivity : DuckDuckGoActivity(), ReportBreakageAppLis
         super.onCreate(savedInstanceState)
         enableTransparentEdgeToEdge()
 
-        reportBreakage = registerForActivityResult(reportBreakageContract.get()) { result ->
+        reportBreakage = registerForActivityResult(reportBreakageContract()) { result ->
             if (!result.isEmpty()) {
                 viewModel.onBreakageSubmitted(result)
             }
         }
 
-        sendAppFeedback = registerForActivityResult(appFeedbackContract.get()) { resultOk ->
+        sendAppFeedback = registerForActivityResult(appFeedbackContract()) { resultOk ->
             if (resultOk) {
                 Toast.makeText(this, R.string.atp_ThanksForTheFeedback, Toast.LENGTH_LONG).show()
                 finish()

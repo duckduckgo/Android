@@ -69,36 +69,6 @@ sealed class FilterSetWithRevision(
     ) : FilterSetWithRevision(insert, delete, revision, replace, SCAM)
 }
 
-sealed class HashPrefixesWithRevision(
-    open val insert: Set<String>,
-    open val delete: Set<String>,
-    open val revision: Int,
-    open val replace: Boolean,
-    val feed: Feed,
-    val type: Type = Type.HASH_PREFIXES,
-) {
-    data class PhishingHashPrefixesWithRevision(
-        override val insert: Set<String>,
-        override val delete: Set<String>,
-        override val revision: Int,
-        override val replace: Boolean,
-    ) : HashPrefixesWithRevision(insert, delete, revision, replace, PHISHING)
-
-    data class MalwareHashPrefixesWithRevision(
-        override val insert: Set<String>,
-        override val delete: Set<String>,
-        override val revision: Int,
-        override val replace: Boolean,
-    ) : HashPrefixesWithRevision(insert, delete, revision, replace, MALWARE)
-
-    data class ScamHashPrefixesWithRevision(
-        override val insert: Set<String>,
-        override val delete: Set<String>,
-        override val revision: Int,
-        override val replace: Boolean,
-    ) : HashPrefixesWithRevision(insert, delete, revision, replace, SCAM)
-}
-
 enum class Type {
     HASH_PREFIXES,
     FILTER_SET,

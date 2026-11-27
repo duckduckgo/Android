@@ -65,7 +65,7 @@ fun DaxCheckbox(
         Checkbox(
             checked = checked,
             onCheckedChange = onCheckedChange,
-            modifier = modifier.alpha(if (enabled) 1f else DaxCheckboxDefaults.disabledAlpha),
+            modifier = modifier.alpha(if (enabled) 1f else DaxCheckboxDefaults.DisabledAlpha),
             enabled = enabled,
             interactionSource = interactionSource,
             colors = CheckboxDefaults.colors(
@@ -82,7 +82,7 @@ fun DaxCheckbox(
 
 private object DaxCheckboxDefaults {
 
-    const val disabledAlpha = 0.4f
+    const val DisabledAlpha = 0.4f
 
     val colors: DaxCheckboxColors
         @Composable

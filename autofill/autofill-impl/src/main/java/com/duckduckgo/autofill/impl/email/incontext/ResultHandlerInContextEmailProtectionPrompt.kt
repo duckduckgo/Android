@@ -32,7 +32,7 @@ import com.duckduckgo.autofill.api.EmailProtectionInContextSignUpDialog.EmailPro
 import com.duckduckgo.autofill.impl.email.incontext.store.EmailProtectionInContextDataStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -40,7 +40,7 @@ import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ResultHandlerInContextEmailProtectionPrompt @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,

@@ -17,7 +17,7 @@
 package com.duckduckgo.app.attributed.metrics.store
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime

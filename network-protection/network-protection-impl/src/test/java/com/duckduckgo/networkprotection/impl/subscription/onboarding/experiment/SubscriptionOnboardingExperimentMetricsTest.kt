@@ -16,6 +16,7 @@
 
 package com.duckduckgo.networkprotection.impl.subscription.onboarding.experiment
 
+import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.ConversionWindow
 import com.duckduckgo.feature.toggles.api.FakeMetricsPixelExtension
 import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
@@ -46,12 +47,15 @@ class SubscriptionOnboardingExperimentMetricsTest {
     @Before
     fun setup() {
         fakeMetricsPixelExtension.register()
-        testee = RealSubscriptionOnboardingExperimentMetrics(inventory = inventory)
+        testee = RealSubscriptionOnboardingExperimentMetrics(
+            inventory = inventory,
+            sharedPreferencesProvider = FakeSharedPreferencesProvider(),
+        )
     }
 
     @Test
     fun whenVpnActivatedThenFiresD1AndExperimentSpecificLaterWindowForEachExperiment() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(listOf(freeTrialToggle, paidToggle))
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle, paidToggle))
 
         testee.fireVpnActivated()
 
@@ -73,11 +77,44 @@ class SubscriptionOnboardingExperimentMetricsTest {
     }
 
     @Test
-    fun whenNoExperimentTogglesInInventoryThenNoMetricSent() = runTest {
-        whenever(inventory.getAllTogglesForParent("privacyPro")).thenReturn(emptyList())
+    fun whenNoActiveExperimentsThenNoMetricSent() = runTest {
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
 
         testee.fireVpnActivated()
 
         assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
+    }
+
+    @Test
+    fun whenVpnActivatedAgainThenNoMetricSentTwice() = runTest {
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle))
+
+        testee.fireVpnActivated()
+        testee.fireVpnActivated()
+
+        assertEquals(2, fakeMetricsPixelExtension.sentMetrics.size)
+    }
+
+    @Test
+    fun whenOnlyOtherExperimentsActiveThenNoMetricSent() = runTest {
+        val otherToggle: Toggle = mock {
+            on { featureName() } doReturn FeatureName(parentName = "privacyPro", name = "otherExperiment")
+        }
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(otherToggle))
+
+        testee.fireVpnActivated()
+
+        assertTrue(fakeMetricsPixelExtension.sentMetrics.isEmpty())
+    }
+
+    @Test
+    fun whenVpnActivatedBeforeEnrollmentThenMetricSentOnceEnrolled() = runTest {
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(emptyList())
+        testee.fireVpnActivated()
+
+        whenever(inventory.getAllActiveExperimentToggles()).thenReturn(listOf(freeTrialToggle))
+        testee.fireVpnActivated()
+
+        assertEquals(2, fakeMetricsPixelExtension.sentMetrics.size)
     }
 }

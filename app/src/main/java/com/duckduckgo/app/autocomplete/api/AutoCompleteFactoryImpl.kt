@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.autocomplete.api
 
-import com.duckduckgo.app.autocomplete.AutocompleteTabsFeature
+import com.duckduckgo.app.autocomplete.AutocompleteSpeedFeature
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.systemsearch.DeviceAppLookup
@@ -30,7 +30,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.savedsites.api.SavedSitesRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
@@ -41,7 +41,7 @@ class AutoCompleteFactoryImpl @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val autoCompleteScorer: AutoCompleteScorer,
     private val tabRepositoryProvider: BrowserModeDataProvider<TabRepository>,
-    private val autocompleteTabsFeature: AutocompleteTabsFeature,
+    private val autocompleteSpeedFeature: AutocompleteSpeedFeature,
     private val duckChat: DuckChat,
     private val history: NavigationHistory,
     private val dispatchers: DispatcherProvider,
@@ -50,7 +50,12 @@ class AutoCompleteFactoryImpl @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
 ) : AutoCompleteFactory {
 
-    override fun create(config: AutoComplete.Config, browserMode: BrowserMode): AutoComplete {
+    override fun create(config: AutoComplete.Config, browserMode: BrowserMode): AutoComplete =
+        create(config, browserMode, isOmnibar = false)
+
+    fun createForOmnibar(browserMode: BrowserMode): AutoComplete = create(AutoComplete.Config(), browserMode, isOmnibar = true)
+
+    private fun create(config: AutoComplete.Config, browserMode: BrowserMode, isOmnibar: Boolean): AutoComplete {
         return AutoCompleteApi(
             autoCompleteService = autoCompleteService,
             savedSitesRepository = savedSitesRepository,
@@ -58,7 +63,7 @@ class AutoCompleteFactoryImpl @Inject constructor(
             autoCompleteScorer = autoCompleteScorer,
             tabRepositoryProvider = tabRepositoryProvider,
             browserMode = browserMode,
-            autocompleteTabsFeature = autocompleteTabsFeature,
+            autocompleteSpeedFeature = autocompleteSpeedFeature,
             duckChat = duckChat,
             history = history,
             dispatchers = dispatchers,
@@ -66,6 +71,7 @@ class AutoCompleteFactoryImpl @Inject constructor(
             deviceAppLookup = deviceAppLookup,
             coroutineScope = coroutineScope,
             config = config,
+            isOmnibar = isOmnibar,
         )
     }
 }

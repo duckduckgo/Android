@@ -26,8 +26,7 @@ import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
@@ -35,18 +34,20 @@ import java.net.InetSocketAddress
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class GoBackend @Inject constructor(
     private val context: Context,
     private val appTrackerDetector: AppTrackerDetector,
     pixels: Lazy<NetworkProtectionPixels>,
 ) {
+    private val flowOwners = FlowOwners()
+
     init {
         try {
             logcat { "Loading wireguard-go library" }
             LibraryLoader.loadLibrary(context, "wg-go")
         } catch (ignored: Throwable) {
-            pixels.get().reportWireguardLibraryLoadFailed()
+            pixels.value.reportWireguardLibraryLoadFailed()
             Thread.sleep(100)
             logcat(ERROR) { "Error loading wireguard-go library: ${ignored.asLog()}" }
             exitProcess(1)
@@ -71,16 +72,6 @@ class GoBackend @Inject constructor(
 
     external fun wgVersion(): String
 
-    /**
-     * Configure (enable/disable) the PCAP functionality. When enable the network layer will record a PCAP file
-     * with every outbound IP packet before being encrypted by the VPN tunnel and any inbound decrypted IP packet.
-     *
-     * @param filename is the pcap filename. If `null` is passed, PCAP will be disabled
-     * @param recordSize is the snap length
-     * @param fileSize is the max size of the PCAP file. File will always be truncated to max value
-     */
-    external fun wgPcap(filename: String?, recordSize: Int, fileSize: Int)
-
     // Called from native code
     @Suppress("unused")
     fun shouldAllow(protocol: Int, saddr: String, sport: Int, daddr: String, dport: Int, sni: String, uid: Int): Boolean {
@@ -100,14 +91,13 @@ class GoBackend @Inject constructor(
         @Suppress("ktlint:standard:comment-wrapping")
         if (protocol != 6 /* TCP */ && protocol != 17 /* UDP */) return true
 
-        @Suppress("NAME_SHADOWING")
-        val uid = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            getUidQ(protocol, saddr, sport, daddr, dport)
-        } else {
-            uid
-        }
-
-        return shouldAllowDomain(sni, uid)
+        val flow = FlowOwners.Flow(protocol, saddr, sport, daddr, dport)
+        return flowOwners.allow(
+            flow,
+            sni,
+            lookup = { if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) getUidQ(protocol, saddr, sport, daddr, dport) else uid },
+            judge = { owner -> shouldAllowDomain(sni, owner) },
+        )
     }
 
     // Called from native code

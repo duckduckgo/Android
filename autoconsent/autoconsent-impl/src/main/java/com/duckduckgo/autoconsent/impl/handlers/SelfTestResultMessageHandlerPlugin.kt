@@ -25,13 +25,13 @@ import com.duckduckgo.autoconsent.impl.adapters.JSONObjectAdapter
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel
 import com.duckduckgo.autoconsent.impl.pixels.AutoconsentPixelManager
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SelfTestResultMessageHandlerPlugin @Inject constructor(
     private val autoconsentPixelManager: AutoconsentPixelManager,
     private val reloadLoopDetector: AutoconsentReloadLoopDetector,

@@ -20,7 +20,7 @@ import android.annotation.SuppressLint
 import android.webkit.WebStorage
 import androidx.webkit.WebStorageCompat
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import kotlin.coroutines.resume

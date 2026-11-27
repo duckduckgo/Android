@@ -26,17 +26,17 @@ import com.duckduckgo.webcompat.store.ALL_MIGRATIONS
 import com.duckduckgo.webcompat.store.RealWebCompatRepository
 import com.duckduckgo.webcompat.store.WebCompatDatabase
 import com.duckduckgo.webcompat.store.WebCompatRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object WebCompatModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideWebCompatDatabase(context: Context): WebCompatDatabase {
         return Room.databaseBuilder(context, WebCompatDatabase::class.java, "web_compat.db")
@@ -46,7 +46,7 @@ object WebCompatModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideWebCompatRepository(
         database: WebCompatDatabase,

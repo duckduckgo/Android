@@ -24,6 +24,8 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.duckchat.api.DuckChat
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -50,6 +52,7 @@ class RealNewAddressBarPickerManagerTest {
     private val appThemeMock: AppTheme = mock()
     private val promptExposureReporterMock: PromptExposureReporter = mock()
     private val dialogMock: BottomSheetDialog = mock()
+    private val toggleMigrationFeature = FakeFeatureToggleFactory.create(DuckAiToggleMigrationFeature::class.java)
 
     private lateinit var testee: RealNewAddressBarPickerManager
 
@@ -69,6 +72,7 @@ class RealNewAddressBarPickerManagerTest {
                     pixelMock,
                     appThemeMock,
                     promptExposureReporterMock,
+                    toggleMigrationFeature,
                     coroutineTestRule.testScope,
                     coroutineTestRule.testDispatcherProvider,
                 )
@@ -83,6 +87,19 @@ class RealNewAddressBarPickerManagerTest {
 
             verify(dialogFactoryMock).create(any(), any(), any())
             verify(dialogMock).show()
+        }
+
+    @Test
+    fun `when confirmed with search only and the parent toggle is off then leaves the setting unwritten`() =
+        runTest {
+            toggleMigrationFeature.self().setRawStoredState(Toggle.State(enable = false))
+            val callback = showPickerAndCaptureCallback()
+
+            callback.onConfirmed(false)
+            coroutineTestRule.testScope.advanceUntilIdle()
+
+            verify(duckChatMock, never()).setInputScreenUserSetting(any())
+            verify(dataStoreMock).setAsShown()
         }
 
     @Test
@@ -201,22 +218,15 @@ class RealNewAddressBarPickerManagerTest {
         }
 
     @Test
-    fun `when confirmed with search only then does not enable toggle and fires confirmed pixel`() =
+    fun `when confirmed with search only then writes the setting as off and fires confirmed pixel`() =
         runTest {
-            setupAllConditionsMet()
-            var capturedCallback: NewAddressBarCallback? = null
-            whenever(dialogFactoryMock.create(any(), any(), any())).thenAnswer {
-                capturedCallback = it.getArgument<NewAddressBarCallback?>(2)
-                dialogMock
-            }
+            val callback = showPickerAndCaptureCallback()
 
-            testee.showChoiceScreen(mock())
-
-            assertNotNull(capturedCallback)
-            capturedCallback!!.onConfirmed(false)
+            callback.onConfirmed(false)
             coroutineTestRule.testScope.advanceUntilIdle()
 
-            verify(duckChatMock, never()).setInputScreenUserSetting(any())
+            verify(duckChatMock).setInputScreenUserSetting(false)
+            verify(duckChatMock, never()).setInputScreenUserSetting(true)
             verify(duckChatMock, never()).onAddressBarPickerDuckAiSelected()
             verify(dataStoreMock).setAsShown()
             verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_only"))
@@ -225,6 +235,32 @@ class RealNewAddressBarPickerManagerTest {
                 mapOf("selection" to "search_only"),
                 type = Pixel.PixelType.Daily(),
             )
+        }
+
+    @Test
+    fun `when confirmed with search only and the write toggle is off then leaves the setting unwritten`() =
+        runTest {
+            toggleMigrationFeature.pickerSearchOnlyWritesSetting().setRawStoredState(Toggle.State(enable = false))
+            val callback = showPickerAndCaptureCallback()
+
+            callback.onConfirmed(false)
+            coroutineTestRule.testScope.advanceUntilIdle()
+
+            verify(duckChatMock, never()).setInputScreenUserSetting(any())
+            verify(dataStoreMock).setAsShown()
+            verify(pixelMock).fire(AppPixelName.NEW_ADDRESS_BAR_PICKER_V2_CONFIRMED_COUNT, mapOf("selection" to "search_only"))
+        }
+
+    @Test
+    fun `when confirmed with search and ai and the write toggle is off then still enables toggle`() =
+        runTest {
+            toggleMigrationFeature.pickerSearchOnlyWritesSetting().setRawStoredState(Toggle.State(enable = false))
+            val callback = showPickerAndCaptureCallback()
+
+            callback.onConfirmed(true)
+            coroutineTestRule.testScope.advanceUntilIdle()
+
+            verify(duckChatMock).setInputScreenUserSetting(true)
         }
 
     @Test
@@ -279,6 +315,17 @@ class RealNewAddressBarPickerManagerTest {
             verify(dialogFactoryMock).create(any(), any(), any())
             verify(dialogMock).show()
         }
+
+    private suspend fun showPickerAndCaptureCallback(): NewAddressBarCallback {
+        setupAllConditionsMet()
+        var capturedCallback: NewAddressBarCallback? = null
+        whenever(dialogFactoryMock.create(any(), any(), any())).thenAnswer {
+            capturedCallback = it.getArgument<NewAddressBarCallback?>(2)
+            dialogMock
+        }
+        testee.showChoiceScreen(mock())
+        return checkNotNull(capturedCallback)
+    }
 
     private suspend fun setupAllConditionsMet() {
         whenever(duckChatMock.isEnabled()).thenReturn(true)

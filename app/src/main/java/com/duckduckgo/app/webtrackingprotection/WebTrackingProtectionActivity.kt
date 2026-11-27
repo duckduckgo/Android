@@ -29,8 +29,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityWebTrackingProtectionBinding
 import com.duckduckgo.app.globalprivacycontrol.ui.GlobalPrivacyControlActivity
@@ -39,6 +37,8 @@ import com.duckduckgo.app.webtrackingprotection.WebTrackingProtectionViewModel.C
 import com.duckduckgo.app.webtrackingprotection.list.FeatureGridAdapter
 import com.duckduckgo.app.webtrackingprotection.list.FeatureGridItem
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.viewbinding.viewBinding

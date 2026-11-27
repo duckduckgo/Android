@@ -9,6 +9,7 @@ import com.duckduckgo.data.store.api.FakeSharedPreferencesProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.FakeToggleStore
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.networkprotection.api.NetworkProtectionAccessState
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.pir.api.PirFeature
@@ -45,6 +46,7 @@ import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboa
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.Subscription
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.stripe.StripePlansHandler
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Companion
@@ -60,6 +62,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -68,6 +71,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -96,6 +101,7 @@ class SubscriptionWebViewViewModelTest {
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler = mock()
     private val paywallUrlResolver: PaywallUrlResolver = mock()
     private val subscriptionOnboardingStore = SubscriptionOnboardingStore(FakeSharedPreferencesProvider())
+    private val stripePlansHandler: StripePlansHandler = mock()
 
     private lateinit var viewModel: SubscriptionWebViewViewModel
 
@@ -116,6 +122,7 @@ class SubscriptionWebViewViewModelTest {
             subscriptionExpirationReminderScheduler = subscriptionExpirationReminderScheduler,
             paywallUrlResolver = paywallUrlResolver,
             subscriptionOnboardingStore = subscriptionOnboardingStore,
+            stripePlansHandler = stripePlansHandler,
         )
         givenSubscriptionStatus(UNKNOWN)
     }
@@ -549,6 +556,152 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenNotificationsDeniedDialogEnabledThenGetUserSettingsResponseReportsDialogSupported() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.onUserSettingsComputed(
+                id = "msgId",
+                notificationsEnabled = false,
+                isAtLeastApi33 = true,
+                runtimePermissionGranted = false,
+                shouldShowRationale = false,
+            )
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertTrue(response.params.getBoolean("notificationsDeniedDialog"))
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogDisabledThenGetUserSettingsResponseReportsDialogNotSupported() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = false))
+
+        viewModel.commands().test {
+            viewModel.onUserSettingsComputed(
+                id = "msgId",
+                notificationsEnabled = false,
+                isAtLeastApi33 = true,
+                runtimePermissionGranted = false,
+                shouldShowRationale = false,
+            )
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertFalse(response.params.getBoolean("notificationsDeniedDialog"))
+        }
+    }
+
+    @Test
+    fun whenShowNotificationsDeniedDialogThenShowNotificationsDeniedDialogCommandSent() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("""{"days":3}"""))
+            val result = awaitItem() as Command.ShowNotificationsDeniedDialog
+            assertEquals("msgId", result.id)
+            assertEquals(3, result.days)
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogFlagDisabledAndShowNotificationsDeniedDialogThenNoCommandEmitted() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = false))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("""{"days":3}"""))
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenShowNotificationsDeniedDialogWithoutDaysThenRespondNotNow() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("showNotificationsDeniedDialog", response.method)
+            assertEquals("notNow", response.params.getString("action"))
+        }
+    }
+
+    @Test
+    fun whenShowNotificationsDeniedDialogWithInvalidDaysThenRespondNotNow() = runTest {
+        subscriptionsFeature.notificationsDeniedDialogMessaging().setRawStoredState(Toggle.State(enable = true))
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "showNotificationsDeniedDialog", "msgId", JSONObject("""{"days":0}"""))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("notNow", response.params.getString("action"))
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogOpenSettingsThenRespondOpenSettings() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("msgId", response.id)
+            assertEquals("showNotificationsDeniedDialog", response.method)
+            assertEquals("openSettings", response.params.getString("action"))
+            assertEquals(Command.OpenNotificationSettings, awaitItem())
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsWithNotificationsEnabledThenSendGrantedEvent() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { true }
+            val event = (awaitItem() as Command.SendJsEvent).event
+            assertEquals("useSubscription", event.featureName)
+            assertEquals("onNotificationsPermissionChanged", event.subscriptionName)
+            assertEquals("granted", event.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsWithNotificationsDisabledThenSendDeniedEvent() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { false }
+            val event = (awaitItem() as Command.SendJsEvent).event
+            assertEquals("denied", event.params.getString("notificationsPermission"))
+        }
+    }
+
+    @Test
+    fun whenReturnFromNotificationSettingsThenEventSentOnlyOnce() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogOpenSettings("msgId")
+            skipItems(2)
+            viewModel.onResume { true }
+            assertTrue(awaitItem() is Command.SendJsEvent)
+            viewModel.onResume { true }
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenResumeWithoutOpenSettingsThenNoEventAndNotificationsNotChecked() = runTest {
+        viewModel.commands().test {
+            viewModel.onResume { throw AssertionError("notifications should not be checked") }
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun whenNotificationsDeniedDialogNotNowThenRespondNotNow() = runTest {
+        viewModel.commands().test {
+            viewModel.onNotificationsDeniedDialogNotNow("msgId")
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("msgId", response.id)
+            assertEquals("showNotificationsDeniedDialog", response.method)
+            assertEquals("notNow", response.params.getString("action"))
+        }
+    }
+
+    @Test
     fun whenRequestNotificationsPermissionThenRequestNotificationsPermissionCommandSent() = runTest {
         subscriptionsFeature.notificationsPermissionMessaging().setRawStoredState(Toggle.State(enable = true))
 
@@ -661,6 +814,30 @@ class SubscriptionWebViewViewModelTest {
         flowTest.emit(CurrentPurchase.Success(isFreeTrial = false))
 
         verify(subscriptionExpirationReminderScheduler, never()).scheduleReminderNotification(any())
+    }
+
+    @Test
+    fun whenPurchaseSucceedsThenReportsPurchaseSuccessWithLaunchOrigin() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.setLaunchOrigin("funnel_appsettings_android")
+        viewModel.start()
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = true))
+
+        verify(pixelSender).reportPurchaseSuccessOrigin("funnel_appsettings_android", isFreeTrial = true)
+    }
+
+    @Test
+    fun whenPlanSwitchSucceedsThenDoesNotReportPurchaseSuccess() = runTest {
+        val flowTest: MutableSharedFlow<CurrentPurchase> = MutableSharedFlow()
+        whenever(subscriptionsManager.currentPurchaseState).thenReturn(flowTest)
+        viewModel.setLaunchOrigin("funnel_appsettings_android")
+        viewModel.start()
+
+        flowTest.emit(CurrentPurchase.Success(isFreeTrial = false, isPlanSwitch = true))
+
+        verify(pixelSender, never()).reportPurchaseSuccessOrigin(any(), any())
     }
 
     @Test
@@ -2425,6 +2602,28 @@ class SubscriptionWebViewViewModelTest {
     }
 
     @Test
+    fun whenSubscriptionChangeSelectedWithChangeThenCommandCarriesChange() = runTest {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = "google",
+                activeOffers = listOf(),
+            ),
+        )
+
+        val json = """{"id":"${SubscriptionsConstants.MONTHLY_PRO_PLAN_US}","change":"upgrade"}"""
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject(json))
+            val result = awaitItem() as Command.SubscriptionChangeSelected
+            assertEquals("upgrade", result.change)
+        }
+    }
+
+    @Test
     fun whenSubscriptionChangeSelectedAndFetchingSubscriptionFailsThenReturnFailure() = runTest {
         whenever(subscriptionsManager.getSubscription()).thenThrow(RuntimeException())
 
@@ -2437,6 +2636,121 @@ class SubscriptionWebViewViewModelTest {
             assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
             cancelAndConsumeRemainingEvents()
         }
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndStripeHandlesSubscriptionThenSendStripeTierOptions() = runTest {
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        val stripeOptions = SubscriptionTierOptionsJson(platform = "stripe", products = emptyList())
+        whenever(stripePlansHandler.getTierOptions()).thenReturn(stripeOptions)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+
+            assertEquals("id", response.id)
+            assertEquals(stripeOptions, tierJsonAdapter.fromJson(response.params.toString()))
+        }
+        verify(subscriptionsManager, never()).getSubscriptionOffer()
+    }
+
+    @Test
+    fun whenGetSubscriptionTierOptionsAndStripeDoesNotHandleSubscriptionThenStripeTierOptionsNotRequested() = runTest {
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(false)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "getSubscriptionTierOptions", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+            assertEquals("android", tierJsonAdapter.fromJson(response.params.toString())?.platform)
+        }
+        verify(stripePlansHandler, never()).getTierOptions()
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionThenSendRedirectEvent() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        val redirectEvent = SubscriptionEventData("useSubscription", "onPurchaseUpdate", JSONObject("""{"type":"redirect"}"""))
+        whenever(stripePlansHandler.getRedirectEvent(any(), any(), anyOrNull(), anyOrNull())).thenReturn(redirectEvent)
+
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject("""{"id":"stripe-yearly"}"""))
+
+            assertEquals(Command.SendJsEvent(redirectEvent), awaitItem())
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionThenPassPlanChangeToHandler() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        viewModel.setLaunchOrigin("origin")
+
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionChangeSelected",
+            "id",
+            JSONObject("""{"id":"stripe-yearly","change":"crossgrade"}"""),
+        )
+
+        verify(stripePlansHandler).getRedirectEvent(any(), eq("stripe-yearly"), eq("crossgrade"), eq("origin"))
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeHandlesSubscriptionAndNoRedirectEventThenReturnFailure() = runTest {
+        givenActiveSubscription(platform = "stripe")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(true)
+        whenever(stripePlansHandler.getRedirectEvent(any(), any(), anyOrNull(), anyOrNull())).thenReturn(null)
+
+        viewModel.currentPurchaseViewState.test {
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Inactive)
+
+            viewModel.processJsCallbackMessage("test", "subscriptionChangeSelected", "id", JSONObject("""{"id":"stripe-yearly"}"""))
+
+            assertTrue(awaitItem().purchaseState is PurchaseStateView.Failure)
+            cancelAndConsumeRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenSubscriptionChangeSelectedAndStripeDoesNotHandleSubscriptionThenRedirectEventNotRequested() = runTest {
+        givenActiveSubscription(platform = "google")
+        whenever(stripePlansHandler.shouldHandle(anyOrNull())).thenReturn(false)
+
+        viewModel.processJsCallbackMessage(
+            "test",
+            "subscriptionChangeSelected",
+            "id",
+            JSONObject("""{"id":"${SubscriptionsConstants.YEARLY_PLAN_US}"}"""),
+        )
+
+        verify(stripePlansHandler, never()).getRedirectEvent(any(), any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
+    fun whenCompleteStripePaymentThenNotifyHandlerAndRespondToJs() = runTest {
+        viewModel.commands().test {
+            viewModel.processJsCallbackMessage("test", "completeStripePayment", "id", JSONObject("{}"))
+            val response = (awaitItem() as Command.SendResponseToJs).data
+
+            assertEquals("id", response.id)
+            assertEquals("completeStripePayment", response.method)
+        }
+        verify(stripePlansHandler).onPlanChangeCompleted()
+    }
+
+    private fun givenActiveSubscription(platform: String) = runBlocking {
+        whenever(subscriptionsManager.getSubscription()).thenReturn(
+            Subscription(
+                productId = SubscriptionsConstants.MONTHLY_PLAN_US,
+                billingPeriod = "Monthly",
+                startedAt = 1234,
+                expiresOrRenewsAt = 1701694623000,
+                status = AUTO_RENEWABLE,
+                platform = platform,
+                activeOffers = listOf(),
+            ),
+        )
     }
 
     private fun givenSubscriptionStatus(subscriptionStatus: SubscriptionStatus) = runBlocking {

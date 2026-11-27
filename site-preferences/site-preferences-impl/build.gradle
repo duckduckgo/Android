@@ -16,24 +16,18 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     namespace 'com.duckduckgo.site.preferences.impl'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -42,39 +36,31 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
-    implementation project(path: ':site-preferences-api')
-    implementation project(path: ':di')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
-
-    implementation AndroidX.core.ktx
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.commonJava8
-
-    // Room
-    implementation AndroidX.room.runtime
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-
-    // Dagger
-    implementation Google.dagger
-
-    implementation KotlinX.coroutines.core
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':di')
+    implementation project(path: ':feature-toggles-api')
+    implementation project(path: ':site-preferences-api')
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation AndroidX.room.runtime
+    implementation KotlinX.coroutines.core
 
+    testImplementation project(path: ':common-test')
+    testImplementation project(path: ':feature-toggles-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
     testImplementation Testing.robolectric
-    testImplementation project(path: ':common-test')
-    testImplementation project(path: ':feature-toggles-test')
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }

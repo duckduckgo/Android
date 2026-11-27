@@ -19,7 +19,7 @@ import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.subscriptions.api.SubscriptionsJSHelper
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONObject
 import javax.inject.Inject
 

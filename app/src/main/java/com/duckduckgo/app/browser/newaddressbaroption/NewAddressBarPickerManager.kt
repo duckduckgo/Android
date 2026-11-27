@@ -30,8 +30,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -45,7 +45,7 @@ interface NewAddressBarPickerManager {
     suspend fun showChoiceScreen(activity: DuckDuckGoActivity)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealNewAddressBarPickerManager @Inject constructor(
     private val duckChat: DuckChat,
@@ -55,6 +55,7 @@ class RealNewAddressBarPickerManager @Inject constructor(
     private val pixel: Pixel,
     private val appTheme: AppTheme,
     private val promptExposureReporter: PromptExposureReporter,
+    private val duckAiToggleMigrationFeature: DuckAiToggleMigrationFeature,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider(),
 ) : NewAddressBarPickerManager {
@@ -132,6 +133,9 @@ class RealNewAddressBarPickerManager @Inject constructor(
                         if (searchAndAiSelected) {
                             duckChat.setInputScreenUserSetting(true)
                             duckChat.onAddressBarPickerDuckAiSelected()
+                        } else if (isSearchOnlyWriteEnabled()) {
+                            // Record the explicit "no" like a Settings change, so nothing later mistakes it for "never asked".
+                            duckChat.setInputScreenUserSetting(false)
                         }
                     }
                     val params = mapOf(SELECTION_PARAM to if (searchAndAiSelected) SELECTION_SEARCH_AND_AI else SELECTION_SEARCH_ONLY)
@@ -143,6 +147,10 @@ class RealNewAddressBarPickerManager @Inject constructor(
             setOnDismissListener { currentDialog = null }
             show()
         }
+    }
+
+    private suspend fun isSearchOnlyWriteEnabled(): Boolean = withContext(dispatchers.io()) {
+        duckAiToggleMigrationFeature.self().isEnabled() && duckAiToggleMigrationFeature.pickerSearchOnlyWritesSetting().isEnabled()
     }
 
     private companion object {

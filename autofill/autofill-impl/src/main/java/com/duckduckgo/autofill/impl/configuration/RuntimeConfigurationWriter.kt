@@ -20,9 +20,9 @@ import com.duckduckgo.autofill.impl.configuration.AutofillAvailableInputTypesPro
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputSuccessResponse
 import com.duckduckgo.autofill.impl.jsbridge.response.AvailableInputTypeCredentials
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface RuntimeConfigurationWriter {
@@ -42,7 +42,7 @@ interface RuntimeConfigurationWriter {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealRuntimeConfigurationWriter @Inject constructor(val moshi: Moshi) : RuntimeConfigurationWriter {
     private val availableInputTypesAdapter = moshi.adapter(AvailableInputSuccessResponse::class.java).indent("  ")
 

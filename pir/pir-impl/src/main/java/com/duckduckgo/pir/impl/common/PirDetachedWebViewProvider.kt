@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Message
+import android.view.View
 import android.webkit.RenderProcessGoneDetail
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -29,15 +30,21 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.core.net.toUri
+import androidx.webkit.UserAgentMetadata
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.common.PirJobConstants.DBP_INITIAL_URL
-import com.duckduckgo.user.agent.api.UserAgentProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 interface PirDetachedWebViewProvider {
     /**
@@ -46,6 +53,7 @@ interface PirDetachedWebViewProvider {
      *
      * @param context in which the webview should run - could be service/activity
      * @param scriptToLoad the JS script that is needed for PIR to run.
+     * @param userAgent the user agent and client hints the WebView should use for the broker it runs.
      * @param onPageLoaded callback to receive whenever a url has finished loading.
      * @param onPageLoadFailed callback to receive whenever a url has failed to load.
      * @param onRendererGone callback to receive whenever the WebView's renderer process has died.
@@ -53,6 +61,7 @@ interface PirDetachedWebViewProvider {
     fun createInstance(
         context: Context,
         scriptToLoad: String,
+        userAgent: PirWebViewUserAgent,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -63,6 +72,7 @@ interface PirDetachedWebViewProvider {
      *
      * @param webView in which PIR should run
      * @param scriptToLoad the JS script that is needed for PIR to run.
+     * @param userAgent the user agent and client hints the WebView should use for the broker it runs.
      * @param onPageLoaded callback to receive whenever a url has finished loading.
      * @param onPageLoadFailed callback to receive whenever a url has failed to load.
      * @param onRendererGone callback to receive whenever the WebView's renderer process has died.
@@ -70,6 +80,7 @@ interface PirDetachedWebViewProvider {
     fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
+        userAgent: PirWebViewUserAgent,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -78,26 +89,46 @@ interface PirDetachedWebViewProvider {
 
 @ContributesBinding(AppScope::class)
 class RealPirDetachedWebViewProvider @Inject constructor(
-    private val userAgentProvider: UserAgentProvider,
     private val pirRequestInterceptor: PirRequestInterceptor,
     private val dispatcherProvider: DispatcherProvider,
+    private val pirRemoteFeatures: PirRemoteFeatures,
 ) :
     PirDetachedWebViewProvider {
     @SuppressLint("SetJavaScriptEnabled")
     override fun createInstance(
         context: Context,
         scriptToLoad: String,
+        userAgent: PirWebViewUserAgent,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
     ): WebView {
-        return setupWebView(WebView(context), scriptToLoad, onPageLoaded, onPageLoadFailed, onRendererGone)
+        val webView = WebView(context)
+        // A detached WebView is never measured, so pages would lay out at 0×0. Nothing triggers another layout pass
+        // while it stays detached, so sizing it once is enough. The width is wide enough for desktop breakpoints, and the
+        // height follows the screen's aspect ratio so the viewport stays consistent with what `screen` reports.
+        if (pirRemoteFeatures.scanWebViewSize().isEnabled()) {
+            webView.layOutAtScreenRatio(SCAN_WEBVIEW_WIDTH_CSS_PX)
+        }
+        return setupWebView(webView, scriptToLoad, userAgent, onPageLoaded, onPageLoadFailed, onRendererGone)
+    }
+
+    private fun WebView.layOutAtScreenRatio(widthCssPx: Int) {
+        val metrics = resources.displayMetrics
+        val widthPx = (widthCssPx * metrics.density).roundToInt()
+        val heightPx = (widthPx.toLong() * metrics.heightPixels / metrics.widthPixels).toInt()
+        measure(
+            View.MeasureSpec.makeMeasureSpec(widthPx, View.MeasureSpec.EXACTLY),
+            View.MeasureSpec.makeMeasureSpec(heightPx, View.MeasureSpec.EXACTLY),
+        )
+        layout(0, 0, widthPx, heightPx)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun setupWebView(
         webView: WebView,
         scriptToLoad: String,
+        userAgent: PirWebViewUserAgent,
         onPageLoaded: (String?) -> Unit,
         onPageLoadFailed: (String?) -> Unit,
         onRendererGone: (didCrash: Boolean) -> Unit,
@@ -201,8 +232,9 @@ class RealPirDetachedWebViewProvider @Inject constructor(
                     return true
                 }
             }
+            applyClientHints(userAgent.clientHints)
             settings.apply {
-                userAgentString = userAgentProvider.userAgent()
+                userAgentString = userAgent.userAgent
                 javaScriptEnabled = true
                 domStorageEnabled = true
                 loadWithOverviewMode = true
@@ -211,5 +243,34 @@ class RealPirDetachedWebViewProvider @Inject constructor(
                 cacheMode = WebSettings.LOAD_NO_CACHE
             }
         }
+    }
+
+    /**
+     * WebView keeps its metadata across loads, so a reused WebView would carry one broker's hints into the next.
+     * The WebView's own metadata is remembered the first time hints are applied and restored, without device details,
+     * for brokers without hints; a WebView that never had hints is left untouched, so it keeps sending only the
+     * low-entropy hints.
+     */
+    @SuppressLint("RequiresFeature")
+    private fun WebView.applyClientHints(clientHints: PirClientHints?) {
+        if (!WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA)) return
+        val savedDefaultMetadata = getTag(R.id.pirDefaultUserAgentMetadata) as? UserAgentMetadata
+        if (clientHints == null && savedDefaultMetadata == null) return
+
+        runCatching {
+            val defaultMetadata = savedDefaultMetadata
+                ?: WebSettingsCompat.getUserAgentMetadata(settings).also { setTag(R.id.pirDefaultUserAgentMetadata, it) }
+            val metadata = clientHints?.toUserAgentMetadata(
+                defaultMetadata = defaultMetadata,
+                supportsFormFactors = WebViewFeature.isFeatureSupported(WebViewFeature.USER_AGENT_METADATA_FORM_FACTORS),
+            ) ?: defaultMetadata.withoutDeviceDetails()
+            WebSettingsCompat.setUserAgentMetadata(settings, metadata)
+        }.onFailure {
+            logcat(WARN) { "PIR-SCAN: Failed to apply client hints $clientHints: $it" }
+        }
+    }
+
+    private companion object {
+        const val SCAN_WEBVIEW_WIDTH_CSS_PX = 1024
     }
 }

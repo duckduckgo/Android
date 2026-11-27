@@ -6,8 +6,8 @@ import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.global.install.daysInstalled
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.util.Locale
 import javax.inject.Inject
 
@@ -25,7 +25,7 @@ interface DefaultBrowserChangedSurveyManager {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealDefaultBrowserChangedSurveyManager @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val defaultBrowserChangedSurveyFeature: DefaultBrowserChangedSurveyFeature,

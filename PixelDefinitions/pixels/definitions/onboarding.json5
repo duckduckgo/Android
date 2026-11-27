@@ -144,6 +144,8 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
+            "inputPreviewAction",
             {
                 "key": "value",
                 "type": "string",
@@ -301,6 +303,7 @@
             "onboardingDaysSinceInstall",
             "onboardingFlow",
             "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
             {
                 "key": "value",
                 "type": "string",
@@ -496,6 +499,27 @@
             "onboardingDownloadReasonVariant",
             "inputPreviewAction",
             { "key": "value", "type": "string", "description": "The limit that ended onboarding.", "enum": ["days", "app-opens"] }
+        ]
+    },
+    "onboarding_completed": {
+        "description": "Onboarding completed: the app stage moved to ESTABLISHED, which is when the app considers the user onboarded. Covers every flow, including skipping onboarding, but not onboarding ended by the time limit (reported by onboarding_time-limit). Reached once per user.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "event",
+                "type": "string",
+                "description": "Event type for the onboarding instrumentation standard",
+                "enum": ["reached"]
+            },
+            "onboardingInstallType",
+            "onboardingDaysSinceInstall",
+            "onboardingFlow",
+            "onboardingPixelSource",
+            "onboardingDownloadReasonVariant",
+            "inputPreviewAction"
         ]
     },
     "onboarding_download-choice": {

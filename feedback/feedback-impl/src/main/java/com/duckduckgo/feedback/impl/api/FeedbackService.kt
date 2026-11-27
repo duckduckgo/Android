@@ -16,7 +16,7 @@
 
 package com.duckduckgo.feedback.impl.api
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded

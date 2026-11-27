@@ -35,8 +35,9 @@ import com.duckduckgo.mobile.android.vpn.ui.notification.DeviceShieldNotificatio
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProtectionManagementScreenNoParams
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -45,11 +46,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.random.Random
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class,
+    binding = binding<VpnServiceCallbacks>(),
 )
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class AlwaysOnLockDownDetector @Inject constructor(
     private val vpnServiceStateStatsDao: VpnServiceStateStatsDao,
     private val dispatcherProvider: DispatcherProvider,

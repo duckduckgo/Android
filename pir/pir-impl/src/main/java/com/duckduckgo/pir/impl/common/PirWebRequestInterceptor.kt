@@ -23,7 +23,7 @@ import com.duckduckgo.app.trackerdetection.model.TrackerStatus
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.tracker.detection.api.TrackerDetector
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

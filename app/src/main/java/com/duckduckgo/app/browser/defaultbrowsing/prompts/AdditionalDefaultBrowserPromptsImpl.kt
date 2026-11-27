@@ -36,6 +36,7 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPr
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STAGE_3
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STARTED
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.store.DefaultBrowserPromptsDataStore.Stage.STOPPED
+import com.duckduckgo.app.devicemigration.MigratedInstallCleanup
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.global.DefaultRoleBrowserDialog
 import com.duckduckgo.app.onboarding.store.AppStage
@@ -46,12 +47,14 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -78,19 +81,19 @@ import javax.inject.Inject
  *
  * For more information refer to the diagrams in [com.duckduckgo.app.browser.defaultbrowsing.prompts.diagrams].
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ModalEvaluator::class,
+    binding = binding<ModalEvaluator>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = AdditionalDefaultBrowserPrompts::class,
+    binding = binding<AdditionalDefaultBrowserPrompts>(),
 )
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatchers: DispatcherProvider,
@@ -104,6 +107,9 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     private val stageEvaluator: DefaultBrowserPromptsFlowStageEvaluator,
     private val userBrowserProperties: UserBrowserProperties,
     private val pixel: Pixel,
+    private val nextStepsSetAsDefaultPromptMetrics: NextStepsSetAsDefaultPromptMetrics,
+    private val nextSteps: NextSteps,
+    private val migratedInstallCleanup: MigratedInstallCleanup,
     moshi: Moshi,
 ) : AdditionalDefaultBrowserPrompts, ModalEvaluator, PrivacyConfigCallbackPlugin {
 
@@ -204,6 +210,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return@withLock ModalEvaluator.EvaluationResult.Skipped
         }
 
+        if (migratedInstallCleanup.isPending()) {
+            logcat { "evaluate: prompt state still comes from the previous phone, skipping evaluation" }
+            return@withLock ModalEvaluator.EvaluationResult.Skipped
+        }
+
         val isStopped = defaultBrowserPromptsDataStore.stage.firstOrNull() == STOPPED
         logcat { "evaluate: has stopped = $isStopped" }
         if (isStopped) {
@@ -216,7 +227,10 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             return@withLock ModalEvaluator.EvaluationResult.Skipped
         }
 
-        defaultBrowserPromptsAppUsageRepository.recordAppUsedNow()
+        val isNextStepsSectionActive = nextSteps.isSectionActive()
+        if (!isNextStepsSectionActive) {
+            defaultBrowserPromptsAppUsageRepository.recordAppUsedNow()
+        }
 
         val isDefaultBrowser = defaultBrowserDetector.isDefaultBrowser()
         logcat { "evaluate: is default browser = $isDefaultBrowser" }
@@ -235,6 +249,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
             STARTED
         } else {
             logcat { "evaluate: current stage is other than NOT_STARTED and DuckDuckGo is NOT default browser." }
+
+            if (isNextStepsSectionActive) {
+                logcat { "evaluate: Next Steps section is active, holding the prompts back" }
+                return@withLock ModalEvaluator.EvaluationResult.Skipped
+            }
             val appActiveDaysUsedSinceStart = defaultBrowserPromptsAppUsageRepository.getActiveDaysUsedSinceStart().getOrElse { throwable ->
                 logcat(ERROR) { throwable.asLog() }
                 return@withLock ModalEvaluator.EvaluationResult.Skipped
@@ -303,6 +322,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     override fun onMessageDialogShown() {
         fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_IMPRESSION)
+        appCoroutineScope.launch { nextStepsSetAsDefaultPromptMetrics.onPromptShown() }
     }
 
     override fun onMessageDialogCanceled() {
@@ -311,6 +331,7 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
 
     override fun onMessageDialogConfirmationButtonClicked() {
         fireInteractionPixel(AppPixelName.SET_AS_DEFAULT_PROMPT_CLICK)
+        appCoroutineScope.launch { nextStepsSetAsDefaultPromptMetrics.onPromptConfirmationClicked() }
         launchBestSelectionWindow(trigger = PROMPT)
     }
 
@@ -332,7 +353,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
     override fun onSystemDefaultBrowserDialogSuccess(trigger: SetAsDefaultActionTrigger) {
         appCoroutineScope.launch {
             when (trigger) {
-                PROMPT, MENU -> fireConversionPixel(trigger)
+                PROMPT -> {
+                    fireConversionPixel(trigger)
+                    nextStepsSetAsDefaultPromptMetrics.onPromptDefaultBrowserSet()
+                }
+                MENU -> fireConversionPixel(trigger)
                 MESSAGE -> {
                     // no-op
                     // the user selected the default browser from the message dialog and this is handled in evaluate()
@@ -356,7 +381,11 @@ class AdditionalDefaultBrowserPromptsImpl @Inject constructor(
         if (defaultBrowserDetector.isDefaultBrowser()) {
             appCoroutineScope.launch {
                 when (trigger) {
-                    PROMPT, MENU -> fireConversionPixel(trigger)
+                    PROMPT -> {
+                        fireConversionPixel(trigger)
+                        nextStepsSetAsDefaultPromptMetrics.onPromptDefaultBrowserSet()
+                    }
+                    MENU -> fireConversionPixel(trigger)
                     MESSAGE -> {
                         // no-op
                         // the user selected the default browser from the message dialog and this is handled in evaluate()

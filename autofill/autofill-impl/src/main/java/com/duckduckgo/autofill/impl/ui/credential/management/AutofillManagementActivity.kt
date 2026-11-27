@@ -24,8 +24,6 @@ import androidx.fragment.app.commitNow
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
@@ -66,6 +64,8 @@ import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillMan
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementDisabledMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementListMode
 import com.duckduckgo.autofill.impl.ui.credential.management.viewing.AutofillManagementLockedMode
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.gone

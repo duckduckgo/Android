@@ -16,56 +16,42 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':di')
-    implementation project(':common-utils')
     implementation project(':browser-api')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':di')
     implementation project(':js-messaging-api')
-
-    implementation project(':anvil-annotations')
-
     implementation "com.squareup.logcat:logcat:_"
     implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation Square.retrofit2.converter.moshi
 
-    // Testing dependencies
+    testImplementation project(path: ':common-test')
+    testImplementation "androidx.test:runner:_"
+    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.junit4
     testImplementation AndroidX.core
     testImplementation AndroidX.test.ext.junit
-    testImplementation "androidx.test:runner:_"
-    testImplementation Testing.robolectric
     testImplementation CashApp.turbine
-    testImplementation "org.jetbrains.kotlin:kotlin-reflect:_"
-
-    testImplementation project(path: ':common-test')
-
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.js.messaging.impl'
 }

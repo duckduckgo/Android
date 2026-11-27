@@ -23,7 +23,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResult
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
@@ -47,13 +46,15 @@ import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCreden
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsDialogFragment.DialogEvent.Shown
 import com.duckduckgo.autofill.impl.ui.credential.selecting.CredentialsPickerRecyclerAdapter.ListItem
 import com.duckduckgo.autofill.store.AutofillPrefsStore
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
+import com.duckduckgo.common.ui.view.dialog.applyRebrandBottomSheetSpacing
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
@@ -116,6 +117,13 @@ class AutofillSelectCredentialsDialogFragment : BottomSheetDialogFragment(), Cre
 
         val binding = ContentAutofillSelectCredentialsTooltipBinding.inflate(inflater, container, false)
         configureViews(binding)
+        binding.root.applyRebrandBottomSheetSpacing(
+            header = binding.appIcon,
+            title = binding.useLoginTitle,
+            buttons = binding.availableCredentialsRecycler,
+            close = binding.closeButton,
+            content = binding.autofillDialogContentContainer,
+        )
         binding.root.applyBottomSystemBarInsetPadding()
         return binding.root
     }

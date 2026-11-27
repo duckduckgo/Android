@@ -21,8 +21,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DismissSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.DoNotAskAgainSetAsDefaultBrowserDialog
 import com.duckduckgo.app.browser.BrowserViewModel.Command.LaunchTabSwitcher
@@ -33,6 +31,8 @@ import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrows
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultAppsActivity
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.Command.OpenSystemDefaultBrowserDialog
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts.SetAsDefaultActionTrigger
+import com.duckduckgo.app.browser.nativeinput.DuckAiChatUrlType
+import com.duckduckgo.app.browser.nativeinput.classifyDuckAiChatUrl
 import com.duckduckgo.app.browser.omnibar.OmnibarEntryConverter
 import com.duckduckgo.app.browser.tabs.TabManager.TabModel
 import com.duckduckgo.app.fire.DataClearer
@@ -64,17 +64,21 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeStateHolder
 import com.duckduckgo.browsermode.api.FireModeAvailability
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.ui.tabs.SwipingTabsFeatureProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
+import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -89,6 +93,7 @@ import kotlinx.coroutines.flow.filterNot
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
@@ -97,6 +102,7 @@ import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.Duration.Companion.milliseconds
 
 @OptIn(FlowPreview::class)
 @ContributesViewModel(ActivityScope::class)
@@ -118,6 +124,7 @@ class BrowserViewModel @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
     private val browserMode: BrowserMode,
     private val duckAiSessionCallback: DuckAiSessionCallback,
+    private val duckChat: DuckChat,
 ) : ViewModel(), CoroutineScope {
 
     // Mode-switch orchestrator: observes the mode it also writes via switchTo().
@@ -190,11 +197,18 @@ class BrowserViewModel @Inject constructor(
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
 
-    val selectedTabFlow: Flow<String> = tabRepository.flowSelectedTab
-        .map { tab -> tab?.tabId }
-        .filterNotNull()
-        .distinctUntilChanged()
-        .debounce(100)
+    // Read once so the flows below and the activity's collector can't disagree if remote config changes mid-session.
+    val isSelectedTabDebounceRemoved: Boolean = swipingTabsFeature.removeSelectedTabDebounceEnabled()
+
+    private val distinctSelectedTabFlow: Flow<String> =
+        tabRepository.flowSelectedTab
+            .mapNotNull { tab -> tab?.tabId }
+            .distinctUntilChanged()
+
+    // Stays debounced so selections that only last a moment don't update the tab's last access.
+    val lastAccessedTabFlow: Flow<String> = distinctSelectedTabFlow.debounce(100.milliseconds)
+
+    val selectedTabFlow: Flow<String> = if (isSelectedTabDebounceRemoved) distinctSelectedTabFlow else lastAccessedTabFlow
 
     val tabsFlow: Flow<List<TabModel>> = tabRepository.flowTabs
         .map { tabs -> tabs.map { tab -> TabModel(tab.tabId, tab.url, tab.skipHome, tab.sourceTabId) } }
@@ -203,6 +217,10 @@ class BrowserViewModel @Inject constructor(
     val selectedTabIndex: Flow<Int> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
         tabs.indexOfFirst { it.tabId == selectedTab }
     }.filterNot { it == -1 }
+
+    val tabIdToMoveTo: Flow<String> = combine(tabsFlow, selectedTabFlow) { tabs, selectedTab ->
+        selectedTab.takeIf { tabs.any { it.tabId == selectedTab } }
+    }.filterNotNull()
 
     private var dataClearingObserver = Observer<ApplicationClearDataState> { state ->
         when (state) {
@@ -313,9 +331,20 @@ class BrowserViewModel @Inject constructor(
         }
     }
 
-    suspend fun onOpenFavoriteFromWidget(query: String) {
+    suspend fun onOpenFavoriteFromWidget(query: String): String {
         pixel.fire(AppPixelName.APP_FAVORITES_ITEM_WIDGET_LAUNCH)
-        tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
+        return selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(query))
+    }
+
+    private suspend fun selectByUrlOrNewTab(url: String): String =
+        tabRepository.getTabId(url)?.also { tabRepository.select(it) } ?: tabRepository.add(url = url, skipHome = true)
+
+    suspend fun findEmptyDuckAiTabId(): String? {
+        val emptyTabIds = tabRepository.getTabs()
+            .filter { classifyDuckAiChatUrl(it.url, duckChat) == DuckAiChatUrlType.NewChat }
+            .map { it.tabId }
+        val selectedTabId = tabRepository.getSelectedTab()?.tabId
+        return emptyTabIds.firstOrNull { it == selectedTabId } ?: emptyTabIds.firstOrNull()
     }
 
     fun launchFromThirdParty() {
@@ -421,12 +450,9 @@ class BrowserViewModel @Inject constructor(
         launch { appEnjoymentUserEventRecorder.onUserDeclinedToSayIfEnjoyingApp(promptCount) }
     }
 
-    fun onOpenShortcut(url: String) {
-        launch(dispatchers.io()) {
-            tabRepository.selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url))
-            pixel.fire(AppPixelName.SHORTCUT_OPENED)
-        }
-    }
+    suspend fun onOpenShortcut(url: String): String = async(dispatchers.io()) {
+        selectByUrlOrNewTab(queryUrlConverter.convertQueryToUrl(url)).also { pixel.fire(AppPixelName.SHORTCUT_OPENED) }
+    }.await()
 
     fun onLaunchedFromNotification(pixelName: String) {
         pixel.fire(pixelName)

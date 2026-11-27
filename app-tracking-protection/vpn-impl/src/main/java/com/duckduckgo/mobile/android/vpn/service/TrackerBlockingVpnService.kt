@@ -37,16 +37,16 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import com.duckduckgo.anrs.api.CrashLogger
 import com.duckduckgo.anrs.api.CrashLogger.Crash
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.library.loader.LibraryLoader
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.feature.AppTpRemoteFeatures
-import com.duckduckgo.mobile.android.vpn.integration.NgVpnNetworkStack
 import com.duckduckgo.mobile.android.vpn.integration.VpnNetworkStackProvider
 import com.duckduckgo.mobile.android.vpn.model.AlwaysOnState
 import com.duckduckgo.mobile.android.vpn.model.VpnServiceState
@@ -60,13 +60,15 @@ import com.duckduckgo.mobile.android.vpn.network.util.asRoute
 import com.duckduckgo.mobile.android.vpn.network.util.getUnderlyingNetworks
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.pixels.VpnEnableWideEvent
+import com.duckduckgo.mobile.android.vpn.pixels.VpnRestartWideEvent
+import com.duckduckgo.mobile.android.vpn.pixels.VpnRestartWideEvent.FailureReason
+import com.duckduckgo.mobile.android.vpn.pixels.VpnRestartWideEvent.Phase
 import com.duckduckgo.mobile.android.vpn.service.state.VpnStateMonitorService
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.ui.notification.VpnEnabledNotificationBuilder
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.android.AndroidInjection
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -89,7 +91,6 @@ import kotlin.system.exitProcess
 
 @InjectWith(
     scope = VpnScope::class,
-    delayGeneration = true,
 )
 class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), VpnSocketProtector {
 
@@ -140,6 +141,8 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
     }
 
+    private var activeTunExcludedApps: List<String> = emptyList()
+
     private val binder: VpnServiceBinder = VpnServiceBinder()
 
     private var vpnStateServiceReference: IBinder? = null
@@ -152,11 +155,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     @Inject lateinit var crashLogger: CrashLogger
 
-    @Inject lateinit var dnsChangeCallback: DnsChangeCallback
-
     @Inject lateinit var appTpRemoteFeatures: AppTpRemoteFeatures
 
     @Inject lateinit var vpnEnableWideEvent: VpnEnableWideEvent
+
+    @Inject lateinit var vpnRestartWideEvent: VpnRestartWideEvent
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
@@ -302,13 +305,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             // stop the current networking stack
             vpnNetworkStack.onStopVpn(VpnStopReason.RESTART)
             vpnNetworkStack.onDestroyVpn()
-            // maybe we have changed the networking stack
+            // maybe we have changed the networking stack. Read it again: the main process registers VPN features in multiprocess
+            // prefs right before restarting, and this process may only see that write by now
             vpnNetworkStack = vpnNetworkStackProvider.provideNetworkStack()
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
         }
         deviceShieldPixels.reportVpnStartAttempt()
-        dnsChangeCallback.unregister()
 
         runCatching {
             vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
@@ -318,6 +321,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
         logcat { "VPN log: Starting VPN" }
         val restarting = activeTun != null
+        // Resolved once so the in-place decision, the null tunnel's exclusions, the wide event and the handover all see the same stack
+        val restartNetworkStack = if (restarting) vpnNetworkStackProvider.provideNetworkStack() else null
+        val restartInPlace = restartNetworkStack != null && appTpRemoteFeatures.restartInPlace().isEnabled() &&
+            VpnNetworkStackHandover.supportsInPlaceRestart(restartNetworkStack)
 
         if (!restarting) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
@@ -328,52 +335,109 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat { "VPN log: skipping service callbacks while restarting" }
         }
 
-        // Create a null route tunnel so that leaks can't scape
-        val nullTun = createNullRouteTempTunnel()?.let {
-            if (!it.waitForTunnelUpOrTimeout()) {
-                logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
-                null
-            } else {
-                it
-            }
-        }
-        if (nullTun == null) {
-            logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
-            deviceShieldPixels.vpnEstablishNullTunInterfaceError()
-            stopVpn(VpnStopReason.ERROR, false)
-            return@withContext
+        if (restartNetworkStack != null) {
+            // Every timed phase runs on the stack the restart brings up, which differs from the running one when a VPN feature was toggled
+            vpnRestartWideEvent.onRestartStarted(networkStackName = restartNetworkStack.name, inPlace = restartInPlace)
         }
 
-        vpnEnableWideEvent.onNullTunnelCreated()
-
-        activeTun?.let {
-            logcat { "VPN log: restarting the tunnel" }
-            updateNetworkStackUponRestart()
-            it
-        }
-        activeTun = nullTun
-
-        val tunnelConfig = vpnNetworkStack.onPrepareVpn().getOrNull().also {
-            if (it != null) {
-                activeTun = createTunnelInterface(it)
-                activeTun?.let { tun ->
-                    if (!tun.waitForTunnelUpOrTimeout()) {
-                        activeTun = null
-                    }
+        // An in-place restart prepares the next stack and establishes the new tunnel while the current tunnel is
+        // still up. Nothing reads the current tunnel once its stack is stopped, so it keeps traffic blackholed
+        // until Android hands over to the new tunnel and no temporary null-route tunnel is needed.
+        val handover = if (restartInPlace) {
+            VpnNetworkStackHandover(
+                current = vpnNetworkStack,
+                next = restartNetworkStack!!,
+            ).also { handover ->
+                logcat { "VPN log: in-place restart, ${if (handover.isSameStack) "reusing" else "switching to"} ${handover.next.name}" }
+                if (!handover.isSameStack) {
+                    vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_CREATE)
+                    handover.next.onCreateVpnWithErrorReporting()
+                    vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_CREATE)
                 }
+            }
+        } else {
+            null
+        }
+
+        if (handover == null) {
+            // Apps the running tunnel excludes stay excluded, otherwise Android moves them into the null-route tunnel and closes
+            // their connections. A stack switch starts from no exclusions because the next stack may protect those apps
+            val nullTunExcludedApps = if (
+                restartNetworkStack?.name == vpnNetworkStack.name && appTpRemoteFeatures.keepExclusionsInNullTunnel().isEnabled()
+            ) {
+                activeTunExcludedApps
             } else {
-                logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
+                emptyList()
+            }
+            // Create a null route tunnel so that leaks can't scape
+            val nullTun = createNullRouteTempTunnel(nullTunExcludedApps)?.let {
+                if (!it.waitForTunnelUpOrTimeout()) {
+                    logcat(WARN) { "VPN log: timeout waiting for null tunnel to go up" }
+                    null
+                } else {
+                    it
+                }
+            }
+            if (nullTun == null) {
+                logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
+                deviceShieldPixels.vpnEstablishNullTunInterfaceError()
+                vpnRestartWideEvent.onRestartFailed(FailureReason.NULL_TUNNEL_FAILED)
                 stopVpn(VpnStopReason.ERROR, false)
                 return@withContext
             }
+
+            vpnEnableWideEvent.onNullTunnelCreated()
+
+            if (restarting) {
+                logcat { "VPN log: restarting the tunnel" }
+                vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_SWITCH)
+                updateNetworkStackUponRestart()
+                vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
+            }
+            activeTun = nullTun
+            activeTunExcludedApps = nullTunExcludedApps
         }
 
-        if (activeTun == null) {
-            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
-            deviceShieldPixels.vpnEstablishTunInterfaceError()
+        val nextNetworkStack = handover?.next ?: vpnNetworkStack
+        vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_PREPARE)
+        val tunnelConfig = nextNetworkStack.onPrepareVpn().getOrNull()
+        if (tunnelConfig == null) {
+            logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
+            vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_PREPARE_FAILED)
+            handover?.abort()
             stopVpn(VpnStopReason.ERROR, false)
             return@withContext
         }
+        vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_PREPARE)
+
+        vpnRestartWideEvent.onPhaseStarted(Phase.TUNNEL_ESTABLISH)
+        val newTun = createTunnelInterface(tunnelConfig)?.let { tun ->
+            if (tun.waitForTunnelUpOrTimeout()) {
+                tun
+            } else {
+                runCatching { tun.close() }
+                null
+            }
+        }
+        if (newTun == null) {
+            logcat(ERROR) { "VPN log: Failed to establish the TUN interface" }
+            deviceShieldPixels.vpnEstablishTunInterfaceError()
+            vpnRestartWideEvent.onRestartFailed(FailureReason.TUNNEL_ESTABLISH_FAILED)
+            handover?.abort()
+            stopVpn(VpnStopReason.ERROR, false)
+            return@withContext
+        }
+        vpnRestartWideEvent.onPhaseCompleted(Phase.TUNNEL_ESTABLISH)
+
+        handover?.let {
+            vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_SWITCH)
+            it.switch()
+            vpnNetworkStack = it.next
+            vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
+        }
+        // Closes the tunnel this one replaces: the null-route tunnel, or the previous tunnel on an in-place restart
+        activeTun = newTun
+        activeTunExcludedApps = tunnelConfig.appExclusionList.toList()
 
         vpnEnableWideEvent.onVpnPrepared()
 
@@ -381,11 +445,15 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         // configureUnderlyingNetworks()
 
         logcat { "VPN log: Enable new error handling for onStartVpn" }
+        vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_START)
         vpnNetworkStack.onStartVpn(activeTun!!).getOrElse {
             logcat(ERROR) { "VPN log: Failed to start VPN" }
+            vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_START_FAILED)
             stopVpn(VpnStopReason.ERROR, false)
             return@withContext
         }
+        vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_START)
+        vpnRestartWideEvent.onRestartSucceeded()
 
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             if (restarting) {
@@ -412,18 +480,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         deviceShieldPixels.reportVpnStartAttemptSuccess()
         vpnEnableWideEvent.onVpnStarted()
 
-        // This is something temporary while we confirm whether we're able to fix the moto g issues with appTP
-        // see https://app.asana.com/0/488551667048375/1203410036713941/f for more info
-        tunnelConfig?.let { config ->
-            // TODO this is temporary hack until we know this approach works for moto g. If it does we'll spend time making it better/more permanent
-            if (vpnNetworkStack is NgVpnNetworkStack && config.dns.isNotEmpty()) {
-                // This solution is only relevant for AppTP
-                // just temporary pixel to know quantify how many users would be impacted
-                deviceShieldPixels.reportMotoGFix()
-                dnsChangeCallback.register()
-            }
-        }
-
         reportVpnAlwaysOnState()
 
         if (isAlwaysOnTriggered) {
@@ -432,7 +488,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
     }
 
-    private fun createNullRouteTempTunnel(): ParcelFileDescriptor? {
+    private fun createNullRouteTempTunnel(excludedApps: List<String>): ParcelFileDescriptor? {
         checkMainThread()
 
         return runCatching {
@@ -456,7 +512,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 }
                 // just so that we can connect to our BE
                 // TODO should we protect all comms with our controller BE? other VPNs do that
-                safelyAddDisallowedApps(listOf(this@TrackerBlockingVpnService.packageName))
+                safelyAddDisallowedApps((excludedApps + this@TrackerBlockingVpnService.packageName).distinct())
                 setBlocking(true)
                 setMtu(1280)
                 try {
@@ -623,6 +679,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnNetworkStack.onStopVpn(reason)
 
         activeTun = null
+        activeTunExcludedApps = emptyList()
 
         sendStopPixels(reason)
         vpnEnableWideEvent.onVpnStop(reason)
@@ -648,8 +705,6 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnStateServiceReference?.let {
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
-
-        dnsChangeCallback.unregister()
 
         stopForeground(true)
         stopSelf()
@@ -936,7 +991,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(VpnScope::class)
 abstract class VpnSocketProtectorModule {
     @Binds

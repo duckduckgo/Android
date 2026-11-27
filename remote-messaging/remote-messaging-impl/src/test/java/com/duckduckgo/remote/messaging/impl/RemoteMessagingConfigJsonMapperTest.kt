@@ -386,7 +386,7 @@ class RemoteMessagingConfigJsonMapperTest {
                         titleText = "Add widget",
                         descriptionText = "Search from your home screen.",
                         placeholder = Content.Placeholder.RADAR,
-                        primaryAction = Action.Url(value = "https://duckduckgo.com/widget"),
+                        primaryAction = Action.AddWidget("search"),
                         primaryActionText = "Add widget",
                         matchingRules = emptyList(),
                         exclusionRules = emptyList(),

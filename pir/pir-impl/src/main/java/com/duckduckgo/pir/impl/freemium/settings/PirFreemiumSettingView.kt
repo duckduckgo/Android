@@ -25,22 +25,21 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.impl.R
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreemiumDashboardScreens
 import com.duckduckgo.pir.impl.databinding.ViewPirFreemiumSettingsBinding
-import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
-import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
-import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
 import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.Command
 import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.Command.OpenPirDashboard
 import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.ViewState
-import dagger.android.support.AndroidSupportInjection
+import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState.START_FREE_SCAN
+import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState.VIEW_SCAN_RESULTS
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -95,15 +94,15 @@ class PirFreemiumSettingView @JvmOverloads constructor(
     }
 
     private fun renderView(viewState: ViewState) {
-        when (viewState.freemiumState) {
-            NOT_ELIGIBLE -> binding.pirFreemiumContainer.isGone = true
+        when (viewState.cta) {
+            null -> binding.pirFreemiumContainer.isGone = true
 
-            ELIGIBLE -> {
+            START_FREE_SCAN -> {
                 binding.pirFreemiumContainer.isVisible = true
                 binding.pirFreemiumCta.setText(R.string.pirFreemiumSettingStartScan)
             }
 
-            USED -> {
+            VIEW_SCAN_RESULTS -> {
                 binding.pirFreemiumContainer.isVisible = true
                 binding.pirFreemiumCta.setText(R.string.pirFreemiumSettingViewResults)
             }
@@ -112,7 +111,7 @@ class PirFreemiumSettingView @JvmOverloads constructor(
 
     private fun processCommands(command: Command) {
         when (command) {
-            OpenPirDashboard -> globalActivityStarter.start(context, PirDashboardWebViewScreen)
+            is OpenPirDashboard -> globalActivityStarter.start(context, PirFreemiumDashboardScreens.FromEntryPoint(command.entryPoint))
         }
     }
 }

@@ -23,8 +23,9 @@ import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerSettingsNoParams
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.customtabs.CustomTabLaunchMode
+import com.duckduckgo.app.browser.customtabs.CustomTabsFeature
 import com.duckduckgo.app.browser.pdf.InlinePdfHandler
 import com.duckduckgo.app.browser.pdf.LocalPdfResult
 import com.duckduckgo.app.global.intentText
@@ -34,7 +35,9 @@ import com.duckduckgo.autofill.api.emailprotection.EmailProtectionLinkVerifier
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerActivityParams
 import com.duckduckgo.browser.api.ui.BrowserScreens.PdfViewerSource
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
@@ -56,7 +59,11 @@ class IntentDispatcherViewModel @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val inlinePdfHandler: InlinePdfHandler,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
+    private val customTabDetector: CustomTabDetector,
+    private val customTabsFeature: CustomTabsFeature,
 ) : ViewModel() {
+
+    private var customTabMarkedEarly = false
 
     private val _viewState = MutableStateFlow(ViewState())
     val viewState = _viewState.asStateFlow()
@@ -72,16 +79,28 @@ class IntentDispatcherViewModel @Inject constructor(
         val toolbarColor: Int? = null,
         val isExternal: Boolean = false,
         val localPdfError: Boolean = false,
+        val customTabLaunchMode: CustomTabLaunchMode = CustomTabLaunchMode.LEGACY,
     )
 
-    fun onIntentReceived(intent: Intent?, isExternal: Boolean) {
+    fun onIntentReceived(
+        intent: Intent?,
+        isExternal: Boolean,
+        isTaskRoot: Boolean = false,
+    ) {
+        // Marked before the background routing below: on a cold start the dispatcher resumes first, and
+        // app-resume work such as modal prompts would otherwise run before CustomTabActivity marks itself.
+        customTabMarkedEarly = runCatching { intent?.hasExtra(CustomTabsIntent.EXTRA_SESSION) == true }.getOrDefault(false)
+        if (customTabMarkedEarly) {
+            customTabDetector.setCustomTab(true)
+        }
+
         viewModelScope.launch(dispatcherProvider.io()) {
             runCatching {
                 val localPdfUri = localPdfUriOrNull(intent)
                 if (localPdfUri != null) {
                     when (val result = inlinePdfHandler.cacheLocalPdf(localPdfUri)) {
                         is LocalPdfResult.Success -> {
-                            _viewState.emit(
+                            resolve(
                                 viewState.value.copy(
                                     resolved = true,
                                     activityParams = PdfViewerActivityParams(
@@ -94,8 +113,9 @@ class IntentDispatcherViewModel @Inject constructor(
                                 ),
                             )
                         }
+
                         is LocalPdfResult.Failure -> {
-                            _viewState.emit(viewState.value.copy(resolved = true, localPdfError = true, isExternal = isExternal))
+                            resolve(viewState.value.copy(resolved = true, localPdfError = true, isExternal = isExternal))
                         }
                     }
                     return@launch
@@ -125,9 +145,22 @@ class IntentDispatcherViewModel @Inject constructor(
                 val isSyncPairingUrl = syncUrlIdentifier.shouldDelegateToSyncSetup(intentText)
                 val customTabRequested = hasSession && !isEmailProtectionLink && !isDuckDuckGoUrl && !isSyncPairingUrl && !isDuckAiUrl
 
-                logcat { "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor" }
+                val customTabLaunchMode = if (customTabRequested) {
+                    CustomTabLaunchMode.resolve(
+                        keepOnAppSwitchEnabled = customTabsFeature.keepCustomTabOnAppSwitch().isEnabled(),
+                        launchedWithNewTask = (intent?.flags ?: 0) and Intent.FLAG_ACTIVITY_NEW_TASK != 0,
+                        isTaskRoot = isTaskRoot,
+                    )
+                } else {
+                    CustomTabLaunchMode.LEGACY
+                }
 
-                _viewState.emit(
+                logcat {
+                    "Intent $intent received. Has extra session=$hasSession. Intent text=$intentText. Toolbar color=$toolbarColor. " +
+                        "Is task root=$isTaskRoot. Custom tab launch mode=$customTabLaunchMode"
+                }
+
+                resolve(
                     viewState.value.copy(
                         resolved = true,
                         customTabRequested = customTabRequested,
@@ -135,13 +168,14 @@ class IntentDispatcherViewModel @Inject constructor(
                         activityParams = activityParams,
                         toolbarColor = toolbarColor,
                         isExternal = isExternal,
+                        customTabLaunchMode = customTabLaunchMode,
                     ),
                 )
             }.onFailure {
                 logcat(WARN) { "Error handling custom tab intent: ${it.message}" }
                 // Resolve to a routable state so the dispatcher doesn't hang on the unresolved default;
                 // fall back to opening the intent's URL in the browser.
-                _viewState.emit(
+                resolve(
                     viewState.value.copy(
                         resolved = true,
                         intentText = runCatching { intent?.intentText }.getOrNull(),
@@ -149,6 +183,20 @@ class IntentDispatcherViewModel @Inject constructor(
                     ),
                 )
             }
+        }
+    }
+
+    private suspend fun resolve(state: ViewState) {
+        if (customTabMarkedEarly && !state.customTabRequested) {
+            customTabDetector.setCustomTab(false)
+        }
+        _viewState.emit(state)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        if (customTabMarkedEarly && !viewState.value.resolved) {
+            customTabDetector.setCustomTab(false)
         }
     }
 

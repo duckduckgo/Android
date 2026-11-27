@@ -1,0 +1,2 @@
+androidx.core:core-remoteviews(-*)
+^^^^^^^^.     ^^^^^^^^^^^^^^^^^^^^

@@ -21,15 +21,16 @@ import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PRIVACY_REMOTE_CONFIG_URL
 import com.duckduckgo.privacy.config.internal.store.DevPrivacyConfigSettingsDataStore
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import okhttp3.Interceptor
 import okhttp3.Response
 import java.net.URI
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class ApiDevPrivacyConfigInterceptor @Inject constructor(
     private val devSettingsDataStore: DevPrivacyConfigSettingsDataStore,

@@ -16,42 +16,33 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
     implementation project(path: ':survey-api')
-
-    implementation Google.dagger
     implementation AndroidX.core.ktx
 
     testImplementation project(path: ':common-test')
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
     testImplementation "androidx.test:runner:_"
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.junit4
     testImplementation Testing.robolectric
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }
 
 android {
     namespace 'com.duckduckgo.survey.impl'
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }

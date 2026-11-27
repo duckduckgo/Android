@@ -60,7 +60,7 @@ fun DaxSwitch(
     Switch(
         checked = checked,
         onCheckedChange = onCheckedChange,
-        modifier = modifier.alpha(if (enabled) 1f else DaxSwitchDefaults.disabledAlpha),
+        modifier = modifier.alpha(if (enabled) 1f else DaxSwitchDefaults.DisabledAlpha),
         enabled = enabled,
         interactionSource = interactionSource,
         thumbContent = {
@@ -87,7 +87,7 @@ fun DaxSwitch(
 
 private object DaxSwitchDefaults {
 
-    const val disabledAlpha = 0.4f
+    const val DisabledAlpha = 0.4f
 
     val thumbSize: Dp
         @Composable

@@ -30,8 +30,9 @@ import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -54,11 +55,11 @@ interface CohortStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = CohortStore::class,
+    binding = binding<CohortStore>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class,
+    binding = binding<VpnServiceCallbacks>(),
 )
 class RealCohortStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,

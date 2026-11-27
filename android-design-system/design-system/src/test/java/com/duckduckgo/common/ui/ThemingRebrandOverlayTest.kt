@@ -46,6 +46,7 @@ import org.mockito.kotlin.whenever
 import org.robolectric.Robolectric
 import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
+import com.google.android.material.R as MaterialR
 
 private const val EXTRA_THEME = "theme"
 private const val EXTRA_THEME_RES_ID = "themeResId"
@@ -54,6 +55,10 @@ private const val EXTRA_OVERLAYS = "overlays"
 private const val EXTRA_FIXED_LOCAL_CLASS_NAME = "fixedLocalClassName"
 private const val EXTRA_ENABLED_TOGGLE = "enabledToggle"
 private const val TOGGLE_RADIUS = "radius"
+private const val TOGGLE_BADGES = "badges"
+private const val TOGGLE_INFO_PANELS = "infoPanels"
+private const val TOGGLE_DIALOG_SPACING = "dialogSpacing"
+private const val TOGGLE_BOTTOM_SHEETS = "bottomSheets"
 private const val EXTRA_FIRE_THEME = "fireTheme"
 
 private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT) : ThemingDataStore {
@@ -63,9 +68,17 @@ private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuc
 private fun configuredToggles(enabled: Set<String>): AppBrandDesignUpdateToggles {
     val themeToggle = enabledToggle(false)
     val radiusToggle = enabledToggle(TOGGLE_RADIUS in enabled)
+    val badgesToggle = enabledToggle(TOGGLE_BADGES in enabled)
+    val infoPanelsToggle = enabledToggle(TOGGLE_INFO_PANELS in enabled)
+    val dialogSpacingToggle = enabledToggle(TOGGLE_DIALOG_SPACING in enabled)
+    val bottomSheetsToggle = enabledToggle(TOGGLE_BOTTOM_SHEETS in enabled)
     return mock<AppBrandDesignUpdateToggles>().also { toggles ->
         whenever(toggles.theme()).thenReturn(themeToggle)
         whenever(toggles.radius()).thenReturn(radiusToggle)
+        whenever(toggles.badges()).thenReturn(badgesToggle)
+        whenever(toggles.infoPanels()).thenReturn(infoPanelsToggle)
+        whenever(toggles.dialogSpacing()).thenReturn(dialogSpacingToggle)
+        whenever(toggles.bottomSheets()).thenReturn(bottomSheetsToggle)
     }
 }
 
@@ -118,7 +131,7 @@ class ThemingRebrandOverlayTest {
                 DuckDuckGoTheme.valueOf(intent.getStringExtra(EXTRA_THEME) ?: DuckDuckGoTheme.LIGHT.name),
             )
             appBrandDesignUpdateToggles = configuredToggles(setOfNotNull(intent.getStringExtra(EXTRA_ENABLED_TOGGLE)))
-            onCreate(savedInstanceState, daggerInject = false)
+            onCreate(savedInstanceState, injectDependencies = false)
         }
     }
 
@@ -401,18 +414,93 @@ class ThemingRebrandOverlayTest {
     }
 
     @Test
+    fun whenDuckDuckGoActivityBadgesToggleIsEnabledThenBadgesOverlayIsApplied() {
+        val activity = toggleAwareActivity(TOGGLE_BADGES)
+
+        assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandBadges))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityBadgesToggleIsDisabledThenBadgesOverlayIsNotApplied() {
+        val activity = toggleAwareActivity(null)
+
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandBadges))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityInfoPanelsToggleIsEnabledThenInfoPanelsOverlayIsApplied() {
+        val activity = toggleAwareActivity(TOGGLE_INFO_PANELS)
+
+        assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandInfoPanels))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityInfoPanelsToggleIsDisabledThenInfoPanelsOverlayIsNotApplied() {
+        val activity = toggleAwareActivity(null)
+
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandInfoPanels))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityDialogSpacingToggleIsEnabledThenDialogSpacingOverlayIsApplied() {
+        val activity = toggleAwareActivity(TOGGLE_DIALOG_SPACING)
+
+        assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandBottomSheets))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityDialogSpacingToggleIsDisabledThenDialogSpacingOverlayIsNotApplied() {
+        val activity = toggleAwareActivity(null)
+
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityBottomSheetsToggleIsEnabledThenBottomSheetsOverlayIsApplied() {
+        val activity = toggleAwareActivity(TOGGLE_BOTTOM_SHEETS)
+
+        assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandBottomSheets))
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandDialogSpacing))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityBottomSheetsToggleIsDisabledThenBottomSheetsOverlayIsNotApplied() {
+        val activity = toggleAwareActivity(null)
+
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandBottomSheets))
+    }
+
+    @Test
     @Config(qualifiers = "xhdpi")
-    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpInRegularAndFireThemes() {
+    fun whenRadiusToggleIsEnabledThenSnackbarCornersAre16DpMenuRadiusInRegularAndFireThemes() {
         listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
             listOf(false, true).forEach { fireTheme ->
                 val activity = toggleAwareActivity(TOGGLE_RADIUS, theme, fireTheme)
                 val background = Snackbar.make(activity.findViewById(android.R.id.content), "Message", Snackbar.LENGTH_SHORT)
                     .view.background as MaterialShapeDrawable
                 val shape = background.shapeAppearanceModel
-                val expectedRadius = 16f * activity.resources.displayMetrics.density
+                val menuRadius = resolveDimension(activity, R.attr.daxMenuRadius)
 
+                assertEquals(16f * activity.resources.displayMetrics.density, menuRadius, 0f)
                 listOf(shape.topLeftCornerSize, shape.topRightCornerSize, shape.bottomLeftCornerSize, shape.bottomRightCornerSize)
-                    .forEach { corner -> assertEquals(expectedRadius, corner.getCornerSize(RectF(0f, 0f, 100f, 100f)), 0f) }
+                    .forEach { corner -> assertEquals(menuRadius, corner.getCornerSize(RectF(0f, 0f, 100f, 100f)), 0f) }
+            }
+        }
+    }
+
+    @Test
+    fun whenRadiusToggleIsEnabledThenRebrandSnackbarUsesMenuShapeAppearanceInRegularAndFireThemes() {
+        listOf(DuckDuckGoTheme.LIGHT, DuckDuckGoTheme.DARK).forEach { theme ->
+            listOf(false, true).forEach { fireTheme ->
+                val activity = toggleAwareActivity(TOGGLE_RADIUS, theme, fireTheme)
+                val snackbarStyle = resolveResourceId(activity, MaterialR.attr.snackbarStyle)
+                val attributes = activity.obtainStyledAttributes(snackbarStyle, intArrayOf(MaterialR.attr.shapeAppearance))
+                val shapeAppearance = attributes.getResourceId(0, 0)
+                attributes.recycle()
+
+                assertEquals(R.style.Widget_DuckDuckGo_Snackbar_Rebrand, snackbarStyle)
+                assertEquals(R.style.ShapeAppearance_DuckDuckGo_Menu, shapeAppearance)
             }
         }
     }

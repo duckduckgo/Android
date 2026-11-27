@@ -29,12 +29,12 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.helper.RealDuckChatJSHelper
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.google.android.material.card.MaterialCardView
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -62,8 +62,7 @@ data class NativeInputPrompt(
 interface ContextualNativeInputManager {
     fun init(
         tabId: String,
-        card: MaterialCardView,
-        widget: NativeInputModeWidget,
+        inputLayout: NativeInputLayout,
         footer: NativeInputFooterView? = null,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
@@ -89,7 +88,7 @@ interface ContextualNativeInputManager {
      * Called when the contextual sheet is closed (e.g. STATE_HIDDEN). Reverts the per-tab
      * [NativeInputState] back to a browser-context default so other observers (like StartChatView
      * in the main widget) don't keep reading the DUCK_AI_CONTEXTUAL/DUCK_AI values the contextual
-     * widget wrote during its lifetime.
+     * widget wrote during its lifetime. The sheet's unsent new-chat pick is dropped with them.
      */
     fun onContextualClosed(tabId: String)
 
@@ -98,6 +97,8 @@ interface ContextualNativeInputManager {
      * per-tab [NativeInputState] to the contextual (DUCK_AI) values that [onContextualClosed] reverted,
      * so the widget's plugin controls (attach, model picker, tools — gated on toggleSelection == DUCK_AI)
      * reappear. Without this the reused widget keeps the browser/search state and renders without them.
+     *
+     * The sheet starts its new chat on the default model, so the tab's new-chat pick is dropped.
      */
     fun onContextualReopened(tabId: String)
 }
@@ -112,7 +113,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     private var isNativeInputEnabled = false
     private var isContextualNativeInputEnabled = false
-    private var card: MaterialCardView? = null
+    private var inputLayout: NativeInputLayout? = null
     private var footer: NativeInputFooterView? = null
     private var jsMessaging: JsMessaging? = null
     private var widget: NativeInputModeWidget? = null
@@ -124,8 +125,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun init(
         tabId: String,
-        card: MaterialCardView,
-        widget: NativeInputModeWidget,
+        inputLayout: NativeInputLayout,
         footer: NativeInputFooterView?,
         jsMessaging: JsMessaging,
         lifecycleOwner: LifecycleOwner,
@@ -141,13 +141,13 @@ class RealContextualNativeInputManager @Inject constructor(
         onInputFocusChanged: (Boolean) -> Unit,
         onInputVisibilityChanged: (Boolean) -> Unit,
     ) {
-        this.card = card
+        this.inputLayout = inputLayout
         this.footer = footer
         this.jsMessaging = jsMessaging
+        val widget = inputLayout.widget
         this.widget = widget
         this.onInputVisibilityChanged = onInputVisibilityChanged
 
-        applyCardShape(card)
         setupWidget(
             tabId, widget, chatIdFlow, onSearchSubmitted,
             onCameraCaptureRequested, onFilePickerRequested,
@@ -166,6 +166,8 @@ class RealContextualNativeInputManager @Inject constructor(
             it.copy(
                 inputContext = browser,
                 toggleSelection = NativeInputState.defaultToggleFor(browser),
+                newChatModelId = null,
+                newChatReasoningMode = null,
             )
         }
     }
@@ -177,12 +179,15 @@ class RealContextualNativeInputManager @Inject constructor(
             it.copy(
                 inputContext = contextual,
                 toggleSelection = NativeInputState.defaultToggleFor(contextual),
+                newChatModelId = null,
+                newChatReasoningMode = null,
             )
         }
     }
 
     override fun onWebViewMode() {
         lastMode = Mode.WEBVIEW
+        widget?.setContextualEntry(false)
         if (isNativeInputEnabled) {
             setInputVisible(true)
             // WEBVIEW mode means a chat is in progress.
@@ -195,6 +200,7 @@ class RealContextualNativeInputManager @Inject constructor(
 
     override fun onInputMode() {
         lastMode = Mode.INPUT
+        widget?.setContextualEntry(true)
         if (isContextualNativeInputEnabled) {
             // The unified input widget is the composer for the initial sheet.
             setInputVisible(true)
@@ -208,23 +214,12 @@ class RealContextualNativeInputManager @Inject constructor(
 
     private fun setInputVisible(visible: Boolean) {
         if (visible) {
-            card?.show()
+            inputLayout?.show()
         } else {
-            card?.gone()
+            inputLayout?.gone()
         }
         footer?.setSurfaceVisible(visible)
         onInputVisibilityChanged(visible)
-    }
-
-    private fun applyCardShape(card: MaterialCardView) {
-        // The card floats within the input area (margins on all sides), matching the Duck.ai omnibar
-        // card, so all four corners are rounded rather than the docked top-only shape.
-        val radius = card.resources.getDimension(
-            com.duckduckgo.mobile.android.R.dimen.extraLargeShapeCornerRadius,
-        )
-        card.shapeAppearanceModel = card.shapeAppearanceModel.toBuilder()
-            .setAllCornerSizes(radius)
-            .build()
     }
 
     private fun setupWidget(
@@ -242,10 +237,8 @@ class RealContextualNativeInputManager @Inject constructor(
         onInputFocusChanged: (Boolean) -> Unit,
     ) {
         widget.configureContextual(tabId)
-        widget.bindTextSelections(tabId, textSelection = null)
         widget.bindChatIdSource(chatIdFlow)
         widget.bindModelPickerEnabledSource(modelPickerEnabled)
-        widget.hideMainButtons()
         widget.onStopTapped = ::sendStopEvent
         widget.onInputFocusChanged = { focused ->
             sendInputFocusedEvent(focused)

@@ -227,12 +227,11 @@ class RealDuckPlayerTest {
 
     //endregion
 
-    // region ad-blocking rollout default (driven by combine() started in onCreate)
+    // region new-install Duck Player default (driven by combine() started in onCreate)
     @Test
-    fun whenNotNewInstall_combineDoesNotPersistRolloutDefault() = runTest {
+    fun whenNotNewInstall_combineDoesNotPersistDuckPlayerDefault() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(false)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
 
@@ -240,21 +239,9 @@ class RealDuckPlayerTest {
     }
 
     @Test
-    fun whenNewInstallAndEnabledByDefaultOff_combineDoesNotPersistRolloutDefault() = runTest {
-        whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
-        adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(false))
-
-        testee.onCreate(mock(LifecycleOwner::class.java))
-
-        verify(mockDuckPlayerFeatureRepository, never()).setUserPreferences(any())
-    }
-
-    @Test
-    fun whenNewInstallAndKillSwitchOff_combineDoesNotPersistRolloutDefault() = runTest {
+    fun whenNewInstallAndKillSwitchOff_combineDoesNotPersistDuckPlayerDefault() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         adBlockingExtensionFeature.self().setRawStoredState(State(false))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
 
@@ -265,11 +252,10 @@ class RealDuckPlayerTest {
     // coroutineRule.testScope); the fresh runTest scope keeps its own Job so the collector isn't policed for completion.
     @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun whenNewInstallAndRolloutOnAndNoStoredMode_combinePersistsDisabled() = runTest(coroutineRule.testDispatcher) {
+    fun whenNewInstallAndNoStoredMode_combinePersistsDisabled() = runTest(coroutineRule.testDispatcher) {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         storedUserPreferencesFlow.value = StoredUserPreferences(true, null)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
         advanceUntilIdle()
@@ -280,11 +266,10 @@ class RealDuckPlayerTest {
     }
 
     @Test
-    fun whenNewInstallAndRolloutOnButStoredModeAlreadySet_combineDoesNotOverwrite() = runTest {
+    fun whenNewInstallAndStoredModeAlreadySet_combineDoesNotOverwrite() = runTest {
         whenever(mockAppBuildConfig.isNewInstall()).thenReturn(true)
         storedUserPreferencesFlow.value = StoredUserPreferences(false, AlwaysAsk)
         adBlockingExtensionFeature.self().setRawStoredState(State(true))
-        adBlockingExtensionFeature.enabledByDefault().setRawStoredState(State(true))
 
         testee.onCreate(mock(LifecycleOwner::class.java))
 

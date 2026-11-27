@@ -18,12 +18,12 @@ package com.duckduckgo.contentscopescripts.impl.features.pagecontext
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
 const val PAGE_CONTEXT_FEATURE_NAME = "pageContext"
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PageContextContentScopeConfigPlugin @Inject constructor(
     private val pageContextRepository: PageContextRepository,
 ) : ContentScopeConfigPlugin {

@@ -24,7 +24,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.subscriptions.api.Product.NetP
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn

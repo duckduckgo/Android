@@ -101,7 +101,7 @@ class NextPageLoginDetection constructor(
 
     private fun scheduleLoginDetection(): Job {
         // Ideally, we should be using a scope tied to the Activity/Fragment lifecycle instead of AppCoroutineScope.
-        // AToW, it's not possible to inject such scope as dependency due to our single Component Dagger setup.
+        // AToW, it's not possible to inject such scope as dependency due to our single-component DI setup.
         return appCoroutineScope.launch(dispatcherProvider.main()) {
             delay(NAVIGATION_EVENT_GRACE_PERIOD)
             logcat(VERBOSE) { "LoginDetectionDelegate execute Login detection Job for $urlToCheck" }

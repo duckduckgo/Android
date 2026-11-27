@@ -17,7 +17,7 @@
 package com.duckduckgo.networkprotection.impl
 
 import com.duckduckgo.di.scopes.VpnScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.Instant
 import javax.inject.Inject
 

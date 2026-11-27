@@ -84,6 +84,12 @@ class SyncPromotionsImplTest {
     }
 
     @Test
+    fun whenCouldShowPasswordPromoButRedesignFlagEnabledThenCannotShowPromo() = runTest {
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = true))
+        assertFalse(testee.canShowPasswordsPromotion(savedPasswords = 5))
+    }
+
+    @Test
     fun whenCouldShowPasswordPromoButSyncFlagDisabledThenCannotShowPromo() = runTest {
         configureSyncFeatureFlagState(state = false)
         assertFalse(testee.canShowPasswordsPromotion(savedPasswords = 5))
@@ -92,6 +98,12 @@ class SyncPromotionsImplTest {
     @Test
     fun whenCouldShowBookmarkPromoButTopLevelPromoFlagDisabledThenCannotShowPromo() = runTest {
         syncPromotionFeature.self().setRawStoredState(State(enable = false))
+        assertFalse(testee.canShowBookmarksPromotion(savedBookmarks = 5))
+    }
+
+    @Test
+    fun whenCouldShowBookmarkPromoButRedesignFlagEnabledThenCannotShowPromo() = runTest {
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = true))
         assertFalse(testee.canShowBookmarksPromotion(savedBookmarks = 5))
     }
 
@@ -158,5 +170,6 @@ class SyncPromotionsImplTest {
         syncPromotionFeature.self().setRawStoredState(State(enable = true))
         syncPromotionFeature.bookmarks().setRawStoredState(State(enable = true))
         syncPromotionFeature.passwords().setRawStoredState(State(enable = true))
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = false))
     }
 }

@@ -16,17 +16,17 @@
 
 package com.duckduckgo.feature.toggles.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle.State.Target
 import com.duckduckgo.feature.toggles.api.Toggle.TargetMatcherPlugin
 import com.duckduckgo.feature.toggles.impl.FeatureTogglesPixelName.EXPERIMENT_ENROLLMENT
 import com.duckduckgo.feature.toggles.internal.api.FeatureTogglesCallback
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
 import okio.ByteString.Companion.encode
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -87,7 +87,7 @@ internal enum class FeatureTogglesPixelName(override val pixelName: String) : Pi
 @Suppress("unused")
 private interface TargetMatcherPluginTrigger
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class LocaleToggleTargetMatcher @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : TargetMatcherPlugin {
@@ -106,7 +106,7 @@ class LocaleToggleTargetMatcher @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class MinSdkToggleTargetMatcher @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : TargetMatcherPlugin {

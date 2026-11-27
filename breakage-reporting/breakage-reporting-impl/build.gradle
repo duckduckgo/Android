@@ -16,51 +16,39 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     namespace 'com.duckduckgo.breakagereporting.impl'
 }
 
 dependencies {
-    implementation project(path: ':anvil-annotations')
-    implementation project(path: ':di')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':feature-toggles-api')
     implementation project(path: ':app-build-config-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
     implementation project(path: ':content-scope-scripts-api')
+    implementation project(path: ':di')
+    implementation project(path: ':feature-toggles-api')
     implementation project(path: ':js-messaging-api')
-
-    // Room
+    implementation project(path: ':privacy-config-api')
+    implementation "com.squareup.logcat:logcat:_"
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    ksp AndroidX.room.compiler
-    testImplementation AndroidX.room.testing
-
-    // Dagger
-    implementation Google.dagger
-
     implementation KotlinX.coroutines.core
 
+    testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.room.testing
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-
-    implementation "com.squareup.logcat:logcat:_"
-
-    // Testing dependencies
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation Testing.junit4
 
-    testImplementation project(path: ':common-test')
+    ksp AndroidX.room.compiler
 }

@@ -24,15 +24,16 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.APP_OPEN
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class AppLifecycleSyncObserver @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,

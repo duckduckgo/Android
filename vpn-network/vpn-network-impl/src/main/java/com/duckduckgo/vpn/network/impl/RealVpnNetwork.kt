@@ -31,8 +31,8 @@ import com.duckduckgo.vpn.network.impl.models.Allowed
 import com.duckduckgo.vpn.network.impl.models.Packet
 import com.duckduckgo.vpn.network.impl.models.ResourceRecord
 import com.duckduckgo.vpn.network.impl.models.Usage
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
@@ -45,7 +45,7 @@ import javax.inject.Inject
 import kotlin.system.exitProcess
 
 @ContributesBinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class RealVpnNetwork @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val context: Context,

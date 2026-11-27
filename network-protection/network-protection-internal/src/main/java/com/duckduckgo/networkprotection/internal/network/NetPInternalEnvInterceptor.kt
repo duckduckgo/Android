@@ -20,16 +20,17 @@ import com.duckduckgo.app.global.api.ApiInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.configuration.NETP_ENVIRONMENT_URL
 import com.duckduckgo.networkprotection.internal.feature.NetPInternalFeatureToggles
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ApiInterceptorPlugin::class,
+    binding = binding<ApiInterceptorPlugin>(),
 )
 class NetPInternalEnvInterceptor @Inject constructor(
     private val vpnInternalFeatures: NetPInternalFeatureToggles,

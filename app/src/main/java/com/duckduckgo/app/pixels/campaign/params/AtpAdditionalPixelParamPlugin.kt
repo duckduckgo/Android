@@ -18,10 +18,10 @@ package com.duckduckgo.app.pixels.campaign.params
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.app.tracking.AppTrackingProtection
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AtpEnabledAdditionalPixelParamPlugin @Inject constructor(
     private val appTrackingProtection: AppTrackingProtection,
 ) : AdditionalPixelParamPlugin {

@@ -33,7 +33,7 @@ import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncApi
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -41,7 +41,7 @@ import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class GetScopedSyncAuthTokenHandler @Inject constructor(
     private val syncApi: SyncApi,
     private val syncStore: SyncStore,

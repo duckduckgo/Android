@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.email.incontext
 
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.BackButtonAction.NavigateBack
 import com.duckduckgo.autofill.impl.email.incontext.EmailProtectionInContextSignupViewModel.Companion.Urls.CHOOSE_ADDRESS
@@ -37,6 +36,7 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_DISPLAYED
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CANCEL
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.EMAIL_PROTECTION_IN_CONTEXT_MODAL_EXIT_EARLY_CONFIRM
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.absoluteString
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.flow.MutableStateFlow

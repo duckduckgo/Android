@@ -18,21 +18,18 @@ package com.duckduckgo.adblocking.impl
 
 import android.net.Uri
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AdBlockingContextualCtaSuppressorPlugin @Inject constructor(
     private val statusChecker: AdBlockingStatusChecker,
-    private val feature: AdBlockingExtensionFeature,
     private val domainMatcher: AdBlockingExtensionDomainMatcher,
 ) : ContextualCtaSuppressorPlugin {
 
     override suspend fun canShowCta(url: Uri): Boolean {
-        if (!feature.adBlockingUXImprovements().isEnabled()) return true
         if (!statusChecker.canInject()) return true
         return !domainMatcher.matches(url)
     }

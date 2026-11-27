@@ -30,8 +30,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FRO
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_SUCCESS
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import javax.inject.Inject
 
@@ -44,7 +44,7 @@ interface ImportGoogleBookmarksJourney {
     fun cancelled(stepReached: String)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealImportGoogleBookmarksJourney @Inject constructor(
     private val timeProvider: TimeProvider,

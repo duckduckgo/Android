@@ -17,43 +17,38 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
     implementation project(path: ':app-build-config-api')
-    implementation project(path: ':di')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
-    implementation project(path: ':statistics-api')
-    implementation project(path: ':referral-api')
+    implementation project(path: ':di')
     implementation project(path: ':experiments-api')
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
-    implementation Google.dagger
-    implementation "com.squareup.logcat:logcat:_"
-    implementation AndroidX.lifecycle.runtime.ktx
-    implementation AndroidX.lifecycle.commonJava8
+    implementation project(path: ':referral-api')
+    implementation project(path: ':statistics-api')
     implementation "androidx.datastore:datastore-preferences:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.commonJava8
+    implementation AndroidX.lifecycle.runtime.ktx
+    implementation KotlinX.coroutines.core
 
-    testImplementation Testing.junit4
-    testImplementation AndroidX.test.ext.junit
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.robolectric
     testImplementation project(path: ':common-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
@@ -62,9 +57,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
     namespace 'com.duckduckgo.installation.impl'
 }

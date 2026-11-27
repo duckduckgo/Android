@@ -19,8 +19,8 @@ package com.duckduckgo.subscriptions.impl.notification
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.NotificationSender
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import javax.inject.Inject
 

@@ -17,8 +17,8 @@
 package com.duckduckgo.duckchat.impl.contextual
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import org.json.JSONArray
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
@@ -40,6 +40,7 @@ data class ContextualEntryPrompt(
     val serializedPageContext: String?,
     val selectionsJson: JSONArray? = null,
     val carriesTermsConsent: Boolean = true,
+    val voice: Boolean = false,
 )
 
 /**
@@ -62,7 +63,7 @@ interface ContextualEntryPromptStore {
     fun clearAll()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealContextualEntryPromptStore @Inject constructor() : ContextualEntryPromptStore {
 

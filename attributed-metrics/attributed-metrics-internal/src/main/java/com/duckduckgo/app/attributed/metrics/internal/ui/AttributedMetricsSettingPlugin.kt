@@ -18,7 +18,7 @@ package com.duckduckgo.app.attributed.metrics.internal.ui
 
 import android.content.Context
 import android.view.View
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 
 @ContributesPluginPoint(ActivityScope::class)

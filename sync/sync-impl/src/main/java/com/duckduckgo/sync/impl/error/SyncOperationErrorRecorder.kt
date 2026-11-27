@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.store.model.SyncOperationErrorType
 import com.duckduckgo.sync.store.model.SyncOperationErrorType.TIMESTAMP_CONFLICT
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

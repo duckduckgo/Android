@@ -32,8 +32,9 @@ import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
 import com.duckduckgo.subscriptions.api.Product.PIR
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -65,10 +66,10 @@ interface PirWorkHandler {
     suspend fun cancelWork(reason: CancellationReason)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = PirWorkHandler::class,
+    binding = binding<PirWorkHandler>(),
 )
 class RealPirWorkHandler @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,

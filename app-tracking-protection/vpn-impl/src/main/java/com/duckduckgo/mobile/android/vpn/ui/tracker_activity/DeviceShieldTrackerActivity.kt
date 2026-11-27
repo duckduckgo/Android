@@ -31,10 +31,10 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.ContributeToActivityStarter
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.notifyme.NotifyMeView
 import com.duckduckgo.common.ui.view.DaxDialogListener
@@ -88,7 +88,6 @@ import nl.dionsegijn.konfetti.models.Shape
 import nl.dionsegijn.konfetti.models.Size
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import javax.inject.Provider
 
 @InjectWith(ActivityScope::class)
 @ContributeToActivityStarter(AppTrackerActivityWithEmptyParams::class, screenName = "apptp.main")
@@ -104,7 +103,7 @@ class DeviceShieldTrackerActivity :
     @Inject
     lateinit var vpnFeaturesRegistry: VpnFeaturesRegistry
 
-    @Inject lateinit var reportBreakageContract: Provider<ReportBreakageContract>
+    @Inject lateinit var reportBreakageContract: () -> ReportBreakageContract
 
     @Inject lateinit var dispatcherProvider: DispatcherProvider
 
@@ -160,7 +159,7 @@ class DeviceShieldTrackerActivity :
         enableTransparentEdgeToEdge()
 
         reportBreakage =
-            registerForActivityResult(reportBreakageContract.get()) {
+            registerForActivityResult(reportBreakageContract()) {
                 if (!it.isEmpty()) {
                     Snackbar.make(binding.root, R.string.atp_ReportBreakageSent, Snackbar.LENGTH_LONG).show()
                 }

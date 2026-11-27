@@ -18,7 +18,6 @@ package com.duckduckgo.app.firebutton
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.clear.ClearWhenOption
@@ -27,6 +26,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DATA_CLEAR_TYPE_CHATS
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DATA_CLEAR_TYPE_DATA
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter.DATA_CLEAR_TYPE_TABS
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState

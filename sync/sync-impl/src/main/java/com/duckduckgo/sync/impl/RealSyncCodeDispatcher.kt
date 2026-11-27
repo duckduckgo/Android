@@ -45,9 +45,9 @@ import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -58,10 +58,9 @@ import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealSyncCodeDispatcher @Inject constructor(
-    private val syncFeature: SyncFeature,
     private val syncAccountRepository: SyncAccountRepository,
     private val qrCode: ExchangeV2QrCode,
     private val runner: ExchangeV2Runner,
@@ -143,16 +142,6 @@ class RealSyncCodeDispatcher @Inject constructor(
     }
 
     override fun route(pastedCode: String): RouteDecision {
-        val v2Enabled = syncFeature.canUseV2ConnectFlow().isEnabled()
-        logcat { "$TAG: route() called, canUseV2ConnectFlow=$v2Enabled" }
-        if (!v2Enabled) {
-            // Flag off → never look at v2 shapes; defer entirely to the v1 path.
-            return legacy(pastedCode, reason = "FF off")
-        }
-        return classifyV2(pastedCode)
-    }
-
-    private fun classifyV2(pastedCode: String): RouteDecision {
         val parsed = qrCode.parse(pastedCode)
         logcat { "$TAG: v2 parse=${parsed::class.simpleName}" }
         return when (parsed) {

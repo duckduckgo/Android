@@ -26,7 +26,6 @@ import androidx.lifecycle.Lifecycle.State
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.favicon.FaviconManager
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource
@@ -66,6 +65,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.sorting.InitialExtr
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionListBuilder
 import com.duckduckgo.autofill.impl.ui.credential.management.suggestion.SuggestionMatcher
 import com.duckduckgo.browser.api.ui.BrowserScreens.WebViewActivityWithParams
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.SearchBar
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE

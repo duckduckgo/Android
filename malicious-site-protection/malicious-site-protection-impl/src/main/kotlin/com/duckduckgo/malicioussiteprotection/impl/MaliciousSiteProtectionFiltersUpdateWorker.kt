@@ -25,8 +25,8 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
@@ -35,8 +35,9 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.P
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.SCAM
 import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -84,15 +85,15 @@ class MaliciousSiteProtectionFiltersUpdateWorker(
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class MaliciousSiteProtectionFiltersUpdateWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionRCFeature,

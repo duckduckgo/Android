@@ -32,36 +32,30 @@ android {
         }
     }
     namespace 'com.duckduckgo.sync.store'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }
 
 dependencies {
+    implementation project(path: ':common-utils')
     implementation AndroidX.core.ktx
-    implementation AndroidX.security.crypto
-    implementation Square.okio
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation KotlinX.coroutines.core
+    implementation AndroidX.security.crypto
     implementation KotlinX.coroutines.android
+    implementation KotlinX.coroutines.core
+    implementation Square.okio
 
-    implementation project(path: ':common-utils')
-
-    ksp AndroidX.room.compiler
-
+    testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation project(path: ':common-test')
-    testImplementation AndroidX.archCore.testing
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
 
     androidTestImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp AndroidX.room.compiler
 }

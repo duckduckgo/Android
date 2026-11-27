@@ -18,6 +18,7 @@ package com.duckduckgo.subscriptions.impl.pixels
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import org.junit.Before
 import org.junit.Test
@@ -47,6 +48,15 @@ class SubscriptionPixelSenderImplTest {
             type = Count,
             parameters = mapOf("origin" to "funnel_freescan_android"),
         )
+    }
+
+    @Test
+    fun whenReportUndoCancellationClickThenFiresCountAndDailyWithFreeTrial() {
+        testee.reportSubscriptionSettingsUndoCancellationClick(isFreeTrial = false)
+
+        val params = mapOf("free_trial" to "false")
+        verify(pixel).fire(pixelName = "subscription_settings_undo_cancellation_click_c", type = Count, parameters = params)
+        verify(pixel).fire(pixelName = "subscription_settings_undo_cancellation_click_d", type = Daily(), parameters = params)
     }
 
     @Test
@@ -87,6 +97,13 @@ class SubscriptionPixelSenderImplTest {
             pixelName = "m_subscription_expiration_reminder_not_fired_permissions_rejected",
             type = Count,
         )
+    }
+
+    @Test
+    fun whenReportSubscriptionSwitchThenFiresSwitchPixel() {
+        testee.reportSubscriptionSwitch()
+
+        verify(pixel).fire(pixelName = "subscription_switch", type = Count)
     }
 
     @Test

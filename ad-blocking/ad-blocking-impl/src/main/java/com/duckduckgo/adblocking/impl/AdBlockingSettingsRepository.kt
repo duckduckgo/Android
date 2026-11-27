@@ -18,8 +18,8 @@ package com.duckduckgo.adblocking.impl
 
 import com.duckduckgo.adblocking.impl.store.AdBlockingUserPreferences
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -32,7 +32,7 @@ interface AdBlockingSettingsRepository {
     suspend fun disable()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingSettingsRepository @Inject constructor(
     private val userPreferences: AdBlockingUserPreferences,

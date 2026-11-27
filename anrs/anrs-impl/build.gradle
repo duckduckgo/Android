@@ -16,48 +16,44 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
-
-    implementation project(':app-build-config-api')
     implementation project(':anrs-api')
     implementation project(':anrs-store')
-    implementation project(':common-utils')
-    implementation project(':di')
+    implementation project(':app-build-config-api')
     implementation project(':browser-api')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
     implementation project(':custom-tabs-api')
+    implementation project(':data-store-api')
+    implementation project(':di')
+    implementation project(':feature-toggles-api')
     implementation project(':statistics-api')
     implementation project(':verified-installation-api')
-    implementation project(':feature-toggles-api')
-    implementation project(':data-store-api')
     implementation "com.duckduckgo.crashkit:android-crashkit:_"
-
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
-    implementation Google.dagger
     implementation "com.squareup.logcat:logcat:_"
-    implementation Square.okio
+    implementation AndroidX.core.ktx
     implementation AndroidX.room.runtime
     implementation AndroidX.room.rxJava2
-    implementation AndroidX.room.rxJava2
     implementation AndroidX.webkit
+    implementation KotlinX.coroutines.core
+    implementation Square.okio
 
     testImplementation project(':common-test')
     testImplementation project(':data-store-test')
-    testImplementation Testing.junit4
+    testImplementation project(":feature-toggles-test")
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.archCore.testing
     testImplementation AndroidX.test.ext.junit
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation Testing.junit4
     testImplementation Testing.robolectric
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }
 
 android {
@@ -65,14 +61,8 @@ android {
         baseline = file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
 
     namespace 'com.duckduckgo.app.anr'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 
     packagingOptions {
         jniLibs {

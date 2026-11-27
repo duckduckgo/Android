@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.browser.api.WebViewVersionProvider.Companion.WEBVIEW_UNKNOWN_VERSION
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

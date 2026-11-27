@@ -95,6 +95,27 @@ class RealPirFreeScanBrokerFilterTest {
     }
 
     @Test
+    fun whenTokenActionIsNestedInsideExpectationThenBrokerIsExcluded() = runTest {
+        val broker = broker("NestedExpectationCaptcha")
+        val expectation = BrokerAction.Expectation(
+            id = "exp",
+            expectations = emptyList(),
+            actions = listOf(BrokerAction.GetCaptchaInfo(id = "c", selector = ".captcha")),
+        )
+        stubScanStep(broker, listOf(navigate(), expectation))
+
+        assertTrue(testee.excludingGatedBrokers(listOf(broker)).isEmpty())
+    }
+
+    @Test
+    fun whenScanStepHasScrollThenBrokerIsNotExcluded() = runTest {
+        val broker = broker("Scroll")
+        stubScanStep(broker, listOf(navigate(), BrokerAction.Scroll(id = "s", selector = ".results"), extract()))
+
+        assertEquals(listOf(broker), testee.excludingGatedBrokers(listOf(broker)))
+    }
+
+    @Test
     fun whenBrokerHasNoScanStepsThenItIsNotFreeScannableButIsNotTreatedAsGated() = runTest {
         val broker = broker("NoSteps")
         whenever(mockPirRepository.getBrokerScanSteps(broker.name)).thenReturn(null)

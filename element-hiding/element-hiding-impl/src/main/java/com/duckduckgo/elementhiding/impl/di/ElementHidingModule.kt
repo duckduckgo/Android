@@ -16,37 +16,41 @@
 
 package com.duckduckgo.elementhiding.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.elementhiding.store.ALL_MIGRATIONS
 import com.duckduckgo.elementhiding.store.ElementHidingDatabase
 import com.duckduckgo.elementhiding.store.ElementHidingRepository
 import com.duckduckgo.elementhiding.store.RealElementHidingRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object ElementHidingModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
-    fun provideElementHidingDatabase(context: Context): ElementHidingDatabase {
-        return Room.databaseBuilder(context, ElementHidingDatabase::class.java, "element_hiding.db")
-            .enableMultiInstanceInvalidation()
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideElementHidingDatabase(databaseProvider: DatabaseProvider): ElementHidingDatabase {
+        return databaseProvider.buildRoomDatabase(
+            ElementHidingDatabase::class.java,
+            "element_hiding.db",
+            config = RoomDatabaseConfig(
+                enableMultiInstanceInvalidation = true,
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideElementHidingRepository(
         database: ElementHidingDatabase,

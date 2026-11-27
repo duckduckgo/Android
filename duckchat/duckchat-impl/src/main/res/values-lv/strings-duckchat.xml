@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Atver Duck.ai</string>
     <string name="duck_ai_paid_settings_learn_more_title">Uzzināt vairāk</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Pajautā Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Vēlies vieglāk piekļūt privātai MI tērzēšanai?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Meklē vai ievadi adresi</string>
@@ -234,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Nesen</string>
     <string name="duck_ai_chat_history_untitled">Tērzēšana bez nosaukuma</string>
     <string name="duck_ai_chat_history_empty_title">Vēl nav nevienas tērzēšanas</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Atvērt Duck.ai</string>
     <string name="duck_ai_chat_history_more_options">Citas iespējas</string>
     <string name="duck_ai_chat_history_action_select">Atlasīt</string>
     <string name="duck_ai_chat_history_action_pin">Piespraust</string>
@@ -398,4 +394,30 @@
         <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d stunda</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d stundas</item>
     </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Apkopo šo dokumentu</string>
+
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Jautāt</string>
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo anonimizē tavas sarunas. Noklikšķinot uz \'^1\', tu piekrīti mūsu <annotation type="privacy_link">privātuma politikai</annotation> un <annotation type="terms_link">pakalpojumu sniegšanas noteikumiem</annotation>.</string>
+    <!-- Duck.ai tab switcher card -->
+    <string name="duckAiTabCardChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a text or image chat, as opposed to a voice chat.">Tērzēšana</string>
+    <string name="duckAiTabCardThinkingTitle" instruction="Header on a tab switcher card for a Duck.ai chat whose question has been sent but whose reply has not started yet. The chat title, if any, is shown below it.">Domā...</string>
+    <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">Klausīšanās…</string>
+    <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Balss tērzēšana</string>
+    <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Transkripcija</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Faili tiek automātiski skenēti, meklējot nelikumīgu saturu. Atzīmēto tērzēšanu dati tiek glabāti ierobežotu laiku. <annotation type="learn_more_link">Uzzināt vairāk</annotation></string>
+    <!-- Duck.ai new chat hints -->
+    <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Analizēt failus</string>
+    <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Jautāt par fotoattēliem</string>
+    <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Izveidot attēlu</string>
+
+    <!-- Duck.ai home-screen widget -->
+    <string name="duckAiWidgetLabel" instruction="Name of the Duck.ai home-screen widget, shown in the Android widget picker">Duck.ai un jaunākās tērzēšanas sarunas</string>
+    <string name="duckAiWidgetDescription" instruction="Short description of the Duck.ai home-screen widget, shown in the Android widget picker">Sāc privātu tērzēšanu ar Duck.ai vai atsāc jaunākās tērzēšanas sarunas.</string>
+    <string name="duckAiWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai home-screen widget">Tērzēt privāti</string>
+    <string name="duckAiWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the home-screen widget">Balss</string>
+    <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Attēls</string>
+    <string name="duckAiWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the home-screen widget">Kamera</string>
 </resources>

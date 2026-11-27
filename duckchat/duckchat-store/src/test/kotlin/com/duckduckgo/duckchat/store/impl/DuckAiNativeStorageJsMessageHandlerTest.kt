@@ -32,7 +32,6 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import dagger.Lazy
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -63,22 +62,37 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     private val fakePrefs = InMemorySharedPreferences()
     private val migrationPrefs = DuckAiMigrationPrefs(fakePrefsProvider(fakePrefs))
     private val pixels: DuckAiNativeStoragePixels = mock()
+    private val deletionListener: DuckAiNativeStorageDeletionListener = mock()
     private val hostProvider: DuckAiHostProvider = mock<DuckAiHostProvider>().also {
         whenever(it.getHost()).thenReturn("duck.ai")
     }
     private fun storageProviderFor(filesDir: java.io.File): BrowserModeDataProvider<DuckAiBridgeStorage> {
-        val storage = RealDuckAiBridgeStorage(settings = settingsDao, chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = Lazy { filesDir })
+        val storage = RealDuckAiBridgeStorage(settings = settingsDao, chats = chatsDao, fileMeta = fileMetaDao, filesDirLazy = lazy { filesDir })
         return mock<BrowserModeDataProvider<DuckAiBridgeStorage>>().also { whenever(it.forMode(any())).thenReturn(storage) }
     }
     private val handlerPlugin by lazy {
-        DuckAiNativeStorageJsMessageHandler(storageProviderFor(tempFolder.root), hostProvider, migrationPrefs, pixels, BrowserMode.REGULAR)
+        DuckAiNativeStorageJsMessageHandler(
+            storageProviderFor(tempFolder.root),
+            hostProvider,
+            migrationPrefs,
+            pixels,
+            deletionListener,
+            BrowserMode.REGULAR,
+        )
     }
     private val handler by lazy { handlerPlugin.getJsMessageHandler() }
     private val jsMessaging: JsMessaging = mock()
 
     // A handler bound to Fire mode, used by the Fire-specific migration tests below.
     private fun fireHandler() =
-        DuckAiNativeStorageJsMessageHandler(storageProviderFor(tempFolder.root), hostProvider, migrationPrefs, pixels, BrowserMode.FIRE)
+        DuckAiNativeStorageJsMessageHandler(
+            storageProviderFor(tempFolder.root),
+            hostProvider,
+            migrationPrefs,
+            pixels,
+            deletionListener,
+            BrowserMode.FIRE,
+        )
             .getJsMessageHandler()
 
     // --- metadata ---
@@ -363,6 +377,27 @@ class DuckAiNativeStorageJsMessageHandlerTest {
         verifyNoInteractions(chatsDao)
     }
 
+    @Test
+    fun `deleteChat notifies the deletion listener with chat id and mode`() {
+        handler.process(jsMessage("deleteChat", """{"chatId":"chat-1"}"""), jsMessaging, null)
+
+        verify(deletionListener).onChatDeleted("chat-1", BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun `deleteChat in fire mode notifies with FIRE`() {
+        fireHandler().process(jsMessage("deleteChat", """{"chatId":"chat-1"}"""), jsMessaging, null)
+
+        verify(deletionListener).onChatDeleted("chat-1", BrowserMode.FIRE)
+    }
+
+    @Test
+    fun `deleteChat with a blank id does not notify`() {
+        handler.process(jsMessage("deleteChat", """{"chatId":""}"""), jsMessaging, null)
+
+        verifyNoInteractions(deletionListener)
+    }
+
     // --- deleteAllChats ---
 
     @Test
@@ -371,6 +406,13 @@ class DuckAiNativeStorageJsMessageHandlerTest {
 
         verify(chatsDao).deleteAll()
         verify(jsMessaging, never()).onResponse(any())
+    }
+
+    @Test
+    fun `deleteAllChats notifies the deletion listener with mode`() {
+        handler.process(jsMessage("deleteAllChats", "{}"), jsMessaging, null)
+
+        verify(deletionListener).onAllChatsDeleted(BrowserMode.REGULAR)
     }
 
     // --- isMigrationDone ---
@@ -872,6 +914,24 @@ class DuckAiNativeStorageJsMessageHandlerTest {
     }
 
     @Test
+    fun `deleteChat that throws does not notify`() {
+        whenever(chatsDao.delete(any())).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteChat", """{"chatId":"chat-1"}"""), jsMessaging, null)
+
+        verifyNoInteractions(deletionListener)
+    }
+
+    @Test
+    fun `deleteAllChats that throws does not notify`() {
+        whenever(chatsDao.deleteAll()).thenThrow(RuntimeException("db error"))
+
+        handler.process(jsMessage("deleteAllChats", "{}"), jsMessaging, null)
+
+        verifyNoInteractions(deletionListener)
+    }
+
+    @Test
     fun `deleteAllChats fires chat delete error pixel when dao throws`() {
         whenever(chatsDao.deleteAll()).thenThrow(RuntimeException("db error"))
 
@@ -956,6 +1016,7 @@ class DuckAiNativeStorageJsMessageHandlerTest {
             hostProvider,
             throwingMigrationPrefs,
             pixels,
+            deletionListener,
             BrowserMode.REGULAR,
         ).getJsMessageHandler()
     }

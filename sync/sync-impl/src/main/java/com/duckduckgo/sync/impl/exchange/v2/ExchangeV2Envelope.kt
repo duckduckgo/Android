@@ -20,7 +20,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.ExchangeEnvelope
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**

@@ -19,11 +19,11 @@ package com.duckduckgo.networkprotection.impl.configuration
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.VpnRemoteFeatures
 import com.duckduckgo.networkprotection.impl.configuration.VPNExcludedDomainsFallback.DnsEntry
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import logcat.asLog
 import logcat.logcat
 import okhttp3.Dns
@@ -106,11 +106,11 @@ class VpnLocalDnsImpl(
 }
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object VpnLocalDnsModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideVpnLocalDns(
         vpnRemoteFeatures: VpnRemoteFeatures,
         moshi: Moshi,

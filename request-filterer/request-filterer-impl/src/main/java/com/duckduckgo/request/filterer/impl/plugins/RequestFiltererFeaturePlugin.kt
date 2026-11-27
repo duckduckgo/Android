@@ -27,12 +27,12 @@ import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleReposit
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggles
 import com.duckduckgo.request.filterer.store.RequestFiltererRepository
 import com.duckduckgo.request.filterer.store.SettingsEntity
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class RequestFiltererFeaturePlugin @Inject constructor(
     private val requestFiltererRepository: RequestFiltererRepository,
     private val requestFiltererFeatureToggleRepository: RequestFiltererFeatureToggleRepository,

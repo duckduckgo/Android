@@ -39,6 +39,7 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.toStringDropScheme
+import com.duckduckgo.duckchat.api.DuckAiPageContextLifecycle
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.store.DuckChatContextualDataStore
 import io.reactivex.Scheduler
@@ -79,6 +80,7 @@ class TabDataRepository(
     private val nativeInputStatePublisher: NativeInputStatePublisher,
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val pageTitleFetcher: PageTitleFetcher,
+    private val pageContextJSHelper: DuckAiPageContextLifecycle,
     private val browserMode: BrowserMode,
 ) : TabRepository, TabAtomicOperations {
 
@@ -375,6 +377,7 @@ class TabDataRepository(
         }
         tabVisitedSitesRepository.clearTab(tab.tabId)
         nativeInputStatePublisher.clearTab(tab.tabId)
+        pageContextJSHelper.clearTab(tab.tabId)
     }
 
     override suspend fun deleteTabs(tabIds: List<String>) {
@@ -385,6 +388,7 @@ class TabDataRepository(
         tabIds.forEach {
             tabVisitedSitesRepository.clearTab(it)
             nativeInputStatePublisher.clearTab(it)
+            pageContextJSHelper.clearTab(it)
         }
     }
 
@@ -396,6 +400,7 @@ class TabDataRepository(
         }
         tabVisitedSitesRepository.clearTab(tabId)
         nativeInputStatePublisher.clearTab(tabId)
+        pageContextJSHelper.clearTab(tabId)
     }
 
     override suspend fun deleteSelectedBlankTabAndSelectTarget(
@@ -411,6 +416,7 @@ class TabDataRepository(
         clearAllSiteData(listOf(currentTabId))
         tabVisitedSitesRepository.clearTab(currentTabId)
         nativeInputStatePublisher.clearTab(currentTabId)
+        pageContextJSHelper.clearTab(currentTabId)
         true
     }
 
@@ -459,6 +465,7 @@ class TabDataRepository(
         deletableTabIds.forEach {
             tabVisitedSitesRepository.clearTab(it)
             nativeInputStatePublisher.clearTab(it)
+            pageContextJSHelper.clearTab(it)
         }
 
         purgeDeletableTabsJob += appCoroutineScope.launch(dispatchers.io()) {
@@ -491,6 +498,7 @@ class TabDataRepository(
         }
         tabVisitedSitesRepository.clearTab(tabId)
         nativeInputStatePublisher.clearTab(tabId)
+        pageContextJSHelper.clearTab(tabId)
     }
 
     override suspend fun deleteAll() = withContext(dispatchers.io()) {
@@ -518,11 +526,13 @@ class TabDataRepository(
             adClickManager.clearTabId(tabId)
             duckChatContextualDataStore.clearTab(tabId)
             nativeInputStatePublisher.clearTab(tabId)
+            pageContextJSHelper.clearTab(tabId)
         }
     }
 
     private suspend fun deleteAllTabsAndSharedData() {
         logcat(INFO) { "Deleting tabs right now" }
+        pageContextJSHelper.clearAll()
         tabsDao.deleteAllTabs()
         webViewPreviewPersister.deleteAll()
         faviconManager.deleteAllTemp()

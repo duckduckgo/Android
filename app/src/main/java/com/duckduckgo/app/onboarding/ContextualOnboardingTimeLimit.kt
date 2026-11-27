@@ -36,9 +36,10 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -59,11 +60,11 @@ interface ContextualOnboardingTimeLimit {
     suspend fun restartTimeLimit()
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, ContextualOnboardingTimeLimit::class)
-@ContributesMultibinding(
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<ContextualOnboardingTimeLimit>())
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class RealContextualOnboardingTimeLimit @Inject constructor(
     private val userStageStore: UserStageStore,

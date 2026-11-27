@@ -47,7 +47,8 @@ interface WideEventClient {
     ): Result<Long>
 
     /**
-     * Record a step in an active flow.
+     * Record a step's outcome in an active flow. Each step name is recorded once and sent as `step.<name>`
+     * with its success flag.
      *
      * @param wideEventId ID of the wide event.
      * @param stepName Step label (e.g., "account_created").
@@ -58,6 +59,29 @@ interface WideEventClient {
         wideEventId: Long,
         stepName: String,
         success: Boolean = true,
+        metadata: Map<String, String> = emptyMap(),
+    ): Result<Unit>
+
+    /**
+     * Append [step] to the path of an active flow. The path is sent as `steps` (comma-separated), and its latest
+     * step as `last_step`. Both replace a metadata entry with the same key.
+     *
+     * Step names must not be empty, contain commas, since commas separate entries in `steps`, or be `truncated`,
+     * which marks a path that was cut short. Such a step is rejected with a failure and the flow is left unchanged.
+     *
+     * A step equal to the last appended one isn't added to the path again, but its [metadata] is still written,
+     * so a flow can save what it learned without moving to a new step. When the path would exceed 20 entries,
+     * it keeps its first 19 steps and ends with `truncated`; `last_step` still holds the latest step.
+     *
+     * Independent of [flowStep]: a flow can record step outcomes, a path, or both.
+     *
+     * @param wideEventId ID of the wide event.
+     * @param step Step label (e.g., "code_screen"). Must not be empty, contain commas or be `truncated`.
+     * @param metadata Optional metadata.
+     */
+    suspend fun flowAppendToPath(
+        wideEventId: Long,
+        step: String,
         metadata: Map<String, String> = emptyMap(),
     ): Result<Unit>
 
@@ -82,7 +106,7 @@ interface WideEventClient {
     suspend fun flowAbort(wideEventId: Long): Result<Unit>
 
     /**
-     * Get ids of active flows by their name.
+     * Get ids of active flows by their name, regardless of the process that started them.
      * Ids are ordered chronologically based on wide event creation time.
      *
      * Use to pick up wideEventId after process restart or if the flow started
@@ -98,8 +122,7 @@ interface WideEventClient {
      * If [timeout] elapses before [intervalEnd], [flowFinish] or [flowAbort], the flow auto-finishes with
      * [FlowStatus.Unknown] and is sent. Explicit finish/abort cancels any pending timeouts.
      *
-     * The measured duration is bucketed according to [buckets]. The recorded duration is rounded down to
-     * the nearest bucket. Values below the smallest bucket are recorded as 0. A null value disables
+     * The measured duration is bucketed according to [buckets] and [rounding]. A null [buckets] disables
      * bucketing and records the raw duration.
      *
      * @param wideEventId ID of the wide event.
@@ -107,12 +130,14 @@ interface WideEventClient {
      * @param timeout Optional duration for auto-finish.
      * @param buckets Bucket boundaries for the measured duration, or null to disable bucketing.
      *   Defaults to [DEFAULT_INTERVAL_BUCKETS].
+     * @param rounding Which bucket boundary is recorded. Ignored when [buckets] is null.
      */
     suspend fun intervalStart(
         wideEventId: Long,
         key: String,
         timeout: Duration? = null,
         buckets: Set<Duration>? = DEFAULT_INTERVAL_BUCKETS,
+        rounding: BucketRounding = BucketRounding.RoundDown,
     ): Result<Unit>
 
     /**
@@ -173,6 +198,23 @@ data class WideEventDefinition(
     }
 }
 
+/**
+ * How an interval's duration is mapped to a bucket boundary. A duration equal to a boundary records that
+ * boundary. A negative duration, e.g. after a clock change, records -1 in both modes.
+ */
+enum class BucketRounding {
+    /**
+     * The largest boundary not greater than the duration. Durations shorter than the smallest boundary record 0.
+     */
+    RoundDown,
+
+    /**
+     * The smallest boundary not less than the duration. Durations longer than the largest boundary record the
+     * largest boundary.
+     */
+    RoundUp,
+}
+
 /** Represents the final outcome status of a wide event. */
 sealed class FlowStatus {
     /** The operation completed successfully */
@@ -205,7 +247,9 @@ sealed class CleanupPolicy {
     abstract val flowStatus: FlowStatus
 
     /**
-     * Apply cleanup on the next (main) process start for any still-open flow.
+     * Apply cleanup on the next start of the process that began the flow: the main process cleans up on startup, a secondary
+     * process on its first wide-event operation. Ownership never moves to another process, so a flow that must outlive the
+     * process that started it should use [OnTimeout] instead.
      *
      * If [ignoreIfIntervalTimeoutPresent] is true and the flow has a pending interval timeout,
      * this policy is skipped so the interval timeout can handle cleanup.

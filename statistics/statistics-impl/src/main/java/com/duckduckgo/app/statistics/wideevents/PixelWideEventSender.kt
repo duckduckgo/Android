@@ -27,8 +27,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
@@ -64,10 +64,15 @@ class PixelWideEventSender @Inject constructor(
             }
 
         val encodedParameters =
-            event.metadata
-                .filterValues { it != null }
-                .mapValues { it.value!! }
-                .mapKeys { PARAM_METADATA_PREFIX + it.key }
+            buildMap {
+                event.metadata.forEach { (key, value) ->
+                    if (value != null) put(PARAM_METADATA_PREFIX + key, value)
+                }
+                event.path?.let { path ->
+                    put(PARAM_PATH_STEPS, path.steps.joinToString(","))
+                    put(PARAM_PATH_LAST_STEP, path.lastStep)
+                }
+            }
 
         val basePixelName = PIXEL_NAME_PREFIX + event.name
         val countPixelName = basePixelName + COUNT_PIXEL_SUFFIX
@@ -137,6 +142,8 @@ class PixelWideEventSender @Inject constructor(
 
         const val PARAM_METADATA_PREFIX = "feature.data.ext."
         const val PARAM_METADATA_STEP_PREFIX = PARAM_METADATA_PREFIX + "step."
+        const val PARAM_PATH_STEPS = PARAM_METADATA_PREFIX + "steps"
+        const val PARAM_PATH_LAST_STEP = PARAM_METADATA_PREFIX + "last_step"
     }
 }
 
@@ -148,7 +155,7 @@ private fun WideEventRepository.WideEventStatus.toParamValue(): String =
         UNKNOWN -> "UNKNOWN"
     }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WideEventPixelParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParamRemovalPlugin.PixelParameter>>> =
         listOf(PIXEL_NAME_PREFIX to PixelParamRemovalPlugin.PixelParameter.Companion.removeAll())

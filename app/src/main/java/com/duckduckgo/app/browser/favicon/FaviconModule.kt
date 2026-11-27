@@ -25,17 +25,17 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.SavedSitesRepository
 import com.duckduckgo.savedsites.store.SavedSitesEntitiesDao
 import com.duckduckgo.sync.api.favicons.FaviconsFetchingStore
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class FaviconModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun faviconManager(
         faviconPersister: FaviconPersister,
         bookmarksDao: SavedSitesEntitiesDao,
@@ -61,7 +61,7 @@ class FaviconModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun faviconDownloader(
         context: Context,
         dispatcherProvider: DispatcherProvider,

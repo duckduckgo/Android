@@ -18,12 +18,12 @@ package com.duckduckgo.app.di
 
 import com.duckduckgo.app.job.ConfigurationDownloader
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import io.reactivex.Completable
 
-@Module
+@BindingContainer
 @ContributesTo(
     scope = AppScope::class,
     replaces = [AppConfigurationDownloaderModule::class],

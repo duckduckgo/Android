@@ -17,14 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Hopp over sponset innhold</string>
+    <string name="segment_skip_mode_always_ask">Bli spurt om du vil hoppe over</string>
+    <string name="segment_skip_mode_always_skip">Alltid</string>
+    <string name="segment_skip_mode_off">Aldri</string>
     <string name="ad_blocking_settings_title">Annonseblokkering på YouTube</string>
     <string name="ad_blocking_settings_toggle_title">Blokker annonser på YouTube</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokkerer videoannonser på YouTube, slik at du kan se videoer uten avbrudd. \n\nNår dette er aktivert, registrerer DuckDuckGo anonymt forstyrrelser i annonseblokkering eller feil i YouTube, for å forbedre opplevelsen for alle. DuckDuckGo ser aldri hvilke videoer du ser på, eller noen personlig identifiserbar informasjon. <annotation type="learn_more_link">Finn ut mer</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blokkerer videoannonser på YouTube, slik at du kan se videoer uten avbrudd. <annotation type="learn_more_link">Finn ut mer</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Åpner videoer i en distraksjonsfri kinomodus som hindrer at det du ser på påvirker YouTube-feeden din.</string>
+    <string name="ad_blocking_settings_duck_player_link">Ser du etter Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Annonseblokkering</string>
-    <string name="ad_blocking_settings_header_description">Blokkerer invaderende sporere før de blir lastet inn, og dette eliminerer også annonser som er basert på sporing.</string>
     <string name="contingencyMessageTitle">Annonseblokkering på YouTube er ikke tilgjengelig</string>
     <string name="contingencyMessageContent">Annonseblokkering har blitt påvirket av nylige endringer på YouTube. Vi jobber med å løse disse problemene og takker for tålmodigheten.</string>
     <string name="contingencyMessagePrimaryButton">Den er grei</string>

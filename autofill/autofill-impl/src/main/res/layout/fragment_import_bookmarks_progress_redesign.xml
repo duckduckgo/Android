@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/daxColorSurfaceTertiary"
+    android:clickable="true"
+    android:focusable="true">
+
+    <Space
+        android:id="@+id/importingTopSpace"
+        android:layout_width="0dp"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/importingScrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@id/importingBottomContainer"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/importingTopSpace">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/keyline_5"
+            android:paddingTop="@dimen/keyline_3"
+            android:paddingBottom="@dimen/keyline_5">
+
+            <FrameLayout
+                android:layout_width="112dp"
+                android:layout_height="112dp">
+
+                <ProgressBar
+                    android:id="@+id/importingProgress"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    android:indeterminateDrawable="@drawable/bookmark_import_progress_bar_redesign"
+                    android:indeterminateDuration="800" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/importingIcon"
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:layout_gravity="center"
+                    android:importantForAccessibility="no"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/bookmarks_import_96" />
+
+            </FrameLayout>
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/importingTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:breakStrategy="balanced"
+                android:gravity="center_horizontal"
+                android:text="@string/importBookmarksProgressTitle"
+                app:typography="h1" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/importingSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/keyline_4"
+                android:breakStrategy="balanced"
+                android:gravity="center_horizontal"
+                android:text="@string/importBookmarksRedesignImportingSubtitle"
+                app:textType="secondary"
+                app:typography="body1" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <LinearLayout
+        android:id="@+id/importingBottomContainer"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/keyline_5"
+        android:paddingTop="@dimen/keyline_4"
+        android:paddingBottom="@dimen/keyline_5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importingFirstInfoRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/autofill_bookmark_import_info_listitem_background"
+            app:leadingIcon="@drawable/info_solid_24"
+            app:primaryText="@string/importBookmarksRedesignImportingFirstInfoRow" />
+
+        <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+            android:id="@+id/importingSecondInfoRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:background="@drawable/autofill_bookmark_import_info_listitem_background"
+            app:leadingIcon="@drawable/info_solid_24"
+            app:primaryText="@string/importBookmarksRedesignImportingSecondInfoRow" />
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+            android:id="@+id/importingCancelButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_5"
+            android:text="@string/cancel"
+            app:daxButtonSize="large" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

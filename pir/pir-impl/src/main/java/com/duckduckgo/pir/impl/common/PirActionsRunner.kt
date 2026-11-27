@@ -72,9 +72,9 @@ import com.duckduckgo.pir.impl.scripts.models.PirError.UnableToLoadBrokerUrl
 import com.duckduckgo.pir.impl.scripts.models.PirError.Unknown
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData
 import com.duckduckgo.pir.impl.scripts.models.PirSuccessResponse
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.NonCancellable
@@ -120,6 +120,7 @@ interface PirActionsRunner {
 class RealPirActionsRunner @AssistedInject constructor(
     private val dispatcherProvider: DispatcherProvider,
     private val pirDetachedWebViewProvider: PirDetachedWebViewProvider,
+    private val brokerUserAgentResolver: PirBrokerUserAgentResolver,
     private val brokerActionProcessor: BrokerActionProcessor,
     private val nativeBrokerActionHandler: NativeBrokerActionHandler,
     private val emailDataResolver: EmailDataResolver,
@@ -162,6 +163,7 @@ class RealPirActionsRunner @AssistedInject constructor(
     ): Result<Unit> {
         val token = WebViewToken()
         activeWebViewToken.set(token)
+        val userAgent = brokerUserAgentResolver.resolve(brokerStep.broker)
 
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Creating detached WebView" }
@@ -169,6 +171,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 pirDetachedWebViewProvider.createInstance(
                     context,
                     pirScriptToLoad,
+                    userAgent,
                     onPageLoaded = {
                         onLoadingComplete(token, it)
                     },
@@ -194,6 +197,7 @@ class RealPirActionsRunner @AssistedInject constructor(
     ): Result<Unit> {
         val token = WebViewToken()
         activeWebViewToken.set(token)
+        val userAgent = brokerUserAgentResolver.resolve(brokerStep.broker)
 
         withContext(dispatcherProvider.main()) {
             logcat { "PIR-RUNNER (${this@RealPirActionsRunner}): ${Thread.currentThread().name} Adopting caller-owned WebView" }
@@ -201,6 +205,7 @@ class RealPirActionsRunner @AssistedInject constructor(
                 pirDetachedWebViewProvider.setupWebView(
                     webView,
                     pirScriptToLoad,
+                    userAgent,
                     onPageLoaded = {
                         onLoadingComplete(token, it)
                     },

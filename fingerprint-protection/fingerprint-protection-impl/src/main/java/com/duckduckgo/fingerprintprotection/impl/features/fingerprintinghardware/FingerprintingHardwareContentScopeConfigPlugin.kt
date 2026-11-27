@@ -20,10 +20,10 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionFeatureName
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintinghardware.FingerprintingHardwareRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FingerprintingHardwareContentScopeConfigPlugin @Inject constructor(
     private val fingerprintingHardwareRepository: FingerprintingHardwareRepository,
 ) : ContentScopeConfigPlugin {

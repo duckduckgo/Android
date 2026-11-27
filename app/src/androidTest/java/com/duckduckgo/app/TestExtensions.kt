@@ -24,6 +24,6 @@ fun getApp(): DuckDuckGoApplication {
     return InstrumentationRegistry.getInstrumentation().targetContext.applicationContext as DuckDuckGoApplication
 }
 
-fun getDaggerComponent(): AppComponent {
-    return getApp().daggerAppComponent as AppComponent
+fun getAppComponent(): AppComponent {
+    return getApp().appComponent as AppComponent
 }

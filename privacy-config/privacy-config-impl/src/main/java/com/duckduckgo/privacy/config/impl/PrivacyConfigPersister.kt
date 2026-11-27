@@ -34,11 +34,11 @@ import com.duckduckgo.privacy.config.store.PrivacyConfigRepository
 import com.duckduckgo.privacy.config.store.PrivacyFeatureTogglesRepository
 import com.duckduckgo.privacy.config.store.UnprotectedTemporaryEntity
 import com.duckduckgo.privacy.config.store.features.unprotectedtemporary.UnprotectedTemporaryRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import java.time.LocalDateTime
@@ -56,7 +56,7 @@ interface PrivacyConfigPersister {
 private const val PRIVACY_SIGNATURE_KEY = "plugin_signature"
 
 @WorkerThread
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPrivacyConfigPersister @Inject constructor(
     private val privacyFeaturePluginPoint: PluginPoint<PrivacyFeaturePlugin>,
@@ -67,6 +67,7 @@ class RealPrivacyConfigPersister @Inject constructor(
     private val database: PrivacyConfigDatabase,
     @ConfigPersisterPreferences private val persisterPreferences: SharedPreferences,
     private val privacyConfigCallbackPlugin: PluginPoint<PrivacyConfigCallbackPlugin>,
+    private val versionCheckOverride: PrivacyConfigVersionCheckOverride,
 ) : PrivacyConfigPersister {
 
     override suspend fun persistPrivacyConfig(
@@ -79,7 +80,8 @@ class RealPrivacyConfigPersister @Inject constructor(
         val currentPluginHashCode = privacyFeaturePluginPoint.signature()
         val previousPluginHashCode = persisterPreferences.getSignature()
 
-        val shouldPersist = newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
+        val shouldPersist = versionCheckOverride.skipVersionCheck() ||
+            newVersion > previousVersion || (newVersion == previousVersion && currentPluginHashCode != previousPluginHashCode)
 
         logcat(VERBOSE) {
             """
@@ -157,7 +159,7 @@ fun PluginPoint<PrivacyFeaturePlugin>.signature(): Int {
 private annotation class PluginVariantManager
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object VariantManagerPluginModule {
     @Provides
     @PluginVariantManager

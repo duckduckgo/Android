@@ -21,12 +21,12 @@ import com.duckduckgo.android_crashkit.Crashpad
 import com.duckduckgo.app.anr.internal.R
 import com.duckduckgo.app.anr.internal.feature.CrashAnrDevCapabilityPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class NativeCrashDumpPlugin @Inject constructor(
     private val context: Context,
 ) : CrashAnrDevCapabilityPlugin {
@@ -37,8 +37,8 @@ class NativeCrashDumpPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class NativeCrashTriggerPlugin @Inject constructor(
     private val context: Context,
 ) : CrashAnrDevCapabilityPlugin {
@@ -49,8 +49,8 @@ class NativeCrashTriggerPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class NativeCrashUploadPlugin @Inject constructor(
     private val context: Context,
 ) : CrashAnrDevCapabilityPlugin {

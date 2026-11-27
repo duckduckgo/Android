@@ -23,9 +23,10 @@ import com.duckduckgo.appbuildconfig.api.BuildFlavor.FDROID
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -41,9 +42,9 @@ interface MaliciousSiteProtectionRCFeature {
     fun isCachingEnabled(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, MaliciousSiteProtectionRCFeature::class)
-@ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<MaliciousSiteProtectionRCFeature>())
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
 class RealMaliciousSiteProtectionRCFeature @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val maliciousSiteProtectionFeature: MaliciousSiteProtectionFeature,

@@ -23,7 +23,8 @@ import android.provider.OpenableColumns
 import android.util.Base64
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
@@ -39,19 +40,13 @@ class RealFileAttachmentProcessor @Inject constructor(
 
     override suspend fun processFile(context: Context, uri: Uri): FileAttachment? = withContext(dispatcherProvider.io()) {
         runCatching {
-            val (fileName, reportedSize) = resolveFileInfo(context, uri) ?: return@withContext null
+            val fileName = resolveFileName(context, uri) ?: return@withContext null
             val mimeType = context.contentResolver.getType(uri) ?: "application/octet-stream"
 
-            // readBytes() + encodeToString each hold the full payload in memory simultaneously (~1.33× file size peak).
-            // At the 5 MB per-file limit this is ~6.7 MB per file; no streaming Base64 path exists on Android.
             val bytes = context.contentResolver.openInputStream(uri)?.use { it.readBytes() } ?: return@withContext null
             val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
 
-            // Some providers omit the SIZE column or return NULL; fall back to the actual byte count so that
-            // size-limit checks always see a non-zero value for non-empty files.
-            val sizeBytes = reportedSize ?: bytes.size.toLong()
-
-            val pageCount = if (mimeType == "application/pdf") {
+            val pageCount = if (mimeType == PDF_MIME_TYPE) {
                 runCatching {
                     context.contentResolver.openFileDescriptor(uri, "r")?.use { pfd ->
                         PdfRenderer(pfd).use { it.pageCount }
@@ -66,21 +61,18 @@ class RealFileAttachmentProcessor @Inject constructor(
                 uri = uri,
                 fileName = fileName,
                 mimeType = mimeType,
-                sizeBytes = sizeBytes,
+                sizeBytes = bytes.size.toLong(),
                 base64Data = base64,
                 pageCount = pageCount,
             )
         }.getOrNull()
     }
 
-    private fun resolveFileInfo(context: Context, uri: Uri): Pair<String, Long?>? {
+    private fun resolveFileName(context: Context, uri: Uri): String? {
         return context.contentResolver.query(uri, null, null, null, null)?.use { cursor ->
             if (!cursor.moveToFirst()) return@use null
             val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
-            val name = if (nameIndex >= 0) cursor.getString(nameIndex) else uri.lastPathSegment ?: "file"
-            val size = if (sizeIndex >= 0 && !cursor.isNull(sizeIndex)) cursor.getLong(sizeIndex) else null
-            name to size
+            if (nameIndex >= 0) cursor.getString(nameIndex) else uri.lastPathSegment ?: "file"
         }
     }
 }

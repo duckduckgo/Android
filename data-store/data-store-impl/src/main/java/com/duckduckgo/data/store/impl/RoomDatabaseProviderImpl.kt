@@ -23,14 +23,13 @@ import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RoomDatabaseProviderImpl @Inject constructor(
     private val context: Context,
@@ -97,8 +96,8 @@ class RoomDatabaseProviderImpl @Inject constructor(
         // Wrap in lazy-initialising proxies so the feature-flag read (SharedPreferences) inside
         // RealDatabaseExecutorProvider's constructor is deferred until the first actual DB query,
         // which Room runs on a background thread — not at DI construction time on the main thread.
-        setQueryExecutor(LazyExecutor { lazyDatabaseExecutorProvider.get().createQueryExecutor(executor) })
-        setTransactionExecutor(LazyExecutor { lazyDatabaseExecutorProvider.get().createTransactionExecutor(executor) })
+        setQueryExecutor(LazyExecutor { lazyDatabaseExecutorProvider.value.createQueryExecutor(executor) })
+        setTransactionExecutor(LazyExecutor { lazyDatabaseExecutorProvider.value.createTransactionExecutor(executor) })
     }
 }
 

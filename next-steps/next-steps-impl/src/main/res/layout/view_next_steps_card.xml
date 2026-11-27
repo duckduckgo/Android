@@ -26,25 +26,27 @@
         android:padding="@dimen/keyline_4">
 
         <ImageView
-            android:id="@+id/sectionIcon"
-            android:layout_width="@dimen/nextStepsSectionIconSize"
-            android:layout_height="@dimen/nextStepsSectionIconSize"
+            android:id="@+id/itemImage"
+            android:layout_width="@dimen/nextStepsItemImageSize"
+            android:layout_height="@dimen/nextStepsItemImageSize"
             android:importantForAccessibility="no"
-            android:src="@drawable/arrow_circle_right_16"
-            app:layout_constraintBottom_toBottomOf="@id/sectionTitle"
+            app:layout_constraintBottom_toBottomOf="@id/itemDescription"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/sectionTitle"
-            app:tint="?attr/daxColorPrimaryIcon" />
+            app:layout_constraintTop_toTopOf="@id/sectionTitle" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/sectionTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_1"
+            android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginEnd="@dimen/keyline_2"
+            android:gravity="center_vertical"
+            android:minHeight="@dimen/nextStepsCloseButtonSize"
             app:layout_constraintEnd_toStartOf="@id/closeButton"
-            app:layout_constraintStart_toEndOf="@id/sectionIcon"
+            app:layout_constraintStart_toEndOf="@id/itemImage"
             app:layout_constraintTop_toTopOf="parent"
+            app:layout_goneMarginStart="0dp"
+            app:textType="secondary"
             app:typography="h4"
             tools:text="Next Steps" />
 
@@ -56,27 +58,18 @@
             android:contentDescription="@string/closeButtonContentDescription"
             android:padding="@dimen/keyline_1"
             android:src="@drawable/ic_close_16"
-            app:layout_constraintBottom_toBottomOf="@id/sectionTitle"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/sectionTitle" />
-
-        <ImageView
-            android:id="@+id/itemImage"
-            android:layout_width="@dimen/nextStepsItemImageSize"
-            android:layout_height="@dimen/nextStepsItemImageSize"
-            android:layout_marginTop="@dimen/keyline_3"
-            android:importantForAccessibility="no"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sectionTitle" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/itemTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/keyline_3"
+            android:layout_marginTop="@dimen/nextStepsSectionTitleSpacing"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/itemImage"
-            app:layout_constraintTop_toTopOf="@id/itemImage"
+            app:layout_constraintTop_toBottomOf="@id/sectionTitle"
             app:layout_goneMarginStart="0dp"
             app:typography="h3"
             tools:text="Browse privately by default" />
@@ -85,12 +78,10 @@
             android:id="@+id/itemDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_3"
             android:layout_marginTop="@dimen/keyline_0"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/itemImage"
+            app:layout_constraintEnd_toEndOf="@id/itemTitle"
+            app:layout_constraintStart_toStartOf="@id/itemTitle"
             app:layout_constraintTop_toBottomOf="@id/itemTitle"
-            app:layout_goneMarginStart="0dp"
             app:textType="secondary"
             app:typography="body2"
             tools:text="Search privately every time with DuckDuckGo as your default browser" />
@@ -106,7 +97,7 @@
             android:id="@+id/primaryAction"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginTop="@dimen/nextStepsPrimaryActionSpacing"
             app:daxButtonSize="small"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

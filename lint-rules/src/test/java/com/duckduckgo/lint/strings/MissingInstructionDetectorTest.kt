@@ -308,4 +308,63 @@ class MissingInstructionDetectorTest {
             .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
             .run().expect(expected)
     }
+
+    @Test
+    fun whenStringHasPlaceholderInsideNestedMarkupAndInstructionThenSuccess() {
+        TestLintTask.lint().files(
+            xml(
+                "res/values/strings.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <resources>
+                    <string name="url" instruction="test">Go to <b><annotation type="url">%1${'$'}s</annotation></b></string>
+                </resources>
+                """
+            ).indented())
+            .skipTestModes(TestMode.CDATA)
+            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .run().expectClean()
+    }
+
+    @Test
+    fun whenStringHasPlaceholderInsideNestedMarkupAndNoInstructionThenFailWithError() {
+        val expected =
+            """
+            res/values/strings.xml:3: Error: Missing instruction attribute or attribute empty [MissingInstruction]
+                <string name="url">Go to <b><annotation type="url">%1＄s</annotation></b></string>
+                                                                   ~~~~~
+            1 errors, 0 warnings
+            """
+
+        TestLintTask.lint().files(
+            xml(
+                "res/values/strings.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <resources>
+                    <string name="url">Go to <b><annotation type="url">%1${'$'}s</annotation></b></string>
+                </resources>
+                """
+            ).indented())
+            .skipTestModes(TestMode.CDATA)
+            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .run().expect(expected)
+    }
+
+    @Test
+    fun whenStringHasPlaceholderInsideNestedMarkupAndIsNotTranslatableThenSuccess() {
+        TestLintTask.lint().files(
+            xml(
+                "res/values/strings.xml",
+                """
+                <?xml version="1.0" encoding="utf-8"?>
+                <resources>
+                    <string name="url" translatable="false">Go to <b><annotation type="url">%1${'$'}s</annotation></b></string>
+                </resources>
+                """
+            ).indented())
+            .skipTestModes(TestMode.CDATA)
+            .issues(MissingInstructionDetector.MISSING_INSTRUCTION)
+            .run().expectClean()
+    }
 }

@@ -16,14 +16,10 @@
 
 package com.duckduckgo.adblocking.impl
 
-import android.annotation.SuppressLint
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.adblocking.api.AdBlockingAnimation
 import com.duckduckgo.adblocking.impl.domain.AdBlockingStatusChecker
-import com.duckduckgo.adblocking.impl.remoteconfig.AdBlockingExtensionFeature
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
-import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -35,7 +31,6 @@ import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 
-@SuppressLint("DenyListedApi") // setRawStoredState
 @RunWith(AndroidJUnit4::class)
 class RealAdBlockingOmnibarAnimationTest {
 
@@ -43,33 +38,18 @@ class RealAdBlockingOmnibarAnimationTest {
     val coroutineRule = CoroutineTestRule()
 
     private val statusChecker: AdBlockingStatusChecker = mock()
-    private val feature = FakeFeatureToggleFactory.create(AdBlockingExtensionFeature::class.java)
 
     private lateinit var testee: RealAdBlockingOmnibarAnimation
 
     @Before
     fun setup() {
         whenever(statusChecker.canInject()).thenReturn(true)
-        feature.showAdBlockingOmnibarAnimation().setRawStoredState(Toggle.State(enable = true))
-        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(enable = true))
-        testee = RealAdBlockingOmnibarAnimation(statusChecker, RealAdBlockingExtensionDomainMatcher(), feature)
+        testee = RealAdBlockingOmnibarAnimation(statusChecker, RealAdBlockingExtensionDomainMatcher())
     }
 
     @Test
     fun whenPageLoadedOnWatchVideoThenShow() = runTest {
         assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Show)
-    }
-
-    @Test
-    fun whenShowAdBlockingOmnibarAnimationDisabledThenSkip() = runTest {
-        feature.showAdBlockingOmnibarAnimation().setRawStoredState(Toggle.State(enable = false))
-        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
-    }
-
-    @Test
-    fun whenAdBlockingUXImprovementsDisabledThenSkip() = runTest {
-        feature.adBlockingUXImprovements().setRawStoredState(Toggle.State(enable = false))
-        assertTrue(testee.getAnimation("https://www.youtube.com/watch?v=abc123", pageChanged = true) is AdBlockingAnimation.Skip)
     }
 
     @Test

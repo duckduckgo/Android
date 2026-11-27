@@ -21,8 +21,8 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.features.apimanipulation.store.ApiManipulationStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -49,7 +49,7 @@ interface ApiManipulationRepository {
     fun getJsonData(): String
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealApiManipulationRepository @Inject constructor(
     private val apiManipulationStore: ApiManipulationStore,

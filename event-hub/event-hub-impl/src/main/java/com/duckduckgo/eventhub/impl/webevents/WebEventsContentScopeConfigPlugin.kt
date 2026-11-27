@@ -18,10 +18,10 @@ package com.duckduckgo.eventhub.impl.webevents
 
 import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WebEventsContentScopeConfigPlugin @Inject constructor(
     private val webEventsDataStore: WebEventsDataStore,
 ) : ContentScopeConfigPlugin {

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.app.browser.mediaplayback
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesRemoteFeature(

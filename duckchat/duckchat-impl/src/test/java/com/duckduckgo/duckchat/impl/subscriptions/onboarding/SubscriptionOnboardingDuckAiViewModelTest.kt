@@ -18,8 +18,9 @@ package com.duckduckgo.duckchat.impl.subscriptions.onboarding
 
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
-import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint.SUBSCRIPTION_ONBOARDING
+import com.duckduckgo.duckchat.impl.DuckChatInternal
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelProvider
@@ -27,6 +28,8 @@ import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.UserTier
 import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiStepPlugin.Companion.DUCK_AI_STEP_ID
 import com.duckduckgo.duckchat.impl.subscriptiononboarding.SubscriptionOnboardingDuckAiViewModel
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingController
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.COMPLETED
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepOutcome.SKIPPED
@@ -39,6 +42,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -49,7 +53,8 @@ class SubscriptionOnboardingDuckAiViewModelTest {
     val coroutineRule = CoroutineTestRule()
 
     private val controller: SubscriptionOnboardingController = mock()
-    private val duckChat: DuckChat = mock()
+    private val duckChat: DuckChatInternal = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val modelManager: DuckAiModelManager = mock()
 
     @Test
@@ -180,7 +185,6 @@ class SubscriptionOnboardingDuckAiViewModelTest {
 
         verify(modelManager).selectModel(plus)
         verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), any())
-        // Duck.ai only opens once the host runs the hand-off, after the completion summary has been shown.
         verifyNoInteractions(duckChat)
     }
 
@@ -195,7 +199,23 @@ class SubscriptionOnboardingDuckAiViewModelTest {
         verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), handoff.capture())
         handoff.firstValue.invoke()
 
-        verify(duckChat).openDuckChat(SUBSCRIPTION_ONBOARDING)
+        verify(duckChat).openDuckChat(SUBSCRIPTION_ONBOARDING, overrideModelId = null)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndStartClickedThenHandoffStartsTheChatOnThePickWithoutChangingTheGlobalSelection() = runTest {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        val plus = model(id = "plus1", name = "GPT-5.4", tiers = listOf("plus"))
+        val testee = createViewModel(models = listOf(plus))
+
+        testee.onStartClicked()
+
+        val handoff = argumentCaptor<() -> Unit>()
+        verify(controller).onStepFinished(eq(DUCK_AI_STEP_ID), eq(COMPLETED), handoff.capture())
+        handoff.firstValue.invoke()
+
+        verify(duckChat).openDuckChat(SUBSCRIPTION_ONBOARDING, overrideModelId = "plus1")
+        verify(modelManager, never()).selectModel(any())
     }
 
     private fun createViewModel(
@@ -208,6 +228,7 @@ class SubscriptionOnboardingDuckAiViewModelTest {
             duckChat,
             modelManager,
             coroutineRule.testDispatcherProvider,
+            duckChatFeature,
         )
     }
 

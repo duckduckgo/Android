@@ -26,4 +26,4 @@ Coordination for app-originated prompts. The module hosts two layers:
 - **Completion tracking**: tracks when evaluators complete, regardless of whether a modal was shown
 
 ## Usage
-Implement the `ModalEvaluator` interface in your class and contribute it via `@ContributesMultibinding`:
+Implement the `ModalEvaluator` interface in your class and contribute it via `@ContributesIntoSet`:

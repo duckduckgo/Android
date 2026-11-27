@@ -17,12 +17,12 @@
 package com.duckduckgo.promptscoordinator.impl.exposure
 
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
 /** Whether a prompt was shown in the current session. In memory by design: a session cannot outlive the process. */
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class PromptExposureSession @Inject constructor() {
 
     private val promptShownThisSession = AtomicBoolean(false)

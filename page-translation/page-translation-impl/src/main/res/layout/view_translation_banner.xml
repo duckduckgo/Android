@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <LinearLayout
+        android:id="@+id/translationBannerCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/keyline_4"
+        android:layout_marginVertical="@dimen/keyline_2"
+        android:background="@drawable/bg_translation_banner"
+        android:elevation="@dimen/keyline_1"
+        android:focusable="true"
+        android:gravity="center_vertical"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingStart="@dimen/keyline_3"
+        android:paddingTop="@dimen/keyline_2"
+        android:paddingEnd="@dimen/keyline_2"
+        android:paddingBottom="@dimen/keyline_2">
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:importantForAccessibility="no"
+            android:src="@drawable/ic_translate_feature_96" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/keyline_2"
+            android:layout_weight="1"
+            android:importantForAccessibility="no"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pageTranslationPromptTitle"
+                app:typography="h4" />
+
+            <com.duckduckgo.common.ui.view.text.DaxTextView
+                android:id="@+id/translationBannerLanguages"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:textType="secondary"
+                app:typography="caption" />
+        </LinearLayout>
+
+        <com.duckduckgo.common.ui.view.button.DaxButtonPrimary
+            android:id="@+id/translationBannerButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/pageTranslationPromptTranslateButton"
+            app:daxButtonSize="small" />
+    </LinearLayout>
+</merge>

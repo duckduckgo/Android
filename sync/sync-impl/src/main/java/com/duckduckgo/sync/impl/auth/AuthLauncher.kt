@@ -26,7 +26,8 @@ import androidx.fragment.app.FragmentActivity
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.auth.AuthLauncher.AuthResult
-import com.squareup.anvil.annotations.ContributesBinding
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -55,7 +56,7 @@ interface AuthLauncher {
     sealed class AuthResult {
         data object Success : AuthResult()
         data object UserCancelled : AuthResult()
-        data class Error(val reason: String) : AuthResult()
+        data class Error(val failureReason: FailureReason, val reason: String) : AuthResult()
     }
 }
 
@@ -101,7 +102,7 @@ class RealAuthLauncher @Inject constructor(
             if (errorCode == BiometricPrompt.ERROR_USER_CANCELED) {
                 onResult(AuthResult.UserCancelled)
             } else {
-                onResult(AuthResult.Error(String.format("(%d) %s", errorCode, errString)))
+                onResult(AuthResult.Error(FailureReason.fromBiometricErrorCode(errorCode), String.format("(%d) %s", errorCode, errString)))
             }
         }
 

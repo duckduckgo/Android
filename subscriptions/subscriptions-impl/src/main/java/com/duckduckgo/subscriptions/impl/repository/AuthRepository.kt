@@ -36,13 +36,13 @@ import com.duckduckgo.subscriptions.impl.serp_promo.SerpPromo
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.store.SubscriptionsEncryptedDataStore
 import com.duckduckgo.subscriptions.impl.toStatus
-import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.Moshi.Builder
 import com.squareup.moshi.Types
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import java.time.Instant
@@ -75,20 +75,39 @@ interface AuthRepository {
     suspend fun removeLocalPurchasedAt()
     suspend fun setPendingPlans(pendingPlans: List<PendingPlan>)
     suspend fun getPendingPlans(): List<PendingPlan>
+    suspend fun saveTokensV2(
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+        entitlements: List<Entitlement>,
+        account: Account,
+        deleteBackupRefreshToken: Boolean = false,
+    ): Boolean
+    suspend fun clearTokens()
+    suspend fun isTokenStoreAvailable(): Boolean
+    suspend fun hasRefreshTokenEntry(): Boolean
+    suspend fun getBackupRefreshToken(): BackupRefreshToken?
+    suspend fun saveBackupRefreshToken(backup: BackupRefreshToken): Boolean
+    suspend fun deleteBackupRefreshToken()
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object AuthRepositoryModule {
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
+    fun provideSubscriptionsDataStore(sharedPreferencesProvider: SharedPreferencesProvider): SubscriptionsDataStore {
+        return SubscriptionsEncryptedDataStore(sharedPreferencesProvider)
+    }
+
+    @Provides
+    @SingleIn(AppScope::class)
     fun provideAuthRepository(
+        subscriptionsDataStore: SubscriptionsDataStore,
         dispatcherProvider: DispatcherProvider,
-        sharedPreferencesProvider: SharedPreferencesProvider,
         serpPromo: SerpPromo,
-        subscriptionsFeature: dagger.Lazy<SubscriptionsFeature>,
+        subscriptionsFeature: Lazy<SubscriptionsFeature>,
     ): AuthRepository {
-        return RealAuthRepository(SubscriptionsEncryptedDataStore(sharedPreferencesProvider), dispatcherProvider, serpPromo, subscriptionsFeature)
+        return RealAuthRepository(subscriptionsDataStore, dispatcherProvider, serpPromo, subscriptionsFeature)
     }
 }
 
@@ -96,7 +115,7 @@ internal class RealAuthRepository constructor(
     private val subscriptionsDataStore: SubscriptionsDataStore,
     private val dispatcherProvider: DispatcherProvider,
     private val serpPromo: SerpPromo,
-    private val subscriptionsFeature: dagger.Lazy<SubscriptionsFeature>,
+    private val subscriptionsFeature: Lazy<SubscriptionsFeature>,
 ) : AuthRepository {
 
     private val moshi = Builder().build()
@@ -203,6 +222,7 @@ internal class RealAuthRepository constructor(
             expiresOrRenewsAt = subscription?.expiresOrRenewsAt
             status = subscription?.status?.statusName
             platform = subscription?.platform
+            planCountry = subscription?.planCountry
             freeTrialActive = subscription?.activeOffers?.contains(ActiveOfferType.TRIAL) ?: false
             pendingPlans = subscription?.pendingPlans?.let { plans ->
                 if (plans.isEmpty()) {
@@ -256,6 +276,7 @@ internal class RealAuthRepository constructor(
             platform = platform,
             activeOffers = activeOffers,
             pendingPlans = pendingPlans,
+            planCountry = subscriptionsDataStore.planCountry,
         )
     }
 
@@ -292,7 +313,7 @@ internal class RealAuthRepository constructor(
     }
 
     override suspend fun getFeatures(basePlanId: String): Set<String> = withContext(dispatcherProvider.io()) {
-        if (subscriptionsFeature.get().tierMessagingEnabled().isEnabled()) {
+        if (subscriptionsFeature.value.tierMessagingEnabled().isEnabled()) {
             // When flag is ON, try v2 first
             val v2Features = getFeaturesV2(basePlanId)
             if (v2Features.isNotEmpty()) {
@@ -379,7 +400,73 @@ internal class RealAuthRepository constructor(
             }.getOrDefault(emptyList())
         } ?: emptyList()
     }
+
+    override suspend fun saveTokensV2(
+        accessToken: AccessToken,
+        refreshToken: RefreshToken,
+        entitlements: List<Entitlement>,
+        account: Account,
+        deleteBackupRefreshToken: Boolean,
+    ): Boolean = withContext(dispatcherProvider.io()) {
+        val saved = subscriptionsDataStore.saveTokensV2(
+            accessToken = accessToken.jwt,
+            accessTokenExpiresAt = accessToken.expiresAt,
+            refreshToken = refreshToken.jwt,
+            refreshTokenExpiresAt = refreshToken.expiresAt,
+            entitlements = moshi.listToJson(entitlements),
+            email = account.email,
+            externalId = account.externalId,
+            clearBackupRefreshToken = deleteBackupRefreshToken,
+        )
+        if (saved) updateSerpPromoCookie()
+        saved
+    }
+
+    override suspend fun clearTokens() = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.clearTokens()
+        updateSerpPromoCookie()
+    }
+
+    override suspend fun isTokenStoreAvailable(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.isAvailable()
+    }
+
+    override suspend fun hasRefreshTokenEntry(): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.hasRefreshTokenV2Entry()
+    }
+
+    override suspend fun getBackupRefreshToken(): BackupRefreshToken? = withContext(dispatcherProvider.io()) {
+        val jwt = subscriptionsDataStore.backupRefreshToken
+        val expiresAt = subscriptionsDataStore.backupRefreshTokenExpiresAt
+        val accountExternalId = subscriptionsDataStore.backupRefreshTokenExternalId
+        val issuedAt = subscriptionsDataStore.backupRefreshTokenIssuedAt
+        if (jwt == null || expiresAt == null || accountExternalId == null || issuedAt == null) {
+            null
+        } else {
+            BackupRefreshToken(
+                jwt = jwt,
+                expiresAt = expiresAt,
+                accountExternalId = accountExternalId,
+                issuedAt = issuedAt,
+            )
+        }
+    }
+
+    override suspend fun saveBackupRefreshToken(backup: BackupRefreshToken): Boolean = withContext(dispatcherProvider.io()) {
+        subscriptionsDataStore.saveBackupRefreshToken(
+            refreshToken = backup.jwt,
+            expiresAt = backup.expiresAt,
+            externalId = backup.accountExternalId,
+            issuedAt = backup.issuedAt,
+        )
+    }
+
+    override suspend fun deleteBackupRefreshToken() {
+        withContext(dispatcherProvider.io()) { subscriptionsDataStore.clearBackupRefreshToken() }
+    }
 }
+
+class TokenStoreException(message: String, cause: Throwable? = null) : RuntimeException(message, cause)
 
 data class AccessToken(
     val jwt: String,
@@ -389,6 +476,13 @@ data class AccessToken(
 data class RefreshToken(
     val jwt: String,
     val expiresAt: Instant,
+)
+
+data class BackupRefreshToken(
+    val jwt: String,
+    val expiresAt: Instant,
+    val accountExternalId: String,
+    val issuedAt: Instant,
 )
 
 data class Account(
@@ -413,6 +507,7 @@ data class Subscription(
     val platform: String,
     val activeOffers: List<ActiveOfferType>,
     val pendingPlans: List<PendingPlan> = emptyList(),
+    val planCountry: String? = null,
 ) {
     fun isActive(): Boolean = status.isActive()
 

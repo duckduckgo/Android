@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl.di
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.DeletableDataManager
 

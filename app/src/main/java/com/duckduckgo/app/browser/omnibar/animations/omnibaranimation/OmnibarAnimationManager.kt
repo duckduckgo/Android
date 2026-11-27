@@ -22,9 +22,10 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
@@ -37,9 +38,9 @@ interface OmnibarAnimationManager {
     fun getTension(): Float
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, OmnibarAnimationManager::class)
-@ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<OmnibarAnimationManager>())
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
 class RealOmnibarAnimationManager @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,

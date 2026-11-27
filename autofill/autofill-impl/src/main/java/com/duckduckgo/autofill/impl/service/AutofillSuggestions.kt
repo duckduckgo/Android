@@ -23,8 +23,8 @@ import com.duckduckgo.autofill.impl.service.mapper.AppCredentialProvider
 import com.duckduckgo.autofill.impl.ui.credential.selecting.AutofillSelectCredentialsGrouper
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
@@ -35,7 +35,7 @@ interface AutofillSuggestions {
     suspend fun getAppSuggestions(packageId: String): List<LoginCredentials>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AutofillServiceSuggestions @Inject constructor(
     private val autofillStore: AutofillStore,

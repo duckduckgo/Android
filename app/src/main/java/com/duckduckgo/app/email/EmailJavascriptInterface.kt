@@ -19,6 +19,7 @@ package com.duckduckgo.app.email
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
+import com.duckduckgo.app.browser.navigation.safeCopyBackForwardList
 import com.duckduckgo.autofill.api.Autofill
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.email.EmailManager
@@ -33,6 +34,7 @@ class EmailJavascriptInterface(
     private val dispatcherProvider: DispatcherProvider,
     private val autofillFeature: AutofillFeature,
     private val autofill: Autofill,
+    private val originCheckFeature: EmailBridgeOriginCheckFeature,
     private val showNativeTooltip: () -> Unit,
 ) {
 
@@ -43,9 +45,16 @@ class EmailJavascriptInterface(
     }
 
     private fun isUrlFromDuckDuckGoEmail(): Boolean {
-        val url = getUrl()
-        return (url != null && urlDetector.isDuckDuckGoEmailUrl(url))
+        if (!originCheckFeature.self().isEnabled()) return isDuckDuckGoEmailUrl(getUrl())
+        // webView.url can already be a pending navigation's destination while the previous document is still running and
+        // calling this interface; the committed back/forward entry names that document until the navigation commits.
+        val (url, committedUrl) = runBlocking(dispatcherProvider.main()) {
+            webView.url to webView.safeCopyBackForwardList()?.currentItem?.url
+        }
+        return isDuckDuckGoEmailUrl(url) && isDuckDuckGoEmailUrl(committedUrl)
     }
+
+    private fun isDuckDuckGoEmailUrl(url: String?): Boolean = url != null && urlDetector.isDuckDuckGoEmailUrl(url)
 
     private fun isAutofillEnabled() = autofillFeature.self().isEnabled()
 

@@ -27,8 +27,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.applyBottomSystemBarInsetPadding
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType
 import com.duckduckgo.common.ui.view.text.DaxTextView.TextType.Secondary
@@ -36,6 +36,7 @@ import com.duckduckgo.common.ui.view.text.DaxTextView.Typography
 import com.duckduckgo.common.ui.view.text.DaxTextView.Typography.Body1
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.safeGetApplicationIcon
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.networkprotection.impl.autoexclude.VpnAutoExcludePromptFragment.Companion.Source.UNKNOWN
@@ -47,7 +48,6 @@ import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

@@ -19,16 +19,17 @@ package com.duckduckgo.sync.impl.auth
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DeviceAuthenticationGracePeriodLifecycleObserver @Inject constructor(
     private val gracePeriod: DeviceAuthorizationGracePeriod,
 ) : MainProcessLifecycleObserver {

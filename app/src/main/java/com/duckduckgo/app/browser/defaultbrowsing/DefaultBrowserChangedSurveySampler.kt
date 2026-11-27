@@ -18,8 +18,8 @@ package com.duckduckgo.app.browser.defaultbrowsing
 
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
@@ -35,7 +35,7 @@ interface DefaultBrowserChangedSurveySampler {
     suspend fun isInSample(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDefaultBrowserChangedSurveySampler @Inject constructor(
     defaultBrowserChangedSurveyFeature: DefaultBrowserChangedSurveyFeature,

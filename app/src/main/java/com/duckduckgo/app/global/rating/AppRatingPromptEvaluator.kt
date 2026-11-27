@@ -20,8 +20,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -37,11 +38,11 @@ import javax.inject.Inject
  * on another screen, where the dialog is silently dropped after the coordinator has already recorded
  * the modal as shown.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ModalEvaluator::class,
+    binding = binding<ModalEvaluator>(),
 )
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class AppRatingPromptEvaluator @Inject constructor(
     private val promptTypeDecider: PromptTypeDecider,
     private val appEnjoymentPromptEmitter: AppEnjoymentPromptEmitter,

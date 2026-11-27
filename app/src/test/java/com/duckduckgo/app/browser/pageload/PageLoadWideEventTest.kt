@@ -68,7 +68,7 @@ class PageLoadWideEventTest {
         // Mock all WideEventClient methods to return successful Results
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
-        whenever(wideEventClient.intervalStart(any(), any(), any(), any())).thenReturn(Result.success(Unit))
+        whenever(wideEventClient.intervalStart(any(), any(), any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
         whenever(wideEventClient.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
 
@@ -77,7 +77,7 @@ class PageLoadWideEventTest {
             webViewVersionProvider = webViewVersionProvider,
             autoconsent = autoconsent,
             contentScopeOptimizations = contentScopeOptimizations,
-            androidBrowserConfigFeature = { androidBrowserConfigFeature },
+            androidBrowserConfigFeature = lazy { androidBrowserConfigFeature },
             currentTimeProvider = currentTimeProvider,
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
@@ -106,11 +106,11 @@ class PageLoadWideEventTest {
             success = true,
             metadata = emptyMap(),
         )
-        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any())
-        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any())
-        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any())
-        verify(wideEventClient, never()).intervalStart(eq(123L), eq("elapsed_time_to_content_scope_experiments_ms_bucketed"), any(), any())
-        verify(wideEventClient, never()).intervalStart(eq(123L), eq("elapsed_time_to_js_injection_complete_ms_bucketed"), any(), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any(), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any(), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any(), any())
+        verify(wideEventClient, never()).intervalStart(eq(123L), eq("elapsed_time_to_content_scope_experiments_ms_bucketed"), any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(eq(123L), eq("elapsed_time_to_js_injection_complete_ms_bucketed"), any(), any(), any())
     }
 
     @Test
@@ -533,7 +533,7 @@ class PageLoadWideEventTest {
 
         // Should not crash and should not call flowStep
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
-        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any(), any())
     }
 
     @Test
@@ -576,9 +576,9 @@ class PageLoadWideEventTest {
         )
 
         // Verify all intervals were managed
-        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any())
-        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any())
-        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any())
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_finish_ms_bucketed"), eq(null), any(), any())
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_visible_ms_bucketed"), eq(null), any(), any())
+        verify(wideEventClient).intervalStart(eq(500L), eq("elapsed_time_to_escaped_fixed_progress_ms_bucketed"), eq(null), any(), any())
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_visible_ms_bucketed")
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_escaped_fixed_progress_ms_bucketed")
         verify(wideEventClient).intervalEnd(500L, "elapsed_time_to_finish_ms_bucketed")

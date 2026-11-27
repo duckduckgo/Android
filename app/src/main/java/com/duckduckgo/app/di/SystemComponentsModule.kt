@@ -34,38 +34,38 @@ import com.duckduckgo.app.systemsearch.InstalledDeviceAppLookup
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SystemComponentsModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun packageManager(context: Context): PackageManager = context.packageManager
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun locationManager(context: Context): LocationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun connectivityManager(context: Context): ConnectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun deviceAppsListProvider(packageManager: PackageManager, dispatcherProvider: DispatcherProvider): DeviceAppListProvider =
         InstalledDeviceAppListProvider(packageManager, dispatcherProvider)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun deviceAppLookup(deviceAppListProvider: DeviceAppListProvider, dispatcherProvider: DispatcherProvider): DeviceAppLookup =
         InstalledDeviceAppLookup(deviceAppListProvider, dispatcherProvider)
 
@@ -93,7 +93,7 @@ object SystemComponentsModule {
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 abstract class SystemComponentsModuleBindings {
     @Binds

@@ -23,20 +23,21 @@ import com.duckduckgo.app.trackerdetection.db.TdsEntityDao
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
 import com.duckduckgo.app.trackerdetection.db.TdsTrackerDao
 import com.duckduckgo.app.trackerdetection.db.TrackerDetectionDatabase
+import com.duckduckgo.app.trackerdetection.db.WebTrackersBlockedDao
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object TrackerDetectionDatabaseModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideTrackerDetectionDatabase(databaseProvider: DatabaseProvider): TrackerDetectionDatabase {
         return databaseProvider.buildRoomDatabase(
             TrackerDetectionDatabase::class.java,
@@ -65,4 +66,7 @@ object TrackerDetectionDatabaseModule {
 
     @Provides
     fun provideTdsMetadataDao(database: TrackerDetectionDatabase): TdsMetadataDao = database.tdsMetadataDao()
+
+    @Provides
+    fun provideWebTrackersBlockedDao(database: TrackerDetectionDatabase): WebTrackersBlockedDao = database.webTrackersBlockedDao()
 }

@@ -26,14 +26,15 @@ import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.engine.*
 import com.duckduckgo.sync.api.engine.SyncableType.CREDENTIALS
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
 import javax.inject.*
 
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableDataProvider::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableDataProvider>())
 class CredentialsSyncDataProvider @Inject constructor(
     private val credentialsSyncStore: CredentialsSyncStore,
     private val credentialsSync: CredentialsSync,

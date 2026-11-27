@@ -26,12 +26,12 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.verifiedinstallation.IsVerifiedPlayStoreInstall
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import io.reactivex.Completable
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class CrashOfflinePixelSender @Inject constructor(
     private val uncaughtExceptionDao: UncaughtExceptionDao,
     private val pixelSender: PixelSender,

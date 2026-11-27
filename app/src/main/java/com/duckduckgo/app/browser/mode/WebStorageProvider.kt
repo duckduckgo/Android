@@ -25,10 +25,10 @@ import com.duckduckgo.browsermode.api.BrowserModeDataProvider
 import com.duckduckgo.browsermode.api.FireModeAvailability
 import com.duckduckgo.browsermode.api.profileName
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Binds
-import dagger.Module
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.Binds
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -37,7 +37,7 @@ import javax.inject.Inject
  * Falls back to the default shared [WebStorage] when MultiProfile is unsupported.
  */
 @SuppressLint("RequiresFeature")
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class WebStorageProvider @Inject constructor(
     private val fireModeAvailability: FireModeAvailability,
 ) : BrowserModeDataProvider<WebStorage> {
@@ -50,7 +50,7 @@ class WebStorageProvider @Inject constructor(
 }
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 abstract class WebStorageProviderModule {
     @Binds
     abstract fun bindWebStorageProvider(impl: WebStorageProvider): BrowserModeDataProvider<WebStorage>

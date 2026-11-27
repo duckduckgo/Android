@@ -22,7 +22,7 @@ package com.duckduckgo.privacy.config.api
  * Usage:
  *
  * ```kotlin
- * @ContributesMultibinding(AppScope::class)
+ * @ContributesIntoSet(AppScope::class)
  * class MuFeaturePlugin @Inject constructor(...) : PrivacyFeaturePlugin {
  *
  * }

@@ -21,8 +21,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.messaging.sync.isSyncable
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject
@@ -59,7 +59,7 @@ interface DuckChatSyncRepository {
     suspend fun clearPendingChatUpdates()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckChatSyncRepository @Inject constructor(
     private val duckChatSyncMetadataStore: DuckChatSyncMetadataStore,

@@ -22,7 +22,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.savedsites.api.views.FavoritesGridConfig
 import com.duckduckgo.savedsites.api.views.SavedSitesViewsProvider
 import com.duckduckgo.savedsites.impl.newtab.FavouritesNewTabSectionView
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(scope = AppScope::class)

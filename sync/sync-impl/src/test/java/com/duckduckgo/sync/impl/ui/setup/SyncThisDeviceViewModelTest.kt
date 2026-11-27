@@ -23,10 +23,14 @@ import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Event
+import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.FailureReason
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.AbortSyncing
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.FinishSyncing
 import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel.Command.ShowAuthError
@@ -40,6 +44,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -84,7 +89,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             assertIs<FinishSyncing>(awaitItem())
 
             cancel()
@@ -98,7 +103,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             assertEquals(connectedDevice, (awaitItem() as FinishSyncing).device)
 
             cancel()
@@ -112,7 +117,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncAccountRepository, never()).createAccount()
@@ -130,11 +135,11 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             assertIs<FinishSyncing>(awaitItem())
 
             verify(syncAccountRepository).createAccount()
-            verify(syncPixels).fireSignupDirectPixel(source = null)
+            verify(syncPixels).fireSignupDirectPixel(launchSource = "other")
 
             cancel()
         }
@@ -148,10 +153,10 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = "foo")
+            testee.syncThisDevice(launchSource = "promotion_bookmarks")
             skipItems(1)
 
-            verify(syncPixels).fireSignupDirectPixel(source = "foo")
+            verify(syncPixels).fireSignupDirectPixel(launchSource = "promotion_bookmarks")
 
             cancel()
         }
@@ -165,7 +170,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreated()
@@ -181,7 +186,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncSetupWideEvent).onSyncEnabled()
@@ -198,7 +203,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreationFailed()
@@ -215,7 +220,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             assertIs<ShowError>(awaitItem())
 
             verify(syncPixels, never()).fireSignupDirectPixel(anyOrNull())
@@ -232,7 +237,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             assertIs<ShowError>(awaitItem())
 
             cancel()
@@ -247,7 +252,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncSetupWideEvent).onAccountCreationFailed()
@@ -293,6 +298,107 @@ class SyncThisDeviceViewModelTest {
     }
 
     @Test
+    fun `when the user closes the screen then the unified event is cancelled as user closed`() = runTest {
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onCloseClicked()
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onCancelled(SetupCancellationReason.USER_CLOSED)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user dismisses the error then the unified event is not cancelled`() = runTest {
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.onErrorDismissed()
+            skipItems(1)
+
+            verify(syncSetupWideEvent, never()).onCancelled(any())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the view model is created then the choice screen step is recorded`() = runTest {
+        createTestee()
+
+        verify(syncSetupWideEvent).onStep(SetupStep.CHOICE_SCREEN)
+    }
+
+    @Test
+    fun `when syncing this device then the preparing sync step is recorded`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onStep(SetupStep.PREPARING_SYNC)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the user dismisses verification while syncing this device then the preparing sync step is not recorded`() = runTest {
+        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            expectNoEvents()
+
+            verify(syncSetupWideEvent, never()).onStep(SetupStep.PREPARING_SYNC)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when account creation fails then the unified event fails with account creation failed`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(false)
+        whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(1, ""))
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when the connected device cannot be retrieved then the unified event fails with account creation failed`() = runTest {
+        whenever(syncAccountRepository.isSignedIn()).thenReturn(true)
+        whenever(syncAccountRepository.getThisConnectedDevice()).thenReturn(null)
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            skipItems(1)
+
+            verify(syncSetupWideEvent).onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
+
+            cancel()
+        }
+    }
+
+    @Test
     fun `when the view model is created then the another device prompt shown pixel is fired`() = runTest {
         createTestee()
 
@@ -313,7 +419,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncPixels).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
@@ -343,7 +449,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             assertEquals(1, deviceAuthenticator.requests.size)
@@ -359,7 +465,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee(isAuthRequired = false)
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             assertIs<FinishSyncing>(awaitItem())
 
             assertTrue(deviceAuthenticator.requests.isEmpty())
@@ -375,7 +481,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             expectNoEvents()
 
             verify(syncSetupWideEvent, never()).onSyncEnabled()
@@ -392,7 +498,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             expectNoEvents()
 
             verify(syncSetupWideEvent, never()).onSyncEnabled()
@@ -411,7 +517,7 @@ class SyncThisDeviceViewModelTest {
         testee.viewState.test {
             assertFalse(awaitItem().isSyncing)
 
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             expectNoEvents()
 
             cancel()
@@ -427,7 +533,7 @@ class SyncThisDeviceViewModelTest {
         testee.viewState.test {
             assertFalse(awaitItem().isSyncing)
 
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             expectNoEvents()
 
             cancel()
@@ -440,8 +546,8 @@ class SyncThisDeviceViewModelTest {
 
         val testee = createTestee()
 
-        testee.syncThisDevice(launchSource = null)
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = "other")
+        testee.syncThisDevice(launchSource = "other")
 
         assertEquals(1, deviceAuthenticator.requests.size)
         verify(syncPixels).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
@@ -453,20 +559,54 @@ class SyncThisDeviceViewModelTest {
 
         val testee = createTestee()
 
-        testee.syncThisDevice(launchSource = null)
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = "other")
+        testee.syncThisDevice(launchSource = "other")
 
         assertEquals(2, deviceAuthenticator.requests.size)
     }
 
     @Test
-    fun `when authentication fails while syncing this device then an auth error is shown`() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+    fun `when syncing this device is in progress then choosing to sync with another device is ignored`() = runTest {
+        deviceAuthenticator.suspendResponse()
 
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
+            testee.onSyncWithAnotherDeviceClicked()
+            expectNoEvents()
+
+            assertEquals(1, deviceAuthenticator.requests.size)
+            verify(syncPixels, never()).fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when syncing this device was cancelled then choosing to sync with another device starts that flow`() = runTest {
+        deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
+            deviceAuthenticator.response = Response.Allowed.UserAuthenticated
+            testee.onSyncWithAnotherDeviceClicked()
+            assertIs<SyncWithAnotherDevice>(awaitItem())
+
+            cancel()
+        }
+    }
+
+    @Test
+    fun `when authentication fails while syncing this device then an auth error is shown`() = runTest {
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
+
+        val testee = createTestee()
+
+        testee.commands.test {
+            testee.syncThisDevice(launchSource = "other")
             assertIs<ShowAuthError>(awaitItem())
 
             verify(syncAccountRepository, never()).createAccount()
@@ -519,7 +659,7 @@ class SyncThisDeviceViewModelTest {
 
     @Test
     fun `when authentication fails while choosing to sync with another device then an auth error is shown`() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         val testee = createTestee()
 
@@ -539,7 +679,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncSetupWideEvent).onUserAuthSuccess()
@@ -556,7 +696,7 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncSetupWideEvent).onUserAuthSuccess()
@@ -570,23 +710,21 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = "other")
 
-        verify(syncSetupWideEvent, never()).onUserAuthCancelled()
         verify(syncSetupWideEvent, never()).onUserAuthSuccess()
     }
 
     @Test
     fun `when authentication fails then no auth outcome event is tracked`() = runTest {
-        deviceAuthenticator.response = Response.Failed("reason")
+        deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         val testee = createTestee()
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
-            verify(syncSetupWideEvent, never()).onUserAuthCancelled()
             verify(syncSetupWideEvent, never()).onUserAuthSuccess()
 
             cancel()
@@ -599,7 +737,7 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = "other")
 
         verify(syncSetupWideEvent).onDeviceAuthNotEnrolled()
     }
@@ -610,9 +748,7 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
-
-        verify(syncSetupWideEvent, never()).onEnrollDeviceAuthDialogShown()
+        testee.syncThisDevice(launchSource = "other")
     }
 
     @Test
@@ -621,10 +757,9 @@ class SyncThisDeviceViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.EnrollmentClosed
 
         val testee = createTestee()
-        testee.syncThisDevice(launchSource = null)
+        testee.syncThisDevice(launchSource = "other")
 
         verify(syncSetupWideEvent, never()).onUserAuthSuccess()
-        verify(syncSetupWideEvent, never()).onUserAuthCancelled()
     }
 
     @Test
@@ -648,11 +783,10 @@ class SyncThisDeviceViewModelTest {
         val testee = createTestee(isAuthRequired = false)
 
         testee.commands.test {
-            testee.syncThisDevice(launchSource = null)
+            testee.syncThisDevice(launchSource = "other")
             skipItems(1)
 
             verify(syncSetupWideEvent, never()).onUserAuthSuccess()
-            verify(syncSetupWideEvent, never()).onUserAuthCancelled()
 
             cancel()
         }

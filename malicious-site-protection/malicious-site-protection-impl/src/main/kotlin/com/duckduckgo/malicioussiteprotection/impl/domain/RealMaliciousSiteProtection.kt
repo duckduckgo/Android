@@ -37,8 +37,9 @@ import com.duckduckgo.malicioussiteprotection.impl.data.MaliciousSiteRepository
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Result
 import com.duckduckgo.malicioussiteprotection.impl.remoteconfig.MaliciousSiteProtectionRCRepository
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority
@@ -56,9 +57,9 @@ interface InternalMaliciousSiteProtection : MaliciousSiteProtection {
     suspend fun loadHashPrefixes(vararg feeds: Feed): kotlin.Result<Unit>
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, InternalMaliciousSiteProtection::class)
-@ContributesBinding(AppScope::class, MaliciousSiteProtection::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<InternalMaliciousSiteProtection>())
+@ContributesBinding(AppScope::class, binding = binding<MaliciousSiteProtection>())
 class RealMaliciousSiteProtection @Inject constructor(
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

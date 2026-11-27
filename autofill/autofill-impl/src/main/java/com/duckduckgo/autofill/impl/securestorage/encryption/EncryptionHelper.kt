@@ -26,7 +26,7 @@ import com.duckduckgo.autofill.impl.securestorage.encryption.EncryptionHelper.En
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.sanitizeStackTrace
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.adblocking.impl.duckplayer
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -64,4 +64,11 @@ interface DuckPlayerFeature {
      */
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun addCustomEmbedReferer(): Toggle
+
+    /**
+     * @return `true` when the remote config has the "standaloneSettings" feature flag enabled
+     * If the remote feature is not present defaults to `false`
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun standaloneSettings(): Toggle
 }

@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -53,7 +53,7 @@ enum class AccountInfoKeyUnavailableReason {
     RATE_LIMITED,
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAccountInfoPrivateKeyProvider @Inject constructor(
     private val syncStore: SyncStore,

@@ -18,7 +18,6 @@ import com.duckduckgo.malicioussiteprotection.impl.data.network.RevisionResponse
 import com.duckduckgo.malicioussiteprotection.impl.models.Filter
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSet
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
-import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult.Ignored
@@ -94,7 +93,7 @@ class RealMaliciousSiteRepositoryTest {
         repository.loadHashPrefixes(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService).getPhishingHashPrefixes(latestRevision.first().revision)
-        verify(maliciousSiteDao).updateHashPrefixes(any<PhishingHashPrefixesWithRevision>())
+        verify(maliciousSiteDao).updateHashPrefixes(org.mockito.kotlin.eq(PHISHING), any())
     }
 
     @Test
@@ -108,7 +107,7 @@ class RealMaliciousSiteRepositoryTest {
         repository.loadHashPrefixes(*enumValues<Feed>())
 
         verify(maliciousSiteDatasetService, never()).getPhishingHashPrefixes(any())
-        verify(maliciousSiteDao, never()).updateHashPrefixes(any())
+        verify(maliciousSiteDao, never()).updateHashPrefixes(any(), any())
     }
 
     @Test

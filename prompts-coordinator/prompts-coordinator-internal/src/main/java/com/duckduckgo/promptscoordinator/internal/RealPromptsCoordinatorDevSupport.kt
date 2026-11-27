@@ -19,7 +19,7 @@ package com.duckduckgo.promptscoordinator.internal
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.impl.RealPromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

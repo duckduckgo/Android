@@ -21,12 +21,11 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import org.iq80.leveldb.DB
@@ -66,7 +65,7 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
             logcat { "WebLocalStorageManager: Allowed domains: $domains" }
             logcat { "WebLocalStorageManager: Matching regex: $matchingRegex" }
 
-            val db = databaseProvider.get()
+            val db = databaseProvider.value
             db.iterator().use { iterator ->
                 iterator.seekToFirst()
 
@@ -105,12 +104,12 @@ class DuckDuckGoWebLocalStorageManager @Inject constructor(
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class WebLocalStorageManagerModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideWebLocalStorageManagerDB(context: Context): DB {
         val options = Options().apply { createIfMissing(false) }
         return factory.open(

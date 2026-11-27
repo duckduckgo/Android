@@ -22,10 +22,11 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.Toast
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingConfigDownloader
@@ -33,8 +34,7 @@ import com.duckduckgo.remote.messaging.internal.feature.RMF_PROD_CONFIG_URL
 import com.duckduckgo.remote.messaging.internal.feature.RmfSettingPlugin
 import com.duckduckgo.remote.messaging.internal.feature.resolveRmfConfigUrl
 import com.duckduckgo.remotemessaging.internal.databinding.ViewRmfConfigSourceBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -157,7 +157,7 @@ class RmfConfigSourceSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class RmfConfigSourceViewPlugin @Inject constructor() : RmfSettingPlugin {
     override fun getView(context: Context): View {
         return RmfConfigSourceSettingView(context)

@@ -27,8 +27,9 @@ import com.duckduckgo.app.statistics.store.StatisticsDataStore
 import com.duckduckgo.browser.api.install.AppInstall
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart.LAZY
 import kotlinx.coroutines.Deferred
@@ -44,9 +45,9 @@ import javax.inject.Inject
  * Report: Bucketed value, how many days user searched last 7d. Not sent if count is 0.
  * Specs: https://app.asana.com/1/137249556945/project/1206716555947156/task/1211301604929609?focus=true
  */
-@ContributesMultibinding(AppScope::class, AtbLifecyclePlugin::class)
-@ContributesMultibinding(AppScope::class, AttributedMetric::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<AtbLifecyclePlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<AttributedMetric>())
+@SingleIn(AppScope::class)
 class SearchDaysAttributedMetric @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,

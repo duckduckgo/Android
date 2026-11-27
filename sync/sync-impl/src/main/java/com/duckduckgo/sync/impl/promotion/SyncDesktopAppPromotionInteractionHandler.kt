@@ -23,12 +23,15 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters.GET_OTHER_DEVICES_SCREEN_LAUNCH_SOURCE
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_ACTIVATING
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARKS
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG
+import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_PASSWORDS
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_DISABLED
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_SYNC_ENABLED
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import javax.inject.Inject
 
 class SyncDesktopAppPromotionInteractionHandler @Inject constructor(
@@ -62,7 +65,7 @@ class SyncDesktopAppPromotionInteractionHandler @Inject constructor(
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object SyncDesktopAppPromotionInteractionHandlerModule {
 
@@ -80,4 +83,19 @@ object SyncDesktopAppPromotionInteractionHandlerModule {
     @IntoSet
     fun provideEnabledHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
         SyncDesktopAppPromotionInteractionHandler(SOURCE_SYNC_ENABLED, pixel)
+
+    @Provides
+    @IntoSet
+    fun providePromotionBookmarksHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
+        SyncDesktopAppPromotionInteractionHandler(SOURCE_PROMOTION_BOOKMARKS, pixel)
+
+    @Provides
+    @IntoSet
+    fun providePromotionPasswordsHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
+        SyncDesktopAppPromotionInteractionHandler(SOURCE_PROMOTION_PASSWORDS, pixel)
+
+    @Provides
+    @IntoSet
+    fun providePromotionBookmarkAddedDialogHandler(pixel: Pixel): DesktopAppPromotionInteractionHandler =
+        SyncDesktopAppPromotionInteractionHandler(SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG, pixel)
 }

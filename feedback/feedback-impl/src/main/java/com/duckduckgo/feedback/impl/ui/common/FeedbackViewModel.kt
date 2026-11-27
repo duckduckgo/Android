@@ -17,9 +17,9 @@
 package com.duckduckgo.feedback.impl.ui.common
 
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.SingleLiveEvent
 import com.duckduckgo.common.utils.playstore.PlayStoreUtils

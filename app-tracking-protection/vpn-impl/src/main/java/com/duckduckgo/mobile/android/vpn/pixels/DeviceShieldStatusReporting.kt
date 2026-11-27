@@ -19,22 +19,22 @@ package com.duckduckgo.mobile.android.vpn.pixels
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import androidx.work.*
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.dao.VpnServiceStateStatsDao
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.IntoSet
+import dev.zacsweers.metro.Provides
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DeviceShieldStatusReportingModule {
     @Provides

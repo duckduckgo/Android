@@ -16,59 +16,50 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':next-steps-api')
-    implementation project(':anvil-annotations')
-    implementation project(':di')
+    implementation project(':app-build-config-api')
+    implementation project(':browser-api')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
     implementation project(':data-store-api')
-    implementation project(':app-build-config-api')
-    implementation project(':feature-toggles-api')
-    implementation project(':remote-messaging-api')
     implementation project(':design-system')
-
-    // Dagger
-    compileOnly "org.glassfish:javax.annotation:10.0-b28"
-    implementation Google.dagger
-
-    implementation KotlinX.coroutines.core
-
-    implementation AndroidX.core.ktx
+    implementation project(':di')
+    implementation project(':feature-toggles-api')
+    implementation project(':navigation-api')
+    implementation project(':next-steps-api')
+    implementation project(':remote-messaging-api')
+    implementation project(':statistics-api')
+    implementation "com.github.bumptech.glide:glide:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.activity
     implementation AndroidX.appCompat
-    implementation Google.android.material
     implementation AndroidX.constraintLayout
+    implementation AndroidX.core.ktx
     implementation AndroidX.lifecycle.runtime.ktx
     implementation AndroidX.lifecycle.viewModelKtx
-    implementation "com.github.bumptech.glide:glide:_"
+    implementation Google.android.material
+    implementation KotlinX.coroutines.core
 
-    // Testing dependencies
     testImplementation project(path: ':common-test')
-    testImplementation project(path: ':feature-toggles-test')
     testImplementation project(path: ':data-store-test')
-    testImplementation Testing.junit4
+    testImplementation project(path: ':feature-toggles-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation (KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }
 
 android {
     namespace "com.duckduckgo.nextsteps.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
 }

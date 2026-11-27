@@ -46,7 +46,9 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction
 import com.duckduckgo.pir.impl.scripts.models.PirScriptRequestData.UserProfile
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -170,6 +172,7 @@ class ExecuteBrokerStepEventHandlerTest {
         verify(mockPirRunStateHandler).handleState(capturedPixel.capture())
         assertEquals(testBroker, capturedPixel.firstValue.broker)
         assertEquals(testCurrentTimeInMillis, capturedPixel.firstValue.eventTimeInMillis)
+        assertFalse(capturedPixel.firstValue.isFreeScan)
 
         // Verify state updates
         assertEquals(0, result.nextState.currentActionIndex)
@@ -193,6 +196,7 @@ class ExecuteBrokerStepEventHandlerTest {
                 actions = listOf(testAction),
                 scanType = "initial",
             ),
+            isFreeScan = true,
         )
         val state = State(
             runType = RunType.SCHEDULED,
@@ -211,6 +215,7 @@ class ExecuteBrokerStepEventHandlerTest {
         verify(mockPirRunStateHandler).handleState(capturedPixel.capture())
         assertEquals(testBroker, capturedPixel.firstValue.broker)
         assertEquals(testCurrentTimeInMillis, capturedPixel.firstValue.eventTimeInMillis)
+        assertTrue(capturedPixel.firstValue.isFreeScan)
     }
 
     @Test

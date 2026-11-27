@@ -18,7 +18,7 @@ package com.duckduckgo.promptscoordinator.api
 
 /**
  * Interface for modal evaluators that can be coordinated by the ModalEvaluatorCoordinator.
- * Each evaluator should implement this interface and contribute itself via @ContributesMultibinding.
+ * Each evaluator should implement this interface and contribute itself via @ContributesIntoSet.
  */
 interface ModalEvaluator {
     /**

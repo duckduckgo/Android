@@ -18,12 +18,12 @@ package com.duckduckgo.app.dev.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.db.DevSettingsDataStore
 import com.duckduckgo.app.dev.settings.db.UAOverride
 import com.duckduckgo.app.survey.api.SurveyEndpointDataStore
 import com.duckduckgo.app.trackerdetection.api.TrackerDataDownloader
 import com.duckduckgo.app.trackerdetection.db.TdsMetadataDao
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.traces.api.StartupTraces
@@ -64,6 +64,7 @@ class DevSettingsViewModel @Inject constructor(
         data object CustomTabs : Command()
         data object Notifications : Command()
         data object Tabs : Command()
+        data object NewTabTransitions : Command()
         data class Toast(val message: String) : Command()
     }
 
@@ -160,5 +161,9 @@ class DevSettingsViewModel @Inject constructor(
 
     fun tabsClicked() {
         viewModelScope.launch { command.send(Command.Tabs) }
+    }
+
+    fun newTabTransitionsClicked() {
+        viewModelScope.launch { command.send(Command.NewTabTransitions) }
     }
 }

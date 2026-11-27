@@ -31,13 +31,13 @@ import com.duckduckgo.app.survey.ui.SurveyActivity
 import com.duckduckgo.app.survey.ui.SurveyActivity.Companion.SurveySource
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DefaultBrowserChangedSurveyNotification @Inject constructor(
     private val context: Context,
     private val notificationDao: NotificationDao,
@@ -73,7 +73,7 @@ class DefaultBrowserChangedSurveyNotificationSpec(context: Context) : Notificati
     override val color: Int = com.duckduckgo.mobile.android.R.color.ic_launcher_red_background
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DefaultBrowserChangedSurveyNotificationPlugin @Inject constructor(
     private val context: Context,
     private val schedulableNotification: DefaultBrowserChangedSurveyNotification,

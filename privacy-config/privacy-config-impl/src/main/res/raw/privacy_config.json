@@ -31,17 +31,7 @@
                 }
             },
             "state": "enabled",
-            "features": {
-                "enabledByDefault": {
-                    "state": "enabled"
-                },
-                "adBlockingUXImprovements": {
-                    "state": "enabled"
-                },
-                "showAdBlockingOmnibarAnimation": {
-                    "state": "enabled"
-                }
-            }
+            "features": {}
         },
         "ampLinks": {
             "exceptions": [
@@ -1180,11 +1170,11 @@
                     "cohorts": [
                         {
                             "name": "control",
-                            "weight": 1
+                            "weight": 0
                         },
                         {
                             "name": "treatment",
-                            "weight": 1
+                            "weight": 0
                         }
                     ]
                 }

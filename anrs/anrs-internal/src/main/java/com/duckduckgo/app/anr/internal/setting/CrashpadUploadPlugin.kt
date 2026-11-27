@@ -26,12 +26,12 @@ import com.duckduckgo.app.anr.internal.databinding.DialogCrashpadUploadBinding
 import com.duckduckgo.app.anr.internal.feature.CrashAnrDevCapabilityPlugin
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class CrashpadUploadPlugin @Inject constructor(
     private val uploadConfig: CrashpadUploadConfig,
 ) : CrashAnrDevCapabilityPlugin {

@@ -20,8 +20,8 @@ import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.notification.NotificationSender
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import javax.inject.Inject

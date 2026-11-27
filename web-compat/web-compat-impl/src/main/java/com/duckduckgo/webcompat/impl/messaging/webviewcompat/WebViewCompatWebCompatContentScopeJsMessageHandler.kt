@@ -21,10 +21,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.ProcessResult
 import com.duckduckgo.js.messaging.api.WebViewCompatMessageHandler
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WebViewCompatWebCompatContentScopeJsMessageHandler @Inject constructor() : WebViewCompatContentScopeJsMessageHandlersPlugin {
 
     override fun getJsMessageHandler(): WebViewCompatMessageHandler = object : WebViewCompatMessageHandler {

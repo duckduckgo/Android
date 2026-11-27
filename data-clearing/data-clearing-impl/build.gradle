@@ -16,45 +16,35 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(":data-clearing-api")
-    implementation project(':feature-toggles-api')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
-
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
+    implementation project(":data-clearing-api")
     implementation project(path: ':di')
-
-    implementation Google.dagger
-    implementation KotlinX.coroutines.core
+    implementation project(':feature-toggles-api')
     implementation "com.squareup.logcat:logcat:_"
+    implementation KotlinX.coroutines.core
 
-    testImplementation Testing.junit4
     testImplementation project(path: ':common-test')
     testImplementation(KotlinX.coroutines.test) {
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }
 
 android {
     namespace "com.duckduckgo.dataclearing.impl"
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             returnDefaultValues = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }

@@ -21,8 +21,8 @@ import android.content.Context
 import android.content.Intent
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
@@ -104,12 +104,14 @@ interface DuckChatFeatureRepository {
 
     suspend fun setLastUsedTogglePosition(position: String)
 
+    suspend fun getLastUsedTogglePosition(): String?
+
     fun observeLastUsedTogglePosition(): StateFlow<String?>
 
     suspend fun checkAndMarkFirstPromptSubmission(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckChatFeatureRepository @Inject constructor(
     private val duckChatDataStore: DuckChatDataStore,
@@ -223,6 +225,8 @@ class RealDuckChatFeatureRepository @Inject constructor(
     override suspend fun setLastUsedTogglePosition(position: String) {
         duckChatDataStore.setLastUsedTogglePosition(position)
     }
+
+    override suspend fun getLastUsedTogglePosition(): String? = duckChatDataStore.getLastUsedTogglePosition()
 
     override fun observeLastUsedTogglePosition(): StateFlow<String?> = duckChatDataStore.observeLastUsedTogglePosition()
 

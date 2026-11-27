@@ -23,10 +23,10 @@ import com.duckduckgo.browser.api.JsInjectorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
 import com.duckduckgo.feature.toggles.api.Toggle
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class EventHubJsInjectorPlugin @Inject constructor(
     private val pixelManager: EventHubPixelManager,
 ) : JsInjectorPlugin {

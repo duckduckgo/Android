@@ -18,6 +18,7 @@ package com.duckduckgo.malicioussiteprotection.impl.data
 
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.versionedset.VersionedSetDelta
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Feed.MALWARE
@@ -38,17 +39,13 @@ import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.MalwareFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.PhishingFilterSetWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.FilterSetWithRevision.ScamFilterSetWithRevision
-import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision
-import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.MalwareHashPrefixesWithRevision
-import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.PhishingHashPrefixesWithRevision
-import com.duckduckgo.malicioussiteprotection.impl.models.HashPrefixesWithRevision.ScamHashPrefixesWithRevision
 import com.duckduckgo.malicioussiteprotection.impl.models.Match
 import com.duckduckgo.malicioussiteprotection.impl.models.MatchesResult
 import com.duckduckgo.malicioussiteprotection.impl.models.Type
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.FILTER_SET
 import com.duckduckgo.malicioussiteprotection.impl.models.Type.HASH_PREFIXES
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -75,7 +72,7 @@ interface MaliciousSiteRepository {
 private const val MATCHES_ENDPOINT_TIMEOUT = 5000L
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealMaliciousSiteRepository @Inject constructor(
     private val maliciousSiteDao: MaliciousSiteDao,
     private val maliciousSiteService: MaliciousSiteService,
@@ -240,7 +237,9 @@ class RealMaliciousSiteRepository @Inject constructor(
             },
         ) {
             writeMutex.withLock {
-                maliciousSiteDao.updateHashPrefixes(it?.toHashPrefixesWithRevision(feed))
+                it?.let { response ->
+                    maliciousSiteDao.updateHashPrefixes(feed, response.toVersionedSetDelta())
+                }
             }
         }
     }
@@ -255,13 +254,7 @@ class RealMaliciousSiteRepository @Inject constructor(
         }
     }
 
-    private fun HashPrefixResponse.toHashPrefixesWithRevision(feed: Feed): HashPrefixesWithRevision {
-        return when (feed) {
-            PHISHING -> PhishingHashPrefixesWithRevision(insert, delete, revision, replace)
-            MALWARE -> MalwareHashPrefixesWithRevision(insert, delete, revision, replace)
-            SCAM -> ScamHashPrefixesWithRevision(insert, delete, revision, replace)
-        }
-    }
+    private fun HashPrefixResponse.toVersionedSetDelta() = VersionedSetDelta(insert, delete, revision, replace)
 
     private suspend fun getLocalRevisions(type: Type) = (maliciousSiteDao.getLatestRevision()?.filter { it.type == type.name } ?: listOf())
 

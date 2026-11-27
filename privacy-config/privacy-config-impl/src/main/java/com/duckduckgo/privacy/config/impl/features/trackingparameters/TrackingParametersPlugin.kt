@@ -22,12 +22,12 @@ import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
 import com.duckduckgo.privacy.config.store.*
 import com.duckduckgo.privacy.config.store.features.trackingparameters.TrackingParametersRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class TrackingParametersPlugin @Inject constructor(
     private val trackingParametersRepository: TrackingParametersRepository,
     private val privacyFeatureTogglesRepository: PrivacyFeatureTogglesRepository,

@@ -48,6 +48,7 @@ import com.duckduckgo.app.pixels.OnboardingPixelName
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.tabs.model.AggregateTabProvider
 import com.duckduckgo.brokensite.api.BrokenSitePrompt
 import com.duckduckgo.brokensite.api.RefreshPattern
@@ -56,7 +57,6 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.duckchat.api.DuckAiFeatureState
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.inputscreen.DuckAiOnboardingEndCtaVariant
 import com.duckduckgo.onboarding.api.LinearOnboardingOrchestrator
@@ -65,7 +65,8 @@ import com.duckduckgo.onboarding.api.cta.ContextualCtaSuppressorPlugin
 import com.duckduckgo.onboarding.api.forPlan
 import com.duckduckgo.subscriptions.api.SubscriptionPromoCtaShownPlugin
 import com.duckduckgo.subscriptions.api.Subscriptions
-import dagger.SingleInstanceIn
+import com.duckduckgo.sync.api.SyncAfterDeviceTransferPrompt
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -85,7 +86,7 @@ import logcat.logcat
 import javax.inject.Inject
 import kotlin.coroutines.CoroutineContext
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class CtaViewModel @Inject constructor(
     private val appInstallStore: AppInstallStore,
     private val pixel: Pixel,
@@ -110,9 +111,9 @@ class CtaViewModel @Inject constructor(
     private val deviceInfo: DeviceInfo,
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     linearOnboardingOrchestrator: LinearOnboardingOrchestrator,
-    private val duckAiFeatureState: DuckAiFeatureState,
     private val onboardingPixelSender: OnboardingPixelSender,
     private val contextualOnboardingTimeLimit: ContextualOnboardingTimeLimit,
+    private val syncAfterDeviceTransferPrompt: SyncAfterDeviceTransferPrompt,
 ) {
     @ExperimentalCoroutinesApi
     @VisibleForTesting
@@ -136,12 +137,6 @@ class CtaViewModel @Inject constructor(
             .onEach { completeStageIfDaxOnboardingCompleted() }
             .launchIn(coroutineScope)
     }
-
-    /**
-     * Whether the legacy `InputScreenActivity` is in play. When false, the native input widget is shown
-     * instead (gated in `RealDuckChat.cacheUserSettings()` by `DuckChatFeature.nativeInputField()` + user settings).
-     */
-    private fun isInputScreenEnabled(): Boolean = duckAiFeatureState.showInputScreen.value
 
     private fun contextualOnboardingPixelNames(cta: Cta): List<OnboardingPixelName> = when (cta) {
         is DaxTryASearchBubbleCta -> listOf(OnboardingPixelName.ONBOARDING_SEARCH)
@@ -233,6 +228,9 @@ class CtaViewModel @Inject constructor(
             if (cta is BrokenSitePromptDialogCta) {
                 brokenSitePrompt.ctaShown()
             }
+            if (cta is SyncAfterDeviceTransferBubbleCta) {
+                pixel.enqueueFire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_SHOWN, type = Unique())
+            }
             if (cta is DaxSubscriptionBubbleCta || cta is SubscriptionPromoModalCta) {
                 subscriptionPromoCtaShownPlugins.getPlugins().forEach { it.onSubscriptionPromoCtaShown() }
             }
@@ -256,6 +254,10 @@ class CtaViewModel @Inject constructor(
         viaSkipBtn: Boolean = false,
     ) {
         withContext(dispatchers.io()) {
+            if (cta is SyncAfterDeviceTransferBubbleCta) {
+                syncAfterDeviceTransferPrompt.dismiss()
+                return@withContext
+            }
             if (viaCloseBtn || viaSkipBtn) {
                 contextualOnboardingPixelNames(cta).forEach {
                     onboardingPixelSender.fireContextual(it, OnboardingPixelAction.Clicked(engaged = false))
@@ -286,6 +288,9 @@ class CtaViewModel @Inject constructor(
         }
         cta.okPixel?.let {
             pixel.fire(it, cta.pixelOkParameters())
+        }
+        if (cta is SyncAfterDeviceTransferBubbleCta) {
+            pixel.enqueueFire(AppPixelName.DEVICE_MIGRATION_SYNC_PROMPT_CLICKED, type = Unique())
         }
         if (cta is BrokenSitePromptDialogCta) {
             brokenSitePrompt.userAcceptedPrompt()
@@ -390,21 +395,15 @@ class CtaViewModel @Inject constructor(
         return when {
             // Duck.ai onboarding end
             canShowDuckAiEndCta() -> {
-                if (isInputScreenEnabled()) {
-                    // Legacy path: the input screen auto-launches with the end CTA. Suppress home
-                    // CTAs until that flow runs (see prepareAndMarkDuckAiEndCtaForInputScreen).
-                    null
-                } else {
-                    setInputToggleStateForDuckAiEndCta()
-                    DaxDuckAiEndBubbleCta(
-                        onboardingStore = onboardingStore,
-                        appInstallStore = appInstallStore,
-                        isLightTheme = appTheme.isLightModeEnabled(),
-                        deviceInfo = deviceInfo,
-                        isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
-                        segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
-                    )
-                }
+                setInputToggleStateForDuckAiEndCta()
+                DaxDuckAiEndBubbleCta(
+                    onboardingStore = onboardingStore,
+                    appInstallStore = appInstallStore,
+                    isLightTheme = appTheme.isLightModeEnabled(),
+                    deviceInfo = deviceInfo,
+                    isCustomAiOnboardingFlow = customAiOnboarding.isEnabled(),
+                    segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
+                )
             }
 
             // Search suggestions
@@ -449,6 +448,11 @@ class CtaViewModel @Inject constructor(
                     isFreeTrialCopy = freeTrialCopyAvailable(),
                     segmentedPath = onboardingStore.getSegmentedPathWithAiInput(),
                 )
+            }
+
+            // Last, so any onboarding dialog that is due goes first and the suggestion waits for the next new tab.
+            syncAfterDeviceTransferPrompt.shouldShow() -> {
+                SyncAfterDeviceTransferBubbleCta(onboardingStore, appInstallStore, appTheme.isLightModeEnabled(), deviceInfo)
             }
             else -> null
         }

@@ -18,7 +18,6 @@ package com.duckduckgo.app.browser.omnibar
 
 import android.annotation.SuppressLint
 import android.text.Editable
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.DrawableRes
@@ -54,7 +53,6 @@ import com.duckduckgo.common.utils.extensions.replaceTextChangedListener
 import com.duckduckgo.common.utils.text.TextChangedWatcher
 import com.google.android.material.appbar.AppBarLayout.GONE
 import com.google.android.material.appbar.AppBarLayout.VISIBLE
-import kotlinx.coroutines.flow.distinctUntilChanged
 import logcat.logcat
 
 @SuppressLint("ClickableViewAccessibility")
@@ -83,8 +81,6 @@ class Omnibar(
 
         fun onDuckChatButtonPressed(anchor: View)
 
-        fun onBackButtonPressed()
-
         fun onDuckAISidebarButtonPressed()
     }
 
@@ -104,21 +100,6 @@ class Omnibar(
     }
 
     interface TextListener {
-        fun onFocusChanged(
-            hasFocus: Boolean,
-            query: String,
-        )
-
-        fun onBackKeyPressed(): Boolean
-
-        fun onEnterPressed()
-
-        fun onTouchEvent(event: MotionEvent)
-
-        fun onOmnibarTextChanged(state: OmnibarTextState)
-
-        fun onShowSuggestions(state: OmnibarTextState)
-
         fun onTrackersCountFinished()
 
         fun onAdBlockingAnimationSuppressed()
@@ -132,10 +113,6 @@ class Omnibar(
         fun onClick(url: String)
     }
 
-    data class OmnibarTextState(
-        val text: String,
-        val hasFocus: Boolean,
-    )
     sealed class ViewMode {
         data object Error : ViewMode()
 
@@ -248,8 +225,6 @@ class Omnibar(
     val textInputRootView: View by lazy {
         omnibarView.omnibarTextInput.rootView
     }
-
-    val isInEditMode = omnibarView.isEditingFlow.distinctUntilChanged()
 
     var isScrollingEnabled: Boolean
         get() =
@@ -387,8 +362,6 @@ class Omnibar(
     fun setTextSelection(index: Int) {
         omnibarTextInput.setSelection(index)
     }
-
-    fun isEditing(): Boolean = omnibarView.isEditing
 
     fun renderBrowserViewState(viewState: BrowserViewState) {
         omnibarView.decorate(

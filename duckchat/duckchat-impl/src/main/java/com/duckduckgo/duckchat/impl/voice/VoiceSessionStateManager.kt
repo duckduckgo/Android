@@ -24,9 +24,10 @@ import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.ui.DuckChatVoiceMicrophoneService
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -57,9 +58,9 @@ interface VoiceSessionStateManager {
     fun triggerVoiceSessionEnd(tabId: String)
 }
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = VoiceSessionStateManager::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<VoiceSessionStateManager>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class RealVoiceSessionStateManager @Inject constructor(
     private val context: Context,
     private val tabRepository: AggregateTabProvider,

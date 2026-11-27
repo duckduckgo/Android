@@ -24,7 +24,7 @@ import com.duckduckgo.browser.api.WebViewVersionProvider
 import com.duckduckgo.common.utils.checkMainThread
 import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

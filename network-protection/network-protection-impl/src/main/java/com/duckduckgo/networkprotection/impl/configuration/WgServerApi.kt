@@ -24,7 +24,7 @@ import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.Mode.FailureRecovery
 import com.duckduckgo.networkprotection.impl.configuration.WgServerApi.WgServerData
 import com.duckduckgo.networkprotection.impl.settings.geoswitching.NetpEgressServersProvider
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 
@@ -36,6 +36,7 @@ interface WgServerApi {
         val address: String,
         val location: String?,
         val gateway: String,
+        val ports: List<Long> = emptyList(),
     )
 
     suspend fun registerPublicKey(
@@ -120,6 +121,7 @@ class RealWgServerApi @Inject constructor(
         address = allowedIPs.first(),
         gateway = server.internalIp,
         location = server.attributes.extractLocation(),
+        ports = server.ports.orEmpty().ifEmpty { listOf(server.port) },
     )
 
     private fun Server.extractPublicEndpoint(): String {

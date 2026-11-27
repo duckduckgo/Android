@@ -16,89 +16,82 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-	implementation project(":duckchat-api")
-    implementation project(':data-clearing-api')
-    implementation project(':settings-api')
-    implementation project(':navigation-api')
-    implementation project(':design-system')
-    implementation project(':common-utils')
-    implementation project(':browser-api')
-    implementation project(':feedback-api')
-    implementation project(':browser-mode-api')
-    implementation project(':browser-ui')
-    implementation project(':js-messaging-api')
-    implementation project(':downloads-api')
-    implementation project(':content-scope-scripts-api')
-    implementation project(':subscriptions-api')
-    implementation project(':new-tab-page-api')
-    implementation project(':onboarding-api')
-    implementation project(':voice-search-api')
-    implementation project(':browser-api')
-    implementation project(':history-api')
-    implementation project(':saved-sites-api')
-    implementation project(':remote-messaging-api')
-    implementation project(':survey-api')
-    implementation project(':attributed-metrics-api')
-    implementation project(':navigation-api')
-    implementation project(':sync-api')
-    implementation project(':data-store-api')
-    implementation project(':cookies-api')
-    implementation project(':duckchat-store')
-
-    implementation project(':app-build-config-api')
-    implementation project(path: ':anvil-annotations')
-    implementation project(path: ':di')
-    implementation project(':statistics-api')
     api AndroidX.dataStore.preferences
 
-    ksp AndroidX.room.compiler
-
-    implementation KotlinX.coroutines.android
+    implementation project(':app-build-config-api')
+    implementation project(':attributed-metrics-api')
+    implementation project(':browser-api')
+    implementation project(':browser-mode-api')
+    implementation project(':browser-ui')
+    implementation project(path: ':codegen-annotations')
+    implementation project(':common-utils')
+    implementation project(':content-scope-scripts-api')
+    implementation project(':cookies-api')
+    implementation project(':data-clearing-api')
+    implementation project(':data-store-api')
+    implementation project(':design-system')
+    implementation project(path: ':di')
+    implementation project(':downloads-api')
+    implementation project(":duckchat-api")
+    implementation project(':duckchat-store')
+    implementation project(':feedback-api')
+    implementation project(':history-api')
+    implementation project(':js-messaging-api')
+    implementation project(':navigation-api')
+    implementation project(':new-tab-page-api')
+    implementation project(':onboarding-api')
+    implementation project(':remote-messaging-api')
+    implementation project(':saved-sites-api')
+    implementation project(':settings-api')
+    implementation project(':statistics-api')
+    implementation project(':subscriptions-api')
+    implementation project(':survey-api')
+    implementation project(':sync-api')
+    implementation project(':voice-search-api')
+    implementation project(':widget-api')
+    implementation "androidx.core:core-remoteviews:_"
+    implementation "com.airbnb.android:lottie:_"
+    implementation "com.github.bumptech.glide:glide:_"
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation "com.squareup.moshi:moshi-kotlin:_"
     implementation AndroidX.core.ktx
     implementation AndroidX.fragment.ktx
-    implementation Google.android.material
-    implementation Google.dagger
-    implementation AndroidX.work.runtimeKtx
     implementation AndroidX.viewPager2
-
-    implementation "com.squareup.logcat:logcat:_"
-    implementation "com.airbnb.android:lottie:_"
-
-    implementation Square.retrofit2.retrofit
+    implementation AndroidX.work.runtimeKtx
+    implementation Google.android.material
+    implementation KotlinX.coroutines.android
     implementation Square.moshi
-    implementation "com.squareup.moshi:moshi-kotlin:_"
+    implementation Square.retrofit2.retrofit
 
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
-    testImplementation "androidx.test.ext:junit-ktx:_"
     testImplementation project(':feature-toggles-test')
+    testImplementation "androidx.test.ext:junit-ktx:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.lifecycle.runtime.testing
     testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation AndroidX.lifecycle.runtime.testing
-    testImplementation AndroidX.archCore.testing
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 android {
     namespace "com.duckduckgo.duckchat.impl"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
@@ -107,9 +100,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }
 

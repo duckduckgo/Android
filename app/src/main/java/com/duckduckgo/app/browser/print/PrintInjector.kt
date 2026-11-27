@@ -18,7 +18,7 @@ package com.duckduckgo.app.browser.print
 
 import android.webkit.WebView
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PrintInjector {

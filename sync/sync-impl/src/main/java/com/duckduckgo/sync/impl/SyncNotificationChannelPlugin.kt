@@ -21,14 +21,16 @@ import com.duckduckgo.app.notification.model.Channel
 import com.duckduckgo.app.notification.model.NotificationPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SYNC_NOTIFICATION_CHANNEL_ID
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.sync.impl.auditlog.RealNewLoginNotifier.Companion.SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SyncNotificationChannelPlugin @Inject constructor() : NotificationPlugin {
     override fun getChannels(): List<Channel> {
         return listOf(
             SyncNotificationChannelType.SYNC_STATE,
+            SyncNotificationChannelType.NEW_LOGIN,
         )
     }
 }
@@ -37,6 +39,11 @@ internal object SyncNotificationChannelType {
     val SYNC_STATE = Channel(
         SYNC_NOTIFICATION_CHANNEL_ID,
         R.string.sync_notification_channel_name,
+        NotificationManagerCompat.IMPORTANCE_HIGH,
+    )
+    val NEW_LOGIN = Channel(
+        SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID,
+        R.string.syncNewLoginNotificationChannelName,
         NotificationManagerCompat.IMPORTANCE_HIGH,
     )
 }

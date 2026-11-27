@@ -35,9 +35,10 @@ import com.duckduckgo.duckchat.impl.ui.filechooser.capture.launcher.UploadFromEx
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.permission.ExternalMediaSystemPermissionsHelper
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.postprocess.MediaCaptureDelayedDeleter
 import com.duckduckgo.duckchat.impl.ui.filechooser.capture.postprocess.MediaCaptureImageMover
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import logcat.asLog
 import logcat.logcat
 import java.io.File
@@ -165,8 +166,8 @@ class PermissionAwareExternalMediaAppLauncher @Inject constructor(
             if (interimFile == null) {
                 onResult(MediaCaptureResult.NoMediaCaptured)
             } else {
-                appCoroutineScope.launch(dispatchers.io()) {
-                    val finalImage = moveCapturedImageToFinalLocation(interimFile)
+                appCoroutineScope.launch(dispatchers.main()) {
+                    val finalImage = withContext(dispatchers.io()) { moveCapturedImageToFinalLocation(interimFile) }
                     if (finalImage == null) {
                         onResult(MediaCaptureResult.NoMediaCaptured)
                     } else {

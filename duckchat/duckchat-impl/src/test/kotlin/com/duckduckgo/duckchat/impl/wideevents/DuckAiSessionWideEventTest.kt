@@ -74,7 +74,7 @@ class DuckAiSessionWideEventTest {
         testee = RealDuckAiSessionWideEvent(
             wideEventClient = wideEventClient,
             duckChat = duckChat,
-            duckChatFeature = { duckChatFeature },
+            duckChatFeature = lazy { duckChatFeature },
             dispatchers = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )

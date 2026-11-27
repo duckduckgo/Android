@@ -24,7 +24,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Daily
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -35,7 +35,7 @@ import javax.inject.Inject
  * one idle-timeout pixel per active user per day, including the defaults for users who never changed
  * a setting.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class NtpAfterIdleStateReporter @Inject constructor(
     private val pixel: Pixel,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

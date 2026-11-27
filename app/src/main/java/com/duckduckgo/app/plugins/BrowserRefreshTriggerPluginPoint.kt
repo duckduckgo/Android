@@ -16,8 +16,8 @@
 
 package com.duckduckgo.app.plugins
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
 import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesPluginPoint(

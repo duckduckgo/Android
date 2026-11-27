@@ -22,7 +22,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -54,7 +55,7 @@ interface MetricsPixelStore {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = MetricsPixelStore::class,
+    binding = binding<MetricsPixelStore>(),
 )
 class RealMetricsPixelStore @Inject constructor(
     private val sharedPreferencesProvider: SharedPreferencesProvider,

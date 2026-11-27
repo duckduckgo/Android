@@ -20,8 +20,8 @@ import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentC
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration.AutofillJsConfigType.Debug
 import com.duckduckgo.autofill.impl.configuration.AutofillJavascriptEnvironmentConfiguration.AutofillJsConfigType.Production
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface AutofillJavascriptEnvironmentConfiguration {
@@ -36,7 +36,7 @@ interface AutofillJavascriptEnvironmentConfiguration {
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class DefaultAutofillJavascriptEnvironmentConfiguration @Inject constructor() : AutofillJavascriptEnvironmentConfiguration {
 

@@ -22,4 +22,5 @@
     <string name="autocompleteRemoveItemCancel">Abbrechen</string>
     <string name="autocompleteRemoveItemRemove">Entfernen</string>
     <string name="autocompleteSwitchToTab" instruction="Placeholder is a website">Zu Tab wechseln · %1$s</string>
+    <string name="autocompleteDuckAiPrompt">Frag Duck.ai</string>
 </resources>

@@ -18,7 +18,7 @@ package com.duckduckgo.settings.impl
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEventPlugin
 import com.duckduckgo.di.scopes.ActivityScope

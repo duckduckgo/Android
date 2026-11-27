@@ -24,13 +24,14 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageRequest
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.dashboard.state.PirWebProfileStateHolder
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirWebRemoveNameAtIndexFromCurrentUserProfileMessageHandler @Inject constructor(
     private val pirWebProfileStateHolder: PirWebProfileStateHolder,

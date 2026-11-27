@@ -29,7 +29,8 @@ import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebMessages
 import com.duckduckgo.pir.impl.dashboard.messaging.model.PirWebMessageResponse
 import com.duckduckgo.pir.impl.freemium.PirFreeScanBrokerFilter
 import com.duckduckgo.pir.impl.store.PirRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -40,9 +41,9 @@ import javax.inject.Inject
  * Handles the getDataBrokers message from Web which is used
  * to retrieve the list of all data brokers the client has / supports.
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = ActivityScope::class,
-    boundType = PirWebJsMessageHandler::class,
+    binding = binding<PirWebJsMessageHandler>(),
 )
 class PirWebGetDataBrokersMessageHandler @Inject constructor(
     private val repository: PirRepository,
@@ -79,9 +80,9 @@ class PirWebGetDataBrokersMessageHandler @Inject constructor(
         }
         val activeBrokers = activeBrokerObjects.associateBy { it.name }
 
-        // A mirror inherits its parent's scan steps, so a gated broker's mirror is equally unscannable.
+        // A mirror inherits its parent's scan steps, so a mirror of a removed or gated broker is equally unscannable.
         val mirrorSites = repository.getAllMirrorSites().filter {
-            it.removedAt == 0L && (!isFreeScan || activeBrokers.containsKey(it.parentSite))
+            it.removedAt == 0L && activeBrokers.containsKey(it.parentSite)
         }
         val brokerOptOutUrls = repository.getAllBrokerOptOutUrls()
 

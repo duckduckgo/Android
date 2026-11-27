@@ -19,7 +19,7 @@ package com.duckduckgo.app.browser.pageload
 import android.net.TrafficStats
 import android.os.Process
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface RxBytesProvider {

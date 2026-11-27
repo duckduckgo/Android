@@ -46,6 +46,7 @@ import com.duckduckgo.app.trackerdetection.model.Entity
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.browser.api.autocomplete.AutoComplete.AutoCompleteSuggestion
 import com.duckduckgo.browser.api.brokensite.BrokenSiteData
+import com.duckduckgo.duckchat.api.DuckAiPdfMetadata
 import com.duckduckgo.duckchat.api.DuckChatHistorySource
 import com.duckduckgo.js.messaging.api.JsCallbackData
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
@@ -86,6 +87,12 @@ sealed class Command {
     ) : Command()
 
     data object LaunchVpnManagement : Command()
+
+    data object LaunchSyncSetup : Command()
+
+    data class LaunchSyncPairing(
+        val launchSource: String?,
+    ) : Command()
 
     class DialNumber(
         val telephoneNumber: String,
@@ -222,8 +229,8 @@ sealed class Command {
         val headers: Map<String, String>,
         val showConfirmation: Boolean = true,
         val trustedCallerPackage: String? = null,
-        val finishCustomTabOnTrustedCallerLaunch: Boolean = false,
         val trustedCallerOnly: Boolean = false,
+        val leaveTabOnTrustedCallerLaunch: Boolean = false,
     ) : Command()
 
     class ShowAppLinkPrompt(
@@ -232,7 +239,7 @@ sealed class Command {
 
     class OpenAppLink(
         val appLink: AppLink,
-        val finishCustomTabOnLaunch: Boolean = false,
+        val leaveTabOnLaunch: Boolean = false,
     ) : Command()
 
     class ExtractUrlFromCloakedAmpLink(
@@ -390,7 +397,9 @@ sealed class Command {
     // TODO (cbarreiro) Rename to SendResponseToCSS
     data class SendResponseToJs(
         val data: JsCallbackData,
-    ) : Command()
+    ) : Command() {
+        override fun toString(): String = "SendResponseToJs"
+    }
 
     data class SendResponseToDuckPlayer(
         val data: JsCallbackData,
@@ -483,12 +492,16 @@ sealed class Command {
         val tabId: String,
     ) : Command()
 
+    data class FocusEmptyDuckAiChat(
+        val tabId: String,
+    ) : Command()
+
     data object CloseCustomTab : Command()
 
     /**
      * Finishes only the [CustomTabActivity] (not the whole task). Used when the custom tab is being
      * dismissed while another activity (e.g. the Duck Chat host) is being launched into the same task,
-     * where [CloseCustomTab]'s `finishAndRemoveTask()` would tear down that activity too.
+     * where [CloseCustomTab] could close that activity too.
      */
     data object FinishCustomTab : Command()
 
@@ -517,6 +530,8 @@ sealed class Command {
     ) : Command()
     data object PageStarted : Command()
 
+    data object PageCommitVisible : Command()
+
     data class EnableDuckAIFullScreen(val browserViewState: BrowserViewState) : Command()
     data class DuckAIFullScreenDisabled(val url: String) : Command()
 
@@ -529,10 +544,14 @@ sealed class Command {
         @StringRes val text: Int,
     ) : Command()
 
+    data class PdfPageContextReceived(val tabId: String, val metadata: DuckAiPdfMetadata) : Command()
+
     data class PageContextReceived(
         val tabId: String,
         val pageContext: String,
-    ) : Command()
+    ) : Command() {
+        override fun toString(): String = "PageContextReceived"
+    }
 
     data class ShowToast(@param:StringRes val textResId: Int) : Command()
 

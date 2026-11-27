@@ -21,9 +21,9 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -34,15 +34,14 @@ import kotlinx.coroutines.flow.onEach
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class SyncAutoRestoreAccountDisabledObserver @Inject constructor(
     @AppCoroutineScope val appCoroutineScope: CoroutineScope,
     private val syncStore: SyncStore,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
-    private val syncFeature: SyncFeature,
     private val dispatcherProvider: DispatcherProvider,
 ) : MainProcessLifecycleObserver {
 
@@ -54,7 +53,6 @@ class SyncAutoRestoreAccountDisabledObserver @Inject constructor(
             .distinctUntilChanged()
             // only interested when user signs out
             .filter { isSignedIn -> !isSignedIn }
-            .filter { syncFeature.syncAutoRestore().isEnabled() }
             .onEach {
                 logcat { "Sync-Recovery: sync disabled, clearing auto-restore data" }
                 syncAutoRestoreManager.clearAutoRestoreData()

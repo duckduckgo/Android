@@ -60,6 +60,18 @@ interface DuckChatInputModeState {
      * the native input for the browser omnibar at all. Emits on subscription and on every settings change.
      */
     val inputModeCapability: StateFlow<NativeInputState.InputMode>
+
+    /**
+     * The input mode the user selected in settings, read from storage rather than a cache so it
+     * is accurate right after launch. [NativeInputState.InputMode.SEARCH_ONLY] when the user turned Duck.ai off.
+     */
+    suspend fun getSelectedInputMode(): NativeInputState.InputMode
+
+    /**
+     * The toggle selection the input opens on, read from the stored default position with
+     * "last used" resolved to the side used last.
+     */
+    suspend fun getInitialToggleSelection(): NativeInputState.ToggleSelection
 }
 
 /**

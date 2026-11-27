@@ -75,6 +75,12 @@ interface NetworkProtectionPrefs {
      * Deletes all content in the shared preference
      */
     fun clear()
+
+    /**
+     * Deletes all content except the string values under [keys], in a single synchronous write, so the file is never left
+     * cleared without them.
+     */
+    fun clearKeepingStrings(keys: Set<String>)
 }
 
 class RealNetworkProtectionPrefs constructor(
@@ -120,6 +126,14 @@ class RealNetworkProtectionPrefs constructor(
 
     override fun clear() {
         prefs.edit { clear() }
+    }
+
+    override fun clearKeepingStrings(keys: Set<String>) {
+        val kept = keys.associateWith { prefs.getString(it, null) }
+        prefs.edit(commit = true) {
+            clear()
+            kept.forEach { (key, value) -> putString(key, value) }
+        }
     }
 
     override fun putBoolean(

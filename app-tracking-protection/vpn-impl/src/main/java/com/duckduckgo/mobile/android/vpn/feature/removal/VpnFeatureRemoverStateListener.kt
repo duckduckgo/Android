@@ -25,16 +25,17 @@ import com.duckduckgo.mobile.android.vpn.dao.VpnFeatureRemoverState
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.mobile.android.vpn.store.VpnDatabase
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnServiceCallbacks::class,
+    binding = binding<VpnServiceCallbacks>(),
 )
 class VpnFeatureRemoverStateListener @Inject constructor(
     private val workManager: WorkManager,

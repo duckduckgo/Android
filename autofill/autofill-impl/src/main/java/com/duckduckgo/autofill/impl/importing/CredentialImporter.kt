@@ -26,8 +26,8 @@ import com.duckduckgo.autofill.impl.importing.CredentialImporter.ImportResult.In
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -58,12 +58,13 @@ interface CredentialImporter {
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class CredentialImporterImpl @Inject constructor(
     private val autofillStore: InternalAutofillStore,
     private val dispatchers: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
+    private val credentialImportTimestamp: CredentialImportTimestamp,
 ) : CredentialImporter {
 
     private val _importStatus = MutableSharedFlow<ImportResult>(replay = 1)
@@ -95,6 +96,9 @@ class CredentialImporterImpl @Inject constructor(
 
         // mark that the user has imported passwords at least once, regardless of the number of credentials imported
         autofillStore.hasEverImportedPasswords = true
+        if (insertedIds.isNotEmpty()) {
+            credentialImportTimestamp.onPasswordsImported()
+        }
 
         _importStatus.emit(Finished(savedCredentials = insertedIds.size, numberSkipped = skippedCredentials, source = source))
     }

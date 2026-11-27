@@ -50,9 +50,13 @@ interface RemoteMessageImageStore {
     suspend fun clearStoredImageFile(surface: Surface)
 
     /**
-     * Returns the local file path for a card item image, or null if it doesn't exist.
+     * Returns the local file path for the image of the list item [itemId] in [message], or null when the message
+     * has no per-item images or the file doesn't exist.
      */
-    suspend fun getCardItemImageFilePath(itemId: String): String?
+    suspend fun getItemImageFilePath(
+        message: RemoteMessage,
+        itemId: String,
+    ): String?
 }
 
 class GlideRemoteMessageImageStore(
@@ -109,21 +113,30 @@ class GlideRemoteMessageImageStore(
         return File(context.filesDir, fileName)
     }
 
-    override suspend fun getCardItemImageFilePath(itemId: String): String? {
+    override suspend fun getItemImageFilePath(
+        message: RemoteMessage,
+        itemId: String,
+    ): String? {
+        val imagesDir = message.content.itemImagesDir() ?: return null
         return withContext(dispatcherProvider.io()) {
-            val file = getCardItemImageFile(itemId)
+            val file = itemImageFile(imagesDir, itemId)
             if (file.exists()) file.absolutePath else null
         }
     }
 
     private suspend fun fetchAndStoreCardItemImages(message: RemoteMessage?) {
-        val (listItems, imagesDir) = when (val content = message?.content) {
-            is Content.CardsList -> content.listItems to CARD_ITEM_IMAGES_DIR
-            is Content.ActionableItems -> content.listItems to ACTIONABLE_ITEM_IMAGES_DIR
+        clearItemImages(ACTIONABLE_ITEM_IMAGES_DIR)
+        val content = message?.content ?: return
+        val imagesDir = content.itemImagesDir() ?: return
+        val listItems = when (content) {
+            is Content.CardsList -> {
+                clearItemImages(imagesDir)
+                content.listItems
+            }
+            is Content.ActionableItems -> content.listItems
             else -> return
         }
 
-        clearItemImages(imagesDir)
         val itemsWithImages = listItems
             .filterIsInstance<CardItem.ListItem>()
             .filter { !it.imageUrl.isNullOrEmpty() }
@@ -133,7 +146,7 @@ class GlideRemoteMessageImageStore(
         withContext(dispatcherProvider.io()) {
             itemsWithImages.map { item ->
                 async {
-                    val targetFile = File(context.filesDir, "$imagesDir/${item.id}.png")
+                    val targetFile = itemImageFile(imagesDir, item.id)
                     targetFile.parentFile?.mkdirs()
                     downloadImageToFile(item.imageUrl.orEmpty(), targetFile)
                 }
@@ -170,8 +183,17 @@ class GlideRemoteMessageImageStore(
         }
     }
 
-    private fun getCardItemImageFile(itemId: String): File {
-        return File(context.filesDir, "$CARD_ITEM_IMAGES_DIR/$itemId.png")
+    private fun itemImageFile(
+        imagesDir: String,
+        itemId: String,
+    ): File = File(context.filesDir, "$imagesDir/$itemId.png")
+
+    private fun Content.itemImagesDir(): String? {
+        return when (this) {
+            is Content.CardsList -> CARD_ITEM_IMAGES_DIR
+            is Content.ActionableItems -> ACTIONABLE_ITEM_IMAGES_DIR
+            else -> null
+        }
     }
 
     private fun Content.getImageUrl(): String? {

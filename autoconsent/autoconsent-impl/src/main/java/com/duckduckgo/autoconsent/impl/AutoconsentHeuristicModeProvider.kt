@@ -19,8 +19,8 @@ package com.duckduckgo.autoconsent.impl
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
 import com.duckduckgo.autoconsent.impl.store.AutoconsentSettingsRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface AutoconsentHeuristicModeProvider {
@@ -28,7 +28,7 @@ interface AutoconsentHeuristicModeProvider {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAutoconsentHeuristicModeProvider @Inject constructor(
     private val settingsRepository: AutoconsentSettingsRepository,
     private val autoconsentFeature: AutoconsentFeature,

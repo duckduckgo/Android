@@ -17,95 +17,76 @@
 plugins {
     id 'com.android.library'
     id 'com.google.devtools.ksp'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'androidx.room'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-
-    implementation project(path: ':anvil-annotations')
-
-    implementation project(path: ':statistics-api')
-    implementation project(path: ':common-utils')
-    implementation project(path: ':di')
-    implementation project(path: ':app-build-config-api')
-    implementation project(path: ':browser-api')
-    implementation project(path: ':autofill-api')
-    implementation project(path: ':privacy-config-api')
-    implementation project(path: ':data-store-api')
     implementation project(path: ':anrs-api')
-
-    implementation KotlinX.coroutines.core
-    implementation KotlinX.coroutines.android
-
-    implementation "io.reactivex.rxjava2:rxjava:_"
-    implementation "io.reactivex.rxjava2:rxandroid:_"
-
-    implementation Square.retrofit2.retrofit
-    implementation Square.retrofit2.converter.moshi
-    implementation Square.retrofit2.adapter.rxJava2
-    implementation Square.retrofit2.converter.scalars
-
-    implementation Google.dagger
-
-    // Room
-    implementation AndroidX.room.runtime
-    ksp AndroidX.room.compiler
-
-    // WorkManager
-    implementation AndroidX.work.runtimeKtx
-    androidTestImplementation AndroidX.work.testing
-    implementation AndroidX.work.rxJava2
-
+    implementation project(path: ':app-build-config-api')
+    implementation project(path: ':app-database')
+    implementation project(path: ':autofill-api')
+    implementation project(path: ':browser-api')
+    implementation project(path: ':codegen-annotations')
+    implementation project(path: ':common-utils')
+    implementation project(path: ':data-store-api')
+    implementation project(path: ':device-migration-api')
+    implementation project(path: ':di')
+    implementation project(path: ':privacy-config-api')
+    implementation project(path: ':statistics-api')
     implementation "com.squareup.logcat:logcat:_"
-    implementation Square.okHttp3.okHttp
-    
-    implementation AndroidX.core.ktx
-
     implementation "com.squareup.moshi:moshi-adapters:_"
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation AndroidX.core.ktx
+    implementation AndroidX.room.runtime
+    implementation AndroidX.work.runtimeKtx
+    implementation AndroidX.work.rxJava2
+    implementation KotlinX.coroutines.android
+    implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.adapter.rxJava2
+    implementation Square.retrofit2.converter.moshi
+    implementation Square.retrofit2.converter.scalars
+    implementation Square.retrofit2.retrofit
 
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
     testImplementation project(path: ':common-test')
     testImplementation project(':data-store-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation "androidx.lifecycle:lifecycle-runtime-testing:_"
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.rxJava2
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.archCore.testing
-    testImplementation AndroidX.room.testing
-    testImplementation AndroidX.room.rxJava2
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
-    androidTestImplementation AndroidX.test.runner
     androidTestImplementation AndroidX.test.rules
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation AndroidX.work.testing
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 android {
     sourceSets {
         test.assets.srcDirs += files("$projectDir/schemas")
     }
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lintOptions {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
     namespace 'com.duckduckgo.app.statistics'
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     buildFeatures {
         buildConfig = true
     }

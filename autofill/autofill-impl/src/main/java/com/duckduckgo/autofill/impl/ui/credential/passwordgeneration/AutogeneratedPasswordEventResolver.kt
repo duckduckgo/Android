@@ -26,7 +26,7 @@ import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.Pro
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.UpdateMatchingUsernames
 import com.duckduckgo.autofill.impl.ui.credential.passwordgeneration.Actions.UpdateSavedAutoLogin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject

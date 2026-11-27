@@ -86,6 +86,12 @@ class RealSetupSyncBookmarkAddedPromoRulesTest {
     }
 
     @Test
+    fun whenPromotionsRedesignFeatureEnabledThenCannotShowPromo() = runTest {
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = true))
+        assertFalse(testee.canShowPromo())
+    }
+
+    @Test
     fun whenAllCriteriaMetThenCanShowPromo() = runTest {
         configureAllCriteriaMet()
         assertTrue(testee.canShowPromo())
@@ -94,6 +100,7 @@ class RealSetupSyncBookmarkAddedPromoRulesTest {
     private suspend fun configureAllCriteriaMet() {
         syncPromotionFeature.self().setRawStoredState(State(enable = true))
         syncPromotionFeature.bookmarkAddedDialog().setRawStoredState(State(enable = true))
+        syncPromotionFeature.leveragePromosRedesign().setRawStoredState(State(enable = false))
         whenever(syncState.isFeatureEnabled()).thenReturn(true)
         whenever(syncState.isUserSignedInOnDevice()).thenReturn(false)
         whenever(syncPromotionDataStore.hasPromoBeenDismissed(PromotionType.BookmarkAddedDialog)).thenReturn(false)

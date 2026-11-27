@@ -18,7 +18,7 @@ package com.duckduckgo.feedback.impl.ui.initial
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.feedback.impl.ui.common.ViewState
 import javax.inject.Inject

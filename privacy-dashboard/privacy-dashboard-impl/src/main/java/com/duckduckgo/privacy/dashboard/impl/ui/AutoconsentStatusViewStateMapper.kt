@@ -19,7 +19,7 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.dashboard.impl.ui.PrivacyDashboardHybridViewModel.CookiePromptManagementState
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AutoconsentStatusViewStateMapper {

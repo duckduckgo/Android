@@ -31,11 +31,11 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedIn
 import com.duckduckgo.sync.api.SyncActivityWithEmptyParams
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SetUpSyncHandler @Inject constructor(
     private val globalActivityStarter: GlobalActivityStarter,
     private val context: Context,

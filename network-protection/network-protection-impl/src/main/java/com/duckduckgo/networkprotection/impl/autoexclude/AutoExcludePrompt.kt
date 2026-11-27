@@ -22,7 +22,7 @@ import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigg
 import com.duckduckgo.networkprotection.impl.autoexclude.AutoExcludePrompt.Trigger.NEW_INCOMPATIBLE_APP_FOUND
 import com.duckduckgo.networkprotection.store.NetPManualExclusionListRepository
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

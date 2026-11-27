@@ -56,6 +56,7 @@ class EmailInjectorJsTest {
                 autofillFeature,
                 javascriptInjector,
                 mockAutofill,
+                FakeFeatureToggleFactory.create(EmailBridgeOriginCheckFeature::class.java),
             )
         whenever(mockAutofill.isAnException(any())).thenReturn(false)
     }

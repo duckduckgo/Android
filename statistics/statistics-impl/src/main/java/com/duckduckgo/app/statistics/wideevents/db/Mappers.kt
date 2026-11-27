@@ -32,6 +32,7 @@ fun WideEventEntity.mapToRepositoryWideEvent(): WideEventRepository.WideEvent =
         metaVersion = metaVersion,
         isFirstDailyOccurrence = isFirstDailyOccurrence,
         appVersion = appVersion,
+        path = lastPathStep?.let { WideEventRepository.WideEventPath(steps = path, lastStep = it) },
     )
 
 fun WideEventRepository.WideEventStatus.mapToDbWideEventStatus(): WideEventEntity.WideEventStatus =
@@ -60,6 +61,7 @@ fun WideEventEntity.CleanupPolicy.mapToRepositoryCleanupPolicy(): WideEventRepos
     when (this) {
         is WideEventEntity.CleanupPolicy.OnProcessStart ->
             WideEventRepository.CleanupPolicy.OnProcessStart(
+                ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
                 status = status.mapToRepositoryWideEventStatus(),
                 metadata = metadata,
@@ -76,6 +78,7 @@ fun WideEventRepository.CleanupPolicy.mapToDbCleanupPolicy(): WideEventEntity.Cl
     when (this) {
         is WideEventRepository.CleanupPolicy.OnProcessStart ->
             WideEventEntity.CleanupPolicy.OnProcessStart(
+                ownerProcessName = ownerProcessName,
                 ignoreIfIntervalTimeoutPresent = ignoreIfIntervalTimeoutPresent,
                 status = status.mapToDbWideEventStatus(),
                 metadata = metadata,
@@ -94,6 +97,7 @@ fun WideEventEntity.WideEventInterval.mapToRepositoryWideEventInterval(): WideEv
         startedAt = startedAt,
         timeout = timeout,
         buckets = buckets,
+        rounding = rounding.mapToRepositoryBucketRounding(),
     )
 
 fun WideEventRepository.WideEventInterval.mapToDbWideEventInterval(): WideEventEntity.WideEventInterval =
@@ -102,4 +106,17 @@ fun WideEventRepository.WideEventInterval.mapToDbWideEventInterval(): WideEventE
         startedAt = startedAt,
         timeout = timeout,
         buckets = buckets,
+        rounding = rounding.mapToDbBucketRounding(),
     )
+
+fun WideEventEntity.BucketRounding.mapToRepositoryBucketRounding(): WideEventRepository.BucketRounding =
+    when (this) {
+        WideEventEntity.BucketRounding.ROUND_DOWN -> WideEventRepository.BucketRounding.ROUND_DOWN
+        WideEventEntity.BucketRounding.ROUND_UP -> WideEventRepository.BucketRounding.ROUND_UP
+    }
+
+fun WideEventRepository.BucketRounding.mapToDbBucketRounding(): WideEventEntity.BucketRounding =
+    when (this) {
+        WideEventRepository.BucketRounding.ROUND_DOWN -> WideEventEntity.BucketRounding.ROUND_DOWN
+        WideEventRepository.BucketRounding.ROUND_UP -> WideEventEntity.BucketRounding.ROUND_UP
+    }

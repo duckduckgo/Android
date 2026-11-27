@@ -27,18 +27,18 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object AutoconsentModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAutoconsentSettingsRepository(
         context: Context,
         autoconsentFeature: AutoconsentFeature,
@@ -49,7 +49,7 @@ object AutoconsentModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAutoconsentDatabase(databaseProvider: DatabaseProvider): AutoconsentDatabase {
         return databaseProvider.buildRoomDatabase(
             AutoconsentDatabase::class.java,
@@ -59,7 +59,7 @@ object AutoconsentModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAutoconsentPixelManager(realAutoconsentPixelManager: RealAutoconsentPixelManager): AutoconsentPixelManager {
         return realAutoconsentPixelManager
     }

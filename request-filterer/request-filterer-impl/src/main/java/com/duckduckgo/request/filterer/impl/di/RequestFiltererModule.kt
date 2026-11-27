@@ -17,10 +17,11 @@
 package com.duckduckgo.request.filterer.impl.di
 
 import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.request.filterer.store.ALL_MIGRATIONS
 import com.duckduckgo.request.filterer.store.RealRequestFiltererFeatureToggleRepository
@@ -30,26 +31,30 @@ import com.duckduckgo.request.filterer.store.RequestFiltererDatabase
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleRepository
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleStore
 import com.duckduckgo.request.filterer.store.RequestFiltererRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object RequestFiltererModule {
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
-    fun provideRequestFiltererDatabase(context: Context): RequestFiltererDatabase {
-        return Room.databaseBuilder(context, RequestFiltererDatabase::class.java, "request_filterer.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS)
-            .build()
+    fun provideRequestFiltererDatabase(databaseProvider: DatabaseProvider): RequestFiltererDatabase {
+        return databaseProvider.buildRoomDatabase(
+            RequestFiltererDatabase::class.java,
+            "request_filterer.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideRequestFiltererRepository(
         database: RequestFiltererDatabase,
@@ -60,7 +65,7 @@ object RequestFiltererModule {
         return RealRequestFiltererRepository(database, appCoroutineScope, dispatcherProvider, isMainProcess)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideRequestFiltererFeatureToggleRepository(
         requestFilterFeatureToggleStore: RequestFiltererFeatureToggleStore,
@@ -68,7 +73,7 @@ object RequestFiltererModule {
         return RealRequestFiltererFeatureToggleRepository(requestFilterFeatureToggleStore)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideRequestFiltererFeatureToggleStore(context: Context): RequestFiltererFeatureToggleStore {
         return RealRequestFiltererFeatureToggleStore(context)

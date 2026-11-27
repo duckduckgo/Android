@@ -40,8 +40,9 @@ import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.Malici
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Malicious
 import com.duckduckgo.malicioussiteprotection.api.MaliciousSiteProtection.MaliciousStatus.Safe
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -92,8 +93,8 @@ class RealExemptedUrlsHolder @Inject constructor() : ExemptedUrlsHolder {
     }
 }
 
-@ContributesMultibinding(AppScope::class, PrivacyConfigCallbackPlugin::class)
-@ContributesBinding(AppScope::class, MaliciousSiteBlockerWebViewIntegration::class)
+@ContributesIntoSet(AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
+@ContributesBinding(AppScope::class, binding = binding<MaliciousSiteBlockerWebViewIntegration>())
 class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
     private val maliciousSiteProtection: MaliciousSiteProtection,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
@@ -152,43 +153,44 @@ class RealMaliciousSiteBlockerWebViewIntegration @Inject constructor(
             return IsMaliciousViewData.Ignored
         }
 
+        val isForIframe = isForIframe(request) && documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
+
+        // Only main frames and current-page iframes are checked; returning here spares every other subresource an IO dispatch on WebView's request threads.
+        if (!request.isForMainFrame && !isForIframe) {
+            return IsMaliciousViewData.Ignored
+        }
+
         return withContext(dispatchers.io()) {
-            val belongsToCurrentPage = documentUri?.host == request.requestHeaders["Referer"]?.toUri()?.host
-            val isForIframe = (isForIframe(request) && belongsToCurrentPage)
+            val url = request.url
+            val mainframeUrl = if (isForIframe) documentUri else url
 
-            if (request.isForMainFrame || isForIframe) {
-                val url = request.url
-                val mainframeUrl = if (isForIframe) documentUri else url
+            getProcessedOrExempted(url, mainframeUrl, request.isForMainFrame)?.let { return@withContext it }
 
-                getProcessedOrExempted(url, mainframeUrl, request.isForMainFrame)?.let { return@withContext it }
-
-                val result = checkMaliciousUrl(url) {
-                    if (isForIframe && it is Malicious) {
-                        firePixelForMaliciousIframe(it.feed)
-                    }
-                    confirmationCallback(it)
+            val result = checkMaliciousUrl(url) {
+                if (isForIframe && it is Malicious) {
+                    firePixelForMaliciousIframe(it.feed)
                 }
-                when (result) {
-                    is ConfirmedResult -> {
-                        processedUrls[url] = ProcessedUrlStatus(result.status, clientSideHit = true)
-                        when (val status = result.status) {
-                            is Malicious -> {
-                                if (isForIframe) {
-                                    firePixelForMaliciousIframe(status.feed)
-                                }
-                                return@withContext IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = true)
+                confirmationCallback(it)
+            }
+            when (result) {
+                is ConfirmedResult -> {
+                    processedUrls[url] = ProcessedUrlStatus(result.status, clientSideHit = true)
+                    when (val status = result.status) {
+                        is Malicious -> {
+                            if (isForIframe) {
+                                firePixelForMaliciousIframe(status.feed)
                             }
-                            is Safe -> return@withContext IsMaliciousViewData.Safe(request.isForMainFrame)
-                            is Ignored -> return@withContext IsMaliciousViewData.Ignored
+                            return@withContext IsMaliciousViewData.MaliciousSite(url, status.feed, exempted = false, clientSideHit = true)
                         }
+                        is Safe -> return@withContext IsMaliciousViewData.Safe(request.isForMainFrame)
+                        is Ignored -> return@withContext IsMaliciousViewData.Ignored
                     }
+                }
 
-                    is WaitForConfirmation -> {
-                        return@withContext IsMaliciousViewData.WaitForConfirmation
-                    }
+                is WaitForConfirmation -> {
+                    return@withContext IsMaliciousViewData.WaitForConfirmation
                 }
             }
-            return@withContext IsMaliciousViewData.Ignored
         }
     }
 

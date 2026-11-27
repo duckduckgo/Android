@@ -18,11 +18,11 @@ package com.duckduckgo.duckchat.impl
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class DuckAiHostProviderModule {
     @Provides

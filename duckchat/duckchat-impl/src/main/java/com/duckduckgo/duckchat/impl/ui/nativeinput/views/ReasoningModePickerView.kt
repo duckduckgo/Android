@@ -31,21 +31,22 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.menu.applyMenuRadiusClipping
 import com.duckduckgo.common.ui.view.divider.HorizontalDivider
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState.InputContext
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.DuckChatConstants.DUCK_AI_FEATURE_PAGE
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.nativeinput.NativeInputHost
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -72,6 +73,7 @@ class ReasoningModePickerView @JvmOverloads constructor(
     private var stateJob: Job? = null
     private var inputContextJob: Job? = null
     private var commandJob: Job? = null
+    private var newChatPickJob: Job? = null
     private var popupWindow: PopupWindow? = null
 
     // Mirrors the input context from the per-tab native input state so currentSurface() can be
@@ -80,6 +82,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
     private var lastNativeInputState: NativeInputState? = null
 
     var isEditMode: Boolean = false
+
+    var host: NativeInputHost? = null
 
     init {
         inflate(context, R.layout.view_reasoning_mode_picker, this)
@@ -106,6 +110,8 @@ class ReasoningModePickerView @JvmOverloads constructor(
         inputContextJob = null
         commandJob?.cancel()
         commandJob = null
+        newChatPickJob?.cancel()
+        newChatPickJob = null
         lastNativeInputState = null
         dismissPopup()
     }
@@ -146,6 +152,11 @@ class ReasoningModePickerView @JvmOverloads constructor(
         commandJob?.cancel()
         commandJob = viewModel.commands
             .onEach { processCommand(it) }
+            .launchIn(scope)
+
+        newChatPickJob?.cancel()
+        newChatPickJob = viewModel.newChatModePicks
+            .onEach { host?.pickNewChatReasoningMode(it) }
             .launchIn(scope)
     }
 

@@ -23,7 +23,7 @@ import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
@@ -54,7 +54,10 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var vmFactory: RecoverSyncedDataViewModel.Factory
 
-    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+    private val launchSource
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
+            "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
+        }
 
     private val isAuthRequired get() = intent.getBooleanExtra(IS_AUTH_REQUIRED_EXTRA_KEY, true)
 
@@ -136,7 +139,7 @@ class RecoverSyncedDataActivity : DuckDuckGoActivity() {
 
         fun intent(
             context: Context,
-            launchSource: String?,
+            launchSource: String,
             isAuthRequired: Boolean,
         ): Intent {
             return Intent(context, RecoverSyncedDataActivity::class.java).apply {

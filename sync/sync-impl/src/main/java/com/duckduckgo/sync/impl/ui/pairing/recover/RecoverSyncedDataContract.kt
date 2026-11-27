@@ -52,7 +52,7 @@ class RecoverSyncedDataContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val launchSource: String?,
+        val launchSource: String,
         val isAuthRequired: Boolean,
     )
 

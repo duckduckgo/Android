@@ -25,7 +25,7 @@ import com.duckduckgo.duckchat.api.DuckAiChatsMenu
 import com.duckduckgo.duckchat.api.DuckChatHistoryParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull

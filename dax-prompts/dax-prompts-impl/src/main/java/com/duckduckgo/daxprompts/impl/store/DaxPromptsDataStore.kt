@@ -23,8 +23,8 @@ import androidx.datastore.preferences.core.edit
 import com.duckduckgo.daxprompts.impl.di.DaxPrompts
 import com.duckduckgo.daxprompts.impl.store.SharedPreferencesDaxPromptsDataStore.Keys.DAX_PROMPTS_BROWSER_COMPARISON_SHOWN
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ interface DaxPromptsDataStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SharedPreferencesDaxPromptsDataStore @Inject constructor(
     @DaxPrompts private val store: DataStore<Preferences>,
 ) : DaxPromptsDataStore {

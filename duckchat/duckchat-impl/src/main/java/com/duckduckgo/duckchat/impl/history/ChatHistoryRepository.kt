@@ -24,16 +24,15 @@ import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.ModelDisplay
 import com.duckduckgo.duckchat.impl.models.toChatType
 import com.duckduckgo.duckchat.impl.sync.DuckChatSyncRepository
-import com.duckduckgo.duckchat.store.impl.DuckAiChat
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.sync.api.engine.SyncEngine
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.io.File
-import java.time.Instant
 import javax.inject.Inject
 
 data class ChatExportRequest(val chatId: String, val modelDisplay: ModelDisplay?)
@@ -52,7 +51,7 @@ interface ChatHistoryRepository {
 }
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealChatHistoryRepository @Inject constructor(
     private val chatStore: DuckAiChatStore,
     private val dispatchers: DispatcherProvider,
@@ -61,6 +60,7 @@ class RealChatHistoryRepository @Inject constructor(
     private val syncEngine: SyncEngine,
     private val chatExportWriter: ChatExportWriter,
     private val browserMode: BrowserMode,
+    private val entryWideEvent: Lazy<DuckAiEntryWideEvent>,
 ) : ChatHistoryRepository {
 
     private val chatExporter = ChatExporter()
@@ -69,14 +69,20 @@ class RealChatHistoryRepository @Inject constructor(
 
     override fun observeChats(): Flow<List<ChatHistoryItem>> =
         chatStore.getChatsFlow()
-            .map { chats -> chats.map(::toChatHistoryItem) }
+            .map { chats -> chats.toChatHistoryItems(fallbackTitle) }
 
     override suspend fun deleteChat(chatId: String) {
-        withContext(dispatchers.io()) { chatStore.deleteChat(chatId) }
+        withContext(dispatchers.io()) {
+            if (chatStore.deleteChat(chatId)) entryWideEvent.value.onChatsDeleted(setOf(chatId))
+        }
     }
 
     override suspend fun deleteAllChats() {
-        withContext(dispatchers.io()) { chatStore.deleteAllChats() }
+        withContext(dispatchers.io()) {
+            val chatIds = chatStore.getChats().map { it.chatId }.toSet()
+            chatStore.deleteAllChats()
+            entryWideEvent.value.onChatsDeleted(chatIds)
+        }
     }
 
     override suspend fun renameChat(chatId: String, newTitle: String): Boolean =
@@ -121,20 +127,5 @@ class RealChatHistoryRepository @Inject constructor(
                 },
             )
         }
-    }
-
-    private fun toChatHistoryItem(chat: DuckAiChat): ChatHistoryItem = ChatHistoryItem(
-        chatId = chat.chatId,
-        displayTitle = chat.title.takeIf { it.isNotBlank() && it != UPSTREAM_UNTITLED } ?: fallbackTitle,
-        type = chat.toChatType(),
-        model = chat.model,
-        pinned = chat.pinned,
-        lastEditMillis = chat.lastEdit.parseIsoMillis(),
-    )
-
-    private fun String.parseIsoMillis(): Long = runCatching { Instant.parse(this).toEpochMilli() }.getOrDefault(0L)
-
-    private companion object {
-        const val UPSTREAM_UNTITLED = "Untitled Chat"
     }
 }

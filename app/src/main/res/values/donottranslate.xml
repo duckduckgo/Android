@@ -130,13 +130,22 @@
     <string name="defaultBrowserChangedSurveyNotificationTitle">We noticed a change</string>
     <string name="defaultBrowserChangedSurveyNotificationDescription">DuckDuckGo is no longer your default browser. Mind telling us why?</string>
 
-    <!-- Page load timeout error page: copy not final yet -->
-    <string name="webViewErrorTimeout">This page is taking too long to load.</string>
-
     <!-- Fire animation rollout: relabel HeroFire to "Inferno Classic" when fireAnimationUpdate is on — pending translation -->
     <plurals name="fireDialogDeleteCountTitle">
         <item quantity="one" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chat?</item>
         <item quantity="other" instruction="%1$d is the number of chats the user is about to delete.">Delete %1$d chats?</item>
     </plurals>
+
+    <!-- Device migration (shown once after the user moved their data from their previous phone to this one) -->
+    <string name="deviceMigrationDefaultBrowserTitle" instruction="Moving to a new phone made another app the default browser">Your phone switched your default browser</string>
+    <string name="deviceMigrationDefaultBrowserBody">Links open in another browser now. Switch back to DuckDuckGo to stay protected.</string>
+    <string name="deviceMigrationDefaultBrowserPrimaryCta" instruction="Button that opens the system dialog to make DuckDuckGo the default browser">Set Default Browser</string>
+    <string name="deviceMigrationAllSetTitle" instruction="Shown after the user's data was moved from their previous phone">You’re all set</string>
+    <string name="deviceMigrationAllSetBody1" instruction="Tabs, Duck.ai chats and bookmarks moved from the user's previous phone">Your tabs, chats and bookmarks are all here.</string>
+    <string name="deviceMigrationAllSetBody2">Same privacy as always, and AI only when you want it.</string>
+    <string name="deviceMigrationAllSetPrimaryCta" instruction="Button that closes the screen and opens the browser">Let’s go!</string>
+    <string name="syncAfterDeviceTransferDaxDialogTitle">Oh before I forget…</string>
+    <string name="syncAfterDeviceTransferDaxDialogDescription"><![CDATA[Want to keep your data in sync across your other devices?<br/><br/>Sync &amp; Backup syncs bookmarks, autofill data, and Duck.ai chats with end-to-end encryption.]]></string>
+    <string name="syncAfterDeviceTransferDaxDialogPrimaryCta" instruction="Button that opens the screen to set up Sync and Backup">Turn On Sync &amp; Backup</string>
 
 </resources>

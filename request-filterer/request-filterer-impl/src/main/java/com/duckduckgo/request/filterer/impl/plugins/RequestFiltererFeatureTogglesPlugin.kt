@@ -21,10 +21,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.request.filterer.impl.requestFiltererFeatureValueOf
 import com.duckduckgo.request.filterer.store.RequestFiltererFeatureToggleRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class RequestFiltererFeatureTogglesPlugin @Inject constructor(
     private val requestFiltererFeatureToggleRepository: RequestFiltererFeatureToggleRepository,
     private val appBuildConfig: AppBuildConfig,

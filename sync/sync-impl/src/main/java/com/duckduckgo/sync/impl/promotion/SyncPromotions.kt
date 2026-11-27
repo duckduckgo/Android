@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
 import com.duckduckgo.sync.impl.promotion.bookmarks.addeddialog.SetupSyncBookmarkAddedPromoRules
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -121,6 +121,10 @@ class SyncPromotionsImpl @Inject constructor(
 
     private fun isSyncFeatureEnabled() = syncState.isFeatureEnabled()
     private fun isUserSyncingAlready() = syncState.isUserSignedInOnDevice()
-    private fun isBookmarksPromoEnabled() = syncPromotionFeature.bookmarks().isEnabled() && syncPromotionFeature.self().isEnabled()
-    private fun isPasswordsPromoEnabled() = syncPromotionFeature.passwords().isEnabled() && syncPromotionFeature.self().isEnabled()
+    private fun isBookmarksPromoEnabled() = syncPromotionFeature.bookmarks().isEnabled() &&
+        syncPromotionFeature.self().isEnabled() &&
+        !syncPromotionFeature.leveragePromosRedesign().isEnabled()
+    private fun isPasswordsPromoEnabled() = syncPromotionFeature.passwords().isEnabled() &&
+        syncPromotionFeature.self().isEnabled() &&
+        !syncPromotionFeature.leveragePromosRedesign().isEnabled()
 }

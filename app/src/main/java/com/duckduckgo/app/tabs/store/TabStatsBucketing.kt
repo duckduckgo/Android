@@ -24,7 +24,7 @@ import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.THREE_WEEKS_IN_
 import com.duckduckgo.app.tabs.store.TabStatsBucketing.Companion.TWO_WEEKS_IN_DAYS
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface TabStatsBucketing {

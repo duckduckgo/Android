@@ -23,7 +23,6 @@ import androidx.core.content.IntentCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.databinding.ActivityCustomAutofillProviderBinding
@@ -36,6 +35,7 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Comm
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ContinueWithoutAuthentication
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ForceFinish
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.RequestAuthentication
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.di.scopes.ActivityScope

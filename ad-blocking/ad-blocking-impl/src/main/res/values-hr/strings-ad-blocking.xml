@@ -17,14 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Preskoči sponzorirani sadržaj</string>
+    <string name="segment_skip_mode_always_ask">Pitaj prije preskakanja</string>
+    <string name="segment_skip_mode_always_skip">Uvijek</string>
+    <string name="segment_skip_mode_off">Nikada</string>
     <string name="ad_blocking_settings_title">Blokiranje YouTube oglasa</string>
     <string name="ad_blocking_settings_toggle_title">Blokiraj oglase na YouTubeu</string>
-    <string name="ad_blocking_settings_description_with_consent">DuckDuckGo blokira video oglase na YouTubeu, tako da videozapise možeš gledati bez prekida. \n\nKada je uključen, DuckDuckGo će anonimno otkriti smetnje u blokiranju oglasa ili pogreške na YouTubeu kako bi poboljšao doživljaj za sve. DuckDuckGo nikada ne vidi koje videozapise gledaš niti bilo kakve osobne podatke. <annotation type="learn_more_link">Saznaj više</annotation></string>
-    <string name="ad_blocking_settings_description">DuckDuckGo blokira video oglase na YouTubeu, tako da videozapise možeš gledati bez prekida. <annotation type="learn_more_link">Saznaj više</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Otvara videozapise u kino načinu rada bez ometanja koji sprječava da ono što gledaš utječe na tvoj YouTube feed.</string>
+    <string name="ad_blocking_settings_duck_player_link">Tražiš Duck Player?</string>
     <string name="ad_blocking_settings_title_v2">Blokiranje oglasa</string>
-    <string name="ad_blocking_settings_header_description">Blokira invazivne alate za praćenje prije nego što se učitaju, učinkovito eliminirajući oglase koji se oslanjaju na praćenje.</string>
     <string name="contingencyMessageTitle">Blokiranje oglasa na YouTubeu nije dostupno</string>
     <string name="contingencyMessageContent">Blokiranje oglasa pogođeno je nedavnim promjenama YouTubea. Radimo na rješavanju ovih problema i cijenimo tvoje razumijevanje.</string>
     <string name="contingencyMessagePrimaryButton">Shvaćam</string>

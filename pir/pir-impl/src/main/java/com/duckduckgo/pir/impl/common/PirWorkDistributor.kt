@@ -26,7 +26,7 @@ import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Click
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Expectation
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.FillForm
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.SolveCaptcha
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope

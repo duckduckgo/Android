@@ -21,8 +21,8 @@ import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.contentscopescripts.impl.features.pagecontext.store.PageContextStore
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,7 +32,7 @@ interface PageContextRepository {
     fun getJsonData(): String
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealPageContextRepository @Inject constructor(
     private val pageContextStore: PageContextStore,

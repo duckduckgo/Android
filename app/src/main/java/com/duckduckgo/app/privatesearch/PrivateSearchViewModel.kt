@@ -18,7 +18,6 @@ package com.duckduckgo.app.privatesearch
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_HISTORY_TOGGLED_ON
@@ -26,6 +25,7 @@ import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_OFF
 import com.duckduckgo.app.pixels.AppPixelName.AUTOCOMPLETE_TOGGLED_ON
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.browser.api.autocomplete.AutoCompleteSettings
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.history.api.NavigationHistory

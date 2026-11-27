@@ -17,11 +17,11 @@
 package com.duckduckgo.autofill.impl.newtab
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.impl.R
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue

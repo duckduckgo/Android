@@ -23,10 +23,13 @@ import android.view.ViewGroup
 import androidx.core.os.BundleCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.di.scopes.FragmentScope
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeManualBinding
+import com.duckduckgo.sync.impl.setup.SyncPairingUrl
+import com.duckduckgo.sync.impl.setup.SyncPairingUrlFeature
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import javax.inject.Inject
 
@@ -43,11 +46,19 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
             "Missing fragment argument: '$ENTRY_POINT_ARG'"
         }
 
+    private val launchSource: String
+        get() = requireNotNull(requireArguments().getString(LAUNCH_SOURCE_ARG)) {
+            "Missing fragment argument: '$LAUNCH_SOURCE_ARG'"
+        }
+
     @Inject
     lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
 
+    @Inject
+    lateinit var syncPairingUrlFeature: SyncPairingUrlFeature
+
     private val viewModel by activityViewModels<ReadSyncCodeViewModel> {
-        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint)
+        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint, launchSource)
     }
 
     override fun onCreateView(
@@ -65,7 +76,17 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        configureInstructions()
         configurePasteButton()
+    }
+
+    private fun configureInstructions() {
+        if (syncPairingUrlFeature.isEnabled) {
+            binding.pairingHeader.setBody(
+                R.string.sync_simplified_scanner_manual_entry_header_body_pairing_url,
+                SyncPairingUrl.INSTRUCTIONS_URL,
+            )
+        }
     }
 
     private fun configurePasteButton() {
@@ -79,9 +100,16 @@ class ReadSyncCodeManualFragment : DuckDuckGoFragment() {
 
     companion object {
         private const val ENTRY_POINT_ARG = "entry_point"
+        private const val LAUNCH_SOURCE_ARG = "launch_source"
 
-        fun instance(entryPoint: SyncEntryPoint) = ReadSyncCodeManualFragment().apply {
-            arguments = bundleOf(ENTRY_POINT_ARG to entryPoint)
+        fun instance(
+            entryPoint: SyncEntryPoint,
+            launchSource: String,
+        ) = ReadSyncCodeManualFragment().apply {
+            arguments = bundleOf(
+                ENTRY_POINT_ARG to entryPoint,
+                LAUNCH_SOURCE_ARG to launchSource,
+            )
         }
     }
 }

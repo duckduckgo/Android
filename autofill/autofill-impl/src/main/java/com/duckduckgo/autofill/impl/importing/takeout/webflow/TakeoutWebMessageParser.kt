@@ -21,9 +21,9 @@ import com.duckduckgo.autofill.impl.importing.takeout.webflow.TakeoutMessageResu
 import com.duckduckgo.autofill.impl.importing.takeout.webflow.TakeoutMessageResult.UnknownMessageFormat
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.asLog

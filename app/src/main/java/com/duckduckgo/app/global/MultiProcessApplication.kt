@@ -28,7 +28,7 @@ abstract class MultiProcessApplication : Application() {
         super.onCreate()
 
         // Isolated processes (e.g. AndroidX PDF sandbox) have no permissions of their own:
-        // most system services return null and bindService() is forbidden. Our Dagger graph
+        // most system services return null and bindService() is forbidden. Our DI graph
         // cannot initialise in this environment, so skip all app init and let the isolated
         // service run with just the base Application.
         if (isIsolatedProcess) return

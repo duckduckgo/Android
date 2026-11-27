@@ -26,13 +26,13 @@ import com.duckduckgo.browser.api.UserBrowserProperties
 import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AppOnboardingCompletedAdditionalPixelParamPlugin @Inject constructor(
     private val userStageStore: UserStageStore,
 ) : AdditionalPixelParamPlugin {
@@ -42,7 +42,7 @@ class AppOnboardingCompletedAdditionalPixelParamPlugin @Inject constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class EmailEnabledAdditionalPixelParamPlugin @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
 ) : AdditionalPixelParamPlugin {
@@ -52,7 +52,7 @@ class EmailEnabledAdditionalPixelParamPlugin @Inject constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class WidgetAddedAdditionalPixelParamPlugin @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
 ) : AdditionalPixelParamPlugin {
@@ -62,7 +62,7 @@ class WidgetAddedAdditionalPixelParamPlugin @Inject constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FireProofingUsedAdditionalPixelParamPlugin @Inject constructor(
     private val fireproofRepository: FireproofRepository,
 ) : AdditionalPixelParamPlugin {
@@ -72,7 +72,7 @@ class FireProofingUsedAdditionalPixelParamPlugin @Inject constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FrequentUserAdditionalPixelParamPlugin @Inject constructor(
     private val appDaysUsedRepository: AppDaysUsedRepository,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -92,7 +92,7 @@ class FrequentUserAdditionalPixelParamPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class LongTermUserAdditionalPixelParamPlugin @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
 ) : AdditionalPixelParamPlugin {
@@ -102,7 +102,7 @@ class LongTermUserAdditionalPixelParamPlugin @Inject constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SearchUserAdditionalPixelParamPlugin @Inject constructor(
     private val userBrowserProperties: UserBrowserProperties,
 ) : AdditionalPixelParamPlugin {
@@ -112,7 +112,7 @@ class SearchUserAdditionalPixelParamPlugin @Inject constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ValidOpenTabsCountAdditionalPixelParamPlugin @Inject constructor(
     @RegularMode private val tabsDao: TabsDao,
 ) : AdditionalPixelParamPlugin {
@@ -122,7 +122,7 @@ class ValidOpenTabsCountAdditionalPixelParamPlugin @Inject constructor(
     )
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FireButtonUsedAdditionalPixelParamPlugin @Inject constructor(
     private val fireButtonStore: FireButtonStore,
 ) : AdditionalPixelParamPlugin {

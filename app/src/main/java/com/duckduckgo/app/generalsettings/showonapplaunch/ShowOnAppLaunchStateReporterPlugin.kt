@@ -22,19 +22,20 @@ import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 interface ShowOnAppLaunchReporterPlugin
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = BrowserFeatureStateReporterPlugin::class,
+    binding = binding<BrowserFeatureStateReporterPlugin>(),
 )
-@ContributesBinding(scope = AppScope::class, boundType = ShowOnAppLaunchReporterPlugin::class)
+@ContributesBinding(scope = AppScope::class, binding = binding<ShowOnAppLaunchReporterPlugin>())
 class ShowOnAppLaunchStateReporterPlugin
 @Inject
 constructor(

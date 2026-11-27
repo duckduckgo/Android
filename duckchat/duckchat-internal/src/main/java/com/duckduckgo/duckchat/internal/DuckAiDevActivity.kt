@@ -17,7 +17,7 @@
 package com.duckduckgo.duckchat.internal
 
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.viewbinding.viewBinding

@@ -114,6 +114,6 @@ class PirWebGetFeatureConfigMessageHandlerTest {
         assertTrue(callbackData.params.has("useUnifiedFeedback"))
         assertEquals(useUnifiedFeedback, callbackData.params.getBoolean("useUnifiedFeedback"))
         assertTrue(callbackData.params.has("isBeta"))
-        assertEquals(true, callbackData.params.getBoolean("isBeta"))
+        assertEquals(false, callbackData.params.getBoolean("isBeta"))
     }
 }

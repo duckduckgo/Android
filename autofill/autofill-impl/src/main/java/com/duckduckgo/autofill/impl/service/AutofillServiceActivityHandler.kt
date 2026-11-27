@@ -26,7 +26,7 @@ import android.view.autofill.AutofillValue
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
 import com.duckduckgo.autofill.impl.service.AutofillFieldType.UNKNOWN
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AutofillServiceActivityHandler {

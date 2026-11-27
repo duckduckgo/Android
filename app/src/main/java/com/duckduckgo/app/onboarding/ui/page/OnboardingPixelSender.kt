@@ -34,8 +34,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.async
@@ -80,6 +80,8 @@ sealed interface OnboardingPixelAction {
     data class SingleChoiceClicked(val optionId: String) : OnboardingPixelAction
 
     data class TimeLimitReached(val byAppOpens: Boolean) : OnboardingPixelAction
+
+    data object Reached : OnboardingPixelAction
 }
 
 /**
@@ -105,13 +107,13 @@ interface OnboardingPixelSender {
 
     /**
      * Records that the user went down the search branch of onboarding. Persisted so it can be
-     * attached as the `variant` param to every subsequent onboarding pixel.
+     * attached as the `variant_search_experience` param to every subsequent onboarding pixel.
      */
     fun searchBranchSelected()
 
     /**
      * Records that the user went down the chat (Duck.ai) branch of onboarding. Persisted so it can be
-     * attached as the `variant` param to every subsequent onboarding pixel.
+     * attached as the `variant_search_experience` param to every subsequent onboarding pixel.
      * */
     fun chatBranchSelected()
 
@@ -130,7 +132,7 @@ interface OnboardingPixelSender {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealOnboardingPixelSender @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val pixel: Pixel,
@@ -219,6 +221,9 @@ class RealOnboardingPixelSender @Inject constructor(
 
             is OnboardingPixelAction.TimeLimitReached ->
                 fireStep(pixelName, PIXEL_EVENT_REACHED, if (action.byAppOpens) VALUE_APP_OPENS else VALUE_DAYS, includeValueInTag = false)
+
+            OnboardingPixelAction.Reached ->
+                fireStep(pixelName, PIXEL_EVENT_REACHED)
         }
     }
 
@@ -305,7 +310,7 @@ class RealOnboardingPixelSender @Inject constructor(
             },
             PIXEL_PARAM_PIXEL_SOURCE to deviceInfo.formFactor().description,
         )
-        attribution.branchVariant?.let { params[PIXEL_PARAM_VARIANT] = it }
+        attribution.branchVariant?.let { params[PIXEL_PARAM_VARIANT_SEARCH_EXPERIENCE] = it }
         attribution.downloadReasonVariant?.let { params[PIXEL_PARAM_VARIANT_DOWNLOAD_REASON] = it }
         params[PIXEL_PARAM_DAYS_SINCE_INSTALL] = daysSinceInstallBucket(days)
         return params
@@ -387,7 +392,7 @@ class RealOnboardingPixelSender @Inject constructor(
         private const val PIXEL_PARAM_INSTALL_TYPE = "installType"
         private const val PIXEL_PARAM_DAYS_SINCE_INSTALL = "daysSinceInstall"
         private const val PIXEL_PARAM_FLOW = "flow"
-        private const val PIXEL_PARAM_VARIANT = "variant"
+        private const val PIXEL_PARAM_VARIANT_SEARCH_EXPERIENCE = "variant_search_experience"
         private const val PIXEL_PARAM_VARIANT_DOWNLOAD_REASON = "variant_download_reason"
         private const val PIXEL_PARAM_PIXEL_SOURCE = "pixelSource"
 

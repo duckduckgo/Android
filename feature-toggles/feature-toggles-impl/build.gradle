@@ -16,60 +16,52 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
-
-    implementation project(':di')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
+    implementation project(":data-store-api")
+    implementation project(':di')
     implementation project(':feature-toggles-api')
     implementation project(':feature-toggles-internal-api')
-    implementation project(":statistics-api")
-    implementation project(":data-store-api")
     implementation project(':remote-messaging-api')
-
-    implementation AndroidX.appCompat
-    implementation Google.android.material
-    implementation AndroidX.constraintLayout
+    implementation project(":statistics-api")
     implementation "com.squareup.logcat:logcat:_"
-    implementation Google.dagger
+    implementation AndroidX.appCompat
+    implementation AndroidX.constraintLayout
     implementation AndroidX.core.ktx
+    implementation Google.android.material
     implementation Square.okHttp3.okHttp
 
-    // Testing dependencies
-    testImplementation project(':feature-toggles-test')
-    testImplementation project(':experiments-api')
-    testImplementation project(':common-test')
     testImplementation project(':app-build-config-api')
-    testImplementation project(':privacy-config-api')
+    testImplementation project(':common-test')
     testImplementation project(':data-store-api')
     testImplementation project(':data-store-test')
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation project(':experiments-api')
+    testImplementation project(':feature-toggles-test')
+    testImplementation project(':privacy-config-api')
     testImplementation "com.squareup.moshi:moshi-kotlin:_"
-    testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.test.ext.junit
+    testImplementation CashApp.turbine
     testImplementation Square.retrofit2.converter.moshi
     testImplementation Testing.junit4
-    androidTestImplementation AndroidX.test.runner
+    testImplementation Testing.robolectric
+
     androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
     androidTestImplementation Square.retrofit2.converter.moshi
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp project(':codegen-ksp')
 }
 
 tasks.register('androidTestsBuild') {
     dependsOn 'assembleDebugAndroidTest'
-}
-
-anvil {
-    generateDaggerFactories = true // default is false
 }
 
 
@@ -77,8 +69,5 @@ android {
   namespace 'com.duckduckgo.feature.impl'
   lintOptions {
       baseline file("lint-baseline.xml")
-  }
-  compileOptions {
-    coreLibraryDesugaringEnabled = true
   }
 }

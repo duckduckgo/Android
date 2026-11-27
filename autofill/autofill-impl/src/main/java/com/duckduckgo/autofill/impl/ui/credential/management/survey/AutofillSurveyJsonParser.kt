@@ -17,10 +17,10 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.survey
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AutofillSurveyJsonParser {

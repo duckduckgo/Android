@@ -20,7 +20,6 @@ import android.app.Notification
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.dev.settings.notifications.NotificationViewModel.ViewState.NotificationItem
 import com.duckduckgo.app.notification.NotificationFactory
 import com.duckduckgo.app.notification.NotificationLaunchIntentBuilder
@@ -29,6 +28,7 @@ import com.duckduckgo.app.survey.api.SurveyRepository
 import com.duckduckgo.app.survey.model.Survey
 import com.duckduckgo.app.survey.model.Survey.Status.SCHEDULED
 import com.duckduckgo.app.survey.notification.SurveyAvailableNotification
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope

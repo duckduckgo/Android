@@ -19,7 +19,7 @@ package com.duckduckgo.vpn.internal.feature.bugreport
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollector
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import javax.inject.Inject

@@ -32,10 +32,10 @@ import com.duckduckgo.mobile.android.vpn.network.VpnNetworkStack.VpnTunnelConfig
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.ERROR
@@ -49,15 +49,15 @@ import javax.inject.Inject
 private const val LRU_CACHE_SIZE = 2048
 private const val EMFILE_ERRNO = 24
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = VpnScope::class,
-    boundType = VpnNetworkStack::class,
+    binding = binding<VpnNetworkStack>(),
 )
 @ContributesBinding(
     scope = VpnScope::class,
-    boundType = VpnNetworkCallback::class,
+    binding = binding<VpnNetworkCallback>(),
 )
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class NgVpnNetworkStack @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
     private val vpnNetwork: Lazy<VpnNetwork>,
@@ -96,40 +96,14 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override suspend fun onPrepareVpn(): Result<VpnTunnelConfig> {
-        fun getDns(): Set<InetAddress> {
-            val privateDns = dnsProvider.getPrivateDns()
-            if (privateDns.isNotEmpty()) {
-                // when private DNS is defined we don't want to define any DNS
-                return emptySet()
-            }
-
-            val targetModels = listOf(
-                "moto g play",
-                "moto g stylus 5G",
-                "moto g(60)",
-                "moto g(7) power",
-                "FIG-LX1",
-                "moto g 5G",
-                "moto g pure",
-                "moto g power",
-            )
-            val model = appBuildConfig.model
-            if (targetModels.any { model.lowercase().contains(it.lowercase()) }) {
-                // else return default system dns
-                return dnsProvider.getSystemDns().toSet()
-            }
-
-            return emptySet()
-        }
-
         return Result.success(
             VpnTunnelConfig(
-                mtu = vpnNetwork.get().mtu(),
+                mtu = vpnNetwork.value.mtu(),
                 addresses = mapOf(
                     InetAddress.getByName("10.0.0.2") to 32,
                     InetAddress.getByName("fd00:1:fd00:1:fd00:1:fd00:1") to 128, // Add IPv6 Unique Local Address
                 ),
-                dns = getDns(),
+                dns = emptySet(),
                 searchDomains = dnsProvider.getSearchDomains(),
                 customDns = emptySet(),
                 routes = emptyMap(),
@@ -291,7 +265,7 @@ class NgVpnNetworkStack @Inject constructor(
 
     private fun Lazy<VpnNetwork>.safeGet(): Result<VpnNetwork> {
         return runCatching {
-            get()
+            value
         }.onFailure {
             logcat(ERROR) { it.asLog() }
             Result.failure<VpnNetwork>(it)

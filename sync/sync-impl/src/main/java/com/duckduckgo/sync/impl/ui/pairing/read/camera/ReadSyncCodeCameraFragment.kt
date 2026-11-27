@@ -45,14 +45,15 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.airbnb.lottie.LottieAnimationView
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.view.toPx
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.sync.impl.SyncFeature
+import com.duckduckgo.sync.impl.R
 import com.duckduckgo.sync.impl.databinding.FragmentReadSyncCodeCameraBinding
+import com.duckduckgo.sync.impl.setup.SyncPairingUrl
+import com.duckduckgo.sync.impl.setup.SyncPairingUrlFeature
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel
 import com.duckduckgo.sync.impl.ui.pairing.read.camera.ReadSyncCodeCameraIntroViewModel.Command
@@ -69,7 +70,6 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @InjectWith(FragmentScope::class)
@@ -85,6 +85,11 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
             "Missing fragment argument: '$ENTRY_POINT_ARG'"
         }
 
+    private val launchSource: String
+        get() = requireNotNull(requireArguments().getString(LAUNCH_SOURCE_ARG)) {
+            "Missing fragment argument: '$LAUNCH_SOURCE_ARG'"
+        }
+
     @Inject
     lateinit var viewModelFactory: FragmentViewModelFactory
 
@@ -92,15 +97,12 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     lateinit var syncCodeViewModelFactory: ReadSyncCodeViewModel.Factory
 
     @Inject
-    lateinit var syncFeature: SyncFeature
-
-    @Inject
-    lateinit var dispatchers: DispatcherProvider
+    lateinit var syncPairingUrlFeature: SyncPairingUrlFeature
 
     private val animationViewModel by viewModels<ReadSyncCodeCameraIntroViewModel> { viewModelFactory }
 
     private val syncCodeViewModel by activityViewModels<ReadSyncCodeViewModel> {
-        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint)
+        ReadSyncCodeViewModel.Factory.Provider(syncCodeViewModelFactory, entryPoint, launchSource)
     }
 
     private val cameraPermissionLauncher = registerForActivityResult(
@@ -113,13 +115,8 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     private var cutoutAnimator: ValueAnimator? = null
     private var introFadeOutAnimator: ViewPropertyAnimator? = null
 
-    // The flag is resolved before the view model sends any command, so this stays stable for every animation call.
     private val introAnimation: LottieAnimationView
-        get() = if (animationViewModel.viewState.value.isImprovedSyncEnabled) {
-            binding.includeIntroV2.introAnimation
-        } else {
-            binding.includeIntro.introAnimation
-        }
+        get() = binding.includeIntro.introAnimation
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -136,14 +133,22 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
+        configureInstructions()
         configureIntroAnimation()
-        configureReadyToScanButtons()
-        configureGoToSettingsButton()
+        configureGotItButton()
         configureChangePermissionsButton()
         configureScanner()
         configureCutout()
 
         observeUiEvents()
+    }
+
+    private fun configureInstructions() {
+        if (!syncPairingUrlFeature.isEnabled) return
+        val body = R.string.sync_simplified_scanner_camera_header_body_pairing_url
+        binding.includeIntro.pairingHeader.setBody(body, SyncPairingUrl.INSTRUCTIONS_URL)
+        binding.includeCamera.scannerHeader.setBody(body, SyncPairingUrl.INSTRUCTIONS_URL)
+        binding.includeNoHardware.pairingHeader.setBody(body, SyncPairingUrl.INSTRUCTIONS_URL)
     }
 
     override fun onResume() {
@@ -205,11 +210,9 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     }
 
     private fun renderIntroAnimationViewState(viewState: ViewState) {
-        binding.includeIntro.root.isVisible = viewState.viewMode == ViewMode.Intro && !viewState.isImprovedSyncEnabled
-        renderIntroOverCamera(isVisible = viewState.viewMode == ViewMode.Intro && viewState.isImprovedSyncEnabled)
+        renderIntroOverCamera(isVisible = viewState.viewMode == ViewMode.Intro)
 
-        binding.includeNoPermission.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission && !viewState.isImprovedSyncEnabled
-        binding.includeNoPermission2.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission && viewState.isImprovedSyncEnabled
+        binding.includeNoPermission.root.isVisible = viewState.viewMode == ViewMode.NoCameraPermission
 
         binding.includeNoHardware.root.isVisible = viewState.viewMode == ViewMode.NoCameraAvailable
 
@@ -218,12 +221,9 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         binding.includeCamera.scannerHeader.isInvisible = !isCameraMode
         binding.includeCamera.scannerOverlay.isCutoutVisible = isCameraMode
 
-        val isAnimationFinished = viewState.animationFinished
-        if (isAnimationFinished) {
+        if (viewState.animationFinished) {
             introAnimation.progress = 1f
         }
-        binding.includeIntro.readyToScanSecondaryButton.isGone = isAnimationFinished
-        binding.includeIntro.readyToScanPrimaryButton.isVisible = isAnimationFinished
     }
 
     private fun processIntroAnimationCommand(command: Command) {
@@ -257,7 +257,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     }
 
     private fun renderIntroOverCamera(isVisible: Boolean) {
-        val intro = binding.includeIntroV2.root
+        val intro = binding.includeIntro.root
         when {
             isVisible -> {
                 introFadeOutAnimator?.cancel()
@@ -281,8 +281,7 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
     }
 
     private fun configureIntroAnimation() {
-        binding.includeIntro.introAnimation.addAnimatorListener(createIntroAnimationListener())
-        binding.includeIntroV2.introAnimation.addAnimatorListener(createIntroAnimationListener())
+        introAnimation.addAnimatorListener(createIntroAnimationListener())
     }
 
     private fun createIntroAnimationListener(): Animator.AnimatorListener {
@@ -305,42 +304,28 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
         }
     }
 
-    private fun configureReadyToScanButtons() {
-        val listener = View.OnClickListener {
+    private fun configureGotItButton() {
+        binding.includeIntro.gotItButton.setOnClickListener {
             if (introAnimation.isAnimating) {
                 introAnimation.cancelAnimation()
             }
             animationViewModel.onScanButtonClicked()
         }
-        binding.includeIntro.readyToScanSecondaryButton.setOnClickListener(listener)
-        binding.includeIntro.readyToScanPrimaryButton.setOnClickListener(listener)
-        binding.includeIntroV2.gotItButton.setOnClickListener(listener)
-    }
-
-    private fun configureGoToSettingsButton() {
-        binding.includeNoPermission.goToPermissionsSettingsButton.setOnClickListener {
-            animationViewModel.onGoToPermissionSettingsClicked()
-        }
     }
 
     private fun configureChangePermissionsButton() {
-        binding.includeNoPermission2.changePermissionsButton.setOnClickListener {
+        binding.includeNoPermission.changePermissionsButton.setOnClickListener {
             animationViewModel.onGoToPermissionSettingsClicked()
         }
     }
 
     private fun configureScanner() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val restrictToQr = withContext(dispatchers.io()) {
-                syncFeature.restrictScannedBarcodesToQrTypes().isEnabled()
-            }
-            if (restrictToQr) {
-                binding.includeCamera.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
-            }
+            binding.includeCamera.barcodeView.decoderFactory = DefaultDecoderFactory(listOf(QR_CODE))
 
             repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 binding.includeCamera.barcodeView.decodeContinuous { barcode ->
-                    // The improved flow runs the camera behind the intro, but we don't want to pick up a code
+                    // We run the camera behind the intro, but we don't want to pick up a code
                     // until the user has seen the instructions.
                     if (animationViewModel.viewState.value.viewMode != ViewMode.Camera) return@decodeContinuous
                     binding.includeCamera.barcodeView.stopDecoding()
@@ -398,9 +383,16 @@ class ReadSyncCodeCameraFragment : DuckDuckGoFragment() {
 
     companion object {
         private const val ENTRY_POINT_ARG = "entry_point"
+        private const val LAUNCH_SOURCE_ARG = "launch_source"
 
-        fun instance(entryPoint: SyncEntryPoint) = ReadSyncCodeCameraFragment().apply {
-            arguments = bundleOf(ENTRY_POINT_ARG to entryPoint)
+        fun instance(
+            entryPoint: SyncEntryPoint,
+            launchSource: String,
+        ) = ReadSyncCodeCameraFragment().apply {
+            arguments = bundleOf(
+                ENTRY_POINT_ARG to entryPoint,
+                LAUNCH_SOURCE_ARG to launchSource,
+            )
         }
 
         private const val CUTOUT_FRACTION_START = 0.53f

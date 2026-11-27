@@ -25,7 +25,6 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.autofill.api.AutofillScreenLaunchSource.Sync
 import com.duckduckgo.autofill.api.AutofillScreens.AutofillPasswordsManagementScreen
 import com.duckduckgo.autofill.impl.R
@@ -33,13 +32,14 @@ import com.duckduckgo.autofill.impl.databinding.ViewCredentialsInvalidItemsWarni
 import com.duckduckgo.autofill.sync.CredentialsInvalidItemsViewModel.Command
 import com.duckduckgo.autofill.sync.CredentialsInvalidItemsViewModel.Command.NavigateToCredentials
 import com.duckduckgo.autofill.sync.CredentialsInvalidItemsViewModel.ViewState
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel

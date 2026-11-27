@@ -42,8 +42,7 @@ import com.duckduckgo.data.store.impl.DataStorePixelNames.DATA_STORE_MIGRATE_UNE
 import com.duckduckgo.di.scopes.AppScope
 import com.frybits.harmony.getHarmonySharedPreferences
 import com.frybits.harmony.secure.getEncryptedHarmonySharedPreferences
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
@@ -63,11 +62,11 @@ class SharedPreferencesProviderImpl @Inject constructor(
 ) : SharedPreferencesProvider {
 
     private val pixel by lazy {
-        pixelLazy.get()
+        pixelLazy.value
     }
 
     private val dataStoreProviderFeature by lazy {
-        dataStoreProviderFeatureLazy.get()
+        dataStoreProviderFeatureLazy.value
     }
 
     @SuppressLint("DenyListedApi")
@@ -84,7 +83,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             context.getSharedPreferences(name, MODE_PRIVATE)
         }
 
-        return SafeSharedPreferences(prefs, crashLogger.get())
+        return SafeSharedPreferences(prefs, crashLogger.value)
     }
 
     override fun getEncryptedSharedPreferences(
@@ -97,7 +96,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
     override suspend fun getMigratedEncryptedSharedPreferences(name: String): SharedPreferences? {
         logcat { "Migrate and return encrypted preferences to Harmony" }
         return migrateEncryptedToHarmonyIfNecessary(name)?.let {
-            SafeSharedPreferences(it, crashLogger.get())
+            SafeSharedPreferences(it, crashLogger.value)
         }
     }
 
@@ -130,7 +129,7 @@ class SharedPreferencesProviderImpl @Inject constructor(
             )
         }
 
-        return SafeSharedPreferences(prefs, crashLogger.get())
+        return SafeSharedPreferences(prefs, crashLogger.value)
     }
 
     private fun migrateToHarmonyIfNecessary(name: String): SharedPreferences {

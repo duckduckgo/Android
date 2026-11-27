@@ -5,6 +5,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -57,6 +58,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -143,6 +145,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -162,6 +165,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -176,6 +180,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -190,6 +195,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -204,6 +210,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -218,6 +225,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -232,6 +240,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -246,6 +255,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -260,6 +270,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -274,6 +285,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -281,6 +293,34 @@
                 "type": "string"
             }
         ]
+    },
+    "m_dbp_optoutjob_removed-identifier-found": {
+        "description": "Fired when a scan marks a stored profile as removed although the same scan found a profile with the same identifier, because the profile's name or profile URL changed.",
+        "owners": ["landomen"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["daily_count_short", "form_factor"],
+        "parameters": [
+            "pirScanWebViewSizeState",
+            "appVersion",
+            {
+                "key": "data_broker",
+                "description": "The URL of the data broker on which the profile was found",
+                "type": "string"
+            },
+            {
+                "key": "changed_field",
+                "description": "Which part of the stored profile no longer matched the profile found with the same identifier",
+                "type": "string",
+                "enum": ["name", "profile_url", "name_and_profile_url"]
+            },
+            {
+                "key": "optout_status",
+                "description": "Status of the opt-out job before it was marked removed",
+                "type": "string",
+                "enum": ["not_executed", "pending_email_confirmation", "requested", "error"]
+            }
+        ],
+        "expires": "2027-01-31"
     },
     "m_dbp_engagement_dau": {
         "description": "Pixel for PIR daily active users.",
@@ -329,7 +369,7 @@
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan"]
+        "parameters": ["appVersion", "pirIsAuthenticated", "pirIsFreeScan", "pirScanWebViewSizeState"]
     },
     "m_dbp_freemium_upsell_u": {
         "description": "Fired once per install when a user who had activated Freemium PIR is first seen holding an active subscription, bought from any entry point.",
@@ -368,12 +408,14 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
                 "description": "The URL of the broker the stage was for",
                 "type": "string"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_scan_stage": {
@@ -382,6 +424,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             "pirIsFreeScan",
             {
@@ -436,6 +479,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -475,6 +519,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             "pirIsAuthenticated",
             "pirIsFreeScan",
@@ -529,6 +574,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             "pirIsAuthenticated",
             "pirIsFreeScan",
@@ -607,6 +653,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             "pirIsAuthenticated",
             "pirIsFreeScan",
@@ -695,6 +742,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -714,6 +762,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -753,6 +802,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -792,6 +842,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -831,6 +882,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -870,6 +922,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -909,6 +962,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -948,6 +1002,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "tries",
@@ -987,6 +1042,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "tries",
@@ -1026,6 +1082,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -1065,6 +1122,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -1104,6 +1162,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -1143,7 +1202,7 @@
         ]
     },
     "m_dbp_update_databrokers_failure": {
-        "description": "Fired when a data broker JSON update has failed.",
+        "description": "Fired when a data broker JSON update has failed or was rejected.",
         "owners": ["karlenDimla", "landomen"],
         "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
@@ -1159,6 +1218,12 @@
                 "key": "removed_at",
                 "description": "Timestamp, in milliseconds, when the broker was removed at (contained on the JSON)",
                 "type": "string"
+            },
+            {
+                "key": "reason",
+                "description": "Why the data broker JSON was not stored.",
+                "type": "string",
+                "enum": ["invalid_json", "unsupported_step", "unsupported_action", "invalid_step", "missing_step", "storage_error"]
             }
         ]
     },
@@ -1264,6 +1329,7 @@
         "triggers": ["exception"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             "pirIsFreeScan",
             {
@@ -1312,6 +1378,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             "pirIsFreeScan",
             {
@@ -1393,6 +1460,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "manufacturer",
@@ -1425,6 +1493,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "manufacturer",
@@ -1480,7 +1549,8 @@
                 "key": "notifications_permission_granted",
                 "description": "Whether the user has granted the POST_NOTIFICATIONS runtime permission",
                 "type": "boolean"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_foreground-run_completed": {
@@ -1489,6 +1559,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "totalTimeInMillis",
@@ -1564,7 +1635,8 @@
                 "key": "notifications_permission_granted",
                 "description": "Whether the user has granted the POST_NOTIFICATIONS runtime permission",
                 "type": "boolean"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_foreground-run_start-failed": {
@@ -1605,6 +1677,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "manufacturer",
@@ -1637,6 +1710,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "manufacturer",
@@ -1687,6 +1761,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "manufacturer",
@@ -1720,7 +1795,8 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_scheduled-run_completed": {
@@ -1729,6 +1805,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "totalTimeInMillis",
@@ -1777,7 +1854,8 @@
                 "key": "broker_count",
                 "description": "The number of active brokers at the start of the scan",
                 "type": "integer"
-            }
+            },
+            "pirIsFreeScan"
         ]
     },
     "m_dbp_cpu-usage": {
@@ -1786,6 +1864,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "cpuUsage",
@@ -1855,6 +1934,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -1889,6 +1969,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -1918,6 +1999,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -1958,6 +2040,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -1998,6 +2081,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -2028,6 +2112,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -2053,6 +2138,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "manufacturer",
@@ -2085,6 +2171,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "totalTimeInMillis",
@@ -2139,6 +2226,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "scanFrequencyWithinThreshold",
@@ -2153,6 +2241,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -2172,6 +2261,7 @@
         "triggers": ["other"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirScanWebViewSizeState",
             "appVersion",
             {
                 "key": "data_broker",
@@ -2193,11 +2283,19 @@
         "parameters": ["appVersion"]
     },
     "m_dbp_freemium_settings_entry_point_impression": {
-        "description": "Fired once per Settings visit when the Freemium PIR entry point is shown. Denominator for the Freemium PIR settings funnel.",
+        "description": "Fired when the Freemium PIR entry point is shown in Settings, and again in the same Settings visit when its call to action changes. Denominator for the Freemium PIR settings funnel.",
         "owners": ["landomen"],
-        "triggers": ["other"],
+        "triggers": ["impression"],
         "suffixes": ["count_short", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "cta_state",
+                "description": "Which call to action the entry point is showing.",
+                "type": "string",
+                "enum": ["start_free_scan", "view_scan_results"]
+            }
+        ]
     },
     "m_dbp_freemium_settings_entry_point_clicked": {
         "description": "Fired when the Freemium PIR entry point in Settings is tapped. Numerator for the Freemium PIR settings funnel.",
@@ -2213,6 +2311,13 @@
                 "enum": ["start_free_scan", "view_scan_results"]
             }
         ]
+    },
+    "m_privacy-pro_app-settings_personal-information-removal_click": {
+        "description": "The user tapped 'Personal Information Removal' (DuckDuckGo Subscription) in the app-wide Settings.",
+        "owners": ["nalcalag"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion"]
     },
     "m_dbp_freemium_notification_sent_first_scan_complete": {
         "description": "Fired when the Freemium PIR scan-complete notification is posted after a free user's scan finishes, at most once per profile save.",
@@ -2242,6 +2347,34 @@
         "triggers": ["impression"],
         "suffixes": ["count_short", "form_factor"],
         "parameters": ["appVersion"]
+    },
+    "m_dbp_notification_permission_prompt_shown": {
+        "description": "Fired when the dialog explaining why PIR needs notifications permission is shown.",
+        "owners": ["landomen"],
+        "triggers": ["impression"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
+    },
+    "m_dbp_notification_permission_prompt_accepted": {
+        "description": "Fired when the user taps the positive button on the PIR notification permission dialog.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
+    },
+    "m_dbp_notification_permission_prompt_dismissed": {
+        "description": "Fired when the user taps the negative button on the PIR notification permission dialog or dismisses it with back or an outside tap.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
+    },
+    "m_dbp_notification_permission_granted": {
+        "description": "Fired when notifications are turned on from the PIR notification permission dialog.",
+        "owners": ["landomen"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["count_short", "form_factor"],
+        "parameters": ["appVersion", "pirNotificationPromptType"]
     },
     "wide_pir-initial-scan": {
         "description": "Wide event tracking the lifecycle of a manually-triggered PIR run (initial scan or post-profile-edit), covering scan progress in 10% increments, scan completion, and the follow-on opt-out scheduling phase. Used to measure end-to-end success rate, drop-off, and per-phase latency.",
@@ -2351,6 +2484,11 @@
             {
                 "key": "feature.data.ext.tracker_blocking_state",
                 "description": "Whether tracker blocking was enabled or disabled during the run",
+                "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.scan_webview_size_state",
+                "description": "Whether the scanWebViewSize remote flag was on at the moment the flow started, laying out scan WebViews at a desktop-width viewport instead of 0x0",
                 "enum": ["enabled", "disabled"]
             },
             {
@@ -2691,6 +2829,11 @@
                 "enum": ["enabled", "disabled"]
             },
             {
+                "key": "feature.data.ext.scan_webview_size_state",
+                "description": "Whether the scanWebViewSize remote flag was on at the moment the flow started, laying out scan WebViews at a desktop-width viewport instead of 0x0",
+                "enum": ["enabled", "disabled"]
+            },
+            {
                 "key": "feature.data.ext.free_scan",
                 "description": "Whether the run was a free (freemium) scan.",
                 "enum": ["true", "false"]
@@ -3010,6 +3153,16 @@
             {
                 "key": "feature.data.ext.tracker_blocking_state",
                 "description": "Whether tracker blocking was enabled or disabled at the moment the flow started",
+                "enum": ["enabled", "disabled"]
+            },
+            {
+                "key": "feature.data.ext.free_scan",
+                "description": "Whether the journey started as a free (freemium) scan: scan-only mode for a user without a PIR subscription, recorded at the moment the flow started (first MANUAL_INITIAL run). Stays true if the user subscribes before the journey completes.",
+                "enum": ["true", "false"]
+            },
+            {
+                "key": "feature.data.ext.scan_webview_size_state",
+                "description": "Whether the scanWebViewSize remote flag was on at the moment the flow started, laying out scan WebViews at a desktop-width viewport instead of 0x0",
                 "enum": ["enabled", "disabled"]
             },
             {

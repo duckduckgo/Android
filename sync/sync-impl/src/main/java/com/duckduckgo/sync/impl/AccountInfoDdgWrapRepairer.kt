@@ -25,8 +25,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyWrapFailureReason
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.logcat
 import javax.inject.Inject
@@ -44,7 +44,7 @@ interface AccountInfoDdgWrapRepairer {
     ): Result<Unit>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAccountInfoDdgWrapRepairer @Inject constructor(
     private val syncStore: SyncStore,

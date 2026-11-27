@@ -16,19 +16,26 @@
 
 package com.duckduckgo.app.browser.navigation
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import com.duckduckgo.app.browser.BrowserActivity
+import com.duckduckgo.app.browser.mode.BrowserLaunchSource
+import com.duckduckgo.app.browser.mode.DuckAiWidget
 import com.duckduckgo.app.browser.mode.InAppNavigation
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
+import com.duckduckgo.app.browser.nativeinput.NativeInputLaunch
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.app.tabs.DuckChatLaunch
+import com.duckduckgo.app.tabs.DuckChatLaunchOrigin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class AppBrowserNav @Inject constructor() : BrowserNav {
     override fun openInNewTab(
         context: Context,
@@ -54,22 +61,47 @@ class AppBrowserNav @Inject constructor() : BrowserNav {
     override fun openDuckChat(
         context: Context,
         hasSessionActive: Boolean,
-        duckChatUrl: String,
-        forceImageGeneration: Boolean,
-        forceLaunchContextual: Boolean,
-        textSelection: String?,
+        duckChatUrl: String?,
+        launch: DuckChatLaunch,
     ): Intent {
-        val isExternal = textSelection != null && !forceLaunchContextual
+        val contextual = launch as? DuckChatLaunch.ContextualChat
+        val externalSelection = launch as? DuckChatLaunch.TextSelection
+        val launchSource = when (launch) {
+            is DuckChatLaunch.Open -> launch.origin.toLaunchSource()
+            is DuckChatLaunch.ImageGeneration -> launch.origin.toLaunchSource()
+            is DuckChatLaunch.CameraCapture -> launch.origin.toLaunchSource()
+            is DuckChatLaunch.Voice -> launch.origin.toLaunchSource()
+            is DuckChatLaunch.ChatHistory -> launch.origin.toLaunchSource()
+            is DuckChatLaunch.ContextualChat -> InAppNavigation
+            is DuckChatLaunch.TextSelection -> SelectedTextSearch
+            is DuckChatLaunch.SharedFiles -> SelectedTextSearch
+        }
         return BrowserActivity.intent(
             context = context,
-            launchSource = if (isExternal) SelectedTextSearch else InAppNavigation,
-            openDuckChat = true,
-            duckChatContextual = forceLaunchContextual,
+            launchSource = launchSource,
+            openDuckChat = launch !is DuckChatLaunch.ChatHistory,
+            duckChatContextual = contextual != null,
             duckChatUrl = duckChatUrl,
             duckChatSessionActive = hasSessionActive,
-            duckChatForceImageGeneration = forceImageGeneration,
-            duckChatTextSelection = textSelection,
-        )
+            duckChatForceImageGeneration = launch is DuckChatLaunch.ImageGeneration,
+            duckChatOverrideModelId = (launch as? DuckChatLaunch.Open)?.overrideModelId,
+            duckChatVoice = launch is DuckChatLaunch.Voice,
+            openDuckChatHistory = launch is DuckChatLaunch.ChatHistory,
+            duckChatTextSelection = contextual?.textSelection ?: externalSelection?.text,
+            nativeInputLaunch = NativeInputLaunch.from(launch),
+        ).attachFiles((launch as? DuckChatLaunch.SharedFiles)?.files.orEmpty())
+    }
+
+    private fun Intent.attachFiles(uris: List<Uri>): Intent = apply {
+        uris.firstOrNull()?.let { firstUri ->
+            clipData = ClipData.newRawUri(null, firstUri).apply { uris.drop(1).forEach { addItem(ClipData.Item(it)) } }
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+    }
+
+    private fun DuckChatLaunchOrigin.toLaunchSource(): BrowserLaunchSource = when (this) {
+        DuckChatLaunchOrigin.IN_APP -> InAppNavigation
+        DuckChatLaunchOrigin.HOME_SCREEN_WIDGET -> DuckAiWidget
     }
 
     override fun closeDuckChat(

@@ -23,7 +23,7 @@ import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingRe
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.TRACKERS_COUNT
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.TRACKING_APPS
 import com.duckduckgo.mobile.android.vpn.ui.onboarding.AppThemeAppTPOnboardingResourceHelper.AppTPOnboadingResource.VPN
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface AppTPOnboardingResourceHelper {

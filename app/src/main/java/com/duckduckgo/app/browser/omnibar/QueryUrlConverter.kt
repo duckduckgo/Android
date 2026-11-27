@@ -31,17 +31,18 @@ import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
 import com.duckduckgo.urlpredictor.Decision
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, boundType = OmnibarEntryConverter::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = PrivacyConfigCallbackPlugin::class)
-@SingleInstanceIn(scope = AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<OmnibarEntryConverter>())
+@ContributesIntoSet(scope = AppScope::class, binding = binding<PrivacyConfigCallbackPlugin>())
+@SingleIn(scope = AppScope::class)
 class QueryUrlConverter @Inject constructor(
     private val requestRewriter: RequestRewriter,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,

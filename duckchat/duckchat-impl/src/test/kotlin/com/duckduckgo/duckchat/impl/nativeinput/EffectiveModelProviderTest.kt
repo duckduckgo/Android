@@ -60,9 +60,10 @@ class EffectiveModelProviderTest {
         whenever(it.currentMode).thenReturn(MutableStateFlow(BrowserMode.REGULAR))
     }
     private val store = RealNativeInputStateStore(
-        dagger.Lazy { tabRepositoryProvider },
+        lazy { tabRepositoryProvider },
         browserModeStateHolder,
-        RealTextSelectionRepository(dagger.Lazy { mock() }, mock()),
+        RealTextSelectionRepository(lazy { mock() }, mock()),
+        ChatStateStore(),
     )
     private val modelStateFlow = MutableStateFlow(
         ModelState(
@@ -91,6 +92,21 @@ class EffectiveModelProviderTest {
         publish(NativeInputState.zero())
 
         assertEquals("global-model", testee.resolvedModelId())
+    }
+
+    @Test
+    fun whenTabPickedAModelForItsNewChatThenThePickIsEffective() = runTest {
+        publish(NativeInputState.zero().copy(newChatModelId = "recovery-model"))
+
+        assertEquals("recovery-model", testee.resolvedModelId())
+    }
+
+    @Test
+    fun whenTabWithAChatHasANewChatPickThenTheChatModelStaysEffective() = runTest {
+        chatsFlow.value = chatsFlow.value + chat("chat-1", "chat-model")
+        publish(NativeInputState.zero().copy(chatId = "chat-1", newChatModelId = "recovery-model"))
+
+        assertEquals("chat-model", testee.resolvedModelId())
     }
 
     @Test

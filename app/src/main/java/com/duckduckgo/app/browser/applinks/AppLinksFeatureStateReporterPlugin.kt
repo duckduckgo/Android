@@ -20,12 +20,13 @@ import com.duckduckgo.app.settings.clear.AppLinkSettingType
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.api.BrowserFeatureStateReporterPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = BrowserFeatureStateReporterPlugin::class,
+    binding = binding<BrowserFeatureStateReporterPlugin>(),
 )
 class AppLinksFeatureStateReporterPlugin @Inject constructor(
     private val settingsDataStore: SettingsDataStore,

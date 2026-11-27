@@ -25,8 +25,9 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.installation.impl.installer.di.InstallerModule.InstallSourceFullPackageDataStore
 import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore.IncludedPackages
 import com.duckduckgo.installation.impl.installer.fullpackage.feature.InstallSourceFullPackageListJsonParser
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -44,8 +45,8 @@ interface InstallSourceFullPackageStore {
     }
 }
 
-@ContributesBinding(AppScope::class, boundType = InstallSourceFullPackageStore::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<InstallSourceFullPackageStore>())
+@SingleIn(AppScope::class)
 class InstallSourceFullPackageStoreImpl @Inject constructor(
     private val dispatchers: DispatcherProvider,
     private val jsonParser: InstallSourceFullPackageListJsonParser,

@@ -17,6 +17,7 @@
 package com.duckduckgo.duckchat.impl
 
 object DuckChatConstants {
+    const val PDF_MIME_TYPE = "application/pdf"
     const val JS_MESSAGING_FEATURE_NAME = "aiChat"
     const val DUCK_AI_FEATURE_PAGE = "duckai"
 

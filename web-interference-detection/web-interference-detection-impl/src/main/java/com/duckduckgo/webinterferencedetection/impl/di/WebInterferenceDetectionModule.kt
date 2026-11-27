@@ -22,11 +22,11 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.webinterferencedetection.impl.WebInterferenceDetection
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object WebInterferenceDetectionModule {
 

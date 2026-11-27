@@ -18,11 +18,11 @@ package com.duckduckgo.autofill.impl.ui.credential.management.survey
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command.DismissSurvey
 import com.duckduckgo.autofill.impl.ui.credential.management.survey.SurveyInPasswordsPromotionViewModel.Command.LaunchSurvey
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST

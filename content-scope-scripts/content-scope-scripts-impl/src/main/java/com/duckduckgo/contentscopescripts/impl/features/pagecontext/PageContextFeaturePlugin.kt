@@ -18,10 +18,10 @@ package com.duckduckgo.contentscopescripts.impl.features.pagecontext
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PageContextFeaturePlugin @Inject constructor(
     private val pageContextRepository: PageContextRepository,
 ) : PrivacyFeaturePlugin {

@@ -332,7 +332,7 @@ class RoomDatabaseProviderImplTest {
         subject = RoomDatabaseProviderImpl(
             context,
             roomDatabaseBuilderFactory,
-            { RealDatabaseExecutorProvider(databaseProviderFeature) },
+            lazy { RealDatabaseExecutorProvider(databaseProviderFeature) },
         )
     }
 }

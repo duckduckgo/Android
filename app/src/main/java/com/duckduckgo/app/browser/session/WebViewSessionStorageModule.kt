@@ -25,21 +25,21 @@ import com.duckduckgo.browsermode.api.RegularMode
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
 /**
  * Each mode keeps its sessions in its own database, so a Fire tab's session can't outlive the Fire tab rows.
  */
 @ContributesTo(AppScope::class)
-@Module
+@BindingContainer
 object WebViewSessionStorageModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @RegularMode
     fun provideRegularWebViewSessionStorage(
         @RegularMode dao: WebViewSessionDao,
@@ -54,7 +54,7 @@ object WebViewSessionStorageModule {
     )
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @FireMode
     fun provideFireWebViewSessionStorage(
         @FireMode dao: WebViewSessionDao,
@@ -75,7 +75,7 @@ object WebViewSessionStorageModule {
  * AppScope consumers must inject the qualified `@RegularMode` / `@FireMode` storage explicitly.
  */
 @ContributesTo(ActivityScope::class)
-@Module
+@BindingContainer
 object WebViewSessionStorageActivityModule {
 
     @Provides

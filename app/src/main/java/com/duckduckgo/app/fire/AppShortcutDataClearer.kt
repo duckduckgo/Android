@@ -20,15 +20,15 @@ import com.duckduckgo.app.fire.store.FireDataStore
 import com.duckduckgo.app.fire.wideevents.DataClearingWideEvent
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface AppShortcutDataClearer {
     suspend fun clearFromAppShortcut(browserMode: BrowserMode)
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAppShortcutDataClearer @Inject constructor(
     private val fireDataStore: FireDataStore,

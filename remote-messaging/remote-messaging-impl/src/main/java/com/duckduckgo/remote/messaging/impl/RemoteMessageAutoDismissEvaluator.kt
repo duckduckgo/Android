@@ -21,7 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.RemoteMessage
 import com.duckduckgo.remote.messaging.impl.pixels.RemoteMessagingPixels
 import com.duckduckgo.remote.messaging.store.RemoteMessageEntity
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

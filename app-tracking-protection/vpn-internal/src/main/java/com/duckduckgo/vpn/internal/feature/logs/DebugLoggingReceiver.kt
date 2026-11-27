@@ -25,7 +25,7 @@ import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.internal.feature.InternalFeatureReceiver
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import logcat.logcat
 import javax.inject.Inject
@@ -62,7 +62,7 @@ class DebugLoggingReceiver(
     }
 }
 
-@ContributesMultibinding(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
 class DebugLoggingReceiverRegister @Inject constructor(
     private val context: Context,
     private val appTpLocalFeature: AppTpLocalFeature,

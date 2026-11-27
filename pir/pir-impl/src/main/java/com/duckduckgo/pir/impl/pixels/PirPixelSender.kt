@@ -20,6 +20,10 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
+import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason
+import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
+import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_APP_SETTINGS_CLICK
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BG_STATS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_ACTION_FAILED
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT
@@ -31,6 +35,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_42DAY_UNC
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_BUNDLE_BROKER_JSON_LOADED
@@ -70,6 +75,10 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_MAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERACTION_WAU
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_INTERNAL_SECURE_STORAGE_UNAVAILABLE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_MANUAL_RESET
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_GRANTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_PROMPT_ACCEPTED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_PROMPT_DISMISSED
+import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_PERMISSION_PROMPT_SHOWN
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_INVALID_EVENT
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_OPTOUT_STAGE_CAPTCHA_PARSE
@@ -102,7 +111,7 @@ import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_FAILURE
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_UPDATE_BROKER_SUCCESS
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 
@@ -118,6 +127,7 @@ interface PirPixelSender {
      * @param brokerCount - the number of active brokers at the start of the scan
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
      * @param notificationsPermissionGranted - whether notifications are enabled for the app
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
@@ -125,6 +135,7 @@ interface PirPixelSender {
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -139,6 +150,7 @@ interface PirPixelSender {
      * @param isPowerSavingEnabled - whether the device is currently in power saving mode
      * @param executionType - which manual flow triggered the scan (onboarding or profile edit)
      * @param notificationsPermissionGranted - whether notifications are enabled for the app
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     suspend fun reportManualScanCompleted(
         totalTimeInMillis: Long,
@@ -150,6 +162,7 @@ interface PirPixelSender {
         isPowerSavingEnabled: Boolean,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -172,10 +185,12 @@ interface PirPixelSender {
      *
      * @param profileQueryCount - the number of profile queries used in the scan
      * @param brokerCount - the number of active brokers at the start of the scan
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     fun reportScheduledScanStarted(
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -186,6 +201,7 @@ interface PirPixelSender {
      * @param totalOptOutJobs - the number of opt-out jobs executed during the run
      * @param profileQueryCount - the number of profile queries used in the scan
      * @param brokerCount - the number of active brokers at the start of the scan
+     * @param isFreeScan - whether the run is a free scan: scan-only mode for a user without a PIR subscription
      */
     fun reportScheduledScanCompleted(
         totalTimeInMillis: Long,
@@ -193,6 +209,7 @@ interface PirPixelSender {
         totalOptOutJobs: Int,
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     )
 
     /**
@@ -434,6 +451,20 @@ interface PirPixelSender {
     fun reportBrokerOptOutProfileReappeared(brokerUrl: String)
 
     /**
+     * Fired when a stored profile is marked removed although the same scan found a profile with the same
+     * identifier, so only its name or profile URL changed.
+     *
+     * @param brokerUrl The url of the broker where the profile was found.
+     * @param changedField Which part of the match key no longer matched.
+     * @param previousStatus Status of the opt-out job before it was marked removed.
+     */
+    fun reportBrokerOptOutRemovedWithIdentifierFound(
+        brokerUrl: String,
+        changedField: ChangedField,
+        previousStatus: OptOutJobStatus,
+    )
+
+    /**
      * Emits a daily pixel to report that the user is eligible to run PIR.
      */
     fun reportCanRunPir()
@@ -502,6 +533,7 @@ interface PirPixelSender {
 
     fun reportScanStarted(
         brokerUrl: String,
+        isFreeScan: Boolean,
     )
 
     fun reportScanStage(
@@ -668,11 +700,13 @@ interface PirPixelSender {
 
     /**
      * @param isFreeScan whether the user has no PIR subscription
+     * @param reason why the broker JSON was not stored
      */
     fun reportUpdateBrokerJsonFailure(
         brokerJsonFileName: String,
         removedAtMs: Long,
         isFreeScan: Boolean?,
+        reason: BrokerJsonUpdateFailureReason,
     )
 
     suspend fun reportDownloadMainConfigBEFailure(
@@ -748,15 +782,25 @@ interface PirPixelSender {
         didCrash: Boolean,
     )
 
-    fun reportFreemiumSettingsEntryPointImpression()
+    fun reportFreemiumSettingsEntryPointImpression(ctaState: PirFreemiumCtaState)
 
     fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState)
+
+    fun reportAppSettingsClick()
 
     fun reportFreemiumScanCompleteNotificationSent()
 
     fun reportFreemiumScanCompleteNotificationOpened()
 
     fun reportScanCompleteNotificationSent()
+
+    fun reportNotificationPermissionPromptShown(promptType: PirNotificationPromptType)
+
+    fun reportNotificationPermissionPromptAccepted(promptType: PirNotificationPromptType)
+
+    fun reportNotificationPermissionPromptDismissed(promptType: PirNotificationPromptType)
+
+    fun reportNotificationPermissionGranted(promptType: PirNotificationPromptType)
 }
 
 @ContributesBinding(AppScope::class)
@@ -771,6 +815,7 @@ class RealPirPixelSender @Inject constructor(
         brokerCount: Int,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_POWER_SAVING to isPowerSavingEnabled.toString(),
@@ -779,6 +824,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
             PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_FOREGROUND_RUN_STARTED, params)
     }
@@ -793,6 +839,7 @@ class RealPirPixelSender @Inject constructor(
         isPowerSavingEnabled: Boolean,
         executionType: PirExecutionType,
         notificationsPermissionGranted: Boolean,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
@@ -805,6 +852,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_SCAN_TRIGGER to executionType.toScanTriggerParam(),
             PARAM_KEY_NOTIFICATIONS_PERMISSION to notificationsPermissionGranted.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_FOREGROUND_RUN_COMPLETED, params)
     }
@@ -824,10 +872,12 @@ class RealPirPixelSender @Inject constructor(
     override fun reportScheduledScanStarted(
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_SCHEDULED_RUN_STARTED, params)
     }
@@ -838,6 +888,7 @@ class RealPirPixelSender @Inject constructor(
         totalOptOutJobs: Int,
         profileQueryCount: Int,
         brokerCount: Int,
+        isFreeScan: Boolean,
     ) {
         val params = mapOf(
             PARAM_KEY_TOTAL_TIME to totalTimeInMillis.toString(),
@@ -845,6 +896,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_TOTAL_OPTOUT to totalOptOutJobs.toString(),
             PARAM_KEY_PROFILE_QUERY_COUNT to profileQueryCount.toString(),
             PARAM_KEY_BROKER_COUNT to brokerCount.toString(),
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
         fire(PIR_SCHEDULED_RUN_COMPLETED, params)
     }
@@ -1130,6 +1182,20 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED, params)
     }
 
+    override fun reportBrokerOptOutRemovedWithIdentifierFound(
+        brokerUrl: String,
+        changedField: ChangedField,
+        previousStatus: OptOutJobStatus,
+    ) {
+        val params = mapOf(
+            PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_CHANGED_FIELD to changedField.toChangedFieldParam(),
+            PARAM_KEY_OPTOUT_STATUS to previousStatus.toOptOutStatusParam(),
+        )
+
+        enqueueFire(PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND, params)
+    }
+
     override fun reportCanRunPir() {
         enqueueFire(PIR_CAN_RUN_PIR)
     }
@@ -1176,9 +1242,13 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_WEEKLY_CHILD_ORPHANED_OPTOUTS, params)
     }
 
-    override fun reportScanStarted(brokerUrl: String) {
+    override fun reportScanStarted(
+        brokerUrl: String,
+        isFreeScan: Boolean,
+    ) {
         val params = mapOf(
             PARAM_KEY_BROKER to brokerUrl,
+            PARAM_KEY_FREE_SCAN to isFreeScan.toString(),
         )
 
         fire(PIR_SCAN_STARTED, params)
@@ -1569,8 +1639,10 @@ class RealPirPixelSender @Inject constructor(
         brokerJsonFileName: String,
         removedAtMs: Long,
         isFreeScan: Boolean?,
+        reason: BrokerJsonUpdateFailureReason,
     ) {
-        fire(PIR_UPDATE_BROKER_FAILURE, brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan))
+        val params = brokerUpdateParams(brokerJsonFileName, removedAtMs, isFreeScan) + (PARAM_KEY_REASON to reason.pixelValue)
+        fire(PIR_UPDATE_BROKER_FAILURE, params)
     }
 
     override suspend fun reportDownloadMainConfigBEFailure(errorCode: String) {
@@ -1720,12 +1792,16 @@ class RealPirPixelSender @Inject constructor(
         enqueueFire(PIR_SCAN_RENDERER_GONE, params)
     }
 
-    override fun reportFreemiumSettingsEntryPointImpression() {
-        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION)
+    override fun reportFreemiumSettingsEntryPointImpression(ctaState: PirFreemiumCtaState) {
+        fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_IMPRESSION, mapOf(PARAM_KEY_CTA_STATE to ctaState.paramValue))
     }
 
     override fun reportFreemiumSettingsEntryPointClicked(ctaState: PirFreemiumCtaState) {
         fire(PIR_FREEMIUM_SETTINGS_ENTRY_POINT_CLICKED, mapOf(PARAM_KEY_CTA_STATE to ctaState.paramValue))
+    }
+
+    override fun reportAppSettingsClick() {
+        fire(PIR_APP_SETTINGS_CLICK)
     }
 
     override fun reportFreemiumScanCompleteNotificationSent() {
@@ -1738,6 +1814,22 @@ class RealPirPixelSender @Inject constructor(
 
     override fun reportScanCompleteNotificationSent() {
         fire(PIR_NOTIFICATION_SENT_FIRST_SCAN_COMPLETE)
+    }
+
+    override fun reportNotificationPermissionPromptShown(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_PROMPT_SHOWN, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
+    }
+
+    override fun reportNotificationPermissionPromptAccepted(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_PROMPT_ACCEPTED, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
+    }
+
+    override fun reportNotificationPermissionPromptDismissed(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_PROMPT_DISMISSED, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
+    }
+
+    override fun reportNotificationPermissionGranted(promptType: PirNotificationPromptType) {
+        fire(PIR_NOTIFICATION_PERMISSION_GRANTED, mapOf(PARAM_KEY_PROMPT_TYPE to promptType.paramValue))
     }
 
     private fun usageParams(isAuthenticated: Boolean): Map<String, String> = mapOf(
@@ -1759,9 +1851,10 @@ class RealPirPixelSender @Inject constructor(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
     ) {
+        val allParams = params.withRunContext(pixel)
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            logcat { "PIR-LOGGING: $pixelName params: $params" }
-            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = params)
+            logcat { "PIR-LOGGING: $pixelName params: $allParams" }
+            pixelSender.fire(pixelName = pixelName, type = pixelType, parameters = allParams)
         }
     }
 
@@ -1769,9 +1862,21 @@ class RealPirPixelSender @Inject constructor(
         pixel: PirPixel,
         params: Map<String, String> = emptyMap(),
     ) {
+        val allParams = params.withRunContext(pixel)
         pixel.getPixelNames().forEach { (pixelType, pixelName) ->
-            logcat { "PIR-LOGGING: $pixelName params: $params" }
-            pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = params)
+            logcat { "PIR-LOGGING: $pixelName params: $allParams" }
+            pixelSender.enqueueFire(pixelName = pixelName, type = pixelType, parameters = allParams)
+        }
+    }
+
+    private fun Map<String, String>.withRunContext(pixel: PirPixel): Map<String, String> =
+        if (pixel in RUN_PIXELS) this + (PARAM_KEY_SCAN_WEBVIEW_SIZE to scanWebViewSizeState()) else this
+
+    private fun scanWebViewSizeState(): String {
+        return if (pirRemoteFeatures.scanWebViewSize().isEnabled()) {
+            "enabled"
+        } else {
+            "disabled"
         }
     }
 
@@ -1802,9 +1907,85 @@ class RealPirPixelSender @Inject constructor(
         PirExecutionType.SCHEDULED -> "scheduled"
     }
 
+    private fun ChangedField.toChangedFieldParam(): String = when (this) {
+        ChangedField.NAME -> "name"
+        ChangedField.PROFILE_URL -> "profile_url"
+        ChangedField.NAME_AND_PROFILE_URL -> "name_and_profile_url"
+    }
+
+    private fun OptOutJobStatus.toOptOutStatusParam(): String = when (this) {
+        OptOutJobStatus.NOT_EXECUTED -> "not_executed"
+        OptOutJobStatus.REQUESTED -> "requested"
+        OptOutJobStatus.REMOVED -> "removed"
+        OptOutJobStatus.ERROR -> "error"
+        OptOutJobStatus.PENDING_EMAIL_CONFIRMATION -> "pending_email_confirmation"
+        OptOutJobStatus.REMOVED_BY_USER -> "removed_by_user"
+    }
+
     private fun Long.roundToNearest10Ms(): Long = ((this + 5) / 10) * 10
 
     companion object {
+        /**
+         * Pixels emitted by, or reporting the outcome of, scan and opt-out runs. They carry the scan WebView size
+         * state so results can be compared with the scanWebViewSize flag on and off.
+         */
+        private val RUN_PIXELS = setOf(
+            PIR_FOREGROUND_RUN_STARTED,
+            PIR_FOREGROUND_RUN_COMPLETED,
+            PIR_FOREGROUND_RUN_LOW_MEMORY,
+            PIR_INITIAL_SCAN_INCOMPLETE,
+            PIR_SCHEDULED_RUN_STARTED,
+            PIR_SCHEDULED_RUN_COMPLETED,
+            PIR_CPU_USAGE,
+            PIR_EMAIL_CONFIRMATION_ATTEMPT_START,
+            PIR_EMAIL_CONFIRMATION_ATTEMPT_SUCCESS,
+            PIR_EMAIL_CONFIRMATION_ATTEMPT_FAILED,
+            PIR_EMAIL_CONFIRMATION_MAX_RETRIES_EXCEEDED,
+            PIR_EMAIL_CONFIRMATION_JOB_SUCCESS,
+            PIR_EMAIL_CONFIRMATION_RUN_STARTED,
+            PIR_EMAIL_CONFIRMATION_RUN_COMPLETED,
+            PIR_OPTOUT_SUBMIT_SUCCESS,
+            PIR_OPTOUT_SUBMIT_FAILURE,
+            PIR_BROKER_CUSTOM_STATS_OPTOUT_SUBMIT_SUCCESSRATE,
+            PIR_BROKER_CUSTOM_STATS_7DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_7DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_14DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_14DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_21DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_21DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_42DAY_CONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_42DAY_UNCONFIRMED_OPTOUT,
+            PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED,
+            PIR_BROKER_CUSTOM_STATS_OPTOUT_REMOVED_IDENTIFIER_FOUND,
+            PIR_FIRST_SCAN_STARTED,
+            PIR_SCAN_STARTED,
+            PIR_SCAN_STAGE,
+            PIR_SCAN_STAGE_EMAIL_GET_DATA,
+            PIR_SCAN_STAGE_RESULT_MATCHES,
+            PIR_SCAN_STAGE_RESULT_NO_MATCH,
+            PIR_SCAN_STAGE_RESULT_ERROR,
+            PIR_OPTOUT_STAGE_START,
+            PIR_OPTOUT_STAGE_EMAIL_GENERATE,
+            PIR_OPTOUT_STAGE_EMAIL_GET_DATA,
+            PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION,
+            PIR_OPTOUT_STAGE_CAPTCHA_PARSE,
+            PIR_OPTOUT_STAGE_CAPTCHA_SEND,
+            PIR_OPTOUT_STAGE_CAPTCHA_SOLVE,
+            PIR_OPTOUT_STAGE_SUBMIT,
+            PIR_OPTOUT_STAGE_CONDITION_FOUND,
+            PIR_OPTOUT_STAGE_CONDITION_NOT_FOUND,
+            PIR_OPTOUT_STAGE_VALIDATE,
+            PIR_OPTOUT_STAGE_FILLFORM,
+            PIR_OPTOUT_STAGE_FINISH,
+            PIR_BROKER_ACTION_FAILED,
+            PIR_INITIAL_SCAN_DURATION,
+            PIR_BG_STATS,
+            PIR_SCAN_INVALID_EVENT,
+            PIR_OPTOUT_INVALID_EVENT,
+            PIR_SCAN_RENDERER_GONE,
+        )
+
+        private const val PARAM_KEY_SCAN_WEBVIEW_SIZE = "scan_webview_size_state"
         private const val PARAM_KEY_TOTAL_TIME = "totalTimeInMillis"
         private const val PARAM_KEY_CPU_USAGE = "cpuUsage"
         private const val PARAM_BROKER_VERSION = "broker_version"
@@ -1821,6 +2002,8 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_FREE_SCAN = "free_scan"
 
         private const val PARAM_KEY_BROKER = "data_broker"
+        private const val PARAM_KEY_CHANGED_FIELD = "changed_field"
+        private const val PARAM_KEY_OPTOUT_STATUS = "optout_status"
         private const val PARAM_KEY_PARENT = "parent"
         private const val PARAM_KEY_STAGE = "stage"
         private const val PARAM_KEY_PATTERN = "pattern"
@@ -1834,6 +2017,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_ERROR_DETAILS = "error_details"
         private const val PARAM_KEY_BROKER_JSON_FILE = "data_broker_json_file"
         private const val PARAM_KEY_REMOVED_AT = "removed_at"
+        private const val PARAM_KEY_REASON = "reason"
         private const val PARAM_KEY_MSG = "message"
         private const val PARAM_KEY_STEP = "stepType"
         private const val PARAM_KEY_DURATION_MS = "duration_in_ms"
@@ -1850,5 +2034,6 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_NOTIFICATIONS_PERMISSION = "notifications_permission_granted"
         private const val PARAM_KEY_DID_CRASH = "did_crash"
         private const val PARAM_KEY_CTA_STATE = "cta_state"
+        private const val PARAM_KEY_PROMPT_TYPE = "prompt_type"
     }
 }

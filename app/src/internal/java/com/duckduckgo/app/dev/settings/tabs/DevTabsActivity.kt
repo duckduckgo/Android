@@ -22,7 +22,6 @@ import android.os.Bundle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.databinding.ActivityDevTabsBinding
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command
@@ -30,6 +29,7 @@ import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandi
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.Command.NoMoreCandidatesForFavorites
 import com.duckduckgo.app.dev.settings.tabs.DevTabsViewModel.ViewState
 import com.duckduckgo.app.notification.NotificationFactory
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler

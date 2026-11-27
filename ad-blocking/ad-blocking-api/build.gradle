@@ -30,13 +30,12 @@ kotlin {
 }
 
 dependencies {
-    implementation Kotlin.stdlib.jdk7
-    implementation AndroidX.core.ktx
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.fragment.ktx
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
     implementation project(path: ':common-utils')
     implementation project(':navigation-api')
+    implementation AndroidX.core.ktx
+    implementation AndroidX.fragment.ktx
+    implementation Kotlin.stdlib.jdk7
+    implementation KotlinX.coroutines.core
 }
 
 
@@ -46,8 +45,5 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }

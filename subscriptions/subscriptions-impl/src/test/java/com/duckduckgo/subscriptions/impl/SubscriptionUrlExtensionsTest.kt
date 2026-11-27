@@ -86,6 +86,21 @@ class SubscriptionUrlExtensionsTest {
         assertEquals("funnel_freescan_android", result.getQueryParameter("origin"))
     }
 
+    @Test
+    fun whenOriginIsAPirFreeScanEntryPointThenOriginParamIsAppended() {
+        listOf(
+            "funnel_freescan_android__freescanbanner",
+            "funnel_freescan_android__viewresultsbanner",
+            "funnel_freescan_android__appsettingsprescan",
+            "funnel_freescan_android__appsettingspostscan",
+            "funnel_freescan_android__scancompletenotification",
+        ).forEach { origin ->
+            val result = BUY_URL.appendFunnelOriginParam(origin).toUri()
+
+            assertEquals(origin, result.getQueryParameter("origin"))
+        }
+    }
+
     companion object {
         private const val BUY_URL = "https://duckduckgo.com/pro"
     }

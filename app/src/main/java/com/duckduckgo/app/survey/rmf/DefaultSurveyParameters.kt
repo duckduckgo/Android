@@ -28,12 +28,12 @@ import com.duckduckgo.feature.toggles.api.FeatureTogglesInventory
 import com.duckduckgo.history.api.HistoryEntry
 import com.duckduckgo.history.api.NavigationHistory
 import com.duckduckgo.survey.api.SurveyParameterPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.firstOrNull
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AtbSurveyParameterPlugin @Inject constructor(
     private val statisticsStore: StatisticsDataStore,
 ) : SurveyParameterPlugin {
@@ -42,7 +42,7 @@ class AtbSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = statisticsStore.atb?.version ?: ""
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AtbVariantSurveyParameterPlugin @Inject constructor(
     private val statisticsStore: StatisticsDataStore,
 ) : SurveyParameterPlugin {
@@ -51,7 +51,7 @@ class AtbVariantSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = statisticsStore.variant ?: ""
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DaysInstalledSurveyParameterPlugin @Inject constructor(
     private val appInstallStore: AppInstallStore,
 ) : SurveyParameterPlugin {
@@ -60,7 +60,7 @@ class DaysInstalledSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = "${appInstallStore.daysInstalled()}"
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AndroidVersionSurveyParameterPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : SurveyParameterPlugin {
@@ -69,7 +69,7 @@ class AndroidVersionSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = "${appBuildConfig.sdkInt}"
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AppVersionSurveyParameterPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : SurveyParameterPlugin {
@@ -78,7 +78,7 @@ class AppVersionSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = appBuildConfig.versionName
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ManufacturerSurveyParameterPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : SurveyParameterPlugin {
@@ -87,7 +87,7 @@ class ManufacturerSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = appBuildConfig.manufacturer
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ModelSurveyParameterPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : SurveyParameterPlugin {
@@ -96,14 +96,14 @@ class ModelSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = appBuildConfig.model
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SourceSurveyParameterPlugin @Inject constructor() : SurveyParameterPlugin {
     override fun matches(paramKey: String): Boolean = paramKey == "src"
 
     override suspend fun evaluate(paramKey: String): String = IN_APP.name.lowercase()
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class LastActiveDateSurveyParameterPlugin @Inject constructor(
     private val appDaysUsedRepository: AppDaysUsedRepository,
 ) : SurveyParameterPlugin {
@@ -112,7 +112,7 @@ class LastActiveDateSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = appDaysUsedRepository.getLastActiveDay()
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class LocaleSurveyParameterPlugin @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
 ) : SurveyParameterPlugin {
@@ -121,7 +121,7 @@ class LocaleSurveyParameterPlugin @Inject constructor(
     override suspend fun evaluate(paramKey: String): String = "${appBuildConfig.deviceLocale.language}-${appBuildConfig.deviceLocale.country}"
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class CohortSurveyParameterPlugin @Inject constructor(
     private val featureTogglesInventory: FeatureTogglesInventory,
 ) : SurveyParameterPlugin {
@@ -141,7 +141,7 @@ class CohortSurveyParameterPlugin @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class LastSearchStateSurveyParameterPlugin @Inject constructor(
     private val navigationHistory: NavigationHistory,
     private val currentTimeProvider: CurrentTimeProvider,

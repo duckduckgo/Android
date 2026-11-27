@@ -16,37 +16,31 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':anvil-annotations')
-
-    implementation project(':di')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
-    implementation project(':sqlcipher-loader-api')
+    implementation project(':di')
     implementation project(':library-loader-api')
+    implementation project(':sqlcipher-loader-api')
     implementation project(':statistics-api')
-
-    implementation AndroidX.lifecycle.runtime.ktx
     implementation "com.squareup.logcat:logcat:_"
-    implementation Google.dagger
+    implementation AndroidX.lifecycle.runtime.ktx
     implementation KotlinX.coroutines.core
 
     testImplementation project(path: ':common-test')
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.core
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.core
 }
 
 android {
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true

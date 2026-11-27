@@ -19,23 +19,30 @@ package com.duckduckgo.pir.impl.freemium.settings
 import androidx.lifecycle.LifecycleOwner
 import app.cash.turbine.test
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pir.impl.dashboard.entrypoint.PirFreeScanEntryPoint
 import com.duckduckgo.pir.impl.freemium.PirFreemium
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState.ELIGIBLE
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState.NOT_ELIGIBLE
 import com.duckduckgo.pir.impl.freemium.PirFreemiumState.USED
 import com.duckduckgo.pir.impl.freemium.settings.PirFreemiumSettingViewModel.Command.OpenPirDashboard
 import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState
+import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState.START_FREE_SCAN
+import com.duckduckgo.pir.impl.pixels.PirFreemiumCtaState.VIEW_SCAN_RESULTS
 import com.duckduckgo.pir.impl.pixels.PirPixelSender
+import com.duckduckgo.pir.impl.store.PirFreemiumDataStore
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 
 class PirFreemiumSettingViewModelTest {
@@ -45,47 +52,70 @@ class PirFreemiumSettingViewModelTest {
 
     private val pirFreemium: PirFreemium = mock()
     private val pixelSender: PirPixelSender = mock()
+    private val pirFreemiumDataStore: PirFreemiumDataStore = mock()
     private val lifecycleOwner: LifecycleOwner = mock()
 
     private lateinit var testee: PirFreemiumSettingViewModel
 
     @Before
     fun before() {
-        testee = PirFreemiumSettingViewModel(pirFreemium, pixelSender)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(false)
+        testee = PirFreemiumSettingViewModel(
+            pirFreemium = pirFreemium,
+            pixelSender = pixelSender,
+            pirFreemiumDataStore = pirFreemiumDataStore,
+            dispatcherProvider = coroutineTestRule.testDispatcherProvider,
+        )
     }
 
     @Test
-    fun whenEligibleThenStateIsEligible() = runTest {
+    fun whenEligibleWithoutSavedProfileThenCtaIsStartFreeScan() = runTest {
         whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
 
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(ELIGIBLE, expectMostRecentItem().freemiumState)
+            assertEquals(START_FREE_SCAN, expectMostRecentItem().cta)
         }
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(START_FREE_SCAN)
     }
 
     @Test
-    fun whenUsedThenStateIsUsed() = runTest {
+    fun whenEligibleWithSavedProfileThenCtaIsViewScanResults() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(true)
+
+        testee.onResume(lifecycleOwner)
+
+        testee.viewState.test {
+            assertEquals(VIEW_SCAN_RESULTS, expectMostRecentItem().cta)
+        }
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(VIEW_SCAN_RESULTS)
+    }
+
+    @Test
+    fun whenUsedThenCtaIsViewScanResults() = runTest {
         whenever(pirFreemium.getPirFreemiumState()).thenReturn(USED)
 
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(USED, expectMostRecentItem().freemiumState)
+            assertEquals(VIEW_SCAN_RESULTS, expectMostRecentItem().cta)
         }
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(VIEW_SCAN_RESULTS)
     }
 
     @Test
-    fun whenNotEligibleThenStateIsNotEligibleAndNoImpressionFired() = runTest {
+    fun whenNotEligibleThenCtaIsHiddenAndNoImpressionFired() = runTest {
         whenever(pirFreemium.getPirFreemiumState()).thenReturn(NOT_ELIGIBLE)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(true)
 
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(NOT_ELIGIBLE, expectMostRecentItem().freemiumState)
+            assertNull(expectMostRecentItem().cta)
         }
-        verify(pixelSender, never()).reportFreemiumSettingsEntryPointImpression()
+        verify(pixelSender, never()).reportFreemiumSettingsEntryPointImpression(any())
     }
 
     @Test
@@ -96,9 +126,21 @@ class PirFreemiumSettingViewModelTest {
         testee.commands().test {
             testee.onEntryPointClicked()
 
-            assertEquals(OpenPirDashboard, awaitItem())
+            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_SETTINGS_PRE_SCAN), awaitItem())
         }
         verify(pixelSender).reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.START_FREE_SCAN)
+    }
+
+    @Test
+    fun whenUsedAndClickedThenDashboardOpensFromThePostScanEntryPoint() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(USED)
+        testee.onResume(lifecycleOwner)
+
+        testee.commands().test {
+            testee.onEntryPointClicked()
+
+            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN), awaitItem())
+        }
     }
 
     @Test
@@ -112,6 +154,38 @@ class PirFreemiumSettingViewModelTest {
     }
 
     @Test
+    fun whenEligibleWithSavedProfileAndClickedThenDashboardOpensFromThePostScanEntryPoint() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(true)
+        testee.onResume(lifecycleOwner)
+
+        testee.commands().test {
+            testee.onEntryPointClicked()
+
+            assertEquals(OpenPirDashboard(PirFreeScanEntryPoint.APP_SETTINGS_POST_SCAN), awaitItem())
+        }
+        verify(pixelSender).reportFreemiumSettingsEntryPointClicked(PirFreemiumCtaState.VIEW_SCAN_RESULTS)
+    }
+
+    @Test
+    fun whenProfileSavedWhileSettingsOpenThenCtaSwitchesToViewScanResultsOnNextResume() = runTest {
+        whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
+        testee.onResume(lifecycleOwner)
+
+        whenever(pirFreemiumDataStore.didActivate).thenReturn(true)
+        testee.onResume(lifecycleOwner)
+
+        testee.viewState.test {
+            assertEquals(VIEW_SCAN_RESULTS, expectMostRecentItem().cta)
+        }
+        inOrder(pixelSender) {
+            verify(pixelSender).reportFreemiumSettingsEntryPointImpression(START_FREE_SCAN)
+            verify(pixelSender).reportFreemiumSettingsEntryPointImpression(VIEW_SCAN_RESULTS)
+        }
+        verifyNoMoreInteractions(pixelSender)
+    }
+
+    @Test
     fun whenResumedRepeatedlyThenImpressionFiredOnlyOnce() = runTest {
         whenever(pirFreemium.getPirFreemiumState()).thenReturn(ELIGIBLE)
 
@@ -119,7 +193,8 @@ class PirFreemiumSettingViewModelTest {
         testee.onResume(lifecycleOwner)
         testee.onResume(lifecycleOwner)
 
-        verify(pixelSender, times(1)).reportFreemiumSettingsEntryPointImpression()
+        verify(pixelSender).reportFreemiumSettingsEntryPointImpression(START_FREE_SCAN)
+        verifyNoMoreInteractions(pixelSender)
     }
 
     @Test
@@ -131,7 +206,7 @@ class PirFreemiumSettingViewModelTest {
         testee.onResume(lifecycleOwner)
 
         testee.viewState.test {
-            assertEquals(NOT_ELIGIBLE, expectMostRecentItem().freemiumState)
+            assertNull(expectMostRecentItem().cta)
         }
     }
 

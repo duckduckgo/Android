@@ -126,6 +126,24 @@ class RealBrowserMenuViewStateFactoryTest {
     }
 
     @Test
+    fun `when creating menu in duck ai mode then vpn menu state is passed through`() = runTest {
+        val vpnMenuState = VpnMenuState.Subscribed(isVpnEnabled = true)
+        val browserViewState = BrowserViewState(vpnMenuState = vpnMenuState)
+
+        val result = testee.create(
+            omnibarViewMode = ViewMode.DuckAI,
+            viewState = browserViewState,
+            customTabsMode = false,
+            tabId = "",
+            title = null,
+            shortUrl = null,
+            omnibarText = null,
+        )
+
+        assertEquals(vpnMenuState, (result as BrowserMenuViewState.DuckAi).vpnMenuState)
+    }
+
+    @Test
     fun `when creating menu in error mode we return the proper state`() = runTest {
         val browserViewState = BrowserViewState(
             showDuckChatOption = true,

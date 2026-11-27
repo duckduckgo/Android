@@ -27,7 +27,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.dialog.CustomAlertDialogBuilder
 import com.duckduckgo.common.ui.view.dialog.DaxAlertDialog
@@ -41,6 +41,8 @@ import com.duckduckgo.sync.impl.databinding.ActivityDisplayQrCodeBinding
 import com.duckduckgo.sync.impl.databinding.DialogSyncCheckOtherDeviceBinding
 import com.duckduckgo.sync.impl.databinding.DialogSyncConnectingBinding
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.setup.SyncPairingUrl
+import com.duckduckgo.sync.impl.setup.SyncPairingUrlFeature
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2ConfirmationMessage
@@ -49,13 +51,11 @@ import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.C
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.SetPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShareCode
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowMessage
-import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.DialogType
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Factory
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Factory.Provider
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.ViewState
-import com.duckduckgo.sync.impl.ui.pairing.showExchangeV1PairingError
 import com.duckduckgo.sync.impl.ui.pairing.showExchangeV2PairingError
 import com.duckduckgo.sync.impl.ui.pairing.showLeadingProgressSpinner
 import com.google.android.material.snackbar.Snackbar
@@ -66,6 +66,9 @@ import com.duckduckgo.mobile.android.R as CommonR
 
 @InjectWith(ActivityScope::class)
 class DisplayQrCodeActivity : DuckDuckGoActivity() {
+    @Inject
+    lateinit var syncPairingUrlFeature: SyncPairingUrlFeature
+
     private val binding by viewBinding<ActivityDisplayQrCodeBinding>()
 
     @Inject
@@ -77,7 +80,10 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
     @Inject
     lateinit var shareAction: ShareAction
 
-    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+    private val launchSource
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
+            "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
+        }
 
     private val syncEntryPoint
         get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
@@ -99,6 +105,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         configureEdgeToEdgeInsets()
 
         configureToolbar()
+        configureInstructions()
         configureCodeButtons()
 
         observeViewModel()
@@ -108,6 +115,15 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         super.onDestroy()
         visibleDialog?.dismiss()
         visibleDialog = null
+    }
+
+    private fun configureInstructions() {
+        if (syncPairingUrlFeature.isEnabled) {
+            binding.pairingHeader.setBody(
+                R.string.sync_simplified_qr_code_header_body_pairing_url,
+                SyncPairingUrl.INSTRUCTIONS_URL,
+            )
+        }
     }
 
     private fun configureCodeButtons() {
@@ -160,7 +176,6 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
             is ShowMessage -> showMessage(command.message)
             is ShareCode -> shareText(command.code)
             is SetPairingResult -> setResult(SyncPairingResult.RESULT_SYNC_COMPLETED, SyncPairingResult.resultIntent(command.result))
-            is ShowV1Error -> showV1Error(command)
             is ShowV2Error -> showV2Error(command)
             is Close -> finish()
         }
@@ -254,12 +269,6 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         shareAction.shareText(this, text)
     }
 
-    private fun showV1Error(error: ShowV1Error) {
-        showExchangeV1PairingError(error.content) {
-            viewModel.onErrorDialogDismissed()
-        }
-    }
-
     private fun showV2Error(error: ShowV2Error) {
         showExchangeV2PairingError(error.content) {
             viewModel.onErrorDialogDismissed()
@@ -285,7 +294,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
-            launchSource: String?,
+            launchSource: String,
         ): Intent {
             return Intent(context, DisplayQrCodeActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)

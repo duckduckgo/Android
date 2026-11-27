@@ -49,8 +49,7 @@
             app:strokeWidth="@dimen/omnibarOutlineWidth"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/inputModeMainButtonsContainer"
-            app:layout_goneMarginEnd="@dimen/keyline_empty">
+            app:layout_constraintEnd_toEndOf="parent">
 
             <LinearLayout
                 android:id="@+id/inputModeWidgetContentContainer"
@@ -256,79 +255,6 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/inputModeMainButtonsContainer"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/toolbarIcon"
-            android:layout_marginStart="@dimen/keyline_2"
-            app:layout_constraintBottom_toBottomOf="@id/inputModeWidgetCard"
-            app:layout_constraintStart_toEndOf="@id/inputModeWidgetCard"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@id/inputModeWidgetCard">
-
-            <FrameLayout
-                android:id="@+id/inputFieldFireButton"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                android:background="@drawable/selectable_item_rounded_corner_background"
-                android:contentDescription="@string/duckChatFireButtonContentDescription"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/inputFieldTabsMenu"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/fireIconImageView"
-                    android:layout_width="@dimen/bottomNavIcon"
-                    android:layout_height="@dimen/bottomNavIcon"
-                    android:layout_gravity="center"
-                    android:scaleType="center"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_fire_24" />
-            </FrameLayout>
-
-            <com.duckduckgo.browser.ui.tabs.NewTabSwitcherButton
-                android:id="@+id/inputFieldTabsMenu"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/inputFieldBrowserMenu"
-                app:layout_constraintStart_toEndOf="@id/inputFieldFireButton"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <FrameLayout
-                android:id="@+id/inputFieldBrowserMenu"
-                android:layout_width="@dimen/toolbarIcon"
-                android:layout_height="@dimen/toolbarIcon"
-                android:background="@drawable/selectable_item_rounded_corner_background"
-                android:contentDescription="@string/duckChatBrowserMenuContentDescription"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/inputFieldTabsMenu"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <ImageView
-                    android:id="@+id/browserMenuImageView"
-                    android:layout_width="@dimen/bottomNavIcon"
-                    android:layout_height="@dimen/bottomNavIcon"
-                    android:layout_gravity="center"
-                    android:scaleType="center"
-                    android:importantForAccessibility="no"
-                    android:src="@drawable/ic_menu_vertical_24" />
-
-                <View
-                    android:id="@+id/browserMenuHighlight"
-                    android:layout_width="7dp"
-                    android:layout_height="7dp"
-                    android:layout_gravity="end"
-                    android:layout_margin="@dimen/keyline_2"
-                    android:background="@drawable/ic_dot_indicator_7"
-                    android:visibility="gone" />
-
-            </FrameLayout>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

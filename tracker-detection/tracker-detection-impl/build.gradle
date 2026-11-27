@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
     id 'androidx.room'
 }
@@ -24,28 +24,49 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(':anvil-annotations')
-    implementation project(':di')
-    ksp AndroidX.room.compiler
-
+    api(project(':browser-api')) {
+        because "TdsTracker's primary key is a Domain"
+    }
     api project(':tracker-detection-api')
-    // TdsTracker's primary key is a Domain
-    api project(':browser-api')
+
+    implementation project(':ad-click-api')
+    implementation project(':app-build-config-api')
+    implementation project(':browser-feature-toggles')
+    implementation project(':codegen-annotations')
+    implementation project(':common-utils')
     implementation project(':data-store-api')
-
+    implementation project(':di')
+    implementation project(':experiments-api')
+    implementation project(':feature-toggles-api')
+    implementation project(':privacy-config-api')
+    implementation project(':privacy-dashboard-api')
+    implementation project(':statistics-api')
+    implementation "com.squareup.logcat:logcat:_"
+    implementation "io.reactivex.rxjava2:rxandroid:_"
+    implementation "io.reactivex.rxjava2:rxjava:_"
+    implementation AndroidX.core.ktx
+    implementation AndroidX.lifecycle.common
     implementation AndroidX.room.runtime
-    implementation Google.dagger
+    implementation KotlinX.coroutines.core
     implementation Square.moshi
+    implementation Square.okHttp3.okHttp
+    implementation Square.retrofit2.retrofit
 
+    testImplementation project(':common-test')
+    testImplementation project(':feature-toggles-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.archCore.testing
+    testImplementation AndroidX.room.testing
+    testImplementation AndroidX.test.ext.junit
     testImplementation Testing.junit4
     testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
-    testImplementation AndroidX.room.testing
-    testImplementation AndroidX.archCore.testing
-    testImplementation project(':common-test')
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    androidTestImplementation AndroidX.test.ext.junit
+    androidTestImplementation AndroidX.test.runner
+    androidTestImplementation Testing.junit4
+
+    ksp project(':codegen-ksp')
+    ksp AndroidX.room.compiler
 }
 
 android {
@@ -53,18 +74,21 @@ android {
         test.assets.srcDirs += files("$projectDir/schemas")
     }
     namespace 'com.duckduckgo.tracker.detection.impl'
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
         }
     }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
-    }
     room {
         schemaDirectory("$projectDir/schemas")
     }
+}
+
+fulladleModuleConfig {
+    // The only instrumented test here is a manual benchmark annotated @Ignore, so Flank has nothing to run.
+    enabled.set(false)
+}
+
+tasks.register('androidTestsBuild') {
+    dependsOn 'assembleDebugAndroidTest'
 }

@@ -21,8 +21,8 @@ import com.duckduckgo.persistentstorage.api.PersistentStorage
 import com.duckduckgo.persistentstorage.api.PersistentStorageAvailability
 import com.duckduckgo.persistentstorage.api.PersistentStorageKey
 import com.duckduckgo.persistentstorage.api.PersistentStorageUnavailableException
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.logcat
 import javax.inject.Inject
 
@@ -30,7 +30,7 @@ import javax.inject.Inject
  * Dummy implementation of [PersistentStorage] for build types without Google Play Services (e.g., F-Droid).
  */
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class DummyPersistentStorage @Inject constructor() : PersistentStorage {
 
     override suspend fun checkAvailability(): PersistentStorageAvailability {

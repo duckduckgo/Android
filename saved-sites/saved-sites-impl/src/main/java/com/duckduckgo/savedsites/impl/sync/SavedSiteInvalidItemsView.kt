@@ -25,12 +25,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.browser.api.ui.BrowserScreens.BookmarksScreenNoParams
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.saved.sites.impl.R
@@ -38,7 +39,6 @@ import com.duckduckgo.saved.sites.impl.databinding.ViewSaveSiteSyncInvalidItemsW
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.Command
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.Command.NavigateToBookmarks
 import com.duckduckgo.savedsites.impl.sync.SavedSiteInvalidItemsViewModel.ViewState
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach

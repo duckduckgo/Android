@@ -26,8 +26,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoFragment
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.PopupMenuItemView
@@ -176,6 +176,8 @@ class ChatHistoryFragment : DuckDuckGoFragment(R.layout.fragment_chat_history) {
         when (event) {
             is ChatHistoryViewModel.NavigationEvent.OpenChat ->
                 startActivity(browserNav.openInNewTab(requireContext(), event.url, event.sourceTabId))
+            is ChatHistoryViewModel.NavigationEvent.OpenExistingTab ->
+                startActivity(browserNav.openExistingTab(requireContext(), event.tabId))
             is ChatHistoryViewModel.NavigationEvent.OpenRename -> openRenameScreen(event.chatId, event.currentTitle)
             is ChatHistoryViewModel.NavigationEvent.ShowDownloadComplete -> showDownloadCompleteSnackbar(event.fileName)
             is ChatHistoryViewModel.NavigationEvent.ShowBulkDownloadComplete -> showBulkDownloadCompleteSnackbar(event.count)

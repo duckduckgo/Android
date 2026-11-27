@@ -25,16 +25,16 @@ import com.duckduckgo.mobile.android.vpn.service.VpnServiceCallbacks
 import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.networkprotection.impl.pixels.NetworkProtectionPixels
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
+@SingleIn(VpnScope::class)
 class NetPWaitlistEndedChecker @Inject constructor(
     private val netpSubscriptionManager: NetpSubscriptionManager,
     private val dispatcherProvider: DispatcherProvider,

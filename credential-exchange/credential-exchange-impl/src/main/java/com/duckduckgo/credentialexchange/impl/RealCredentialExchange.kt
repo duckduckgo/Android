@@ -19,7 +19,7 @@ package com.duckduckgo.credentialexchange.impl
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.credentialexchange.api.CredentialExchange
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

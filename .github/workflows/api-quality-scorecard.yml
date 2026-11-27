@@ -1,0 +1,61 @@
+name: API quality scorecard
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Commit SHA or tag to score (optional, defaults to the latest commit of the branch above)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      ref:
+        description: 'Branch, tag or commit to score (optional, defaults to the calling commit)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  scorecard:
+    name: API quality scorecard
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Pick the date
+        id: date
+        run: echo "today=$(date -u +%F)" >> "$GITHUB_OUTPUT"
+
+      - name: Score
+        id: score
+        uses: ./.github/actions/api-quality-score
+        with:
+          ref: ${{ inputs.ref || github.sha }}
+          out-dir: ${{ runner.temp }}/scorecard
+          label: ${{ steps.date.outputs.today }}
+
+      - name: Write summary
+        id: summary
+        env:
+          REF: ${{ inputs.ref || github.ref_name }}
+          SHA: ${{ steps.score.outputs.sha }}
+        run: |
+          short_sha="${SHA:0:10}"
+          echo "short_sha=$short_sha" >> "$GITHUB_OUTPUT"
+          {
+            echo "Scored \`$REF\` at \`$short_sha\`."
+            echo
+            cat "$RUNNER_TEMP"/scorecard/api-quality-scorecard-*.md
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload scorecard
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-quality-scorecard-${{ steps.date.outputs.today }}-${{ steps.summary.outputs.short_sha }}
+          path: ${{ runner.temp }}/scorecard
+          retention-days: 90

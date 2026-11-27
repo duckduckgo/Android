@@ -27,7 +27,7 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeDone
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeRequest
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeResponse
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.RecoveryCodeUnavailable
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONObject
 import javax.inject.Inject
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message.Unknown as UnknownMessage

@@ -28,8 +28,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.checker.DisabledReason
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -140,7 +140,7 @@ interface PirScanWideEvent {
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class PirScanWideEventImpl @Inject constructor(
     private val wideEventClient: WideEventClient,
@@ -189,6 +189,7 @@ class PirScanWideEventImpl @Inject constructor(
             isTrackerBlockingEnabled = isTrackerBlockingEnabled,
             isFreeScan = isFreeScan,
             scheduling = schedulingMetadataValue(),
+            scanWebViewSizeState = scanWebViewSizeMetadataValue(),
         )
     }
 
@@ -261,6 +262,7 @@ class PirScanWideEventImpl @Inject constructor(
                 KEY_TOTAL_SCAN_JOBS to "0",
                 KEY_WEB_VIEW_COUNT to "0",
                 KEY_SCHEDULING to schedulingMetadataValue(),
+                KEY_SCAN_WEBVIEW_SIZE_STATE to scanWebViewSizeMetadataValue(),
             ),
             cleanupPolicy = CleanupPolicy.OnTimeout(
                 duration = TIMEOUT_DURATION,
@@ -293,6 +295,10 @@ class PirScanWideEventImpl @Inject constructor(
 
     private suspend fun schedulingMetadataValue(): String = withContext(dispatchers.io()) {
         if (pirRemoteFeatures.workQueueScheduling().isEnabled()) SCHEDULING_QUEUE else SCHEDULING_STATIC
+    }
+
+    private suspend fun scanWebViewSizeMetadataValue(): String = withContext(dispatchers.io()) {
+        if (pirRemoteFeatures.scanWebViewSize().isEnabled()) STATE_ENABLED else STATE_DISABLED
     }
 
     /**
@@ -362,6 +368,7 @@ class PirScanWideEventImpl @Inject constructor(
             isTrackerBlockingEnabled: Boolean,
             isFreeScan: Boolean,
             scheduling: String,
+            scanWebViewSizeState: String,
         ) {
             mutex.withLock {
                 // Finish any stale in-memory flow with Cancelled so we don't leave two open flows of
@@ -402,6 +409,7 @@ class PirScanWideEventImpl @Inject constructor(
                         KEY_NOTIFICATIONS_PERMISSION_GRANTED to notificationsPermissionGranted.toString(),
                         KEY_TRACKER_BLOCKING_STATE to isTrackerBlockingEnabled.toTrackerBlockingState(),
                         KEY_SCHEDULING to scheduling,
+                        KEY_SCAN_WEBVIEW_SIZE_STATE to scanWebViewSizeState,
                         KEY_FREE_SCAN to isFreeScan.toString(),
                     ),
                     cleanupPolicy = CleanupPolicy.OnTimeout(
@@ -666,7 +674,7 @@ class PirScanWideEventImpl @Inject constructor(
 
     companion object {
         private val TIMEOUT_DURATION = 8.hours
-        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 1)
+        val DEFINITION_VERSION = WideEventDefinition.Version(minor = 0, patch = 2)
 
         const val WIDE_EVENT_NAME_MANUAL = "pir-initial-scan"
         const val WIDE_EVENT_NAME_SCHEDULED = "pir-scheduled-scan"
@@ -692,6 +700,7 @@ class PirScanWideEventImpl @Inject constructor(
         const val KEY_VPN_CONNECTION_STATE = "vpn_connection_state"
         const val KEY_NOTIFICATIONS_PERMISSION_GRANTED = "notifications_permission_granted"
         const val KEY_TRACKER_BLOCKING_STATE = "tracker_blocking_state"
+        const val KEY_SCAN_WEBVIEW_SIZE_STATE = "scan_webview_size_state"
         const val KEY_FREE_SCAN = "free_scan"
         const val KEY_SCHEDULING = "scheduling"
         const val KEY_LAST_STEP = "last_step"
@@ -701,6 +710,8 @@ class PirScanWideEventImpl @Inject constructor(
 
         const val SCHEDULING_QUEUE = "queue"
         const val SCHEDULING_STATIC = "static"
+        const val STATE_ENABLED = "enabled"
+        const val STATE_DISABLED = "disabled"
 
         const val STEP_STARTED = "started"
         const val STEP_PROGRESS_PREFIX = "progress_"

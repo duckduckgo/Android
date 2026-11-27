@@ -19,12 +19,13 @@ package com.duckduckgo.eventhub.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.eventhub.impl.pixels.EventHubPixelManager
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
 class EventHubPrivacyConfigCallback @Inject constructor(
     private val pixelManager: EventHubPixelManager,

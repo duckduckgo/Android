@@ -19,8 +19,8 @@ package com.duckduckgo.pir.impl.dashboard.state
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.pir.impl.models.Address
 import com.duckduckgo.pir.impl.models.ProfileQuery
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface PirWebProfileStateHolder {
@@ -60,7 +60,7 @@ interface PirWebProfileStateHolder {
 }
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealPirWebProfileStateHolder @Inject constructor() : PirWebProfileStateHolder {
 
     private val names: MutableList<Name> = mutableListOf()

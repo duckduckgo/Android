@@ -16,7 +16,7 @@
 
 package com.duckduckgo.referral.impl
 
-import com.duckduckgo.anvil.annotations.ContributesPluginPoint
+import com.duckduckgo.codegen.annotations.ContributesPluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.ReferrerParserPlugin
 

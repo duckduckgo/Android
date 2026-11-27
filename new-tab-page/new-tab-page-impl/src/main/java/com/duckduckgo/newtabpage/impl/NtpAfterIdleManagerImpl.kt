@@ -34,9 +34,10 @@ import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_AFT
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_USER_INITIATED
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixelName.NTP_SHOWN_USER_INITIATED_DAILY
 import com.duckduckgo.newtabpage.impl.pixels.NtpAfterIdlePixels
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -44,9 +45,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesBinding(AppScope::class, boundType = NtpAfterIdleManager::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserLifecycleObserver::class)
+@SingleIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<NtpAfterIdleManager>())
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserLifecycleObserver>())
 class NtpAfterIdleManagerImpl @Inject constructor(
     private val pixel: Pixel,
     private val hatchPixels: HatchPixels,

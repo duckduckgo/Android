@@ -41,7 +41,7 @@ jobs:
             exit 0
           fi
           echo "Changed files:"; echo "$CHANGED"
-          if ([ -n "$CHANGED" ] && echo "$CHANGED" | grep -qvE '(\.md$|^\.github/|^\.claude/|^\.maestro/|^scripts/)') || \
+          if ([ -n "$CHANGED" ] && echo "$CHANGED" | grep -qvE '(\.md$|^\.github/|^\.claude/|^\.agents/|^\.maestro/|^scripts/)') || \
              echo "$CHANGED" | grep -qF '.github/workflows/ci.yml'; then
             echo "Code or required CI workflow changes detected — running checks"
             echo "should_run=true" >> "$GITHUB_OUTPUT"

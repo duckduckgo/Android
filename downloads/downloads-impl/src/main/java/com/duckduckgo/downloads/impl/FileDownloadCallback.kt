@@ -32,8 +32,9 @@ import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_STARTED
 import com.duckduckgo.downloads.impl.pixels.DownloadsPixelName.DOWNLOAD_REQUEST_SUCCEEDED
 import com.duckduckgo.downloads.store.DownloadStatus.FINISHED
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -82,13 +83,13 @@ interface DownloadCallback {
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DownloadCallback::class,
+    binding = binding<DownloadCallback>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = DownloadStateListener::class,
+    binding = binding<DownloadStateListener>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FileDownloadCallback @Inject constructor(
     private val fileDownloadNotificationManager: FileDownloadNotificationManager,
     private val downloadsRepository: DownloadsRepository,

@@ -16,6 +16,7 @@
 
 package com.duckduckgo.app.widget
 
+import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
 import org.junit.Test
@@ -29,6 +30,7 @@ class AddWidgetCompatLauncherTest {
     private val defaultAddWidgetLauncher: AddWidgetLauncher = mock()
     private val legacyAddWidgetLauncher: AddWidgetLauncher = mock()
     private val widgetCapabilities: WidgetCapabilities = mock()
+    private val context: Context = mock()
     private val testee = AddWidgetCompatLauncher(
         defaultAddWidgetLauncher,
         legacyAddWidgetLauncher,
@@ -39,17 +41,17 @@ class AddWidgetCompatLauncherTest {
     fun whenAutomaticWidgetAddIsNotSupportedThenDelegateToLegacyAddWidgetLauncher() {
         whenever(widgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(false)
 
-        testee.launchAddWidget(null)
+        testee.launchAddWidget(context, WidgetType.SEARCH_ONLY)
 
-        verify(legacyAddWidgetLauncher).launchAddWidget(null)
+        verify(legacyAddWidgetLauncher).launchAddWidget(context, WidgetType.SEARCH_ONLY)
     }
 
     @Test
     fun whenAutomaticWidgetAddIsSupportedThenDelegateToAppWidgetManagerAddWidgetLauncher() {
         whenever(widgetCapabilities.supportsAutomaticWidgetAdd).thenReturn(true)
 
-        testee.launchAddWidget(null)
+        testee.launchAddWidget(context, WidgetType.SEARCH_ONLY)
 
-        verify(defaultAddWidgetLauncher).launchAddWidget(null)
+        verify(defaultAddWidgetLauncher).launchAddWidget(context, WidgetType.SEARCH_ONLY)
     }
 }

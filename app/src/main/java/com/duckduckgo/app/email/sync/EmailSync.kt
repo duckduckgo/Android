@@ -23,16 +23,17 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.*
 import com.duckduckgo.sync.settings.api.SyncSettingsListener
 import com.duckduckgo.sync.settings.api.SyncableSetting
-import com.squareup.anvil.annotations.*
 import com.squareup.moshi.*
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.*
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import logcat.LogPriority.INFO
 import logcat.logcat
 import javax.inject.*
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(scope = AppScope::class, boundType = SyncableSetting::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(scope = AppScope::class, binding = binding<SyncableSetting>())
 class EmailSync @Inject constructor(
     private val emailDataStore: EmailDataStore,
     private val syncSettingsListener: SyncSettingsListener,

@@ -71,9 +71,6 @@
     <string name="duck_ai_paid_settings_open_duck_ai">Duck.ai openen</string>
     <string name="duck_ai_paid_settings_learn_more_title">Meer informatie</string>
 
-    <!-- AutoComplete -->
-    <string name="autocompleteDuckAiPrompt">Vraag stellen aan Duck.ai</string>
-
     <!-- New Address Bar Option Bottom Sheet Dialog -->
     <string name="newAddressBarOptionBottomSheetDialogTitle">Wil je eenvoudiger toegang\ntot privé AI-chat?</string>
     <string name="newAddressBarOptionBottomSheetDialogSearchText">Zoek of voer een adres in</string>
@@ -234,7 +231,6 @@
     <string name="duck_ai_chat_history_section_recent">Recent</string>
     <string name="duck_ai_chat_history_untitled">Chat zonder titel</string>
     <string name="duck_ai_chat_history_empty_title">Nog geen chats</string>
-    <string name="duck_ai_chat_history_empty_cta_open">Duck.ai openen</string>
     <string name="duck_ai_chat_history_more_options">Meer opties</string>
     <string name="duck_ai_chat_history_action_select">Selecteren</string>
     <string name="duck_ai_chat_history_action_pin">Pin</string>
@@ -394,4 +390,30 @@
         <item quantity="one" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d uur</item>
         <item quantity="other" instruction="%1$d is the number of whole hours until the usage limit resets">%1$d uur</item>
     </plurals>
+    <string name="duckAIContextualPromptSummarizeDocument" instruction="Suggested prompt for Duck.ai to summarize the PDF document currently displayed in the browser">Dit document samenvatten</string>
+
+    <!-- Duck.ai ToS consent submit button -->
+    <string name="duckChatSubmitAskLabel" instruction="Label of the submit button while the Duck.ai terms are not yet accepted. Required wording from legal, tapping it is how the user accepts.">Vragen</string>
+    <!-- Duck.ai ToS consent footer -->
+    <string name="duckChatTermsFooterMessage" instruction="Disclaimer under the Duck.ai input. ^1 is the label of the submit button, so the sentence always names the button the user taps. The two annotated phrases are tappable links to the Privacy Policy and the Terms of Service.">DuckDuckGo maakt je chats anoniem. Door op \'^1\' te klikken, ga je akkoord met ons <annotation type="privacy_link">privacybeleid</annotation> en onze <annotation type="terms_link">servicevoorwaarden</annotation>.</string>
+    <!-- Duck.ai tab switcher card -->
+    <string name="duckAiTabCardChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a text or image chat, as opposed to a voice chat.">Praten</string>
+    <string name="duckAiTabCardThinkingTitle" instruction="Header on a tab switcher card for a Duck.ai chat whose question has been sent but whose reply has not started yet. The chat title, if any, is shown below it.">Nadenken…</string>
+    <string name="duckAiTabCardListeningTitle" instruction="Header on a tab switcher card for a Duck.ai tab with a voice chat in progress, shown while Duck.ai is listening to the user.">Luisteren…</string>
+    <string name="duckAiTabCardVoiceChatTypeLabel" instruction="Label on a tab switcher card marking the Duck.ai tab as a voice chat, as opposed to a text chat.">Voicechat</string>
+    <string name="duckAiTabCardTranscriptTypeLabel" instruction="Label on a tab switcher card for a finished Duck.ai voice chat, whose preview shows the conversation transcript.">Transcript</string>
+    <!-- Duck.ai attachment privacy footer -->
+    <string name="duckChatAttachmentPrivacyFooterMessage" instruction="Disclaimer under the Duck.ai input while an image or file is attached. The annotated phrase is a tappable link to a help page.">Bestanden worden automatisch gescand op illegale inhoud. Gemarkeerde chats hebben een beperkte gegevensbewaring. <annotation type="learn_more_link">Meer informatie</annotation></string>
+    <!-- Duck.ai new chat hints -->
+    <string name="newChatHintDocuments" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens a picker to attach documents for the AI to analyze.">Bestanden analyseren</string>
+    <string name="newChatHintPhoto" instruction="Tappable suggestion shown on an empty new Duck.ai chat; opens the photo library to attach photos and ask the AI about them.">Stel een vraag over foto\'s</string>
+    <string name="newChatHintImage" instruction="Tappable suggestion shown on an empty new Duck.ai chat; switches the chat to AI image generation.">Afbeelding maken</string>
+
+    <!-- Duck.ai home-screen widget -->
+    <string name="duckAiWidgetLabel" instruction="Name of the Duck.ai home-screen widget, shown in the Android widget picker">Duck.ai en recente chats</string>
+    <string name="duckAiWidgetDescription" instruction="Short description of the Duck.ai home-screen widget, shown in the Android widget picker">Start een privéchat met Duck.ai of ga verder met recente chats.</string>
+    <string name="duckAiWidgetHint" instruction="Placeholder text shown in the prompt bar of the Duck.ai home-screen widget">Privé chatten</string>
+    <string name="duckAiWidgetVoiceAction" instruction="Label of the pill button that starts a voice chat with Duck.ai in the home-screen widget">Voice</string>
+    <string name="duckAiWidgetImageAction" instruction="Label of the pill button that starts creating an image with Duck.ai in the home-screen widget">Afbeelding</string>
+    <string name="duckAiWidgetCameraAction" instruction="Label of the pill button that opens the camera to start a Duck.ai chat in the home-screen widget">Camera</string>
 </resources>

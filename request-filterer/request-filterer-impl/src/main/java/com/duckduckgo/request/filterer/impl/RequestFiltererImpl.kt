@@ -26,7 +26,7 @@ import com.duckduckgo.privacy.config.api.UnprotectedTemporary
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.filterer.api.RequestFiltererFeatureName
 import com.duckduckgo.request.filterer.store.RequestFiltererRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

@@ -31,9 +31,9 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.StateFlow
@@ -44,7 +44,6 @@ import logcat.logcat
 
 class PreviousSessionReadyViewModel @AssistedInject constructor(
     @Assisted private val launchSource: String,
-    @Assisted private val isAuthRequired: Boolean,
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val deviceAuthenticator: SyncDeviceAuthenticator,
     private val syncPixels: SyncPixels,
@@ -98,14 +97,11 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
     }
 
     private suspend fun authenticate(): Boolean {
-        if (!isAuthRequired) return true
         val response = deviceAuthenticator.authenticate(AuthenticationSource.SESSION_RESTORE, Request()) { event ->
-            viewModelScope.launch {
-                when (event) {
-                    Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
-                    Event.EnrollmentShown -> Unit
-                    Event.VerificationShown -> Unit
-                }
+            when (event) {
+                Event.EnrollmentNeeded -> syncSetupWideEvent.onDeviceAuthNotEnrolled()
+                Event.EnrollmentShown -> Unit
+                Event.VerificationShown -> Unit
             }
         }
         return when (response) {
@@ -140,20 +136,16 @@ class PreviousSessionReadyViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(
-            launchSource: String,
-            isAuthRequired: Boolean,
-        ): PreviousSessionReadyViewModel
+        fun create(launchSource: String): PreviousSessionReadyViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val launchSource: String,
-            private val isAuthRequired: Boolean,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(launchSource, isAuthRequired) as T
+                return assistedFactory.create(launchSource) as T
             }
         }
     }

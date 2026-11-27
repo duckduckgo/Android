@@ -32,7 +32,7 @@ import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.toPx
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -58,7 +58,10 @@ import javax.inject.Inject
 class ReadSyncCodeActivity : DuckDuckGoActivity() {
     private val binding by viewBinding<ActivityReadSyncCodeBinding>()
 
-    private val launchSource get() = intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)
+    private val launchSource
+        get() = requireNotNull(intent.getStringExtra(LAUNCH_SOURCE_EXTRA_KEY)) {
+            "Missing intent extra: '$LAUNCH_SOURCE_EXTRA_KEY'"
+        }
 
     private val syncEntryPoint
         get() = requireNotNull(IntentCompat.getSerializableExtra(intent, ORIGINAL_FLOW_EXTRA_KEY, SyncEntryPoint::class.java)) {
@@ -72,7 +75,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
     lateinit var vmFactory: ReadSyncCodeViewModel.Factory
 
     private val viewModel by viewModels<ReadSyncCodeViewModel> {
-        ReadSyncCodeViewModel.Factory.Provider(vmFactory, syncEntryPoint)
+        ReadSyncCodeViewModel.Factory.Provider(vmFactory, syncEntryPoint, launchSource)
     }
 
     private val isRecoveryFlow get() = syncEntryPoint == SyncEntryPoint.RECOVER_SYNCED_DATA
@@ -123,7 +126,8 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
             is StartSyncProcess -> {
                 processSyncCodeLauncher.launch(
                     ProcessSyncCodeContract.Input(
-                        source = command.source,
+                        codeSource = command.codeSource,
+                        launchSource = launchSource,
                     ),
                 )
             }
@@ -175,8 +179,8 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
 
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
-                    SCANNER_POSITION -> ReadSyncCodeCameraFragment.instance(syncEntryPoint)
-                    MANUAL_CODE_ENTRY_POSITION -> ReadSyncCodeManualFragment.instance(syncEntryPoint)
+                    SCANNER_POSITION -> ReadSyncCodeCameraFragment.instance(syncEntryPoint, launchSource)
+                    MANUAL_CODE_ENTRY_POSITION -> ReadSyncCodeManualFragment.instance(syncEntryPoint, launchSource)
                     else -> error("Unknown position: $position")
                 }
             }
@@ -230,7 +234,7 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         fun intent(
             context: Context,
             syncEntryPoint: SyncEntryPoint,
-            launchSource: String?,
+            launchSource: String,
         ): Intent {
             return Intent(context, ReadSyncCodeActivity::class.java).apply {
                 putExtra(ORIGINAL_FLOW_EXTRA_KEY, syncEntryPoint)

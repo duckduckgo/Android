@@ -227,6 +227,8 @@
         <item name="daxColorAccentBlue">@color/blue30</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorAccentContentPrimary">@color/accent_content_primary_dark</item>
+        <item name="daxColorAccentGlowSecondary">@color/accent_glow_secondary_dark</item>
+        <item name="daxColorAccentAltTextPrimary">@color/pondwater0</item>
         <item name="daxColorRipple">@color/white12</item>
         <item name="daxLogoTitleText">@color/white</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue30_20</item>
@@ -302,6 +304,7 @@
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
         <item name="daxColorAccentAltPrimary">@color/blue60</item>
         <item name="daxColorAccentAltContentPrimary">@color/blue0</item>
+        <item name="daxColorTabDuckAiContentTypeBorder">@color/white36</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray50</item>
@@ -403,6 +406,8 @@
         <item name="daxColorAccentBlue">@color/blue50</item>
         <item name="daxColorAccentYellow">@color/yellow50</item>
         <item name="daxColorAccentContentPrimary">@color/accent_content_primary_light</item>
+        <item name="daxColorAccentGlowSecondary">@color/accent_glow_secondary_light</item>
+        <item name="daxColorAccentAltTextPrimary">@color/pondwater70</item>
         <item name="daxColorRipple">@color/black6</item>
         <item name="daxLogoTitleText">@color/gray85</item>
         <item name="daxOmnibarTextColorHighlight">@color/blue50_20</item>
@@ -479,6 +484,7 @@
         <item name="daxColorFabSecondaryIcon">@color/blue70</item>
         <item name="daxColorAccentAltPrimary">@color/blue0</item>
         <item name="daxColorAccentAltContentPrimary">@color/blue80</item>
+        <item name="daxColorTabDuckAiContentTypeBorder">@color/black20</item>
 
         <!-- Tab -->
         <item name="daxColorTabHighlight">@color/gray60</item>
@@ -598,6 +604,11 @@
     <style name="ShapeAppearance.DuckDuckGo.LargeComponent" parent="ShapeAppearance.MaterialComponents.LargeComponent">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">@dimen/largeShapeCornerRadius</item>
+    </style>
+
+    <style name="ShapeAppearance.DuckDuckGo.Menu" parent="ShapeAppearance.MaterialComponents">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">?attr/daxMenuRadius</item>
     </style>
 
     <style name="TabSwitcher.Widget.Toolbar" parent="Widget.DuckDuckGo.ToolbarTheme">

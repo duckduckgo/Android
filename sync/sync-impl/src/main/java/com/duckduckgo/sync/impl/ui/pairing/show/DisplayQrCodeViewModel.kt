@@ -26,12 +26,9 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.QREncoder
 import com.duckduckgo.sync.impl.R
-import com.duckduckgo.sync.impl.Result
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
-import com.duckduckgo.sync.impl.SyncFeature
-import com.duckduckgo.sync.impl.onFailure
-import com.duckduckgo.sync.impl.onSuccess
+import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
@@ -41,38 +38,32 @@ import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
-import com.duckduckgo.sync.impl.ui.pairing.ExchangeV1PairingErrorContent
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV2PairingErrorContent
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2UpgradeRequiredError
-import com.duckduckgo.sync.impl.ui.pairing.toExchangeV1PairingError
 import com.duckduckgo.sync.impl.ui.pairing.toExchangeV2PairingError
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
-import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.seconds
 
 class DisplayQrCodeViewModel @AssistedInject constructor(
     @Assisted private val syncEntryPoint: SyncEntryPoint,
-    @Assisted private val launchSource: String?,
+    @Assisted private val launchSource: String,
     private val accountRepository: SyncAccountRepository,
     private val codeDispatcher: SyncCodeDispatcher,
     private val pixels: SyncPixels,
-    private val syncFeature: SyncFeature,
     private val qrEncoder: QREncoder,
     private val clipboard: ClipboardInteractor,
+    private val switchedAccountDetector: SwitchedAccountDetector,
     private val dispatchers: DispatcherProvider,
 ) : ViewModel() {
     private val _commands = Channel<Command>(Channel.BUFFERED)
@@ -90,11 +81,9 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch(dispatchers.io()) {
             isSignedIn = accountRepository.getAccountInfo().isSignedIn
+            switchedAccountDetector.onPairingStarted()
             pixels.fireSyncBarcodeScreenShown(syncType)
-            when (protocolVersion()) {
-                ProtocolVersion.V1 -> startV1Presentation()
-                ProtocolVersion.V2 -> startV2Presentation()
-            }
+            startV2Presentation()
         }
     }
 
@@ -156,86 +145,10 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
         }
     }
 
-    private suspend fun startV1Presentation() {
-        if (isSignedIn) {
-            startV1ExchangePresentation()
-        } else {
-            startV1ConnectPresentation()
-        }
-    }
-
-    private suspend fun startV1ConnectPresentation() = coroutineScope {
-        val qrCodeResult = accountRepository.getConnectQR()
-            .onSuccess { showQrCode(it.qrCode) }
-            .onFailure { failure ->
-                val content = ExchangeV1PairingErrorContent(R.string.sync_connect_generic_error, failure.reason)
-                _commands.send(Command.ShowV1Error(content))
-            }
-
-        var isPolling = qrCodeResult is Result.Success
-        while (isPolling) {
-            delay(POLLING_INTERVAL_CONNECT_FLOW)
-            accountRepository.pollConnectionKeys()
-                .onSuccess { isSynced ->
-                    if (isSynced) {
-                        pixels.fireSignupConnectPixel(launchSource)
-                        pixels.fireSyncSetupFinishedSuccessfully(syncType)
-
-                        _commands.send(Command.SetPairingResult(pairingResult()))
-                        _commands.send(Command.Close)
-                        isPolling = false
-                    }
-                }
-                .onFailure { failure ->
-                    _commands.send(Command.ShowV1Error(failure.toExchangeV1PairingError()))
-                    isPolling = false
-                }
-        }
-    }
-
-    private suspend fun startV1ExchangePresentation() {
-        if (!syncFeature.exchangeKeysToSyncWithAnotherDevice().isEnabled()) {
-            accountRepository.getRecoveryCode()
-                .onSuccess { showQrCode(it.qrCode) }
-                .onFailure { failure ->
-                    val content = ExchangeV1PairingErrorContent(R.string.sync_connect_generic_error, failure.reason)
-                    _commands.send(Command.ShowV1Error(content))
-                }
-            return
-        }
-
-        val invitationResult = accountRepository.generateExchangeInvitationCode()
-            .onSuccess { showQrCode(it.qrCode) }
-            .onFailure { failure ->
-                val content = ExchangeV1PairingErrorContent(R.string.sync_connect_generic_error, failure.reason)
-                _commands.send(Command.ShowV1Error(content))
-            }
-
-        var isPolling = invitationResult is Result.Success
-        while (isPolling) {
-            delay(POLLING_INTERVAL_EXCHANGE_FLOW)
-            accountRepository.pollSecondDeviceExchangeAcknowledgement()
-                .onSuccess { isAcknowledged ->
-                    if (isAcknowledged) {
-                        // The peer joined this account; this device did not log in, so no login pixel.
-                        pixels.fireSyncSetupFinishedSuccessfully(syncType)
-
-                        _commands.send(Command.SetPairingResult(pairingResult()))
-                        _commands.send(Command.Close)
-                        isPolling = false
-                    }
-                }
-                .onFailure { failure ->
-                    _commands.send(Command.ShowV1Error(failure.toExchangeV1PairingError()))
-                    isPolling = false
-                }
-        }
-    }
-
     private suspend fun startV2Presentation() {
         codeDispatcher.presentV2().collect { outcome ->
-            pixels.fireSetupFailed(syncType, outcome)
-            pixels.fireSetupCancelledIfDenied(syncType, outcome)
+            pixels.fireSetupFailed(syncType, launchSource, outcome)
+            pixels.fireSetupCancelledIfDenied(syncType, launchSource, outcome)
 
             when (outcome) {
                 is DispatchOutcome.LinkingCodeReady -> {
@@ -253,7 +166,8 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 is DispatchOutcome.LoggedIn -> {
                     _viewState.update { it.copy(dialog = null) }
                     pixels.fireLoginPixel()
-                    pixels.fireSyncSetupFinishedSuccessfully(syncType, outcome.path, outcome.myRole, outcome.peerKind)
+                    switchedAccountDetector.onPaired()
+                    pixels.fireSyncSetupFinishedSuccessfully(syncType, launchSource, outcome.path, outcome.myRole, outcome.peerKind)
                     _commands.send(Command.SetPairingResult(pairingResult()))
                     _commands.send(Command.Close)
                 }
@@ -297,14 +211,6 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
             ?: SyncPairingResult.Failure
     }
 
-    private suspend fun protocolVersion(): ProtocolVersion = withContext(dispatchers.io()) {
-        if (syncFeature.canUseV2ConnectFlow().isEnabled() && syncFeature.canShowV2ConnectCode().isEnabled()) {
-            ProtocolVersion.V2
-        } else {
-            ProtocolVersion.V1
-        }
-    }
-
     data class ViewState(
         val bitmap: BitmapWithCode? = null,
         val dialog: DialogType? = null,
@@ -333,10 +239,6 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     )
 
     internal sealed interface Command {
-        data class ShowV1Error(
-            val content: ExchangeV1PairingErrorContent,
-        ) : Command
-
         data class ShowV2Error(
             val content: ExchangeV2PairingErrorContent,
         ) : Command
@@ -360,13 +262,13 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     interface Factory {
         fun create(
             syncEntryPoint: SyncEntryPoint,
-            launchSource: String?,
+            launchSource: String,
         ): DisplayQrCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val syncEntryPoint: SyncEntryPoint,
-            private val launchSource: String?,
+            private val launchSource: String,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
@@ -374,10 +276,5 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 return assistedFactory.create(syncEntryPoint, launchSource) as T
             }
         }
-    }
-
-    companion object {
-        private val POLLING_INTERVAL_CONNECT_FLOW = 5.seconds
-        private val POLLING_INTERVAL_EXCHANGE_FLOW = 2.seconds
     }
 }

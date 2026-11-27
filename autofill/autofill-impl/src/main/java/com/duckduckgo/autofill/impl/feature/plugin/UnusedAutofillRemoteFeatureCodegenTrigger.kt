@@ -16,8 +16,8 @@
 
 package com.duckduckgo.autofill.impl.feature.plugin
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.autofill.api.AutofillFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 
 @ContributesRemoteFeature(

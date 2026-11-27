@@ -23,10 +23,10 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import logcat.logcat
 import javax.inject.Inject
 

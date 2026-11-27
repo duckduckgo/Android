@@ -19,13 +19,13 @@ package com.duckduckgo.referral.impl
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.ReferrerParserPlugin
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class ReferrerOriginAttributeParserPlugin @Inject constructor(
     private val appReferrerDataStore: AppReferrerDataStore,
     private val playStoreInstallChecker: VerificationCheckPlayStoreInstall,

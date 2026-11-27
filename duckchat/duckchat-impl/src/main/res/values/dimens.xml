@@ -16,7 +16,6 @@
 
 <resources>
     <dimen name="inputScreenUserPrefToggleSpacing">16dp</dimen>
-    <dimen name="inputScreenOmnibarCardMarginHorizontal">4dp</dimen>
     <dimen name="nativeInputModeWidgetMarginHorizontal">4dp</dimen>
     <dimen name="nativeInputFooterOverlap">32dp</dimen>
     <dimen name="contextualBottomSheetTopOffset">80dp</dimen>
@@ -42,4 +41,5 @@
     <dimen name="chipCornerRadius">20dp</dimen>
     <dimen name="chipStrokeWidth">1dp</dimen>
     <dimen name="chipImageCornerRadius">6dp</dimen>
+    <dimen name="duckAiBrowserToolsPermissionsListMaxHeight">360dp</dimen>
 </resources>

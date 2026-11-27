@@ -42,6 +42,7 @@ interface SubscriptionsDataStore {
     // Local purchased at time, not from server or other devices
     var localPurchasedAt: Long?
     var platform: String?
+    var planCountry: String?
     var status: String?
     var entitlements: String?
     var productId: String?
@@ -53,7 +54,38 @@ interface SubscriptionsDataStore {
     // Pending Plans (stored as JSON array string)
     var pendingPlans: String?
 
+    val backupRefreshToken: String?
+    val backupRefreshTokenExpiresAt: Instant?
+    val backupRefreshTokenExternalId: String?
+    val backupRefreshTokenIssuedAt: Instant?
+
     fun canUseEncryption(): Boolean
+
+    fun isAvailable(): Boolean
+
+    fun hasRefreshTokenV2Entry(): Boolean
+
+    fun saveTokensV2(
+        accessToken: String,
+        accessTokenExpiresAt: Instant,
+        refreshToken: String,
+        refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
+        clearBackupRefreshToken: Boolean = false,
+    ): Boolean
+
+    fun clearTokens(): Boolean
+
+    fun saveBackupRefreshToken(
+        refreshToken: String,
+        expiresAt: Instant,
+        externalId: String,
+        issuedAt: Instant,
+    ): Boolean
+
+    fun clearBackupRefreshToken(): Boolean
 }
 
 /**
@@ -172,6 +204,14 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override var planCountry: String?
+        get() = encryptedPreferences?.getString(KEY_PLAN_COUNTRY, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                putString(KEY_PLAN_COUNTRY, value)
+            }
+        }
+
     override var externalId: String?
         get() = encryptedPreferences?.getString(KEY_EXTERNAL_ID, null)
         set(value) {
@@ -248,12 +288,99 @@ internal class SubscriptionsEncryptedDataStore(
             }
         }
 
+    override val backupRefreshToken: String?
+        get() = encryptedPreferences?.getString(KEY_BACKUP_REFRESH_TOKEN, null)
+
+    override val backupRefreshTokenExpiresAt: Instant?
+        get() = encryptedPreferences?.getInstant(KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT)
+
+    override val backupRefreshTokenExternalId: String?
+        get() = encryptedPreferences?.getString(KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID, null)
+
+    override val backupRefreshTokenIssuedAt: Instant?
+        get() = encryptedPreferences?.getInstant(KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT)
+
+    private fun SharedPreferences.getInstant(key: String): Instant? {
+        val epochMillis = getLong(key, NOT_SET)
+        return if (epochMillis == NOT_SET) null else Instant.ofEpochMilli(epochMillis)
+    }
+
     override fun canUseEncryption(): Boolean {
         encryptedPreferences?.edit(commit = true) { putBoolean("test", true) }
         return encryptedPreferences?.getBoolean("test", false) == true
     }
 
+    override fun isAvailable(): Boolean = encryptedPreferences != null
+
+    // A key that exists but reads as null is a value the store could not decrypt
+    override fun hasRefreshTokenV2Entry(): Boolean = encryptedPreferences?.contains(KEY_REFRESH_TOKEN_V2) == true
+
+    override fun saveTokensV2(
+        accessToken: String,
+        accessTokenExpiresAt: Instant,
+        refreshToken: String,
+        refreshTokenExpiresAt: Instant,
+        entitlements: String,
+        email: String?,
+        externalId: String,
+        clearBackupRefreshToken: Boolean,
+    ): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        if (clearBackupRefreshToken) editor.removeBackupRefreshToken()
+        return editor
+            .putString(KEY_ACCESS_TOKEN_V2, accessToken)
+            .putLong(KEY_ACCESS_TOKEN_V2_EXPIRES_AT, accessTokenExpiresAt.toEpochMilli())
+            .putString(KEY_REFRESH_TOKEN_V2, refreshToken)
+            .putLong(KEY_REFRESH_TOKEN_V2_EXPIRES_AT, refreshTokenExpiresAt.toEpochMilli())
+            .putString(KEY_ENTITLEMENTS, entitlements)
+            .putString(KEY_EMAIL, email)
+            .putString(KEY_EXTERNAL_ID, externalId)
+            .commit()
+    }
+
+    override fun clearTokens(): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor
+            .remove(KEY_ACCESS_TOKEN_V2)
+            .remove(KEY_ACCESS_TOKEN_V2_EXPIRES_AT)
+            .remove(KEY_REFRESH_TOKEN_V2)
+            .remove(KEY_REFRESH_TOKEN_V2_EXPIRES_AT)
+            .remove(KEY_ACCESS_TOKEN)
+            .remove(KEY_AUTH_TOKEN)
+            .remove(KEY_EMAIL)
+            .remove(KEY_EXTERNAL_ID)
+            .removeBackupRefreshToken()
+            .commit()
+    }
+
+    override fun saveBackupRefreshToken(
+        refreshToken: String,
+        expiresAt: Instant,
+        externalId: String,
+        issuedAt: Instant,
+    ): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor
+            .putString(KEY_BACKUP_REFRESH_TOKEN, refreshToken)
+            .putLong(KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT, expiresAt.toEpochMilli())
+            .putString(KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID, externalId)
+            .putLong(KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT, issuedAt.toEpochMilli())
+            .commit()
+    }
+
+    override fun clearBackupRefreshToken(): Boolean {
+        val editor = encryptedPreferences?.edit() ?: return false
+        return editor.removeBackupRefreshToken().commit()
+    }
+
+    private fun SharedPreferences.Editor.removeBackupRefreshToken(): SharedPreferences.Editor =
+        remove(KEY_BACKUP_REFRESH_TOKEN)
+            .remove(KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT)
+            .remove(KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID)
+            .remove(KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT)
+
     companion object {
+        private const val NOT_SET = 0L
         const val FILENAME = "com.duckduckgo.subscriptions.store"
         const val KEY_ACCESS_TOKEN_V2 = "KEY_ACCESS_TOKEN_V2"
         const val KEY_ACCESS_TOKEN_V2_EXPIRES_AT = "KEY_ACCESS_TOKEN_V2_EXPIRES_AT"
@@ -262,6 +389,7 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_ACCESS_TOKEN = "KEY_ACCESS_TOKEN"
         const val KEY_AUTH_TOKEN = "KEY_AUTH_TOKEN"
         const val KEY_PLATFORM = "KEY_PLATFORM"
+        const val KEY_PLAN_COUNTRY = "KEY_PLAN_COUNTRY"
         const val KEY_EMAIL = "KEY_EMAIL"
         const val KEY_EXTERNAL_ID = "KEY_EXTERNAL_ID"
         const val KEY_EXPIRES_OR_RENEWS_AT = "KEY_EXPIRES_OR_RENEWS_AT"
@@ -275,5 +403,9 @@ internal class SubscriptionsEncryptedDataStore(
         const val KEY_SUBSCRIPTION_ENTITLEMENTS = "KEY_SUBSCRIPTION_ENTITLEMENTS"
         const val KEY_FREE_TRIAL_ACTIVE = "KEY_FREE_TRIAL_ACTIVE"
         const val KEY_PENDING_PLANS = "KEY_PENDING_PLANS"
+        const val KEY_BACKUP_REFRESH_TOKEN = "KEY_BACKUP_REFRESH_TOKEN"
+        const val KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT = "KEY_BACKUP_REFRESH_TOKEN_EXPIRES_AT"
+        const val KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID = "KEY_BACKUP_REFRESH_TOKEN_EXTERNAL_ID"
+        const val KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT = "KEY_BACKUP_REFRESH_TOKEN_ISSUED_AT"
     }
 }

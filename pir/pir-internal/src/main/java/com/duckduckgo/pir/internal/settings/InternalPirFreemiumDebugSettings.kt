@@ -18,12 +18,12 @@ package com.duckduckgo.pir.internal.settings
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.freemium.PirFreemiumDebugSettings
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(
     scope = AppScope::class,
-    rank = ContributesBinding.RANK_HIGHEST,
+    priority = Int.MAX_VALUE,
 )
 class InternalPirFreemiumDebugSettings @Inject constructor(
     private val store: PirInternalSettingsDataStore,

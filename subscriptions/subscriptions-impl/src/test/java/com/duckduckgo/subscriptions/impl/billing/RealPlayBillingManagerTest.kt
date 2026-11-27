@@ -9,10 +9,13 @@ import app.cash.turbine.test
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.Purchase
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.BASIC_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.LIST_OF_PRODUCTS
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.MONTHLY_PLAN_US
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.YEARLY_PLAN_US
+import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.billing.BillingError.BILLING_UNAVAILABLE
 import com.duckduckgo.subscriptions.impl.billing.BillingError.NETWORK_ERROR
 import com.duckduckgo.subscriptions.impl.billing.BillingError.SERVICE_UNAVAILABLE
@@ -22,21 +25,31 @@ import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMe
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.LaunchSubscriptionUpdate
 import com.duckduckgo.subscriptions.impl.billing.FakeBillingClientAdapter.FakeMethodInvocation.QueryPurchases
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState.InProgress
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.wideevents.BillingFlowInitFailureContext
 import com.duckduckgo.subscriptions.impl.wideevents.LastLoadProductsOutcome
 import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionPurchaseWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionSwitchWideEvent
+import com.duckduckgo.subscriptions.impl.wideevents.SubscriptionUndoCancellationWideEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -48,17 +61,15 @@ class RealPlayBillingManagerTest {
 
     private val billingClientAdapter = FakeBillingClientAdapter()
     private val subscriptionPurchaseWideEvent: SubscriptionPurchaseWideEvent = mock()
+    private val pixelSender: SubscriptionPixelSender = mock()
+    private val subscriptionsFeature: SubscriptionsFeature = FakeFeatureToggleFactory.create(SubscriptionsFeature::class.java)
 
     private lateinit var processLifecycleOwner: TestLifecycleOwner
 
-    private val subject = RealPlayBillingManager(
-        coroutineScope = coroutineRule.testScope,
-        pixelSender = mock(),
-        billingClient = billingClientAdapter,
-        dispatcherProvider = coroutineRule.testDispatcherProvider,
-        subscriptionPurchaseWideEvent = subscriptionPurchaseWideEvent,
-        subscriptionSwitchWideEvent = mock(),
-    )
+    private val subscriptionSwitchWideEvent: SubscriptionSwitchWideEvent = mock()
+    private val subscriptionUndoCancellationWideEvent: SubscriptionUndoCancellationWideEvent = mock()
+
+    private val subject = createSubject(isMainProcess = true)
 
     @Before
     fun setUp() {
@@ -422,6 +433,166 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
+    fun `when purchase update fails then reports store failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+
+        subject.purchaseState.test {
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("BILLING_UNAVAILABLE"))
+            awaitItem()
+        }
+
+        verify(pixelSender).reportPurchaseFailureStore("BILLING_UNAVAILABLE")
+    }
+
+    @Test
+    fun `when launch cancellation undo flow then replaces old purchase without proration and reports undo wide event`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        val productDetails: ProductDetails = subject.products.single()
+        val externalId = "external_id"
+
+        subject.purchaseState.test {
+            subject.launchCancellationUndoFlow(
+                activity = mock(),
+                planId = MONTHLY_PLAN_US,
+                externalId = externalId,
+                oldPurchaseToken = "old_purchase_token",
+            )
+
+            assertEquals(InProgress, awaitItem())
+        }
+
+        billingClientAdapter.verifyLaunchSubscriptionUpdateInvoked(
+            productDetails = productDetails,
+            offerToken = "monthly_offer_token",
+            externalId = externalId,
+            oldPurchaseToken = "old_purchase_token",
+            replacementMode = SubscriptionReplacementMode.WITHOUT_PRORATION,
+        )
+        billingClientAdapter.verifyLaunchBillingFlowNotInvoked()
+        verify(subscriptionUndoCancellationWideEvent).onBillingFlowInitSuccess()
+        verify(subscriptionPurchaseWideEvent, never()).onBillingFlowInitSuccess()
+        verify(subscriptionSwitchWideEvent, never()).onBillingFlowInitSuccess()
+    }
+
+    @Test
+    fun `when cancellation undo flow fails to launch then reports undo wide event init failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Failure(error = BILLING_UNAVAILABLE)
+
+        subject.purchaseState.test {
+            subject.launchCancellationUndoFlow(
+                activity = mock(),
+                planId = MONTHLY_PLAN_US,
+                externalId = "external_id",
+                oldPurchaseToken = "old_purchase_token",
+            )
+            awaitItem()
+        }
+
+        verify(subscriptionUndoCancellationWideEvent).onBillingFlowInitFailure("BILLING_UNAVAILABLE")
+        verify(subscriptionPurchaseWideEvent, never()).onBillingFlowInitFailure(any(), anyOrNull())
+        verify(subscriptionSwitchWideEvent, never()).onBillingFlowInitFailure(any())
+    }
+
+    @Test
+    fun `when cancellation undo purchase fails then does not report store failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        subject.purchaseState.test {
+            subject.launchCancellationUndoFlow(
+                activity = mock(),
+                planId = MONTHLY_PLAN_US,
+                externalId = "external_id",
+                oldPurchaseToken = "old_purchase_token",
+            )
+            awaitItem()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("BILLING_UNAVAILABLE"))
+
+            assertEquals(PurchaseState.Failure("BILLING_UNAVAILABLE"), awaitItem())
+        }
+
+        verify(pixelSender, never()).reportPurchaseFailureStore(any())
+    }
+
+    @Test
+    fun `when subscription update purchase fails then does not report store failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        subject.purchaseState.test {
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = MONTHLY_PLAN_US,
+                externalId = "external_id",
+                newOfferId = null,
+                oldPurchaseToken = "old_purchase_token",
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+            awaitItem()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("BILLING_UNAVAILABLE"))
+
+            assertEquals(PurchaseState.Failure("BILLING_UNAVAILABLE"), awaitItem())
+        }
+
+        verify(pixelSender, never()).reportPurchaseFailureStore(any())
+    }
+
+    @Test
+    fun `when subscription update fails then next purchase failure reports store failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        billingClientAdapter.launchBillingFlowResult = LaunchBillingFlowResult.Success
+
+        subject.purchaseState.test {
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = MONTHLY_PLAN_US,
+                externalId = "external_id",
+                newOfferId = null,
+                oldPurchaseToken = "old_purchase_token",
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+            awaitItem()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("ITEM_UNAVAILABLE"))
+            awaitItem()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("BILLING_UNAVAILABLE"))
+            awaitItem()
+        }
+
+        verify(pixelSender, never()).reportPurchaseFailureStore("ITEM_UNAVAILABLE")
+        verify(pixelSender).reportPurchaseFailureStore("BILLING_UNAVAILABLE")
+    }
+
+    @Test
+    fun `when subscription update fails to launch then next purchase failure reports store failure`() = runTest {
+        processLifecycleOwner.currentState = RESUMED
+        runCurrent()
+
+        subject.purchaseState.test {
+            subject.launchSubscriptionUpdate(
+                activity = mock(),
+                newPlanId = MONTHLY_PLAN_US,
+                externalId = "external_id",
+                newOfferId = null,
+                oldPurchaseToken = "",
+                replacementMode = SubscriptionReplacementMode.DEFERRED,
+            )
+            awaitItem()
+
+            billingClientAdapter.purchasesListener?.invoke(PurchasesUpdateResult.Failure("BILLING_UNAVAILABLE"))
+            awaitItem()
+        }
+
+        verify(pixelSender).reportPurchaseFailureStore("BILLING_UNAVAILABLE")
+    }
+
+    @Test
     fun `getLatestPurchase returns Present when active subscription purchase exists`() = runTest {
         val activePurchase = mock<Purchase> {
             whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
@@ -497,12 +668,119 @@ class RealPlayBillingManagerTest {
     }
 
     @Test
-    fun `getLatestPurchase returns Unknown when billing client is not ready`() = runTest {
-        // do not connect the billing client (no lifecycle transition to CREATED/RESUMED)
+    fun `getLatestPurchase returns Unknown without connecting when billing client is not ready and flag is off`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = false)
+
         val result = subject.getLatestPurchase()
 
         assertEquals(LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), result)
+        billingClientAdapter.verifyConnectInvoked(times = 0)
     }
+
+    @Test
+    fun `getLatestPurchase connects then returns the purchase when billing client is not ready and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        val activePurchase = mock<Purchase> {
+            whenever(it.products).thenReturn(listOf(BASIC_SUBSCRIPTION))
+            whenever(it.purchaseState).thenReturn(Purchase.PurchaseState.PURCHASED)
+            whenever(it.purchaseTime).thenReturn(1000L)
+        }
+        billingClientAdapter.activePurchases = listOf(activePurchase)
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Present(activePurchase), result)
+        billingClientAdapter.verifyConnectInvoked()
+    }
+
+    @Test
+    fun `getLatestPurchase returns Absent after connecting when Play has no purchase and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.activePurchases = emptyList()
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Absent, result)
+    }
+
+    @Test
+    fun `getLatestPurchase returns Unknown when connecting fails and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.billingInitResult = BillingInitResult.Failure(BILLING_UNAVAILABLE)
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_connect_failed"), result)
+        billingClientAdapter.verifyConnectInvoked()
+    }
+
+    @Test
+    fun `getLatestPurchase returns Unknown when connecting does not finish in time and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.connectDuration = 1.minutes
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_connect_timeout"), result)
+    }
+
+    @Test
+    fun `getLatestPurchase queries purchases when connected but loading products outlasts the timeout and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.getSubscriptionsDuration = 1.minutes
+        billingClientAdapter.activePurchases = emptyList()
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Absent, result)
+    }
+
+    @Test
+    fun `getLatestPurchase returns Unknown when connecting throws and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.connectException = IllegalStateException()
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_connect_error"), result)
+    }
+
+    @Test
+    fun `getLatestPurchase queries purchases when connected but loading products throws and flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+        billingClientAdapter.getSubscriptionsException = IllegalStateException()
+        billingClientAdapter.activePurchases = emptyList()
+
+        val result = subject.getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Absent, result)
+    }
+
+    @Test
+    fun `getLatestPurchase returns Unknown without connecting outside the main process when flag is on`() = runTest {
+        givenConnectBeforeQueryingEnabled(enabled = true)
+
+        val result = createSubject(isMainProcess = false).getLatestPurchase()
+
+        assertEquals(LatestPurchaseResult.Unknown(cause = "billing_client_not_ready"), result)
+        billingClientAdapter.verifyConnectInvoked(times = 0)
+    }
+
+    private fun givenConnectBeforeQueryingEnabled(enabled: Boolean) {
+        subscriptionsFeature.connectBillingBeforeQueryingPurchases().setRawStoredState(Toggle.State(remoteEnableState = enabled))
+    }
+
+    private fun createSubject(isMainProcess: Boolean) = RealPlayBillingManager(
+        coroutineScope = coroutineRule.testScope,
+        pixelSender = pixelSender,
+        billingClient = billingClientAdapter,
+        dispatcherProvider = coroutineRule.testDispatcherProvider,
+        subscriptionPurchaseWideEvent = subscriptionPurchaseWideEvent,
+        subscriptionSwitchWideEvent = subscriptionSwitchWideEvent,
+        subscriptionUndoCancellationWideEvent = subscriptionUndoCancellationWideEvent,
+        subscriptionsFeature = lazy { subscriptionsFeature },
+        isMainProcess = isMainProcess,
+    )
 }
 
 class FakeBillingClientAdapter : BillingClientAdapter {
@@ -531,6 +809,10 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     var activePurchases: List<Purchase> = emptyList()
     var launchBillingFlowResult: LaunchBillingFlowResult = LaunchBillingFlowResult.Failure(error = SERVICE_UNAVAILABLE)
     var billingInitResult: BillingInitResult = BillingInitResult.Success
+    var connectDuration: Duration = Duration.ZERO
+    var connectException: Exception? = null
+    var getSubscriptionsDuration: Duration = Duration.ZERO
+    var getSubscriptionsException: Exception? = null
 
     var purchasesListener: ((PurchasesUpdateResult) -> Unit)? = null
     var disconnectionListener: (() -> Unit)? = null
@@ -543,6 +825,8 @@ class FakeBillingClientAdapter : BillingClientAdapter {
         disconnectionListener: () -> Unit,
     ): BillingInitResult {
         methodInvocations.add(Connect)
+        withContext(NonCancellable) { delay(connectDuration) }
+        connectException?.let { throw it }
 
         when (billingInitResult) {
             BillingInitResult.Success -> {
@@ -561,7 +845,9 @@ class FakeBillingClientAdapter : BillingClientAdapter {
     }
 
     override suspend fun getSubscriptions(productIds: List<String>): SubscriptionsResult {
+        delay(getSubscriptionsDuration)
         methodInvocations.add(GetSubscriptions(productIds))
+        getSubscriptionsException?.let { throw it }
         return if (ready) {
             SubscriptionsResult.Success(subscriptions)
         } else {

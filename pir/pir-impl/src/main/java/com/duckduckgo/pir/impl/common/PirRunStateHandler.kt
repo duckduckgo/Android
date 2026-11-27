@@ -66,8 +66,8 @@ import com.duckduckgo.pir.impl.store.db.BrokerScanEventType.BROKER_SUCCESS
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_FAILED
 import com.duckduckgo.pir.impl.store.db.EmailConfirmationEventType.EMAIL_CONFIRMATION_SUCCESS
 import com.duckduckgo.pir.impl.store.db.PirBrokerScanLog
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Named
@@ -81,6 +81,7 @@ interface PirRunStateHandler {
         data class BrokerScanStarted(
             override val broker: Broker,
             val eventTimeInMillis: Long,
+            val isFreeScan: Boolean,
         ) : PirRunState(broker)
 
         data class BrokerScanSuccess(
@@ -478,7 +479,7 @@ class RealPirRunStateHandler @Inject constructor(
     }
 
     private suspend fun handleBrokerScanStarted(state: BrokerScanStarted) {
-        pixelSender.reportScanStarted(brokerUrl = state.broker.url)
+        pixelSender.reportScanStarted(brokerUrl = state.broker.url, isFreeScan = state.isFreeScan)
         eventsRepository.saveBrokerScanLog(
             PirBrokerScanLog(
                 eventTimeInMillis = state.eventTimeInMillis,
@@ -696,8 +697,17 @@ class RealPirRunStateHandler @Inject constructor(
                          * - Update the corresponding ScanJobRecord
                          * For every stored extractedProfile that reappears in the results and whose opt-out was previously
                          * REMOVED, we revert it back to REQUESTED and report a reappearance pixel.
+                         * For every stored extractedProfile marked REMOVED although a profile with the same identifier was
+                         * found, we report a pixel: other platforms match on the identifier alone and would have kept it.
                          */
                         jobRecordUpdater.markRemovedOptOutJobRecords(it, brokerName, state.profileQueryId)
+                            .forEach { removal ->
+                                pixelSender.reportBrokerOptOutRemovedWithIdentifierFound(
+                                    brokerUrl = state.broker.url,
+                                    changedField = removal.changedField,
+                                    previousStatus = removal.previousStatus,
+                                )
+                            }
 
                         if (it.isNotEmpty()) {
                             jobRecordUpdater.markReappearedOptOutJobRecords(it, brokerName, state.profileQueryId)

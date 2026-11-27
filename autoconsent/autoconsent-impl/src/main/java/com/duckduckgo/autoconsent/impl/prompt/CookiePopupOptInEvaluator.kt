@@ -29,9 +29,11 @@ import com.duckduckgo.common.utils.AppInstallTimeProvider
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.nextsteps.api.NextSteps
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -39,11 +41,11 @@ import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ModalEvaluator::class,
+    binding = binding<ModalEvaluator>(),
 )
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class CookiePopupOptInEvaluator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val applicationContext: Context,
@@ -54,6 +56,7 @@ class CookiePopupOptInEvaluator @Inject constructor(
     private val settingsRepository: AutoconsentSettingsRepository,
     private val currentTimeProvider: CurrentTimeProvider,
     private val appInstallTimeProvider: AppInstallTimeProvider,
+    private val nextSteps: NextSteps,
 ) : ModalEvaluator {
 
     override val priority: Int = 7
@@ -62,7 +65,6 @@ class CookiePopupOptInEvaluator @Inject constructor(
 
     override suspend fun evaluate(): ModalEvaluator.EvaluationResult = withContext(dispatchers.io()) {
         if (!autoconsentFeature.self().isEnabled() ||
-            !autoconsentFeature.cookiePopUpOptInPrompt().isEnabled() ||
             !autoconsentFeature.cookiePopUpPreferenceSetting().isEnabled()
         ) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
@@ -73,6 +75,11 @@ class CookiePopupOptInEvaluator @Inject constructor(
         }
 
         if (daysSinceInstall() < MIN_DAYS_SINCE_INSTALL) {
+            return@withContext ModalEvaluator.EvaluationResult.Skipped
+        }
+
+        // The prompt would take the screen from the Next Steps section, so it waits until the section ends.
+        if (nextSteps.isSectionActive()) {
             return@withContext ModalEvaluator.EvaluationResult.Skipped
         }
 

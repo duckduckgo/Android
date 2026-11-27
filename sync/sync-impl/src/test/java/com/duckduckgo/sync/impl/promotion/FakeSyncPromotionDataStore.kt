@@ -17,10 +17,13 @@
 package com.duckduckgo.sync.impl.promotion
 
 import com.duckduckgo.sync.impl.promotion.SyncPromotionDataStore.PromotionType
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.ZERO
 
 class FakeSyncPromotionDataStore : SyncPromotionDataStore {
     private val dismissMap = mutableMapOf<PromotionType, Boolean>()
     private val impressionsMap = mutableMapOf<PromotionType, Long>()
+    private val timeSinceLastImpressionMap = mutableMapOf<PromotionType, Duration>()
 
     override suspend fun hasPromoBeenDismissed(promotionType: PromotionType): Boolean {
         return dismissMap.getOrDefault(promotionType, false)
@@ -36,10 +39,20 @@ class FakeSyncPromotionDataStore : SyncPromotionDataStore {
 
     override suspend fun recordPromoImpression(promotionType: PromotionType) {
         impressionsMap[promotionType] = impressionsMap.getOrDefault(promotionType, 0) + 1
+        timeSinceLastImpressionMap[promotionType] = ZERO
+    }
+
+    override suspend fun getTimeSinceLastPromoImpression(promotionType: PromotionType): Duration? {
+        return timeSinceLastImpressionMap[promotionType]
+    }
+
+    fun setTimeSinceLastPromoImpression(promotionType: PromotionType, duration: Duration) {
+        timeSinceLastImpressionMap[promotionType] = duration
     }
 
     override suspend fun clearPromoHistory(promotionType: PromotionType) {
         dismissMap.clear()
         impressionsMap.clear()
+        timeSinceLastImpressionMap.clear()
     }
 }

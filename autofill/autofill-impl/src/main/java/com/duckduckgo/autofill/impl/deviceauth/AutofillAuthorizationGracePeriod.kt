@@ -18,8 +18,8 @@ package com.duckduckgo.autofill.impl.deviceauth
 
 import com.duckduckgo.autofill.impl.time.TimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
@@ -57,7 +57,7 @@ interface AutofillAuthorizationGracePeriod {
     fun invalidate()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class AutofillTimeBasedAuthorizationGracePeriod @Inject constructor(
     private val timeProvider: TimeProvider,

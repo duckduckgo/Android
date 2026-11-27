@@ -19,7 +19,14 @@ package com.duckduckgo.duckchat.impl.contextual
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
+import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.models.AIChatModel
+import com.duckduckgo.duckchat.impl.models.AvailableReasoningMode
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelSource
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.ReasoningEffort
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelPageType
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
@@ -28,7 +35,11 @@ import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelecti
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.RealTextSelectionRepository
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionPayloadBuilder
 import com.duckduckgo.duckchat.impl.ui.nativeinput.textselection.TextSelectionRepository
+import com.duckduckgo.duckchat.impl.wideevents.DuckAiEntryWideEvent
 import com.duckduckgo.duckchat.impl.wideevents.DuckAiSelectionJourneyWideEvent
+import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
+import com.duckduckgo.feature.toggles.api.Toggle
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.runTest
 import org.json.JSONArray
 import org.json.JSONObject
@@ -41,6 +52,7 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -52,10 +64,13 @@ class DuckChatContextualEntryViewModelTest {
 
     private val store: ContextualEntryPromptStore = mock()
     private val duckChatPixels: DuckChatPixels = mock()
-    private val modelManager: DuckAiModelManager = mock()
+    private val modelStateFlow = MutableStateFlow(ModelState())
+    private val modelManager: DuckAiModelManager = mock { on { modelState } doReturn modelStateFlow }
     private val selectionJourney: DuckAiSelectionJourneyWideEvent = mock()
     private val inputOutcomeTracker: InputOutcomeTracker = mock()
-    private val textSelectionRepository = RealTextSelectionRepository(dagger.Lazy { duckChatPixels }, selectionJourney)
+    private val entryWideEvent: DuckAiEntryWideEvent = mock()
+    private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
+    private val textSelectionRepository = RealTextSelectionRepository(lazy { duckChatPixels }, selectionJourney)
     private val viewModel = DuckChatContextualEntryViewModel(
         store,
         duckChatPixels,
@@ -64,6 +79,8 @@ class DuckChatContextualEntryViewModelTest {
         RealTextSelectionPayloadBuilder(RuntimeEnvironment.getApplication(), object : DuckAiHostProvider {}),
         selectionJourney,
         inputOutcomeTracker,
+        entryWideEvent,
+        duckChatFeature,
     )
 
     private val validContext = """{"title":"Example","url":"https://example.com","content":"some page content"}"""
@@ -95,6 +112,16 @@ class DuckChatContextualEntryViewModelTest {
         viewModel.onPageContextReceived(validContext)
 
         assertNull(viewModel.viewState.value.attachedContext)
+    }
+
+    @Test
+    fun whenDictatedPromptSubmittedThenVoiceAttributionIsStored() = runTest {
+        viewModel.start("tab-1")
+        viewModel.onPromptSubmitted(samplePrompt, voice = true)
+
+        val captor = argumentCaptor<ContextualEntryPrompt>()
+        verify(store).store(captor.capture())
+        assertTrue(captor.firstValue.voice)
     }
 
     @Test
@@ -173,13 +200,40 @@ class DuckChatContextualEntryViewModelTest {
     }
 
     @Test
-    fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+    fun whenSuggestionSubmittedThenUnifiedInputPromptSubmittedPixelReportsThePromptsModel() = runTest {
         viewModel.start("tab-1")
         whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
         whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
 
         viewModel.commands.test {
             viewModel.onSuggestionSubmitted(samplePrompt)
+            assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
+        }
+
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = "model-1",
+            reasoningEffort = "high",
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab-1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+            modelSource = null,
+        )
+    }
+
+    @Test
+    fun whenSuggestionPromptCarriesNoModelThenPixelReportsTheGlobalSelectionTheRequestFallsBackTo() = runTest {
+        viewModel.start("tab-1")
+        whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
+        whenever(modelManager.getResolvedReasoningEffort()).thenReturn("low")
+
+        viewModel.commands.test {
+            viewModel.onSuggestionSubmitted(samplePrompt.copy(modelId = null, reasoningEffort = null))
             assertEquals(DuckChatContextualEntryViewModel.Command.HandOffToSheet, awaitItem())
         }
 
@@ -195,11 +249,12 @@ class DuckChatContextualEntryViewModelTest {
             tabId = "tab-1",
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = null,
         )
     }
 
     @Test
-    fun whenSummarizeSubmittedThenUnifiedInputPromptSubmittedPixelFired() = runTest {
+    fun whenSummarizeSubmittedThenUnifiedInputPromptSubmittedPixelReportsThePromptsModel() = runTest {
         viewModel.start("tab-1")
         viewModel.onPageContextReceived(validContext)
         whenever(modelManager.getSelectedModelId()).thenReturn("gpt-5.2")
@@ -212,8 +267,8 @@ class DuckChatContextualEntryViewModelTest {
 
         verify(duckChatPixels).firePromptSubmitted(
             selectedTool = "none",
-            modelId = "gpt-5.2",
-            reasoningEffort = "low",
+            modelId = "model-1",
+            reasoningEffort = "high",
             hasImageAttachment = false,
             hasFileAttachment = false,
             hasText = true,
@@ -222,6 +277,74 @@ class DuckChatContextualEntryViewModelTest {
             tabId = "tab-1",
             pageType = DuckChatPixelPageType.CONTEXTUAL,
             addressBarEntryPoint = null,
+            modelSource = null,
+        )
+    }
+
+    @Test
+    fun whenResetOnAndSummarizeSentOnTheDefaultThenModelSourceIsDefault() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        viewModel.start("tab-1")
+        viewModel.onPageContextReceived(validContext)
+
+        viewModel.onSummarizeSubmitted(NativeInputPrompt("Summarize", "gpt-6-luna", "none", null, null, null))
+
+        verifyUnifiedPixel(modelId = "gpt-6-luna", reasoningEffort = "none", modelSource = ModelSource.DEFAULT)
+    }
+
+    @Test
+    fun whenResetOnAndSuggestionSentOnASheetPickThenModelSourceIsPicked() = runTest {
+        givenResetOnWithTierDefaultSelected()
+        viewModel.start("tab-1")
+
+        viewModel.onSuggestionSubmitted(NativeInputPrompt("hi", "other-model", null, null, null, null))
+
+        verifyUnifiedPixel(modelId = "other-model", reasoningEffort = null, modelSource = ModelSource.PICKED)
+    }
+
+    @Test
+    fun whenResetOffAndSummarizeSentThenNoModelSource() = runTest {
+        modelStateFlow.value = tierDefaultState()
+        viewModel.start("tab-1")
+        viewModel.onPageContextReceived(validContext)
+
+        viewModel.onSummarizeSubmitted(NativeInputPrompt("Summarize", "gpt-6-luna", "none", null, null, null))
+
+        verifyUnifiedPixel(modelId = "gpt-6-luna", reasoningEffort = "none", modelSource = null)
+    }
+
+    private fun givenResetOnWithTierDefaultSelected() {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        modelStateFlow.value = tierDefaultState()
+    }
+
+    private fun tierDefaultState(): ModelState {
+        val fast = AvailableReasoningMode(ReasoningMode.FAST, ReasoningEffort.NONE)
+        return ModelState(
+            models = listOf(
+                AIChatModel("gpt-6-luna", "Luna", "Luna", "Luna", listOf("free"), true, supportedReasoningEfforts = listOf(ReasoningEffort.NONE)),
+                AIChatModel("other-model", "Other", "Other", "Other", listOf("free"), true),
+            ),
+            selectedModelId = "gpt-6-luna",
+            selectedReasoningMode = ReasoningMode.FAST,
+            availableReasoningModes = listOf(fast),
+        )
+    }
+
+    private fun verifyUnifiedPixel(modelId: String?, reasoningEffort: String?, modelSource: ModelSource?) {
+        verify(duckChatPixels).firePromptSubmitted(
+            selectedTool = "none",
+            modelId = modelId,
+            reasoningEffort = reasoningEffort,
+            hasImageAttachment = false,
+            hasFileAttachment = false,
+            hasText = true,
+            surface = DuckChatPixelSurface.CONTEXTUAL_CHAT,
+            defaultMode = null,
+            tabId = "tab-1",
+            pageType = DuckChatPixelPageType.CONTEXTUAL,
+            addressBarEntryPoint = null,
+            modelSource = modelSource,
         )
     }
 
@@ -246,6 +369,7 @@ class DuckChatContextualEntryViewModelTest {
             tabId = anyOrNull(),
             pageType = any(),
             addressBarEntryPoint = anyOrNull(),
+            modelSource = anyOrNull(),
         )
     }
 
@@ -325,6 +449,15 @@ class DuckChatContextualEntryViewModelTest {
         viewModel.onDismiss()
 
         verify(selectionJourney).onSurfaceDismissed("tab-1")
+    }
+
+    @Test
+    fun whenDismissedThenClosesTheContextualDuckAiEntry() {
+        viewModel.start("tab-1")
+
+        viewModel.onDismiss()
+
+        verify(entryWideEvent).onContextualSheetClosed("tab-1")
     }
 
     @Test

@@ -21,10 +21,10 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestSeederKey
 import com.duckduckgo.testseeder.api.TestSeederPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class OmnibarPositionSeederPlugin @Inject constructor(
     private val settingsDataStore: SettingsDataStore,
 ) : TestSeederPlugin {

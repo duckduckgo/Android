@@ -30,8 +30,8 @@ import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.Com
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.Command.OpenPlayerModeSelector
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.ViewState.DisabledWithHelpLink
 import com.duckduckgo.adblocking.impl.duckplayer.DuckPlayerSettingsViewModel.ViewState.Enabled
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel

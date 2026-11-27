@@ -32,8 +32,9 @@ import com.duckduckgo.installation.impl.installer.InstallationPixelName.APP_INST
 import com.duckduckgo.installation.impl.installer.fullpackage.InstallSourceFullPackageStore
 import com.duckduckgo.installation.impl.installer.fullpackage.feature.InstallSourceFullPackageFeature
 import com.duckduckgo.privacy.config.api.PrivacyConfigCallbackPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
@@ -42,11 +43,11 @@ import logcat.logcat
 import javax.inject.Inject
 
 @SuppressLint("DenyListedApi")
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PrivacyConfigCallbackPlugin::class,
+    binding = binding<PrivacyConfigCallbackPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class InstallSourcePrivacyConfigObserver @Inject constructor(
     private val installSourceExtractor: InstallSourceExtractor,
     private val context: Context,
@@ -124,9 +125,9 @@ enum class InstallationPixelName(override val pixelName: String) : Pixel.PixelNa
     APP_INSTALLER_FULL_PACKAGE_NAME("m_installation_installer"),
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object InstallerPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

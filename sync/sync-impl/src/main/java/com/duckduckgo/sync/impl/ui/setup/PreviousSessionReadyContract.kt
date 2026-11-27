@@ -29,7 +29,7 @@ class PreviousSessionReadyContract : ActivityResultContract<Input, Output>() {
         context: Context,
         input: Input,
     ): Intent {
-        return PreviousSessionReadyActivity.intent(context, input.syncEntryPoint, input.isAuthRequired)
+        return PreviousSessionReadyActivity.intent(context, input.syncEntryPoint)
     }
 
     override fun parseResult(
@@ -57,7 +57,6 @@ class PreviousSessionReadyContract : ActivityResultContract<Input, Output>() {
 
     data class Input(
         val syncEntryPoint: SyncEntryPoint,
-        val isAuthRequired: Boolean,
     )
 
     sealed interface Output {

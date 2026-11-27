@@ -25,12 +25,12 @@ import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.AccessTokenResult.Success
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.auth.TokenRefreshWorker.Companion.REFRESH_WORKER_NAME
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.time.Duration
 import java.util.concurrent.TimeUnit.MINUTES
 import javax.inject.Inject

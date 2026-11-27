@@ -19,16 +19,16 @@ package com.duckduckgo.app.anr.internal.feature
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.anr.internal.databinding.ActivityCrashAnrInternalSettingsBinding
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @InjectWith(ActivityScope::class)
@@ -67,8 +67,8 @@ class CrashANRsInternalSettingsActivity : DuckDuckGoActivity() {
     }
 }
 
-@ContributesMultibinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesIntoSet(AppScope::class)
+@SingleIn(AppScope::class)
 class CrashAnrLogsCapabilityPlugin @Inject constructor() : CrashAnrDevCapabilityPlugin {
 
     override fun title(): String = "Recent Crash & ANR"

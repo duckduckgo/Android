@@ -18,7 +18,7 @@ package com.duckduckgo.app.launch.seeder
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.testseeder.api.TestScenarioSeeder
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

@@ -26,8 +26,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiSessionCallback
 import com.duckduckgo.duckchat.api.DuckAiSessionExitTrigger
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.INFO
 import logcat.logcat
@@ -40,7 +40,8 @@ interface TabManager {
 
     fun registerCallbacks(onTabsUpdated: (List<TabModel>) -> Unit)
     fun getSelectedTabId(): String?
-    suspend fun onSelectedTabChanged(tabId: String)
+    fun onSelectedTabChanged(tabId: String)
+    suspend fun onTabAccessed(tabId: String)
 
     suspend fun onTabsChanged(updatedTabIds: List<TabModel>)
     suspend fun switchToTab(tabId: String)
@@ -55,7 +56,7 @@ interface TabManager {
     )
 }
 
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 @ContributesBinding(ActivityScope::class)
 class DefaultTabManager @Inject constructor(
     private val tabRepository: TabRepository,
@@ -74,8 +75,11 @@ class DefaultTabManager @Inject constructor(
 
     override fun getSelectedTabId(): String? = selectedTabId
 
-    override suspend fun onSelectedTabChanged(tabId: String) {
+    override fun onSelectedTabChanged(tabId: String) {
         selectedTabId = tabId
+    }
+
+    override suspend fun onTabAccessed(tabId: String) {
         withContext(dispatchers.io()) {
             tabRepository.updateTabLastAccess(tabId)
         }

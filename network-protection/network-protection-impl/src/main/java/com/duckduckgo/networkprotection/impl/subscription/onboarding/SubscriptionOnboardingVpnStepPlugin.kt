@@ -17,16 +17,15 @@
 package com.duckduckgo.networkprotection.impl.subscription.onboarding
 
 import androidx.fragment.app.Fragment
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.impl.R
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingCompletionSummaryRow
 import com.duckduckgo.subscriptions.api.SubscriptionOnboardingStepPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import javax.inject.Inject
 
-/** VPN step of the subscription onboarding, contributed from `network-protection-impl`. */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoMap(AppScope::class)
 @PriorityKey(200)
 class SubscriptionOnboardingVpnStepPlugin @Inject constructor() : SubscriptionOnboardingStepPlugin {
 

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.remote.messaging.impl.network
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.impl.models.JsonRemoteMessagingConfig
 import retrofit2.http.GET

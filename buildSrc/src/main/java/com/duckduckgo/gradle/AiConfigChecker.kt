@@ -37,7 +37,7 @@ class AiConfigChecker(private val repoRoot: File) {
     private val claudeMd = File(repoRoot, "CLAUDE.md")
     private val rulesDir = File(repoRoot, ".claude/rules")
     private val docsDir = File(repoRoot, ".claude/docs")
-    private val skillsDir = File(repoRoot, ".claude/skills")
+    private val skillsDir = File(repoRoot, ".agents/skills")
 
     fun check(): List<Violation> {
         if (!agentsMd.exists()) return listOf(Violation("AGENTS.md not found at repo root"))
@@ -138,7 +138,7 @@ class AiConfigChecker(private val repoRoot: File) {
         val violations = mutableListOf<Violation>()
         for (file in skills()) {
             val keys = frontmatterKeys(file)
-            val rel = ".claude/skills/${file.parentFile.name}/SKILL.md"
+            val rel = ".agents/skills/${file.parentFile.name}/SKILL.md"
             if ("name" !in keys) violations += Violation("Skill missing `name:` frontmatter: $rel")
             if ("description" !in keys) {
                 violations += Violation("Skill missing `description:` frontmatter: $rel — without it the skill can never be invoked")

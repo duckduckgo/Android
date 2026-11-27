@@ -16,45 +16,37 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
-    implementation project(':example-feature-api')
-
-    implementation project(':anvil-annotations')
-    implementation project(':di')
+    implementation project(':codegen-annotations')
     implementation project(':common-utils')
-    ksp AndroidX.room.compiler
-
-    implementation KotlinX.coroutines.android
-    implementation AndroidX.core.ktx
-    implementation Google.dagger
-
+    implementation project(':di')
+    implementation project(':example-feature-api')
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.core.ktx
+    implementation KotlinX.coroutines.android
 
-    testImplementation Testing.junit4
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation project(path: ':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation CashApp.turbine
-    testImplementation Testing.robolectric
     testImplementation(KotlinX.coroutines.test) {
+        // We exclude kotlinx-coroutines-debug because it bundles ByteBuddy, which conflicts with Mockito.
         // https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        // conflicts with mockito due to direct inclusion of byte buddy
         exclude group: "org.jetbrains.kotlinx", module: "kotlinx-coroutines-debug"
     }
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
 
-    coreLibraryDesugaring Android.tools.desugarJdkLibs
+    ksp AndroidX.room.compiler
 }
 
 android {
     namespace "com.duckduckgo.examplefeature.internal"
-    anvil {
-        generateDaggerFactories = true // default is false
-    }
     lint {
         baseline file("lint-baseline.xml")
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
@@ -63,9 +55,6 @@ android {
         unitTests {
             includeAndroidResources = true
         }
-    }
-    compileOptions {
-        coreLibraryDesugaringEnabled = true
     }
 }
 

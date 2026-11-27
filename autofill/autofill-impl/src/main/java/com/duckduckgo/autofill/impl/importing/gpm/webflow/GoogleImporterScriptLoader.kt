@@ -20,7 +20,7 @@ import com.duckduckgo.autofill.impl.importing.gpm.feature.AutofillImportPassword
 import com.duckduckgo.autofill.impl.importing.takeout.store.BookmarkImportConfigStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import javax.inject.Inject

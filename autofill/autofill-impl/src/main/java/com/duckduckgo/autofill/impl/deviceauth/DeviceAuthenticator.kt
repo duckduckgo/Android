@@ -26,7 +26,7 @@ import com.duckduckgo.autofill.impl.R
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthConfiguration
 import com.duckduckgo.autofill.impl.deviceauth.DeviceAuthenticator.AuthResult
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface DeviceAuthenticator {

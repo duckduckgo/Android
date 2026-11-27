@@ -16,7 +16,7 @@
 
 package com.duckduckgo.sync.impl
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -42,83 +42,20 @@ interface SyncFeature {
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun level3AllowCreateAccount(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun gzipPatchRequests(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun seamlessAccountSwitching(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun exchangeKeysToSyncWithAnotherDevice(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun automaticallyUpdateSyncSettings(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun syncSetupBarcodeIsUrlBased(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canScanUrlBasedSyncSetupBarcodes(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canInterceptSyncSetupUrls(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canOverrideThemeSyncSetup(): Toggle
-
     @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun aiChatSync(): Toggle
 
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun useExpandableBarcodeConnectSyncLayout(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun syncAutoRestore(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun recoverDataEasilySetupScreen(): Toggle
-
+    /**
+     * Kill switch for the `sync-setup` wide event. Disabled sends no `sync-setup` event from either writer.
+     */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
     fun sendSyncSetupWideEvent(): Toggle
 
     /**
-     * Global switch for the v2 connect/exchange stack. When disabled, the device uses the
-     * v1 stack only — no v2 keys, no v2 channel, no scoped credentials.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canUseV2ConnectFlow(): Toggle
-
-    /**
-     * When enabled, this device displays a v2 QR code. No effect unless [canUseV2ConnectFlow]
-     * is also enabled.
+     * Gates the unified Sync setup wide event. No effect unless [sendSyncSetupWideEvent] is also enabled.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
-    fun canShowV2ConnectCode(): Toggle
-
-    /**
-     * Global switch for the v2.1 exchange protocol.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
-    fun canUseExchangeV2Point1(): Toggle
-
-    /**
-     * Kill switch for sending the exchange channel secret as the `Authorization` header on the v2.0
-     * exchange relay endpoints. Independent of [canUseExchangeV2Point1] so the header can be turned
-     * on (or off) without moving the protocol version.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canSendExchangeChannelSecret(): Toggle
-
-    /**
-     * When enabled, the sync barcode scanner only attempts to decode QR codes. Sync codes are
-     * always encoded as QR, so other formats only add noise (and false-positive decodes) to
-     * the scanner.
-     */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun restrictScannedBarcodesToQrTypes(): Toggle
-
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun preventStaleTokenLogout(): Toggle
+    fun sendUnifiedSyncSetupWideEvent(): Toggle
 
     /**
      * Gates writing `device_info`
@@ -133,29 +70,27 @@ interface SyncFeature {
     fun canReadUnifiedDeviceList(): Toggle
 
     /**
-     * Whether to rename this device using new `PATCH /sync/devices` or legacy `login` endpoint
-     * Applies only when [canWriteUnifiedDeviceList] is disabled.
-     *
-     * If this flag is enabled, it will use the `PATCH /sync/devices` endpoint and omit `device_info`
-     * If this flag is disabled, it will fallback to the previous renaming endpoint using `POST /sync/login`
+     * Kill switch for refreshing the connected devices count after app-open and background syncs. Syncs after creating or joining
+     * an account always refresh it.
      */
     @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canUsePatchEndpointForLegacyDeviceRename(): Toggle
+    fun refreshConnectedDevicesOnSync(): Toggle
 
     /**
-     * When enabled:
-     *   - On-device authentication is moved from the sync settings to the last possible moment before syncing.
-     *   - Camera permission is request upfront when opening barcode scanner.
-     *   - Account deletion flow is explicit about deletion results.
+     * Kill switch for everything that reads the account audit log.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.TRUE)
-    fun canUseImprovedSyncFlow(): Toggle
-}
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun loginAuditLog(): Toggle
 
-/**
- * `device_info` is read only on the v2 device-list path, and the `account_info` key backing it must be wrapped for every credential on the
- * account, which needs the scoped credentials [SyncFeature.canUseV2ConnectFlow] governs. Writing it with v2 disabled would publish a blob
- * nobody on this device reads, off a key we can only wrap for `ddg`.
- */
-internal fun SyncFeature.canWriteDeviceInfo(): Boolean =
-    canUseV2ConnectFlow().isEnabled() && canWriteUnifiedDeviceList().isEnabled()
+    /**
+     * Gates the new-login banner and system notification. No effect unless [loginAuditLog] is also enabled.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    fun loginNotification(): Toggle
+
+    /**
+     * Gates the typeable pairing URL: opening Sync pairing when the user types duck.com/pair or duck.ai/pair in the address bar.
+     */
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun syncPairingUrl(): Toggle
+}

@@ -33,8 +33,8 @@ import com.duckduckgo.promptscoordinator.impl.exposure.PromptExposurePixelParams
 import com.duckduckgo.promptscoordinator.impl.exposure.daysSinceInstallBucket
 import com.duckduckgo.promptscoordinator.impl.exposure.firePromptExposurePixel
 import com.duckduckgo.promptscoordinator.impl.exposure.gapBucket
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicLong
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPromptsCoordinator @Inject constructor(
     private val feature: PromptsCoordinatorFeature,
     @PromptsCoordinatorStore private val store: DataStore<Preferences>,

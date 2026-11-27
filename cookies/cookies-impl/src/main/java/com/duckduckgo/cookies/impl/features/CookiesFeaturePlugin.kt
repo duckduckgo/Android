@@ -30,12 +30,12 @@ import com.duckduckgo.cookies.store.RealCookieRepository.Companion.DEFAULT_THRES
 import com.duckduckgo.cookies.store.contentscopescripts.ContentScopeScriptsCookieRepository
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class CookiesFeaturePlugin @Inject constructor(
     private val cookiesRepository: CookiesRepository,
     private val contentScopeScriptsCookieRepository: ContentScopeScriptsCookieRepository,

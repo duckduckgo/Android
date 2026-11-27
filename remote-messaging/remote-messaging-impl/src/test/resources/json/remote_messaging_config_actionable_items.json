@@ -35,8 +35,8 @@
             "placeholder": "Radar",
             "primaryActionText": "Add widget",
             "primaryAction": {
-              "type": "url",
-              "value": "https://duckduckgo.com/widget"
+              "type": "addWidget",
+              "value": "search"
             }
           }
         ]

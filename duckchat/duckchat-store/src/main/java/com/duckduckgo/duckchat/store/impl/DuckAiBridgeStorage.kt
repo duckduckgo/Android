@@ -19,7 +19,6 @@ package com.duckduckgo.duckchat.store.impl
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeChatsDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
-import dagger.Lazy
 import java.io.File
 
 /**
@@ -46,5 +45,5 @@ internal class RealDuckAiBridgeStorage(
 ) : DuckAiBridgeStorage {
     // Deferred so the context.filesDir access isn't done at construction time (kept off whatever
     // thread first injects the per-mode storage)
-    override val filesDir: File get() = filesDirLazy.get()
+    override val filesDir: File get() = filesDirLazy.value
 }

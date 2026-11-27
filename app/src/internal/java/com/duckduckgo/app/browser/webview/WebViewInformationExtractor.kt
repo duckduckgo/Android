@@ -20,7 +20,7 @@ import android.content.Context
 import androidx.webkit.WebViewCompat
 import com.duckduckgo.app.browser.webview.WebViewInformationExtractor.WebViewData
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface WebViewInformationExtractor {

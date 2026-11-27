@@ -19,14 +19,14 @@ package com.duckduckgo.autofill.sync
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class SyncCredentialsListener @Inject constructor(
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val dispatcherProvider: DispatcherProvider,

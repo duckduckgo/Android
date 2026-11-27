@@ -38,6 +38,7 @@ import com.duckduckgo.lint.NoRobolectricTestRunnerDetector.Companion.NO_ROBOLECT
 import com.duckduckgo.lint.NoSingletonDetector.Companion.NO_SINGLETON_ISSUE
 import com.duckduckgo.lint.NoSystemLoadLibraryDetector.Companion.NO_SYSTEM_LOAD_LIBRARY
 import com.duckduckgo.lint.NonCancellableDetector.Companion.ISSUE_NON_CANCELLABLE
+import com.duckduckgo.lint.NonSerializableActivityParamsDetector.Companion.NON_SERIALIZABLE_ACTIVITY_PARAMS
 import com.duckduckgo.lint.NoPostValueOnSingleLiveEventDetector.Companion.NO_POST_VALUE_ON_SINGLE_LIVE_EVENT
 import com.duckduckgo.lint.WebViewCompatApisUsageDetector
 import com.duckduckgo.lint.NoNewAppDatabaseTableDetector.Companion.NO_NEW_APP_DATABASE_TABLE
@@ -56,6 +57,7 @@ import com.duckduckgo.lint.ui.DaxDividerColorUsageDetector.Companion.INVALID_DAX
 import com.duckduckgo.lint.ui.DaxListItemColorUsageDetector.Companion.INVALID_DAX_LIST_ITEM_COLOR_USAGE
 import com.duckduckgo.lint.ui.DaxListItemContentDetector.Companion.INVALID_DAX_LIST_ITEM_CONTENT_USAGE
 import com.duckduckgo.lint.ui.DaxTextColorUsageDetector.Companion.INVALID_DAX_TEXT_COLOR_USAGE
+import com.duckduckgo.lint.ui.DefaultsObjectCasingDetector.Companion.DEFAULTS_PROPERTY_CASING
 import com.duckduckgo.lint.ui.NoRawM3AlertDialogUsageDetector.Companion.NO_RAW_M3_ALERT_DIALOG_USAGE
 import com.duckduckgo.lint.ui.NoRawM3ButtonUsageDetector.Companion.NO_RAW_M3_BUTTON_USAGE
 import com.duckduckgo.lint.ui.NoRawM3SliderUsageDetector.Companion.NO_RAW_M3_SLIDER_USAGE
@@ -114,6 +116,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             MISSING_CONTRIBUTES_TO_ON_MODULE,
             MISSING_HAS_MEMBER_INJECTIONS,
             MISSING_EXPLICIT_RETURN_TYPE,
+            NON_SERIALIZABLE_ACTIVITY_PARAMS,
 
             // Android Design System
             DEPRECATED_WIDGET_IN_XML,
@@ -152,6 +155,7 @@ class DuckDuckGoIssueRegistry : IssueRegistry() {
             NO_RAW_M3_SURFACE_USAGE,
             NO_RAW_M3_SNACKBAR_USAGE,
             NO_RAW_M3_SLIDER_USAGE,
+            DEFAULTS_PROPERTY_CASING,
 
         ).plus(WebViewCompatApisUsageDetector.issues)
 

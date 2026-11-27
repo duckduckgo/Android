@@ -1,4 +1,4 @@
-import asana, {Client} from 'asana'
+import {ApiClient, CustomFieldsApi, SectionsApi, TasksApi} from 'asana'
 import {info, setFailed, getInput, debug, setOutput} from '@actions/core'
 import {context, getOctokit} from '@actions/github'
 import {
@@ -22,22 +22,63 @@ const USER_MAP: {[key: string]: string} = JSON.parse(
 
 type PRState = 'Open' | 'Closed' | 'Merged' | 'Approved' | 'Draft'
 
-type PRFields = {
-  url: asana.resources.CustomField
-  status: asana.resources.CustomField
+type CustomField = {
+  gid: string
+  name: string
+  enum_options?: {gid: string; name: string}[]
 }
-const client = Client.create({
-  defaultHeaders: {
-    'asana-enable':
-      'new_user_task_lists,new_project_templates,new_goal_memberships'
-  }
-}).useAccessToken(getInput('ASANA_ACCESS_TOKEN', {required: true}))
+
+type Task = {
+  gid: string
+  name: string
+  completed: boolean
+  permalink_url: string
+  custom_fields: {gid: string; display_value: string | null}[]
+}
+
+type TaskParams = {
+  workspace?: string
+  resource_subtype?: string
+  custom_fields?: {[gid: string]: string}
+  name?: string
+  projects?: string[]
+  followers?: string[]
+  parent?: string
+  due_on?: string
+  approval_status?: string
+  assignee?: string
+  notes?: string
+  html_notes?: string
+}
+
+type Page<T> = {data: T[] | null; nextPage?: () => Promise<Page<T>>}
+
+type PRFields = {
+  url: CustomField
+  status: CustomField
+}
+
+const client = new ApiClient()
+client.authentications.token.accessToken = getInput('ASANA_ACCESS_TOKEN', {
+  required: true
+})
+client.defaultHeaders = {
+  'asana-enable':
+    'new_user_task_lists,new_project_templates,new_goal_memberships'
+}
+const tasksApi = new TasksApi(client)
+const sectionsApi = new SectionsApi(client)
+const customFieldsApi = new CustomFieldsApi(client)
 
 const ASANA_WORKSPACE_ID = getInput('ASANA_WORKSPACE_ID', {required: true})
 const PROJECT_ID = getInput('ASANA_PROJECT_ID', {required: true})
 // Users which will not receive PRs/reviews tasks
 const RANDOMIZED_REVIEWERS = getInput('RANDOMIZED_REVIEWERS')
 const RANDOMIZED_REVIEWERS_LIST = RANDOMIZED_REVIEWERS.split(',')
+// Tolerance for clock skew between GitHub and Asana when scanning the project
+// for tasks modified since the PR was opened
+const CLOCK_SKEW_TOLERANCE_MS = 60 * 60 * 1000
+const MAX_SCANNED_TASKS = 500
 
 function getUserIdFromLogin(login: string): string | undefined {
   const userId = USER_MAP[login]
@@ -81,43 +122,49 @@ function getApprovalStatus(
   return undefined
 }
 
-async function findPRTask(
-  customFields: PRFields
-): Promise<asana.resources.Tasks.Type | null> {
+async function findPRTask(customFields: PRFields): Promise<Task | null> {
   // Let's first try to search using PR URL
   const payload = context.payload as PullRequestEvent
   const prURL = payload.pull_request.html_url
 
-  const prTasks = await client.tasks.searchInWorkspace(ASANA_WORKSPACE_ID, {
-    [`custom_fields.${customFields.url.gid}.value`]: prURL,
-    // eslint-disable-next-line camelcase
-    opt_fields: 'name,parent,completed'
-  })
-  if (prTasks.data.length > 0) {
+  const prTasks: Page<Task> = await tasksApi.searchTasksForWorkspace(
+    ASANA_WORKSPACE_ID,
+    {
+      [`custom_fields.${customFields.url.gid}.value`]: prURL,
+      // eslint-disable-next-line camelcase
+      opt_fields: 'name,parent,completed,permalink_url'
+    }
+  )
+  if (prTasks.data && prTasks.data.length > 0) {
     info(`Found PR task using searchInWorkspace: ${prTasks.data[0].gid}`)
     return prTasks.data[0]
-  } else {
-    // searchInWorkspace can fail for recently created Asana tasks. Let's look
-    // at 100 most recent tasks in destination project
-    // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
-    const projectTasks = await client.tasks.findByProject(PROJECT_ID, {
-      // eslint-disable-next-line camelcase
-      opt_fields: 'custom_fields',
-      limit: 100
-    })
+  }
 
-    for (const task of projectTasks.data) {
+  // Asana recommends using GET /tasks for consistent lookup as search infrastructure
+  // can have delays of up to 60 seconds due to indexing.
+  // https://developers.asana.com/reference/searchtasksforworkspace#eventual-consistency
+  const modifiedSince = new Date(
+    Date.parse(payload.pull_request.created_at) - CLOCK_SKEW_TOLERANCE_MS
+  ).toISOString()
+  let page: Page<Task> = await tasksApi.getTasks({
+    project: PROJECT_ID,
+    // eslint-disable-next-line camelcase
+    modified_since: modifiedSince,
+    // eslint-disable-next-line camelcase
+    opt_fields: 'name,completed,custom_fields,permalink_url',
+    limit: 100
+  })
+  let scanned = 0
+  while (page.data && page.nextPage && scanned < MAX_SCANNED_TASKS) {
+    for (const task of page.data) {
       info(`Checking task ${task.gid} for PR link`)
-      for (const field of task.custom_fields) {
-        if (
-          field.gid === customFields.url.gid &&
-          field.display_value === prURL
-        ) {
-          info(`Found existing task ID ${task.gid} for PR ${prURL}`)
-          return task
-        }
+      if (linksPR(task, customFields, prURL)) {
+        info(`Found existing task ID ${task.gid} for PR ${prURL}`)
+        return task
       }
     }
+    scanned += page.data.length
+    page = await page.nextPage()
   }
   info(`No matching Asana task found for PR ${prURL}`)
   return null
@@ -130,10 +177,10 @@ async function createPRTask(
   prStatus: string,
   customFields: PRFields,
   automatedPR: boolean
-): Promise<asana.resources.Tasks.Type> {
+): Promise<Task> {
   info('Creating new PR task')
   const payload = context.payload as PullRequestEvent
-  const data: asana.resources.Tasks.CreateParams & {workspace: string} = {
+  const data: TaskParams = {
     workspace: ASANA_WORKSPACE_ID,
     // eslint-disable-next-line camelcase
     resource_subtype: 'approval',
@@ -156,7 +203,12 @@ async function createPRTask(
     data.parent = parentTaskId
   }
 
-  return client.tasks.create(data)
+  const response = await tasksApi.createTask(
+    {data},
+    // eslint-disable-next-line camelcase
+    {opt_fields: 'name,completed,permalink_url'}
+  )
+  return response.data
 }
 
 function isImportantAutomatedPR(payload: PullRequestEvent): boolean {
@@ -245,44 +297,47 @@ async function createOrFindPRTask(
   title: string,
   prStatus: string,
   customFields: PRFields
-): Promise<asana.resources.Tasks.Type | undefined> {
+): Promise<Task | undefined> {
   const body = payload.pull_request.body || ''
   const asanaTaskMatch = body.match(
     /Task\/Issue URL:.*https:\/\/app.asana.*\/([0-9]+).*/
   )
   let parentTaskId = asanaTaskMatch && asanaTaskMatch[1]
-  let openShipReviewTask: asana.resources.Tasks.Type | undefined
-  let shipReviewPRTask: asana.resources.Tasks.Type | undefined
+  const prURL = payload.pull_request.html_url
+  let linkedPRTask: Task | undefined
+  let openShipReviewTask: Task | undefined
+  let shipReviewPRTask: Task | undefined
   if (parentTaskId) {
     info(`Found Asana task mention with parent ID: ${parentTaskId}`)
 
     try {
-      let subTasks = await client.tasks.subtasks(parentTaskId, {
-        // eslint-disable-next-line camelcase
-        opt_fields: 'name,completed',
-        limit: 100
-      })
-      openShipReviewTask = subTasks.data.find(
+      let subTasks: Task[] = (
+        await tasksApi.getSubtasksForTask(parentTaskId, {
+          // eslint-disable-next-line camelcase
+          opt_fields: 'name,completed,custom_fields,permalink_url',
+          limit: 100
+        })
+      ).data
+      linkedPRTask = subTasks.find(t => linksPR(t, customFields, prURL))
+      openShipReviewTask = subTasks.find(
         t => t.name.startsWith('Ship Review') && !t.completed
       )
       if (openShipReviewTask) {
-        subTasks = await client.tasks.subtasks(openShipReviewTask.gid, {
-          // eslint-disable-next-line camelcase
-          opt_fields: 'name,completed,assignee,custom_fields',
-          limit: 100
-        })
-        shipReviewPRTask = subTasks.data.find(
+        subTasks = (
+          await tasksApi.getSubtasksForTask(openShipReviewTask.gid, {
+            // eslint-disable-next-line camelcase
+            opt_fields: 'name,completed,assignee,custom_fields,permalink_url',
+            limit: 100
+          })
+        ).data
+        linkedPRTask ??= subTasks.find(t => linksPR(t, customFields, prURL))
+        shipReviewPRTask = subTasks.find(
           t =>
             t.name.includes('Pull Request') &&
-            ((t.custom_fields.every(
+            !t.completed &&
+            t.custom_fields.every(
               customField => customField.gid !== customFields.url.gid
-            ) &&
-              !t.completed) ||
-              t.custom_fields.some(
-                customField =>
-                  customField.gid === customFields.url.gid &&
-                  customField.display_value === payload.pull_request.html_url
-              ))
+            )
         )
       }
     } catch (e) {
@@ -302,110 +357,77 @@ async function createOrFindPRTask(
     return
   }
 
-  let task
-  // PR is opened
-  if (['opened'].includes(payload.action)) {
-    // the parent task has a Ship Review ...
-    if (openShipReviewTask) {
-      // ... and an approriate PR review task
-      if (shipReviewPRTask) {
-        await client.tasks.addProject(shipReviewPRTask.gid, {
-          project: PROJECT_ID
-        })
-        client.tasks.updateTask(shipReviewPRTask.gid, {
-          // eslint-disable-next-line camelcase
-          custom_fields: {
-            [customFields.url.gid]: payload.pull_request.html_url,
-            [customFields.status.gid]: prStatus
-          }
-        })
-        task = shipReviewPRTask
-        setOutput('result', 'updated')
-        // ... otherwise create a new code review task under the ship review task
-      } else {
-        task = await createPRTask(
-          openShipReviewTask.gid,
-          followers,
-          title,
-          prStatus,
-          customFields,
-          automatedPR
-        )
-        setOutput('result', 'created')
-      }
-      // if parent doesn't have a Ship Review just create a new Code Review task
-    } else {
-      task = await createPRTask(
-        parentTaskId,
-        followers,
-        title,
-        prStatus,
-        customFields,
-        automatedPR
+  // The workflow's concurrency group serializes runs per PR, so whichever
+  // event reaches here first creates the task and every later one finds it,
+  // under the linked task when there is one and by lookup otherwise.
+  const existingTask = linkedPRTask ?? (await findPRTask(customFields))
+  if (existingTask) {
+    setOutput('result', 'updated')
+    return existingTask
+  }
+
+  // the parent task has a Ship Review ...
+  if (openShipReviewTask) {
+    // ... and a PR review subtask we can adopt: add it to the code review
+    // project and point it at this PR
+    if (shipReviewPRTask) {
+      await tasksApi.addProjectForTask(
+        {data: {project: PROJECT_ID}},
+        shipReviewPRTask.gid
       )
-      setOutput('result', 'created')
-    }
-  } else {
-    const maxRetries = 5
-    let retries = 0
-
-    while (retries < maxRetries) {
-      // Wait for PR to appear
-      task = await findPRTask(customFields)
-      if (task) {
-        setOutput('result', 'updated')
-        break
-      }
-      info(`PR task not found yet. Sleeping...`)
-      await new Promise(resolve => setTimeout(resolve, 20000))
-      retries++
-    }
-
-    // if PR task cannot be found although this is an ongoing PR
-    if (!task) {
-      // the parent task has a Ship Review ...
-      if (openShipReviewTask) {
-        // ... and an PR review task that's not completed without any PR link
-        if (shipReviewPRTask) {
-          // add the Ship Review PR task to the code review project and assign the PR link to it
-          await client.tasks.addProject(shipReviewPRTask.gid, {
-            project: PROJECT_ID
-          })
-          client.tasks.updateTask(shipReviewPRTask.gid, {
+      tasksApi.updateTask(
+        {
+          data: {
             // eslint-disable-next-line camelcase
             custom_fields: {
               [customFields.url.gid]: payload.pull_request.html_url,
               [customFields.status.gid]: prStatus
             }
-          })
-          task = shipReviewPRTask
-          setOutput('result', 'updated')
-          // ... otherwise abort sync as this action cannot open a new Ship Review PR task
-        } else {
-          info(
-            `Skipping code review task creation for PR because the linked Asana task already has a pending '${openShipReviewTask.name}' task but no open PR review subtask`
-          )
-          return
-        }
-        // if parent doesn't have a Ship Review just create a new Code Review task
-      } else {
-        info(
-          `Waited a long time and no task appeared. Assuming old PR and creating a new task.`
-        )
-        task = await createPRTask(
-          parentTaskId,
-          followers,
-          title,
-          prStatus,
-          customFields,
-          automatedPR
-        )
-        setOutput('result', 'created')
-      }
+          }
+        },
+        shipReviewPRTask.gid
+      )
+      setOutput('result', 'updated')
+      return shipReviewPRTask
     }
+
+    // ... otherwise only the `opened` run may add a new code review task under
+    // the ship review task; any later event aborts the sync instead
+    if (payload.action !== 'opened') {
+      info(
+        `Skipping code review task creation for PR because the linked Asana task already has a pending '${openShipReviewTask.name}' task but no open PR review subtask`
+      )
+      return
+    }
+    const task = await createPRTask(
+      openShipReviewTask.gid,
+      followers,
+      title,
+      prStatus,
+      customFields,
+      automatedPR
+    )
+    setOutput('result', 'created')
+    return task
   }
 
+  // if parent doesn't have a Ship Review just create a new Code Review task
+  const task = await createPRTask(
+    parentTaskId,
+    followers,
+    title,
+    prStatus,
+    customFields,
+    automatedPR
+  )
+  setOutput('result', 'created')
   return task
+}
+
+function linksPR(task: Task, customFields: PRFields, prURL: string): boolean {
+  return task.custom_fields.some(
+    field => field.gid === customFields.url.gid && field.display_value === prURL
+  )
 }
 
 async function run(): Promise<void> {
@@ -505,11 +527,13 @@ ${truncatedBody}`
     ) {
       const sectionId = getInput('ASANA_IN_PROGRESS_SECTION_ID')
       if (sectionId) {
-        await client.sections.addTask(sectionId, {task: task.gid})
+        await sectionsApi.addTaskForSection(sectionId, {
+          body: {data: {task: task.gid}}
+        })
       }
     }
 
-    const updateParams: asana.resources.Tasks.UpdateParams = {
+    const updateParams: TaskParams = {
       // eslint-disable-next-line camelcase
       custom_fields: {
         [customFields.status.gid]: prStatus
@@ -541,7 +565,7 @@ ${truncatedBody}`
         `Update task with html update params ${JSON.stringify(updateParams)}`
       )
       // Try using html notes first and fall back to unformatted if this fails
-      await client.tasks.updateTask(taskId, updateParams)
+      await tasksApi.updateTask({data: updateParams}, taskId)
     } catch (err) {
       if (updateParams.html_notes) {
         delete updateParams.html_notes
@@ -551,7 +575,7 @@ ${truncatedBody}`
             updateParams
           )}`
         )
-        await client.tasks.updateTask(taskId, updateParams)
+        await tasksApi.updateTask({data: updateParams}, taskId)
       } else if (err instanceof Error) {
         setFailed(`${err.message}\nStacktrace:\n${err.stack}`)
       }
@@ -564,16 +588,17 @@ ${truncatedBody}`
 }
 
 async function findCustomFields(workspaceGid: string): Promise<PRFields> {
-  const apiResponse = await client.customFields.getCustomFieldsForWorkspace(
-    workspaceGid
-  )
-  // pull all fields from the API with the streaming
-  const stream = apiResponse.stream()
-  const customFields: asana.resources.CustomFields.Type[] = []
-  stream.on('data', field => {
-    customFields.push(field)
-  })
-  await new Promise<void>(resolve => stream.on('end', resolve))
+  const customFields: CustomField[] = []
+  let page: Page<CustomField> =
+    await customFieldsApi.getCustomFieldsForWorkspace(workspaceGid, {
+      // eslint-disable-next-line camelcase
+      opt_fields: 'name,enum_options,enum_options.name',
+      limit: 100
+    })
+  while (page.data && page.nextPage) {
+    customFields.push(...page.data)
+    page = await page.nextPage()
+  }
 
   const githubUrlField = customFields.find(
     f => f.name === CUSTOM_FIELD_NAMES.url
@@ -589,8 +614,8 @@ async function findCustomFields(workspaceGid: string): Promise<PRFields> {
     debug(`${CUSTOM_FIELD_NAMES.status} field GID: ${githubStatusField?.gid}`)
   }
   return {
-    url: githubUrlField as asana.resources.CustomField,
-    status: githubStatusField as asana.resources.CustomField
+    url: githubUrlField,
+    status: githubStatusField
   }
 }
 

@@ -32,8 +32,8 @@ import com.duckduckgo.mobile.android.vpn.feature.getProtectionDisabledAppFromDet
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableAppProtection
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedDisableProtection
 import com.duckduckgo.mobile.android.vpn.feature.getSelectedRemoveAppTP
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -378,8 +378,6 @@ interface DeviceShieldPixels {
     fun reportVpnSnoozedStarted()
     fun reportVpnSnoozedEnded()
 
-    fun reportMotoGFix()
-
     fun reportVpnStartAttempt()
 
     fun reportVpnStartAttemptSuccess()
@@ -406,7 +404,7 @@ interface DeviceShieldPixels {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealDeviceShieldPixels @Inject constructor(
     private val pixel: Pixel,
     private val sharedPreferencesProvider: SharedPreferencesProvider,
@@ -831,10 +829,6 @@ class RealDeviceShieldPixels @Inject constructor(
     override fun reportVpnSnoozedEnded() {
         tryToFireDailyPixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED_DAILY)
         firePixel(DeviceShieldPixelNames.VPN_SNOOZE_ENDED)
-    }
-
-    override fun reportMotoGFix() {
-        tryToFireDailyPixel(DeviceShieldPixelNames.VPN_MOTO_G_FIX_DAILY)
     }
 
     override fun reportVpnStartAttempt() {

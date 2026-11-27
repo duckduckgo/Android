@@ -33,7 +33,7 @@ class RealAuthRepositoryTest {
         authStore,
         coroutineRule.testDispatcherProvider,
         serpPromo,
-        dagger.Lazy { subscriptionsFeature },
+        lazy { subscriptionsFeature },
     )
 
     @Test
@@ -67,6 +67,7 @@ class RealAuthRepositoryTest {
         authStore.startedAt = 1000L
         authStore.expiresOrRenewsAt = 1000L
         authStore.platform = "google"
+        authStore.planCountry = "US"
         authStore.productId = "productId"
         authStore.entitlements = "[]"
 
@@ -77,6 +78,7 @@ class RealAuthRepositoryTest {
         assertNull(authStore.startedAt)
         assertNull(authStore.expiresOrRenewsAt)
         assertNull(authStore.platform)
+        assertNull(authStore.planCountry)
         assertNull(authStore.productId)
         assertEquals("[]", authStore.entitlements)
     }
@@ -150,7 +152,7 @@ class RealAuthRepositoryTest {
             FakeSubscriptionsDataStore(supportEncryption = false),
             coroutineRule.testDispatcherProvider,
             serpPromo,
-            dagger.Lazy { subscriptionsFeature },
+            lazy { subscriptionsFeature },
         )
         assertFalse(repository.canSupportEncryption())
     }
@@ -501,5 +503,193 @@ class RealAuthRepositoryTest {
         assertEquals(1, subscription!!.pendingPlans.size)
         assertEquals("ddg-privacy-pro-yearly-renews-us", subscription.pendingPlans[0].productId)
         assertTrue(subscription.hasPendingChange)
+    }
+
+    @Test
+    fun whenSetSubscriptionWithPlanCountryThenStorePlanCountry() = runTest {
+        authRepository.setSubscription(
+            Subscription(
+                productId = "ddg-subscription-pro-monthly-renews-us",
+                billingPeriod = "monthly",
+                startedAt = 1234L,
+                expiresOrRenewsAt = 5678L,
+                status = AUTO_RENEWABLE,
+                platform = "stripe",
+                activeOffers = emptyList(),
+                planCountry = "DE",
+            ),
+        )
+
+        assertEquals("DE", authStore.planCountry)
+    }
+
+    @Test
+    fun whenGetSubscriptionWithPlanCountryThenPlanCountryReturned() = runTest {
+        authStore.productId = "ddg-subscription-pro-monthly-renews-us"
+        authStore.billingPeriod = "monthly"
+        authStore.startedAt = 1234L
+        authStore.expiresOrRenewsAt = 5678L
+        authStore.status = AUTO_RENEWABLE.statusName
+        authStore.platform = "stripe"
+        authStore.planCountry = "DE"
+
+        val subscription = authRepository.getSubscription()
+
+        assertEquals("DE", subscription!!.planCountry)
+    }
+
+    @Test
+    fun whenGetSubscriptionWithoutPlanCountryThenPlanCountryIsNull() = runTest {
+        authStore.productId = "ddg-subscription-pro-monthly-renews-us"
+        authStore.billingPeriod = "monthly"
+        authStore.startedAt = 1234L
+        authStore.expiresOrRenewsAt = 5678L
+        authStore.status = AUTO_RENEWABLE.statusName
+        authStore.platform = "google"
+
+        val subscription = authRepository.getSubscription()
+
+        assertNull(subscription!!.planCountry)
+    }
+
+    @Test
+    fun whenSaveTokensV2SucceedsThenTokensEntitlementsAndAccountAreStoredAndSerpCookieIsInjected() = runTest {
+        val saved = authRepository.saveTokensV2(
+            accessToken = AccessToken("access", Instant.ofEpochMilli(1_000L)),
+            refreshToken = RefreshToken("refresh", Instant.ofEpochMilli(2_000L)),
+            entitlements = listOf(Entitlement(name = "subscriber", product = "Network Protection")),
+            account = Account(email = "email@duck.com", externalId = "externalId"),
+        )
+
+        assertTrue(saved)
+        assertEquals("access", authStore.accessTokenV2)
+        assertEquals(Instant.ofEpochMilli(1_000L), authStore.accessTokenV2ExpiresAt)
+        assertEquals("refresh", authStore.refreshTokenV2)
+        assertEquals(Instant.ofEpochMilli(2_000L), authStore.refreshTokenV2ExpiresAt)
+        assertEquals(listOf(Entitlement(name = "subscriber", product = "Network Protection")), authRepository.getEntitlements())
+        assertEquals(Account(email = "email@duck.com", externalId = "externalId"), authRepository.getAccount())
+        assertEquals("access", serpPromo.cookie)
+    }
+
+    @Test
+    fun whenSaveTokensV2CommitFailsThenNothingChanges() = runTest {
+        authStore.accessTokenV2 = "old access"
+        authStore.refreshTokenV2 = "old refresh"
+        authStore.externalId = "old externalId"
+        authStore.simulateTokenCommitFailure = true
+
+        val saved = authRepository.saveTokensV2(
+            accessToken = AccessToken("access", Instant.ofEpochMilli(1_000L)),
+            refreshToken = RefreshToken("refresh", Instant.ofEpochMilli(2_000L)),
+            entitlements = emptyList(),
+            account = Account(email = null, externalId = "externalId"),
+        )
+
+        assertFalse(saved)
+        assertEquals("old access", authStore.accessTokenV2)
+        assertEquals("old refresh", authStore.refreshTokenV2)
+        assertEquals("old externalId", authStore.externalId)
+        assertNull(serpPromo.cookie)
+    }
+
+    @Test
+    fun whenClearTokensThenTokensAndAccountAreGoneAndSerpCookieIsCleared() = runTest {
+        authStore.accessTokenV2 = "access"
+        authStore.refreshTokenV2 = "refresh"
+        authStore.accessToken = "legacy access"
+        authStore.authToken = "legacy auth"
+        authStore.email = "email@duck.com"
+        authStore.externalId = "externalId"
+        serpPromo.injectCookie("access")
+
+        authRepository.saveBackupRefreshToken(
+            BackupRefreshToken(
+                jwt = "backup",
+                expiresAt = Instant.ofEpochMilli(9_000L),
+                accountExternalId = "1234",
+                issuedAt = Instant.ofEpochMilli(1_000L),
+            ),
+        )
+
+        authRepository.clearTokens()
+
+        assertNull(authRepository.getBackupRefreshToken())
+        assertNull(authStore.accessTokenV2)
+        assertNull(authStore.refreshTokenV2)
+        assertNull(authStore.accessToken)
+        assertNull(authStore.authToken)
+        assertNull(authStore.email)
+        assertNull(authStore.externalId)
+        assertNull(serpPromo.cookie)
+    }
+
+    @Test
+    fun whenTokenStoreIsUnavailableThenIsTokenStoreAvailableIsFalse() = runTest {
+        assertTrue(authRepository.isTokenStoreAvailable())
+
+        authStore.available = false
+
+        assertFalse(authRepository.isTokenStoreAvailable())
+    }
+
+    @Test
+    fun whenRefreshTokenIsStoredButUnreadableThenHasRefreshTokenEntryIsTrue() = runTest {
+        authStore.refreshTokenV2 = null
+        assertFalse(authRepository.hasRefreshTokenEntry())
+
+        authStore.simulateUnreadableRefreshToken = true
+
+        assertTrue(authRepository.hasRefreshTokenEntry())
+    }
+
+    @Test
+    fun whenTokensAreSavedWithBackupDeletionThenBackupIsGoneWithTheNewPair() = runTest {
+        givenStoredBackup()
+
+        saveNewTokens(deleteBackupRefreshToken = true)
+
+        assertEquals("new refresh", authStore.refreshTokenV2)
+        assertNull(authRepository.getBackupRefreshToken())
+    }
+
+    @Test
+    fun whenTokensAreSavedWithoutBackupDeletionThenBackupIsKept() = runTest {
+        givenStoredBackup()
+
+        saveNewTokens(deleteBackupRefreshToken = false)
+
+        assertEquals("backup", authRepository.getBackupRefreshToken()?.jwt)
+    }
+
+    private suspend fun saveNewTokens(deleteBackupRefreshToken: Boolean) {
+        val accessToken = AccessToken(
+            jwt = "new access",
+            expiresAt = Instant.ofEpochMilli(5_000L),
+        )
+        val refreshToken = RefreshToken(
+            jwt = "new refresh",
+            expiresAt = Instant.ofEpochMilli(6_000L),
+        )
+        val account = Account(
+            email = null,
+            externalId = "1234",
+        )
+        authRepository.saveTokensV2(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            entitlements = emptyList(),
+            account = account,
+            deleteBackupRefreshToken = deleteBackupRefreshToken,
+        )
+    }
+
+    private suspend fun givenStoredBackup() {
+        val backup = BackupRefreshToken(
+            jwt = "backup",
+            expiresAt = Instant.ofEpochMilli(9_000L),
+            accountExternalId = "1234",
+            issuedAt = Instant.ofEpochMilli(1_000L),
+        )
+        authRepository.saveBackupRefreshToken(backup)
     }
 }

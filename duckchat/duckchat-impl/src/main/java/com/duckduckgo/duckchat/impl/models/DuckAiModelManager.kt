@@ -28,15 +28,16 @@ import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
 import com.duckduckgo.subscriptions.api.Product
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.Lazy
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -63,14 +64,30 @@ data class ModelState(
      * change this to a bounded Map<String, ReasoningMode> keyed by chatId.
      * */
     val chatScopedReasoningMode: ReasoningMode? = null,
-)
+    /** Where a new chat starts while `resetModelForNewChats` is on; null while it is off. */
+    val newChatDefault: NewChatDefault? = null,
+) {
+    /**
+     * Models not loaded yet count as supported, so the entry points are not hidden while they fetch.
+     */
+    fun supportsImageUpload(imageUploadEnabled: Boolean): Boolean =
+        imageUploadEnabled && (models.isEmpty() || models.firstOrNull { it.id == selectedModelId }?.supportsImageUpload == true)
+}
 
 interface DuckAiModelManager {
     val modelState: StateFlow<ModelState>
 
     suspend fun fetchModels()
 
+    /** Ignored while `resetModelForNewChats` is on, where the pick belongs to the tab's next chat instead. */
     suspend fun selectModel(model: AIChatModel)
+
+    /**
+     * Switches to the first accessible image-capable model unless the selected one already is.
+     * Returns false when no such model exists. While `resetModelForNewChats` is on, only reports whether one
+     * exists and leaves the selection alone, since the tab picks the model for its next new chat.
+     */
+    suspend fun ensureImageCapableModelSelected(): Boolean
 
     /**
      * Pins the user to a provider rather than to one of its models, so they keep following the
@@ -78,6 +95,7 @@ interface DuckAiModelManager {
      */
     suspend fun selectProvider(provider: ModelProvider)
 
+    /** Ignored while `resetModelForNewChats` is on, like [selectModel]. */
     suspend fun selectReasoningMode(mode: ReasoningMode)
 
     suspend fun setChatScopedReasoningMode(mode: ReasoningMode?)
@@ -87,7 +105,7 @@ interface DuckAiModelManager {
     fun getResolvedReasoningEffort(): String?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiModelManager @Inject constructor(
     private val modelsService: DuckAiModelsService,
@@ -110,6 +128,7 @@ class RealDuckAiModelManager @Inject constructor(
     // with availableReasoningModes. This mutex serializes those operations so each one sees a
     // consistent view of the previous state.
     private val stateMutex = Mutex()
+    private var selectionRevision = 0L
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -124,18 +143,22 @@ class RealDuckAiModelManager @Inject constructor(
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to restore cached selection: ${e.message}" }
             }
-            // Status as well as entitlements: signing in or out changes whether the response carries
-            // model labels, and entitlements stay empty either way when there is no subscription.
-            combine(
-                subscriptions.getEntitlements(),
-                subscriptions.getSubscriptionStatusFlow(),
-            ) { entitlements, status -> entitlements to status }
-                .distinctUntilChanged()
-                .collect {
-                    logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
-                    fetchModels()
-                }
         }
+    }
+
+    // Status as well as entitlements: signing in or out changes whether the response carries
+    // model labels, and entitlements stay empty either way when there is no subscription.
+    private val subscriptionChangeObserver = appCoroutineScope.launch(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        combine(
+            subscriptions.getEntitlements(),
+            subscriptions.getSubscriptionStatusFlow(),
+        ) { entitlements, status -> entitlements to status }
+            .distinctUntilChanged()
+            .drop(1)
+            .collect {
+                logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
+                fetchModels()
+            }
     }
 
     /**
@@ -154,6 +177,10 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     private suspend fun restoreCachedSelection() {
+        if (resetsModelForNewChats()) {
+            selectHardcodedDefaultWhileModelsMissing()
+            return
+        }
         val cachedModel = dataStore.getSelectedModel()
         val cachedReasoningRaw = dataStore.getSelectedReasoningMode()
         if (cachedModel == null) {
@@ -174,6 +201,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun fetchModels() {
+        subscriptionChangeObserver.start()
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
@@ -198,10 +226,16 @@ class RealDuckAiModelManager @Inject constructor(
                         !it.isAccessible && !isSubscriptionEligible
                     }
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
+                val resetForNewChats = resetsModelForNewChats()
                 stateMutex.withLock {
                     // Selection is resolved before sorting so the derived default keeps following
                     // endpoint order, and only the picker's display order changes.
-                    val selectedModelId = resolveSelection(models)
+                    val newChatDefault = if (resetForNewChats) NewChatDefaults.preferred(userTier, response.newChatDefault) else null
+                    val selectedModelId = if (newChatDefault != null) {
+                        NewChatDefaults.modelId(userTier, newChatDefault, models)
+                    } else {
+                        resolveSelection(models)
+                    }
                     val displayModels = models.sortLabelledFirst()
                     val selectedModel = models.find { it.id == selectedModelId }
                     val available = ReasoningResolver.availableModes(
@@ -209,7 +243,11 @@ class RealDuckAiModelManager @Inject constructor(
                         effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
                         isEligible = isSubscriptionEligible,
                     )
-                    val nextReasoningMode = validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+                    val nextReasoningMode = if (newChatDefault != null) {
+                        NewChatDefaults.reasoningMode(newChatDefault, selectedModelId, available)
+                    } else {
+                        validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
+                    }
 
                     _modelState.value = _modelState.value.copy(
                         models = displayModels,
@@ -221,13 +259,30 @@ class RealDuckAiModelManager @Inject constructor(
                         attachmentLimits = attachmentLimits,
                         selectedReasoningMode = nextReasoningMode,
                         availableReasoningModes = available,
+                        newChatDefault = newChatDefault,
                     )
                     logcat { "Duck.ai Model Manager: fetched ${displayModels.size} models, tier=$userTier, selected=$selectedModelId" }
                 }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to fetch models: ${e.message}" }
+                if (resetsModelForNewChats()) stateMutex.withLock { selectHardcodedDefaultWhileModelsMissing() }
             }
         }
+    }
+
+    /**
+     * Without a model list a new chat would go out with no model and the page would choose one, so the
+     * tier default is sent unchecked until a fetch succeeds. Callers hold [stateMutex].
+     */
+    private suspend fun selectHardcodedDefaultWhileModelsMissing() {
+        if (_modelState.value.models.isNotEmpty()) return
+        val newChatDefault = NewChatDefaults.preferred(resolveUserTier(), remote = null)
+        _modelState.value = _modelState.value.copy(
+            selectedModelId = newChatDefault.modelId,
+            selectedReasoningMode = newChatDefault.mode,
+            newChatDefault = newChatDefault,
+        )
+        logcat { "Duck.ai Model Manager: models not loaded, selected hardcoded default ${newChatDefault.modelId}" }
     }
 
     private suspend fun fetchModelsResponse(): AIChatModelsResponse {
@@ -243,7 +298,7 @@ class RealDuckAiModelManager @Inject constructor(
     // The picker sublines (model `label`) are only returned on an authenticated request, so the
     // token rides along only while the updated pickers are the ones consuming it.
     private suspend fun authorizationHeader(): String? {
-        if (!duckChatFeature.get().updatedPickers().isEnabled()) return null
+        if (!duckChatFeature.value.updatedPickers().isEnabled()) return null
         return runCatching {
             subscriptions.getAccessToken()?.takeUnless { it.isBlank() }?.let { "Bearer $it" }
         }.getOrElse {
@@ -277,25 +332,60 @@ class RealDuckAiModelManager @Inject constructor(
         return models.firstOrNull { it.isAccessible }?.id
     }
 
+    /**
+     * With this on, the global selection is always the tier default and picks live on the tab, so nothing
+     * here reads or writes the persisted pick: turning it off brings back the user's last-used model.
+     */
+    private suspend fun resetsModelForNewChats(): Boolean = withContext(dispatcherProvider.io()) {
+        duckChatFeature.value.resetModelForNewChats().isEnabled()
+    }
+
     private companion object {
         const val MAX_LABEL_LENGTH = 40
         const val PINNED_DEFAULT_MODEL_ID = "gpt-5.4-mini"
     }
 
     override suspend fun selectModel(model: AIChatModel) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
-                dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
-                dataStore.setSelectedProvider(null)
-                publishSelection(modelId = model.id, model = model)
-                logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
+                selectionRevision++
+                persistModelSelection(model)
             }
         }
     }
 
+    private suspend fun persistModelSelection(model: AIChatModel) {
+        dataStore.setSelectedModel(SelectedModel(model.id, model.shortName))
+        dataStore.setSelectedProvider(null)
+        publishSelection(modelId = model.id, model = model)
+        logcat { "Duck.ai Model Manager: selected model ${model.id} (${model.shortName})" }
+    }
+
+    override suspend fun ensureImageCapableModelSelected(): Boolean = withContext(dispatcherProvider.io()) {
+        val revision = stateMutex.withLock { selectionRevision }
+        if (_modelState.value.models.isEmpty()) fetchModels()
+        if (resetsModelForNewChats()) {
+            return@withContext _modelState.value.models.any { it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION) }
+        }
+        stateMutex.withLock {
+            if (selectionRevision != revision) return@withLock false
+            val state = _modelState.value
+            val selectedModel = state.models.firstOrNull { it.id == state.selectedModelId }
+            if (selectedModel?.supportsTool(Tool.IMAGE_GENERATION) == true) return@withLock true
+            val imageCapableModel = state.models.firstOrNull {
+                it.isAccessible && it.supportsTool(Tool.IMAGE_GENERATION)
+            } ?: return@withLock false
+            persistModelSelection(imageCapableModel)
+            true
+        }
+    }
+
     override suspend fun selectProvider(provider: ModelProvider) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
+                selectionRevision++
                 dataStore.setSelectedModel(null)
                 dataStore.setSelectedProvider(provider.name)
 
@@ -330,6 +420,7 @@ class RealDuckAiModelManager @Inject constructor(
     }
 
     override suspend fun selectReasoningMode(mode: ReasoningMode) {
+        if (resetsModelForNewChats()) return
         withContext(dispatcherProvider.io()) {
             stateMutex.withLock {
                 val match = _modelState.value.availableReasoningModes.firstOrNull { it.mode == mode }
@@ -417,7 +508,7 @@ class RealDuckAiModelManager @Inject constructor(
             .filter { ModelLabel.from(it) == ModelLabel.UNKNOWN }
             .map { it.sanitisedLabel() }
             .distinct()
-            .forEach { duckChatPixels.get().fireUnknownModelLabel(it) }
+            .forEach { duckChatPixels.value.fireUnknownModelLabel(it) }
     }
 
     // The label is a backend-authored id, so keep the pixel to that shape rather than passing
@@ -429,7 +520,7 @@ class RealDuckAiModelManager @Inject constructor(
 
     /** Labelled models lead the list, as the backend marks them as the ones to recommend. */
     private suspend fun List<AIChatModel>.sortLabelledFirst(): List<AIChatModel> {
-        if (!duckChatFeature.get().updatedPickers().isEnabled()) return this
+        if (!duckChatFeature.value.updatedPickers().isEnabled()) return this
         return sortedBy { if (it.label != null) 0 else 1 }
     }
 

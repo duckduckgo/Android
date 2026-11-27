@@ -21,7 +21,6 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
 import com.duckduckgo.feature.toggles.api.Toggle
-import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -50,7 +49,7 @@ class DelegatingDuckChatDeleterTest {
     fun setup() {
         whenever(feature.useNativeStorageChatData()).thenReturn(nativeStorageToggle)
         deleter = DelegatingDuckChatDeleter(
-            nativeDeleter, webViewDeleter, store, feature, Lazy { pixels }, coroutineTestRule.testDispatcherProvider,
+            nativeDeleter, webViewDeleter, store, feature, lazy { pixels }, coroutineTestRule.testDispatcherProvider,
         )
     }
 

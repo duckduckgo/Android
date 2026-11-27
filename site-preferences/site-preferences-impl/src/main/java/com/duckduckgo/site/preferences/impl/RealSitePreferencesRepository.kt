@@ -29,19 +29,20 @@ import com.duckduckgo.site.preferences.api.DesktopModeSettings
 import com.duckduckgo.site.preferences.api.SitePreferencesDataClearer
 import com.duckduckgo.site.preferences.impl.store.SitePreferencesDao
 import com.duckduckgo.site.preferences.impl.store.SitePreferencesEntity
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.CopyOnWriteArraySet
 import javax.inject.Inject
 
-@ContributesBinding(AppScope::class, boundType = DesktopModeSettings::class)
-@ContributesBinding(AppScope::class, boundType = SitePreferencesDataClearer::class)
-@ContributesMultibinding(AppScope::class, boundType = MainProcessLifecycleObserver::class)
-@SingleInstanceIn(AppScope::class)
+@ContributesBinding(AppScope::class, binding = binding<DesktopModeSettings>())
+@ContributesBinding(AppScope::class, binding = binding<SitePreferencesDataClearer>())
+@ContributesIntoSet(AppScope::class, binding = binding<MainProcessLifecycleObserver>())
+@SingleIn(AppScope::class)
 class RealSitePreferencesRepository @Inject constructor(
     private val sitePreferencesDao: SitePreferencesDao,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

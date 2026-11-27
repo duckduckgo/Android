@@ -30,7 +30,8 @@ class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
     ): Intent {
         return ProcessSyncCodeActivity.intent(
             context = context,
-            codeSource = input.source,
+            codeSource = input.codeSource,
+            launchSource = input.launchSource,
         )
     }
 
@@ -51,7 +52,8 @@ class ProcessSyncCodeContract : ActivityResultContract<Input, Output>() {
     }
 
     data class Input(
-        val source: SyncCodeSource,
+        val codeSource: SyncCodeSource,
+        val launchSource: String,
     )
 
     sealed interface Output {

@@ -21,6 +21,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
@@ -29,9 +30,10 @@ import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.duckduckgo.promptscoordinator.api.PromptType
 import com.duckduckgo.promptscoordinator.api.PromptsCoordinator
 import com.duckduckgo.promptscoordinator.impl.store.ModalEvaluatorCompletionStore
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -49,15 +51,15 @@ import javax.inject.Inject
  * - Evaluators blocked by 24-hour window are skipped entirely (evaluate() not called)
  * - When evaluation completes (with or without action), timestamp is recorded
  */
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = NewTabPageModalTrigger::class,
+    binding = binding<NewTabPageModalTrigger>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ModalEvaluatorCoordinator @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val modalEvaluatorPluginPoint: PluginPoint<ModalEvaluator>,
@@ -65,6 +67,7 @@ class ModalEvaluatorCoordinator @Inject constructor(
     private val promptsCoordinator: PromptsCoordinator,
     private val dispatchers: DispatcherProvider,
     private val promptExposureReporter: PromptExposureReporter,
+    private val customTabDetector: CustomTabDetector,
 ) : MainProcessLifecycleObserver, NewTabPageModalTrigger {
 
     private val evaluationMutex = Mutex()
@@ -84,6 +87,11 @@ class ModalEvaluatorCoordinator @Inject constructor(
 
     private suspend fun coordinateEvaluation(trigger: ModalTrigger) = evaluationMutex.withLock {
         logcat { "ModalEvaluatorCoordinator: Starting coordinated evaluation for trigger $trigger" }
+
+        if (customTabDetector.isCustomTab()) {
+            logcat { "ModalEvaluatorCoordinator: Evaluation skipped, a custom tab is showing" }
+            return@withLock
+        }
 
         var claimHeld = false
         val promptsCoordinatorEnabled = promptsCoordinator.isEnabled()

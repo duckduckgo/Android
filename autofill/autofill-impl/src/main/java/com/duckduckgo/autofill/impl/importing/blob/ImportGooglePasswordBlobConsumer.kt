@@ -26,7 +26,7 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.autofill.impl.importing.blob.GooglePasswordBlobConsumer.Callback
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

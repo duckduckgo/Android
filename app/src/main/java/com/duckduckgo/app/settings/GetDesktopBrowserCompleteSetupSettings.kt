@@ -25,11 +25,11 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.PriorityKey
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.pixels.AppPixelName
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.gone
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
@@ -39,13 +39,13 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.api.CompleteSetupSettingsPlugin
 import com.duckduckgo.settings.api.SettingsPageFeature
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoMap(ActivityScope::class)
 @PriorityKey(200)
 class GetDesktopBrowserCompleteSetupSettings @Inject constructor(
     private val settingsPageFeature: SettingsPageFeature,

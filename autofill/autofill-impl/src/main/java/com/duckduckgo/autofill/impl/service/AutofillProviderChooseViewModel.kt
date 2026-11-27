@@ -18,7 +18,6 @@ package com.duckduckgo.autofill.impl.service
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autofill.api.domain.app.LoginCredentials
@@ -29,6 +28,7 @@ import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Comm
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.ForceFinish
 import com.duckduckgo.autofill.impl.service.AutofillProviderChooseViewModel.Command.RequestAuthentication
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.CoroutineScope

@@ -24,8 +24,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.UnifiedDeviceListPixel
 import com.duckduckgo.sync.impl.pixels.toDeviceInfoWriteFailureReason
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -55,7 +55,7 @@ enum class DeviceInfoUpdateSource {
     REPAIR,
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDeviceInfoUpdater @Inject constructor(
     private val syncStore: SyncStore,
@@ -82,7 +82,7 @@ class RealDeviceInfoUpdater @Inject constructor(
      * @return the server's device list as it stands after the update
      */
     private suspend fun setName(name: String, source: DeviceInfoUpdateSource?): Result<List<DeviceV2>> {
-        val includeDeviceInfo = syncFeature.canWriteDeviceInfo()
+        val includeDeviceInfo = syncFeature.canWriteUnifiedDeviceList().isEnabled()
 
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "UpdateDeviceInfo: not signed in")

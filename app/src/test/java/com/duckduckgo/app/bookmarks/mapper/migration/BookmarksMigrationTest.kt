@@ -267,7 +267,7 @@ class BookmarksMigrationTest {
     private fun whenMigrationApplied() {
         appDatabase.apply {
             whenever(appBuildConfig.flavor).thenReturn(BuildFlavor.INTERNAL)
-            AppDatabaseBookmarksMigrationCallback({ this }, coroutineRule.testDispatcherProvider, appBuildConfig).runMigration()
+            AppDatabaseBookmarksMigrationCallback(lazy { this }, coroutineRule.testDispatcherProvider, appBuildConfig).runMigration()
         }
     }
 

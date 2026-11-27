@@ -27,11 +27,10 @@ import com.duckduckgo.feature.toggles.api.FeatureToggle
 import com.duckduckgo.user.agent.api.UserAgentInterceptor
 import com.duckduckgo.user.agent.api.UserAgentProvider
 import com.duckduckgo.user.agent.store.UserAgentFeatureName
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 import javax.inject.Named
-import javax.inject.Provider
 
 /**
  * Example Default User Agent (From Chrome):
@@ -41,9 +40,9 @@ import javax.inject.Provider
  * Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/64.0.3282.137 Safari/537.36
  */
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealUserAgentProvider @Inject constructor(
-    @Named("defaultUserAgent") private val defaultUserAgent: Provider<String>,
+    @Named("defaultUserAgent") private val defaultUserAgent: () -> String,
     device: DeviceInfo,
     private val userAgentInterceptorPluginPoint: PluginPoint<UserAgentInterceptor>,
     private val userAgent: UserAgent,
@@ -78,9 +77,9 @@ class RealUserAgentProvider @Inject constructor(
 
         if (isDomainInUserAllowList || !toggle.isFeatureEnabled(UserAgentFeatureName.UserAgent.value) || shouldUseDefaultUserAgent) {
             return if (isDesktop) {
-                defaultUserAgent.get().replace(AgentRegex.platform, fallbackDesktopPrefix)
+                defaultUserAgent().replace(AgentRegex.platform, fallbackDesktopPrefix)
             } else {
-                defaultUserAgent.get()
+                defaultUserAgent()
             }
         }
 
@@ -114,7 +113,7 @@ class RealUserAgentProvider @Inject constructor(
 
     private fun getWebKitVersionOnwards(forDesktop: Boolean): String? {
         val matches =
-            AgentRegex.webkitUntilSafari.find(defaultUserAgent.get()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent.get()) ?: return null
+            AgentRegex.webkitUntilSafari.find(defaultUserAgent()) ?: AgentRegex.webkitUntilEnd.find(defaultUserAgent()) ?: return null
         var result = matches.groupValues.last()
         if (forDesktop) {
             result = result.replace(" Mobile", "")
@@ -127,7 +126,7 @@ class RealUserAgentProvider @Inject constructor(
     }
 
     private fun getSafariComponentFromUserAgent(): String? {
-        val matches = AgentRegex.safari.find(defaultUserAgent.get()) ?: return null
+        val matches = AgentRegex.safari.find(defaultUserAgent()) ?: return null
         return matches.groupValues.last()
     }
 

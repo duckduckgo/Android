@@ -22,19 +22,20 @@ import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
 import com.duckduckgo.subscriptions.impl.repository.AuthRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = JsonToMatchingAttributeMapper::class,
+    binding = binding<JsonToMatchingAttributeMapper>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = AttributeMatcherPlugin::class,
+    binding = binding<AttributeMatcherPlugin>(),
 )
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RMFSubscriptionFreeTrialActiveMatchingAttribute @Inject constructor(
     private val authRepository: AuthRepository,
 ) : JsonToMatchingAttributeMapper, AttributeMatcherPlugin {

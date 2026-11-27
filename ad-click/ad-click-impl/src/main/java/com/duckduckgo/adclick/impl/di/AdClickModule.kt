@@ -16,8 +16,6 @@
 
 package com.duckduckgo.adclick.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.adclick.impl.AdClickData
 import com.duckduckgo.adclick.impl.DuckDuckGoAdClickData
 import com.duckduckgo.adclick.impl.remoteconfig.AdClickAttributionFeature
@@ -29,28 +27,34 @@ import com.duckduckgo.adclick.impl.store.exemptions.AdClickExemptionsDatabase
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 class AdClickModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideAdClickDatabase(context: Context): AdClickDatabase {
-        return Room.databaseBuilder(context, AdClickDatabase::class.java, "adclick.db")
-            .addMigrations(*ALL_MIGRATIONS)
-            .fallbackToDestructiveMigration()
-            .build()
+    @SingleIn(AppScope::class)
+    fun provideAdClickDatabase(databaseProvider: DatabaseProvider): AdClickDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AdClickDatabase::class.java,
+            "adclick.db",
+            config = RoomDatabaseConfig(
+                migrations = ALL_MIGRATIONS,
+                fallbackToDestructiveMigration = true,
+            ),
+        )
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAdClickAttributionRepository(
         database: AdClickDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,
@@ -61,15 +65,19 @@ class AdClickModule {
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
-    fun provideAdClickExemptionsDatabase(context: Context): AdClickExemptionsDatabase {
-        return Room.databaseBuilder(context, AdClickExemptionsDatabase::class.java, "adclick_exemptions.db")
-            .fallbackToDestructiveMigration()
-            .build()
+    @SingleIn(AppScope::class)
+    fun provideAdClickExemptionsDatabase(databaseProvider: DatabaseProvider): AdClickExemptionsDatabase {
+        return databaseProvider.buildRoomDatabase(
+            AdClickExemptionsDatabase::class.java,
+            "adclick_exemptions.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+            ),
+        )
     }
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideAdClickData(
         database: AdClickExemptionsDatabase,
         @AppCoroutineScope appCoroutineScope: CoroutineScope,

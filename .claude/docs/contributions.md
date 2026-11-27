@@ -18,7 +18,7 @@ Use the imperative mood in the subject line (e.g. "Add feature X", not "Added fe
 
 ## PR body
 
-Read @.github/PULL_REQUEST_TEMPLATE.md and use it as the PR body exactly — do not skip or reorder sections, do not add content above the first line of the template.
+Read `.github/PULL_REQUEST_TEMPLATE.md` and use it as the PR body exactly — do not skip or reorder sections, do not add content above the first line of the template.
 
 Fill in the template sections as follows:
 - **Task/Issue URL**: the Asana task URL
@@ -26,11 +26,18 @@ Fill in the template sections as follows:
 - **Steps to test**: reviewer-facing steps per scenario; specific enough that someone unfamiliar with the code can follow them
 - **UI changes**: before/after screenshots or recordings; write `No UI changes` in both columns for pure logic/backend changes
 
+When auto opens or updates the PR, keep only the template's header fields at the top (`Task/Issue URL:` first,
+then `Tech Design URL`, `API Proposals URL(s)` and `Evidence URL`, filled or left blank) and let auto write the rest
+of the body in its own format. The merge and Asana sync workflows read `Task/Issue URL:`, and the API Proposal
+check reads its own field, so both still work.
+
+## Tech Design and API Proposals
+
+When you first scope a change, judge whether it is cross-cutting (needs a tech design) or touches a `-api` public surface (needs an approved API Proposal), as described below. If either applies, tell the user up front so the document can be written and reviewed before implementation, not at PR time.
+
 ## Tech Design
 
 Larger or cross-cutting changes — work that spans multiple modules or APIs, introduces a new integration, or otherwise can't be captured by a single self-contained API proposal — should also be backed by a **tech design** document. The tech design covers the overall approach; the API proposals cover each public surface it introduces. A big feature often has one tech design and several API proposals.
-
-**Surface this early.** When you first scope a change, judge whether it's cross-cutting like this. If it is, tell the user up front that a tech design will be needed, so it can be written and reviewed before implementation — don't wait until PR time to raise it.
 
 **Before opening a PR for a change of this size, ask the user for the tech design link** and add it to the `Tech Design URL` field of the PR body — do not open the PR unless the tech design exists and is linked, or the user explicitly confirms that no tech design is needed. Small, self-contained changes don't need one; leave the field blank.
 
@@ -38,9 +45,7 @@ Larger or cross-cutting changes — work that spans multiple modules or APIs, in
 
 Any change to a public API — a `.kt`/`.java` file under a `*-api` module's `src/main` — must be accompanied by an **approved API Proposal**. `-api` modules are the contract other modules depend on, so the team reviews the public surface before it ships.
 
-**Surface this early.** When you first scope a change, check whether it will touch a `-api` public surface. If it will, tell the user up front that an approved API Proposal is required, so it can be started before implementation — don't wait until PR time to raise it.
-
-**Before opening a PR, check whether the changes touch a public API** (any `.kt`/`.java` file under a `*-api` module's `src/main`). If they do, stop and explicitly ask the user for the API Proposal link(s) — do not open the PR until they provide them. The proposal should exist and be linked before the PR goes up. If the user confirms the change does not alter the public surface (e.g. KDoc, comments, tests, dependency bumps), record `None` instead.
+**Before opening a PR, check whether the changes touch a public API** (any `.kt`/`.java` file under a `*-api` module's `src/main`). If they do, stop and explicitly ask the user for the API Proposal link(s) — do not open the PR until they provide them. If the user confirms the change does not alter the public surface (e.g. KDoc, comments, tests, dependency bumps), record `None` instead.
 
 An API Proposal is an Asana task in the [Android Proposals project](https://app.asana.com/1/137249556945/project/1212087397361015/task/1216523494440439).
 

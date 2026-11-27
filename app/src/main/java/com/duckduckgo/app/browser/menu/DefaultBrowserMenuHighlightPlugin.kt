@@ -18,12 +18,12 @@ package com.duckduckgo.app.browser.menu
 
 import com.duckduckgo.app.browser.defaultbrowsing.prompts.AdditionalDefaultBrowserPrompts
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DefaultBrowserMenuHighlightPlugin @Inject constructor(
     private val additionalDefaultBrowserPrompts: AdditionalDefaultBrowserPrompts,
 ) : BrowserMenuHighlightPlugin {

@@ -32,6 +32,8 @@
     <string name="removeAll">Ta bort alla</string>
     <string name="undo">Återställ</string>
     <string name="cancel">Avbryt</string>
+    <string name="done">Klart</string>
+    <string name="search">Sökning</string>
 
     <!--Status Indicator-->
     <string name="alwaysOn">Alltid på</string>

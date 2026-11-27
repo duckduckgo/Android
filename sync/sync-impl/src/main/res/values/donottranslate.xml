@@ -17,4 +17,61 @@
 <resources>
     <!-- Scanner screen: manual entry tab -->
     <string name="sync_simplified_scanner_manual_entry_example_code">eyJyZWNvdmVyeSI6eyJ1c2VyX2lkIjoiNjgwRDQ1QjUtNUU2RS00MzQ3LTlDNDQtQjZGQkU4MEZDNEE3IiwicHJpbWFyelkasd92V9rZXkiOiJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFQkFRRUJBUUVCQVFFPSJ9fQ==</string>
+
+    <string name="syncAuditLogTitle">Device Activity</string>
+    <string name="syncAuditLogListLabel">Most recently synced or removed devices:</string>
+    <string name="syncAuditLogError">Device activity is temporarily unavailable</string>
+    <string name="syncAuditLogLoadMoreError">Older activity is temporarily unavailable. Tap to retry.</string>
+    <string name="syncAuditLogEmpty">You have no recent activity</string>
+    <string name="syncAuditLogOnlyThisDevice">Only this device is synced</string>
+    <string name="syncAuditLogSynced">Synced</string>
+    <string name="syncAuditLogRemoved">Removed</string>
+    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity, for example Removed · iPhone. First placeholder is Synced or Removed. Second placeholder is the device name. Keep Synced or Removed first: a long device name is cut at the end of the line">%1$s · %2$s</string>
+    <plurals name="syncNewDeviceBannerTitle" instruction="Title of a message in Sync settings. The number is how many new devices synced with this account. Do not show the number">
+        <item quantity="one">New synced device</item>
+        <item quantity="other">New synced devices</item>
+    </plurals>
+    <string name="syncNewDeviceBannerBody" instruction="Message in Sync settings. Placeholder is one device name, or a list of device names">This phone has synced with %1$s.</string>
+    <string name="syncNewDeviceBannerLastName" instruction="Joins the last device name to a list. First placeholder is the earlier device names, separated by commas. Second placeholder is the last device name">%1$s and %2$s</string>
+    <plurals name="syncNewDeviceBannerMore" instruction="Ends a list of device names. Placeholder 1 is the device names, separated by commas. Placeholder 2 is how many more devices synced">
+        <item quantity="one">%1$s and %2$d more</item>
+        <item quantity="other">%1$s and %2$d more</item>
+    </plurals>
+    <string name="syncNewDeviceBannerReview">Review Activity</string>
+    <string name="syncNewLoginNotificationChannelName">New synced devices</string>
+    <plurals name="syncNewLoginNotificationTitle" instruction="Title of a phone notification. The number is how many new devices synced with this account. Do not show the number">
+        <item quantity="one">New synced device</item>
+        <item quantity="other">New synced devices</item>
+    </plurals>
+    <plurals name="syncNewLoginNotificationBody" instruction="Text of a phone notification. The number is how many new devices synced with this account">
+        <item quantity="one">This phone has synced with another device</item>
+        <item quantity="other">This phone has synced with %1$d devices</item>
+    </plurals>
+    <string name="syncAuditLogJustNow">Just now</string>
+    <plurals name="syncAuditLogMinutesAgo" instruction="Placeholder is the number of minutes since a device was synced or removed">
+        <item quantity="one">%1$d minute ago</item>
+        <item quantity="other">%1$d minutes ago</item>
+    </plurals>
+    <plurals name="syncAuditLogHoursAgo" instruction="Placeholder is the number of hours since a device was synced or removed">
+        <item quantity="one">%1$d hour ago</item>
+        <item quantity="other">%1$d hours ago</item>
+    </plurals>
+    <plurals name="syncAuditLogDaysAgo" instruction="Placeholder is the number of days since a device was synced or removed">
+        <item quantity="one">%1$d day ago</item>
+        <item quantity="other">%1$d days ago</item>
+    </plurals>
+    <plurals name="syncAuditLogMonthsAgo" instruction="Placeholder is the number of months since a device was synced or removed">
+        <item quantity="one">%1$d month ago</item>
+        <item quantity="other">%1$d months ago</item>
+    </plurals>
+    <plurals name="syncAuditLogYearsAgo" instruction="Placeholder is the number of years since a device was synced or removed">
+        <item quantity="one">%1$d year ago</item>
+        <item quantity="other">%1$d years ago</item>
+    </plurals>
+    <string name="syncNewLoginNotificationsTitle">Notify on New Connections</string>
+    <string name="syncNewLoginNotificationsDescription">Get notified whenever a new device is added to Sync &amp; Backup.</string>
+    <string name="syncNewLoginNotificationsEnable">Enable Notifications</string>
+    <string name="syncNewLoginNotificationsSettingsDialogTitle">Requires notification permission for DuckDuckGo</string>
+    <string name="syncNewLoginNotificationsSettingsDialogMessage">Enable notifications for DuckDuckGo in system Settings to turn on New Device Notifications.</string>
+    <string name="syncNewLoginNotificationsSettingsDialogConfirm">Go to Settings…</string>
 </resources>

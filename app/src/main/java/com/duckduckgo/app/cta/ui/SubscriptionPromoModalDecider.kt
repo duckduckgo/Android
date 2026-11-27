@@ -26,8 +26,8 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
 import com.duckduckgo.subscriptions.api.Subscriptions
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -50,7 +50,7 @@ data class SubscriptionPromoModalDecision(
 )
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealSubscriptionPromoModalDecider @Inject constructor(
     private val extendedOnboardingFeatureToggles: ExtendedOnboardingFeatureToggles,
     private val appInstallStore: AppInstallStore,

@@ -19,7 +19,6 @@ package com.duckduckgo.autoconsent.impl.ui
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
@@ -27,6 +26,7 @@ import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONS
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_ON
 import com.duckduckgo.autoconsent.impl.pixels.AutoConsentPixel.SETTINGS_AUTOCONSENT_SHOWN
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.di.scopes.ActivityScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel

@@ -29,8 +29,8 @@ import com.duckduckgo.browser.ui.browsermenu.PageContextHeaderState
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.NewDownloadState
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface BrowserMenuViewStateFactory {
@@ -48,7 +48,7 @@ interface BrowserMenuViewStateFactory {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealBrowserMenuViewStateFactory @Inject constructor(
     private val duckAiFeatureState: DuckAiFeatureState,
     private val newDownloadState: NewDownloadState,
@@ -129,6 +129,7 @@ class RealBrowserMenuViewStateFactory @Inject constructor(
             showDuckChatHistoryOption = browserViewState.showDuckChatHistoryOption,
             showDuckAiSection = duckAiFeatureState.showPopupMenuShortcut.value,
             showDuckChatVoiceOption = duckAiFeatureState.showVoiceChatEntry.value,
+            vpnMenuState = browserViewState.vpnMenuState,
             pageContextHeader = PageContextHeaderState.DuckAi(title = title, tabId = tabId),
         )
     }

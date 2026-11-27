@@ -22,8 +22,9 @@ import com.duckduckgo.data.store.api.DatabaseProvider
 import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sqlcipher.loader.api.SqlCipherLoader
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import logcat.LogPriority.ERROR
@@ -36,10 +37,10 @@ interface SecureStorageDatabaseFactory {
     suspend fun getDatabase(): SecureStorageDatabase?
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SecureStorageDatabaseFactory::class,
+    binding = binding<SecureStorageDatabaseFactory>(),
 )
 class RealSecureStorageDatabaseFactory @Inject constructor(
     private val keyProvider: SecureStorageKeyProvider,

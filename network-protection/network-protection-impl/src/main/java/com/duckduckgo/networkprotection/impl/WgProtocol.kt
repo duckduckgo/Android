@@ -20,22 +20,19 @@ import android.util.Log
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.service.VpnSocketProtector
-import com.duckduckgo.networkprotection.impl.config.PcapConfig
-import com.squareup.anvil.annotations.ContributesBinding
 import com.wireguard.android.backend.GoBackend
 import com.wireguard.crypto.Key
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
 import javax.inject.Inject
-import javax.inject.Provider
 
 interface WgProtocol {
     fun startWg(
         tunFd: Int,
         configString: String,
-        pcapConfig: PcapConfig? = null,
     ): Result<Unit>
 
     fun stopWg(): Result<Unit>
@@ -43,32 +40,21 @@ interface WgProtocol {
 }
 
 @ContributesBinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@SingleIn(VpnScope::class)
 class RealWgProtocol @Inject constructor(
     private val goBackend: GoBackend,
     private val appBuildConfig: AppBuildConfig,
-    private val socketProtector: Provider<VpnSocketProtector>,
+    private val socketProtector: () -> VpnSocketProtector,
 ) : WgProtocol {
     private var wgTunnel: Int = -1
 
     override fun startWg(
         tunFd: Int,
         configString: String,
-        pcapConfig: PcapConfig?,
     ): Result<Unit> {
         return runCatching {
-            safelyStartWg(tunFd, configString).also {
-                safelyConfigurePcap(pcapConfig)
-            }
+            safelyStartWg(tunFd, configString)
         }.getOrDefault(Result.failure(java.lang.IllegalStateException("Wireguard failed to start")))
-    }
-
-    private fun safelyConfigurePcap(pcapConfig: PcapConfig?) {
-        runCatching {
-            pcapConfig?.let {
-                goBackend.wgPcap(it.filename, it.snapLen, it.fileSize)
-            } ?: goBackend.wgPcap(null, 0, 0)
-        }
     }
 
     private fun safelyStartWg(
@@ -82,8 +68,8 @@ class RealWgProtocol @Inject constructor(
             Result.failure(java.lang.IllegalStateException("Wireguard failed to connect to backend"))
         } else {
             logcat { "Protecting V4 and V6 wg-sockets" }
-            socketProtector.get().protect(goBackend.wgGetSocketV4(wgTunnel))
-            socketProtector.get().protect(goBackend.wgGetSocketV6(wgTunnel))
+            socketProtector().protect(goBackend.wgGetSocketV4(wgTunnel))
+            socketProtector().protect(goBackend.wgGetSocketV6(wgTunnel))
             Result.success(Unit)
         }
     }

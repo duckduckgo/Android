@@ -18,8 +18,8 @@ package com.duckduckgo.duckchat.impl.pixel
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 /**
@@ -42,7 +42,7 @@ interface InputOutcomeTracker {
     fun sessionEnded()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealInputOutcomeTracker @Inject constructor(
     private val duckChatPixels: DuckChatPixels,

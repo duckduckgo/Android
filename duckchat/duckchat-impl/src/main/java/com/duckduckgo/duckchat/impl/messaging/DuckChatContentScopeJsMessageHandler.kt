@@ -24,10 +24,10 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckChatContentScopeJsMessageHandler @Inject constructor(
     private val duckAiHostProvider: DuckAiHostProvider,
 ) : ContentScopeJsMessageHandlersPlugin {
@@ -74,6 +74,8 @@ class DuckChatContentScopeJsMessageHandler @Inject constructor(
                     "editPrompt",
                     "cancelEdit",
                     "getAIChats",
+                    "aiChatPromoVisibility",
+                    "executeClientTool",
                 )
         }
 }

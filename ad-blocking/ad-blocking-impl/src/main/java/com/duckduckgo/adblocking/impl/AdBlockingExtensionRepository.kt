@@ -19,8 +19,8 @@ package com.duckduckgo.adblocking.impl
 import com.duckduckgo.adblocking.impl.store.AdBlockingExtensionDao
 import com.duckduckgo.adblocking.impl.store.ScriptletEntity
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -31,7 +31,7 @@ interface AdBlockingExtensionRepository {
     fun scriptletsFlow(): Flow<List<Scriptlet>>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealAdBlockingExtensionRepository @Inject constructor(
     private val dao: AdBlockingExtensionDao,

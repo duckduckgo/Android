@@ -32,9 +32,10 @@ import com.duckduckgo.remote.messaging.impl.RemoteMessagingFeatureToggles
 import com.duckduckgo.remote.messaging.impl.RemoteMessagingRepository
 import com.duckduckgo.remote.messaging.impl.modal.ModalSurfaceActivityFromMessageId
 import com.duckduckgo.remote.messaging.impl.store.ModalSurfaceStore
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,15 +44,15 @@ import javax.inject.Inject
 
 interface RemoteMessageModalSurfaceEvaluator
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = ModalEvaluator::class,
+    binding = binding<ModalEvaluator>(),
 )
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = RemoteMessageModalSurfaceEvaluator::class,
+    binding = binding<RemoteMessageModalSurfaceEvaluator>(),
 )
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class RemoteMessageModalSurfaceEvaluatorImpl @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
     private val remoteMessagingRepository: RemoteMessagingRepository,

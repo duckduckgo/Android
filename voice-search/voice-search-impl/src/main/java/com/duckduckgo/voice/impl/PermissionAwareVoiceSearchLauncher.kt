@@ -27,7 +27,7 @@ import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.SearchCancelled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Event.VoiceSearchDisabled
 import com.duckduckgo.voice.api.VoiceSearchLauncher.Source
 import com.duckduckgo.voice.api.VoiceSearchLauncher.VoiceSearchMode
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(ActivityScope::class)

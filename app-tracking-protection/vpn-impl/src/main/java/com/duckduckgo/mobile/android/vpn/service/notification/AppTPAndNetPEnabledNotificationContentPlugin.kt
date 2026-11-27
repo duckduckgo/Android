@@ -29,16 +29,16 @@ import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPl
 import com.duckduckgo.mobile.android.vpn.service.VpnEnabledNotificationContentPlugin.VpnEnabledNotificationContent
 import com.duckduckgo.mobile.android.vpn.stats.AppTrackerBlockingStatsRepository
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
-@ContributesMultibinding(VpnScope::class)
-@SingleInstanceIn(VpnScope::class)
+@ContributesIntoSet(VpnScope::class)
+@SingleIn(VpnScope::class)
 class AppTPAndNetPEnabledNotificationContentPlugin @Inject constructor(
     private val resources: Resources,
     private val repository: AppTrackerBlockingStatsRepository,

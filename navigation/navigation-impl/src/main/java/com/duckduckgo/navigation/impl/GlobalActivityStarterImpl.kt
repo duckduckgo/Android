@@ -21,13 +21,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.result.ActivityResultLauncher
-import com.duckduckgo.di.DaggerSet
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.GlobalActivityStarter.DeeplinkActivityParams
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import logcat.LogPriority.ERROR
 import logcat.LogPriority.WARN
 import logcat.logcat
@@ -35,9 +34,9 @@ import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class GlobalActivityStarterImpl @Inject constructor(
-    private val activityMappers: DaggerSet<GlobalActivityStarter.ParamToActivityMapper>,
+    private val activityMappers: Set<GlobalActivityStarter.ParamToActivityMapper>,
 ) : GlobalActivityStarter {
 
     override fun start(context: Context, params: GlobalActivityStarter.ActivityParams, options: Bundle?) {

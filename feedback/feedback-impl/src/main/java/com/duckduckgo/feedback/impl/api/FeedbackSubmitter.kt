@@ -34,8 +34,8 @@ import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.MainReason.OTHER
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.MainReason.SEARCH_NOT_GOOD_ENOUGH
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.MainReason.WEBSITES_NOT_LOADING
 import com.duckduckgo.feedback.impl.ui.negative.FeedbackType.SubReason
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.INFO
@@ -62,7 +62,7 @@ interface FeedbackSubmitter {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class FireAndForgetFeedbackSubmitter @Inject constructor(
     private val feedbackService: FeedbackService,
     private val variantManager: VariantManager,

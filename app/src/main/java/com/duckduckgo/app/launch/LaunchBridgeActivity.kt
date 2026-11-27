@@ -18,13 +18,13 @@ package com.duckduckgo.app.launch
 
 import android.os.Bundle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.mode.AppLauncher
 import com.duckduckgo.app.onboarding.ui.OnboardingActivity
 import com.duckduckgo.app.pixels.AppReturnPixelSender
 import com.duckduckgo.app.pixels.toPixelLaunchSourceValue
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.di.scopes.ActivityScope
 import javax.inject.Inject

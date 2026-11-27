@@ -77,8 +77,8 @@ internal fun DaxMessage(
     title: String,
     body: String,
     modifier: Modifier = Modifier,
-    shape: Shape = DaxMessageDefaults.shape,
-    elevation: Dp = DaxMessageDefaults.elevation,
+    shape: Shape = DaxMessageDefaults.Shape,
+    elevation: Dp = DaxMessageDefaults.Elevation,
     contentAlignment: DaxMessageContentAlignment = DaxMessageContentAlignment.Center,
     topContent: (@Composable ColumnScope.() -> Unit)? = null,
     actions: DaxMessageActions? = null,
@@ -183,8 +183,8 @@ sealed interface DaxMessageActions {
 }
 
 private object DaxMessageDefaults {
-    val shape: Shape = RectangleShape
-    val elevation: Dp = 0.dp
+    val Shape: Shape = RectangleShape
+    val Elevation: Dp = 0.dp
 }
 
 @Composable

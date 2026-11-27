@@ -22,8 +22,8 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -46,7 +46,7 @@ interface DeviceInfoMigrator {
     suspend fun ensureMigrated(): Result<Unit>
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDeviceInfoMigrator @Inject constructor(
     private val syncStore: SyncStore,
@@ -93,7 +93,7 @@ class RealDeviceInfoMigrator @Inject constructor(
                 return Precheck.Stop(Error(reason = "DeviceInfoMigration: not signed in"))
             }
 
-        if (!syncFeature.canWriteDeviceInfo()) {
+        if (!syncFeature.canWriteUnifiedDeviceList().isEnabled()) {
             logcat { "Sync-UnifiedDevices: migration skipped — writing device_info is disabled" }
             return Precheck.Stop(Success(Unit))
         }

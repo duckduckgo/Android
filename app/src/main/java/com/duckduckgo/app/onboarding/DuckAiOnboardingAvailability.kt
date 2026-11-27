@@ -19,8 +19,8 @@ package com.duckduckgo.app.onboarding
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -28,7 +28,7 @@ interface DuckAiOnboardingAvailability {
     suspend fun isDuckAiOnboardingEnabled(): Boolean
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealDuckAiOnboardingAvailability @Inject constructor(
     private val duckChat: DuckChat,

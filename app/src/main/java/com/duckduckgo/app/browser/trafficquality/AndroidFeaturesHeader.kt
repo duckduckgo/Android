@@ -17,45 +17,26 @@
 package com.duckduckgo.app.browser.trafficquality
 
 import com.duckduckgo.app.browser.DuckDuckGoUrlDetector
-import com.duckduckgo.app.browser.trafficquality.Result.Allowed
-import com.duckduckgo.app.browser.trafficquality.Result.NotAllowed
 import com.duckduckgo.app.browser.trafficquality.remote.AndroidFeaturesHeaderProvider
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.plugins.headers.CustomHeadersProvider.CustomHeadersPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
+@ContributesIntoSet(scope = AppScope::class)
 class AndroidFeaturesHeaderPlugin @Inject constructor(
     private val duckDuckGoUrlDetector: DuckDuckGoUrlDetector,
-    private val customHeaderAllowedChecker: CustomHeaderAllowedChecker,
     private val androidBrowserConfigFeature: AndroidBrowserConfigFeature,
     private val androidFeaturesHeaderProvider: AndroidFeaturesHeaderProvider,
-    private val appVersionProvider: AppVersionHeaderProvider,
 ) : CustomHeadersPlugin {
 
-    override fun getHeaders(url: String): Map<String, String> {
-        if (isFeatureEnabled() && duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
-            return when (val result = customHeaderAllowedChecker.isAllowed()) {
-                is Allowed -> {
-                    val headers = mutableMapOf<String, String>()
-                    androidFeaturesHeaderProvider.provide(result.config)?.let { headerValue ->
-                        headers.put(X_DUCKDUCKGO_ANDROID_HEADER, headerValue)
-                    }
-                    appVersionProvider.provide(isStub = false).let { headerValue ->
-                        headers.put(X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER, headerValue)
-                    }
-                    headers
-                }
-
-                NotAllowed -> {
-                    mapOf(X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER to appVersionProvider.provide(isStub = true))
-                }
-            }
-        } else {
+    override fun getHeaders(url: String, browserMode: BrowserMode): Map<String, String> {
+        if (!isFeatureEnabled() || browserMode == BrowserMode.FIRE || !duckDuckGoUrlDetector.isDuckDuckGoQueryUrl(url)) {
             return emptyMap()
         }
+        return mapOf(X_DUCKDUCKGO_ANDROID_HEADER to androidFeaturesHeaderProvider.provide())
     }
 
     private fun isFeatureEnabled(): Boolean {
@@ -65,6 +46,5 @@ class AndroidFeaturesHeaderPlugin @Inject constructor(
 
     companion object {
         internal const val X_DUCKDUCKGO_ANDROID_HEADER = "x-duckduckgo-android"
-        internal const val X_DUCKDUCKGO_ANDROID_APP_VERSION_HEADER = "x-duckduckgo-android-version"
     }
 }

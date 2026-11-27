@@ -19,7 +19,7 @@ package com.duckduckgo.cookies.impl.thirdpartycookienames
 import com.duckduckgo.cookies.api.ThirdPartyCookieNames
 import com.duckduckgo.cookies.store.CookiesRepository
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

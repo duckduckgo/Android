@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository.CleanupPo
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import java.time.Duration
 import java.time.Instant
@@ -83,6 +83,32 @@ class WideEventRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun appendToWideEventPath(
+        eventId: Long,
+        step: String,
+        metadata: Map<String, String?>,
+    ) {
+        require(step.isNotEmpty()) { "Path step must not be empty" }
+        require(',' !in step) { "Path step must not contain commas: '$step'" }
+        require(step != WideEventRepository.PATH_TRUNCATED) { "Path step must not be '${WideEventRepository.PATH_TRUNCATED}'" }
+
+        updateWideEvent(eventId) { event ->
+            checkEventIsActive(event)
+
+            val path = when {
+                step == event.lastPathStep -> event.path
+                event.path.size < WideEventRepository.MAX_PATH_SIZE -> event.path + step
+                else -> event.path.take(WideEventRepository.MAX_PATH_SIZE - 1) + WideEventRepository.PATH_TRUNCATED
+            }
+
+            event.copy(
+                path = path,
+                lastPathStep = step,
+                metadata = mergeMetadata(event.metadata, metadata),
+            )
+        }
+    }
+
     override suspend fun setWideEventStatus(
         eventId: Long,
         status: WideEventRepository.WideEventStatus,
@@ -98,6 +124,29 @@ class WideEventRepositoryImpl @Inject constructor(
                 metadata = mergeMetadata(event.metadata, metadata),
                 isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
             )
+        }
+    }
+
+    override suspend fun cleanUpWideEvent(
+        eventId: Long,
+        decide: (WideEventRepository.WideEvent) -> WideEventRepository.CleanupDecision?,
+    ) {
+        database.withTransaction {
+            val event = wideEventDao.getWideEventById(eventId) ?: return@withTransaction
+            if (event.status != null) return@withTransaction
+
+            val decision = decide(event.mapToRepositoryWideEvent()) ?: return@withTransaction
+            val dbStatus = decision.status.mapToDbWideEventStatus()
+
+            val updatedEvent =
+                event.copy(
+                    status = dbStatus,
+                    metadata = mergeMetadata(event.metadata, decision.metadata),
+                    isFirstDailyOccurrence = recordDailyOccurrence(event.name, dbStatus),
+                )
+
+            val updateSuccessful = wideEventDao.updateWideEvent(updatedEvent) == 1
+            check(updateSuccessful) { "Failed to clean up wide event" }
         }
     }
 
@@ -124,6 +173,7 @@ class WideEventRepositoryImpl @Inject constructor(
         name: String,
         timeout: Duration?,
         buckets: List<Duration>?,
+        rounding: WideEventRepository.BucketRounding,
     ) {
         if (buckets != null) {
             require(buckets.none { it.isNegative }) {
@@ -145,6 +195,7 @@ class WideEventRepositoryImpl @Inject constructor(
                     startedAt = timeProvider.getCurrentTime(),
                     timeout = timeout,
                     buckets = sortedBuckets,
+                    rounding = rounding.mapToDbBucketRounding(),
                 )
 
             event.copy(activeIntervals = event.activeIntervals + interval)
@@ -171,7 +222,10 @@ class WideEventRepositoryImpl @Inject constructor(
                 duration.isNegative -> NEGATIVE_INTERVAL_BUCKET_VALUE
                 intervalBuckets == null -> duration.toMillis().toString()
                 else -> {
-                    val matched = intervalBuckets.lastOrNull { it <= duration }
+                    val matched = when (interval.rounding) {
+                        WideEventEntity.BucketRounding.ROUND_DOWN -> intervalBuckets.lastOrNull { it <= duration }
+                        WideEventEntity.BucketRounding.ROUND_UP -> intervalBuckets.firstOrNull { it >= duration } ?: intervalBuckets.lastOrNull()
+                    }
                     (matched?.toMillis() ?: 0L).toString()
                 }
             }

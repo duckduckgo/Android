@@ -52,7 +52,7 @@ fun DaxCard(
     modifier: Modifier = Modifier,
     border: BorderStroke? = null,
     shape: Shape = DaxCardDefaults.shape,
-    elevation: DaxCardElevation = DaxCardDefaults.elevation,
+    elevation: DaxCardElevation = DaxCardDefaults.Elevation,
     content: @Composable ColumnScope.() -> Unit,
 ) {
     Card(
@@ -87,7 +87,7 @@ fun DaxCard(
     enabled: Boolean = true,
     border: BorderStroke? = null,
     shape: Shape = DaxCardDefaults.shape,
-    elevation: DaxCardElevation = DaxCardDefaults.elevation,
+    elevation: DaxCardElevation = DaxCardDefaults.Elevation,
     interactionSource: MutableInteractionSource? = null,
     content: @Composable ColumnScope.() -> Unit,
 ) {
@@ -114,7 +114,7 @@ private object DaxCardDefaults {
         @Composable
         get() = DuckDuckGoTheme.shapes.medium
 
-    val elevation: DaxCardElevation = DaxCardElevation(1.dp)
+    val Elevation: DaxCardElevation = DaxCardElevation(1.dp)
 
     val colors: CardColors
         @Composable

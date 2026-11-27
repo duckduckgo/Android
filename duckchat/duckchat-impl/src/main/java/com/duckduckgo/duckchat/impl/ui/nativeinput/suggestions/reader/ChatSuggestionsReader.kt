@@ -33,7 +33,7 @@ import com.duckduckgo.duckchat.impl.feature.recentDaysCutoff
 import com.duckduckgo.duckchat.impl.ui.nativeinput.suggestions.ChatSuggestion
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull

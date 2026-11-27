@@ -19,9 +19,9 @@ package com.duckduckgo.sync.impl.exchange.v2
 import android.util.Base64
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Json
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import org.json.JSONObject
 import javax.inject.Inject
 

@@ -25,6 +25,7 @@ import com.duckduckgo.duckchat.api.DuckChatNativeSettingsNoParams
 import com.duckduckgo.duckchat.api.DuckChatSettingsNoParams
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
+import com.duckduckgo.duckchat.impl.clienttools.AiChatBrowserToolsFeature
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.metric.nativeinput.discovery.InputScreenDiscoveryFunnel
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelName
@@ -44,9 +45,9 @@ import com.duckduckgo.settings.api.SerpSettingsDataProvider
 import com.duckduckgo.settings.api.SettingsPageFeature
 import com.duckduckgo.settings.api.observeSetting
 import com.duckduckgo.settings.api.setSetting
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.SharingStarted
@@ -69,6 +70,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
     private val duckChatFeature: DuckChatFeature,
     private val serpSettingsDataProvider: SerpSettingsDataProvider,
     private val subscriptionOnboardingExperimentMetrics: SubscriptionOnboardingExperimentMetrics,
+    private val browserToolsFeature: AiChatBrowserToolsFeature,
 ) : ViewModel() {
     private val commandChannel = Channel<Command>(capacity = 1, onBufferOverflow = DROP_OLDEST)
     val commands = commandChannel.receiveAsFlow()
@@ -77,6 +79,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         val isDuckChatUserEnabled: Boolean = false,
         val isInputScreenEnabled: Boolean = false,
         val shouldShowShortcuts: Boolean = false,
+        val shouldShowBrowserAccess: Boolean = false,
         val shouldShowInputScreenToggle: Boolean = false,
         val isSearchSectionVisible: Boolean = true,
         val isAutomaticContextVisible: Boolean = false,
@@ -99,6 +102,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
 
     private data class FeatureVisibility(
         val isNativeControlsEnabled: Boolean,
+        val isBrowserToolsEnabled: Boolean,
     )
 
     private val featureState =
@@ -121,6 +125,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
             emit(
                 FeatureVisibility(
                     isNativeControlsEnabled = duckChatFeature.aiFeaturesNativeControls().isEnabled(),
+                    isBrowserToolsEnabled = browserToolsFeature.self().isEnabled(),
                 ),
             )
         }.flowOn(dispatcherProvider.io())
@@ -144,6 +149,7 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
                 isDuckChatUserEnabled = isDuckChatUserEnabled,
                 isInputScreenEnabled = isInputScreenEnabled,
                 shouldShowShortcuts = isDuckChatUserEnabled,
+                shouldShowBrowserAccess = isDuckChatUserEnabled && featureVisibility.isBrowserToolsEnabled,
                 shouldShowInputScreenToggle = isDuckChatUserEnabled && duckChat.isInputScreenFeatureAvailable(),
                 isSearchSectionVisible = isSearchSectionVisible(duckChatActivityParams, featureVisibility.isNativeControlsEnabled),
                 isAutomaticContextEnabled = featureState.isAutomaticContextEnabled,
@@ -170,6 +176,8 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         ) : Command()
 
         data object OpenShortcutSettings : Command()
+
+        data object OpenBrowserAccessSettings : Command()
 
         data object LaunchFeedback : Command()
 
@@ -307,6 +315,12 @@ class DuckChatSettingsViewModel @AssistedInject constructor(
         viewModelScope.launch {
             // The SERP blob is the single source of truth, so the web reflects this on its next getNativeSettings.
             serpSettingsDataProvider.setSetting(option)
+        }
+    }
+
+    fun onBrowserAccessClicked() {
+        viewModelScope.launch {
+            commandChannel.send(Command.OpenBrowserAccessSettings)
         }
     }
 

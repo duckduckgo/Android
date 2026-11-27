@@ -63,6 +63,13 @@ class DefaultTabManagerTest {
     }
 
     @Test
+    fun whenOnTabAccessedThenLastAccessIsUpdated() = runTest {
+        testee.onTabAccessed("tabId")
+
+        verify(tabRepository).updateTabLastAccess("tabId")
+    }
+
+    @Test
     fun whenOpenNewTabThenPendingNewTabOpenedExitRecordedForCurrentlySelectedTab() = runTest {
         testee.onSelectedTabChanged("current-tab")
 

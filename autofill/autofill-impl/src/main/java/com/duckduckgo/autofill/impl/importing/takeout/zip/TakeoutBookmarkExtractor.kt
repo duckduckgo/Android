@@ -23,7 +23,7 @@ import com.duckduckgo.autofill.impl.importing.takeout.zip.TakeoutBookmarkExtract
 import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.BOOKMARK_IMPORT_FROM_GOOGLE_FLOW_EXTRA_CHROME_EXPORT
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.WARN
 import logcat.logcat

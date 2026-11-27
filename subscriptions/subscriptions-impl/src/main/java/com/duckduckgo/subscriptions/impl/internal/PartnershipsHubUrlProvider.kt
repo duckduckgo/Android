@@ -19,10 +19,10 @@ package com.duckduckgo.subscriptions.impl.internal
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.SubscriptionsConstants.PARTNER_BENEFITS_URL
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PartnershipsHubUrlProvider {

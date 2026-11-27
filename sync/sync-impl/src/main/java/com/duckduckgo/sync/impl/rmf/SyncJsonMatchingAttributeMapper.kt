@@ -20,10 +20,10 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.remote.messaging.api.JsonMatchingAttribute
 import com.duckduckgo.remote.messaging.api.JsonToMatchingAttributeMapper
 import com.duckduckgo.remote.messaging.api.MatchingAttribute
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SyncJsonMatchingAttributeMapper @Inject constructor() : JsonToMatchingAttributeMapper {
     override fun map(key: String, jsonMatchingAttribute: JsonMatchingAttribute): MatchingAttribute? {
         return when (key) {

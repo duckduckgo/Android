@@ -51,7 +51,7 @@ class SubscriptionPurchaseWideEventTest {
         subscriptionPurchaseWideEvent =
             SubscriptionPurchaseWideEventImpl(
                 wideEventClient = wideEventClient,
-                subscriptionsFeature = { subscriptionsFeature },
+                subscriptionsFeature = lazy { subscriptionsFeature },
                 dispatchers = coroutineRule.testDispatcherProvider,
             )
     }

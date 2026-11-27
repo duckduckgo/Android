@@ -29,13 +29,6 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
-    "m_addressbar_click_aichat": {
-        "description": "Fires when the user touches the address bar while the Duck.ai chat input is showing",
-        "owners": ["0nko"],
-        "triggers": ["other"],
-        "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "browserMode"]
-    },
     "m_aichat_contextual_selection_attached": {
         "description": "User attached a text selection to Duck.ai via the \"Ask Duck.ai\" text selection action. Not sent when the same text is selected again, or when the attachment is refused at the limit.",
         "owners": ["joshliebe"],
@@ -476,13 +469,18 @@
         ]
     },
     "m_aichat_entry_point": {
-        "description": "Fires when an active user action enters Duck.ai, with the initiating surface and navigation context.",
+        "description": "Fires when a user enters Duck.ai, including opening the app onto a Duck.ai tab or swiping onto one, with the initiating surface and navigation context.",
         "owners": ["YoussefKeyrouz"],
-        "triggers": ["other"],
+        "triggers": ["user_interaction", "startup"],
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": [
             "appVersion",
             "duckAiEntrySource",
+            {
+                "key": "voice",
+                "type": "boolean",
+                "description": "Whether voice was used to start this entry, including dictated prompts."
+            },
             { "key": "duck_ai_enabled", "type": "boolean", "description": "Whether Duck.ai is enabled by feature and user settings." },
             {
                 "key": "input_screen_enabled",
@@ -744,11 +742,35 @@
         ]
     },
     "m_aichat_duckai_dau_toggle_never_enabled": {
-        "description": "Fired once per Duck.ai DAU day for users who have never enabled the Duck.ai native input field. Used to identify heavy Duck.ai users who haven't discovered the feature.",
+        "description": "Fired once per Duck.ai DAU day for users whose Duck.ai native input field setting was never written (never turned on or off). Used to identify heavy Duck.ai users who haven't discovered the feature. Since the address bar picker records a Search only choice as the setting turned off (duckAiToggleMigration.pickerSearchOnlyWritesSetting), those users stop firing this pixel, which breaks the trend the week that ships.",
         "owners": ["aitorvs"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": [
+            "appVersion",
+            {
+                "key": "picker_was_shown",
+                "type": "boolean",
+                "description": "Whether the address bar picker is marked as shown: confirmed with either option, displayed twice, or skipped by Quick Setup."
+            },
+            {
+                "key": "picker_display_count",
+                "type": "string",
+                "description": "How many times the address bar picker was displayed, bucketed. Read with picker_was_shown: 1 with picker_was_shown=true means Search only was confirmed on the first display while that answer was not recorded (older app versions, or pickerSearchOnlyWritesSetting off); 1 with picker_was_shown=false means it was displayed once and not answered.",
+                "enum": ["0", "1", "2_plus"]
+            },
+            {
+                "key": "is_reinstall",
+                "type": "boolean",
+                "description": "Whether the app detected this install as a reinstall."
+            },
+            {
+                "key": "app_stage",
+                "type": "string",
+                "description": "The user's onboarding stage when the pixel fires.",
+                "enum": ["new", "dax_onboarding", "established"]
+            }
+        ]
     },
     "m_aichat_contextual_fire_button_tapped": {
         "description": "User tapped the fire button in the contextual Duck.ai sheet",
@@ -967,6 +989,62 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "aichat_responding-service_started": {
+        "description": "The app started the Duck.ai responding foreground service, which keeps the app alive while a response the user left is generating.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "restricted",
+                "type": "boolean",
+                "description": "Whether battery usage was set to Restricted (ActivityManager.isBackgroundRestricted) at the start"
+            }
+        ]
+    },
+    "aichat_responding-service_start_failed": {
+        "description": "The Duck.ai responding foreground service failed to start or to enter the foreground. The service was stopped instead of crashing.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "enum": [
+                    "request_not_allowed",
+                    "late_request_not_allowed",
+                    "request_failed",
+                    "foreground_not_allowed",
+                    "foreground_failed"
+                ],
+                "description": "Which step failed. request_*: Context.startForegroundService, late_request_* when keep-alive was requested after the app had already left the foreground. foreground_*: Service.startForeground, including creating its notification. *_not_allowed: Android refused it (IllegalStateException), *_failed: another exception"
+            }
+        ]
+    },
+    "aichat_responding-service_interrupted": {
+        "description": "On a cold start, the app found that the previous process ended while the Duck.ai responding foreground service was keeping it alive.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "restricted",
+                "type": "boolean",
+                "description": "Whether battery usage was set to Restricted (ActivityManager.isBackgroundRestricted) at the start of the interrupted run"
+            }
+        ]
+    },
+    "aichat_responding-service_timed_out": {
+        "description": "Android's shortService time limit ended the Duck.ai responding foreground service before the app stopped it.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_unified_input_image_generation_selected_count": {
         "description": "User selected the image generation tool in the Unified Input",
         "owners": ["malmstein"],
@@ -1081,17 +1159,35 @@
     },
     "m_aichat_unified_input_file_attached_count": {
         "description": "User attached a file in the Unified Input",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "unifiedInputSurface"]
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
+            }
+        ]
     },
     "m_aichat_unified_input_file_attached_daily": {
         "description": "(Daily Pixel) User attached a file in the Unified Input",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
-        "parameters": ["appVersion", "unifiedInputSurface"]
+        "parameters": [
+            "appVersion",
+            "unifiedInputSurface",
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
+            }
+        ]
     },
     "m_aichat_unified_input_file_removed_count": {
         "description": "User removed an attached file from the Unified Input",
@@ -1237,7 +1333,7 @@
     },
     "m_aichat_unified_input_file_validation_failed_count": {
         "description": "A file the user attempted to attach in the Unified Input failed validation",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -1248,12 +1344,18 @@
                 "type": "string",
                 "description": "Why the file validation failed",
                 "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
+            },
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
             }
         ]
     },
     "m_aichat_unified_input_file_validation_failed_daily": {
         "description": "(Daily Pixel) A file the user attempted to attach in the Unified Input failed validation",
-        "owners": ["malmstein"],
+        "owners": ["malmstein", "karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["form_factor"],
         "parameters": [
@@ -1264,6 +1366,12 @@
                 "type": "string",
                 "description": "Why the file validation failed",
                 "enum": ["size_exceeded", "count_exceeded", "page_count_exceeded", "other"]
+            },
+            {
+                "key": "entry_point",
+                "type": "string",
+                "description": "Where the user started attaching the file",
+                "enum": ["attachment_menu", "new_chat_hint", "share"]
             }
         ]
     },
@@ -1326,7 +1434,8 @@
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
             "duckAiEntrySource",
-            "firstPromptNewInstall"
+            "firstPromptNewInstall",
+            "duckAiModelSource"
         ]
     },
     "m_aichat_unified_input_prompt_submitted_daily": {
@@ -1361,7 +1470,8 @@
             { "key": "has_text", "type": "boolean", "description": "Whether the prompt included text" },
             "duckAiPromptPageType",
             "duckAiEntrySource",
-            "firstPromptNewInstall"
+            "firstPromptNewInstall",
+            "duckAiModelSource"
         ]
     },
     "m_aichat_unified_input_sent_prompt_in_chat_count": {
@@ -1803,6 +1913,34 @@
         "suffixes": ["first_daily_count", "form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_attachment_privacy_image_shown": {
+        "description": "Fires when the attachment privacy disclaimer appears under the native Duck.ai input with an image staged. Once per prompt, and the disclaimer is shown for one prompt per install.",
+        "owners": ["joshliebe"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_file_shown": {
+        "description": "Fires when the attachment privacy disclaimer appears under the native Duck.ai input with a file (no image) staged. Once per prompt, and the disclaimer is shown for one prompt per install.",
+        "owners": ["joshliebe"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_image_learn_more_tapped": {
+        "description": "Fires when the user taps the Learn more link on the attachment privacy disclaimer while an image is staged.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
+    "m_aichat_attachment_privacy_file_learn_more_tapped": {
+        "description": "Fires when the user taps the Learn more link on the attachment privacy disclaimer while a file (no image) is staged.",
+        "owners": ["joshliebe"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "unifiedInputSurface"]
+    },
     "m_aichat_contextual_quick_action_ask_about_page_shown": {
         "description": "The Ask About Page quick action pill was shown in the Contextual sheet",
         "owners": ["karlenDimla"],
@@ -1904,14 +2042,21 @@
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
+    },
+    "aichat_contextual_address_bar_menu_skipped": {
+        "description": "Fired when the address bar Duck.ai button skips the menu because the tab already has a chat in progress",
+        "owners": ["YoussefKeyrouz"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
     },
     "aichat_contextual_address_bar_menu_new_chat_selected": {
         "description": "Fired when the user selects New Chat in the address bar Duck.ai menu",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
     },
     "aichat_contextual_address_bar_menu_ask_about_page_selected": {
         "description": "Fired when the user selects Ask About Page in the address bar Duck.ai menu",
@@ -1932,7 +2077,7 @@
         "owners": ["malmstein"],
         "triggers": ["other"],
         "suffixes": ["first_daily_count", "form_factor"],
-        "parameters": ["appVersion"]
+        "parameters": ["appVersion", "duckAiAddressBarMenuPageType"]
     },
     "aichat_contextual_open_duckai_menu_tapped": {
         "description": "Fired when the user selects Open Duck.ai in the contextual sheet chats menu",
@@ -2001,6 +2146,123 @@
         "description": "User tapped the sidebar button in the Duck.ai omnibar, which opens the recent chats sidebar",
         "owners": ["karlenDimla"],
         "triggers": ["other"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_new_chat_shown": {
+        "description": "A full-screen Duck.ai New Chat is shown. Once per New Chat, whether or not the hints flag is on, as the denominator for how many New Chats reach a first prompt.",
+        "owners": ["karlenDimla"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "newchathints_enabled",
+                "type": "boolean",
+                "description": "Whether the New Chat hints feature flag is enabled"
+            }
+        ]
+    },
+    "aichat_new_chat_first_prompt_sent": {
+        "description": "The first prompt is sent from a New Chat counted by aichat_new_chat_shown.",
+        "owners": ["karlenDimla"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "newchathints_enabled",
+                "type": "boolean",
+                "description": "Whether the New Chat hints feature flag is enabled"
+            },
+            {
+                "key": "hints_shown",
+                "type": "boolean",
+                "description": "Whether hints were shown at any point in this New Chat before the prompt; stays true if a promo hides them afterwards. False when hints were never shown (not eligible, capped, or behind a promo the whole time)"
+            },
+            {
+                "key": "hint_tapped",
+                "type": "string",
+                "description": "The last hint tapped in this New Chat before the prompt was sent",
+                "enum": ["documents", "photo", "image_generation", "none"]
+            },
+            { "key": "has_image_attachment", "type": "boolean", "description": "Whether the prompt included an image attachment" },
+            { "key": "has_file_attachment", "type": "boolean", "description": "Whether the prompt included a file attachment" },
+            {
+                "key": "selected_tool",
+                "type": "string",
+                "description": "Which tool was selected when the prompt was sent",
+                "enum": ["none", "image_generation", "web_search"]
+            },
+            "duckAiModelSource"
+        ]
+    },
+    "aichat_new_chat_hints_shown": {
+        "description": "New Chat hints are shown above the Duck.ai input. Once per New Chat, with the slot of each hint.",
+        "owners": ["karlenDimla"],
+        "triggers": ["impression"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "documents_position",
+                "type": "integer",
+                "description": "The documents hint's 1-based slot in the row, which is shuffled per tab; 0 when it isn't shown",
+                "enum": [0, 1, 2, 3]
+            },
+            {
+                "key": "photo_position",
+                "type": "integer",
+                "description": "The photo hint's 1-based slot in the row, which is shuffled per tab; 0 when it isn't shown",
+                "enum": [0, 1, 2, 3]
+            },
+            {
+                "key": "image_generation_position",
+                "type": "integer",
+                "description": "The image generation hint's 1-based slot in the row, which is shuffled per tab; 0 when it isn't shown",
+                "enum": [0, 1, 2, 3]
+            }
+        ]
+    },
+    "aichat_new_chat_hint_tapped": {
+        "description": "User tapped a New Chat hint above the Duck.ai input.",
+        "owners": ["karlenDimla"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "hint",
+                "type": "string",
+                "description": "Which hint",
+                "enum": ["documents", "photo", "image_generation"]
+            },
+            {
+                "key": "position",
+                "type": "integer",
+                "description": "The hint's 1-based slot in the row; the order is shuffled per tab",
+                "enum": [1, 2, 3]
+            }
+        ]
+    },
+    "m_aichat_widget_added": {
+        "description": "Triggered when the Duck.ai home-screen widget is added",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_widget_deleted": {
+        "description": "Triggered when the Duck.ai home-screen widget is removed",
+        "owners": ["GerardPaligot"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_new_chat_hints_cap_reached": {
+        "description": "The user has ignored New Chat hints in enough New Chats that the hints stop showing. Once per install, the first time the cap is reached.",
+        "owners": ["karlenDimla"],
+        "triggers": ["feature_lifecycle"],
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     }

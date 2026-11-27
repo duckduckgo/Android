@@ -17,14 +17,16 @@
 <!-- smartling.entity_escaping = false -->
 <!-- smartling.instruction_attributes = instruction -->
 <resources>
+    <string name="segment_skip_settings_title">Praleisti remiamą turinį</string>
+    <string name="segment_skip_mode_always_ask">Paklausti prieš praleidžiant</string>
+    <string name="segment_skip_mode_always_skip">Visada</string>
+    <string name="segment_skip_mode_off">Niekada</string>
     <string name="ad_blocking_settings_title">„YouTube“ reklamų blokavimas</string>
     <string name="ad_blocking_settings_toggle_title">Blokuoti „YouTube“ reklamas</string>
-    <string name="ad_blocking_settings_description_with_consent">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas platformoje „YouTube“, todėl galite žiūrėti vaizdo įrašus be trukdžių.Kai įjungta, „DuckDuckGo“ anonimiškai aptiks skelbimų blokavimo trukdžius arba „YouTube“ klaidas, kad pagerintų patirtį visiems. „DuckDuckGo“ niekada nemato, kokius vaizdo įrašus žiūrite, ar bet kokios asmenį identifikuojančios informacijos. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
-    <string name="ad_blocking_settings_description">„DuckDuckGo“ blokuoja vaizdo įrašų reklamas platformoje „YouTube“, todėl galite žiūrėti vaizdo įrašus be trukdžių. <annotation type="learn_more_link">Sužinokite daugiau</annotation></string>
     <string name="ad_blocking_settings_duck_player_header">Duck Player</string>
     <string name="ad_blocking_settings_duck_player_description">Atidaro vaizdo įrašus neblaškančiu kino teatro režimu, kad tai, ką žiūri, nedarytų įtakos tavo „YouTube“ srautui.</string>
+    <string name="ad_blocking_settings_duck_player_link">Ieškai „Duck Player“?</string>
     <string name="ad_blocking_settings_title_v2">Reklamų blokavimas</string>
-    <string name="ad_blocking_settings_header_description">Blokuoja įkyrius sekiklius dar jiems neįsikėlus ir veiksmingai pašalina sekimu paremtus skelbimus.</string>
     <string name="contingencyMessageTitle">„YouTube“ reklamų blokavimas nepasiekiamas</string>
     <string name="contingencyMessageContent">Dėl pastarųjų „YouTube“ pakeitimų sutriko skelbimų blokavimas. Stengiamės išspręsti šiuos nesklandumus ir dėkojame už supratingumą.</string>
     <string name="contingencyMessagePrimaryButton">Supratau</string>

@@ -25,18 +25,18 @@ import android.service.quicksettings.Tile.STATE_ACTIVE
 import android.service.quicksettings.Tile.STATE_INACTIVE
 import android.service.quicksettings.TileService
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.android.AndroidInjection
+import com.duckduckgo.di.binding.TileServiceBindingKey
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.mobile.android.vpn.AppTpVpnFeature
 import com.duckduckgo.mobile.android.vpn.VpnFeaturesRegistry
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
-import dagger.android.AndroidInjection
-import dagger.binding.TileServiceBingingKey
 import kotlinx.coroutines.*
 import logcat.logcat
 import javax.inject.Inject
@@ -44,10 +44,10 @@ import javax.inject.Inject
 @Suppress("NoHardcodedCoroutineDispatcher")
 // We don't use the DeviceShieldTileService::class as binding key because TileService (Android) class does not
 // exist in all APIs, and so using it DeviceShieldTileService::class as key would compile but immediately crash
-// at startup when Java class loader tries to resolve the TileService::class upon Dagger setup
+// at startup when Java class loader tries to resolve the TileService::class upon DI graph setup
 @InjectWith(
     scope = ServiceScope::class,
-    bindingKey = TileServiceBingingKey::class,
+    bindingKey = TileServiceBindingKey::class,
 )
 class DeviceShieldTileService : TileService() {
 
@@ -64,7 +64,7 @@ class DeviceShieldTileService : TileService() {
 
     override fun onCreate() {
         super.onCreate()
-        AndroidInjection.inject(this, TileServiceBingingKey::class.java)
+        AndroidInjection.inject(this, TileServiceBindingKey::class.java)
     }
 
     override fun onClick() {

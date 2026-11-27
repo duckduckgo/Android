@@ -27,9 +27,9 @@ import com.duckduckgo.sync.impl.Result.Success
 import com.duckduckgo.sync.impl.crypto.SyncJweCrypto
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.delay
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -65,14 +65,13 @@ interface ThirdPartyCredentialManager {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @WorkerThread
 class RealThirdPartyCredentialManager @Inject constructor(
     private val syncStore: SyncStore,
     private val syncApi: SyncApi,
     private val syncJweCrypto: SyncJweCrypto,
     private val nativeLib: SyncLib,
-    private val syncFeature: SyncFeature,
     private val protectedKeyUnwrapper: ProtectedKeyUnwrapper,
 ) : ThirdPartyCredentialManager {
 
@@ -110,9 +109,6 @@ class RealThirdPartyCredentialManager @Inject constructor(
     }
 
     private fun validateCreatePreconditions(): Result<CreateInputs> {
-        if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            return Error(reason = "Scoped access credentials feature is disabled")
-        }
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "CreateThirdPartyCredential: not signed in")
         val primaryKey = syncStore.primaryKey
@@ -400,9 +396,6 @@ class RealThirdPartyCredentialManager @Inject constructor(
     }
 
     override fun refresh(): Result<Boolean> {
-        if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            return Error(reason = "Scoped access credentials feature is disabled")
-        }
         val token = syncStore.token.takeUnless { it.isNullOrEmpty() }
             ?: return Error(reason = "RefreshThirdPartyCredential: not signed in")
         logcat { "Sync-ScopedToken: refreshing 3party credential from server" }
@@ -441,9 +434,6 @@ class RealThirdPartyCredentialManager @Inject constructor(
     }
 
     override fun getRecoveryCode(): Result<String> {
-        if (!syncFeature.canUseV2ConnectFlow().isEnabled()) {
-            return Error(reason = "Get 3party Recovery Code: scoped access credentials feature is disabled")
-        }
         val scopedPassword = syncStore.scopedPassword
             ?: return Error(reason = "Get 3party Recovery Code: no scoped password — create a 3party credential first")
         val userId = syncStore.userId

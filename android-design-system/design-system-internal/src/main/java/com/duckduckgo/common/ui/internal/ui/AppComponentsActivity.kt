@@ -92,6 +92,10 @@ class AppComponentsActivity : AppCompatActivity() {
                 applyBrandDesignUpdate = brandDesignUpdateEnabled,
                 overlayStyleIds = listOfNotNull(
                     CommonR.style.ThemeOverlay_Rebrand_Radius.takeIf { brandDesignUpdateEnabled },
+                    CommonR.style.ThemeOverlay_Rebrand_Badges.takeIf { brandDesignUpdateEnabled },
+                    CommonR.style.ThemeOverlay_Rebrand_InfoPanels.takeIf { brandDesignUpdateEnabled },
+                    CommonR.style.ThemeOverlay_Rebrand_DialogSpacing.takeIf { brandDesignUpdateEnabled },
+                    CommonR.style.ThemeOverlay_Rebrand_BottomSheets.takeIf { brandDesignUpdateEnabled },
                 ),
             )
             selectedTheme to brandDesignUpdateEnabled

@@ -20,7 +20,7 @@ import com.duckduckgo.autofill.store.RealSecureStorageRepository
 import com.duckduckgo.autofill.store.SecureStorageRepository
 import com.duckduckgo.autofill.store.db.SecureStorageDatabase
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.LogPriority.ERROR
 import logcat.logcat

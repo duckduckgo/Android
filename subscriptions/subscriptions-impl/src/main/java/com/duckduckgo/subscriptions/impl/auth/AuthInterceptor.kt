@@ -20,7 +20,8 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.impl.AccessTokenResult.Success
 import com.duckduckgo.subscriptions.impl.SubscriptionsManager
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
@@ -29,9 +30,9 @@ import retrofit2.Invocation
 import java.io.IOException
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class,
+    binding = binding<PixelInterceptorPlugin>(),
 )
 class AuthInterceptor @Inject constructor(
     private val subscriptionsManager: SubscriptionsManager,

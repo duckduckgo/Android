@@ -1,0 +1,60 @@
+appId: com.duckduckgo.mobile.android
+androidWebViewHierarchy: devtools
+name: "Tracker stays blocked after ad click: Ad click detection"
+tags:
+  - adClickTest
+---
+- retry:
+    maxRetries: 3
+    commands:
+      - launchApp:
+          clearState: true
+      - runFlow: ../shared/skip_all_onboarding.yaml
+
+- runFlow:
+    label: "1 - y.js heuristic no ad domain param u3 param included"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-1"
+      AD_ID: "ad-id-1"
+      EXPECT: "blocked"
+
+- runFlow:
+    label: "2 - m.js heuristic no ad domain param dsl param included"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-2"
+      AD_ID: "ad-id-2"
+      EXPECT: "blocked"
+
+- runFlow:
+    label: "3 - y.js heuristic no ad domain param, but missing u3 param"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-3"
+      AD_ID: "ad-id-3"
+      EXPECT: "blocked"
+
+- runFlow:
+    label: "4 - m.js heuristic no ad domain param, but missing dsl param"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-4"
+      AD_ID: "ad-id-4"
+      EXPECT: "blocked"
+
+- runFlow:
+    label: "9 - y.js bing-provided ad domain provided but incorrect u3 not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-9"
+      AD_ID: "ad-id-9"
+      EXPECT: "blocked"
+
+- runFlow:
+    label: "10 - m.js bing-provided ad domain provided but incorrect dsl not needed"
+    file: steps/ad_click_case.yaml
+    env:
+      ANCHOR: "ad-id-10"
+      AD_ID: "ad-id-10"
+      EXPECT: "blocked"

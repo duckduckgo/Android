@@ -17,10 +17,10 @@
 package com.duckduckgo.autoconsent.impl.onboarding
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.autoconsent.api.Autoconsent
 import com.duckduckgo.autoconsent.impl.R
 import com.duckduckgo.autoconsent.impl.remoteconfig.AutoconsentFeature
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin
 import com.duckduckgo.onboarding.api.OnboardingBooleanPreferencePlugin.Id

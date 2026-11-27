@@ -24,7 +24,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.referral.api.AppReferrer
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import logcat.LogPriority.VERBOSE
@@ -32,7 +32,7 @@ import logcat.logcat
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 
-@ContributesMultibinding(scope = AppScope::class)
+@ContributesIntoSet(scope = AppScope::class)
 class AppReferrerInstallPixelSender @Inject constructor(
     private val appReferrer: AppReferrer,
     private val pixel: Pixel,

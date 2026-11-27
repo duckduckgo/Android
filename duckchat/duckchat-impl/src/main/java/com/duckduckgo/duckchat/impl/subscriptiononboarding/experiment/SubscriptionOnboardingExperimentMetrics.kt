@@ -23,7 +23,7 @@ import com.duckduckgo.feature.toggles.api.MetricType
 import com.duckduckgo.feature.toggles.api.MetricsPixel
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.send
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface SubscriptionOnboardingExperimentMetrics {
@@ -49,10 +49,9 @@ class RealSubscriptionOnboardingExperimentMetrics @Inject constructor(
     }
 
     private suspend fun experimentToggles(): List<Toggle> =
-        inventory.getAllTogglesForParent(PRIVACY_PRO_FEATURE_NAME).filter { it.featureName().name in EXPERIMENT_NAMES }
+        inventory.getAllActiveExperimentToggles().filter { it.featureName().name in EXPERIMENT_NAMES }
 
     private companion object {
-        const val PRIVACY_PRO_FEATURE_NAME = "privacyPro"
         val EXPERIMENT_NAMES = setOf(
             "subscriptionOnboardingFreeTrialsOct2026",
             "subscriptionOnboardingPaidSubsOct2026",

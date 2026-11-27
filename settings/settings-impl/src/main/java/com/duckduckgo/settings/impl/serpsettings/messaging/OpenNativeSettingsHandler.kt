@@ -28,7 +28,7 @@ import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.settings.impl.serpsettings.pixel.SerpSettingsPixelName.SERP_SETTINGS_OPEN_DUCK_AI
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.LogPriority.WARN
 import logcat.logcat
 import javax.inject.Inject
@@ -36,7 +36,7 @@ import javax.inject.Inject
 /**
  * Handles the openNativeSettings message from SERP to open native settings screens.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class OpenNativeSettingsHandler @Inject constructor(
     private val context: Context,
     private val globalActivityStarter: GlobalActivityStarter,

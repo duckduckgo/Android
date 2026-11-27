@@ -20,7 +20,7 @@ import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler
 import com.duckduckgo.desktopapppromotion.api.DesktopAppPromotionInteractionHandler.Interaction
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 /**

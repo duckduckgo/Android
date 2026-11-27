@@ -16,7 +16,7 @@
 
 package com.duckduckgo.networkprotection.internal.feature
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.feature.toggles.api.Toggle.DefaultFeatureValue
@@ -33,9 +33,6 @@ interface NetPInternalFeatureToggles {
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun excludeSystemApps(): Toggle
-
-    @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
-    fun enablePcapRecording(): Toggle
 
     @Toggle.DefaultValue(defaultValue = DefaultFeatureValue.FALSE)
     fun useVpnStagingEnvironment(): Toggle

@@ -19,6 +19,7 @@ package com.duckduckgo.promptscoordinator.impl
 import androidx.lifecycle.LifecycleOwner
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.utils.plugins.PluginPoint
+import com.duckduckgo.customtabs.api.CustomTabDetector
 import com.duckduckgo.promptscoordinator.api.ModalEvaluator
 import com.duckduckgo.promptscoordinator.api.ModalTrigger
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
@@ -46,6 +47,7 @@ class ModalEvaluatorCoordinatorTest {
     private val mockLifecycleOwner: LifecycleOwner = mock()
     private val mockPromptsCoordinator: PromptsCoordinator = mock()
     private val mockPromptExposureReporter: PromptExposureReporter = mock()
+    private val mockCustomTabDetector: CustomTabDetector = mock()
 
     private lateinit var testee: ModalEvaluatorCoordinator
 
@@ -60,6 +62,7 @@ class ModalEvaluatorCoordinatorTest {
             promptsCoordinator = mockPromptsCoordinator,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
             promptExposureReporter = mockPromptExposureReporter,
+            customTabDetector = mockCustomTabDetector,
         )
     }
 
@@ -73,6 +76,21 @@ class ModalEvaluatorCoordinatorTest {
         coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
 
         verify(mockEvaluator, never()).evaluate()
+        verify(mockCompletionStore, never()).recordCompletion()
+    }
+
+    @Test
+    fun whenOnResumeCalledWhileInCustomTabThenNoEvaluatorsAreCalledAndNothingIsClaimed() = runTest {
+        whenever(mockPromptsCoordinator.isEnabled()).thenReturn(true)
+        whenever(mockCustomTabDetector.isCustomTab()).thenReturn(true)
+        val mockEvaluator = createMockEvaluator("test", 1, ModalEvaluator.EvaluationResult.ModalShown)
+        whenever(mockPluginPoint.getPlugins()).thenReturn(listOf(mockEvaluator))
+
+        testee.onResume(mockLifecycleOwner)
+        coroutinesTestRule.testScope.testScheduler.advanceUntilIdle()
+
+        verify(mockEvaluator, never()).evaluate()
+        verify(mockPromptsCoordinator, never()).tryClaim(PromptType.MODAL)
         verify(mockCompletionStore, never()).recordCompletion()
     }
 

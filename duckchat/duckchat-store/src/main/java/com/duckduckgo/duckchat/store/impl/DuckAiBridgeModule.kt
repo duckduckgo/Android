@@ -27,11 +27,10 @@ import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeDatabase
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeFileMetaDao
 import com.duckduckgo.duckchat.store.impl.store.DuckAiBridgeSettingsDao
 import com.duckduckgo.duckchat.store.impl.store.FireModeDuckAiDatabase
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import java.io.File
 
 /**
@@ -40,19 +39,19 @@ import java.io.File
  * so each DAO and the chat-files directory are qualified with `@RegularMode` / `@FireMode`. Consumers either
  * inject a qualified [DuckAiBridgeStorage] directly or resolve one via `BrowserModeDataProvider<DuckAiBridgeStorage>`.
  */
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DuckAiBridgeModule {
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideDatabase(context: Context): DuckAiBridgeDatabase =
         Room.databaseBuilder(context, DuckAiBridgeDatabase::class.java, "duck_ai_bridge.db")
             .addMigrations(DuckAiBridgeDatabase.MIGRATION_1_2, DuckAiBridgeDatabase.MIGRATION_2_3)
             .build()
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     fun provideFireDatabase(context: Context): FireModeDuckAiDatabase =
         Room.databaseBuilder(context, FireModeDuckAiDatabase::class.java, "fire_mode_duck_ai.db")
             .setJournalMode(RoomDatabase.JournalMode.TRUNCATE)
@@ -94,7 +93,7 @@ object DuckAiBridgeModule {
         File(context.filesDir, "fire_mode_duck_ai_files")
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @RegularMode
     fun provideRegularStorage(
         @RegularMode settings: DuckAiBridgeSettingsDao,
@@ -104,7 +103,7 @@ object DuckAiBridgeModule {
     ): DuckAiBridgeStorage = RealDuckAiBridgeStorage(settings, chats, fileMeta, filesDir)
 
     @Provides
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @FireMode
     fun provideFireStorage(
         @FireMode settings: DuckAiBridgeSettingsDao,

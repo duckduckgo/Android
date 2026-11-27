@@ -25,7 +25,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.R
 import com.duckduckgo.mobile.android.vpn.service.VpnReminderNotificationContentPlugin
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface VpnReminderNotificationBuilder {

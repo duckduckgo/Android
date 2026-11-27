@@ -21,7 +21,7 @@ import com.duckduckgo.common.utils.extensions.getPrivateDnsServerName
 import com.duckduckgo.di.scopes.VpnScope
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkDefaultDns
 import com.duckduckgo.mobile.android.vpn.network.util.getSystemActiveNetworkSearchDomain
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.net.InetAddress
 import javax.inject.Inject
 

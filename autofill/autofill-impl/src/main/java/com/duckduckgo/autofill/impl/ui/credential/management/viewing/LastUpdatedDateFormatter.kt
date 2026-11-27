@@ -17,7 +17,7 @@
 package com.duckduckgo.autofill.impl.ui.credential.management.viewing
 
 import com.duckduckgo.di.scopes.FragmentScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject

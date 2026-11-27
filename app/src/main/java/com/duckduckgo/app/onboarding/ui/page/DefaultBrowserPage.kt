@@ -33,10 +33,10 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.ViewModelProvider
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.R
 import com.duckduckgo.app.browser.defaultbrowsing.DefaultBrowserSystemSettings
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppTheme
 import com.duckduckgo.common.ui.view.button.DaxButton
 import com.duckduckgo.common.ui.view.show

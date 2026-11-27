@@ -50,7 +50,7 @@ class ReadSyncCodeContract : ActivityResultContract<Input, Output>() {
 
     data class Input(
         val syncEntryPoint: SyncEntryPoint,
-        val launchSource: String?,
+        val launchSource: String,
     )
 
     sealed interface Output {

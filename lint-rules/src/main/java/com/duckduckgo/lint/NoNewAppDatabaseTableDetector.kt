@@ -109,7 +109,6 @@ class NoNewAppDatabaseTableDetector : Detector(), SourceCodeScanner {
             "com.duckduckgo.app.statistics.model.PixelEntity",
             "com.duckduckgo.app.browser.pageloadpixel.PageLoadedPixelEntity",
             "com.duckduckgo.app.browser.pageloadpixel.firstpaint.PagePaintedPixelEntity",
-            "com.duckduckgo.app.trackerdetection.db.WebTrackerBlocked",
             "com.duckduckgo.app.browser.cookies.db.AuthCookieAllowedDomainEntity",
             "com.duckduckgo.savedsites.store.Entity",
             "com.duckduckgo.savedsites.store.Relation",

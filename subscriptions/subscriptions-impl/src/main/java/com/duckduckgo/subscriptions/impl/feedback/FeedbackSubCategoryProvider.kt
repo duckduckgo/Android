@@ -24,7 +24,7 @@ import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.I
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.PIR
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.SUBS_AND_PAYMENTS
 import com.duckduckgo.subscriptions.impl.feedback.SubscriptionFeedbackCategory.VPN
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface FeedbackSubCategoryProvider {

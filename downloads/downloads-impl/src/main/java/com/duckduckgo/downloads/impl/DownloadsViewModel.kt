@@ -19,7 +19,7 @@ package com.duckduckgo.downloads.impl
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.formatters.time.TimeDiffFormatter
 import com.duckduckgo.di.scopes.ActivityScope

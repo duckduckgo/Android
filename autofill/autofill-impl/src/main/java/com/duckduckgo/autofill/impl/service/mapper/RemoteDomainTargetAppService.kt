@@ -16,7 +16,7 @@
 
 package com.duckduckgo.autofill.impl.service.mapper
 
-import com.duckduckgo.anvil.annotations.ContributesServiceApi
+import com.duckduckgo.codegen.annotations.ContributesServiceApi
 import com.duckduckgo.di.scopes.AppScope
 import retrofit2.http.GET
 

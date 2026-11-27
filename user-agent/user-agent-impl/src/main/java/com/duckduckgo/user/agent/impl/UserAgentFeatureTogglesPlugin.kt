@@ -20,10 +20,10 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.FeatureTogglesPlugin
 import com.duckduckgo.user.agent.store.UserAgentFeatureToggleRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class UserAgentFeatureTogglesPlugin @Inject constructor(
     private val userAgentFeatureToggleRepository: UserAgentFeatureToggleRepository,
     private val appBuildConfig: AppBuildConfig,

@@ -16,26 +16,21 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
 }
 
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.credentialexchange.dummy'
-    anvil {
-        generateDaggerFactories = true
-    }
     lint {
         abortOnError = !project.hasProperty("abortOnError") || project.property("abortOnError") != "false"
     }
 }
 
 dependencies {
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':credential-exchange-api')
     implementation project(path: ':di')
-    implementation project(path: ':anvil-annotations')
-
-    implementation Google.dagger
     implementation Square.logcat
 }

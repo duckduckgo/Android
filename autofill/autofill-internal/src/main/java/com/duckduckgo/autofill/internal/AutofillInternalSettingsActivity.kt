@@ -28,7 +28,6 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Lifecycle.State.STARTED
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Unknown
@@ -62,6 +61,7 @@ import com.duckduckgo.autofill.impl.ui.credential.management.survey.AutofillSurv
 import com.duckduckgo.autofill.internal.databinding.ActivityAutofillInternalSettingsBinding
 import com.duckduckgo.autofill.store.AutofillPrefsStore
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT

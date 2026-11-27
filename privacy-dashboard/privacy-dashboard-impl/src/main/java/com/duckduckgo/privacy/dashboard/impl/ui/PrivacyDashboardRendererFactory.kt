@@ -19,8 +19,8 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.webkit.WebView
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.privacy.dashboard.impl.ui.RendererViewHolder.WebviewRenderer
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 import javax.inject.Named
 

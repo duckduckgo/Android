@@ -14,11 +14,16 @@
   ~ limitations under the License.
   -->
 <resources>
-    <dimen name="nextStepsSectionIconSize">16dp</dimen>
+    <dimen name="nextStepsCardMaxWidth">512dp</dimen>
     <dimen name="nextStepsCloseButtonSize">24dp</dimen>
     <dimen name="nextStepsItemImageSize">60dp</dimen>
-    <dimen name="nextStepsBackCardOffset">12dp</dimen>
+    <dimen name="nextStepsBackCardOffset">8dp</dimen>
     <dimen name="nextStepsStackPaddingBottom">16dp</dimen>
     <dimen name="nextStepsCardElevation">4dp</dimen>
-    <dimen name="nextStepsBackCardElevation">1dp</dimen>
+    <dimen name="nextStepsBackCardElevation">2dp</dimen>
+    <dimen name="nextStepsItemTitleTextSize">16sp</dimen>
+    <dimen name="nextStepsSectionTitleSpacing">6dp</dimen>
+    <dimen name="nextStepsPrimaryActionSpacing">20dp</dimen>
+    <dimen name="nextStepsCheckListItemIconSize">24dp</dimen>
+    <dimen name="nextStepsCheckListItemIconSpacing">10dp</dimen>
 </resources>

@@ -19,7 +19,7 @@ package com.duckduckgo.subscriptions.impl.ui
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.js.messaging.api.JsCallbackData
@@ -76,6 +76,7 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.isActive
 import com.duckduckgo.subscriptions.impl.repository.isExpired
 import com.duckduckgo.subscriptions.impl.store.SubscriptionOnboardingStore
+import com.duckduckgo.subscriptions.impl.stripe.StripePlansHandler
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.*
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.Failure
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView.InProgress
@@ -112,6 +113,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
     private val subscriptionExpirationReminderScheduler: SubscriptionExpirationReminderScheduler,
     private val paywallUrlResolver: PaywallUrlResolver,
     private val subscriptionOnboardingStore: SubscriptionOnboardingStore,
+    private val stripePlansHandler: StripePlansHandler,
 ) : ViewModel() {
 
     private val moshi = Moshi.Builder().add(JSONObjectAdapter()).build()
@@ -133,6 +135,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
 
     private var pendingScheduleNotificationDaysBeforeCancel: Int? = null
 
+    private var awaitingReturnFromNotificationSettings = false
+
     // Origin the offer webview was launched with, captured when the paywall is shown, so the subscribe
     // (primary CTA) click can be attributed to the same subscription-funnel entry point.
     private var launchOrigin: String? = null
@@ -153,6 +157,9 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     Waiting
                 }
                 is CurrentPurchase.Success -> {
+                    if (!it.isPlanSwitch) {
+                        pixelSender.reportPurchaseSuccessOrigin(launchOrigin, it.isFreeTrial)
+                    }
                     subscriptionsChecker.runChecker()
                     pendingScheduleNotificationDaysBeforeCancel?.let { days ->
                         if (subscriptionsFeature.subscriptionExpirationReminderNotification().isEnabled()) {
@@ -169,7 +176,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
                             PURCHASE_COMPLETED_SUBSCRIPTION_NAME,
                             JSONObject(PURCHASE_COMPLETED_JSON),
                         ),
-                        isFreeTrial = it.isFreeTrial,
                         launchOnboarding = launchOnboarding,
                     )
                 }
@@ -210,6 +216,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
             "subscriptionsWelcomeAddEmailClicked" -> subscriptionsWelcomeAddEmailClicked()
             "getUserSettings" -> id?.let { getUserSettings(it) }
             "requestNotificationsPermission" -> id?.let { requestNotificationsPermission(it) }
+            "showNotificationsDeniedDialog" -> id?.let { showNotificationsDeniedDialog(it, data) }
+            "completeStripePayment" -> completeStripePayment(featureName, method, id)
             else -> {
                 // NOOP
             }
@@ -237,12 +245,15 @@ class SubscriptionWebViewViewModel @Inject constructor(
             shouldShowRationale -> NOTIFICATIONS_PERMISSION_NOT_DETERMINED
             else -> NOTIFICATIONS_PERMISSION_DENIED
         }
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcherProvider.io()) {
             val response = JsCallbackData(
                 featureName = "useSubscription",
                 method = "getUserSettings",
                 id = id,
-                params = JSONObject().apply { put("notificationsPermission", status) },
+                params = JSONObject().apply {
+                    put("notificationsPermission", status)
+                    put("notificationsDeniedDialog", subscriptionsFeature.notificationsDeniedDialogMessaging().isEnabled())
+                },
             )
             command.send(SendResponseToJs(response))
         }
@@ -265,6 +276,56 @@ class SubscriptionWebViewViewModel @Inject constructor(
             )
             command.send(SendResponseToJs(response))
         }
+    }
+
+    private fun showNotificationsDeniedDialog(id: String, data: JSONObject?) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            if (!subscriptionsFeature.notificationsDeniedDialogMessaging().isEnabled()) return@launch
+            val days = runCatching { data?.getInt("days") }.getOrNull()
+            if (days == null || days <= 0) {
+                sendNotificationsDeniedDialogResponse(id, NOTIFICATIONS_DENIED_DIALOG_NOT_NOW)
+            } else {
+                command.send(ShowNotificationsDeniedDialog(id, days))
+            }
+        }
+    }
+
+    fun onNotificationsDeniedDialogOpenSettings(id: String) {
+        awaitingReturnFromNotificationSettings = true
+        viewModelScope.launch {
+            sendNotificationsDeniedDialogResponse(id, NOTIFICATIONS_DENIED_DIALOG_OPEN_SETTINGS)
+            command.send(OpenNotificationSettings)
+        }
+    }
+
+    fun onResume(notificationsEnabled: () -> Boolean) {
+        if (!awaitingReturnFromNotificationSettings) return
+        awaitingReturnFromNotificationSettings = false
+        val status = if (notificationsEnabled()) NOTIFICATIONS_PERMISSION_GRANTED else NOTIFICATIONS_PERMISSION_DENIED
+        viewModelScope.launch {
+            val event = SubscriptionEventData(
+                featureName = PURCHASE_COMPLETED_FEATURE_NAME,
+                subscriptionName = NOTIFICATIONS_PERMISSION_CHANGED_SUBSCRIPTION_NAME,
+                params = JSONObject().apply { put("notificationsPermission", status) },
+            )
+            command.send(SendJsEvent(event))
+        }
+    }
+
+    fun onNotificationsDeniedDialogNotNow(id: String) {
+        viewModelScope.launch {
+            sendNotificationsDeniedDialogResponse(id, NOTIFICATIONS_DENIED_DIALOG_NOT_NOW)
+        }
+    }
+
+    private suspend fun sendNotificationsDeniedDialogResponse(id: String, action: String) {
+        val response = JsCallbackData(
+            featureName = "useSubscription",
+            method = "showNotificationsDeniedDialog",
+            id = id,
+            params = JSONObject().apply { put("action", action) },
+        )
+        command.send(SendResponseToJs(response))
     }
 
     fun onSubscriptionRestored() = viewModelScope.launch {
@@ -435,6 +496,22 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 return@launch
             }
 
+            // Stripe plan changes can't go through Play Billing
+            if (subscription != null && stripePlansHandler.shouldHandle(subscription)) {
+                val redirectEvent = stripePlansHandler.getRedirectEvent(
+                    subscription = subscription,
+                    planId = targetPlanId,
+                    change = change,
+                    origin = launchOrigin,
+                )
+                if (redirectEvent != null) {
+                    command.send(SendJsEvent(redirectEvent))
+                } else {
+                    _currentPurchaseViewState.emit(currentPurchaseViewState.value.copy(purchaseState = Failure))
+                }
+                return@launch
+            }
+
             val currentTier = subscription?.productId?.let { SubscriptionTier.fromPlanId(it) } ?: SubscriptionTier.UNKNOWN
             val targetTier = SubscriptionTier.fromPlanId(targetPlanId)
 
@@ -478,7 +555,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                     "targetPlanId/targetTier: $targetPlanId/$targetTier, replacementMode: $replacementMode"
             }
 
-            command.send(SubscriptionChangeSelected(planId = targetPlanId, offerId = null, replacementMode = replacementMode))
+            command.send(SubscriptionChangeSelected(planId = targetPlanId, offerId = null, replacementMode = replacementMode, change = change))
         }
     }
 
@@ -500,6 +577,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
         offerId: String?,
         replacementMode: SubscriptionReplacementMode,
         origin: String?,
+        change: String?,
     ) {
         viewModelScope.launch(dispatcherProvider.io()) {
             subscriptionsManager.switchSubscriptionPlan(
@@ -508,6 +586,7 @@ class SubscriptionWebViewViewModel @Inject constructor(
                 offerId = offerId,
                 replacementMode = replacementMode,
                 origin = origin,
+                change = change,
             )
         }
     }
@@ -591,6 +670,12 @@ class SubscriptionWebViewViewModel @Inject constructor(
         }
 
         viewModelScope.launch(dispatcherProvider.io()) {
+            val subscription = runCatching { subscriptionsManager.getSubscription() }.getOrNull()
+            if (stripePlansHandler.shouldHandle(subscription)) {
+                sendTierOptionJson(stripePlansHandler.getTierOptions())
+                return@launch
+            }
+
             val defaultOptions = SubscriptionTierOptionsJson(
                 products = emptyList(),
             )
@@ -690,6 +775,15 @@ class SubscriptionWebViewViewModel @Inject constructor(
             }
 
             sendTierOptionJson(subscriptionTierOptions)
+        }
+    }
+
+    private fun completeStripePayment(featureName: String, method: String, id: String?) {
+        viewModelScope.launch(dispatcherProvider.io()) {
+            stripePlansHandler.onPlanChangeCompleted()
+            id?.let {
+                command.send(SendResponseToJs(JsCallbackData(featureName = featureName, method = method, id = it, params = JSONObject())))
+            }
         }
     }
 
@@ -837,7 +931,6 @@ class SubscriptionWebViewViewModel @Inject constructor(
         data object InProgress : PurchaseStateView()
         data class Success(
             val subscriptionEventData: SubscriptionEventData,
-            val isFreeTrial: Boolean,
             val launchOnboarding: Boolean,
         ) : PurchaseStateView()
         data object Waiting : PurchaseStateView()
@@ -860,10 +953,13 @@ class SubscriptionWebViewViewModel @Inject constructor(
             val planId: String,
             val offerId: String?,
             val replacementMode: SubscriptionReplacementMode,
+            val change: String?,
         ) : Command()
         data object RestoreSubscription : Command()
         data class ComputeUserSettings(val id: String) : Command()
         data class RequestNotificationsPermission(val id: String) : Command()
+        data class ShowNotificationsDeniedDialog(val id: String, val days: Int) : Command()
+        data object OpenNotificationSettings : Command()
         data object GoToITR : Command()
         data object GoToPIR : Command()
         data object GoToPIRDashboard : Command()
@@ -880,5 +976,8 @@ class SubscriptionWebViewViewModel @Inject constructor(
         private const val NOTIFICATIONS_PERMISSION_GRANTED = "granted"
         private const val NOTIFICATIONS_PERMISSION_DENIED = "denied"
         private const val NOTIFICATIONS_PERMISSION_NOT_DETERMINED = "notDetermined"
+        private const val NOTIFICATIONS_DENIED_DIALOG_OPEN_SETTINGS = "openSettings"
+        private const val NOTIFICATIONS_DENIED_DIALOG_NOT_NOW = "notNow"
+        private const val NOTIFICATIONS_PERMISSION_CHANGED_SUBSCRIPTION_NAME = "onNotificationsPermissionChanged"
     }
 }

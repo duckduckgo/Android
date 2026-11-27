@@ -19,7 +19,6 @@ package com.duckduckgo.privacy.dashboard.impl.ui
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.app.global.model.Site
 import com.duckduckgo.app.global.model.domain
 import com.duckduckgo.app.privacy.db.UserAllowListRepository
@@ -31,6 +30,7 @@ import com.duckduckgo.brokensite.api.BrokenSite
 import com.duckduckgo.brokensite.api.BrokenSiteSender
 import com.duckduckgo.brokensite.api.ReportFlow
 import com.duckduckgo.browser.api.UserBrowserProperties
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.baseHost
 import com.duckduckgo.common.utils.plugins.PluginPoint

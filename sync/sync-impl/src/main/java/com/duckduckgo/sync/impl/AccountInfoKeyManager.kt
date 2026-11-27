@@ -29,8 +29,8 @@ import com.duckduckgo.sync.impl.pixels.toAccountInfoKeyCreateFailureReason
 import com.duckduckgo.sync.store.AccountInfoPublicKey
 import com.duckduckgo.sync.store.ScopedPassword
 import com.duckduckgo.sync.store.SyncStore
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
 import logcat.logcat
@@ -70,7 +70,7 @@ data class AccountInfoKeyResult(
 )
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealAccountInfoKeyManager @Inject constructor(
     private val syncStore: SyncStore,
     private val syncApi: SyncApi,

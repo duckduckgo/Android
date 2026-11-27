@@ -57,6 +57,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import coil3.compose.rememberAsyncImagePainter
 import com.airbnb.lottie.compose.LottieAnimation
@@ -103,6 +106,7 @@ import com.duckduckgo.common.ui.compose.text.DaxText
 import com.duckduckgo.common.ui.compose.theme.DuckDuckGoTheme
 import com.duckduckgo.common.ui.internal.R
 import com.duckduckgo.common.ui.internal.ui.setupThemedComposeView
+import com.duckduckgo.common.ui.isRebrandAreaEnabled
 import com.duckduckgo.common.ui.menu.PopupMenu
 import com.duckduckgo.common.ui.view.MessageCta
 import com.duckduckgo.common.ui.view.MessageCta.Message
@@ -340,6 +344,12 @@ sealed class ComponentViewHolder(val view: View) : RecyclerView.ViewHolder(view)
     ) : ComponentViewHolder(inflate(parent, R.layout.component_info_panel)) {
 
         init {
+            if (view.context.isRebrandAreaEnabled(CommonR.attr.daxRebrandInfoPanels)) {
+                view.findViewById<View>(R.id.info_panel_protections).isVisible = true
+                view.findViewById<View>(R.id.compose_label).updateLayoutParams<ConstraintLayout.LayoutParams> {
+                    topToBottom = R.id.info_panel_protections
+                }
+            }
             view.setupThemedComposeView(R.id.info_panel_tooltip_compose, isDarkTheme = isDarkTheme) {
                 DaxInfoPanel(
                     body = "This is a Tooltip Compose Info Panel, interesting information can be shown here",
@@ -1292,6 +1302,8 @@ private class ShowcaseSnackbar(
 
     fun trailingIcon() = show("Overflow menu clicked")
 
+    fun menuItem(text: String) = show("$text pressed")
+
     fun switch(checked: Boolean) = show("Switch checked: $checked")
 
     private fun show(message: String) = Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
@@ -1304,9 +1316,19 @@ private fun ComposeSectionHeader(snackbar: ShowcaseSnackbar) {
         DaxSectionHeader(title = "Section Header")
         DaxSectionHeader(
             title = "Section Header with Overflow Menu",
-            overflowMenuClickListener = { snackbar.trailingIcon() },
             overflowMenuContentDescription = "Overflow menu",
-        )
+        ) {
+            DaxDefaultItem(text = "Edit", onClick = { snackbar.menuItem("Edit") })
+            DaxDefaultItem(text = "Hide section", onClick = { snackbar.menuItem("Hide section") })
+            DaxDefaultItem(text = "Clear all", onClick = { snackbar.menuItem("Clear all") }, isDestructive = true)
+        }
+        DaxSectionHeader(
+            title = "Section Header with Disabled Overflow Menu",
+            overflowMenuEnabled = false,
+            overflowMenuContentDescription = "Overflow menu",
+        ) {
+            DaxDefaultItem(text = "Edit", onClick = {})
+        }
     }
 }
 

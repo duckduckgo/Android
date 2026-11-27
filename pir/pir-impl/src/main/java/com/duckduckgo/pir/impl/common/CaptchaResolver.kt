@@ -33,8 +33,8 @@ import com.duckduckgo.pir.impl.service.DbpService.CaptchaSolutionMeta
 import com.duckduckgo.pir.impl.service.DbpService.PirStartCaptchaSolutionBody
 import com.duckduckgo.pir.impl.service.ResponseError
 import com.duckduckgo.pir.impl.service.parseError
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.Moshi
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import retrofit2.HttpException

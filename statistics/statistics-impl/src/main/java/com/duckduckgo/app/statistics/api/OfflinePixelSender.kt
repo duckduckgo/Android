@@ -16,7 +16,6 @@
 
 package com.duckduckgo.app.statistics.api
 
-import com.duckduckgo.di.DaggerSet
 import io.reactivex.Completable
 import io.reactivex.Completable.*
 
@@ -25,7 +24,7 @@ import io.reactivex.Completable.*
  * sent. In those cases we schedule them to happen as part of our app data sync.
  */
 class OfflinePixelSender constructor(
-    private val offlinePixels: DaggerSet<OfflinePixel>,
+    private val offlinePixels: Set<OfflinePixel>,
 ) {
 
     fun sendOfflinePixels(): Completable {

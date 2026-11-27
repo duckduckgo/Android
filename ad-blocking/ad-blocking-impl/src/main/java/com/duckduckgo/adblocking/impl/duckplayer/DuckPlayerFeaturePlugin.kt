@@ -19,10 +19,10 @@ package com.duckduckgo.adblocking.impl.duckplayer
 import com.duckduckgo.adblocking.api.duckplayer.DuckPlayerFeatureName
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.privacy.config.api.PrivacyFeaturePlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckPlayerFeaturePlugin @Inject constructor(
     private val duckPlayerFeatureRepository: DuckPlayerFeatureRepository,
 ) : PrivacyFeaturePlugin {

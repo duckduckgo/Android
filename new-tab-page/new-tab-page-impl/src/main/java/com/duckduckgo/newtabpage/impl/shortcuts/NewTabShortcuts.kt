@@ -17,9 +17,9 @@
 package com.duckduckgo.newtabpage.impl.shortcuts
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.tabs.BrowserNav
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint

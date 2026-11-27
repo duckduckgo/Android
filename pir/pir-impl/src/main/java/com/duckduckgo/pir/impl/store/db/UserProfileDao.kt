@@ -30,6 +30,9 @@ interface UserProfileDao {
     @Query("SELECT * FROM pir_user_profile WHERE deprecated = 0")
     fun getValidUserProfiles(): List<UserProfile>
 
+    @Query("SELECT EXISTS(SELECT 1 FROM pir_user_profile WHERE deprecated = 0)")
+    fun hasValidUserProfiles(): Boolean
+
     @Query("SELECT * FROM pir_user_profile WHERE id = :id")
     fun getUserProfile(id: Long): UserProfile?
 

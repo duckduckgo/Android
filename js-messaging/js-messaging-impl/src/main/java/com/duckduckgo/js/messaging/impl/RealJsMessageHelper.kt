@@ -26,15 +26,15 @@ import com.duckduckgo.js.messaging.api.JsRequestResponse
 import com.duckduckgo.js.messaging.api.JsRequestResponse.Error
 import com.duckduckgo.js.messaging.api.JsRequestResponse.Success
 import com.duckduckgo.js.messaging.api.SubscriptionEvent
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealJsMessageHelper @Inject constructor(
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,

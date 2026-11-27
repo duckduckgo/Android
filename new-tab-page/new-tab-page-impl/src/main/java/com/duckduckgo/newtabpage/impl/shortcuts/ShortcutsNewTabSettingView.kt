@@ -24,20 +24,20 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
-import com.duckduckgo.anvil.annotations.PriorityKey
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.PriorityKey
 import com.duckduckgo.common.ui.viewbinding.viewBinding
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.ViewViewModelFactory
+import com.duckduckgo.di.android.support.AndroidSupportInjection
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.newtabpage.api.NewTabPageSection
 import com.duckduckgo.newtabpage.api.NewTabPageSectionSettingsPlugin
 import com.duckduckgo.newtabpage.impl.databinding.ViewNewTabShortcutsSettingItemBinding
 import com.duckduckgo.newtabpage.impl.shortcuts.ShortcutsNewTabSettingsViewModel.ViewState
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.android.support.AndroidSupportInjection
+import dev.zacsweers.metro.ContributesIntoMap
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -87,7 +87,7 @@ class ShortcutsNewTabSettingView @JvmOverloads constructor(
     }
 }
 
-@ContributesMultibinding(scope = ActivityScope::class)
+@ContributesIntoMap(scope = ActivityScope::class)
 @PriorityKey(NewTabPageSectionSettingsPlugin.SHORTCUTS)
 class ShortcutsNewTabSettingViewPlugin @Inject constructor() : NewTabPageSectionSettingsPlugin {
     override val name = NewTabPageSection.SHORTCUTS.name

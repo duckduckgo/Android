@@ -22,4 +22,9 @@ package com.duckduckgo.sync.api.setup
 interface SyncUrlIdentifier {
 
     fun shouldDelegateToSyncSetup(intentText: String?): Boolean
+
+    /**
+     * Returns true when [url] should open Sync pairing instead of loading as a page.
+     */
+    fun shouldOpenSyncPairing(url: String): Boolean
 }

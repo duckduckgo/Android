@@ -21,12 +21,12 @@ import com.duckduckgo.verifiedinstallation.apppackage.VerificationCheckAppPackag
 import com.duckduckgo.verifiedinstallation.buildtype.VerificationCheckBuildType
 import com.duckduckgo.verifiedinstallation.certificate.VerificationCheckBuildCertificate
 import com.duckduckgo.verifiedinstallation.installsource.VerificationCheckPlayStoreInstall
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class IsVerifiedPlayStoreInstallImpl @Inject constructor(
     private val packageChecker: VerificationCheckAppPackage,
     private val buildTypeChecker: VerificationCheckBuildType,

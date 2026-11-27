@@ -16,7 +16,6 @@
 
 package com.duckduckgo.duckchat.impl.contextual
 
-import android.content.res.Resources
 import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
@@ -28,12 +27,11 @@ import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputStatePublisher
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterView
+import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputLayout
 import com.duckduckgo.duckchat.impl.ui.nativeinput.views.NativeInputModeWidget
 import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
 import com.duckduckgo.voice.api.VoiceSearchAvailability
-import com.google.android.material.card.MaterialCardView
-import com.google.android.material.shape.ShapeAppearanceModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,12 +39,14 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.eq
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
@@ -71,13 +71,42 @@ class RealContextualNativeInputManagerTest {
     private val voiceSearchAvailability: VoiceSearchAvailability = mock {
         whenever(it.observeVoiceSearchAvailability()).thenReturn(voiceSearchAvailable)
     }
-    private val testee = RealContextualNativeInputManager(duckChatInternal, publisher, duckAiFeatureState, voiceSearchAvailability)
+    private val testee =
+        RealContextualNativeInputManager(duckChatInternal, publisher, duckAiFeatureState, voiceSearchAvailability)
 
     @Test
     fun `when onContextualClosed called with blank tabId then publisher is not touched`() {
         testee.onContextualClosed("")
 
         verify(publisher, never()).update(any(), any())
+    }
+
+    @Test
+    fun `when sheet opens then the tab new chat pick is dropped and stays dropped after close`() {
+        val store = FakeStatePublisher()
+        val manager = RealContextualNativeInputManager(duckChatInternal, store, duckAiFeatureState, voiceSearchAvailability)
+        store.update("tab") { it.copy(newChatModelId = "omnibar-model", newChatReasoningMode = "reasoning") }
+
+        manager.onContextualReopened("tab")
+        assertNull(store.state("tab").newChatModelId)
+        assertNull(store.state("tab").newChatReasoningMode)
+
+        manager.onContextualClosed("tab")
+        assertNull(store.state("tab").newChatModelId)
+        assertNull(store.state("tab").newChatReasoningMode)
+    }
+
+    @Test
+    fun `when sheet closes then its unsent new chat pick does not reach the omnibar`() {
+        val store = FakeStatePublisher()
+        val manager = RealContextualNativeInputManager(duckChatInternal, store, duckAiFeatureState, voiceSearchAvailability)
+        manager.onContextualReopened("tab")
+        store.update("tab") { it.copy(newChatModelId = "sheet-model", newChatReasoningMode = "reasoning") }
+
+        manager.onContextualClosed("tab")
+
+        assertNull(store.state("tab").newChatModelId)
+        assertNull(store.state("tab").newChatReasoningMode)
     }
 
     @Test
@@ -127,8 +156,7 @@ class RealContextualNativeInputManagerTest {
         val pickerFlowCaptor = argumentCaptor<Flow<Boolean>>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -151,6 +179,29 @@ class RealContextualNativeInputManagerTest {
     }
 
     @Test
+    fun `when the sheet switches between entry input and running chat then the widget is told which`() {
+        whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(MutableStateFlow(true))
+        whenever(duckChatInternal.isContextualNativeInputEnabled()).thenReturn(true)
+        val widget = mock<NativeInputModeWidget>()
+        testee.init(
+            tabId = "tab",
+            inputLayout = mockCard().withWidget(widget),
+            jsMessaging = mock<JsMessaging>(),
+            lifecycleOwner = lifecycleOwner(),
+            chatIdFlow = emptyFlow(),
+            onSearchSubmitted = {},
+        )
+
+        testee.onInputMode()
+        testee.onWebViewMode()
+
+        inOrder(widget) {
+            verify(widget).setContextualEntry(true)
+            verify(widget).setContextualEntry(false)
+        }
+    }
+
+    @Test
     fun `when native chat input flips off in web view mode then card is hidden`() {
         val enabled = MutableStateFlow(true)
         whenever(duckChatInternal.observeNativeChatInputEnabled()).thenReturn(enabled)
@@ -158,8 +209,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = card,
-            widget = widget,
+            inputLayout = card.withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -179,8 +229,7 @@ class RealContextualNativeInputManagerTest {
         val visibilityChanges = mutableListOf<Boolean>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = mock<NativeInputModeWidget>(),
+            inputLayout = mockCard().withWidget(mock<NativeInputModeWidget>()),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -206,8 +255,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = card,
-            widget = widget,
+            inputLayout = card.withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -230,8 +278,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = card,
-            widget = widget,
+            inputLayout = card.withWidget(widget),
             footer = footer,
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
@@ -256,8 +303,7 @@ class RealContextualNativeInputManagerTest {
         var submitted: NativeInputPrompt? = null
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -286,8 +332,7 @@ class RealContextualNativeInputManagerTest {
         var submitted: NativeInputPrompt? = null
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = jsMessaging,
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -316,8 +361,7 @@ class RealContextualNativeInputManagerTest {
         var submitted: NativeInputPrompt? = null
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = jsMessaging,
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -343,8 +387,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -362,8 +405,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -381,8 +423,7 @@ class RealContextualNativeInputManagerTest {
         var voiceChatRequested = false
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -406,8 +447,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -426,8 +466,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -446,8 +485,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -466,8 +504,7 @@ class RealContextualNativeInputManagerTest {
         val widget = mock<NativeInputModeWidget>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -489,8 +526,7 @@ class RealContextualNativeInputManagerTest {
         var voiceSearchRequested = false
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -513,8 +549,7 @@ class RealContextualNativeInputManagerTest {
         val jsMessaging = mock<JsMessaging>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = jsMessaging,
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -542,8 +577,7 @@ class RealContextualNativeInputManagerTest {
         val focusChanges = mutableListOf<Boolean>()
         testee.init(
             tabId = "tab",
-            card = mockCard(),
-            widget = widget,
+            inputLayout = mockCard().withWidget(widget),
             jsMessaging = mock<JsMessaging>(),
             lifecycleOwner = lifecycleOwner(),
             chatIdFlow = emptyFlow(),
@@ -559,13 +593,10 @@ class RealContextualNativeInputManagerTest {
         assertEquals(listOf(true, false), focusChanges)
     }
 
-    private fun mockCard(): MaterialCardView {
-        val card = mock<MaterialCardView>()
-        val resources = mock<Resources>()
-        whenever(card.resources).thenReturn(resources)
-        whenever(resources.getDimension(any())).thenReturn(16f)
-        whenever(card.shapeAppearanceModel).thenReturn(ShapeAppearanceModel())
-        return card
+    private fun mockCard(): NativeInputLayout = mock()
+
+    private fun NativeInputLayout.withWidget(widget: NativeInputModeWidget): NativeInputLayout = apply {
+        whenever(this.widget).thenReturn(widget)
     }
 
     private fun lifecycleOwner(): LifecycleOwner {
@@ -576,5 +607,25 @@ class RealContextualNativeInputManagerTest {
         // createUnsafe bypasses the main-thread assertion so the registry can be driven from the test thread.
         owner.registry = LifecycleRegistry.createUnsafe(owner).apply { currentState = Lifecycle.State.RESUMED }
         return owner
+    }
+
+    private class FakeStatePublisher : NativeInputStatePublisher {
+        private val states = mutableMapOf<String, NativeInputState>()
+
+        fun state(tabId: String): NativeInputState = states[tabId] ?: NativeInputState.zero()
+
+        override fun publish(tabId: String, state: NativeInputState) {
+            states[tabId] = state
+        }
+
+        override fun update(tabId: String, transform: (NativeInputState) -> NativeInputState) {
+            states[tabId] = transform(state(tabId))
+        }
+
+        override fun clearTab(tabId: String) {
+            states.remove(tabId)
+        }
+
+        override fun clearAll() = states.clear()
     }
 }

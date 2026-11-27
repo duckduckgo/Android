@@ -26,7 +26,7 @@ import io.reactivex.Completable
  *
  * Example:
  * <pre><code>
- * @ContributesMultibinding(AppScope::class)
+ * @ContributesIntoSet(AppScope::class)
  * class MyOfflinePixelSender @Inject constructor(...) {
  *   override fun send(): Completable {
  *     return defer {

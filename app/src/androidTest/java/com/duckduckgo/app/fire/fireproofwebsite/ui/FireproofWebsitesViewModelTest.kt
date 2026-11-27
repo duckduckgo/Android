@@ -34,7 +34,6 @@ import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.InstantSchedulersRule
-import dagger.Lazy
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.*
@@ -83,7 +82,7 @@ class FireproofWebsitesViewModelTest {
 
     private val mockUserEventsStore: UserEventsStore = mock()
 
-    private val lazyFaviconManager = Lazy { mockFaviconManager }
+    private val lazyFaviconManager = lazy { mockFaviconManager }
 
     @Before
     fun before() {

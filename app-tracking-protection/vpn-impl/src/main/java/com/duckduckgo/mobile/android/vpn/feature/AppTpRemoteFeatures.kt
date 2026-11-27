@@ -19,8 +19,8 @@ package com.duckduckgo.mobile.android.vpn.feature
 import android.content.SharedPreferences
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener
 import androidx.core.content.edit
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
 import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.common.utils.DefaultDispatcherProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
@@ -36,12 +36,12 @@ import com.duckduckgo.feature.toggles.api.Toggle.DefaultValue
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.feature.toggles.api.Toggle.State.CohortName
 import com.duckduckgo.mobile.android.vpn.feature.settings.ExceptionListsSettingStore
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -63,6 +63,17 @@ interface AppTpRemoteFeatures {
 
     @DefaultValue(DefaultFeatureValue.TRUE)
     fun setSearchDomains(): Toggle // kill switch
+
+    // Restart the VPN by swapping the tunnel under the running service instead of tearing the network stack down
+    @DefaultValue(DefaultFeatureValue.INTERNAL)
+    fun restartInPlace(): Toggle
+
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun restartWideEvent(): Toggle
+
+    // Keeps excluded apps out of the null-route tunnel a restart puts up, so Android doesn't close their connections
+    @DefaultValue(DefaultFeatureValue.TRUE)
+    fun keepExclusionsInNullTunnel(): Toggle // kill switch
 
     @DefaultValue(DefaultFeatureValue.FALSE)
     fun atpTdsExperiment001(): Toggle
@@ -225,7 +236,7 @@ interface AppTpRemoteFeatures {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @RemoteFeatureStoreNamed(AppTpRemoteFeatures::class)
 class AppTpRemoteFeaturesStore @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
@@ -302,7 +313,7 @@ class AppTpRemoteFeaturesStore @Inject constructor(
     }
 }
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AppTpTDSPixelsPlugin @Inject constructor(private val inventory: FeatureTogglesInventory) : MetricsPixelPlugin {
     private val dispatchers: DispatcherProvider = DefaultDispatcherProvider()
 

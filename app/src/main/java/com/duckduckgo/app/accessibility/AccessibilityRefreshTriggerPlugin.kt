@@ -19,7 +19,7 @@ package com.duckduckgo.app.accessibility
 import com.duckduckgo.app.accessibility.data.AccessibilitySettingsDataStore
 import com.duckduckgo.browser.api.BrowserRefreshTriggerPlugin
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
@@ -31,7 +31,7 @@ import javax.inject.Inject
  * subscription and a distinct value on each change, so dropping the first emission leaves only the
  * changes that require a reflow.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class AccessibilityRefreshTriggerPlugin @Inject constructor(
     private val accessibilitySettings: AccessibilitySettingsDataStore,
 ) : BrowserRefreshTriggerPlugin {

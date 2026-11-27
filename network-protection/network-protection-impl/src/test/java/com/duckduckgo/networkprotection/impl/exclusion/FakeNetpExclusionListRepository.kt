@@ -26,4 +26,8 @@ class FakeNetpExclusionListRepository : NetPExclusionListRepository {
     override suspend fun getExcludedAppPackages(): List<String> {
         return _excludedPackages.toList()
     }
+
+    override suspend fun isExcluded(packageName: String): Boolean {
+        return _excludedPackages.contains(packageName)
+    }
 }

@@ -16,7 +16,7 @@
 
 plugins {
     id 'com.android.library'
-    id 'com.squareup.anvil'
+    id 'dev.zacsweers.metro'
     id 'com.google.devtools.ksp'
 }
 
@@ -24,9 +24,6 @@ apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 android {
     namespace 'com.duckduckgo.browsermode.impl'
-    anvil {
-        generateDaggerFactories = true
-    }
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -35,25 +32,23 @@ android {
 }
 
 dependencies {
-    ksp project(':anvil-ksp')
-    implementation project(path: ':anvil-annotations')
-
     implementation project(path: ':browser-api')
     implementation project(path: ':browser-mode-api')
+    implementation project(path: ':codegen-annotations')
     implementation project(path: ':common-utils')
     implementation project(path: ':di')
-
-    implementation Google.dagger
-    implementation KotlinX.coroutines.core
-    implementation AndroidX.webkit
-    implementation AndroidX.lifecycle.common
-    implementation AndroidX.dataStore.preferences
     implementation "com.squareup.logcat:logcat:_"
+    implementation AndroidX.dataStore.preferences
+    implementation AndroidX.lifecycle.common
+    implementation AndroidX.webkit
+    implementation KotlinX.coroutines.core
 
-    testImplementation Testing.junit4
-    testImplementation KotlinX.coroutines.test
-    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
-    testImplementation Testing.robolectric
-    testImplementation AndroidX.test.ext.junit
     testImplementation project(':common-test')
+    testImplementation "org.mockito.kotlin:mockito-kotlin:_"
+    testImplementation AndroidX.test.ext.junit
+    testImplementation KotlinX.coroutines.test
+    testImplementation Testing.junit4
+    testImplementation Testing.robolectric
+
+    ksp project(':codegen-ksp')
 }

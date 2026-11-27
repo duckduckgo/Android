@@ -20,7 +20,7 @@ import android.content.Context
 import com.duckduckgo.common.utils.R
 import com.duckduckgo.common.utils.formatters.time.model.TimePassed
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.LocalDateTime

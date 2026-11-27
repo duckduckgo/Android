@@ -1,0 +1,531 @@
+{
+  "name": "Kids Live Safe",
+  "url": "kidslivesafe.com",
+  "version": "0.4.0",
+  "addedDatetime": 1791417600000,
+  "optOutUrl": "https://www.kidslivesafe.com/help-center/privacy-requests",
+  "steps": [
+    {
+      "stepType": "scan",
+      "scanType": "templatedUrl",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.kidslivesafe.com/help-center/privacy-requests",
+          "id": "fe5dfc9e-5826-45aa-9706-9c3073a15091"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-7d3c9888-bd67-47a8-be81-b7ce8a7c0cac"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "7436e2ae-bb02-4e73-971b-234fe6a041a4"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "_comment": "This input doesn't follow the same id pattern as the rest",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "4b762f07-0997-4d5b-86d6-522cac4f0a76"
+        },
+        {
+          "_comment": "Turnstile auto-completes on every help-center form. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-86eb679a-d79b-4609-89c7-4216fade5b32"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "acbbf7de-7a4a-4109-8459-e864f25644e5"
+        },
+        {
+          "_comment": "After Continue, the email verification page loads.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "22ba3c59-7727-4562-bbdc-2f905183eed9"
+        },
+        {
+          "_comment": "Generate a disposable email address before filling the email field",
+          "actionType": "generateEmail",
+          "id": "9be27b01-e537-4e9d-96a9-67a0551f8e3f"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "7802bc9c-dd8f-4a4a-aa5f-a0bfcf565ecb"
+        },
+        {
+          "_comment": "Turnstile auto-completes on every help-center form. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-49c680c8-a4ea-4adb-ba89-61a6c14588e9"
+        },
+        {
+          "_comment": "Submit the email",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "9216d67f-c6c1-43bd-a513-74a8e7e61ef9"
+        },
+        {
+          "_comment": "Kids Live Safe sends a verification code to the generated email. Poll the backend until it arrives.",
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "3c3501c1-1f37-4df6-ab88-f349c3323a7e"
+        },
+        {
+          "_comment": "Wait for the verification code page to load",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "bb2d7402-322b-4676-9d10-f2986730b37c"
+        },
+        {
+          "_comment": "Fill the verification code from the email",
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "8792f4d1-7843-42b9-ba1e-38ddf143176d"
+        },
+        {
+          "_comment": "Turnstile auto-completes on every help-center form. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-633b5741-2894-4678-a8b6-6000c887c927"
+        },
+        {
+          "_comment": "Submit the verification code",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "86f650c3-86e1-4790-b000-d0aa302ea8a8"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "a Cloudflare challenge is shown after the code is submitted, before the results page",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-94419952-dc05-44cc-82fd-d3fad20ba4ee"
+        },
+        {
+          "_comment": "Wait for the results page to load",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".section__head h1"
+            },
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "78b868d9-af25-4e71-8c88-fdd1df04ad1a"
+        },
+        {
+          "actionType": "extract",
+          "selector": ".result-item",
+          "noResultsSelector": "//h1[contains(., 'Sorry, we were unable to find any results')]",
+          "profile": {
+            "name": {
+              "selector": "h2"
+            },
+            "age": {
+              "selector": ".//p[contains(., 'Age')]",
+              "afterText": "Age: "
+            },
+            "addressCityStateList": {
+              "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "relativesList": {
+              "selector": ".//p[contains(., 'Relatives')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+              "findElements": true
+            },
+            "profileUrl": {
+              "identifierType": "hash"
+            }
+          },
+          "id": "2e455ef0-de6d-4ea2-8991-f1ea4eff847f"
+        }
+      ]
+    },
+    {
+      "stepType": "optOut",
+      "optOutType": "formOptOut",
+      "actions": [
+        {
+          "actionType": "navigate",
+          "url": "https://www.kidslivesafe.com/help-center/privacy-requests",
+          "id": "f39eda42-500c-4cfa-bcba-fc80ab6d7c72"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "wait for cloudflare check to pass - we are using a negative xpath selector to ensure the challenge is not being displayed",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-cf16043b-e44c-40e6-b9d8-8e57ad6a882e"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".main"
+            }
+          ],
+          "id": "847d152a-edc1-4340-a400-038cbaed4310"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "userProfile",
+          "elements": [
+            {
+              "type": "firstName",
+              "selector": "#firstName"
+            },
+            {
+              "type": "lastName",
+              "selector": ".//input[@placeholder='Last Name']"
+            },
+            {
+              "type": "city",
+              "selector": "#city"
+            },
+            {
+              "type": "fullState",
+              "selector": "#states"
+            },
+            {
+              "type": "$generated_zip_code$",
+              "selector": "#zip"
+            },
+            {
+              "type": "age",
+              "selector": "#age"
+            }
+          ],
+          "id": "adc8ab22-cde5-4cd7-acff-1401b9aa486b"
+        },
+        {
+          "_comment": "Turnstile auto-completes on every help-center form. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-70bbdd42-1ae0-46c3-9a5d-4b48739dbc33"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".//button[@type='submit']"
+            }
+          ],
+          "id": "fae30c36-e7d1-4b1e-92d9-759a23f507b3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "03e3eea7-b428-4942-aa35-631bc19c90e8"
+        },
+        {
+          "actionType": "generateEmail",
+          "id": "8f5e8332-6f39-476b-b4cb-33679349c9ec"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "fetchedEmail",
+          "elements": [
+            {
+              "type": "email",
+              "selector": "#email-address"
+            }
+          ],
+          "id": "2c57b4d6-47ab-4fce-9ce0-169f60856ce9"
+        },
+        {
+          "_comment": "Turnstile auto-completes on every help-center form. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-ec03f3de-71ea-46ad-bddf-7acdbbe86b24"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "8d92a405-9c7b-448e-a198-bee7ec642a65"
+        },
+        {
+          "actionType": "getEmailData",
+          "pollingTime": 3,
+          "extract": ["verificationCode"],
+          "id": "c239fff5-84d8-4d18-80cf-61ed96196fc4"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "f7908888-55c4-4c8e-be2a-7046cc465ee6"
+        },
+        {
+          "actionType": "fillForm",
+          "selector": ".form-contact-help form",
+          "dataSource": "emailData",
+          "elements": [
+            {
+              "type": "verificationCode",
+              "selector": "#unique-code"
+            }
+          ],
+          "id": "5bf97260-019d-442d-95cd-96a5c8a0f547"
+        },
+        {
+          "_comment": "Turnstile auto-completes on every help-center form. Wait for the hidden token before submitting.",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//input[@name='cf-turnstile-response' and @value and @value != '']"
+            }
+          ],
+          "id": "cft-16dae4b6-65b1-42af-b208-9bdf4cfa6be4"
+        },
+        {
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": "#continue-button"
+            }
+          ],
+          "id": "ddc4ac67-e7a1-4ea0-8940-1851eddb00db"
+        },
+        {
+          "actionType": "expectation",
+          "_comment": "a Cloudflare challenge is shown after the code is submitted, before the results page",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": "//body[not(.//script[contains(@src, '/cdn-cgi/challenge-platform/')]) and not(.//script[contains(., '_cf_chl_opt')])]"
+            }
+          ],
+          "id": "cfc-e75f1f8f-938f-443d-9db4-18fd1e989a1a"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".section__head h1"
+            },
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Select Data for Removal"
+            }
+          ],
+          "id": "a6d72598-b177-4e27-b24e-12bc53d6ef25"
+        },
+        {
+          "_comment": "Click Remove on the matched profile using profileMatch",
+          "actionType": "click",
+          "elements": [
+            {
+              "type": "button",
+              "selector": ".btn",
+              "parent": {
+                "profileMatch": {
+                  "selector": ".result-item",
+                  "profile": {
+                    "name": {
+                      "selector": "h2"
+                    },
+                    "age": {
+                      "selector": ".//p[contains(., 'Age')]",
+                      "afterText": "Age: "
+                    },
+                    "addressCityStateList": {
+                      "selector": ".//p[contains(., 'Location')]//following-sibling::ul[contains(@class, 'result-list')]//li",
+                      "findElements": true
+                    }
+                  }
+                }
+              }
+            }
+          ],
+          "id": "e01fe126-0ab7-483b-b2c1-7dadbaae8ba3"
+        },
+        {
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".section__head h1"
+            },
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Request Submitted"
+            }
+          ],
+          "id": "1b8e627d-8d85-4f57-94b4-5e967f38be84"
+        },
+        {
+          "_comment": "Kids Live Safe sends a confirmation link. Decoupled: native releases the webview and picks up the link later.",
+          "actionType": "emailConfirmation",
+          "pollingTime": 30,
+          "id": "4332c170-eb30-492a-80cb-32c4c20e33fd"
+        },
+        {
+          "_comment": "After clicking the confirmation link, verify the success page",
+          "actionType": "expectation",
+          "expectations": [
+            {
+              "type": "element",
+              "selector": ".section__head h1"
+            },
+            {
+              "type": "text",
+              "selector": ".section__head h1",
+              "expect": "Verification Complete"
+            }
+          ],
+          "id": "ef18de9e-c01b-4b66-aa85-d5a85b633c53"
+        }
+      ]
+    }
+  ],
+  "schedulingConfig": {
+    "retryError": 48,
+    "confirmOptOutScan": 72,
+    "maintenanceScan": 120,
+    "maxAttempts": -1
+  },
+  "removedAt": null
+}

@@ -24,8 +24,8 @@ import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.promptscoordinator.impl.di.ModalEvaluatorCompletion
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -60,7 +60,7 @@ interface ModalEvaluatorCompletionStore {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class ModalEvaluatorCompletionStoreImpl @Inject constructor(
     @ModalEvaluatorCompletion private val store: DataStore<Preferences>,
     private val dispatchers: DispatcherProvider,

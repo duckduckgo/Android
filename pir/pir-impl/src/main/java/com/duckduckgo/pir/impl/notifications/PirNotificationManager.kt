@@ -33,7 +33,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.dashboard.PirDashboardWebViewActivity
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface PirNotificationManager {
@@ -51,6 +51,12 @@ interface PirNotificationManager {
     fun showScanCompleteNotification(runMode: PirRunMode): Boolean
 
     fun cancelNotifications()
+
+    /** Whether POST_NOTIFICATIONS is granted. Always true below Android 13, where it is not a runtime permission. */
+    fun hasNotificationPermission(): Boolean
+
+    /** Whether PIR notifications reach the user: the runtime permission, the app's notification switch and the PIR channel all allow them. */
+    fun canShowNotifications(): Boolean
 }
 
 @ContributesBinding(AppScope::class)
@@ -82,10 +88,7 @@ class RealPirNotificationManager @Inject constructor(
         notificationManagerCompat.checkPermissionAndNotify(
             context,
             PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE,
-            createScanStatusNotification(
-                title = title,
-                message = message,
-            ),
+            buildNotification(title = title, message = message, contentIntent = dashboardPendingIntent()),
         )
     }
 
@@ -93,11 +96,12 @@ class RealPirNotificationManager @Inject constructor(
         title: String,
         message: String,
     ): Notification {
-        return buildNotification(title = title, message = message, contentIntent = dashboardPendingIntent())
+        // the foreground service re-posts this under the same id once the run mode is known, which would otherwise alert twice
+        return buildNotification(title = title, message = message, contentIntent = dashboardPendingIntent(), onlyAlertOnce = true)
     }
 
     override fun showScanCompleteNotification(runMode: PirRunMode): Boolean = runCatching {
-        val hasPermission = VERSION.SDK_INT < 33 || ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
+        val hasPermission = hasNotificationPermission()
         if (hasPermission) {
             // the scan can finish in a :pir process that never ran the dashboard, which is where the channel is otherwise created
             createNotificationChannel()
@@ -112,6 +116,17 @@ class RealPirNotificationManager @Inject constructor(
 
     override fun cancelNotifications() {
         notificationManagerCompat.cancel(PIR_FOREGROUND_SERVICE_NOTIFICATION_ID_STATUS_COMPLETE)
+    }
+
+    override fun hasNotificationPermission(): Boolean =
+        VERSION.SDK_INT < 33 || ActivityCompat.checkSelfPermission(context, POST_NOTIFICATIONS) == PERMISSION_GRANTED
+
+    override fun canShowNotifications(): Boolean {
+        // a channel that doesn't exist yet is created at default importance on first use
+        val channelImportance = notificationManagerCompat.getNotificationChannelCompat(PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)?.importance
+        return hasNotificationPermission() &&
+            notificationManagerCompat.areNotificationsEnabled() &&
+            channelImportance != NotificationManagerCompat.IMPORTANCE_NONE
     }
 
     private fun createScanCompleteNotification(runMode: PirRunMode): Notification = when (runMode) {
@@ -145,7 +160,7 @@ class RealPirNotificationManager @Inject constructor(
         )
 
         return buildNotification(
-            title = context.getString(R.string.pirFreemiumNotificationTitleComplete),
+            title = context.getString(R.string.pirFreemiumNotificationTitle),
             message = context.getString(R.string.pirFreemiumNotificationMessageComplete),
             contentIntent = pendingIntent,
             autoCancel = true,
@@ -157,6 +172,7 @@ class RealPirNotificationManager @Inject constructor(
         message: String,
         contentIntent: PendingIntent,
         autoCancel: Boolean = false,
+        onlyAlertOnce: Boolean = false,
     ): Notification {
         return NotificationCompat.Builder(context, PIR_FOREGROUND_SERVICE_NOTIFICATION_CHANNEL_ID)
             .setContentTitle(title)
@@ -164,6 +180,7 @@ class RealPirNotificationManager @Inject constructor(
             .setSmallIcon(com.duckduckgo.mobile.android.R.drawable.notification_logo)
             .setContentIntent(contentIntent)
             .setAutoCancel(autoCancel)
+            .setOnlyAlertOnce(onlyAlertOnce)
             .setStyle(NotificationCompat.BigTextStyle().bigText(message))
             .build()
     }

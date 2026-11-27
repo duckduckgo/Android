@@ -18,8 +18,8 @@ package com.duckduckgo.app.global.job
 
 import android.content.Context
 import androidx.work.*
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.job.ConfigurationDownloader
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.di.scopes.AppScope
 import io.reactivex.Single
 import logcat.LogPriority.INFO

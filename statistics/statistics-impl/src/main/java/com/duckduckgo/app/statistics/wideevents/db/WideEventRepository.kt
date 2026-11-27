@@ -37,10 +37,31 @@ interface WideEventRepository {
         metadata: Map<String, String?>,
     )
 
+    /**
+     * Appends [step] to the event's path, unless it equals the last appended step. A path past [MAX_PATH_SIZE] entries
+     * keeps its first entries and ends with [PATH_TRUNCATED]. [metadata] is merged either way.
+     *
+     * @throws IllegalArgumentException if [step] is empty, contains a comma or equals [PATH_TRUNCATED].
+     */
+    suspend fun appendToWideEventPath(
+        eventId: Long,
+        step: String,
+        metadata: Map<String, String?>,
+    )
+
     suspend fun setWideEventStatus(
         eventId: Long,
         status: WideEventStatus,
         metadata: Map<String, String?>,
+    )
+
+    /**
+     * Closes the event with the status returned by [decide], evaluated against the event's current state inside the same transaction.
+     * Does nothing when the event is missing, already completed, or [decide] returns null.
+     */
+    suspend fun cleanUpWideEvent(
+        eventId: Long,
+        decide: (WideEvent) -> CleanupDecision?,
     )
 
     suspend fun deleteWideEvent(eventId: Long): Boolean
@@ -60,6 +81,7 @@ interface WideEventRepository {
         name: String,
         timeout: Duration?,
         buckets: List<Duration>?,
+        rounding: BucketRounding,
     )
 
     suspend fun endInterval(
@@ -82,6 +104,16 @@ interface WideEventRepository {
         val metaVersion: String,
         val isFirstDailyOccurrence: Boolean = false,
         val appVersion: String,
+        val path: WideEventPath? = null,
+    )
+
+    /**
+     * @param steps Steps in the order they were appended, at most [MAX_PATH_SIZE] entries.
+     * @param lastStep The latest appended step, kept when [steps] ends with [PATH_TRUNCATED].
+     */
+    data class WideEventPath(
+        val steps: List<String>,
+        val lastStep: String,
     )
 
     data class WideEventStep(
@@ -101,6 +133,7 @@ interface WideEventRepository {
         abstract val metadata: Map<String, String>
 
         data class OnProcessStart(
+            val ownerProcessName: String,
             val ignoreIfIntervalTimeoutPresent: Boolean,
             override val status: WideEventStatus,
             override val metadata: Map<String, String> = emptyMap(),
@@ -118,5 +151,21 @@ interface WideEventRepository {
         val startedAt: Instant,
         val timeout: Duration?,
         val buckets: List<Duration>?,
+        val rounding: BucketRounding,
     )
+
+    enum class BucketRounding {
+        ROUND_DOWN,
+        ROUND_UP,
+    }
+
+    data class CleanupDecision(
+        val status: WideEventStatus,
+        val metadata: Map<String, String>,
+    )
+
+    companion object {
+        const val MAX_PATH_SIZE = 20
+        const val PATH_TRUNCATED = "truncated"
+    }
 }

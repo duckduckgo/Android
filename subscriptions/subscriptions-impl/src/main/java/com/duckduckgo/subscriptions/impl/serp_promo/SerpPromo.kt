@@ -25,12 +25,12 @@ import com.duckduckgo.cookies.api.setCookieForAllModes
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.subscriptions.api.Subscriptions
 import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
-import com.squareup.anvil.annotations.ContributesBinding
-import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Lazy
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import logcat.logcat
@@ -46,11 +46,11 @@ private const val SERP_PPRO_PROMO_COOKIE_NAME = "privacy_pro_access_token"
 
 @ContributesBinding(
     scope = AppScope::class,
-    boundType = SerpPromo::class,
+    binding = binding<SerpPromo>(),
 )
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class RealSerpPromo @Inject constructor(
     @InternalApi private val cookieManager: CookieManagerWrapper,
@@ -60,7 +60,7 @@ class RealSerpPromo @Inject constructor(
 ) : SerpPromo, MainProcessLifecycleObserver {
 
     override suspend fun injectCookie(cookieValue: String?) {
-        if (!subscriptionsFeature.get().serpPromoCookie().isEnabled()) return
+        if (!subscriptionsFeature.value.serpPromoCookie().isEnabled()) return
 
         withContext(dispatcherProvider.io()) {
             synchronized(cookieManager) {
@@ -74,9 +74,9 @@ class RealSerpPromo @Inject constructor(
 
     override fun onStart(owner: LifecycleOwner) {
         owner.lifecycleScope.launch(dispatcherProvider.io()) {
-            if (subscriptionsFeature.get().serpPromoCookie().isEnabled()) {
+            if (subscriptionsFeature.value.serpPromoCookie().isEnabled()) {
                 kotlin.runCatching {
-                    val accessToken = subscriptions.get().getAccessToken() ?: ""
+                    val accessToken = subscriptions.value.getAccessToken() ?: ""
                     injectCookie(accessToken)
                 }
             }
@@ -97,7 +97,7 @@ interface CookieManagerWrapper {
 @Qualifier
 private annotation class InternalApi
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object CookieManagerWrapperModule {
     @Provides

@@ -29,12 +29,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import logcat.logcat
-import javax.inject.Provider
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class VpnDatabaseCallback(
     private val context: Context,
-    private val vpnDatabase: Provider<VpnDatabase>,
+    private val vpnDatabase: () -> VpnDatabase,
     private val dispatcherProvider: DispatcherProvider,
     private val coroutineScope: CoroutineScope,
     private val mutex: Mutex,
@@ -44,7 +43,7 @@ internal class VpnDatabaseCallback(
         super.onCreate(db)
         coroutineScope.launch(dispatcherProvider.io()) {
             mutex.withLock {
-                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
+                if (vpnDatabase().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
                     logcat { "VPN-db onCreate: pre-populating db" }
                     // only pre-populate when there's no blocklist
                     prepopulateAppTrackerBlockingList()
@@ -60,7 +59,7 @@ internal class VpnDatabaseCallback(
     override fun onDestructiveMigration(db: SupportSQLiteDatabase) {
         coroutineScope.launch(dispatcherProvider.io()) {
             mutex.withLock {
-                if (vpnDatabase.get().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
+                if (vpnDatabase().vpnAppTrackerBlockingDao().getTrackerBlocklistMetadata()?.eTag == null) {
                     logcat { "VPN-db onDestructiveMigration: pre-populating db" }
                     // only pre-populate when there's no blocklist
                     prepopulateAppTrackerBlockingList()
@@ -76,7 +75,7 @@ internal class VpnDatabaseCallback(
             .use { it.readText() }
             .also {
                 val blocklist = getFullAppTrackerBlockingList(it)
-                with(vpnDatabase.get().vpnAppTrackerBlockingDao()) {
+                with(vpnDatabase().vpnAppTrackerBlockingDao()) {
                     insertTrackerBlocklist(blocklist.trackers)
                     insertAppPackages(blocklist.packages)
                     insertTrackerEntities(blocklist.entities)
@@ -89,7 +88,7 @@ internal class VpnDatabaseCallback(
             .use { it.readText() }
             .also {
                 val excludedAppPackages = parseAppTrackerExclusionList(it)
-                vpnDatabase.get().vpnAppTrackerBlockingDao().insertExclusionList(excludedAppPackages)
+                vpnDatabase().vpnAppTrackerBlockingDao().insertExclusionList(excludedAppPackages)
             }
     }
 
@@ -98,7 +97,7 @@ internal class VpnDatabaseCallback(
             .use { it.readText() }
             .also { json ->
                 val rules = parseJsonAppTrackerExceptionRules(json)
-                vpnDatabase.get().vpnAppTrackerBlockingDao().insertTrackerExceptionRules(rules)
+                vpnDatabase().vpnAppTrackerBlockingDao().insertTrackerExceptionRules(rules)
             }
     }
 

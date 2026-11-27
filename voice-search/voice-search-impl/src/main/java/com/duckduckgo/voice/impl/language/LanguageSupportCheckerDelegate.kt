@@ -24,7 +24,7 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer.createOnDeviceSpeechRecognizer
 import androidx.annotation.RequiresApi
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat

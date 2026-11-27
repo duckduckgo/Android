@@ -17,17 +17,19 @@
 package com.duckduckgo.duckchat.impl.ui
 
 import android.annotation.SuppressLint
+import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Environment
 import android.util.Base64
 import androidx.annotation.VisibleForTesting
 import androidx.core.graphics.scale
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.duckduckgo.anvil.annotations.ContributesViewModel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
+import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.ViewScope
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
@@ -36,6 +38,9 @@ import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.forTab
+import com.duckduckgo.duckchat.impl.pixel.AttachmentEntryPoint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -54,7 +59,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -62,6 +69,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.max
@@ -101,6 +109,7 @@ class AttachmentViewModel @Inject constructor(
         val imageLimitError: String? = null,
         val fileLimitError: String? = null,
         val fileSizeError: String? = null,
+        val oversizedFileIds: Set<String> = emptySet(),
         val filePageCountError: String? = null,
         val fileTotalSizeError: String? = null,
         val supportsUpload: Boolean = false,
@@ -142,15 +151,17 @@ class AttachmentViewModel @Inject constructor(
         ) { images, files, pageContext, selections, limitReached ->
             AttachmentLists(images, files, pageContext, selections, limitReached)
         },
-        modelManager.modelState,
+        // Starts from the global selection so attachments work before a tab has published any state.
+        combine(modelManager.modelState, nativeInputStateProvider.state.onStart<NativeInputState?> { emit(null) }) { modelState, inputState ->
+            inputState?.let(modelState::forTab) ?: modelState
+        },
         combine(limitsHandler.conversationImagesSent, limitsHandler.conversationFilesUsed) { imgSent, filesUsed -> Pair(imgSent, filesUsed) },
         isDuckAiModeFlow,
     ) { (images, files, pageContext, selections, selectionLimitReached), modelState, (conversationImagesSent, conversationFilesUsed), isDuckAiMode ->
         val conversationFilesSent = conversationFilesUsed.count
         val conversationFileSizeSentBytes = conversationFilesUsed.sizeBytes
         val model = modelState.models.find { it.id == modelState.selectedModelId }
-        val supportsImageUpload = modelState.models.isEmpty() ||
-            (model?.supportsImageUpload == true && duckChatInternal.isImageUploadEnabled())
+        val supportsImageUpload = modelState.supportsImageUpload(duckChatInternal.isImageUploadEnabled())
         val supportedFileTypes = model?.supportedFileTypes.orEmpty()
         val imageLimits = modelState.attachmentLimits.images
         val fileLimits = modelState.attachmentLimits.files
@@ -167,6 +178,7 @@ class AttachmentViewModel @Inject constructor(
             imageLimitError = computeImageLimitError(currentImageCount, totalImages, imageLimits),
             fileLimitError = computeFileLimitError(totalFiles, fileLimits.maxPerConversation),
             fileSizeError = computeFileSizeError(files, fileLimits.maxFileSizeBytes),
+            oversizedFileIds = files.filter { it.sizeBytes > fileLimits.maxFileSizeBytes }.mapTo(mutableSetOf()) { it.id },
             filePageCountError = computeFilePageCountError(files, fileLimits.maxPagesPerFile),
             fileTotalSizeError = computeFileTotalSizeError(totalFileSizeBytes, fileLimits.maxTotalFileSizeBytes),
             supportsUpload = supportsImageUpload || supportedFileTypes.isNotEmpty(),
@@ -238,16 +250,16 @@ class AttachmentViewModel @Inject constructor(
     private fun placeholderBitmap(): Bitmap =
         Bitmap.createBitmap(PLACEHOLDER_BITMAP_SIZE_PX, PLACEHOLDER_BITMAP_SIZE_PX, Bitmap.Config.ARGB_8888)
 
-    fun onFilesPicked(uris: List<Uri>) {
+    fun onFilesPicked(uris: List<Uri>, entryPoint: AttachmentEntryPoint) {
         viewModelScope.launch {
             for (uri in uris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri)
                 if (attachment == null) {
-                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value)
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value, entryPoint)
                     continue
                 }
                 _fileAttachments.update { it + attachment }
-                fireFileAcceptedOrRejectedPixel(attachment)
+                fireFileAcceptedOrRejectedPixel(attachment, entryPoint)
             }
         }
     }
@@ -270,11 +282,11 @@ class AttachmentViewModel @Inject constructor(
             for (uri in fileUris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri)
                 if (attachment == null) {
-                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value)
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value, AttachmentEntryPoint.SHARE)
                     continue
                 }
                 _fileAttachments.update { it + attachment }
-                fireFileAcceptedOrRejectedPixel(attachment)
+                fireFileAcceptedOrRejectedPixel(attachment, AttachmentEntryPoint.SHARE)
             }
         }
     }
@@ -284,12 +296,12 @@ class AttachmentViewModel @Inject constructor(
      * violations are reflected as derived error state rather than an explicit rejection, so this is the
      * single transition point where we can attribute a reason to a freshly-picked file exactly once.
      */
-    private fun fireFileAcceptedOrRejectedPixel(added: FileAttachment) {
+    private fun fireFileAcceptedOrRejectedPixel(added: FileAttachment, entryPoint: AttachmentEntryPoint) {
         val reason = resolveFileValidationReason(added)
         if (reason != null) {
-            duckChatPixels.fireFileValidationFailed(reason, surface.value)
+            duckChatPixels.fireFileValidationFailed(reason, surface.value, entryPoint)
         } else {
-            duckChatPixels.fireFileAttached(surface.value)
+            duckChatPixels.fireFileAttached(surface.value, entryPoint)
         }
     }
 
@@ -371,9 +383,47 @@ class AttachmentViewModel @Inject constructor(
         val textSelectionLimitReached: Boolean,
     )
 
-    fun bindTextSelections(tabId: String, textSelection: String?) {
+    fun addAttachments(tabId: String, textSelection: String?, files: List<Uri>) {
+        textSelection?.let {
+            textSelectionRepository.add(tabId, it, url = "")
+            bindTextSelections(tabId)
+        }
+
+        if (files.isEmpty()) return
+        viewModelScope.launch {
+            val modelState = modelManager.modelState.first { it.models.isNotEmpty() }
+            val attachable = withContext(dispatchers.io()) { files.filter { it.isAllowedSource() && it.isAttachable(modelState) } }
+            if (attachable.isNotEmpty()) onMixedAttachmentsPicked(attachable)
+        }
+    }
+
+    // Excludes attachments from the app's providers (or file://), except Downloads.
+    private fun Uri.isAllowedSource(): Boolean {
+        if (scheme != ContentResolver.SCHEME_CONTENT) return false
+        val authority = this.authority?.substringAfterLast('@') ?: return false
+        val isDuckDuckGoProvider = context.packageManager.resolveContentProvider(authority, 0)?.packageName == context.packageName
+        return !isDuckDuckGoProvider || (authority == "${context.packageName}.provider" && isInDownloads())
+    }
+
+    private fun Uri.isInDownloads(): Boolean {
+        if (pathSegments.firstOrNull() != "external_files") return false
+        val root = Environment.getExternalStorageDirectory()
+        val downloads = File(root, Environment.DIRECTORY_DOWNLOADS)
+        val file = File(root, pathSegments.drop(1).joinToString("/"))
+        return runCatching { file.canonicalFile.startsWith(downloads.canonicalFile) }.getOrDefault(false)
+    }
+
+    private fun Uri.isAttachable(modelState: ModelState): Boolean {
+        val type = context.contentResolver.getType(this)?.lowercase() ?: return false
+        val model = modelState.models.find { it.id == modelState.selectedModelId } ?: return false
+        val images = if (model.supportsImageUpload && duckChatInternal.isImageUploadEnabled()) listOf("image/*") else emptyList()
+        return (model.supportedFileTypes + images).map { it.lowercase() }.any { accepted ->
+            accepted == type || (accepted.endsWith("/*") && type.startsWith(accepted.removeSuffix("*")))
+        }
+    }
+
+    fun bindTextSelections(tabId: String) {
         textSelectionsTabId = tabId
-        textSelection?.let { textSelectionRepository.add(tabId, it, url = "") }
         textSelectionsJob?.cancel()
         textSelectionsJob = viewModelScope.launch {
             launch { textSelectionRepository.limitReached(tabId).collect { _textSelectionLimitReached.value = it } }

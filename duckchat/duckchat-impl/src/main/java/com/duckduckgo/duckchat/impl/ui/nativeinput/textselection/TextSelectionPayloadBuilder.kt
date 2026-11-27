@@ -20,8 +20,8 @@ import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.R
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import org.json.JSONArray
 import org.json.JSONObject
 import javax.inject.Inject
@@ -34,7 +34,7 @@ interface TextSelectionPayloadBuilder {
     }
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealTextSelectionPayloadBuilder @Inject constructor(
     private val context: Context,

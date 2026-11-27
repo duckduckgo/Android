@@ -37,7 +37,6 @@ class FakeDuckChat(
     private val inputScreenUserSettingEnabled = MutableStateFlow(false)
     private val cosmeticInputScreenUserSettingEnabled = MutableStateFlow<Boolean?>(null)
     private val automaticContextAttachmentUserSettingEnabled = MutableStateFlow(false)
-    private val nativeInputFieldUserSettingEnabled = MutableStateFlow(false)
     private val nativeChatInputEnabled = MutableStateFlow(false)
     private val nativeInputNavBarEnabled = MutableStateFlow(false)
     private val chatSuggestionsUserSettingEnabled = MutableStateFlow(true)
@@ -49,7 +48,7 @@ class FakeDuckChat(
         openDuckChatCalls.add(Unit)
     }
 
-    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint) {
+    override fun openDuckChatWithAutoPrompt(query: String, entryPoint: DuckChatEntryPoint, voice: Boolean) {
         openDuckChatWithAutoPromptCalls.add(query)
     }
 
@@ -57,7 +56,7 @@ class FakeDuckChat(
         openDuckChatWithPrefillCalls.add(query)
     }
 
-    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean) { }
+    override fun reportDuckChatEntry(entryPoint: DuckChatEntryPoint, opensNewTab: Boolean, hasPrompt: Boolean, voice: Boolean) { }
 
     override fun getDuckChatUrl(
         query: String,
@@ -97,10 +96,6 @@ class FakeDuckChat(
 
     override fun observeAutomaticContextAttachmentUserSettingEnabled(): Flow<Boolean> {
         return automaticContextAttachmentUserSettingEnabled
-    }
-
-    override fun observeNativeInputFieldUserSettingEnabled(): Flow<Boolean> {
-        return nativeInputFieldUserSettingEnabled
     }
 
     override fun observeNativeChatInputEnabled(): Flow<Boolean> {

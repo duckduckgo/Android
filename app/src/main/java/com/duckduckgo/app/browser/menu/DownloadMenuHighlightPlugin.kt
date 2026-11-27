@@ -23,8 +23,9 @@ import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.downloads.api.FileDownloadCallbackPlugin
 import com.duckduckgo.downloads.api.NewDownloadState
-import com.squareup.anvil.annotations.ContributesMultibinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.SingleIn
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,9 +35,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
-@ContributesMultibinding(AppScope::class, boundType = BrowserMenuHighlightPlugin::class)
-@ContributesMultibinding(AppScope::class, boundType = FileDownloadCallbackPlugin::class)
+@SingleIn(AppScope::class)
+@ContributesIntoSet(AppScope::class, binding = binding<BrowserMenuHighlightPlugin>())
+@ContributesIntoSet(AppScope::class, binding = binding<FileDownloadCallbackPlugin>())
 class DownloadMenuHighlightPlugin @Inject constructor(
     private val newDownloadState: NewDownloadState,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

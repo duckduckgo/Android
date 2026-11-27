@@ -19,8 +19,8 @@ package com.duckduckgo.brokensite.impl
 import android.net.Uri
 import com.duckduckgo.brokensite.api.RefreshPattern
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.time.LocalDateTime
 import javax.inject.Inject
 
@@ -37,7 +37,7 @@ interface BrokenSiteRefreshesInMemoryStore {
 class RefreshPatternOwner
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealBrokenSiteRefreshesInMemoryStore @Inject constructor() : BrokenSiteRefreshesInMemoryStore {
 
     private var lastRefreshOwner: RefreshPatternOwner? = null

@@ -31,28 +31,28 @@ import com.duckduckgo.voice.store.SharedPreferencesVoiceSearchDataStore
 import com.duckduckgo.voice.store.VoiceSearchDataStore
 import com.duckduckgo.voice.store.VoiceSearchDatabase
 import com.duckduckgo.voice.store.VoiceSearchRepository
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object VoiceSearchModule {
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideVoiceSearchRepository(dataStore: VoiceSearchDataStore, voiceSearchStatusListener: VoiceSearchStatusListener): VoiceSearchRepository {
         return RealVoiceSearchRepository(dataStore, voiceSearchStatusListener)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideVoiceSearchDataStore(context: Context): VoiceSearchDataStore {
         return SharedPreferencesVoiceSearchDataStore(context)
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideDatabase(context: Context): VoiceSearchDatabase {
         return Room.databaseBuilder(context, VoiceSearchDatabase::class.java, "voicesearch.db")
@@ -61,7 +61,7 @@ object VoiceSearchModule {
             .build()
     }
 
-    @SingleInstanceIn(AppScope::class)
+    @SingleIn(AppScope::class)
     @Provides
     fun provideVoiceSearchFeatureRepository(
         database: VoiceSearchDatabase,

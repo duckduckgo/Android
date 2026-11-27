@@ -17,15 +17,18 @@
 package com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.browsermode.api.BrowserModeDataProvider
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -65,6 +68,7 @@ class UsageLimitFooterPlugin @Inject constructor(
     private val messageMapper: UsageLimitFooterMessageMapper,
     private val ctaResolver: UsageLimitCtaResolver,
     private val modelManager: DuckAiModelManager,
+    private val nativeInputStateProvider: NativeInputStateProvider,
     private val storageProvider: BrowserModeDataProvider<DuckAiBridgeStorage>,
     private val duckChatFeature: DuckChatFeature,
     private val currentTimeProvider: CurrentTimeProvider,
@@ -80,9 +84,10 @@ class UsageLimitFooterPlugin @Inject constructor(
         val snapshot: UsageLimitsSnapshot?,
         val dismissals: Map<UsageWindow, UsageNoticeDismissal>,
         val actedOn: UsageNoticeActedOn?,
-        val selectedModelId: String?,
-        val isFreeTrialEligible: Boolean,
-    )
+        val modelState: ModelState,
+    ) {
+        val selectedModelId: String? get() = modelState.selectedModelId
+    }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun createFooter(
@@ -110,8 +115,9 @@ class UsageLimitFooterPlugin @Inject constructor(
                     dismissalStore.dismissals,
                     dismissalStore.actedOn,
                     modelManager.modelState,
-                ) { snapshot, dismissals, actedOn, modelState ->
-                    Inputs(snapshot, dismissals, actedOn, modelState.selectedModelId, modelState.isFreeTrialEligible)
+                    nativeInputStateProvider.state,
+                ) { snapshot, dismissals, actedOn, modelState, inputState ->
+                    Inputs(snapshot, dismissals, actedOn, modelState.forTab(inputState))
                 }
             } else {
                 flowOf(null)
@@ -140,7 +146,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             if (input.actedOn?.applies(notice) == true) return@combine NativeInputFooterState(visible = false)
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
-            val resolvedCta = ctaResolver.resolve(snapshot.cta, modelManager.modelState.value, host.draft(), input.isFreeTrialEligible)
+            val resolvedCta = ctaResolver.resolve(snapshot.cta, input.modelState, host.draft(), input.modelState.isFreeTrialEligible)
             retireIfManuallySwitched(snapshot, selectedModelId = input.selectedModelId, previousModelId = previousModelId)
 
             val exposure = UsageWarningExposure.of(notice)

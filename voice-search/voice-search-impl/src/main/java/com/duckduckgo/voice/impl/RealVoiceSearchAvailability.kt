@@ -22,7 +22,7 @@ import com.duckduckgo.voice.impl.language.LanguageSupportChecker
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeature
 import com.duckduckgo.voice.impl.remoteconfig.VoiceSearchFeatureRepository
 import com.duckduckgo.voice.store.VoiceSearchRepository
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

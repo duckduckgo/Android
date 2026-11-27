@@ -23,18 +23,17 @@ import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.di.BatteryOptimizationState
 import com.duckduckgo.mobile.android.vpn.state.VpnStateCollectorPlugin
-import com.squareup.anvil.annotations.ContributesMultibinding
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 import org.json.JSONObject
 import javax.inject.Inject
-import javax.inject.Provider
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class DeviceInfoCollector @Inject constructor(
     private val appBuildConfig: AppBuildConfig,
-    @BatteryOptimizationState private val isIgnoringBatteryOptimizations: Provider<Boolean>,
+    @BatteryOptimizationState private val isIgnoringBatteryOptimizations: () -> Boolean,
 ) : VpnStateCollectorPlugin {
     override val collectorName: String
         get() = "deviceInfo"
@@ -43,13 +42,13 @@ class DeviceInfoCollector @Inject constructor(
         return JSONObject().apply {
             put("buildFlavor", appBuildConfig.flavor.toString())
             put("os", appBuildConfig.sdkInt)
-            put("batteryOptimizations", (!isIgnoringBatteryOptimizations.get()).toString())
+            put("batteryOptimizations", (!isIgnoringBatteryOptimizations()).toString())
             put("man", appBuildConfig.manufacturer)
         }
     }
 }
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object DeviceInfoCollectorModule {
     // this convenience class is just to allow testing

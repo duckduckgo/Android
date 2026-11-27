@@ -18,10 +18,10 @@ package com.duckduckgo.app.pixels.campaign.params
 
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class SyncedUsedAdditionalPixelParamPlugin @Inject constructor(
     private val deviceSyncState: DeviceSyncState,
 ) : AdditionalPixelParamPlugin {

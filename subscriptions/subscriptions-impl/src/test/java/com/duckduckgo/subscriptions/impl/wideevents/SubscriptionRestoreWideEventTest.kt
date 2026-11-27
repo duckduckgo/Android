@@ -55,7 +55,7 @@ class SubscriptionRestoreWideEventTest {
         subscriptionRestoreWideEvent =
             SubscriptionRestoreWideEventImpl(
                 wideEventClient = wideEventClient,
-                subscriptionsFeature = { subscriptionsFeature },
+                subscriptionsFeature = lazy { subscriptionsFeature },
                 dispatchers = coroutineRule.testDispatcherProvider,
                 coroutineScope = coroutineRule.testScope,
             )
@@ -213,7 +213,7 @@ class SubscriptionRestoreWideEventTest {
         subscriptionRestoreWideEvent.onEmailRestoreFlowStarted(isOriginWeb = false)
 
         verify(wideEventClient).flowStart(any(), anyOrNull(), any(), any(), any(), any())
-        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any())
+        verify(wideEventClient, never()).intervalStart(any(), any(), any(), any(), any())
     }
 
     @Test

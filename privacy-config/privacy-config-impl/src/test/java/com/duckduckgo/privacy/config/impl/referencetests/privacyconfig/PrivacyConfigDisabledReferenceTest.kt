@@ -20,6 +20,7 @@ import androidx.room.Room
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.common.test.FileUtilities
 import com.duckduckgo.common.test.api.InMemorySharedPreferences
+import com.duckduckgo.privacy.config.impl.DefaultPrivacyConfigVersionCheckOverride
 import com.duckduckgo.privacy.config.impl.RealPrivacyConfigPersister
 import com.duckduckgo.privacy.config.impl.ReferenceTestUtilities
 import com.duckduckgo.privacy.config.impl.features.privacyFeatureValueOf
@@ -87,6 +88,7 @@ class PrivacyConfigDisabledReferenceTest(private val testCase: TestCase) {
             db,
             InMemorySharedPreferences(),
             mock(),
+            DefaultPrivacyConfigVersionCheckOverride(),
         )
     }
 

@@ -19,10 +19,10 @@ package com.duckduckgo.autofill.impl.configuration
 import com.duckduckgo.autofill.api.AutofillFeature
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
@@ -37,7 +37,7 @@ data class AutofillSiteSpecificFixesSettings(
 )
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class AutofillSiteSpecificFixesSettingsImpl @Inject constructor(
     private val autofillFeature: AutofillFeature,
     private val dispatchers: DispatcherProvider,

@@ -25,11 +25,11 @@ import com.duckduckgo.app.onboarding.ui.page.welcome.DownloadReasonSelection
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.R.drawable
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import java.util.Locale
 import javax.inject.Inject
 
-@SingleInstanceIn(scope = AppScope::class)
+@SingleIn(scope = AppScope::class)
 class OnboardingStoreImpl @Inject constructor(
     private val context: Context,
     private val sharedPreferencesProvider: SharedPreferencesProvider,

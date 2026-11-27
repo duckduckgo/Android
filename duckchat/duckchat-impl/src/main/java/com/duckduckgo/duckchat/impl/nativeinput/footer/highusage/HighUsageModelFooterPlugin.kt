@@ -17,12 +17,14 @@
 package com.duckduckgo.duckchat.impl.nativeinput.footer.highusage
 
 import android.content.Context
-import com.duckduckgo.anvil.annotations.ContributesActivePlugin
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.codegen.annotations.ContributesActivePlugin
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.duckchat.api.nativeinput.NativeInputStateProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
+import com.duckduckgo.duckchat.impl.models.forTab
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FooterCategory
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooter
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
@@ -54,6 +56,7 @@ import javax.inject.Inject
 )
 class HighUsageModelFooterPlugin @Inject constructor(
     private val modelManager: DuckAiModelManager,
+    private val nativeInputStateProvider: NativeInputStateProvider,
     private val duckChatFeature: DuckChatFeature,
     private val resolver: HighUsageModelNoticeResolver,
     private val dismissalStore: HighUsageModelNoticeDismissalStore,
@@ -108,7 +111,7 @@ class HighUsageModelFooterPlugin @Inject constructor(
             }
 
         val state = combine(
-            modelManager.modelState,
+            combine(modelManager.modelState, nativeInputStateProvider.state) { modelState, inputState -> modelState.forTab(inputState) },
             hostContext,
             persistedDismissedModelIds,
             locallyDismissedModelIds,

@@ -16,7 +16,7 @@
 
 package com.duckduckgo.adblocking.impl.remoteconfig
 
-import com.duckduckgo.anvil.annotations.ContributesRemoteFeature
+import com.duckduckgo.codegen.annotations.ContributesRemoteFeature
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.feature.toggles.api.Toggle
 
@@ -31,27 +31,10 @@ interface AdBlockingExtensionFeature {
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
     fun self(): Toggle
 
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
-    fun enabledByDefault(): Toggle
-
     /**
      * When enabled, the feature settings will still be accessible, but no scripts
      * will be injected, and a contingency message will be shown
      */
     @Toggle.DefaultValue(Toggle.DefaultFeatureValue.FALSE)
     fun enableContingencyMode(): Toggle
-
-    /**
-     * When enabled, UX improvements for ad blocking phase 2 will be available.
-     * To be removed after phase 2 initial rollout
-     *
-     */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
-    fun adBlockingUXImprovements(): Toggle
-
-    /**
-     * When enabled, ad blocking animation will show on the omnibar if all other conditions met
-     */
-    @Toggle.DefaultValue(Toggle.DefaultFeatureValue.TRUE)
-    fun showAdBlockingOmnibarAnimation(): Toggle
 }

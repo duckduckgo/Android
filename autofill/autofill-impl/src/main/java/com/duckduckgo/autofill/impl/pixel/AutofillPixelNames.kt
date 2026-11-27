@@ -77,7 +77,8 @@ import com.duckduckgo.autofill.impl.pixel.AutofillPixelNames.PRODUCT_TELEMETRY_S
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin
 import com.duckduckgo.common.utils.plugins.pixel.PixelParamRemovalPlugin.PixelParameter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 
 enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName {
     AUTOFILL_ONBOARDING_SAVE_PROMPT_SHOWN("autofill_logins_save_login_inline_onboarding_displayed"),
@@ -182,6 +183,9 @@ enum class AutofillPixelNames(override val pixelName: String) : Pixel.PixelName 
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_ERROR_PARSING("autofill_import_google_passwords_result_parsing"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_WEBVIEW_CRASH("autofill_import_google_passwords_webview_crash"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_FAILURE_USER_CANCELLED("autofill_import_google_passwords_result_user_cancelled"),
+
+    IMPORT_PROMOTION_DISPLAYED("import_promotion_displayed"),
+    IMPORT_PROMOTION_CONFIRMED("import_promotion_confirmed"),
     AUTOFILL_IMPORT_GOOGLE_PASSWORDS_RESULT_SUCCESS("autofill_import_google_passwords_result_success"),
 
     AUTOFILL_SYNC_DESKTOP_PASSWORDS_CTA_BUTTON("m_autofill_logins_import_no_passwords"),
@@ -263,9 +267,9 @@ object AutofillPixelParameters {
     const val LAST_USED_PIXEL_KEY = "last_used"
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelParamRemovalPlugin::class,
+    binding = binding<PixelParamRemovalPlugin>(),
 )
 object AutofillPixelsRequiringDataCleaning : PixelParamRemovalPlugin {
     override fun names(): List<Pair<String, Set<PixelParameter>>> {

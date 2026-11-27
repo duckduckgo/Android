@@ -24,7 +24,7 @@ import com.duckduckgo.networkprotection.impl.exclusion.NetPExclusionListReposito
 import com.duckduckgo.networkprotection.impl.exclusion.systemapps.SystemAppsExclusionRepository
 import com.duckduckgo.networkprotection.impl.settings.NetPSettingsLocalConfig
 import com.duckduckgo.networkprotection.impl.settings.NetpVpnSettingsDataStore
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
 import logcat.logcat
 import okhttp3.Dns
@@ -40,15 +40,7 @@ interface NetPDefaultConfigProvider {
     fun fallbackDns(): Set<InetAddress> = emptySet()
 
     suspend fun routes(): Map<String, Int> = emptyMap()
-
-    fun pcapConfig(): PcapConfig? = null
 }
-
-data class PcapConfig(
-    val filename: String,
-    val snapLen: Int,
-    val fileSize: Int,
-)
 
 @ContributesBinding(VpnScope::class)
 class RealNetPDefaultConfigProvider @Inject constructor(

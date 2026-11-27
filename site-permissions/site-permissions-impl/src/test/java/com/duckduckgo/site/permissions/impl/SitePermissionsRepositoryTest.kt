@@ -79,7 +79,7 @@ class SitePermissionsRepositoryTest {
         mockDrmBlock,
         DrmSessionStore(),
         drmPolicyFeature,
-        { mockDrmPolicyManager },
+        lazy { mockDrmPolicyManager },
         sitePermissionsDialogRedesignFeature,
     )
 

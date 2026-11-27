@@ -224,6 +224,14 @@ class FakePirMessagingInterface(moshi: Moshi) : JsMessaging {
                 }
             """.trimIndent()
 
+            is BrokerAction.Scroll -> """
+                {
+                    "actionID": "${action.id}",
+                    "actionType": "scroll",
+                    "response": null
+                }
+            """.trimIndent()
+
             is BrokerAction.GenerateEmail -> """
                 {
                     "actionID": "${action.id}",

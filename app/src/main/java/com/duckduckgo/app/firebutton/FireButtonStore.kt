@@ -19,7 +19,7 @@ package com.duckduckgo.app.firebutton
 import androidx.core.content.edit
 import com.duckduckgo.data.store.api.SharedPreferencesProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 interface FireButtonStore {

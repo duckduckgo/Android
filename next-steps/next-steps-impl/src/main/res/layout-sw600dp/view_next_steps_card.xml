@@ -23,34 +23,16 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/keyline_5"
-        android:paddingTop="@dimen/keyline_4"
-        android:paddingEnd="@dimen/keyline_5"
-        android:paddingBottom="@dimen/keyline_5">
+        android:padding="@dimen/keyline_4">
 
         <ImageView
-            android:id="@+id/sectionIcon"
-            android:layout_width="@dimen/nextStepsSectionIconSize"
-            android:layout_height="@dimen/nextStepsSectionIconSize"
+            android:id="@+id/itemImage"
+            android:layout_width="@dimen/nextStepsItemImageSize"
+            android:layout_height="@dimen/nextStepsItemImageSize"
+            android:layout_marginStart="@dimen/keyline_4"
             android:importantForAccessibility="no"
-            android:src="@drawable/arrow_circle_right_16"
-            app:layout_constraintBottom_toBottomOf="@id/sectionTitle"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/sectionTitle"
-            app:tint="?attr/daxColorPrimaryIcon" />
-
-        <com.duckduckgo.common.ui.view.text.DaxTextView
-            android:id="@+id/sectionTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_1"
-            android:layout_marginEnd="@dimen/keyline_2"
-            app:layout_constraintBottom_toBottomOf="@id/closeButton"
-            app:layout_constraintEnd_toStartOf="@id/closeButton"
-            app:layout_constraintStart_toEndOf="@id/sectionIcon"
-            app:layout_constraintTop_toTopOf="@id/closeButton"
-            app:typography="h4"
-            tools:text="Next Steps" />
+            app:layout_constraintTop_toBottomOf="@id/sectionTitle" />
 
         <ImageView
             android:id="@+id/closeButton"
@@ -63,26 +45,31 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/itemImage"
-            android:layout_width="@dimen/nextStepsItemImageSize"
-            android:layout_height="@dimen/nextStepsItemImageSize"
-            android:layout_marginStart="@dimen/keyline_4"
-            android:importantForAccessibility="no"
-            app:layout_constraintBottom_toBottomOf="@id/primaryAction"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sectionTitle" />
+        <com.duckduckgo.common.ui.view.text.DaxTextView
+            android:id="@+id/sectionTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/keyline_5"
+            android:layout_marginEnd="@dimen/keyline_2"
+            android:gravity="center_vertical"
+            app:layout_constraintEnd_toStartOf="@id/closeButton"
+            app:layout_constraintStart_toEndOf="@id/itemImage"
+            app:layout_constraintTop_toTopOf="@id/closeButton"
+            app:layout_constraintBottom_toBottomOf="@id/closeButton"
+            app:layout_goneMarginStart="@dimen/keyline_4"
+            app:textType="secondary"
+            app:typography="h4"
+            tools:text="Next Steps" />
 
         <com.duckduckgo.common.ui.view.text.DaxTextView
             android:id="@+id/itemTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/keyline_5"
-            android:layout_marginEnd="@dimen/keyline_6"
+            android:layout_marginTop="@dimen/keyline_2"
+            android:layout_marginEnd="@dimen/keyline_4"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/itemImage"
-            app:layout_constraintTop_toTopOf="@id/itemImage"
-            app:layout_goneMarginStart="@dimen/keyline_4"
+            app:layout_constraintStart_toStartOf="@id/sectionTitle"
+            app:layout_constraintTop_toBottomOf="@id/sectionTitle"
             app:typography="h3"
             tools:text="Browse privately by default" />
 
@@ -90,6 +77,7 @@
             android:id="@+id/itemDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
             app:layout_constraintEnd_toEndOf="@id/itemTitle"
             app:layout_constraintStart_toStartOf="@id/itemTitle"
             app:layout_constraintTop_toBottomOf="@id/itemTitle"
@@ -101,7 +89,7 @@
             android:id="@+id/primaryAction"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/keyline_3"
+            android:layout_marginTop="@dimen/keyline_4"
             app:daxButtonSize="small"
             app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"

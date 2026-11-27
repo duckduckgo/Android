@@ -24,15 +24,17 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.duckduckgo.anvil.annotations.ContributesWorker
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
+import com.duckduckgo.codegen.annotations.ContributesWorker
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.engine.SyncEngine
 import com.duckduckgo.sync.api.engine.SyncEngine.SyncTrigger.BACKGROUND_SYNC
-import com.squareup.anvil.annotations.ContributesMultibinding
+import com.duckduckgo.sync.impl.auditlog.AuditLogSyncHook
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -57,19 +59,25 @@ class SyncBackgroundWorker(
     @Inject
     lateinit var deviceSyncState: DeviceSyncState
 
+    @Inject
+    lateinit var auditLogSyncHook: AuditLogSyncHook
+
     override suspend fun doWork(): Result {
         return withContext(dispatchers.io()) {
             if (deviceSyncState.isUserSignedInOnDevice()) {
                 syncEngine.triggerSync(BACKGROUND_SYNC)
+
+                // WorkManager keeps the process unfrozen only until doWork returns, and the check runs on the app scope.
+                auditLogSyncHook.awaitRunningCheck()
             }
             return@withContext Result.success()
         }
     }
 }
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = MainProcessLifecycleObserver::class,
+    binding = binding<MainProcessLifecycleObserver>(),
 )
 class SyncBackgroundWorkerScheduler @Inject constructor(
     private val workManager: WorkManager,

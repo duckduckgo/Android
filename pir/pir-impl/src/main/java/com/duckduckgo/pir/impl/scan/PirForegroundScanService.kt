@@ -26,11 +26,13 @@ import android.os.Build
 import android.os.IBinder
 import android.os.Process
 import androidx.core.app.ServiceCompat
-import com.duckduckgo.anvil.annotations.InjectWith
+import com.duckduckgo.codegen.annotations.InjectWith
+import com.duckduckgo.di.android.AndroidInjection
 import com.duckduckgo.di.scopes.ServiceScope
 import com.duckduckgo.pir.impl.PirFeatureDataCleaner
 import com.duckduckgo.pir.impl.R
 import com.duckduckgo.pir.impl.checker.PirEligibility
+import com.duckduckgo.pir.impl.checker.PirRunMode
 import com.duckduckgo.pir.impl.checker.PirWorkHandler
 import com.duckduckgo.pir.impl.checker.runModeOrNull
 import com.duckduckgo.pir.impl.notifications.PirNotificationManager
@@ -39,7 +41,6 @@ import com.duckduckgo.pir.impl.scheduling.PirExecutionType
 import com.duckduckgo.pir.impl.scheduling.PirJobsRunner
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent
 import com.duckduckgo.pir.impl.wideevents.PirScanWideEvent.CancellationReason
-import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.firstOrNull
@@ -69,6 +70,9 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
     @Inject
     lateinit var pirScanWideEvent: PirScanWideEvent
 
+    private var isRunInProgress = false
+    private var currentRunMode: PirRunMode? = null
+
     override fun onCreate() {
         super.onCreate()
         AndroidInjection.inject(this)
@@ -84,23 +88,15 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
         startId: Int,
     ): Int {
         logcat { "PIR-SCAN: PIR service started on ${Process.myPid()} thread: ${Thread.currentThread().name}" }
+        if (intent?.action == ACTION_SHOW_SCAN_NOTIFICATION) {
+            showScanNotificationForRunInProgress(startId)
+            return START_NOT_STICKY
+        }
+
         val executionType = intent?.getStringExtra(EXTRA_EXECUTION_TYPE)?.let { PirExecutionType.valueOf(it) }
             ?: PirExecutionType.MANUAL_INITIAL
-        val notification: Notification = pirNotificationManager.createScanStatusNotification(
-            title = getString(R.string.pirFeatureName),
-            message = getString(R.string.pirNotificationMessageInProgress),
-        )
         try {
-            ServiceCompat.startForeground(
-                this,
-                PIR_SCAN_NOTIFICATION_ID,
-                notification,
-                if (Build.VERSION.SDK_INT >= 34) {
-                    FOREGROUND_SERVICE_TYPE_SPECIAL_USE
-                } else {
-                    0
-                },
-            )
+            startForegroundWithScanNotification()
         } catch (_: Exception) {
             logcat(LogPriority.ERROR) { "PIR-SCAN: Could not start the service as foreground!" }
             pirPixelSender.reportManualScanStartFailed()
@@ -111,6 +107,7 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
             return START_NOT_STICKY
         }
 
+        isRunInProgress = true
         launch {
             val eligibility = pirWorkHandler.canRunPir().firstOrNull()
             if (eligibility is PirEligibility.Disabled) {
@@ -129,12 +126,57 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
                 stopSelf()
                 return@launch
             }
+            currentRunMode = runMode
+            if (runMode == PirRunMode.SCAN_ONLY) {
+                runCatching { startForegroundWithScanNotification() }
+                    .onFailure { logcat(WARN) { "PIR-SCAN: Could not update the scan notification: ${it.message}" } }
+            }
             pirJobsRunner.runEligibleJobs(this@PirForegroundScanService, executionType, runMode)
             stopSelf()
         }
 
         logcat { "PIR-SCAN: START_NOT_STICKY" }
         return START_NOT_STICKY
+    }
+
+    /**
+     * The scan notification is not shown when the run starts without the notification permission, and
+     * granting it later does not show it either, so the dashboard asks for it once the permission is granted.
+     */
+    private fun showScanNotificationForRunInProgress(startId: Int) {
+        if (!isRunInProgress) {
+            // the run finished before this arrived, which recreated the service just to deliver it
+            stopSelf(startId)
+            return
+        }
+
+        runCatching { startForegroundWithScanNotification() }
+            .onFailure { logcat(WARN) { "PIR-SCAN: Could not show the scan notification: ${it.message}" } }
+    }
+
+    /**
+     * The service must go foreground before eligibility resolves, so the notification starts with the feature name
+     * and is re-posted with the free scan title once the run turns out to be scan-only.
+     */
+    private fun startForegroundWithScanNotification() {
+        val title = when (currentRunMode) {
+            PirRunMode.SCAN_ONLY -> R.string.pirFreemiumNotificationTitle
+            PirRunMode.SCAN_AND_OPT_OUT, null -> R.string.pirFeatureName
+        }
+        val notification: Notification = pirNotificationManager.createScanStatusNotification(
+            title = getString(title),
+            message = getString(R.string.pirNotificationMessageInProgress),
+        )
+        ServiceCompat.startForeground(
+            this,
+            PIR_SCAN_NOTIFICATION_ID,
+            notification,
+            if (Build.VERSION.SDK_INT >= 34) {
+                FOREGROUND_SERVICE_TYPE_SPECIAL_USE
+            } else {
+                0
+            },
+        )
     }
 
     override fun onLowMemory() {
@@ -148,18 +190,29 @@ class PirForegroundScanService : Service(), CoroutineScope by MainScope() {
 
     override fun onDestroy() {
         logcat { "PIR-SCAN: PIR service destroyed" }
-        pirJobsRunner.stop()
+        // an instance recreated only to show the notification ran no jobs, and the runner is shared with the scheduled worker
+        if (isRunInProgress) {
+            pirJobsRunner.stop()
+        }
+        isRunInProgress = false
+        currentRunMode = null
     }
 
     companion object {
         private const val PIR_SCAN_NOTIFICATION_ID = 8791
         private const val EXTRA_EXECUTION_TYPE = "extra_execution_type"
+        private const val ACTION_SHOW_SCAN_NOTIFICATION = "com.duckduckgo.pir.action.SHOW_SCAN_NOTIFICATION"
 
         fun intentFor(
             context: Context,
             executionType: PirExecutionType,
         ): Intent = Intent(context, PirForegroundScanService::class.java).apply {
             putExtra(EXTRA_EXECUTION_TYPE, executionType.name)
+        }
+
+        /** Only shows the notification of a scan that is already running, without starting another run. */
+        fun intentForShowScanNotification(context: Context): Intent = Intent(context, PirForegroundScanService::class.java).apply {
+            action = ACTION_SHOW_SCAN_NOTIFICATION
         }
 
         // This method was deprecated in API level 26. As of Build.VERSION_CODES.O,

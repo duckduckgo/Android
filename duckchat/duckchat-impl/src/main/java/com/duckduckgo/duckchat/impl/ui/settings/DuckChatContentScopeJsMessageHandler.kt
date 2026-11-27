@@ -20,11 +20,11 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeScriptsSubscriptionEve
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.js.messaging.api.SubscriptionEventData
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckChatEnabledContentScopeScriptsSubscriptionEventPlugin @Inject constructor(
     private val duckChat: DuckChat,
 ) : ContentScopeScriptsSubscriptionEventPlugin {

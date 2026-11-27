@@ -25,7 +25,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.store.db.AutoExcludeDao
 import com.duckduckgo.networkprotection.store.db.FlaggedIncompatibleApp
 import com.duckduckgo.networkprotection.store.db.VpnIncompatibleApp
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred

@@ -107,9 +107,9 @@ class RealDuckChatPixelsAttachmentsTest {
 
     @Test
     fun whenFileAttachedThenCountAndDaily() = runTest {
-        testee.fireFileAttached(DuckChatPixelSurface.DUCK_AI)
+        testee.fireFileAttached(DuckChatPixelSurface.DUCK_AI, AttachmentEntryPoint.NEW_CHAT_HINT)
 
-        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        val params = mapOf("surface" to "duck_ai", "entry_point" to "new_chat_hint")
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT, parameters = params)
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
@@ -133,11 +133,16 @@ class RealDuckChatPixelsAttachmentsTest {
 
     @Test
     fun whenFileValidationFailedThenReasonParam() = runTest {
-        testee.fireFileValidationFailed(reason = "size_exceeded", surface = DuckChatPixelSurface.DUCK_AI)
+        testee.fireFileValidationFailed(
+            reason = "size_exceeded",
+            surface = DuckChatPixelSurface.DUCK_AI,
+            entryPoint = AttachmentEntryPoint.SHARE,
+        )
 
         val params = mapOf(
-            DuckChatPixelParameters.FILE_VALIDATION_REASON to "size_exceeded",
-            DuckChatPixelParameters.SURFACE to "duck_ai",
+            "reason" to "size_exceeded",
+            "surface" to "duck_ai",
+            "entry_point" to "share",
         )
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
@@ -183,6 +188,58 @@ class RealDuckChatPixelsAttachmentsTest {
         verify(pixel).fire(
             DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_STOP_GENERATION_TAPPED,
             parameters = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai"),
+        )
+    }
+
+    @Test
+    fun whenAttachmentPrivacyShownWithImagesThenImagePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyShown(hasImages = true, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenAttachmentPrivacyShownWithoutImagesThenFilePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyShown(hasImages = false, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_SHOWN_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenAttachmentPrivacyLearnMoreTappedWithImagesThenImagePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyLearnMoreTapped(hasImages = true, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_IMAGE_LEARN_MORE_TAPPED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
+        )
+    }
+
+    @Test
+    fun whenAttachmentPrivacyLearnMoreTappedWithoutImagesThenFilePixelsSent() = runTest {
+        testee.fireAttachmentPrivacyLearnMoreTapped(hasImages = false, surface = DuckChatPixelSurface.DUCK_AI)
+
+        val params = mapOf(DuckChatPixelParameters.SURFACE to "duck_ai")
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_COUNT, parameters = params)
+        verify(pixel).fire(
+            DuckChatPixelName.DUCK_CHAT_ATTACHMENT_PRIVACY_FILE_LEARN_MORE_TAPPED_DAILY,
+            parameters = params,
+            type = Pixel.PixelType.Daily(),
         )
     }
 }

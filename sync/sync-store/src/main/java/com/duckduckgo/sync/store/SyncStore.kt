@@ -5,8 +5,13 @@ import androidx.core.content.edit
 import com.duckduckgo.common.utils.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 /**
@@ -44,9 +49,37 @@ interface SyncStore {
      */
     var unifiedDeviceListMigratedForUserId: String?
 
+    /**
+     * Number of devices on the sync account as last written, persisted across restarts. [clearAll] resets it to 0.
+     */
+    var connectedDevicesCount: Int
+
+    /** Last `after` cursor from the audit log check. Never store a `before` cursor here. */
+    var auditLogCursor: String?
+
+    /** JSON list of logins by other devices that the user has not seen yet. Its format belongs to the caller. */
+    var auditLogPending: String?
+
+    /** Id of the newest audit log entry loaded the last time Device Activity opened with no error. */
+    var auditLogLastSeenEntryId: String?
+
+    /**
+     * Emits [connectedDevicesCount] now and again whenever it changes.
+     */
+    fun connectedDevicesCountFlow(): Flow<Int>
+
     fun isEncryptionSupported(): Boolean
+
     fun isSignedInFlow(): Flow<Boolean>
+
+    /**
+     * The last known sign-in state, kept in memory so it can be read on the main thread without touching disk.
+     * Null until the store has read it once after the process started.
+     */
+    fun cachedIsSignedIn(): Boolean?
+
     fun isSignedIn(): Boolean
+
     fun storeCredentials(
         userId: String,
         deviceId: String,
@@ -210,9 +243,58 @@ constructor(
             }
         }
 
+    override var auditLogCursor: String?
+        get() = encryptedPreferences?.getString(KEY_AUDIT_LOG_CURSOR, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_AUDIT_LOG_CURSOR) else putString(KEY_AUDIT_LOG_CURSOR, value)
+            }
+        }
+
+    override var auditLogPending: String?
+        get() = encryptedPreferences?.getString(KEY_AUDIT_LOG_PENDING, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_AUDIT_LOG_PENDING) else putString(KEY_AUDIT_LOG_PENDING, value)
+            }
+        }
+
+    override var auditLogLastSeenEntryId: String?
+        get() = encryptedPreferences?.getString(KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID, null)
+        set(value) {
+            encryptedPreferences?.edit(commit = true) {
+                if (value == null) remove(KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID) else putString(KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID, value)
+            }
+        }
+
+    override fun connectedDevicesCountFlow(): Flow<Int> {
+        val flow = callbackFlow {
+            val preferences = encryptedPreferences
+            val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+                // A null key means the preferences were cleared.
+                if (key == null || key == KEY_CONNECTED_DEVICES_COUNT) trySend(Unit)
+            }
+            preferences?.registerOnSharedPreferenceChangeListener(listener)
+            send(Unit)
+            awaitClose { preferences?.unregisterOnSharedPreferenceChangeListener(listener) }
+        }
+        return flow
+            .map { connectedDevicesCount }
+            .distinctUntilChanged()
+            .flowOn(dispatcherProvider.io())
+    }
+
+    override var connectedDevicesCount: Int
+        get() = encryptedPreferences?.getInt(KEY_CONNECTED_DEVICES_COUNT, 0) ?: 0
+        set(value) {
+            encryptedPreferences?.edit(commit = true) { putInt(KEY_CONNECTED_DEVICES_COUNT, value) }
+        }
+
     override fun isEncryptionSupported(): Boolean = encryptedPreferences != null
 
     override fun isSignedInFlow(): Flow<Boolean> = isSignedInStateFlow
+
+    override fun cachedIsSignedIn(): Boolean? = isSignedInStateFlow.replayCache.firstOrNull()
 
     override fun isSignedIn() = !primaryKey.isNullOrEmpty() && !userId.isNullOrEmpty()
 
@@ -237,6 +319,9 @@ constructor(
     }
 
     override fun clearAll() {
+        // Listeners aren't told about keys dropped by clear(), so we remove the count on its own first
+        // to let connectedDevicesCountFlow() collectors see the reset.
+        encryptedPreferences?.edit(commit = true) { remove(KEY_CONNECTED_DEVICES_COUNT) }
         encryptedPreferences?.edit(commit = true) { clear() }
         appCoroutineScope.launch(dispatcherProvider.io()) {
             isSignedInStateFlow.emit(false)
@@ -258,5 +343,9 @@ constructor(
         private const val KEY_ACCOUNT_INFO_MODULUS = "KEY_ACCOUNT_INFO_MODULUS"
         private const val KEY_ACCOUNT_INFO_EXPONENT = "KEY_ACCOUNT_INFO_EXPONENT"
         private const val KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID = "KEY_UNIFIED_DEVICE_LIST_MIGRATED_USER_ID"
+        private const val KEY_CONNECTED_DEVICES_COUNT = "KEY_CONNECTED_DEVICES_COUNT"
+        private const val KEY_AUDIT_LOG_CURSOR = "KEY_AUDIT_LOG_CURSOR"
+        private const val KEY_AUDIT_LOG_PENDING = "KEY_AUDIT_LOG_PENDING"
+        private const val KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID = "KEY_AUDIT_LOG_LAST_SEEN_ENTRY_ID"
     }
 }

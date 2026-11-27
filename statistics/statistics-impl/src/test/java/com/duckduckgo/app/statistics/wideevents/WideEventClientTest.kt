@@ -21,21 +21,29 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.app.statistics.wideevents.WideEventClient.Companion.SAMPLED_OUT_FLOW_ID
 import com.duckduckgo.app.statistics.wideevents.db.WideEventRepository
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
+import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
 import java.time.Duration
+import java.time.LocalDateTime
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -56,12 +64,41 @@ class WideEventClientTest {
 
     private val fakeRandom = FakeRandom()
 
+    private val wideEventCleaner =
+        WideEventCleaner(
+            wideEventRepository = wideEventRepository,
+            policyEvaluator = WideEventCleanupPolicyEvaluator(PROCESS_NAME),
+            wideEventFeature = wideEventFeature,
+            currentTimeProvider = object : CurrentTimeProvider {
+                override fun elapsedRealtime(): Long = throw UnsupportedOperationException()
+
+                override fun currentTimeMillis(): Long = 0L
+
+                override fun localDateTimeNow(): LocalDateTime = throw UnsupportedOperationException()
+            },
+            pixel = mock(),
+            appCoroutineScope = coroutineRule.testScope,
+            dispatcherProvider = coroutineRule.testDispatcherProvider,
+        )
+
+    @Before
+    fun setUp() =
+        runTest {
+            whenever(wideEventRepository.getActiveWideEventIds()).thenReturn(emptyList())
+        }
+
+    private companion object {
+        const val PROCESS_NAME = ":vpn"
+    }
+
     private val wideEventClient =
         WideEventClientImpl(
             wideEventRepository = wideEventRepository,
-            wideEventFeature = { wideEventFeature },
+            wideEventFeature = lazy { wideEventFeature },
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             random = fakeRandom,
+            processName = PROCESS_NAME,
+            wideEventCleaner = wideEventCleaner,
         )
 
     @Test
@@ -86,6 +123,7 @@ class WideEventClientTest {
                 flowEntryPoint = flowEntryPoint,
                 metadata = mapOf("free_trial_eligible" to "true", "user_type" to "premium"),
                 cleanupPolicy = WideEventRepository.CleanupPolicy.OnProcessStart(
+                    ownerProcessName = PROCESS_NAME,
                     ignoreIfIntervalTimeoutPresent = true,
                     status = WideEventRepository.WideEventStatus.UNKNOWN,
                     metadata = emptyMap(),
@@ -95,6 +133,74 @@ class WideEventClientTest {
                 metaVersion = "1.0.0",
             )
         }
+
+    @Test
+    fun `when flowStart called with process-start policy then the current process owns the event`() =
+        runTest {
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(1L)
+
+            wideEventClient.flowStart(name = "flow", cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false))
+
+            val policyCaptor = argumentCaptor<WideEventRepository.CleanupPolicy>()
+            verify(wideEventRepository).insertWideEvent(any(), anyOrNull(), any(), policyCaptor.capture(), any(), anyOrNull(), any())
+            val policy = policyCaptor.firstValue as WideEventRepository.CleanupPolicy.OnProcessStart
+            assertEquals(PROCESS_NAME, policy.ownerProcessName)
+        }
+
+    @Test
+    fun `when cleanup initialization fails then every operation fails without touching events`() =
+        runTest {
+            whenever(wideEventRepository.getActiveWideEventIds()).thenThrow(IllegalStateException("db unavailable"))
+
+            val results = allOperations().map { (name, operation) -> name to operation() }
+
+            results.forEach { (name, result) -> assertTrue("$name should fail", result.isFailure) }
+            verify(wideEventRepository, times(results.size)).getActiveWideEventIds()
+            verifyNoMoreInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when cleanup initialization succeeds then operations run after it`() =
+        runTest {
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(1L)
+
+            val result = wideEventClient.flowStart(name = "flow")
+
+            assertTrue(result.isSuccess)
+            inOrder(wideEventRepository) {
+                verify(wideEventRepository).getActiveWideEventIds()
+                verify(wideEventRepository).insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any())
+            }
+        }
+
+    @SuppressLint("DenyListedApi")
+    @Test
+    fun `when process-scoped cleanup is disabled then operations do not wait for initialization`() =
+        runTest {
+            wideEventFeature.processScopedCleanup().setRawStoredState(State(false))
+            whenever(wideEventRepository.getActiveWideEventIds()).thenThrow(IllegalStateException("db unavailable"))
+            whenever(wideEventRepository.insertWideEvent(any(), anyOrNull(), any(), anyOrNull(), any(), anyOrNull(), any()))
+                .thenReturn(1L)
+
+            val result = wideEventClient.flowStart(name = "flow")
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository, never()).getActiveWideEventIds()
+        }
+
+    private fun allOperations(): List<Pair<String, suspend () -> Result<*>>> =
+        listOf(
+            "flowStart" to { wideEventClient.flowStart(name = "flow") },
+            "flowStep" to { wideEventClient.flowStep(wideEventId = 1L, stepName = "step") },
+            "flowAppendToPath" to { wideEventClient.flowAppendToPath(wideEventId = 1L, step = "step") },
+            "flowFinish" to { wideEventClient.flowFinish(wideEventId = 1L, status = FlowStatus.Success) },
+            "flowAbort" to { wideEventClient.flowAbort(wideEventId = 1L) },
+            "getFlowIds" to { wideEventClient.getFlowIds(name = "flow") },
+            "intervalStart" to { wideEventClient.intervalStart(wideEventId = 1L, key = "key") },
+            "intervalEnd" to { wideEventClient.intervalEnd(wideEventId = 1L, key = "key") },
+        )
 
     @Test
     fun `when flowStart called with minimal parameters then uses defaults`() =
@@ -381,6 +487,40 @@ class WideEventClientTest {
                 name = key,
                 timeout = Duration.ofSeconds(5),
                 buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
+            )
+        }
+
+    @Test
+    fun `when intervalStart called without rounding then forwards round down`() =
+        runTest {
+            wideEventClient.intervalStart(wideEventId = 1L, key = "k")
+
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
+            )
+        }
+
+    @Test
+    fun `when intervalStart called with round up then forwards round up`() =
+        runTest {
+            val result = wideEventClient.intervalStart(
+                wideEventId = 1L,
+                key = "k",
+                rounding = BucketRounding.RoundUp,
+            )
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).startInterval(
+                eventId = 1L,
+                name = "k",
+                timeout = null,
+                buckets = WideEventClient.DEFAULT_INTERVAL_BUCKETS.map { it.toJavaDuration() },
+                rounding = WideEventRepository.BucketRounding.ROUND_UP,
             )
         }
 
@@ -400,6 +540,7 @@ class WideEventClientTest {
                 name = "k",
                 timeout = null,
                 buckets = listOf(Duration.ofMillis(100), Duration.ofSeconds(1)),
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
             )
         }
 
@@ -419,6 +560,7 @@ class WideEventClientTest {
                 name = "k",
                 timeout = null,
                 buckets = null,
+                rounding = WideEventRepository.BucketRounding.ROUND_DOWN,
             )
         }
 
@@ -443,7 +585,7 @@ class WideEventClientTest {
             val wideEventId = 303L
             val key = "network_call"
             val exception = RuntimeException("Database error")
-            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull(), anyOrNull())).thenThrow(exception)
+            whenever(wideEventRepository.startInterval(any(), any(), anyOrNull(), anyOrNull(), any())).thenThrow(exception)
 
             val result = wideEventClient.intervalStart(wideEventId, key, 5.seconds)
 
@@ -573,6 +715,39 @@ class WideEventClientTest {
     fun `when flowStep called with SAMPLED_OUT_ID then returns success without repository interaction`() =
         runTest {
             val result = wideEventClient.flowStep(SAMPLED_OUT_FLOW_ID, "step1")
+
+            assertTrue(result.isSuccess)
+            verifyNoInteractions(wideEventRepository)
+        }
+
+    @Test
+    fun `when flowAppendToPath called then appends step to path in repository`() =
+        runTest {
+            val result = wideEventClient.flowAppendToPath(123L, "code_screen", mapOf("method" to "qr"))
+
+            assertTrue(result.isSuccess)
+            verify(wideEventRepository).appendToWideEventPath(
+                eventId = 123L,
+                step = "code_screen",
+                metadata = mapOf("method" to "qr"),
+            )
+        }
+
+    @Test
+    fun `when flowAppendToPath encounters repository exception then returns failure`() =
+        runTest {
+            val exception = RuntimeException("Database connection failed")
+            whenever(wideEventRepository.appendToWideEventPath(any(), any(), any())).thenThrow(exception)
+
+            val result = wideEventClient.flowAppendToPath(123L, "code_screen")
+
+            assertEquals(exception, result.exceptionOrNull())
+        }
+
+    @Test
+    fun `when flowAppendToPath called with SAMPLED_OUT_ID then returns success without repository interaction`() =
+        runTest {
+            val result = wideEventClient.flowAppendToPath(SAMPLED_OUT_FLOW_ID, "code_screen")
 
             assertTrue(result.isSuccess)
             verifyNoInteractions(wideEventRepository)

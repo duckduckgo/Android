@@ -22,8 +22,8 @@ import com.duckduckgo.autofill.impl.importing.capability.PasswordImportAvailabil
 import com.duckduckgo.autofill.impl.store.InternalAutofillStore
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -36,7 +36,7 @@ interface ImportInPasswordsVisibility {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealImportInPasswordsVisibility @Inject constructor(
     private val internalAutofillStore: InternalAutofillStore,
     private val autofillFeature: AutofillFeature,

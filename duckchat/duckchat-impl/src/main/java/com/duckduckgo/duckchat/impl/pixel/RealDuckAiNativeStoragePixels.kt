@@ -19,7 +19,7 @@ package com.duckduckgo.duckchat.impl.pixel
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.store.impl.DuckAiNativeStoragePixels
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import javax.inject.Inject
 
 @ContributesBinding(AppScope::class)

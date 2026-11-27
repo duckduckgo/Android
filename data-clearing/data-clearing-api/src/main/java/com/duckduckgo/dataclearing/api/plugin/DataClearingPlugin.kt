@@ -23,7 +23,7 @@ package com.duckduckgo.dataclearing.api.plugin
  * The orchestrator calls all registered plugins whenever data needs to be removed.
  * Each plugin inspects the [types] set to decide what action to take.
  *
- * Implement this interface and annotate with `@ContributesMultibinding(AppScope::class)`
+ * Implement this interface and annotate with `@ContributesIntoSet(AppScope::class)`
  * to register a plugin.
  */
 interface DataClearingPlugin {

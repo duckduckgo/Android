@@ -17,9 +17,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Personal Information Removal -->
-    <string name="pirStorageUnavailableDialogTitle">Temporary issue with Personal Information Removal</string>
-    <string name="pirStorageUnavailableDialogMessage">Please restart the DuckDuckGo app and try again.</string>
-    <string name="pirStorageUnavailableDialogButton">Got It</string>
     <string name="planTierNamePlus">Plus</string>
     <string name="planTierNamePro">Pro</string>
 
@@ -42,6 +39,15 @@
         <item quantity="other" instruction="Placeholder is the number of days until the free trial ends">Your trial ends in %1$d days</item>
     </plurals>
     <string name="subscriptionExpirationReminderNotificationDescription">Try all your new premium protections before your trial ends!</string>
+
+    <!-- Notifications Denied Dialog -->
+    <string name="subscriptionNotificationsDeniedDialogTitle">Get Notified About Your Trial?</string>
+    <plurals name="subscriptionNotificationsDeniedDialogMessage" tools:ignore="ImpliedQuantity">
+        <item quantity="one">If you turn on notifications in Settings, we\'ll send you a notification 1 day before your free trial ends.</item>
+        <item quantity="other" instruction="Placeholder is the number of days before the free trial ends">If you turn on notifications in Settings, we\'ll send you a notification %1$d days before your free trial ends.</item>
+    </plurals>
+    <string name="subscriptionNotificationsDeniedDialogNotNow">Not Now</string>
+    <string name="subscriptionNotificationsDeniedDialogOpenSettings">Open Settings</string>
 
     <!-- Subscription Onboarding (English only, not translated) -->
     <string name="subscriptionOnboardingWelcomeTitle">Protections unlocked!</string>

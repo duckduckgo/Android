@@ -38,14 +38,15 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.duckduckgo.anvil.annotations.InjectWith
 import com.duckduckgo.app.tabs.BrowserNav
 import com.duckduckgo.app.tabs.model.TabRepository
+import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoBottomSheetDialogFragment
 import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.extensions.hideKeyboard
 import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.duckchat.api.DuckChatEntryPoint
+import com.duckduckgo.duckchat.impl.DuckChatConstants.PDF_MIME_TYPE
 import com.duckduckgo.duckchat.impl.DuckChatInternal
 import com.duckduckgo.duckchat.impl.R
 import com.duckduckgo.duckchat.impl.databinding.DialogContextualDuckAiEntryBinding
@@ -66,7 +67,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
 import com.google.android.material.R as MaterialR
@@ -218,9 +218,9 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun renderViewState(state: DuckChatContextualEntryViewModel.ViewState) {
         val context = state.attachedContext
         if (context != null) {
-            binding.entryNativeInputWidget.setPageContext(context.title, context.url)
+            binding.entryNativeInputCard.widget.setPageContext(context.title, context.url, context.mimeType)
         } else {
-            binding.entryNativeInputWidget.clearPageContext()
+            binding.entryNativeInputCard.widget.clearPageContext()
         }
         updateQuickActionVisibility()
     }
@@ -237,26 +237,22 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun registerFileChooserResult() {
         externalCameraLauncher.registerForResult(this) { result ->
-            // The launcher may deliver the result from a background thread (media capture moves the file
-            // off the main thread), so hop back to the main thread before touching views / WebView callbacks.
-            lifecycleScope.launch {
-                when (result) {
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
-                        pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(result.file)))
+            when (result) {
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.MediaCaptured ->
+                    pendingUploadTask?.onReceiveValue(arrayOf(Uri.fromFile(result.file)))
 
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
-                        pendingUploadTask?.onReceiveValue(null)
-                        externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), result.inputAction)
-                    }
-
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
-                    is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
-                        pendingUploadTask?.onReceiveValue(null)
-                        Snackbar.make(binding.entryDialogRoot, result.messageId, Snackbar.LENGTH_SHORT).show()
-                    }
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.CouldNotCapturePermissionDenied -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    externalCameraLauncher.showPermissionRationaleDialog(requireActivity(), result.inputAction)
                 }
-                pendingUploadTask = null
+
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.NoMediaCaptured -> pendingUploadTask?.onReceiveValue(null)
+                is UploadFromExternalMediaAppLauncher.MediaCaptureResult.ErrorAccessingMediaApp -> {
+                    pendingUploadTask?.onReceiveValue(null)
+                    Snackbar.make(binding.entryDialogRoot, result.messageId, Snackbar.LENGTH_SHORT).show()
+                }
             }
+            pendingUploadTask = null
         }
     }
 
@@ -277,8 +273,14 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureQuickAction() {
         binding.entryPromptQuickAction.setOnClickListener {
             if (viewModel.viewState.value.attachedContext == null) return@setOnClickListener
-            viewModel.onSummarizeSubmitted(NativeInputPrompt(getString(R.string.duckAIContextualPromptSummarize), null, null, null, null, null))
+            viewModel.onSummarizeSubmitted(composerPrompt(getString(summarizePromptResource())))
         }
+    }
+
+    // Sent on the composer's model and effort, like a typed prompt, rather than the global selection.
+    private fun composerPrompt(text: String): NativeInputPrompt {
+        val widget = binding.entryNativeInputCard.widget
+        return NativeInputPrompt(text, widget.getSelectedModelId(), widget.getResolvedReasoningEffort(), null, null, null)
     }
 
     private fun configureWindowInsets() {
@@ -296,14 +298,14 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
 
     private fun focusInput() {
         // Auto-focus the composer once laid out so the keyboard comes up as soon as the dialog is shown.
-        binding.entryNativeInputWidget.doOnLayout {
-            binding.entryNativeInputWidget.focusInput(activity)
+        binding.entryNativeInputCard.widget.doOnLayout {
+            binding.entryNativeInputCard.widget.focusInput(activity)
         }
     }
 
     private fun configureSuggestions() {
         binding.entrySuggestionsView.onSuggestionSelected = { suggestion ->
-            viewModel.onSuggestionSubmitted(NativeInputPrompt(suggestion.prompt, null, null, null, null, null))
+            viewModel.onSuggestionSubmitted(composerPrompt(suggestion.prompt))
         }
 
         binding.entrySuggestionsView.onContentChanged = { updateQuickActionVisibility() }
@@ -311,7 +313,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             .onEach { command ->
                 when (command) {
                     is DuckChatContextualSharedViewModel.Command.PageContextAttached ->
-                        viewModel.onPageContextReceived(command.pageContext)
+                        if (command.tabId == tabId) viewModel.onPageContextReceived(command.pageContext)
 
                     is DuckChatContextualSharedViewModel.Command.MainBrowserPageFinished ->
                         // The dialog may have opened while the page was still loading, so the initial
@@ -338,8 +340,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     private fun configureInput() {
         contextualNativeInputManager.init(
             tabId = tabId,
-            card = binding.entryNativeInputCard,
-            widget = binding.entryNativeInputWidget,
+            inputLayout = binding.entryNativeInputCard,
             footer = binding.entryNativeInputFooter,
             jsMessaging = contentScopeScripts,
             lifecycleOwner = viewLifecycleOwner,
@@ -354,7 +355,7 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
             onAskAboutPage = { viewModel.onAttachContextRequested() },
             onPageContextRemoved = { viewModel.onContextRemoved() },
             onVoiceChatRequested = {
-                duckChat.openVoiceDuckChat(DuckChatEntryPoint.VOICE)
+                duckChat.openVoiceDuckChat(DuckChatEntryPoint.CONTEXTUAL_CHAT)
                 dismiss()
             },
             onVoiceSearchRequested = {
@@ -372,14 +373,23 @@ class DuckChatContextualEntryDialog : DuckDuckGoBottomSheetDialogFragment() {
     ) {
         if (query.isBlank()) return
         if (isDuckAiResult) {
-            viewModel.onPromptSubmitted(NativeInputPrompt(query, null, null, null, null, null))
+            val prompt = if (_binding != null) composerPrompt(query) else NativeInputPrompt(query, null, null, null, null, null)
+            viewModel.onPromptSubmitted(prompt, voice = true)
         } else {
             startActivity(browserNav.openInNewTab(requireContext(), query))
             dismiss()
         }
     }
 
+    private fun summarizePromptResource(): Int =
+        if (duckChatFeature.pdfPageContext().isEnabled() && viewModel.viewState.value.attachedContext?.mimeType == PDF_MIME_TYPE) {
+            R.string.duckAIContextualPromptSummarizeDocument
+        } else {
+            R.string.duckAIContextualPromptSummarize
+        }
+
     private fun updateQuickActionVisibility() {
+        binding.entryPromptQuickAction.setText(summarizePromptResource())
         // Summarize acts on the attached page, and suggestions take its place when present.
         val show = viewModel.viewState.value.attachedContext != null && !binding.entrySuggestionsView.hasContent()
         binding.entryPromptQuickAction.visibility = if (show) View.VISIBLE else View.GONE

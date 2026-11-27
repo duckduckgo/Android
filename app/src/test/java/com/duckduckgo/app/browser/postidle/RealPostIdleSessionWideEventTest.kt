@@ -60,7 +60,7 @@ class RealPostIdleSessionWideEventTest {
 
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any())).thenReturn(Result.success(123L))
         whenever(wideEventClient.flowStep(any(), any(), any(), any())).thenReturn(Result.success(Unit))
-        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull())).thenReturn(Result.success(Unit))
+        whenever(wideEventClient.intervalStart(any(), any(), anyOrNull(), anyOrNull(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.intervalEnd(any(), any())).thenReturn(Result.success(100.milliseconds))
         whenever(wideEventClient.flowFinish(any(), any(), any())).thenReturn(Result.success(Unit))
         whenever(wideEventClient.flowAbort(any())).thenReturn(Result.success(Unit))
@@ -91,8 +91,8 @@ class RealPostIdleSessionWideEventTest {
             samplingProbability = eq(0.05f),
             definition = any(),
         )
-        verify(wideEventClient).intervalStart(eq(123L), eq("session_duration_ms_bucketed"), anyOrNull(), anyOrNull())
-        verify(wideEventClient).intervalStart(eq(123L), eq("time_to_first_interaction_ms_bucketed"), anyOrNull(), anyOrNull())
+        verify(wideEventClient).intervalStart(eq(123L), eq("session_duration_ms_bucketed"), anyOrNull(), anyOrNull(), any())
+        verify(wideEventClient).intervalStart(eq(123L), eq("time_to_first_interaction_ms_bucketed"), anyOrNull(), anyOrNull(), any())
         verify(wideEventClient, never()).flowStep(any(), any(), any(), any())
     }
 

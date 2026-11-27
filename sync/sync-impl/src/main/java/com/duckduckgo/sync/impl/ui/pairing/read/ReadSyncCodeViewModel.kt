@@ -31,15 +31,16 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
+import dev.zacsweers.metro.Assisted
+import dev.zacsweers.metro.AssistedFactory
+import dev.zacsweers.metro.AssistedInject
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class ReadSyncCodeViewModel @AssistedInject constructor(
     @Assisted val entryPoint: SyncEntryPoint,
+    @Assisted private val launchSource: String,
     private val clipboard: Clipboard,
     private val syncPixels: SyncPixels,
     private val codeDispatcher: SyncCodeDispatcher,
@@ -68,7 +69,7 @@ class ReadSyncCodeViewModel @AssistedInject constructor(
         } else {
             CancellationReason.SCANNING_CANCELLED
         }
-        syncPixels.fireSyncSetupAbandoned(screenType, reason)
+        syncPixels.fireSyncSetupAbandoned(screenType, launchSource, reason)
     }
 
     fun pasteSyncCode() {
@@ -95,22 +96,26 @@ class ReadSyncCodeViewModel @AssistedInject constructor(
         ) : Command
 
         data class StartSyncProcess(
-            val source: SyncCodeSource,
+            val codeSource: SyncCodeSource,
         ) : Command
     }
 
     @AssistedFactory
     interface Factory {
-        fun create(entryPoint: SyncEntryPoint): ReadSyncCodeViewModel
+        fun create(
+            entryPoint: SyncEntryPoint,
+            launchSource: String,
+        ): ReadSyncCodeViewModel
 
         class Provider(
             private val assistedFactory: Factory,
             private val entryPoint: SyncEntryPoint,
+            private val launchSource: String,
         ) : ViewModelProvider.Factory {
 
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return assistedFactory.create(entryPoint) as T
+                return assistedFactory.create(entryPoint, launchSource) as T
             }
         }
     }

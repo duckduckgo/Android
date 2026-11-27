@@ -20,11 +20,11 @@ import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.file.AndroidFileDeleter
 import com.duckduckgo.common.utils.file.FileDeleter
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesTo
-import dagger.Module
-import dagger.Provides
+import dev.zacsweers.metro.BindingContainer
+import dev.zacsweers.metro.ContributesTo
+import dev.zacsweers.metro.Provides
 
-@Module
+@BindingContainer
 @ContributesTo(AppScope::class)
 object FileModule {
 

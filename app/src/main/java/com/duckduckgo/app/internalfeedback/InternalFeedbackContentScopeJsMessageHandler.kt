@@ -24,7 +24,7 @@ import com.duckduckgo.js.messaging.api.JsMessage
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessageHandler
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -40,7 +40,7 @@ import javax.inject.Inject
  *
  * Not gated on internal-user state: the form is behind SSO and the bridge is only enabled for its host.
  */
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class InternalFeedbackContentScopeJsMessageHandler @Inject constructor(
     private val deviceInfoProvider: InternalFeedbackDeviceInfoProvider,
     private val screenshotStore: InternalFeedbackScreenshotStore,

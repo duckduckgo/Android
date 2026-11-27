@@ -21,7 +21,8 @@ import com.duckduckgo.common.utils.plugins.pixel.PixelInterceptorPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_REPORT_BLOCKLIST_STATS_DAILY
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixelNames.ATP_TDS_EXPERIMENT_DOWNLOAD_FAILED
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
+import dev.zacsweers.metro.binding
 import logcat.logcat
 import okhttp3.Interceptor
 import okhttp3.Protocol
@@ -29,9 +30,9 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import javax.inject.Inject
 
-@ContributesMultibinding(
+@ContributesIntoSet(
     scope = AppScope::class,
-    boundType = PixelInterceptorPlugin::class,
+    binding = binding<PixelInterceptorPlugin>(),
 )
 class CohortPixelInterceptor @Inject constructor(
     private val cohortCalculator: CohortCalculator,

@@ -17,7 +17,7 @@
 package com.duckduckgo.experiments.impl
 
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
+import dev.zacsweers.metro.ContributesBinding
 import org.apache.commons.math3.distribution.EnumeratedIntegerDistribution
 import javax.inject.Inject
 

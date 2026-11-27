@@ -30,14 +30,14 @@ import com.duckduckgo.js.messaging.api.JsMessaging
 import com.duckduckgo.sync.api.DeviceSyncState
 import com.duckduckgo.sync.api.DeviceSyncState.SyncAccountState.SignedIn
 import com.duckduckgo.sync.api.SyncCrypto
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import logcat.LogPriority
 import logcat.asLog
 import logcat.logcat
 import org.json.JSONObject
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class EncryptWithSyncMasterKeyHandler @Inject constructor(
     private val crypto: SyncCrypto,
     private val deviceSyncState: DeviceSyncState,

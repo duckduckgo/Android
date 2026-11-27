@@ -64,6 +64,7 @@ class TabSwitcherAdapterTestAndroid {
             dispatchers = mock<DispatcherProvider>(),
             trackerCountAnimator = mock<TrackerCountAnimator>(),
             addressDisplayFormatter = mock<AddressDisplayFormatter>(),
+            duckAiTabGridItemRenderer = mock(),
         )
     }
 }

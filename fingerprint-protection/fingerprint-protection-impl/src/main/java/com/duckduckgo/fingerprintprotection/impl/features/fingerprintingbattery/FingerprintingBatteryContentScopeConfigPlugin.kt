@@ -20,10 +20,10 @@ import com.duckduckgo.contentscopescripts.api.ContentScopeConfigPlugin
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.fingerprintprotection.api.FingerprintProtectionFeatureName
 import com.duckduckgo.fingerprintprotection.store.features.fingerprintingbattery.FingerprintingBatteryRepository
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class FingerprintingBatteryContentScopeConfigPlugin @Inject constructor(
     private val fingerprintingBatteryRepository: FingerprintingBatteryRepository,
 ) : ContentScopeConfigPlugin {

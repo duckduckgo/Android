@@ -20,10 +20,10 @@ import android.content.Context
 import android.view.View
 import com.duckduckgo.app.attributed.metrics.internal.ui.AttributedMetricsSettingPlugin
 import com.duckduckgo.di.scopes.ActivityScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(ActivityScope::class)
+@ContributesIntoSet(ActivityScope::class)
 class StatisticsAttributedMetricsPlugin @Inject constructor() : AttributedMetricsSettingPlugin {
 
     override fun getView(context: Context): View {

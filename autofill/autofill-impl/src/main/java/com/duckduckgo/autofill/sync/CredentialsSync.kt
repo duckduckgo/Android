@@ -22,27 +22,25 @@ import com.duckduckgo.autofill.impl.securestorage.SecureStorage
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetails
 import com.duckduckgo.autofill.impl.securestorage.WebsiteLoginDetailsWithCredentials
 import com.duckduckgo.autofill.store.CredentialsSyncMetadataEntity
-import com.duckduckgo.autofill.sync.provider.CredentialsSyncLocalValidationFeature
 import com.duckduckgo.autofill.sync.provider.LoginCredentialEntry
 import com.duckduckgo.common.utils.formatters.time.DatabaseDateFormatter
 import com.duckduckgo.common.utils.formatters.time.SyncDateProvider
 import com.duckduckgo.common.utils.plugins.PluginPoint
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.api.SyncCrypto
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.firstOrNull
 import logcat.logcat
 import javax.inject.*
 
 typealias Iso8601String = String
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class CredentialsSync @Inject constructor(
     private val secureStorage: SecureStorage,
     private val credentialsSyncStore: CredentialsSyncStore,
     private val credentialsSyncMetadata: CredentialsSyncMetadata,
     private val syncCrypto: SyncCrypto,
-    private val credentialsSyncLocalValidationFeature: CredentialsSyncLocalValidationFeature,
     private val passwordStoreEventPlugins: PluginPoint<PasswordStoreEventListener>,
 ) {
 
@@ -224,7 +222,6 @@ class CredentialsSync @Inject constructor(
     }
 
     private fun List<LoginCredentialEntry>.validItems(): List<LoginCredentialEntry> {
-        if (credentialsSyncLocalValidationFeature.self().isEnabled().not()) return this // Skip validation if feature is disabled
         return this.filter {
             (it.title?.length ?: 0) < MAX_ENCRYPTED_TITLE_LENGTH &&
                 (it.domain?.length ?: 0) < MAX_ENCRYPTED_DOMAIN_LENGTH &&

@@ -19,8 +19,8 @@ package com.duckduckgo.pir.impl.common
 import android.webkit.CookieManager
 import android.webkit.WebStorage
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
 interface PirWebViewDataCleaner {
@@ -28,7 +28,7 @@ interface PirWebViewDataCleaner {
 }
 
 @ContributesBinding(AppScope::class)
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 class RealPirWebViewDataCleaner @Inject constructor() : PirWebViewDataCleaner {
     private val cookieManager by lazy { CookieManager.getInstance() }
     private val webStorage by lazy { WebStorage.getInstance() }

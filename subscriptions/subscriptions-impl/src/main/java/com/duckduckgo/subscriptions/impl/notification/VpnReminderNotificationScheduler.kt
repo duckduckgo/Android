@@ -20,8 +20,8 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -41,7 +41,7 @@ interface VpnReminderNotificationScheduler {
     fun cancelScheduledNotification()
 }
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class VpnReminderNotificationSchedulerImpl @Inject constructor(
     private val workManager: WorkManager,

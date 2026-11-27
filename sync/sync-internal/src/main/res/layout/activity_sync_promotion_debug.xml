@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Copyright (c) 2026 DuckDuckGo
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/includeToolbar"
+        layout="@layout/include_default_toolbar" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/contentScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Promo data" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                    android:id="@+id/promotionSetting"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    app:primaryText="Selected promo"
+                    tools:secondaryText="Bookmarks screen" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/changePromotionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_4"
+                    android:text="Change" />
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/lastImpressionSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Last impression"
+                tools:secondaryText="Never" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/keyline_4">
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/changeLastImpressionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_2"
+                    android:text="Change Impression Date" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/clearImpressionsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clear" />
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/dismissSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Dismissed"
+                tools:secondaryText="Never" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/keyline_4">
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/changeDismissButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_2"
+                    android:text="Change Dismiss Date" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/clearDismissButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clear" />
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Clear promo data" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/keyline_2"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/keyline_4">
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+                    android:id="@+id/clearPromotionDataButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_2"
+                    android:text="Clear This Promo" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonDestructive
+                    android:id="@+id/clearAllPromotionDataButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Clear All Promos" />
+            </LinearLayout>
+
+            <com.duckduckgo.common.ui.view.divider.HorizontalDivider
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Installation" />
+
+            <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
+                android:id="@+id/installationTimeSetting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="Installation date"
+                tools:secondaryText="22 Oct 2026, 09:10:00" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="@dimen/keyline_4">
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/changeInstallationTimeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/keyline_2"
+                    android:text="Change Date" />
+
+                <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                    android:id="@+id/resetInstallationTimeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reset To Real" />
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>

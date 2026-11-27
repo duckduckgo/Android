@@ -21,14 +21,14 @@ import com.duckduckgo.common.utils.extensions.toTldPlusOne
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.dashboard.PirDashboardUrlProvider
 import com.duckduckgo.pir.impl.dashboard.messaging.PirDashboardWebConstants
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import javax.inject.Inject
 
-@SingleInstanceIn(AppScope::class)
+@SingleIn(AppScope::class)
 @ContributesBinding(
     scope = AppScope::class,
-    rank = ContributesBinding.RANK_HIGHEST,
+    priority = Int.MAX_VALUE,
 )
 class InternalPirDashboardUrlProvider @Inject constructor(
     private val store: PirInternalSettingsDataStore,

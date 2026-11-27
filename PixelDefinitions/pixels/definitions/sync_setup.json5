@@ -15,7 +15,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -88,7 +88,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -121,7 +121,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -166,7 +166,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -211,7 +211,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -244,7 +244,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -283,7 +283,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -320,9 +320,28 @@
                 "enum": ["connect", "exchange"]
             },
             {
+                "key": "launch_source",
+                "type": "string",
+                "description": "The entry point that opened Sync",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
+                    "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
+                    "other"
+                ]
+            },
+            {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {
@@ -369,6 +388,25 @@
                 "type": "string",
                 "description": "Which sync setup flow failed",
                 "enum": ["connect", "exchange"]
+            },
+            {
+                "key": "launch_source",
+                "type": "string",
+                "description": "The entry point that opened Sync",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
+                    "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
+                    "other"
+                ]
             },
             {
                 "key": "reason",
@@ -462,6 +500,25 @@
                 "enum": ["connect", "exchange"]
             },
             {
+                "key": "launch_source",
+                "type": "string",
+                "description": "The entry point that opened Sync",
+                "enum": [
+                    "promotion_bookmarks",
+                    "promotion_passwords",
+                    "promotion_bookmark_added_dialog",
+                    "promotion_ai_chat",
+                    "promotion_passwords_import",
+                    "promotion_bookmarks_import",
+                    "promotion_bookmarks_multi_device",
+                    "promotion_passwords_multi_device",
+                    "promotion_bookmark_multi_device_added_dialog",
+                    "typed_url_duck_com",
+                    "typed_url_duck_ai",
+                    "other"
+                ]
+            },
+            {
                 "key": "reason",
                 "type": "string",
                 "description": "Why the setup was cancelled, based on the v2 protocol state at cancellation",
@@ -470,7 +527,7 @@
             {
                 "key": "flow_version",
                 "type": "string",
-                "description": "Which sync setup protocol stack the device is on (v2 when canUseV2ConnectFlow is enabled, v2.1 when canUseExchangeV2Point1 is also enabled)",
+                "description": "Which sync setup protocol stack the device is on: always v2.1 in current app versions; v1 and v2 are only sent by older versions",
                 "enum": ["v1", "v2", "v2.1"]
             },
             {

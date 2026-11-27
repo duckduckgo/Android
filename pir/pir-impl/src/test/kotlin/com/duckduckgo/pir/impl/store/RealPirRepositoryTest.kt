@@ -25,8 +25,12 @@ import com.duckduckgo.pir.impl.pixels.PirPixelSender
 import com.duckduckgo.pir.impl.service.DbpService
 import com.duckduckgo.pir.impl.service.DbpService.PirEmailConfirmationDataRequest
 import com.duckduckgo.pir.impl.service.DbpService.PirGetEmailConfirmationLinkResponse
+import com.duckduckgo.pir.impl.service.DbpService.PirJsonBroker
+import com.duckduckgo.pir.impl.service.DbpService.PirJsonBrokerSchedulingConfig
+import com.duckduckgo.pir.impl.service.DbpService.PirJsonBrokerUserAgent
 import com.duckduckgo.pir.impl.store.PirRepository.EmailConfirmationLinkFetchStatus
 import com.duckduckgo.pir.impl.store.db.BrokerDao
+import com.duckduckgo.pir.impl.store.db.BrokerEntity
 import com.duckduckgo.pir.impl.store.db.BrokerJsonDao
 import com.duckduckgo.pir.impl.store.db.ExtractedProfileDao
 import com.duckduckgo.pir.impl.store.db.StoredExtractedProfile
@@ -39,6 +43,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -387,6 +392,21 @@ class RealPirRepositoryTest {
         testee.deleteEmailData(emailDataList)
 
         verifyNoInteractions(mockDbpService)
+    }
+
+    @Test
+    fun whenValidUserProfilesStoredThenHasValidUserProfileQueriesReturnsTrue() = runTest {
+        whenever(mockUserProfileDao.hasValidUserProfiles()).thenReturn(true)
+
+        assertTrue(testee.hasValidUserProfileQueries())
+    }
+
+    @Test
+    fun whenDatabaseNotReadableThenHasValidUserProfileQueriesReturnsFalse() = runTest {
+        whenever(mockBrokerJsonDao.getAllBrokersCount()).thenThrow(RuntimeException("Database not readable"))
+
+        assertFalse(testee.hasValidUserProfileQueries())
+        verify(mockUserProfileDao, never()).hasValidUserProfiles()
     }
 
     // Tests for getUserProfileQuery
@@ -1045,6 +1065,27 @@ class RealPirRepositoryTest {
     }
 
     @Test
+    fun whenDeactivateBrokersNotInThenMarksBrokersRemovedAndDropsTheirEtagsInOneTransaction() = runTest {
+        val activeFileNames = setOf("broker1.json", "broker2.json")
+
+        testee.deactivateBrokersNotIn(activeFileNames, 1234L)
+
+        verify(mockDatabase).runInTransaction(any<Runnable>())
+        verify(mockBrokerDao).markBrokersRemovedExcept(activeFileNames, 1234L)
+        verify(mockBrokerJsonDao).deleteEtagsExcept(activeFileNames)
+    }
+
+    @Test
+    fun whenDeactivateBrokersNotInAndDatabaseUnavailableThenDoesNothing() = runTest {
+        whenever(mockDatabaseFactory.getDatabase()).thenReturn(null)
+
+        testee.deactivateBrokersNotIn(setOf("broker1.json"), 1234L)
+
+        verify(mockBrokerDao, never()).markBrokersRemovedExcept(any(), any())
+        verify(mockBrokerJsonDao, never()).deleteEtagsExcept(any())
+    }
+
+    @Test
     fun whenUpdateProfileQueriesAndDatabaseUnavailableThenReturnFalse() = runTest {
         whenever(mockDatabaseFactory.getDatabase()).thenReturn(null)
 
@@ -1055,5 +1096,58 @@ class RealPirRepositoryTest {
         )
 
         assertEquals(false, result)
+    }
+
+    @Test
+    fun whenUpdateBrokerDataWithAndroidUserAgentThenStoresUserAgent() = runTest {
+        testee.updateBrokerData("broker.json", jsonBroker(userAgent = PirJsonBrokerUserAgent(android = TEST_USER_AGENT)))
+
+        val captor = argumentCaptor<BrokerEntity>()
+        verify(mockBrokerDao).upsert(captor.capture(), any(), any(), any(), any())
+        assertEquals(TEST_USER_AGENT, captor.firstValue.userAgent)
+    }
+
+    @Test
+    fun whenUpdateBrokerDataWithEmptyAndroidUserAgentThenStoresNullUserAgent() = runTest {
+        testee.updateBrokerData("broker.json", jsonBroker(userAgent = PirJsonBrokerUserAgent(android = "")))
+
+        val captor = argumentCaptor<BrokerEntity>()
+        verify(mockBrokerDao).upsert(captor.capture(), any(), any(), any(), any())
+        assertNull(captor.firstValue.userAgent)
+    }
+
+    @Test
+    fun whenGetBrokerForNameThenMapsStoredUserAgent() = runTest {
+        whenever(mockBrokerDao.getBrokerDetails("broker")).thenReturn(
+            BrokerEntity(
+                name = "broker",
+                fileName = "broker.json",
+                url = "https://broker.com",
+                version = "1.0",
+                parent = null,
+                addedDatetime = 1000L,
+                removedAt = 0L,
+                userAgent = TEST_USER_AGENT,
+            ),
+        )
+
+        assertEquals(TEST_USER_AGENT, testee.getBrokerForName("broker")?.userAgent)
+    }
+
+    private fun jsonBroker(userAgent: PirJsonBrokerUserAgent?) = PirJsonBroker(
+        name = "broker",
+        url = "https://broker.com",
+        version = "1.0",
+        parent = null,
+        addedDatetime = 1000L,
+        optOutUrl = "https://broker.com/optout",
+        steps = listOf("""{"stepType":"scan"}""", """{"stepType":"optOut"}"""),
+        schedulingConfig = PirJsonBrokerSchedulingConfig(retryError = 1, confirmOptOutScan = 1, maintenanceScan = 1, maxAttempts = 1),
+        removedAt = null,
+        userAgent = userAgent,
+    )
+
+    private companion object {
+        const val TEST_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:142.0) Gecko/20100101 Firefox/142.0"
     }
 }

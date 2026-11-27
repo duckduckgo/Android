@@ -18,10 +18,10 @@ package com.duckduckgo.duckchat.internal
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import javax.inject.Inject
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class DuckAiUsageWarningsDevCapabilityPlugin @Inject constructor(
     private val context: Context,
 ) : DuckAiDevCapabilityPlugin {

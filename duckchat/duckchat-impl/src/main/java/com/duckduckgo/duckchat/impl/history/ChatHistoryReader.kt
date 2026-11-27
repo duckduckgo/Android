@@ -32,8 +32,8 @@ import com.duckduckgo.duckchat.impl.helper.DuckChatJSHelper
 import com.duckduckgo.duckchat.impl.ui.DuckChatWebViewClient
 import com.duckduckgo.js.messaging.api.JsMessageCallback
 import com.duckduckgo.js.messaging.api.JsMessaging
-import com.squareup.anvil.annotations.ContributesBinding
-import dagger.SingleInstanceIn
+import dev.zacsweers.metro.ContributesBinding
+import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -53,7 +53,7 @@ interface ChatHistoryReader {
 }
 
 @ContributesBinding(ActivityScope::class)
-@SingleInstanceIn(ActivityScope::class)
+@SingleIn(ActivityScope::class)
 class RealChatHistoryReader @Inject constructor(
     @ActivityContext private val context: Context,
     private val dispatchers: DispatcherProvider,

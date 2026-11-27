@@ -41,6 +41,7 @@ internal sealed class PendingAction {
         val skipHome: Boolean,
         val isExternal: Boolean,
         val inputModeTarget: InputMode? = null,
+        val launchingAppPackage: String? = null,
     ) : PendingAction()
     data class OpenExistingTab(val tabId: String) : PendingAction()
 }
@@ -66,6 +67,7 @@ internal fun PendingModeSwitch.toBundle(): Bundle {
             bundle.putBoolean(KEY_SKIP_HOME, pendingAction.skipHome)
             bundle.putBoolean(KEY_IS_EXTERNAL, pendingAction.isExternal)
             bundle.putString(KEY_INPUT_MODE_TARGET, pendingAction.inputModeTarget?.name)
+            bundle.putString(KEY_LAUNCHING_APP_PACKAGE, pendingAction.launchingAppPackage)
         }
         is PendingAction.OpenExistingTab -> {
             bundle.putString(KEY_ACTION, ACTION_OPEN_EXISTING_TAB)
@@ -89,6 +91,7 @@ internal fun Bundle.toPendingModeSwitch(): PendingModeSwitch? {
             skipHome = getBoolean(KEY_SKIP_HOME),
             isExternal = getBoolean(KEY_IS_EXTERNAL),
             inputModeTarget = getString(KEY_INPUT_MODE_TARGET)?.let { runCatching { InputMode.valueOf(it) }.getOrNull() },
+            launchingAppPackage = getString(KEY_LAUNCHING_APP_PACKAGE),
         )
         ACTION_OPEN_EXISTING_TAB -> PendingAction.OpenExistingTab(
             tabId = getString(KEY_EXISTING_TAB_ID) ?: return null,
@@ -107,6 +110,7 @@ private const val KEY_SOURCE_TAB_ID = "pendingModeSwitchSourceTabId"
 private const val KEY_SKIP_HOME = "pendingModeSwitchSkipHome"
 private const val KEY_IS_EXTERNAL = "pendingModeSwitchIsExternal"
 private const val KEY_INPUT_MODE_TARGET = "pendingModeSwitchInputModeTarget"
+private const val KEY_LAUNCHING_APP_PACKAGE = "pendingModeSwitchLaunchingAppPackage"
 private const val KEY_EXISTING_TAB_ID = "pendingModeSwitchExistingTabId"
 private const val ACTION_PROCESS_INTENT = "processIntent"
 private const val ACTION_OPEN_NEW_TAB = "openNewTab"

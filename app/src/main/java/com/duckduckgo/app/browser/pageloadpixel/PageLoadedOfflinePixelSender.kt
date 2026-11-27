@@ -21,7 +21,7 @@ import com.duckduckgo.app.statistics.api.OfflinePixel
 import com.duckduckgo.app.statistics.api.PixelSender
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Count
 import com.duckduckgo.di.scopes.AppScope
-import com.squareup.anvil.annotations.ContributesMultibinding
+import dev.zacsweers.metro.ContributesIntoSet
 import io.reactivex.Completable
 import logcat.logcat
 import javax.inject.Inject
@@ -36,7 +36,7 @@ private const val CONCURRENT_REQUESTS_ON_FINISH = "concurrent_requests_on_finish
 // This is used to ensure the app version we send is the one from the moment the page was loaded, and not then the pixel is fired later on
 private const val APP_VERSION = "app_version_when_page_loaded"
 
-@ContributesMultibinding(AppScope::class)
+@ContributesIntoSet(AppScope::class)
 class PageLoadedOfflinePixelSender @Inject constructor(
     private val pageLoadedPixelDao: PageLoadedPixelDao,
     private val pixelSender: PixelSender,
