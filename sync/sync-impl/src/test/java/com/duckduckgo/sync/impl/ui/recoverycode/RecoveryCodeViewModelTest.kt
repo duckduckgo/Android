@@ -30,7 +30,6 @@ import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
-import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeViewModel.Command.CheckStoragePermission
 import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeViewModel.Command.Close
 import com.duckduckgo.sync.impl.ui.recoverycode.RecoveryCodeViewModel.Command.ShareRecoveryCodeFile
@@ -46,7 +45,6 @@ import org.junit.Test
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.inOrder
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -114,9 +112,7 @@ class RecoveryCodeViewModelTest {
         givenRecoveryCodeAvailable()
 
         testee.viewState.test {
-            val inOrder = inOrder(syncSetupWideEvent)
-            inOrder.verify(syncSetupWideEvent).onStep(SetupStep.RECOVERY_CODE_SHOWN)
-            inOrder.verify(syncSetupWideEvent).onSucceeded()
+            verify(syncSetupWideEvent).onRecoveryCodeScreenShown()
 
             cancelAndIgnoreRemainingEvents()
         }
@@ -155,7 +151,7 @@ class RecoveryCodeViewModelTest {
         whenever(syncAccountRepository.getRecoveryCode()).thenReturn(Result.Error(reason = "boom"))
 
         testee.viewState.test {
-            verify(syncSetupWideEvent).onFailed(SetupFailureReason.RECOVERY_CODE_GENERATION_FAILED)
+            verify(syncSetupWideEvent).onRecoveryCodeScreenFailed(SetupFailureReason.RECOVERY_CODE_GENERATION_FAILED)
             verify(syncSetupWideEvent, never()).onSucceeded()
 
             cancelAndIgnoreRemainingEvents()
@@ -168,7 +164,7 @@ class RecoveryCodeViewModelTest {
         whenever(syncAccountRepository.createAccount()).thenReturn(Result.Error(reason = "boom"))
 
         testee.viewState.test {
-            verify(syncSetupWideEvent).onFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
+            verify(syncSetupWideEvent).onRecoveryCodeScreenFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
 
             cancelAndIgnoreRemainingEvents()
         }

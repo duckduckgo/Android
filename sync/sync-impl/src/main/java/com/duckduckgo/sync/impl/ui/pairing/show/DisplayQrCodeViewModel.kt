@@ -80,6 +80,9 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     @Volatile
     private var isSignedIn = false
 
+    @Volatile
+    private var pairingCompleted = false
+
     private val syncType: ScreenType
         get() = if (isSignedIn) SYNC_EXCHANGE else SYNC_CONNECT
 
@@ -110,6 +113,11 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     fun onJoinerDenied() {
         _viewState.update { it.copy(dialog = null) }
         codeDispatcher.denyJoiner()
+    }
+
+    fun onScreenClosed() {
+        if (pairingCompleted) return
+        setupEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
     }
 
     fun onErrorDialogDismissed() {
@@ -153,6 +161,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     }
 
     private suspend fun startV2Presentation() {
+        setupEvent.onStep(SetupStep.PREPARING_CODE)
         codeDispatcher.presentV2().collect { outcome ->
             setupEvent.onPairingOutcome(outcome)
             pixels.fireSetupFailed(syncType, launchSource, outcome)
@@ -173,6 +182,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                 }
 
                 is DispatchOutcome.LoggedIn -> {
+                    pairingCompleted = true
                     _viewState.update { it.copy(dialog = null) }
                     pixels.fireLoginPixel()
                     switchedAccountDetector.onPaired()
