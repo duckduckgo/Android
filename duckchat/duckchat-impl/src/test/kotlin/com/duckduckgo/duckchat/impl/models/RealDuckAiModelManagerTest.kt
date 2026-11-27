@@ -43,7 +43,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -764,16 +763,17 @@ class RealDuckAiModelManagerTest {
     }
 
     @Test
-    fun whenResetModelForNewChatsAndOverLimitResetsThenBackToServerDefaultOnTime() = runTest {
+    fun whenResetModelForNewChatsAndOverLimitResetHasPassedThenNextFetchIsBackOnServerDefault() = runTest {
         givenResetModelForNewChatsWithServerDefault()
         testee.fetchModels()
         usageLimits.value = overLimitSnapshot("gpt-6-luna", resetsAtMillis = NOW_MILLIS + 1_000)
-
-        coroutineRule.testScope.advanceTimeBy(999)
         assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
 
-        coroutineRule.testScope.advanceTimeBy(2)
+        whenever(currentTimeProvider.currentTimeMillis()).thenReturn(NOW_MILLIS + 1_000)
+        testee.fetchModels()
+
         assertEquals("server-model", testee.modelState.value.selectedModelId)
+        assertEquals(NewChatDefault("server-model", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
     }
 
     @Test

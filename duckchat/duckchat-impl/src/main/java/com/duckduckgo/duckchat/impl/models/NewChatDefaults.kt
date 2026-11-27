@@ -35,14 +35,19 @@ internal object NewChatDefaults {
         return newChatDefault(modelId, remote.reasoningEffort)
     }
 
-    /** [overLimit] while its model is accessible in [models], else the [preferred] server or tier default. */
+    /**
+     * [overLimit] until its reset and while its model is accessible in [models], else the [preferred] server or tier
+     * default. The reset is checked against the wall clock here rather than timed, since a timer stops while the device sleeps.
+     */
     fun preferred(
         tier: UserTier,
         remote: RemoteNewChatDefault?,
         overLimit: OverLimitNewChatDefault?,
         models: List<AIChatModel>,
+        nowMillis: Long,
     ): NewChatDefault {
-        val overLimitModelId = overLimit?.modelId?.takeIf { id -> models.any { it.id == id && it.isAccessible } }
+        val overLimitModelId = overLimit?.takeIf { nowMillis < it.resetsAtMillis }
+            ?.modelId?.takeIf { id -> models.any { it.id == id && it.isAccessible } }
             ?: return preferred(tier, remote)
         return newChatDefault(overLimitModelId, overLimit.reasoningEffort)
     }
