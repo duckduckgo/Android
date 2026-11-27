@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Salta</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Importa le password da Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google potrebbe chiederti di effettuare l\'accesso o di inserire la password per confermare.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importa da Google</string>
     <string name="preOnboardingImportCompleteTitle">Importazione completata</string>
     <string name="preOnboardingImportCompleteCta">Continua</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importazione password in corso</string>

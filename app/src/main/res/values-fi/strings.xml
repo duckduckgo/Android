@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Ohita</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Tuo salasanat Googlesta</string>
-    <string name="preOnboardingImportPasswordsBody">Google saattaa pyytää sinua kirjautumaan sisään tai antamaan salasanasi vahvistusta varten.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Tuo Googlesta</string>
     <string name="preOnboardingImportCompleteTitle">Tuonti on valmis</string>
     <string name="preOnboardingImportCompleteCta">Jatka</string>
     <string name="preOnboardingImportCompleteParsingTitle">Tuodaan salasanoja</string>

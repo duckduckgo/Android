@@ -984,9 +984,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Preskoči</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Uvezi lozinke s Googlea</string>
-    <string name="preOnboardingImportPasswordsBody">Google te može tražiti da se prijaviš ili uneseš svoju lozinku za potvrdu.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Uvezi s Googlea</string>
     <string name="preOnboardingImportCompleteTitle">Uvoz je završen</string>
     <string name="preOnboardingImportCompleteCta">Nastavi</string>
     <string name="preOnboardingImportCompleteParsingTitle">Uvoz lozinki</string>

@@ -235,7 +235,7 @@ class DialogConfigResolver @Inject constructor(
             cardArrow = CardArrowConfig.AtStartMirrored,
             content = ContentConfig.ImportPasswords(
                 title = TextConfig.Resource(R.string.preOnboardingImportYourPasswordsTitle),
-                body = TextConfig.Resource(R.string.preOnboardingImportYourPasswordsBody),
+                body = TextConfig.Resource(R.string.preOnboardingImportYourPasswordsUnlockBody),
             ),
             primaryCta = CtaConfig(
                 text = TextConfig.Resource(R.string.preOnboardingImportYourPasswordsPrimaryCta),

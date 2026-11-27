@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Spring over</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Importer adgangskoder fra Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google kan bede dig om at logge ind eller indtaste din adgangskode for at bekræfte.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importer fra Google</string>
     <string name="preOnboardingImportCompleteTitle">Import er fuldført</string>
     <string name="preOnboardingImportCompleteCta">Forsæt</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importerer adgangskoder</string>

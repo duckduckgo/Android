@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Overslaan</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Wachtwoorden importeren van Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google kan je vragen om in te loggen of je wachtwoord in te voeren ter bevestiging.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importeren van Google</string>
     <string name="preOnboardingImportCompleteTitle">Importeren voltooid</string>
     <string name="preOnboardingImportCompleteCta">Doorgaan</string>
     <string name="preOnboardingImportCompleteParsingTitle">Wachtwoorden importeren...</string>
