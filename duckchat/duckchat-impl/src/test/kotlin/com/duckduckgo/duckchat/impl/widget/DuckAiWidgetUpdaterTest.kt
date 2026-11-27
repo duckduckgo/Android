@@ -55,6 +55,7 @@ class DuckAiWidgetUpdaterTest {
         context = context,
         chats = DuckAiChatsWidgetChats(stringContext, chatStore),
         appCoroutineScope = coroutineTestRule.testScope,
+        dispatcherProvider = coroutineTestRule.testDispatcherProvider,
     )
 
     @Test
@@ -74,7 +75,12 @@ class DuckAiWidgetUpdaterTest {
         val widgetContext = object : ContextWrapper(context) {
             override fun getSystemService(name: String): Any? = if (name == APPWIDGET_SERVICE) manager else super.getSystemService(name)
         }
-        val updater = DuckAiWidgetUpdater(widgetContext, DuckAiChatsWidgetChats(stringContext, chatStore), coroutineTestRule.testScope)
+        val updater = DuckAiWidgetUpdater(
+            widgetContext,
+            DuckAiChatsWidgetChats(stringContext, chatStore),
+            coroutineTestRule.testScope,
+            coroutineTestRule.testDispatcherProvider,
+        )
         updater.startObservingIfNeeded()
         assertEquals(1, chatsFlow.subscriptionCount.value)
         shadowOf(context).clearBroadcastIntents()
