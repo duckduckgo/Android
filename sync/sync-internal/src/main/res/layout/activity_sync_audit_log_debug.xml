@@ -162,6 +162,13 @@
                 android:layout_margin="10dp"
                 android:text="Mark all as seen" />
 
+            <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                android:id="@+id/showTestNotificationButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:text="Show test notification" />
+
             <com.duckduckgo.common.ui.view.text.DaxTextView
                 android:id="@+id/unseenLoginsResultTextView"
                 android:layout_width="match_parent"
