@@ -51,7 +51,15 @@ sealed interface ExchangeV2CodeParseResult {
     data object LinkingV1 : ExchangeV2CodeParseResult
 
     /** A recovery code — no URL prefix. Caller routes to recovery-handling path. */
-    data class RecoveryCode(val rawJson: JSONObject) : ExchangeV2CodeParseResult
+    data class RecoveryCode(
+        val userId: String,
+        val secret: String,
+        val cid: String,
+        val version: ExchangeProtocolVersion.V2,
+    ) : ExchangeV2CodeParseResult
+
+    /** Recognized recovery input that must not fall through to legacy login. */
+    data object InvalidRecoveryCode : ExchangeV2CodeParseResult
 
     /** Anything we couldn't interpret. */
     data object Unknown : ExchangeV2CodeParseResult
@@ -92,9 +100,20 @@ class RealExchangeV2QrCode @Inject constructor() : ExchangeV2QrCode {
         // Recovery code: {"recovery": { user_id, secret, ... }}
         if (json.has("recovery")) {
             val recovery = json.optJSONObject("recovery") ?: return ExchangeV2CodeParseResult.Unknown
-            if (recovery.has("user_id") && recovery.has("secret")) {
-                return ExchangeV2CodeParseResult.RecoveryCode(rawJson = recovery)
+            if (!recovery.has("secret") && recovery.has("primary_key")) return ExchangeV2CodeParseResult.Unknown
+            val version = if (recovery.has("v")) {
+                (recovery.opt("v") as? String)?.let { ExchangeProtocolVersion.parseOrUnsupported(it) }
+            } else {
+                ExchangeProtocolVersion.V2_0
             }
+            if (version !is ExchangeProtocolVersion.V2) {
+                return ExchangeV2CodeParseResult.InvalidRecoveryCode
+            }
+            val userId = (recovery.opt("user_id") as? String)?.takeIf { it.isNotBlank() }
+            val secret = (recovery.opt("secret") as? String)?.takeIf { it.isNotBlank() }
+            val cid = if (recovery.has("cid")) recovery.opt("cid") as? String else "ddg"
+            if (userId == null || secret == null || cid == null) return ExchangeV2CodeParseResult.InvalidRecoveryCode
+            return ExchangeV2CodeParseResult.RecoveryCode(userId, secret, cid, version)
         }
 
         // Accept any same-major (2.x) version per Transport TD 1214486492252757 §Versioning.

@@ -40,10 +40,14 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Runner
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
+import com.duckduckgo.sync.impl.exchange.v2.RealExchangeV2QrCode
 import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
@@ -84,10 +88,12 @@ class RealSyncCodeDispatcherTest {
         whenever(it.protocolVersion).thenReturn(ExchangeProtocolVersion.V2_0)
     }
 
+    private val setupEvent = mock<SyncSetupWideEvent>()
     private val dispatcher = RealSyncCodeDispatcher(
         syncAccountRepository = syncAccountRepository,
         qrCode = qrCode,
         runner = runner,
+        setupEvent = setupEvent,
     )
 
     @Test fun `v2 parser returns LinkingV1 - falls back to legacy stack`() {
@@ -108,6 +114,18 @@ class RealSyncCodeDispatcherTest {
         val decision = dispatcher.route("recovery-code") as RouteDecision.Legacy
 
         assertSame(recovery, decision.authCode)
+    }
+
+    @Test fun `newer major linking code is rejected at entry before a session is started`() {
+        val rawCode = """{"version":"3","channel_id":"channel","public_key":"key"}"""
+        val encoded = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(rawCode.toByteArray())
+        val url = "https://duckduckgo.com/sync/pairing/#&code2=$encoded"
+        val unknown = SyncAuthCode.Unknown(url)
+        whenever(syncAccountRepository.parseSyncAuthCode(url)).thenReturn(unknown)
+        val dispatcher = RealSyncCodeDispatcher(syncAccountRepository, RealExchangeV2QrCode(), runner, setupEvent)
+
+        assertEquals(RouteDecision.Legacy(unknown), dispatcher.route(url))
+        verify(runner, never()).startScan(any())
     }
 
     @Test fun `v2 LinkingV2 - returns V2InProgress and does NOT call parseSyncAuthCode`() {
@@ -139,7 +157,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", "s-1")
             put("cid", "ddg")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
 
         val decision = dispatcher.route("any") as RouteDecision.V2InProgress
@@ -159,7 +177,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", base64urlSecret)
             put("cid", "ddg")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
 
         (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.toList()
@@ -177,7 +195,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", "s-1")
             put("cid", "ddg")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
 
         val decision = dispatcher.route("any") as RouteDecision.V2InProgress
         val outcome = decision.outcomes.first()
@@ -192,7 +210,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", "s-3p")
             put("cid", "3party")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
 
         val decision = dispatcher.route("any") as RouteDecision.V2InProgress
@@ -203,6 +221,116 @@ class RealSyncCodeDispatcherTest {
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
     }
 
+    @Test fun `direct recovery code with newer major is rejected before login`() = runTest {
+        val dispatcher = RealSyncCodeDispatcher(syncAccountRepository, RealExchangeV2QrCode(), runner, setupEvent)
+        for (cid in listOf("ddg", "3party")) {
+            val payload = """{"recovery":{"user_id":"user","secret":"c2VjcmV0","cid":"$cid","v":"3.0"}}"""
+            val encoded = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(payload.toByteArray())
+
+            val outcome = (dispatcher.route(encoded) as RouteDecision.V2InProgress).outcomes.toList().single() as DispatchOutcome.Failed
+
+            assertEquals(SetupCancellationReason.CODE_REJECTED, outcome.cancellationReason)
+            assertEquals(SetupPath.RECOVERY, outcome.path)
+        }
+        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
+        verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
+        verify(runner, never()).startScan(any())
+        verify(setupEvent, never()).onStep(SetupStep.PREPARING_SYNC)
+    }
+
+    @Test fun `direct recovery code with missing or blank required fields is rejected before login`() = runTest {
+        for (cid in listOf("ddg", "3party")) {
+            for (field in listOf("user_id", "secret")) {
+                for (invalidValue in listOf(null, JSONObject.NULL, "", " \t", 42, true, JSONObject(), org.json.JSONArray())) {
+                    val rawJson = JSONObject().apply {
+                        put("user_id", "user")
+                        put("secret", "c2VjcmV0")
+                        put("cid", cid)
+                        put(field, invalidValue)
+                    }
+                    whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
+
+                    val outcome = (dispatcher.route("code") as RouteDecision.V2InProgress).outcomes.toList().single() as DispatchOutcome.Failed
+
+                    assertEquals(SetupCancellationReason.CODE_REJECTED, outcome.cancellationReason)
+                }
+            }
+        }
+        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
+        verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
+        verify(setupEvent, never()).onStep(SetupStep.PREPARING_SYNC)
+    }
+
+    @Test fun `valid direct recovery records preparation immediately before login`() = runTest {
+        for (cid in listOf("ddg", "3party")) {
+            val rawJson = JSONObject().apply {
+                put("user_id", "user")
+                put("secret", "c2VjcmV0")
+                put("cid", cid)
+            }
+            whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
+            whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenAnswer {
+                org.mockito.kotlin.verify(setupEvent).onStep(SetupStep.PREPARING_SYNC)
+                Result.Success(true)
+            }
+            whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenAnswer {
+                org.mockito.kotlin.verify(setupEvent).onStep(SetupStep.PREPARING_SYNC)
+                Result.Success(true)
+            }
+
+            val outcome = (dispatcher.route("code") as RouteDecision.V2InProgress).outcomes.toList().single()
+
+            assertEquals(DispatchOutcome.LoggedIn(SetupPath.RECOVERY), outcome)
+            org.mockito.kotlin.clearInvocations(setupEvent)
+        }
+    }
+
+    @Test fun `direct recovery version and credential type must be strings when present`() = runTest {
+        for (field in listOf("v", "cid")) {
+            for (invalidValue in listOf(JSONObject.NULL, 2, 2.0, true, JSONObject(), org.json.JSONArray())) {
+                val rawJson = JSONObject().apply {
+                    put("user_id", "user")
+                    put("secret", "c2VjcmV0")
+                    put("cid", "ddg")
+                    put("v", "2.0")
+                    put(field, invalidValue)
+                }
+                whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
+
+                val outcome = (dispatcher.route("code") as RouteDecision.V2InProgress).outcomes.toList().single() as DispatchOutcome.Failed
+
+                assertEquals(SetupCancellationReason.CODE_REJECTED, outcome.cancellationReason)
+            }
+        }
+        verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
+        verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
+        verify(setupEvent, never()).onStep(SetupStep.PREPARING_SYNC)
+    }
+
+    @Test fun `direct recovery code accepts missing version and all supported major two versions`() = runTest {
+        val dispatcher = RealSyncCodeDispatcher(syncAccountRepository, RealExchangeV2QrCode(), runner, setupEvent)
+        whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(Result.Success(true))
+        whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
+        for (cid in listOf("ddg", "3party")) {
+            for (version in listOf(null, "2", "2.0", "2.1", "2.99")) {
+                val recovery = JSONObject().apply {
+                    put("user_id", "user")
+                    put("secret", "c2VjcmV0")
+                    put("cid", cid)
+                    put("v", version)
+                }
+                val payload = JSONObject().put("recovery", recovery).toString()
+                val encoded = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(payload.toByteArray())
+
+                val outcome = (dispatcher.route(encoded) as RouteDecision.V2InProgress).outcomes.toList().single()
+
+                assertEquals(DispatchOutcome.LoggedIn(SetupPath.RECOVERY), outcome)
+            }
+        }
+        verify(syncAccountRepository, org.mockito.kotlin.times(5)).processCode(any(), anyOrNull())
+        verify(syncAccountRepository, org.mockito.kotlin.times(5)).joinAccountFromThirdPartyRecoveryCode(any())
+    }
+
     @Test fun `v2 RecoveryCode cid=3party - re-encoded code is canonical JSON without escaped slashes`() = runTest {
         val secretWithSlashes = "apZ+7PAe89rDhuG4DRyi/M3zU2/D5DZNdRsR3RM6Ujw="
         val rawJson = JSONObject().apply {
@@ -211,7 +339,7 @@ class RealSyncCodeDispatcherTest {
             put("cid", "3party")
             put("v", "2.0")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(Result.Success(true))
 
         (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.toList()
@@ -224,7 +352,7 @@ class RealSyncCodeDispatcherTest {
         assertEquals(secretWithSlashes, recovery.getString("secret"))
         assertEquals("u-3p", recovery.getString("user_id"))
         assertEquals("3party", recovery.getString("cid"))
-        assertEquals("2.0", recovery.getString("v"))
+        assertEquals("2", recovery.getString("v"))
     }
 
     @Test fun `v2 RecoveryCode cid=ddg - ALREADY_SIGNED_IN triggers logoutAndJoinNewAccount and emits LoggedIn`() = runTest {
@@ -234,7 +362,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", base64urlSecret)
             put("cid", "ddg")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
             Result.Error(
                 code = ALREADY_SIGNED_IN.code,
@@ -265,7 +393,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", secretWithSlashes)
             put("cid", "ddg")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
             Result.Error(
                 code = ALREADY_SIGNED_IN.code,
@@ -291,7 +419,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", "s-other")
             put("cid", "ddg")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
             Result.Error(
                 code = ALREADY_SIGNED_IN.code,
@@ -316,7 +444,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", "s-3p")
             put("cid", "3party")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(
             Result.Error(
                 code = ALREADY_SIGNED_IN.code,
@@ -331,6 +459,7 @@ class RealSyncCodeDispatcherTest {
                 "Already signed in",
                 ALREADY_SIGNED_IN.code,
                 path = SetupPath.RECOVERY,
+                cancellationReason = SetupCancellationReason.ACCOUNT_SWITCH_BLOCKED,
             ),
             outcome,
         )
@@ -343,7 +472,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", "AQID") // valid base64 so decoding succeeds and processCode is reached
             put("cid", "ddg")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.processCode(any(), anyOrNull())).thenReturn(
             Result.Error(code = -1, reason = "Some other error"),
         )
@@ -359,7 +488,7 @@ class RealSyncCodeDispatcherTest {
             put("secret", "s-3p")
             put("cid", "3party")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
         whenever(syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(any())).thenReturn(
             Result.Error(reason = "BE rejected"),
         )
@@ -375,12 +504,13 @@ class RealSyncCodeDispatcherTest {
             put("secret", "s")
             put("cid", "future-credential")
         }
-        whenever(qrCode.parse(any())).thenReturn(ExchangeV2CodeParseResult.RecoveryCode(rawJson))
+        whenever(qrCode.parse(any())).thenReturn(parseRecoveryCode(rawJson))
 
         val outcome = (dispatcher.route("any") as RouteDecision.V2InProgress).outcomes.first()
 
         assertTrue("expected Failed, got $outcome", outcome is DispatchOutcome.Failed)
         assertTrue((outcome as DispatchOutcome.Failed).reason.contains("future-credential"))
+        assertEquals(SetupCancellationReason.CODE_REJECTED, outcome.cancellationReason)
     }
 
     @Test fun `Legacy path - dispatcher never invokes processCode (caller owns that)`() = runTest {
@@ -1051,6 +1181,7 @@ class RealSyncCodeDispatcherTest {
                 DispatchOutcome.Failed(
                     "peer_left(cancelled)",
                     PAIRING_REJECTED.code,
+                    cancellationReason = SetupCancellationReason.PEER_LEFT,
                     path = SetupPath.PAIRING,
                     myRole = SetupRole.JOINER,
                 ),
@@ -1073,6 +1204,7 @@ class RealSyncCodeDispatcherTest {
                 DispatchOutcome.Failed(
                     "peer_left(error)",
                     PAIRING_FAILED.code,
+                    cancellationReason = SetupCancellationReason.PEER_LEFT,
                     path = SetupPath.PAIRING,
                     myRole = SetupRole.HOST,
                 ),
@@ -1095,6 +1227,7 @@ class RealSyncCodeDispatcherTest {
                 DispatchOutcome.Failed(
                     "peer_left(future_reason)",
                     PAIRING_FAILED.code,
+                    cancellationReason = SetupCancellationReason.PEER_LEFT,
                     path = SetupPath.PAIRING,
                     myRole = SetupRole.HOST,
                 ),
@@ -1142,7 +1275,12 @@ class RealSyncCodeDispatcherTest {
                 ),
             )
             assertEquals(
-                DispatchOutcome.Failed("peer_left(cancelled)", PAIRING_REJECTED.code, path = SetupPath.PAIRING),
+                DispatchOutcome.Failed(
+                    "peer_left(cancelled)",
+                    PAIRING_REJECTED.code,
+                    path = SetupPath.PAIRING,
+                    cancellationReason = SetupCancellationReason.PEER_LEFT,
+                ),
                 awaitItem(),
             )
             cancelAndIgnoreRemainingEvents()
@@ -1478,5 +1616,10 @@ class RealSyncCodeDispatcherTest {
         }
         verify(syncAccountRepository, never()).processCode(any(), anyOrNull())
         verify(syncAccountRepository, never()).joinAccountFromThirdPartyRecoveryCode(any())
+    }
+    private fun parseRecoveryCode(recovery: JSONObject): ExchangeV2CodeParseResult {
+        val payload = JSONObject().put("recovery", recovery).toString()
+        val encoded = java.util.Base64.getUrlEncoder().withoutPadding().encodeToString(payload.toByteArray())
+        return RealExchangeV2QrCode().parse(encoded)
     }
 }

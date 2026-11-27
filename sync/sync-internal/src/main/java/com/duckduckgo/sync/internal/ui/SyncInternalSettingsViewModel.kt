@@ -388,7 +388,9 @@ constructor(
                 "v2 linking code\nversion ${parsed.version}\nchannel_id: ${parsed.channelId}\npublic_key: ${parsed.publicKey}"
             }
 
-            is ExchangeV2CodeParseResult.RecoveryCode -> "recovery code\n${parsed.rawJson}"
+            is ExchangeV2CodeParseResult.RecoveryCode -> "recovery code\n$decodedPayload"
+
+            is ExchangeV2CodeParseResult.InvalidRecoveryCode -> "invalid recovery code\n$decodedPayload"
 
             is ExchangeV2CodeParseResult.Unknown -> decodedPayload
         }

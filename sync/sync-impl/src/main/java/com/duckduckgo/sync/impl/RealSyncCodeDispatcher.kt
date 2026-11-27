@@ -43,14 +43,18 @@ import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
 import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.transformWhile
@@ -64,6 +68,7 @@ class RealSyncCodeDispatcher @Inject constructor(
     private val syncAccountRepository: SyncAccountRepository,
     private val qrCode: ExchangeV2QrCode,
     private val runner: ExchangeV2Runner,
+    private val setupEvent: SyncSetupWideEvent,
 ) : SyncCodeDispatcher {
 
     override fun confirmJoiner() {
@@ -150,9 +155,16 @@ class RealSyncCodeDispatcher @Inject constructor(
                 RouteDecision.V2InProgress(SyncCodeType.LINKING, driveV2Linking(pastedCode))
             }
             is ExchangeV2CodeParseResult.RecoveryCode -> {
-                val cid = parsed.rawJson.optString("cid", "ddg")
-                logcat { "$TAG: routing → V2 RecoveryCode (cid=$cid)" }
-                RouteDecision.V2InProgress(SyncCodeType.RECOVERY, driveV2Recovery(parsed, cid))
+                logcat { "$TAG: routing → V2 RecoveryCode (cid=${parsed.cid})" }
+                RouteDecision.V2InProgress(SyncCodeType.RECOVERY, driveV2Recovery(parsed))
+            }
+            ExchangeV2CodeParseResult.InvalidRecoveryCode -> {
+                val outcome = DispatchOutcome.Failed(
+                    reason = "Invalid v2 recovery code",
+                    cancellationReason = SetupCancellationReason.CODE_REJECTED,
+                    path = SetupPath.RECOVERY,
+                )
+                RouteDecision.V2InProgress(SyncCodeType.RECOVERY, flowOf(outcome))
             }
             ExchangeV2CodeParseResult.LinkingV1,
             ExchangeV2CodeParseResult.Unknown,
@@ -171,24 +183,24 @@ class RealSyncCodeDispatcher @Inject constructor(
      * the existing v1 Recovery login (same fields, just renamed). cid=3party drives the
      * 3party-join upgrade flow on [SyncAccountRepository]. Anything else → error.
      */
-    private fun driveV2Recovery(parsed: ExchangeV2CodeParseResult.RecoveryCode, cid: String): Flow<DispatchOutcome> = flow {
+    private fun driveV2Recovery(parsed: ExchangeV2CodeParseResult.RecoveryCode): Flow<DispatchOutcome> = flow {
+        val (userId, secret, cid, version) = parsed
         when (cid) {
             CID_DDG -> {
-                val userId = parsed.rawJson.optString("user_id").takeIf { it.isNotEmpty() }
-                val secret = parsed.rawJson.optString("secret").takeIf { it.isNotEmpty() }
-                if (userId == null || secret == null) {
-                    logcat { "$TAG: v2 recovery (ddg) missing user_id or secret" }
-                    emit(DispatchOutcome.Failed("v2 recovery code missing required fields"))
-                    return@flow
-                }
                 val primaryKey = v2SecretToV1PrimaryKey(secret)
                 if (primaryKey == null) {
                     logcat { "$TAG: v2 recovery (ddg) secret is not valid base64" }
-                    emit(DispatchOutcome.Failed("v2 recovery code has a malformed secret"))
+                    emit(
+                        DispatchOutcome.Failed(
+                            reason = "v2 recovery code has a malformed secret",
+                            cancellationReason = SetupCancellationReason.CODE_REJECTED,
+                        ),
+                    )
                     return@flow
                 }
                 val authCode = SyncAuthCode.Recovery(RecoveryCode(primaryKey = primaryKey, userId = userId))
                 logcat { "$TAG: v2 recovery (ddg) → processCode(Recovery)" }
+                setupEvent.onStep(SetupStep.PREPARING_SYNC)
                 emit(
                     syncAccountRepository.processCode(authCode, existingDeviceId = null).toOutcome(
                         label = "v2 recovery (ddg)",
@@ -204,10 +216,10 @@ class RealSyncCodeDispatcher @Inject constructor(
                 val rewrapped = thirdPartyRecoveryCodeAdapter.toJson(
                     ThirdPartyRecoveryCodeWrapper(
                         recovery = ThirdPartyRecoveryCode(
-                            userId = parsed.rawJson.optString("user_id"),
-                            secret = parsed.rawJson.optString("secret"),
-                            cid = parsed.rawJson.optString("cid", CID_3PARTY),
-                            v = parsed.rawJson.optString("v", RECOVERY_CODE_V2),
+                            userId = userId,
+                            secret = secret,
+                            cid = cid,
+                            v = version.toString(),
                         ),
                     ),
                 )
@@ -216,6 +228,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                     Base64.URL_SAFE or Base64.NO_PADDING or Base64.NO_WRAP,
                 )
                 logcat { "$TAG: v2 recovery (3party) → joinAccountFromThirdPartyRecoveryCode" }
+                setupEvent.onStep(SetupStep.PREPARING_SYNC)
                 emit(
                     syncAccountRepository.joinAccountFromThirdPartyRecoveryCode(
                         b64,
@@ -224,7 +237,12 @@ class RealSyncCodeDispatcher @Inject constructor(
             }
             else -> {
                 logcat { "$TAG: v2 recovery: unknown cid='$cid'" }
-                emit(DispatchOutcome.Failed("Unknown v2 credential type: $cid"))
+                emit(
+                    DispatchOutcome.Failed(
+                        reason = "Unknown v2 credential type: $cid",
+                        cancellationReason = SetupCancellationReason.CODE_REJECTED,
+                    ),
+                )
             }
         }
     }.map { it.withFailureContext(SetupPath.RECOVERY, myRole = null, peerKind = null) }
@@ -548,13 +566,18 @@ class RealSyncCodeDispatcher @Inject constructor(
                     }
                 }
             } else {
-                DispatchOutcome.Failed(reason, code)
+                DispatchOutcome.Failed(
+                    reason,
+                    code,
+                    cancellationReason = if (code == ALREADY_SIGNED_IN.code) SetupCancellationReason.ACCOUNT_SWITCH_BLOCKED else null,
+                )
             }
         }
     }
 
     private fun ExchangeV2Message.Bye.toPeerLeftOutcome(): DispatchOutcome.Failed = DispatchOutcome.Failed(
         "peer_left(${reason.value})",
+        cancellationReason = if (reason == ExchangeV2Message.Bye.Reason.Done) null else SetupCancellationReason.PEER_LEFT,
         code = when (reason) {
             is ExchangeV2Message.Bye.Reason.Cancelled -> PAIRING_REJECTED.code
 
