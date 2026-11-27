@@ -23,27 +23,49 @@ class ContentTopInsetTest {
 
     @Test
     fun `bottom mode insets content by the nav bar height so it clears the top nav bar`() {
-        assertEquals(NAV_BAR, contentTopInset(isBottom = true, isLogoOnly = false, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = 0))
+        assertEquals(NAV_BAR, contentTopInset(isBottom = true, isLogoOnly = false, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = 0, logoOverlapPx = 0))
     }
 
     @Test
     fun `bottom mode logo-only content is not inset`() {
-        assertEquals(0, contentTopInset(isBottom = true, isLogoOnly = true, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = 0))
+        assertEquals(0, contentTopInset(isBottom = true, isLogoOnly = true, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = 0, logoOverlapPx = 0))
     }
 
     @Test
     fun `top mode insets content below the widget which already clears the nav bar`() {
-        assertEquals(WIDGET_OFFSET, contentTopInset(isBottom = false, isLogoOnly = false, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = WIDGET_OFFSET))
+        assertEquals(
+            WIDGET_OFFSET,
+            contentTopInset(isBottom = false, isLogoOnly = false, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = WIDGET_OFFSET, logoOverlapPx = 0),
+        )
     }
 
     @Test
-    fun `top mode logo-only content is not inset`() {
-        assertEquals(0, contentTopInset(isBottom = false, isLogoOnly = true, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = WIDGET_OFFSET))
+    fun `top mode logo-only content is not inset when the widget clears the logo`() {
+        val overlap = logoOverlap(anchorBottomInWindow = WIDGET_BOTTOM, logoTopInWindow = WIDGET_BOTTOM + 100, gapPx = GAP)
+        assertEquals(
+            0,
+            contentTopInset(isBottom = false, isLogoOnly = true, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = WIDGET_OFFSET, logoOverlapPx = overlap),
+        )
+    }
+
+    @Test
+    fun `top mode logo-only content moves down just enough to clear a widget that covers the logo`() {
+        val logoTop = WIDGET_BOTTOM - 200
+        val overlap = logoOverlap(anchorBottomInWindow = WIDGET_BOTTOM, logoTopInWindow = logoTop, gapPx = GAP)
+        val inset =
+            contentTopInset(isBottom = false, isLogoOnly = true, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = WIDGET_OFFSET, logoOverlapPx = overlap)
+
+        assertEquals(WIDGET_BOTTOM + GAP, logoTop + inset)
+    }
+
+    @Test
+    fun `bottom mode logo-only content ignores the logo overlap`() {
+        assertEquals(0, contentTopInset(isBottom = true, isLogoOnly = true, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = 0, logoOverlapPx = 200))
     }
 
     @Test
     fun `top mode clamps a negative widget offset to zero`() {
-        assertEquals(0, contentTopInset(isBottom = false, isLogoOnly = false, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = -20))
+        assertEquals(0, contentTopInset(isBottom = false, isLogoOnly = false, navBarInsetPx = NAV_BAR, widgetTopOffsetPx = -20, logoOverlapPx = 0))
     }
 
     @Test
@@ -75,5 +97,6 @@ class ContentTopInsetTest {
         private const val WIDGET_OFFSET = 120
         private const val WIDGET_BOTTOM = 300
         private const val FOOTER_HEIGHT = 50
+        private const val GAP = 16
     }
 }

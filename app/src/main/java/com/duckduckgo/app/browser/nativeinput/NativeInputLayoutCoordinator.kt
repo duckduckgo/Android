@@ -266,6 +266,7 @@ class NativeInputLayoutCoordinator(
         // Cached once: isLogoOnlyContent runs on every layout pass and findViewById walks the tree.
         // Safe to cache (they inflate with newTabContent); live visibility/height are read each pass.
         val ddgLogoView = rootView.findViewById<View?>(R.id.ddgLogo)
+        val logoGapPx by lazy { rootView.resources.getDimensionPixelSize(com.duckduckgo.mobile.android.R.dimen.keyline_4) }
         val returnHatchView = rootView.findViewById<View?>(R.id.newTabReturnHatchView)
         // NTP content that renders above the logo and must clear the widget. Checked by height, not
         // visibility: these containers stay attached and collapse to zero height when empty.
@@ -325,7 +326,26 @@ class NativeInputLayoutCoordinator(
             return isLogoOnly(logoVisible, hatchHeightPx, onboardingCtaVisible, sectionsVisible)
         }
 
-        fun computeDeltaTop(view: View, anchorBottomInWindow: Int): Int {
+        // Where the logo sits with no inset applied, from layout positions the inset doesn't move. Reading the
+        // logo's live position instead feeds the padding (and its reflow animation) back into the next inset.
+        fun logoTopWithoutInset(target: Target): Int? {
+            val content = target.view as? ViewGroup ?: return null
+            val logo = ddgLogoView ?: return null
+            // Until its first layout the logo's top reads as zero, which would push the content far down for a frame.
+            if (!logo.isLaidOut || logo.height == 0) return null
+            var view: View = logo
+            var offsetInChild = 0
+            while (view.parent !== content) {
+                offsetInChild += view.top
+                view = view.parent as? View ?: return null
+            }
+            val childMarginTop = (view.layoutParams as? ViewGroup.MarginLayoutParams)?.topMargin ?: 0
+            val contentTop = IntArray(2).also { content.getLocationInWindow(it) }[1]
+            return contentTop + target.basePadding.top + childMarginTop + offsetInChild
+        }
+
+        fun computeDeltaTop(target: Target, anchorBottomInWindow: Int): Int {
+            val view = target.view
             val logoOnly = isLogoOnlyContent(view)
             val widgetTopOffsetPx = if (!logoOnly && !isBottom) {
                 val viewLocation = IntArray(2).also { view.getLocationInWindow(it) }
@@ -333,7 +353,12 @@ class NativeInputLayoutCoordinator(
             } else {
                 0
             }
-            return contentTopInset(isBottom, logoOnly, this@NativeInputLayoutCoordinator.navBarInsetPx, widgetTopOffsetPx)
+            val logoOverlapPx = if (logoOnly && !isBottom) {
+                logoTopWithoutInset(target)?.let { logoOverlap(anchorBottomInWindow, it, logoGapPx) } ?: 0
+            } else {
+                0
+            }
+            return contentTopInset(isBottom, logoOnly, this@NativeInputLayoutCoordinator.navBarInsetPx, widgetTopOffsetPx, logoOverlapPx)
         }
 
         fun computeDeltaBottom(view: View, anchorTopInWindow: Int): Int {
@@ -345,7 +370,7 @@ class NativeInputLayoutCoordinator(
 
         fun applyOffsetWithBottom(anchorTopInWindow: Int, anchorBottomInWindow: Int) {
             targets.forEach { target ->
-                val deltaTop = computeDeltaTop(target.view, anchorBottomInWindow)
+                val deltaTop = computeDeltaTop(target, anchorBottomInWindow)
                 val deltaBottom = computeDeltaBottom(target.view, anchorTopInWindow)
                 applyPadding(target.view, target.basePadding, deltaTop, deltaBottom)
             }
@@ -657,8 +682,8 @@ class NativeInputLayoutCoordinator(
 }
 
 /**
- * Whether the new-tab page shows only the dax logo. When true the content is NOT offset below the widget
- * so the logo stays centered (otherwise it shifts between Search and the taller Duck.ai tab).
+ * Whether the new-tab page shows only the dax logo. When true the content is offset only as far as the logo
+ * needs to clear the widget (see [contentTopInset]), so it doesn't shift between Search and Duck.ai when it fits.
  *
  * [hatchHeightPx] is used instead of hatch visibility: the container is always VISIBLE and only collapses
  * to zero height when no hatch is shown. [onboardingCtaVisible]/[sectionsVisible] force a non-logo-only
@@ -670,19 +695,24 @@ internal fun isLogoOnly(logoVisible: Boolean, hatchHeightPx: Int, onboardingCtaV
 /**
  * The top padding the NTP/browser content needs to clear the input-mode chrome.
  *
- * - Logo-only content is never inset, so the centered logo doesn't shift between Search and the taller
- *   Duck.ai tab (and it can't collide with the short top nav bar anyway).
+ * - Logo-only content stays where it is so the logo doesn't shift between Search and the taller Duck.ai tab.
+ *   In top mode it moves down only by [logoOverlapPx], when the widget and its footer would cover the logo.
+ *   In bottom mode it can't collide with the short top nav bar, so it is never inset.
  * - Bottom mode: the widget sits at the bottom, so the only top chrome is the persistent nav bar — inset by
  *   [navBarInsetPx] so the content isn't drawn under it.
  * - Top mode: the widget sits below the nav bar, so [widgetTopOffsetPx] (content top → widget bottom) already
  *   accounts for the nav bar; clamp negatives to zero.
  */
-internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInsetPx: Int, widgetTopOffsetPx: Int): Int =
+internal fun contentTopInset(isBottom: Boolean, isLogoOnly: Boolean, navBarInsetPx: Int, widgetTopOffsetPx: Int, logoOverlapPx: Int): Int =
     when {
-        isLogoOnly -> 0
+        isLogoOnly && isBottom -> 0
+        isLogoOnly -> maxOf(0, logoOverlapPx)
         isBottom -> navBarInsetPx
         else -> maxOf(0, widgetTopOffsetPx)
     }
+
+/** How far the logo must move down so its top sits [gapPx] below [anchorBottomInWindow]; negative when it already clears. */
+internal fun logoOverlap(anchorBottomInWindow: Int, logoTopInWindow: Int, gapPx: Int): Int = anchorBottomInWindow + gapPx - logoTopInWindow
 
 internal fun contentAnchorBottom(isBottom: Boolean, widgetBottomInWindow: Int, visibleFooterExtent: Int): Int =
     if (isBottom) widgetBottomInWindow else widgetBottomInWindow + visibleFooterExtent
