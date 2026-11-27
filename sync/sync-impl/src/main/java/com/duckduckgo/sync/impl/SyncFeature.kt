@@ -79,13 +79,13 @@ interface SyncFeature {
     /**
      * Kill switch for everything that reads the account audit log.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun loginAuditLog(): Toggle
 
     /**
      * Gates the new-login banner and system notification. No effect unless [loginAuditLog] is also enabled.
      */
-    @Toggle.DefaultValue(DefaultFeatureValue.FALSE)
+    @Toggle.DefaultValue(DefaultFeatureValue.INTERNAL)
     fun loginNotification(): Toggle
 
     /**
