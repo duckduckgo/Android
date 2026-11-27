@@ -395,13 +395,53 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `non back up attempt sends nothing without the unified event`() = runTest {
-        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+    fun `non back up attempt sends nothing without the unified event`(
+        @TestParameter("MULTI_DEVICE", "RECOVERY") setupMode: SetupMode,
+    ) = runTest {
+        syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(false))
+
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = setupMode)
         wideEvent.onStep(SetupStep.CODE_ENTRY)
+        wideEvent.onUpdate { it.copy(role = SetupRole.JOINER) }
+        wideEvent.onPairingSessionReset()
+        wideEvent.onSucceeded()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
         process(RouteDecision.V2InProgress(SyncCodeType.LINKING, flowOf(DispatchOutcome.UpgradeRequired(3))))
         advanceUntilIdle()
 
         verifyNoInteractions(wideEventClient, cameraAccess)
+    }
+
+    @Test
+    fun `non back up attempt preserves legacy reporting without the unified event`(
+        @TestParameter("MULTI_DEVICE", "RECOVERY") setupMode: SetupMode,
+    ) = runTest {
+        syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(false))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        wideEvent.onFlowStarted(launchSource = "promotion_passwords", setupMode = SetupMode.SINGLE_DEVICE)
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = setupMode)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        wideEvent.onUpdate { it.copy(role = SetupRole.JOINER) }
+        wideEvent.onPairingSessionReset()
+        wideEvent.onSucceeded()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        wideEvent.onRecoveryCodeShown()
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = "sync-setup",
+            flowEntryPoint = "promotion_passwords",
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to "v2.1"),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+        )
+        verify(wideEventClient).flowStep(wideEventId = 1L, stepName = "recovery_code_shown", success = true)
+        verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success)
+        verifyNoMoreInteractions(wideEventClient)
+        verifyNoInteractions(cameraAccess)
     }
 
     @Test
