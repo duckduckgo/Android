@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Überspringen</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Passwörter von Google importieren</string>
-    <string name="preOnboardingImportPasswordsBody">Google fordert dich eventuell auf, dich anzumelden oder dein Passwort zur Bestätigung einzugeben.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Von Google importieren</string>
     <string name="preOnboardingImportCompleteTitle">Import abgeschlossen</string>
     <string name="preOnboardingImportCompleteCta">Fortsetzen</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importieren von Passwörtern</string>

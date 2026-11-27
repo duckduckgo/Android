@@ -948,7 +948,7 @@
 
     <!-- Pre-onboarding: import passwords -->
     <string name="preOnboardingImportYourPasswordsTitle">Import your passwords</string>
-    <string name="preOnboardingImportYourPasswordsBody">I\'ll bring them over from Google or another password manager. You may need to confirm it\'s you.</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">I\'ll bring them over from Google or another password manager. You may need to unlock your phone or sign in.</string>
     <string name="preOnboardingImportYourPasswordsPrimaryCta">Import Passwords</string>
     <string name="preOnboardingImportCompleteTitle">Import complete</string>
     <string name="preOnboardingImportCompleteCta">Continue</string>

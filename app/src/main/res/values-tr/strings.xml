@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Atla</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Google\'dan şifreleri içe aktar</string>
-    <string name="preOnboardingImportPasswordsBody">Google, onaylamak için oturum açmanızı veya şifre girmenizi isteyebilir.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Google\'dan İçe Aktar</string>
     <string name="preOnboardingImportCompleteTitle">İçe aktarma tamamlandı</string>
     <string name="preOnboardingImportCompleteCta">Devam et</string>
     <string name="preOnboardingImportCompleteParsingTitle">Şifreler içe aktarılıyor</string>

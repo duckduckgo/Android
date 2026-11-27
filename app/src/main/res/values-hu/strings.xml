@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Kihagyás</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Jelszavak importálása a Google-ból</string>
-    <string name="preOnboardingImportPasswordsBody">A Google megkérhet, hogy jelentkezz be, vagy a megerősítéshez add meg a jelszavad.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importálás a Google-ból</string>
     <string name="preOnboardingImportCompleteTitle">Importálás kész</string>
     <string name="preOnboardingImportCompleteCta">Folytatás</string>
     <string name="preOnboardingImportCompleteParsingTitle">Jelszavak importálása</string>

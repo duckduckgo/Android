@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Jäta vahele</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Impordi paroolid Google\'ist</string>
-    <string name="preOnboardingImportPasswordsBody">Google võib paluda sul sisse logida või sisestada kinnitamiseks parooli.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Impordi Google\'ist</string>
     <string name="preOnboardingImportCompleteTitle">Import on lõpetatud</string>
     <string name="preOnboardingImportCompleteCta">Jätka</string>
     <string name="preOnboardingImportCompleteParsingTitle">Paroolide importimine</string>
