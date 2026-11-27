@@ -134,7 +134,7 @@ class RealPageTranslationMessaging @Inject constructor(
 
     private suspend fun request(subscription: String, params: JSONObject): JSONObject? = withContext(dispatchers.main()) {
         val webView = attachedWebView.webView ?: return@withContext null
-        val secret = synchronized(lock) { injectedDocument?.secret } ?: return@withContext null
+        val document = synchronized(lock) { injectedDocument } ?: return@withContext null
         val request = PendingRequest(UUID.randomUUID().toString())
         synchronized(lock) {
             pendingRequest?.reply?.complete(null)
@@ -142,21 +142,22 @@ class RealPageTranslationMessaging @Inject constructor(
         }
 
         try {
-            webView.evaluateJavascript(createEvent(subscription, params.put(REQUEST_ID_KEY, request.id), secret), null)
+            webView.evaluateJavascript(createEvent(subscription, params.put(REQUEST_ID_KEY, request.id), document), null)
             withTimeoutOrNull(REPLY_TIMEOUT) { request.reply.await() }
         } finally {
             synchronized(lock) { if (pendingRequest === request) pendingRequest = null }
         }
     }
 
-    private fun createEvent(subscription: String, params: JSONObject, secret: String): String {
+    private fun createEvent(subscription: String, params: JSONObject, document: InjectedDocument): String {
         val event = JSONObject()
             .put(CONTEXT_KEY, CONTEXT)
             .put(FEATURE_NAME_KEY, FEATURE_NAME)
             .put(SUBSCRIPTION_NAME_KEY, subscription)
             .put(PARAMS_KEY, params)
 
-        return "window['${script.callbackName}']('$secret', $event);"
+        // the WebView may have moved on to another document, which must not receive the event
+        return "if (performance.timeOrigin === ${document.timeOrigin}) window['${script.callbackName}']('${document.secret}', $event);"
     }
 
     private fun onMessage(message: String, secret: String) {

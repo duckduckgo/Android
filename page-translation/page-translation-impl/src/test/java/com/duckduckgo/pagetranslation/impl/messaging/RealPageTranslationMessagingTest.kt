@@ -128,7 +128,7 @@ class RealPageTranslationMessagingTest {
 
         val units = async { messaging.extract() }
         runCurrent()
-        page.reply(EXTRACT_RESULT, getLastEvent(webView).requestId, """"units":[]""", secret = previousSecret)
+        page.reply(EXTRACT_RESULT, getLastEvent(webView, timeOrigin = TIME_ORIGIN + 1).requestId, """"units":[]""", secret = previousSecret)
         advanceTimeBy(11.seconds)
 
         assertNull(units.await())
@@ -186,6 +186,17 @@ class RealPageTranslationMessagingTest {
         assertEquals("en", params.getString("targetLanguage"))
         assertEquals("""[{"id":0,"text":"Hello"},{"id":1,"tree":"{\"tree\":1}"}]""", params.getJSONArray("updates").toString())
         assertEquals(2, count.await())
+    }
+
+    @Test
+    fun runEachEventOnlyInTheLastInjectedDocument() = runMessagingTest {
+        attach(webView)
+        messaging.inject(TIME_ORIGIN + 1)
+
+        async { messaging.extract() }
+        runCurrent()
+
+        assertEquals("extract", getLastEvent(webView, timeOrigin = TIME_ORIGIN + 1).getString("subscriptionName"))
     }
 
     @Test
@@ -293,9 +304,9 @@ class RealPageTranslationMessagingTest {
             ).addJavascriptInterface(it.capture(), eq(INTERFACE_NAME))
         }.lastValue as PageTranslationJsInterface
 
-    private fun getLastEvent(webView: WebView): JSONObject {
+    private fun getLastEvent(webView: WebView, timeOrigin: Double = TIME_ORIGIN): JSONObject {
         val source = argumentCaptor<String>().also { verify(webView, atLeastOnce()).evaluateJavascript(it.capture(), anyOrNull()) }.lastValue
-        val prefix = "window['$CALLBACK_NAME']('$secret', "
+        val prefix = "if (performance.timeOrigin === $timeOrigin) window['$CALLBACK_NAME']('$secret', "
         assertTrue(source.startsWith(prefix))
 
         return JSONObject(source.removePrefix(prefix).removeSuffix(");"))
