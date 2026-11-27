@@ -26,6 +26,7 @@ import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
 import com.duckduckgo.common.utils.AppUrl
 import com.duckduckgo.common.utils.AppUrl.Url
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.common.utils.UrlScheme.Companion.http
 import com.duckduckgo.common.utils.UrlScheme.Companion.https
 import com.duckduckgo.common.utils.withScheme
 import com.duckduckgo.di.scopes.AppScope
@@ -49,10 +50,14 @@ class QueryUrlConverter @Inject constructor(
     @AppCoroutineScope private val coroutineScope: CoroutineScope,
     private val dispatcherProvider: DispatcherProvider,
     private val queryUrlPredictor: QueryUrlPredictor,
+    private val loadCompleteWebUrlAsGivenFeature: LoadCompleteWebUrlAsGivenFeature,
 ) : OmnibarEntryConverter, PrivacyConfigCallbackPlugin {
 
     @Volatile
     private var useUrlPredictor: Boolean = false
+
+    @Volatile
+    private var loadCompleteWebUrlAsGiven: Boolean = true
 
     init {
         cacheRemoteConfig()
@@ -121,7 +126,7 @@ class QueryUrlConverter @Inject constructor(
     }
 
     private fun convertUri(input: String): String {
-        val url = UriString.extractUrl(input, cleanInputQuery = false) ?: input
+        val url = if (loadCompleteWebUrlAsGiven && isCompleteWebUrl(input)) input else UriString.extractUrl(input, cleanInputQuery = false) ?: input
         val uri = Uri.parse(url).withScheme()
 
         if (requestRewriter.shouldRewriteRequest(uri)) {
@@ -131,13 +136,27 @@ class QueryUrlConverter @Inject constructor(
         return uri.toString()
     }
 
+    // extractUrl keeps only what the web URL pattern matches, so it cuts a valid URL at characters such as `[` or `|` and drops a host
+    // without a dot. Input with whitespace, another scheme, or an authority that is more than a host and a port still needs it: it picks
+    // the link out of shared text, drops userinfo tricks and wrapping punctuation, and turns file://host into a web URL.
+    private fun isCompleteWebUrl(input: String): Boolean {
+        if (input.any { it.isWhitespace() }) return false
+        val uri = Uri.parse(input).withScheme()
+        val scheme = uri.scheme?.lowercase()
+        return (scheme == http || scheme == https) && uri.encodedAuthority?.matches(hostAndPortRegex) == true
+    }
+
     private fun cacheRemoteConfig() {
         coroutineScope.launch(dispatcherProvider.io()) {
             useUrlPredictor = androidBrowserConfigFeature.useUrlPredictor().isEnabled()
+            loadCompleteWebUrlAsGiven = loadCompleteWebUrlAsGivenFeature.self().isEnabled()
         }
     }
 
     companion object {
         val majorVerticals = listOf("images", "videos", "news", "shopping")
+
+        // Uri.parse accepts any character in a host, so the host is checked here: dot-separated labels or a bracketed IPv6 address.
+        private val hostAndPortRegex = Regex("""(?:[\p{L}\p{N}_-]+(?:\.[\p{L}\p{N}_-]+)*|\[[0-9A-Fa-f:.]+])(?::\d{1,5})?""")
     }
 }
