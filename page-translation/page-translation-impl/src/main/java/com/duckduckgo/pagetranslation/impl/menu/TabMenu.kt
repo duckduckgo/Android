@@ -62,9 +62,9 @@ class TabMenu @Inject constructor(
         visibleTab.hide(this)
     }
 
-    fun onRowTapped() {
+    suspend fun onRowTapped() {
         when (val viewState = current()) {
-            is TranslationMenuViewState.Translate -> if (viewState.enabled) source.pair.value?.let(translateRequest::translate)
+            is TranslationMenuViewState.Translate -> if (viewState.enabled) source.pair.value?.let { translateRequest.translate(it) }
             TranslationMenuViewState.ShowOriginal -> source.showOriginal()
             TranslationMenuViewState.InProgress, TranslationMenuViewState.Hidden -> Unit
         }

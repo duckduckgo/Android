@@ -16,8 +16,12 @@
 
 package com.duckduckgo.pagetranslation.impl.translate
 
-import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
+import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDirectories
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownload
+import kotlinx.coroutines.test.runTest
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
@@ -27,15 +31,20 @@ import org.mockito.kotlin.whenever
 
 class TranslateRequestTest {
 
+    @get:Rule
+    val coroutineRule = CoroutineTestRule()
+
     private val pair = LanguagePair("es", "en")
-    private val languagePacks: LanguagePacks = mock()
+    private val directories: LanguagePackDirectories = mock()
     private val translateAction: TranslateAction = mock()
     private val downloadPrompt: LanguagePackDownloadPrompt = mock()
-    private val testee = RealTranslateRequest(languagePacks, translateAction, downloadPrompt)
+    private val languagePackDownload: LanguagePackDownload = mock()
+    private val testee =
+        RealTranslateRequest(directories, translateAction, downloadPrompt, languagePackDownload, coroutineRule.testDispatcherProvider)
 
     @Test
-    fun whenPackInstalledThenTranslates() {
-        whenever(languagePacks.isInstalled(pair)).thenReturn(true)
+    fun whenPackInstalledThenTranslates() = runTest {
+        whenever(directories.getInstalledPairs()).thenReturn(setOf(pair.key))
 
         testee.translate(pair)
 
@@ -44,12 +53,23 @@ class TranslateRequestTest {
     }
 
     @Test
-    fun whenPackMissingThenAsksToDownload() {
-        whenever(languagePacks.isInstalled(pair)).thenReturn(false)
+    fun whenPackMissingThenAsksToDownload() = runTest {
+        whenever(directories.getInstalledPairs()).thenReturn(emptySet())
 
         testee.translate(pair)
 
         verify(downloadPrompt).requestDownload(pair)
+        verify(translateAction, never()).translate(pair)
+    }
+
+    @Test
+    fun whenPackMissingAndDownloadRunningThenDoesNothing() = runTest {
+        whenever(directories.getInstalledPairs()).thenReturn(emptySet())
+        whenever(languagePackDownload.isDownloading(pair)).thenReturn(true)
+
+        testee.translate(pair)
+
+        verifyNoInteractions(downloadPrompt)
         verify(translateAction, never()).translate(pair)
     }
 }

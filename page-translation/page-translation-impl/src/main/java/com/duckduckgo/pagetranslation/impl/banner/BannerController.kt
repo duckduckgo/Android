@@ -74,7 +74,7 @@ class BannerController(
         }
     }
 
-    fun onTranslate() {
+    suspend fun onTranslate() {
         val offer = (state.value as? BannerState.Showing)?.offer ?: return
         reduce(BannerEvent.Dismiss(Dismissal.Translate))
         translateRequest.translate(offer.pair)

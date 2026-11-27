@@ -16,11 +16,14 @@
 
 package com.duckduckgo.pagetranslation.impl.translate
 
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.pagetranslation.impl.language.LanguagePacks
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDirectories
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownload
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.binding
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -28,22 +31,27 @@ import javax.inject.Inject
  */
 interface TranslateRequest {
     /**
-     * Translates the page, or asks to download the language pack first when [pair] isn't installed.
+     * Translates the page, or asks to download the language pack first when [pair] isn't installed. Does nothing while that
+     * download is already running.
      */
-    fun translate(pair: LanguagePair)
+    suspend fun translate(pair: LanguagePair)
 }
 
 @ContributesBinding(FragmentScope::class, binding = binding<TranslateRequest>())
 class RealTranslateRequest @Inject constructor(
-    private val languagePacks: LanguagePacks,
+    private val directories: LanguagePackDirectories,
     private val translateAction: TranslateAction,
     private val downloadPrompt: LanguagePackDownloadPrompt,
+    private val languagePackDownload: LanguagePackDownload,
+    private val dispatchers: DispatcherProvider,
 ) : TranslateRequest {
-    override fun translate(pair: LanguagePair) {
-        if (languagePacks.isInstalled(pair)) {
+    override suspend fun translate(pair: LanguagePair) {
+        if (isInstalled(pair)) {
             translateAction.translate(pair)
-        } else {
+        } else if (!languagePackDownload.isDownloading(pair)) {
             downloadPrompt.requestDownload(pair)
         }
     }
+
+    private suspend fun isInstalled(pair: LanguagePair) = withContext(dispatchers.io()) { pair.key in directories.getInstalledPairs() }
 }

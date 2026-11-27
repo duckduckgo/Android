@@ -77,7 +77,7 @@ class TranslationBannerView @JvmOverloads constructor(
         this.controller = controller
         this.deviceLanguages = deviceLanguages
         this.mainDispatcher = mainDispatcher
-        binding.translationBannerButton.setOnClickListener { controller.onTranslate() }
+        binding.translationBannerButton.setOnClickListener { scope?.launch { controller.onTranslate() } }
     }
 
     override fun onAttachedToWindow() {

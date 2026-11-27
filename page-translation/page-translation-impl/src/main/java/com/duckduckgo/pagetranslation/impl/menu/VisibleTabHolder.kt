@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -60,7 +61,7 @@ interface VisibleTabHolder {
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
 class RealVisibleTabHolder @Inject constructor(
-    @AppCoroutineScope appScope: CoroutineScope,
+    @AppCoroutineScope private val appScope: CoroutineScope,
 ) : VisibleTabHolder {
 
     private val visible = MutableStateFlow<TabMenu?>(null)
@@ -80,6 +81,6 @@ class RealVisibleTabHolder @Inject constructor(
     }
 
     override fun onRowTapped() {
-        visible.value?.onRowTapped()
+        appScope.launch { visible.value?.onRowTapped() }
     }
 }
