@@ -137,13 +137,13 @@ class QueryUrlConverter @Inject constructor(
     }
 
     // extractUrl keeps only what the web URL pattern matches, so it cuts a valid URL at characters such as `[` or `|` and drops a host
-    // without a dot. Input with whitespace, userinfo or another scheme still needs it: it picks the link out of shared text and turns
-    // file://host into a web URL.
+    // without a dot. Input with whitespace, another scheme, or an authority that is more than a host and a port still needs it: it picks
+    // the link out of shared text, drops userinfo tricks and wrapping punctuation, and turns file://host into a web URL.
     private fun isCompleteWebUrl(input: String): Boolean {
         if (input.any { it.isWhitespace() }) return false
         val uri = Uri.parse(input).withScheme()
         val scheme = uri.scheme?.lowercase()
-        return (scheme == http || scheme == https) && !uri.host.isNullOrEmpty() && uri.userInfo == null
+        return (scheme == http || scheme == https) && uri.encodedAuthority?.matches(hostAndPortRegex) == true
     }
 
     private fun cacheRemoteConfig() {
@@ -155,5 +155,8 @@ class QueryUrlConverter @Inject constructor(
 
     companion object {
         val majorVerticals = listOf("images", "videos", "news", "shopping")
+
+        // Uri.parse accepts any character in a host, so the host is checked here: dot-separated labels or a bracketed IPv6 address.
+        private val hostAndPortRegex = Regex("""(?:[\p{L}\p{N}_-]+(?:\.[\p{L}\p{N}_-]+)*|\[[0-9A-Fa-f:.]+])(?::\d{1,5})?""")
     }
 }

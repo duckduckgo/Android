@@ -587,6 +587,47 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun `when url predictor enabled and shared domain is wrapped in quotes then domain extracted without quotes`() {
+        val testee = createTestee(useUrlPredictorEnabled = true)
+        whenever(queryUrlPredictor.classify(any())).thenReturn(Decision.Search("foo"))
+        whenever(queryUrlPredictor.classify("example.com")).thenReturn(Decision.Navigate("http://example.com"))
+        val result = testee.convertQueryToUrl("\"example.com\"", extractUrlFromQuery = true)
+        assertEquals("http://example.com", result)
+    }
+
+    @Test
+    fun `when shared domain is wrapped in angle brackets then domain extracted without brackets`() {
+        val result = testee.convertQueryToUrl("<example.com>", extractUrlFromQuery = true)
+        assertEquals("http://example.com", result)
+    }
+
+    @Test
+    fun `when shared url has comma after host then url extracted without comma`() {
+        val result = testee.convertQueryToUrl("https://example.com,", extractUrlFromQuery = true)
+        assertEquals("https://example.com", result)
+    }
+
+    @Test
+    fun `when shared url has comma after port then url extracted without comma`() {
+        val result = testee.convertQueryToUrl("http://example.com:8080,", extractUrlFromQuery = true)
+        assertEquals("http://example.com:8080", result)
+    }
+
+    @Test
+    fun `when url has ipv6 host and pipe in query then url returned unchanged`() {
+        val input = "http://[::1]:8080/?a=1|2"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
+        assertEquals(input, result)
+    }
+
+    @Test
+    fun `when url has non ascii host and pipe in query then url returned unchanged`() {
+        val input = "https://bücher.example/?a=1|2"
+        val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
+        assertEquals(input, result)
+    }
+
+    @Test
     fun `when load complete web url as given disabled and url has pipe in query then url is extracted`() {
         val testee = createTestee(useUrlPredictorEnabled = false, loadCompleteWebUrlAsGivenEnabled = false)
         val result = testee.convertQueryToUrl("https://example.com/?a=1|2")
