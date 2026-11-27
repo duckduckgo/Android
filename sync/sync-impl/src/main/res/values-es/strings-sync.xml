@@ -358,4 +358,60 @@
     <string name="sync_passwords_multi_device_promo_message">Sync &amp; Backup está activado en este dispositivo.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Conectar</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Obtener app</string>
+
+    <!-- Device Activity and new synced device alerts -->
+    <string name="syncAuditLogTitle" instruction="Title of a screen, and of a section in Sync settings, that lists the devices that synced with or were removed from this Sync account">Actividad de los dispositivos</string>
+    <string name="syncAuditLogListLabel">Dispositivos sincronizados o eliminados más recientemente:</string>
+    <string name="syncAuditLogError">La actividad de los dispositivos no está disponible temporalmente</string>
+    <string name="syncAuditLogLoadMoreError">La actividad anterior no está disponible temporalmente. Toca para volver a intentarlo.</string>
+    <string name="syncAuditLogEmpty">No hay actividad reciente</string>
+    <string name="syncAuditLogOnlyThisDevice" instruction="Shown in the device activity list when this device is the only device in the Sync account">Solo este dispositivo está sincronizado</string>
+    <string name="syncAuditLogSynced" instruction="Action shown before a device name in a list of device activity: the device synced with this Sync account">Sincronizado</string>
+    <string name="syncAuditLogRemoved" instruction="Action shown before a device name in a list of device activity: the device was removed from this Sync account">Eliminado</string>
+    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity, for example Removed · iPhone. First placeholder is Synced or Removed. Second placeholder is the device name. Keep Synced or Removed first: a long device name is cut at the end of the line">%1$s · %2$s</string>
+    <string name="syncNewDeviceBannerTitleOne" instruction="Title of a message in Sync settings when one new device synced with this account">Nuevo dispositivo sincronizado</string>
+    <string name="syncNewDeviceBannerTitleMany" instruction="Title of a message in Sync settings when two or more new devices synced with this account">Nuevos dispositivos sincronizados</string>
+    <string name="syncNewDeviceBannerBody" instruction="Message in Sync settings. Placeholder is one device name, or a list of device names">Este teléfono se ha sincronizado con %1$s.</string>
+    <string name="syncNewDeviceBannerTwoNames" instruction="Joins exactly two device names, for example Laptop and Phone. Each placeholder is one device name">%1$s y %2$s</string>
+    <string name="syncNewDeviceBannerLastName" instruction="Joins the last device name to a list of 3 to 8 names, for example Laptop, Phone, and Tablet. First placeholder is the earlier device names, separated by commas. Second placeholder is the last device name. Use the comma before and only if your language uses it in lists">%1$s y %2$s</string>
+    <plurals name="syncNewDeviceBannerMore" instruction="Ends a list of 8 device names, for example A, B, C, D, E, F, G, H, and 3 more. Placeholder 1 is the 8 device names, separated by commas. Placeholder 2 is how many more devices synced. Use the comma before and only if your language uses it in lists">
+        <item quantity="one">%1$s y %2$d más</item>
+        <item quantity="other">%1$s y %2$d más</item>
+    </plurals>
+    <string name="syncNewDeviceBannerReview" instruction="Button on a message about new synced devices. Opens a screen that lists recent device activity">Revisar actividad</string>
+    <string name="syncNewLoginNotificationChannelName" instruction="Name of a notification category in Android system settings. The app uses it to tell the user that a new device synced with this account">Nuevos dispositivos sincronizados</string>
+    <string name="syncNewLoginNotificationTitleOne" instruction="Title of a phone notification when one new device synced with this account">Nuevo dispositivo sincronizado</string>
+    <string name="syncNewLoginNotificationTitleMany" instruction="Title of a phone notification when two or more new devices synced with this account">Nuevos dispositivos sincronizados</string>
+    <string name="syncNewLoginNotificationBodyOne" instruction="Text of a phone notification when one new device synced with this account">Este teléfono se ha sincronizado con otro dispositivo</string>
+    <plurals name="syncNewLoginNotificationBodyMany" instruction="Text of a phone notification. Used only for two or more devices. The placeholder is how many new devices synced with this account">
+        <item quantity="one">Este teléfono se ha sincronizado con %1$d dispositivo</item>
+        <item quantity="other">Este teléfono se ha sincronizado con %1$d dispositivos</item>
+    </plurals>
+    <string name="syncAuditLogJustNow">Justo ahora</string>
+    <plurals name="syncAuditLogMinutesAgo" instruction="Placeholder is the number of minutes since a device was synced or removed">
+        <item quantity="one">Hace %1$d minuto</item>
+        <item quantity="other">Hace %1$d minutos</item>
+    </plurals>
+    <plurals name="syncAuditLogHoursAgo" instruction="Placeholder is the number of hours since a device was synced or removed">
+        <item quantity="one">Hace %1$d hora</item>
+        <item quantity="other">Hace %1$d horas</item>
+    </plurals>
+    <plurals name="syncAuditLogDaysAgo" instruction="Placeholder is the number of days since a device was synced or removed">
+        <item quantity="one">hace %1$d día</item>
+        <item quantity="other">hace %1$d días</item>
+    </plurals>
+    <plurals name="syncAuditLogMonthsAgo" instruction="Placeholder is the number of months since a device was synced or removed">
+        <item quantity="one">Hace %1$d mes</item>
+        <item quantity="other">Hace %1$d meses</item>
+    </plurals>
+    <plurals name="syncAuditLogYearsAgo" instruction="Placeholder is the number of years since a device was synced or removed">
+        <item quantity="one">Hace %1$d año</item>
+        <item quantity="other">Hace %1$d años</item>
+    </plurals>
+    <string name="syncNewLoginNotificationsTitle" instruction="Label of a switch in Sync settings. When it is on, the app shows a notification when a new device syncs with this account">Recibir notificaciones de nuevas conexiones</string>
+    <string name="syncNewLoginNotificationsDescription">Recibe una notificación cada vez que se añada un dispositivo nuevo a Sync &amp; Backup.</string>
+    <string name="syncNewLoginNotificationsEnable">Activar notificaciones</string>
+    <string name="syncNewLoginNotificationsSettingsDialogTitle">Requiere permiso para las notificaciones de DuckDuckGo</string>
+    <string name="syncNewLoginNotificationsSettingsDialogMessage">Activa las notificaciones de DuckDuckGo en Ajustes del sistema para activar las notificaciones de nuevos dispositivos.</string>
+    <string name="syncNewLoginNotificationsSettingsDialogConfirm">Ir a Ajustes…</string>
 </resources>

@@ -358,4 +358,67 @@
     <string name="sync_passwords_multi_device_promo_message">Šajā ierīcē ir iespējota funkcija Sync &amp; Backup.</string>
     <string name="sync_passwords_multi_device_promo_primary_button" instruction="Button that starts connecting this device to the DuckDuckGo desktop app with Sync &amp; Backup">Savienot</string>
     <string name="sync_passwords_multi_device_promo_secondary_button" instruction="Button that opens a page about getting the DuckDuckGo desktop app">Iegūt lietotni</string>
+
+    <!-- Device Activity and new synced device alerts -->
+    <string name="syncAuditLogTitle" instruction="Title of a screen, and of a section in Sync settings, that lists the devices that synced with or were removed from this Sync account">Ierīces darbības</string>
+    <string name="syncAuditLogListLabel">Pēdējās sinhronizētās vai noņemtās ierīces:</string>
+    <string name="syncAuditLogError">Pašlaik nevar parādīt ierīču darbību vēsturi</string>
+    <string name="syncAuditLogLoadMoreError">Pašlaik nevar parādīt agrākās darbības. Pieskaries, lai mēģinātu vēlreiz.</string>
+    <string name="syncAuditLogEmpty">Pēdējā laikā nav reģistrēta neviena darbība</string>
+    <string name="syncAuditLogOnlyThisDevice" instruction="Shown in the device activity list when this device is the only device in the Sync account">Sinhronizēta ir tikai šī ierīce</string>
+    <string name="syncAuditLogSynced" instruction="Action shown before a device name in a list of device activity: the device synced with this Sync account">Sinhronizēts</string>
+    <string name="syncAuditLogRemoved" instruction="Action shown before a device name in a list of device activity: the device was removed from this Sync account">Noņemts</string>
+    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity, for example Removed · iPhone. First placeholder is Synced or Removed. Second placeholder is the device name. Keep Synced or Removed first: a long device name is cut at the end of the line">%1$s · %2$s</string>
+    <string name="syncNewDeviceBannerTitleOne" instruction="Title of a message in Sync settings when one new device synced with this account">Jauna sinhronizēta ierīce</string>
+    <string name="syncNewDeviceBannerTitleMany" instruction="Title of a message in Sync settings when two or more new devices synced with this account">Jaunas sinhronizētas ierīces</string>
+    <string name="syncNewDeviceBannerBody" instruction="Message in Sync settings. Placeholder is one device name, or a list of device names">Šis tālrunis ir sinhronizēts ar %1$s.</string>
+    <string name="syncNewDeviceBannerTwoNames" instruction="Joins exactly two device names, for example Laptop and Phone. Each placeholder is one device name">%1$s un %2$s</string>
+    <string name="syncNewDeviceBannerLastName" instruction="Joins the last device name to a list of 3 to 8 names, for example Laptop, Phone, and Tablet. First placeholder is the earlier device names, separated by commas. Second placeholder is the last device name. Use the comma before and only if your language uses it in lists">%1$s un %2$s</string>
+    <plurals name="syncNewDeviceBannerMore" instruction="Ends a list of 8 device names, for example A, B, C, D, E, F, G, H, and 3 more. Placeholder 1 is the 8 device names, separated by commas. Placeholder 2 is how many more devices synced. Use the comma before and only if your language uses it in lists">
+        <item quantity="zero">%1$s un vēl %2$d ierīču</item>
+        <item quantity="one">%1$s un vēl %2$d ierīce</item>
+        <item quantity="other">%1$s un vēl %2$d ierīču</item>
+    </plurals>
+    <string name="syncNewDeviceBannerReview" instruction="Button on a message about new synced devices. Opens a screen that lists recent device activity">Skatīt darbību vēsturi</string>
+    <string name="syncNewLoginNotificationChannelName" instruction="Name of a notification category in Android system settings. The app uses it to tell the user that a new device synced with this account">Jaunas sinhronizētas ierīces</string>
+    <string name="syncNewLoginNotificationTitleOne" instruction="Title of a phone notification when one new device synced with this account">Jauna sinhronizēta ierīce</string>
+    <string name="syncNewLoginNotificationTitleMany" instruction="Title of a phone notification when two or more new devices synced with this account">Jaunas sinhronizētas ierīces</string>
+    <string name="syncNewLoginNotificationBodyOne" instruction="Text of a phone notification when one new device synced with this account">Šis tālrunis ir sinhronizēts ar citu ierīci</string>
+    <plurals name="syncNewLoginNotificationBodyMany" instruction="Text of a phone notification. Used only for two or more devices. The placeholder is how many new devices synced with this account">
+        <item quantity="zero">Šis tālrunis ir sinhronizēts ar %1$d ierīcēm</item>
+        <item quantity="one">Šis tālrunis ir sinhronizēts ar %1$d ierīci</item>
+        <item quantity="other">Šis tālrunis ir sinhronizēts ar %1$d ierīcēm</item>
+    </plurals>
+    <string name="syncAuditLogJustNow">Tikko</string>
+    <plurals name="syncAuditLogMinutesAgo" instruction="Placeholder is the number of minutes since a device was synced or removed">
+        <item quantity="zero">Pirms %1$d minūtēm</item>
+        <item quantity="one">Pirms %1$d minūtes</item>
+        <item quantity="other">Pirms %1$d minūtēm</item>
+    </plurals>
+    <plurals name="syncAuditLogHoursAgo" instruction="Placeholder is the number of hours since a device was synced or removed">
+        <item quantity="zero">Pirms %1$d stundām</item>
+        <item quantity="one">Pirms %1$d stundas</item>
+        <item quantity="other">Pirms %1$d stundām</item>
+    </plurals>
+    <plurals name="syncAuditLogDaysAgo" instruction="Placeholder is the number of days since a device was synced or removed">
+        <item quantity="zero">Pirms %1$d dienām</item>
+        <item quantity="one">Pirms %1$d dienas</item>
+        <item quantity="other">Pirms %1$d dienām</item>
+    </plurals>
+    <plurals name="syncAuditLogMonthsAgo" instruction="Placeholder is the number of months since a device was synced or removed">
+        <item quantity="zero">Pirms %1$d mēnešiem</item>
+        <item quantity="one">Pirms %1$d mēneša</item>
+        <item quantity="other">Pirms %1$d mēnešiem</item>
+    </plurals>
+    <plurals name="syncAuditLogYearsAgo" instruction="Placeholder is the number of years since a device was synced or removed">
+        <item quantity="zero">Pirms %1$d gadiem</item>
+        <item quantity="one">Pirms %1$d gada</item>
+        <item quantity="other">Pirms %1$d gadiem</item>
+    </plurals>
+    <string name="syncNewLoginNotificationsTitle" instruction="Label of a switch in Sync settings. When it is on, the app shows a notification when a new device syncs with this account">Paziņot par jaunām ierīcēm</string>
+    <string name="syncNewLoginNotificationsDescription">Saņem paziņojumu ikreiz, kad pakalpojumam Sync &amp; Backup tiek pievienota jauna ierīce.</string>
+    <string name="syncNewLoginNotificationsEnable">Ieslēgt paziņojumus</string>
+    <string name="syncNewLoginNotificationsSettingsDialogTitle">DuckDuckGo nepieciešama atļauja rādīt paziņojumus</string>
+    <string name="syncNewLoginNotificationsSettingsDialogMessage">Lai ieslēgtu paziņojumus par jaunām ierīcēm, ieslēdz DuckDuckGo paziņojumus sistēmas iestatījumos.</string>
+    <string name="syncNewLoginNotificationsSettingsDialogConfirm">Atver iestatījumus…</string>
 </resources>
