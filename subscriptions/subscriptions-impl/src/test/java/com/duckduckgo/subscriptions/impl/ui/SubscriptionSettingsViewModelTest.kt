@@ -1506,7 +1506,7 @@ class SubscriptionSettingsViewModelTest {
         verify(pixelSender).reportCancellationFlowPlayStoreCancelled(
             entry = CancellationEntry.CANCELLATION,
             isFreeTrial = true,
-            daysSincePurchase = DaysSincePurchaseBucket.D2_7,
+            daysSincePurchase = DaysSincePurchaseBucket.D1_7,
         )
     }
 

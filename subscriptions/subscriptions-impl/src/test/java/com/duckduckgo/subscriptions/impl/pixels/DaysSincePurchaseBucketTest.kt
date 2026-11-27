@@ -23,15 +23,14 @@ import java.util.concurrent.TimeUnit
 class DaysSincePurchaseBucketTest {
 
     @Test
-    fun whenPurchasedUpToOneDayAgoThenD1() {
-        assertEquals(DaysSincePurchaseBucket.D1, bucketFor(days = 0))
-        assertEquals(DaysSincePurchaseBucket.D1, bucketFor(days = 1))
+    fun whenPurchasedLessThanOneDayAgoThenD0() {
+        assertEquals(DaysSincePurchaseBucket.D0, bucketFor(days = 0))
     }
 
     @Test
-    fun whenPurchasedTwoToSevenDaysAgoThenD2To7() {
-        assertEquals(DaysSincePurchaseBucket.D2_7, bucketFor(days = 2))
-        assertEquals(DaysSincePurchaseBucket.D2_7, bucketFor(days = 7))
+    fun whenPurchasedOneToSevenDaysAgoThenD1To7() {
+        assertEquals(DaysSincePurchaseBucket.D1_7, bucketFor(days = 1))
+        assertEquals(DaysSincePurchaseBucket.D1_7, bucketFor(days = 7))
     }
 
     @Test
@@ -46,8 +45,8 @@ class DaysSincePurchaseBucketTest {
     }
 
     @Test
-    fun whenStartDateIsInTheFutureThenD1() {
-        assertEquals(DaysSincePurchaseBucket.D1, DaysSincePurchaseBucket.from(startedAtMillis = NOW + 1000, nowMillis = NOW))
+    fun whenStartDateIsInTheFutureThenD0() {
+        assertEquals(DaysSincePurchaseBucket.D0, DaysSincePurchaseBucket.from(startedAtMillis = NOW + 1000, nowMillis = NOW))
     }
 
     private fun bucketFor(days: Long): DaysSincePurchaseBucket =

@@ -494,8 +494,8 @@
             {
                 "key": "days_since_purchase",
                 "type": "string",
-                "description": "Days between the subscription start date and the cancellation, bucketed: d1 is days 0-1, d2_7 is days 2-7, d8_30 is days 8-30, d31_plus is day 31 onwards",
-                "enum": ["d1", "d2_7", "d8_30", "d31_plus"]
+                "description": "Days between the subscription start date and the cancellation, bucketed: d0 is the purchase day, d1_7 is days 1-7, d8_30 is days 8-30, d31_plus is day 31 onwards",
+                "enum": ["d0", "d1_7", "d8_30", "d31_plus"]
             }
         ]
     },

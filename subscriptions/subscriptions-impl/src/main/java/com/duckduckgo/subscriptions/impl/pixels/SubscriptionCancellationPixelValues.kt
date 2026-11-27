@@ -30,8 +30,8 @@ enum class CancellationFlowLoadFailureReason(val pixelValue: String) {
 }
 
 enum class DaysSincePurchaseBucket(val pixelValue: String) {
-    D1("d1"),
-    D2_7("d2_7"),
+    D0("d0"),
+    D1_7("d1_7"),
     D8_30("d8_30"),
     D31_PLUS("d31_plus"),
     ;
@@ -40,8 +40,8 @@ enum class DaysSincePurchaseBucket(val pixelValue: String) {
         fun from(startedAtMillis: Long, nowMillis: Long): DaysSincePurchaseBucket {
             val days = TimeUnit.MILLISECONDS.toDays((nowMillis - startedAtMillis).coerceAtLeast(0))
             return when {
-                days <= 1 -> D1
-                days <= 7 -> D2_7
+                days < 1 -> D0
+                days <= 7 -> D1_7
                 days <= 30 -> D8_30
                 else -> D31_PLUS
             }

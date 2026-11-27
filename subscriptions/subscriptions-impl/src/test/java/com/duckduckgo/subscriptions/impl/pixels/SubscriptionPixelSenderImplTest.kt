@@ -72,10 +72,10 @@ class SubscriptionPixelSenderImplTest {
         testee.reportCancellationFlowPlayStoreCancelled(
             entry = CancellationEntry.CANCELLATION,
             isFreeTrial = true,
-            daysSincePurchase = DaysSincePurchaseBucket.D2_7,
+            daysSincePurchase = DaysSincePurchaseBucket.D1_7,
         )
 
-        val params = mapOf("entry" to "cancellation", "free_trial" to "true", "days_since_purchase" to "d2_7")
+        val params = mapOf("entry" to "cancellation", "free_trial" to "true", "days_since_purchase" to "d1_7")
         verify(pixel).fire(pixelName = "subscription_cancellation_play_store_cancelled_c", type = Count, parameters = params)
         verify(pixel).fire(pixelName = "subscription_cancellation_play_store_cancelled_d", type = Daily(), parameters = params)
     }
