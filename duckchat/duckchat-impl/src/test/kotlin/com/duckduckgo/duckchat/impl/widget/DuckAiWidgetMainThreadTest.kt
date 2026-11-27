@@ -21,8 +21,10 @@ import android.content.Context
 import android.content.ContextWrapper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.duckchat.store.impl.DuckAiChat
 import com.duckduckgo.duckchat.store.impl.DuckAiChatStore
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -30,9 +32,11 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runCurrent
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.atLeastOnce
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -62,6 +66,9 @@ class DuckAiWidgetMainThreadTest {
         context = context,
         chats = DuckAiChatsWidgetChats(stringContext, chatStore),
         appCoroutineScope = testScope,
+        dispatcherProvider = object : DispatcherProvider {
+            override fun io(): CoroutineDispatcher = ioDispatcher
+        },
     )
 
     @Test
@@ -93,6 +100,10 @@ class DuckAiWidgetMainThreadTest {
 
     private fun assertQueriedOnlyWhenIoDispatcherRuns() {
         verify(manager, never()).getAppWidgetIds(any())
+
+        ioDispatcher.scheduler.runCurrent()
+
+        verify(manager, atLeastOnce()).getAppWidgetIds(any())
     }
 
     private fun chat(id: String) = DuckAiChat(
