@@ -16,20 +16,14 @@
 
 package com.duckduckgo.pagetranslation.impl.session
 
-import com.duckduckgo.app.di.AppCoroutineScope
-import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.pagetranslation.impl.engine.TranslationEngine
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
-import com.duckduckgo.pagetranslation.impl.messaging.PageTranslationMessaging
 import com.duckduckgo.pagetranslation.impl.translate.TranslateAction
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import dev.zacsweers.metro.binding
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.plus
 import javax.inject.Inject
 
 sealed interface TranslationState {
@@ -64,12 +58,8 @@ interface TabTranslation {
 @ContributesBinding(FragmentScope::class, binding = binding<TabTranslation>())
 @ContributesBinding(FragmentScope::class, binding = binding<TranslateAction>())
 class RealTabTranslation @Inject constructor(
-    private val messaging: PageTranslationMessaging,
-    private val engine: TranslationEngine,
-    @AppCoroutineScope appScope: CoroutineScope,
-    dispatchers: DispatcherProvider,
+    private val sessionFactory: TranslationSessionFactory,
 ) : TabTranslation, TranslateAction {
-    private val sessionScope = appScope + dispatchers.main()
     private val isVisible = MutableStateFlow(false)
     private val _state = MutableStateFlow<TranslationState>(TranslationState.Idle)
     override val state: StateFlow<TranslationState> = _state
@@ -78,7 +68,7 @@ class RealTabTranslation @Inject constructor(
 
     override fun startSession(timeOrigin: Double) {
         endSession()
-        session = TranslationSession(timeOrigin, messaging, engine, isVisible, _state, sessionScope)
+        session = sessionFactory.create(timeOrigin, isVisible, _state)
     }
 
     override fun endSession() {

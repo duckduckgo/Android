@@ -16,33 +16,44 @@
 
 package com.duckduckgo.pagetranslation.impl.session
 
+import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pagetranslation.impl.messaging.PageUnit
+import dev.zacsweers.metro.ContributesBinding
+import javax.inject.Inject
 
 /** Units translated and applied together. [isViewport] when they belong to the part of the page the user sees first. */
 data class TranslationBatch(val units: List<PageUnit>, val isViewport: Boolean)
 
-/**
- * Splits a page's units into batches: the viewport's units first, then the rest, each in page order. A batch holds only plain or
- * only HTML units, and units are added until the next one would take it past [maxCharacters]. A longer unit goes alone, and no unit
- * is ever split. HTML is counted without its tags. When no unit is in the viewport, the first batch counts as the viewport.
- */
-fun planBatches(units: List<PageUnit>, maxCharacters: Int = MAX_BATCH_CHARACTERS): List<TranslationBatch> {
-    val (viewport, rest) = units.partition { it.isInViewport }
-    val viewportBatches = pack(viewport, maxCharacters).map { TranslationBatch(it, isViewport = true) }
-    val restBatches = pack(rest, maxCharacters).mapIndexed { i, batch ->
-        TranslationBatch(batch, isViewport = viewportBatches.isEmpty() && i == 0)
-    }
-
-    return viewportBatches + restBatches
+interface TranslationBatchPlanner {
+    /**
+     * Splits a page's units into batches: the viewport's units first, then the rest, each in page order. A batch holds only plain
+     * or only HTML units, and units are added until the next one would take it past 2,000 characters. A longer unit goes alone,
+     * and no unit is ever split. HTML is counted without its tags. When no unit is in the viewport, the first batch counts as the
+     * viewport.
+     */
+    fun plan(units: List<PageUnit>): List<TranslationBatch>
 }
 
-private fun pack(units: List<PageUnit>, maxCharacters: Int): List<List<PageUnit>> {
+@ContributesBinding(AppScope::class)
+class RealTranslationBatchPlanner @Inject constructor() : TranslationBatchPlanner {
+    override fun plan(units: List<PageUnit>): List<TranslationBatch> {
+        val (viewport, rest) = units.partition { it.isInViewport }
+        val viewportBatches = pack(viewport).map { TranslationBatch(it, isViewport = true) }
+        val restBatches = pack(rest).mapIndexed { i, batch ->
+            TranslationBatch(batch, isViewport = viewportBatches.isEmpty() && i == 0)
+        }
+
+        return viewportBatches + restBatches
+    }
+}
+
+private fun pack(units: List<PageUnit>): List<List<PageUnit>> {
     val batches = mutableListOf<MutableList<PageUnit>>()
     var characters = 0
     units.forEach { unit ->
         val current = batches.lastOrNull()
         val unitCharacters = unit.countCharacters()
-        if (current == null || current.first().isHtml != unit.isHtml || characters + unitCharacters > maxCharacters) {
+        if (current == null || current.first().isHtml != unit.isHtml || characters + unitCharacters > MAX_BATCH_CHARACTERS) {
             batches += mutableListOf(unit)
             characters = unitCharacters
         } else {

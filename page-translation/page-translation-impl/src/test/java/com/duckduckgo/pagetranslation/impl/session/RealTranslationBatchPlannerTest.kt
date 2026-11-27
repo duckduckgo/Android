@@ -20,11 +20,12 @@ import com.duckduckgo.pagetranslation.impl.messaging.PageUnit
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class TranslationBatchesTest {
+class RealTranslationBatchPlannerTest {
+    private val planner = RealTranslationBatchPlanner()
 
     @Test
     fun translateTheViewportFirstThenTheRestEachInPageOrder() {
-        val batches = planBatches(listOf(plain(0, "a"), plain(1, "b", vp = true), plain(2, "c"), plain(3, "d", vp = true)))
+        val batches = planner.plan(listOf(plain(0, "a"), plain(1, "b", vp = true), plain(2, "c"), plain(3, "d", vp = true)))
 
         assertEquals(
             listOf(
@@ -37,21 +38,21 @@ class TranslationBatchesTest {
 
     @Test
     fun startANewBatchWhenTheKindChanges() {
-        val batches = planBatches(listOf(plain(0, "a"), html(1, "<b>b</b>"), html(2, "c"), plain(3, "d")))
+        val batches = planner.plan(listOf(plain(0, "a"), html(1, "<b>b</b>"), html(2, "c"), plain(3, "d")))
 
         assertEquals(listOf(listOf(0), listOf(1, 2), listOf(3)), batches.map { batch -> batch.units.map { it.id } })
     }
 
     @Test
     fun fillABatchUpToExactlyTheLimit() {
-        val batches = planBatches(listOf(plain(0, "a".repeat(1_500)), plain(1, "b".repeat(500)), plain(2, "c")))
+        val batches = planner.plan(listOf(plain(0, "a".repeat(1_500)), plain(1, "b".repeat(500)), plain(2, "c")))
 
         assertEquals(listOf(listOf(0, 1), listOf(2)), batches.map { batch -> batch.units.map { it.id } })
     }
 
     @Test
     fun startANewBatchWhenTheNextUnitWouldPassTheLimit() {
-        val batches = planBatches(listOf(plain(0, "a".repeat(1_500)), plain(1, "b".repeat(501))))
+        val batches = planner.plan(listOf(plain(0, "a".repeat(1_500)), plain(1, "b".repeat(501))))
 
         assertEquals(listOf(listOf(0), listOf(1)), batches.map { batch -> batch.units.map { it.id } })
     }
@@ -60,35 +61,35 @@ class TranslationBatchesTest {
     fun putAUnitLongerThanTheLimitAloneWithoutSplittingIt() {
         val long = plain(1, "b".repeat(2_001))
 
-        val batches = planBatches(listOf(plain(0, "a"), long, plain(2, "c")))
+        val batches = planner.plan(listOf(plain(0, "a"), long, plain(2, "c")))
 
         assertEquals(listOf(listOf(plain(0, "a")), listOf(long), listOf(plain(2, "c"))), batches.map { it.units })
     }
 
     @Test
     fun countHtmlWithoutItsTags() {
-        val batches = planBatches(listOf(html(0, "<p>" + "a".repeat(1_000) + "</p>"), html(1, "<a href=\"x\">" + "b".repeat(1_000) + "</a>")))
+        val batches = planner.plan(listOf(html(0, "<p>" + "a".repeat(1_000) + "</p>"), html(1, "<a href=\"x\">" + "b".repeat(1_000) + "</a>")))
 
         assertEquals(listOf(listOf(0, 1)), batches.map { batch -> batch.units.map { it.id } })
     }
 
     @Test
     fun countTheFirstBatchAsTheViewportWhenNoUnitIsInIt() {
-        val batches = planBatches(listOf(plain(0, "a".repeat(2_000)), plain(1, "b")))
+        val batches = planner.plan(listOf(plain(0, "a".repeat(2_000)), plain(1, "b")))
 
         assertEquals(listOf(true, false), batches.map { it.isViewport })
     }
 
     @Test
     fun markEveryViewportBatchAndNoOther() {
-        val batches = planBatches(listOf(plain(0, "a".repeat(2_000), vp = true), plain(1, "b", vp = true), plain(2, "c")))
+        val batches = planner.plan(listOf(plain(0, "a".repeat(2_000), vp = true), plain(1, "b", vp = true), plain(2, "c")))
 
         assertEquals(listOf(true, true, false), batches.map { it.isViewport })
     }
 
     @Test
     fun planNothingForAPageWithoutUnits() {
-        assertEquals(emptyList<TranslationBatch>(), planBatches(emptyList()))
+        assertEquals(emptyList<TranslationBatch>(), planner.plan(emptyList()))
     }
 
     private fun plain(id: Int, text: String, vp: Boolean = false) = PageUnit(id, text, isHtml = false, isInViewport = vp)

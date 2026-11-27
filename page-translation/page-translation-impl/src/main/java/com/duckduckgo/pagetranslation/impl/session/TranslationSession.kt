@@ -16,50 +16,86 @@
 
 package com.duckduckgo.pagetranslation.impl.session
 
+import com.duckduckgo.app.di.AppCoroutineScope
+import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.di.scopes.FragmentScope
 import com.duckduckgo.pagetranslation.impl.engine.BatchTranslation
 import com.duckduckgo.pagetranslation.impl.engine.TranslationEngine
 import com.duckduckgo.pagetranslation.impl.engine.TranslationUnit
 import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.messaging.PageTranslationMessaging
 import com.duckduckgo.pagetranslation.impl.messaging.UnitTranslation
+import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
+import javax.inject.Inject
 
-/**
- * Translates the document whose `performance.timeOrigin` is [timeOrigin], one batch at a time, and writes its progress to [state].
- * It runs on [scope], which must be the main thread's, so that once [end] returns nothing it started can still write.
- */
-class TranslationSession(
+/** Translates one document, one batch at a time. Call every method on the main thread. */
+interface TranslationSession {
+    /** Translates the document into [pair] if it hasn't been yet. */
+    fun translate(pair: LanguagePair)
+
+    /** Stops translating and drops the request in flight. Results that arrive later are ignored. */
+    fun end()
+}
+
+interface TranslationSessionFactory {
+    /**
+     * Creates a session for the document whose `performance.timeOrigin` is [timeOrigin]. It writes its progress to [state] and,
+     * while [isVisible] is false, waits between batches.
+     */
+    fun create(timeOrigin: Double, isVisible: StateFlow<Boolean>, state: MutableStateFlow<TranslationState>): TranslationSession
+}
+
+@ContributesBinding(FragmentScope::class)
+class RealTranslationSessionFactory @Inject constructor(
+    private val messaging: PageTranslationMessaging,
+    private val engine: TranslationEngine,
+    private val planner: TranslationBatchPlanner,
+    @AppCoroutineScope appScope: CoroutineScope,
+    dispatchers: DispatcherProvider,
+) : TranslationSessionFactory {
+    private val sessionScope = appScope + dispatchers.main()
+
+    override fun create(
+        timeOrigin: Double,
+        isVisible: StateFlow<Boolean>,
+        state: MutableStateFlow<TranslationState>,
+    ): TranslationSession = RealTranslationSession(timeOrigin, messaging, engine, planner, isVisible, state, sessionScope)
+}
+
+/** Runs on [scope], which must be the main thread's, so that once [end] returns nothing it started can still write. */
+class RealTranslationSession(
     private val timeOrigin: Double,
     private val messaging: PageTranslationMessaging,
     private val engine: TranslationEngine,
+    private val planner: TranslationBatchPlanner,
     private val isVisible: StateFlow<Boolean>,
     private val state: MutableStateFlow<TranslationState>,
     private val scope: CoroutineScope,
-) {
+) : TranslationSession {
     private var job: Job? = null
 
-    /** Translates the document into [pair] if it hasn't been yet. */
-    fun translate(pair: LanguagePair) {
+    override fun translate(pair: LanguagePair) {
         if (state.value != TranslationState.Idle) return
 
         state.value = TranslationState.Translating
         job = scope.launch { translatePage(pair) }
     }
 
-    /** Stops translating and drops the request in flight. Results that arrive later are ignored. */
-    fun end() {
+    override fun end() {
         job?.cancel()
         messaging.cancel()
     }
 
     private suspend fun translatePage(pair: LanguagePair) {
         messaging.inject(timeOrigin)
-        val (viewport, rest) = planBatches(messaging.extract().orEmpty()).partition { it.isViewport }
+        val (viewport, rest) = planner.plan(messaging.extract().orEmpty()).partition { it.isViewport }
 
         var written = 0
         for (batch in viewport) {
