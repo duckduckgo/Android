@@ -17,7 +17,10 @@
 package com.duckduckgo.sync.impl.ui.auditlog
 
 import android.text.TextUtils.TruncateAt
+import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
@@ -25,8 +28,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.R
+import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Content
 import com.duckduckgo.sync.impl.ui.auditlog.SyncAuditLogViewModel.Footer
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -86,9 +91,78 @@ class SyncAuditLogAdapterTest {
         assertNull(bindEntry(row(SyncAuditLogAction.SYNCED, "iPhone", RelativeTime.JustNow, highlighted = false)).background)
     }
 
+    @Test
+    fun whenErrorThenHeaderThenUnavailableRowWithIcon() {
+        val items = itemViews(Content.ERROR)
+
+        assertEquals(2, items.size)
+        assertEquals(listOf("Most recently synced or removed devices:"), items[0].texts())
+        assertEquals(listOf("Device activity is temporarily unavailable"), items[1].texts())
+        assertNotNull(items[1].findViewById<ImageView>(CommonR.id.leadingIcon).drawable)
+        assertFalse(items[1].isClickable)
+    }
+
+    @Test
+    fun whenEmptyThenHeaderThenNoRecentActivityRow() {
+        val items = itemViews(Content.EMPTY)
+
+        assertEquals(2, items.size)
+        assertEquals(listOf("You have no recent activity"), items[1].texts())
+    }
+
+    @Test
+    fun whenOnlyThisDeviceThenHeaderThenOnlyThisDeviceRow() {
+        val items = itemViews(Content.ONLY_THIS_DEVICE)
+
+        assertEquals(2, items.size)
+        assertEquals(listOf("Only this device is synced"), items[1].texts())
+    }
+
+    @Test
+    fun whenListWithLoadMoreErrorThenHeaderThenRowsThenRetryFooter() {
+        val rows = listOf(
+            row(SyncAuditLogAction.SYNCED, "iPhone", RelativeTime.JustNow),
+            row(SyncAuditLogAction.REMOVED, "Pixel 8", RelativeTime.JustNow),
+        )
+        val items = itemViews(Content.LIST, rows, Footer.ERROR)
+
+        assertEquals(4, items.size)
+        assertEquals(listOf("Synced · iPhone", "Just now"), items[1].texts())
+        assertEquals(listOf("Removed · Pixel 8", "Just now"), items[2].texts())
+        assertEquals(listOf("Older activity is temporarily unavailable. Tap to retry."), items[3].texts())
+    }
+
+    @Test
+    fun whenLoadingThenOnlyHeader() {
+        assertEquals(1, itemViews(Content.LOADING).size)
+    }
+
+    private fun itemViews(
+        content: Content,
+        rows: List<SyncAuditLogRow> = emptyList(),
+        footer: Footer = Footer.NONE,
+    ): List<View> {
+        val adapter = SyncAuditLogAdapter(onRetryClicked = {})
+        adapter.submitRows(rows, footer, content) {}
+        ShadowLooper.idleMainLooper()
+        val parent = FrameLayout(activity)
+        return (0 until adapter.itemCount).map { position ->
+            val holder: ViewHolder = adapter.onCreateViewHolder(parent, adapter.getItemViewType(position))
+            adapter.onBindViewHolder(holder, position)
+            holder.itemView
+        }
+    }
+
+    private fun View.texts(): List<String> = when {
+        visibility != View.VISIBLE -> emptyList()
+        this is TextView -> listOf(text.toString()).filter { it.isNotEmpty() }
+        this is ViewGroup -> (0 until childCount).flatMap { getChildAt(it).texts() }
+        else -> emptyList()
+    }
+
     private fun bindEntry(row: SyncAuditLogRow): TwoLineListItem {
         val adapter = SyncAuditLogAdapter(onRetryClicked = {})
-        adapter.submitRows(listOf(row), Footer.NONE, onlyThisDevice = false) {}
+        adapter.submitRows(listOf(row), Footer.NONE, Content.LIST) {}
         ShadowLooper.idleMainLooper()
         val position = 1
         val parent = FrameLayout(activity)
