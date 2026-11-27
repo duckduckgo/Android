@@ -597,7 +597,122 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_marginTop="16dp"
+            app:primaryText="Onboarding Dialogs"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="view" />
+
+        <FrameLayout
+            android:id="@+id/onboardingViewDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipChildren="false"
+            android:clipToPadding="false">
+
+            <com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="@dimen/keyline_4"
+                android:layout_marginBottom="36dp"
+                app:arrowOffsetStart="80dp"
+                app:cardElevation="0dp"
+                app:showArrow="true">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingTop="@dimen/keyline_6"
+                    android:paddingBottom="20dp">
+
+                    <ImageView
+                        android:layout_width="96dp"
+                        android:layout_height="96dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="@dimen/keyline_4"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no"
+                        app:srcCompat="@drawable/subscription_96" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_6"
+                        android:text="Onboarding title"
+                        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Title.InContext"
+                        app:typography="h2" />
+
+                    <com.duckduckgo.common.ui.view.text.DaxTextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="@dimen/keyline_6"
+                        android:layout_marginTop="@dimen/keyline_4"
+                        android:text="Onboarding body copy for the View and Compose comparison."
+                        android:textAppearance="@style/Typography.DuckDuckGo.Onboarding.Body.InContext" />
+
+                    <com.duckduckgo.common.ui.view.button.DaxButtonBrand
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="20dp"
+                        android:enabled="true"
+                        android:text="Continue"
+                        app:daxButtonBrandTypography="duckSans" />
+
+                    <com.duckduckgo.common.ui.view.button.DaxButtonSecondary
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="8dp"
+                        android:enabled="true"
+                        android:text="Not now" />
+
+                </LinearLayout>
+
+            </com.duckduckgo.common.ui.view.shape.DaxOnboardingBubbleCardView>
+
+            <ImageView
+                android:id="@+id/onboardingViewDismissButton"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_gravity="top|end"
+                android:layout_marginTop="-4dp"
+                android:layout_marginEnd="12dp"
+                android:background="@drawable/bg_onboarding_view_dismiss_button"
+                android:contentDescription="Close onboarding dialog"
+                android:foreground="?attr/selectableItemBackgroundBorderless"
+                android:outlineProvider="none"
+                android:padding="8dp"
+                android:theme="@style/ThemeOverlay.DuckDuckGo.Onboarding"
+                android:translationZ="8dp"
+                app:srcCompat="@drawable/ic_close_16" />
+
+        </FrameLayout>
+
+        <com.duckduckgo.common.ui.internal.ui.PlatformLabelView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_1"
+            app:platformType="compose" />
+
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/composeOnboardingDialog"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/keyline_1"
+            android:layout_marginBottom="@dimen/keyline_2" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>
-

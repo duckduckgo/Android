@@ -43,7 +43,7 @@ private val DuckSansDisplay = FontFamily(
     Font(FontsR.font.ducksansdisplay_bold, FontWeight.Bold),
 )
 
-private val DuckSansProduct = FontFamily(
+internal val DuckSansProduct = FontFamily(
     Font(FontsR.font.ducksansproduct_regular, FontWeight.Normal),
     Font(FontsR.font.ducksansproduct_medium, FontWeight.Medium),
     Font(FontsR.font.ducksansproduct_bold, FontWeight.Bold),
@@ -181,6 +181,18 @@ data class DuckDuckGoTypography(
             fontSize = 18.sp,
             fontFamily = DuckSansProduct,
             fontWeight = FontWeight.Normal,
+        ),
+    ),
+
+    val onboardingTitleInContext: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        onboardingTitle.textStyle.copy(
+            fontSize = 20.sp,
+        ),
+    ),
+
+    val onboardingBodyInContext: DuckDuckGoTextStyle = DuckDuckGoTextStyle(
+        onboardingBody.textStyle.copy(
+            fontSize = 16.sp,
         ),
     ),
 )

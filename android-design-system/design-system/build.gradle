@@ -83,6 +83,8 @@ dependencies {
 
     testImplementation project(path: ':common-test')
     testImplementation project(':feature-toggles-test')
+    testImplementation "androidx.compose.ui:ui-test-junit4"
+    testImplementation "androidx.compose.ui:ui-test-manifest"
     testImplementation 'app.cash.turbine:turbine:_'
     testImplementation "org.mockito.kotlin:mockito-kotlin:_"
     testImplementation AndroidX.archCore.testing
