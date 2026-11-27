@@ -143,6 +143,12 @@ enum class DuckChatPixelSurface(val value: String) {
     }
 }
 
+enum class AttachmentEntryPoint(val pixelValue: String) {
+    ATTACHMENT_MENU("attachment_menu"),
+    NEW_CHAT_HINT("new_chat_hint"),
+    SHARE("share"),
+}
+
 enum class DuckChatPixelPageType(val value: String) {
     NTP("ntp"),
     SERP("serp"),
@@ -294,9 +300,9 @@ interface DuckChatPixels {
     fun fireImageAttached(source: String, surface: DuckChatPixelSurface)
     fun fireImageValidationFailed(reason: String, surface: DuckChatPixelSurface)
     fun fireImageRemoved(surface: DuckChatPixelSurface)
-    fun fireFileAttached(surface: DuckChatPixelSurface)
+    fun fireFileAttached(surface: DuckChatPixelSurface, entryPoint: AttachmentEntryPoint)
     fun fireFileRemoved(surface: DuckChatPixelSurface)
-    fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface)
+    fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface, entryPoint: AttachmentEntryPoint)
     fun fireVoiceTapped(surface: DuckChatPixelSurface)
     fun fireVoiceSearchTapped(surface: DuckChatPixelSurface)
     fun fireStopGenerationTapped(surface: DuckChatPixelSurface)
@@ -1267,10 +1273,13 @@ class RealDuckChatPixels @Inject constructor(
         ),
     )
 
-    override fun fireFileAttached(surface: DuckChatPixelSurface) = fireCountAndDaily(
+    override fun fireFileAttached(surface: DuckChatPixelSurface, entryPoint: AttachmentEntryPoint) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_ATTACHED_DAILY,
-        surfaceParams(surface),
+        mapOf(
+            DuckChatPixelParameters.SURFACE to surface.value,
+            DuckChatPixelParameters.ENTRY_POINT to entryPoint.pixelValue,
+        ),
     )
 
     override fun fireFileRemoved(surface: DuckChatPixelSurface) = fireCountAndDaily(
@@ -1306,12 +1315,17 @@ class RealDuckChatPixels @Inject constructor(
         surfaceParams(surface),
     )
 
-    override fun fireFileValidationFailed(reason: String, surface: DuckChatPixelSurface) = fireCountAndDaily(
+    override fun fireFileValidationFailed(
+        reason: String,
+        surface: DuckChatPixelSurface,
+        entryPoint: AttachmentEntryPoint,
+    ) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_FILE_VALIDATION_FAILED_DAILY,
         mapOf(
             DuckChatPixelParameters.FILE_VALIDATION_REASON to reason,
             DuckChatPixelParameters.SURFACE to surface.value,
+            DuckChatPixelParameters.ENTRY_POINT to entryPoint.pixelValue,
         ),
     )
 
@@ -1935,6 +1949,7 @@ object DuckChatPixelParameters {
     const val ATTACHMENT_SOURCE = "source"
     const val FILE_VALIDATION_REASON = "reason"
     const val SURFACE = "surface"
+    const val ENTRY_POINT = "entry_point"
     const val OUTCOME = "outcome"
     const val SUBMIT_METHOD = "submit_method"
     const val TOS_DISCLAIMER_SHOWN = "tos_disclaimer_shown"

@@ -40,6 +40,7 @@ import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ImageLimits
 import com.duckduckgo.duckchat.impl.models.ModelState
 import com.duckduckgo.duckchat.impl.models.forTab
+import com.duckduckgo.duckchat.impl.pixel.AttachmentEntryPoint
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixelSurface
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.ui.nativeinput.attachment.ImageAttachment
@@ -249,16 +250,16 @@ class AttachmentViewModel @Inject constructor(
     private fun placeholderBitmap(): Bitmap =
         Bitmap.createBitmap(PLACEHOLDER_BITMAP_SIZE_PX, PLACEHOLDER_BITMAP_SIZE_PX, Bitmap.Config.ARGB_8888)
 
-    fun onFilesPicked(uris: List<Uri>) {
+    fun onFilesPicked(uris: List<Uri>, entryPoint: AttachmentEntryPoint) {
         viewModelScope.launch {
             for (uri in uris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri)
                 if (attachment == null) {
-                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value)
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value, entryPoint)
                     continue
                 }
                 _fileAttachments.update { it + attachment }
-                fireFileAcceptedOrRejectedPixel(attachment)
+                fireFileAcceptedOrRejectedPixel(attachment, entryPoint)
             }
         }
     }
@@ -281,11 +282,11 @@ class AttachmentViewModel @Inject constructor(
             for (uri in fileUris) {
                 val attachment = fileAttachmentProcessor.processFile(context, uri)
                 if (attachment == null) {
-                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value)
+                    duckChatPixels.fireFileValidationFailed(FILE_VALIDATION_OTHER, surface.value, AttachmentEntryPoint.SHARE)
                     continue
                 }
                 _fileAttachments.update { it + attachment }
-                fireFileAcceptedOrRejectedPixel(attachment)
+                fireFileAcceptedOrRejectedPixel(attachment, AttachmentEntryPoint.SHARE)
             }
         }
     }
@@ -295,12 +296,12 @@ class AttachmentViewModel @Inject constructor(
      * violations are reflected as derived error state rather than an explicit rejection, so this is the
      * single transition point where we can attribute a reason to a freshly-picked file exactly once.
      */
-    private fun fireFileAcceptedOrRejectedPixel(added: FileAttachment) {
+    private fun fireFileAcceptedOrRejectedPixel(added: FileAttachment, entryPoint: AttachmentEntryPoint) {
         val reason = resolveFileValidationReason(added)
         if (reason != null) {
-            duckChatPixels.fireFileValidationFailed(reason, surface.value)
+            duckChatPixels.fireFileValidationFailed(reason, surface.value, entryPoint)
         } else {
-            duckChatPixels.fireFileAttached(surface.value)
+            duckChatPixels.fireFileAttached(surface.value, entryPoint)
         }
     }
 
