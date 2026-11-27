@@ -370,6 +370,7 @@ import com.duckduckgo.networkprotection.api.NetworkProtectionScreens.NetworkProt
 import com.duckduckgo.newtabpage.api.NewTabPageProvider
 import com.duckduckgo.newtabpage.api.NtpAfterIdleManager
 import com.duckduckgo.pagetranslation.api.PageTranslation
+import com.duckduckgo.pagetranslation.api.TabContent
 import com.duckduckgo.privacy.dashboard.api.ui.DashboardOpener
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm
 import com.duckduckgo.privacy.dashboard.api.ui.PrivacyDashboardHybridScreenParams.BrokenSiteForm.BrokenSiteFormReportFlow
@@ -1264,6 +1265,9 @@ class BrowserTabFragment :
             omnibarType = omnibarType,
             binding = binding,
         )
+        omnibar.viewModeFlow
+            .onEach { reportTranslationTabState(isTabVisible()) }
+            .launchIn(viewLifecycleOwner.lifecycleScope)
 
         nativeInputManager.init(omnibar, binding.rootView, viewLifecycleOwner)
 
@@ -2161,6 +2165,7 @@ class BrowserTabFragment :
         removeContextualSheetIfWaitingForHide()
         if (view != null) binding.swipeUpNewChatIndicator.reset()
         nativeInputManager.onTabVisibilityChanged(false)
+        reportTranslationTabState(false)
         pdfDownloadTooltipPopup?.dismiss()
         pdfDownloadTooltipPopup = null
         dismissDownloadFragment()
@@ -3266,7 +3271,7 @@ class BrowserTabFragment :
                 if (omnibar.viewMode == DuckAI) {
                     nativeInputManager.hideNativeInput()
                 }
-                omnibar.setViewMode(Browser(it.url))
+                omnibar.setViewMode(omnibar.viewMode.afterDuckAiFullScreenDisabled(it.url))
                 sharedContextualViewModel.onMainBrowserPageFinished(it.url, androidBrowserConfigFeature.storePageContext().isEnabled())
             }
 
@@ -5373,14 +5378,21 @@ class BrowserTabFragment :
     }
 
     private fun updateNativeInputTabVisibility() {
-        nativeInputManager.onTabVisibilityChanged(
-            isNativeInputTabVisible(
-                isResumed = isResumed,
-                isHidden = isHidden,
-                isSelected = viewModel.liveSelectedTab.value?.tabId == tabId,
-                isCustomTab = isActiveCustomTab(),
-            ),
-        )
+        val isVisible = isTabVisible()
+        nativeInputManager.onTabVisibilityChanged(isVisible)
+        reportTranslationTabState(isVisible)
+    }
+
+    private fun isTabVisible() = isNativeInputTabVisible(
+        isResumed = isResumed,
+        isHidden = isHidden,
+        isSelected = viewModel.liveSelectedTab.value?.tabId == tabId,
+        isCustomTab = isActiveCustomTab(),
+    )
+
+    private fun reportTranslationTabState(isVisible: Boolean) {
+        val content = if (::omnibar.isInitialized) omnibar.viewMode.toTabContent() else TabContent.Other
+        pageTranslation.onTabStateChanged(isVisible, content)
     }
 
     fun requestNativeInputFocus() {
@@ -5392,6 +5404,7 @@ class BrowserTabFragment :
         removeContextualSheetIfWaitingForHide()
         if (view != null) binding.swipeUpNewChatIndicator.reset()
         nativeInputManager.onTabVisibilityChanged(false)
+        reportTranslationTabState(false)
         viewModel.onViewHidden()
         webViewClient.onTabBackgrounded()
         downloadMessagesJob.cancel()
@@ -7053,3 +7066,18 @@ private class JsOrientationHandler {
 
 internal fun isNativeInputTabVisible(isResumed: Boolean, isHidden: Boolean, isSelected: Boolean, isCustomTab: Boolean): Boolean =
     isResumed && !isHidden && (isSelected || isCustomTab)
+
+internal fun ViewMode.toTabContent(): TabContent = when (this) {
+    is Pdf -> TabContent.Pdf
+    ViewMode.NewTab, ViewMode.DuckAI, ViewMode.Error, ViewMode.SSLWarning, ViewMode.MaliciousSiteWarning -> TabContent.Other
+    is Browser, is CustomTab -> TabContent.WebPage
+}
+
+/**
+ * The mode after the tab navigated to a non Duck.ai url. This runs on every such navigation, so it must not turn
+ * a mode that is not a web page (error, warning, new tab, PDF) into [Browser].
+ */
+internal fun ViewMode.afterDuckAiFullScreenDisabled(url: String): ViewMode = when (this) {
+    ViewMode.Error, ViewMode.SSLWarning, ViewMode.MaliciousSiteWarning, ViewMode.NewTab, is Pdf -> this
+    is Browser, is CustomTab, ViewMode.DuckAI -> Browser(url)
+}

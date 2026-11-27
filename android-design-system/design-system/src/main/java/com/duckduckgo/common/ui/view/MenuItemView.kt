@@ -74,6 +74,8 @@ constructor(
         setSize(MenuItemViewSize.getMenuItemSize(attrSizeValue))
         binding.dotIndicator.isVisible = attributes.getBoolean(R.styleable.MenuItemView_showDotIndicator, false)
         updateContentDescription()
+        binding.icon.setEnabledOpacity(isEnabled)
+        binding.label.setEnabledOpacity(isEnabled)
         attributes.recycle()
     }
 
@@ -112,6 +114,12 @@ constructor(
             this.marginStart = marginStart
         }
         invalidate()
+    }
+
+    override fun setEnabled(enabled: Boolean) {
+        binding.icon.setEnabledOpacity(enabled)
+        binding.label.setEnabledOpacity(enabled)
+        super.setEnabled(enabled)
     }
 
     private fun updateContentDescription() {
