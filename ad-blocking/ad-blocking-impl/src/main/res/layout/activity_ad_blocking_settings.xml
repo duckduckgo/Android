@@ -79,11 +79,16 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/keyline_4" />
 
+            <com.duckduckgo.common.ui.view.listitem.SectionHeaderListItem
+                android:id="@+id/youTubeSectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:primaryText="@string/ad_blocking_settings_youtube_header" />
+
             <com.duckduckgo.common.ui.view.listitem.OneLineListItem
                 android:id="@+id/blockAdsToggle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/keyline_1"
                 app:primaryText="@string/ad_blocking_settings_toggle_title"
                 app:showSwitch="true" />
 
@@ -134,7 +139,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="@dimen/keyline_4"
                 android:layout_marginTop="@dimen/keyline_2"
-                android:text="@string/segment_skip_settings_description_v2"
+                android:text="@string/segment_skip_settings_disclaimer"
                 android:visibility="gone"
                 app:textType="secondary"
                 app:typography="body2"

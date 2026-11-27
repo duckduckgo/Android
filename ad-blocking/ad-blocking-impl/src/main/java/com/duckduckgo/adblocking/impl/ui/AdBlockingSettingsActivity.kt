@@ -89,6 +89,26 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
                 },
             ),
         )
+        binding.adBlockingDescription.addClickableSpan(
+            textSequence = getText(R.string.ad_blocking_settings_disclaimer),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onInterferenceLearnMoreClicked()
+                    }
+                },
+            ),
+        )
+        binding.segmentSkipDescription.addClickableSpan(
+            textSequence = getText(R.string.segment_skip_settings_disclaimer),
+            spans = listOf(
+                "learn_more_link" to object : DuckDuckGoClickableSpan() {
+                    override fun onClick(widget: View) {
+                        viewModel.onInterferenceLearnMoreClicked()
+                    }
+                },
+            ),
+        )
         binding.duckPlayerEntry.setClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerDescription.setOnClickListener { viewModel.onDuckPlayerClicked() }
         binding.duckPlayerSettingsLink.setOnClickListener { viewModel.onDuckPlayerClicked() }
@@ -106,7 +126,7 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
 
     private fun render(state: AdBlockingSettingsViewModel.ViewState) {
         binding.blockAdsToggle.quietlySetIsChecked(state.isEnabled, blockAdsToggleListener)
-        renderDescription(state.showConsentDescription)
+        binding.adBlockingDescription.isVisible = state.showConsentDescription != null && !state.isContingencyMode
         binding.blockAdsToggle.isVisible = !state.disabledUntilRelaunch && !state.isContingencyMode
         binding.blockAdsToggleUntilRelaunch.isVisible = state.disabledUntilRelaunch && !state.isContingencyMode
         if (state.disabledUntilRelaunch) {
@@ -124,33 +144,12 @@ class AdBlockingSettingsActivity : DuckDuckGoActivity() {
         )
         binding.segmentSkipModeEntry.isVisible = state.segmentSkipMode != null
         binding.segmentSkipDescription.isVisible = state.segmentSkipMode != null
-        val segmentSkipDescription = if (state.showSegmentSkipConsent) {
-            R.string.segment_skip_settings_description_with_consent
-        } else {
-            R.string.segment_skip_settings_description_v2
-        }
-        binding.segmentSkipDescription.setText(segmentSkipDescription)
         state.segmentSkipMode?.let { binding.segmentSkipModeEntry.setSecondaryText(getString(it.labelRes())) }
         if (state.isContingencyMode) {
-            binding.adBlockingDescription.gone()
             binding.contingencyModeItem.show()
         } else {
             binding.contingencyModeItem.gone()
         }
-    }
-
-    private fun renderDescription(showConsentDescription: Boolean?) {
-        if (showConsentDescription == null) {
-            binding.adBlockingDescription.gone()
-            return
-        }
-        val descriptionRes = if (showConsentDescription) {
-            R.string.ad_blocking_settings_description_with_consent_v2
-        } else {
-            R.string.ad_blocking_settings_description_v2
-        }
-        binding.adBlockingDescription.setText(descriptionRes)
-        binding.adBlockingDescription.show()
     }
 
     private fun observeViewModel() {
