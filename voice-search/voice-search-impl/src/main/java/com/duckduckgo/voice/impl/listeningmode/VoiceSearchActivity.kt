@@ -32,6 +32,7 @@ import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.viewbinding.viewBinding
+import com.duckduckgo.common.utils.edgetoedge.EdgeToEdgeHandler
 import com.duckduckgo.common.utils.extensions.capitalizeFirstLetter
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.duckchat.api.DuckAiFeatureState
@@ -59,6 +60,8 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     @Inject lateinit var appBuildConfig: AppBuildConfig
 
     @Inject lateinit var duckAiFeatureState: DuckAiFeatureState
+
+    @Inject lateinit var edgeToEdgeHandler: EdgeToEdgeHandler
 
     private val viewModel: VoiceSearchViewModel by bindViewModel()
     private val binding: ActivityVoiceSearchBinding by viewBinding()
@@ -114,6 +117,8 @@ class VoiceSearchActivity : DuckDuckGoActivity() {
     private fun configureToolbar() {
         setupToolbar(binding.toolbar)
         supportActionBar?.title = ""
+        // The landscape layout draws under a side navigation bar; without this the Back arrow sits beneath its buttons.
+        edgeToEdgeHandler.applyHorizontalSystemBarInsets(binding.toolbar)
     }
 
     @SuppressLint("NewApi")
