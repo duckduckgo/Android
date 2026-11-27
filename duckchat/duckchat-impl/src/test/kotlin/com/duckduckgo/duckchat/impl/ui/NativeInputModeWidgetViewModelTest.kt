@@ -542,7 +542,7 @@ class NativeInputModeWidgetViewModelTest {
         whenever(subscriptions.getSubscriptionStatus()).thenReturn(com.duckduckgo.subscriptions.api.SubscriptionStatus.INACTIVE)
         val manager = com.duckduckgo.duckchat.impl.models.RealDuckAiModelManager(
             service, dataStore, subscriptions, host, lazy { duckChatFeature }, lazy { duckChatPixels }, mock(),
-            mock(), mock(), coroutineRule.testDispatcherProvider, coroutineRule.testScope,
+            mock(), mock(), mock(), coroutineRule.testDispatcherProvider, coroutineRule.testScope,
         )
         whenever(modelManager.modelState).thenReturn(manager.modelState)
         modelManager.stub { onBlocking { ensureImageCapableModelSelected() } doSuspendableAnswer { manager.ensureImageCapableModelSelected() } }
