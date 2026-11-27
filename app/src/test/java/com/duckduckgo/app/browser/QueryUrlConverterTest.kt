@@ -614,6 +614,20 @@ class QueryUrlConverterTest {
     }
 
     @Test
+    fun `when shared input has other punctuation around the host then url extracted without it`() {
+        val expectedByInput = mapOf(
+            "'example.com'" to "http://example.com",
+            "(example.com)" to "http://example.com",
+            "example.com," to "http://example.com",
+            "example.com." to "http://example.com",
+            "https://example.com\"" to "https://example.com",
+        )
+        expectedByInput.forEach { (input, expected) ->
+            assertEquals(expected, testee.convertQueryToUrl(input, extractUrlFromQuery = true))
+        }
+    }
+
+    @Test
     fun `when url has ipv6 host and pipe in query then url returned unchanged`() {
         val input = "http://[::1]:8080/?a=1|2"
         val result = testee.convertQueryToUrl(input, queryOrigin = QueryOrigin.FromAutocomplete(isNav = true))
