@@ -22,7 +22,6 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.duckduckgo.app.browser.BrowserActivity
 import com.duckduckgo.app.browser.mode.SelectedTextSearch
-import com.duckduckgo.common.utils.extensions.getTextExtra
 import logcat.LogPriority.WARN
 import logcat.logcat
 
@@ -51,7 +50,7 @@ class SelectedTextSearchActivity : AppCompatActivity() {
     private fun extractQuery(intent: Intent?): String? {
         if (intent == null) return null
 
-        val textSelectionQuery = intent.getTextExtra(Intent.EXTRA_PROCESS_TEXT)
+        val textSelectionQuery = intent.getCharSequenceExtra(Intent.EXTRA_PROCESS_TEXT)?.toString()
         if (textSelectionQuery != null) return textSelectionQuery
 
         val webSearchQuery = intent.getStringExtra(SearchManager.QUERY)

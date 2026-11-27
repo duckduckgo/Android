@@ -27,9 +27,3 @@ inline fun <reified T : Serializable> Intent.getSerializableExtra(name: String):
         @Suppress("DEPRECATION")
         getSerializableExtra(name) as? T
     }
-
-/**
- * Reads a text extra such as [Intent.EXTRA_TEXT] or [Intent.EXTRA_PROCESS_TEXT] as plain text.
- * The sender may pass a styled CharSequence, for which [Intent.getStringExtra] returns null.
- */
-fun Intent.getTextExtra(name: String): String? = getCharSequenceExtra(name)?.toString()

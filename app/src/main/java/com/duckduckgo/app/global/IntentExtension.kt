@@ -19,14 +19,13 @@ package com.duckduckgo.app.global
 import android.content.Intent
 import android.os.BadParcelableException
 import android.os.Bundle
-import com.duckduckgo.common.utils.extensions.getTextExtra
 import logcat.LogPriority.ERROR
 import logcat.asLog
 import logcat.logcat
 
 val Intent.intentText: String?
     get() {
-        return data?.toString() ?: getTextExtra(Intent.EXTRA_TEXT)
+        return data?.toString() ?: getCharSequenceExtra(Intent.EXTRA_TEXT)?.toString()
     }
 
 fun Intent.sanitize() {
