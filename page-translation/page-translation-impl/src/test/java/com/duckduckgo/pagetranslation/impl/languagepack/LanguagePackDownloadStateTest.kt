@@ -27,9 +27,9 @@ import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadStat
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Idle
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.InProgress
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Interrupted
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.DOWNLOADED_BYTES_KEY
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.FAILURE_REASON_KEY
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.TOTAL_BYTES_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.DOWNLOADED_BYTES_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.FAILURE_REASON_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.TOTAL_BYTES_KEY
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import java.util.UUID
@@ -53,11 +53,18 @@ class LanguagePackDownloadStateTest {
     }
 
     @Test
-    fun reportFailureReasonFromOutput() {
+    fun reportFailureReasonOfACrashedDownload() {
         val output = workDataOf(FAILURE_REASON_KEY to NOT_ENOUGH_STORAGE.name)
 
         assertEquals(Failed(NOT_ENOUGH_STORAGE), workInfo(State.FAILED, output = output).toLanguagePackDownloadState())
         assertEquals(Failed(DOWNLOAD_ERROR), workInfo(State.FAILED).toLanguagePackDownloadState())
+    }
+
+    @Test
+    fun reportTheFailureReasonOfADownloadThatSucceededSoItsChainKeepsRunning() {
+        val output = workDataOf(FAILURE_REASON_KEY to NOT_ENOUGH_STORAGE.name)
+
+        assertEquals(Failed(NOT_ENOUGH_STORAGE), workInfo(State.SUCCEEDED, output = output).toLanguagePackDownloadState())
     }
 
     @Test

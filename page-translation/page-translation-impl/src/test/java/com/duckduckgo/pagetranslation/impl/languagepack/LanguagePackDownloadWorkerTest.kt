@@ -29,11 +29,11 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.DOWNLOADED_BYTES_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.FAILURE_REASON_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.PAIR_KEY
+import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.TOTAL_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFetcher.FetchResult
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.DOWNLOADED_BYTES_KEY
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.FAILURE_REASON_KEY
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.PAIR_KEY
-import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackWorker.Companion.TOTAL_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.ModelFile
 import com.duckduckgo.pagetranslation.impl.manifest.ModelsManifest.TranslationModel
@@ -42,7 +42,9 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,7 +57,7 @@ import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 
 @RunWith(AndroidJUnit4::class)
-class LanguagePackWorkerTest {
+class LanguagePackDownloadWorkerTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
@@ -65,13 +67,60 @@ class LanguagePackWorkerTest {
     private val fetcher: LanguagePackFetcher = mock()
     private val installer: LanguagePackInstaller = mock()
 
+    @After
+    fun tearDown() {
+        context.filesDir.resolve("page-translation").deleteRecursively()
+    }
+
     @Test
     fun failWithoutDownloadingWhenTranslationIsOff() = runTest {
         setTranslationEnabled(false)
 
-        assertEquals(Result.failure(), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
 
         verifyNoInteractions(fetcher)
+    }
+
+    @Test
+    fun removeTheDeletedPackOfThePairBeforeDownloading() = runTest {
+        setTranslationEnabled(true)
+        context.filesDir.resolve(OLD_PATH).mkdirs()
+        whenever(store.readManifest()).thenReturn(MANIFEST)
+        whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.FAILURE)
+
+        createWorker().doWork()
+
+        assertFalse(context.filesDir.resolve(OLD_PATH).exists())
+    }
+
+    @Test
+    fun removeAPartialDownloadOfThePairBeforeDownloading() = runTest {
+        setTranslationEnabled(true)
+        context.filesDir.resolve(STAGING_PATH).mkdirs()
+        whenever(store.readManifest()).thenReturn(MANIFEST.copy(models = emptyMap()))
+
+        createWorker().doWork()
+
+        assertFalse(context.filesDir.resolve(STAGING_PATH).exists())
+    }
+
+    @Test
+    fun succeedWithoutDownloadingWhenThePackIsInstalled() = runTest {
+        setTranslationEnabled(true)
+        context.filesDir.resolve(PACK_PATH).mkdirs()
+
+        assertEquals(Result.success(), createWorker().doWork())
+
+        verifyNoInteractions(fetcher)
+    }
+
+    @Test
+    fun reportDownloadErrorReasonWhenDownloadThrows() = runTest {
+        setTranslationEnabled(true)
+        whenever(store.readManifest()).thenReturn(MANIFEST)
+        whenever(fetcher.fetch(any(), any(), any(), any())).thenThrow(IllegalStateException())
+
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
     }
 
     @Test
@@ -84,7 +133,7 @@ class LanguagePackWorkerTest {
         runCurrent()
         setTranslationEnabled(false)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), work.await())
+        assertEquals(DOWNLOAD_ERROR_RESULT, work.await())
     }
 
     @Test
@@ -92,7 +141,7 @@ class LanguagePackWorkerTest {
         setTranslationEnabled(true)
         whenever(store.readManifest()).thenReturn(MANIFEST.copy(models = emptyMap()))
 
-        assertEquals(Result.failure(), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
 
         verifyNoInteractions(fetcher)
     }
@@ -117,7 +166,7 @@ class LanguagePackWorkerTest {
         whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.SUCCESS)
         whenever(installer.install(any(), any(), any(), any())).thenReturn(false)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
     }
 
     @Test
@@ -137,7 +186,7 @@ class LanguagePackWorkerTest {
         whenever(store.readManifest()).thenReturn(MANIFEST)
         whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.NOT_ENOUGH_STORAGE)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.NOT_ENOUGH_STORAGE.name)), createWorker().doWork())
+        assertEquals(Result.success(workDataOf(FAILURE_REASON_KEY to Reason.NOT_ENOUGH_STORAGE.name)), createWorker().doWork())
     }
 
     @Test
@@ -146,7 +195,7 @@ class LanguagePackWorkerTest {
         whenever(store.readManifest()).thenReturn(MANIFEST)
         whenever(fetcher.fetch(any(), any(), any(), any())).thenReturn(FetchResult.FAILURE)
 
-        assertEquals(Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name)), createWorker().doWork())
+        assertEquals(DOWNLOAD_ERROR_RESULT, createWorker().doWork())
     }
 
     private fun setTranslationEnabled(isEnabled: Boolean) {
@@ -155,7 +204,7 @@ class LanguagePackWorkerTest {
 
     private val progressUpdates = mutableListOf<Data>()
 
-    private fun createWorker() = TestListenableWorkerBuilder<LanguagePackWorker>(context)
+    private fun createWorker() = TestListenableWorkerBuilder<LanguagePackDownloadWorker>(context)
         .setInputData(workDataOf(PAIR_KEY to PAIR))
         .setProgressUpdater { _, _, data ->
             progressUpdates += data
@@ -167,6 +216,7 @@ class LanguagePackWorkerTest {
             it.store = store
             it.fetcher = lazyOf(fetcher)
             it.installer = lazyOf(installer)
+            it.directories = RealLanguagePackDirectories(context)
             it.dispatchers = coroutineRule.testDispatcherProvider
         }
 
@@ -175,6 +225,7 @@ class LanguagePackWorkerTest {
         const val BASE_URL = "https://models.test/"
         const val STAGING_PATH = "page-translation/packs/fr-en.tmp"
         const val PACK_PATH = "page-translation/packs/fr-en"
+        const val OLD_PATH = "page-translation/packs/fr-en.old"
 
         val MODEL = TranslationModel(
             sourceLanguage = "fr",
@@ -184,6 +235,8 @@ class LanguagePackWorkerTest {
             totalBytes = 11,
             files = mapOf("model" to ModelFile("model.zst", bytes = 11, sha256 = "a", decompressedSize = 20, decompressedHash = "b")),
         )
+
+        val DOWNLOAD_ERROR_RESULT = Result.success(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name))
 
         val MANIFEST = ModelsManifest(schemaVersion = 1, baseUrl = BASE_URL, models = mapOf(PAIR to MODEL))
     }

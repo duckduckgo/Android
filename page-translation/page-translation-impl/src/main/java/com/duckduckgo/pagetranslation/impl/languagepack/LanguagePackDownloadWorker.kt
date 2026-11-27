@@ -41,12 +41,14 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.File
+import logcat.LogPriority.ERROR
+import logcat.asLog
+import logcat.logcat
 import javax.inject.Inject
 import com.duckduckgo.mobile.android.R as CommonR
 
 @ContributesWorker(AppScope::class)
-internal class LanguagePackWorker(
+internal class LanguagePackDownloadWorker(
     context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
@@ -63,21 +65,40 @@ internal class LanguagePackWorker(
     lateinit var installer: Lazy<LanguagePackInstaller>
 
     @Inject
+    lateinit var directories: LanguagePackDirectories
+
+    @Inject
     lateinit var dispatchers: DispatcherProvider
 
     override suspend fun doWork(): Result = withContext(dispatchers.io()) {
-        val pair = inputData.getString(PAIR_KEY)
-        if (pair == null || !feature.translation().isEnabled()) return@withContext Result.failure()
+        val pair = inputData.getString(PAIR_KEY) ?: return@withContext failure(Reason.DOWNLOAD_ERROR)
+        // a deleted pack can only be restored until the pair's next operation starts
+        directories.getOldDirectory(pair).deleteRecursively()
+        directories.getStagingDirectory(pair).deleteRecursively()
+        if (directories.getPackDirectory(pair).exists()) return@withContext Result.success()
+
+        try {
+            download(pair)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            logcat(ERROR) { "Page translation language pack download failed: ${e.asLog()}" }
+            failure(Reason.DOWNLOAD_ERROR)
+        }
+    }
+
+    private suspend fun download(pair: String): Result {
+        if (!feature.translation().isEnabled()) return failure(Reason.DOWNLOAD_ERROR)
 
         val manifest = store.readManifest()
-        val model = manifest?.models?.get(pair) ?: return@withContext Result.failure()
+        val model = manifest?.models?.get(pair) ?: return failure(Reason.DOWNLOAD_ERROR)
 
         // WorkManager keeps the progress of a stopped attempt, but the fetcher starts over
         setProgress(workDataOf(DOWNLOADED_BYTES_KEY to 0L, TOTAL_BYTES_KEY to model.totalBytes))
 
         val result = coroutineScope {
             val fetch = async {
-                val stagingDirectory = getStagingDirectory(applicationContext, pair)
+                val stagingDirectory = directories.getStagingDirectory(pair)
                 val fetchResult = fetcher.value.fetch(
                     baseUrl = manifest.baseUrl,
                     model = model,
@@ -87,7 +108,7 @@ internal class LanguagePackWorker(
                 }
                 if (fetchResult != SUCCESS) return@async fetchResult
 
-                if (installer.value.install(pair, model, stagingDirectory, getPackDirectory(applicationContext, pair))) SUCCESS else FAILURE
+                if (installer.value.install(pair, model, stagingDirectory, directories.getPackDirectory(pair))) SUCCESS else FAILURE
             }
             val stopWhenDisabled = launch {
                 feature.translation().enabled().firstOrNull { isEnabled -> !isEnabled } ?: return@launch
@@ -105,12 +126,15 @@ internal class LanguagePackWorker(
             }
         }
 
-        when (result) {
+        return when (result) {
             SUCCESS -> Result.success()
-            NOT_ENOUGH_STORAGE -> Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.NOT_ENOUGH_STORAGE.name))
-            FAILURE -> Result.failure(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name))
+            NOT_ENOUGH_STORAGE -> failure(Reason.NOT_ENOUGH_STORAGE)
+            FAILURE -> failure(Reason.DOWNLOAD_ERROR)
         }
     }
+
+    // WorkManager fails every operation queued after a failed work, so a failed download still succeeds
+    private fun failure(reason: Reason) = Result.success(workDataOf(FAILURE_REASON_KEY to reason.name))
 
     // only called before Android 12, where expedited work runs as a foreground service
     override suspend fun getForegroundInfo(): ForegroundInfo {
@@ -138,13 +162,7 @@ internal class LanguagePackWorker(
         const val TOTAL_BYTES_KEY = "totalBytes"
         const val FAILURE_REASON_KEY = "failureReason"
 
-        private const val PACKS_DIRECTORY = "page-translation/packs"
-        private const val STAGING_SUFFIX = ".tmp"
         private const val NOTIFICATION_CHANNEL_ID = "com.duckduckgo.pagetranslation.downloads"
         private const val NOTIFICATION_ID = 7_341
-
-        fun getStagingDirectory(context: Context, pair: String): File = context.filesDir.resolve(PACKS_DIRECTORY).resolve(pair + STAGING_SUFFIX)
-
-        fun getPackDirectory(context: Context, pair: String): File = context.filesDir.resolve(PACKS_DIRECTORY).resolve(pair)
     }
 }
