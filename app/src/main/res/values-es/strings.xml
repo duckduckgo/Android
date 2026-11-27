@@ -948,6 +948,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Omitir</string>
 
     <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportYourPasswordsTitle">Importa las contraseñas</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Las importaré desde Google o desde otro gestor de contraseñas. Puede que tengas que desbloquear el teléfono o iniciar sesión.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Importar contraseñas</string>
     <string name="preOnboardingImportCompleteTitle">Importación completada</string>
     <string name="preOnboardingImportCompleteCta">Continuar</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importar contraseñas</string>
