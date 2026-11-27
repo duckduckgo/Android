@@ -55,10 +55,10 @@ internal object NewChatDefaults {
         nowMillis: Long,
         userDefault: UserDefaultModel? = null,
     ): NewChatDefault {
-        val overLimitModelId = overLimit?.takeIf { nowMillis < it.resetsAtMillis }
-            ?.modelId?.takeIf { id -> models.any { it.id == id && it.isAccessible } }
+        val activeOverLimit = overLimit?.takeIf { nowMillis < it.resetsAtMillis }
+        val overLimitModelId = activeOverLimit?.modelId?.takeIf { id -> models.any { it.id == id && it.isAccessible } }
         if (overLimitModelId != null) {
-            val default = newChatDefault(overLimitModelId, overLimit.reasoningEffort)
+            val default = newChatDefault(overLimitModelId, activeOverLimit.reasoningEffort)
             if (userDefault == null) return default
             val outcome = if (overLimitModelId == userDefault.modelId) UserDefaultOutcome.APPLIED else UserDefaultOutcome.UNAVAILABLE
             return default.copy(userDefaultOutcome = outcome)
@@ -66,7 +66,9 @@ internal object NewChatDefaults {
         val server = preferred(tier, remote)
         if (userDefault == null || models.isEmpty()) return server
         val userModelId = userDefault.modelId
-        if (userModelId != null && models.any { it.id == userModelId && it.isAccessible }) {
+        // Over the limit, web allows only its over-limit model, even when that model is not usable here.
+        val isAllowedByUsageLimit = activeOverLimit == null || activeOverLimit.modelId == userModelId
+        if (isAllowedByUsageLimit && models.any { it.id == userModelId && it.isAccessible }) {
             return NewChatDefault(userModelId, server.modeFor(userModelId) ?: ReasoningMode.FAST, UserDefaultOutcome.APPLIED)
         }
         return server.copy(userDefaultOutcome = UserDefaultOutcome.UNAVAILABLE)

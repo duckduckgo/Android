@@ -167,10 +167,10 @@ class NewChatDefaultsTest {
     }
 
     @Test
-    fun whenUserModelMissingLockedOrMalformedThenServerModelWinsAndUserDefaultIsUnavailable() {
+    fun whenUserModelMissingOrLockedThenServerModelWinsAndUserDefaultIsUnavailable() {
         val models = listOf(luna.copy(isAccessible = false), terra)
 
-        listOf(luna.id, "gone", null).forEach { modelId ->
+        listOf(luna.id, "gone").forEach { modelId ->
             assertEquals(
                 NewChatDefault(terra.id, EXTENDED_REASONING, UserDefaultOutcome.UNAVAILABLE),
                 withUserDefault(UserDefaultModel(modelId), models = models),
@@ -194,6 +194,21 @@ class NewChatDefaultsTest {
         assertEquals(
             NewChatDefault(terra.id, EXTENDED_REASONING, UserDefaultOutcome.APPLIED),
             withUserDefault(UserDefaultModel(terra.id), overLimit = overLimit.copy(resetsAtMillis = 0L)),
+        )
+    }
+
+    @Test
+    fun whenOverLimitModelIsUnusableThenUserDefaultIsStillUnavailableUntilTheReset() {
+        val models = listOf(luna.copy(isAccessible = false), terra, other)
+        val overLimit = OverLimitNewChatDefault(luna.id, "low", resetsAtMillis = 1L)
+
+        assertEquals(
+            NewChatDefault(terra.id, EXTENDED_REASONING, UserDefaultOutcome.UNAVAILABLE),
+            withUserDefault(UserDefaultModel(other.id), models = models, overLimit = overLimit),
+        )
+        assertEquals(
+            NewChatDefault(other.id, FAST, UserDefaultOutcome.APPLIED),
+            withUserDefault(UserDefaultModel(other.id), models = models, overLimit = overLimit.copy(resetsAtMillis = 0L)),
         )
     }
 
