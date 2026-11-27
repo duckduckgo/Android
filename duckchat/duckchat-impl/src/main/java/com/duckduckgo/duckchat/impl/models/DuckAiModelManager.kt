@@ -18,11 +18,14 @@ package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.DuckAiUsageLimitsRepository
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
@@ -32,13 +35,16 @@ import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -115,6 +121,8 @@ class RealDuckAiModelManager @Inject constructor(
     private val duckChatFeature: Lazy<DuckChatFeature>,
     private val duckChatPixels: Lazy<DuckChatPixels>,
     private val cookiesManager: CookieManagerProvider,
+    private val usageLimitsRepository: DuckAiUsageLimitsRepository,
+    private val currentTimeProvider: CurrentTimeProvider,
     private val dispatcherProvider: DispatcherProvider,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : DuckAiModelManager {
@@ -129,6 +137,12 @@ class RealDuckAiModelManager @Inject constructor(
     // consistent view of the previous state.
     private val stateMutex = Mutex()
     private var selectionRevision = 0L
+
+    // The new-chat default's inputs, kept so a usage-limits change can re-derive it without a fetch.
+    // The models stay in endpoint order so the first-accessible fallback matches a fetch. Guarded by stateMutex.
+    private var endpointModels: List<AIChatModel> = emptyList()
+    private var remoteNewChatDefault: RemoteNewChatDefault? = null
+    private var overLimitDefault: OverLimitNewChatDefault? = null
 
     init {
         appCoroutineScope.launch(dispatcherProvider.io()) {
@@ -158,6 +172,21 @@ class RealDuckAiModelManager @Inject constructor(
             .collect {
                 logcat { "Duck.ai Model Manager: subscription state changed, re-fetching models" }
                 fetchModels()
+            }
+    }
+
+    // Started by fetchModels, since the over-limit default is ignored until models load. The usage snapshot is
+    // only rewritten when the page runs, so the timer is what moves new chats back once the limit resets.
+    private val overLimitDefaultObserver = appCoroutineScope.launch(dispatcherProvider.io(), start = CoroutineStart.LAZY) {
+        if (!resetsModelForNewChats()) return@launch
+        usageLimitsRepository.usageLimits(BrowserMode.REGULAR)
+            .map { it?.newChatDefault }
+            .distinctUntilChanged()
+            .collectLatest { overLimit ->
+                applyOverLimitDefault(overLimit)
+                if (overLimit == null) return@collectLatest
+                delay(overLimit.resetsAtMillis - currentTimeProvider.currentTimeMillis())
+                applyOverLimitDefault(null)
             }
     }
 
@@ -202,6 +231,7 @@ class RealDuckAiModelManager @Inject constructor(
 
     override suspend fun fetchModels() {
         subscriptionChangeObserver.start()
+        overLimitDefaultObserver.start()
         withContext(dispatcherProvider.io()) {
             try {
                 val userTier = resolveUserTier()
@@ -228,46 +258,74 @@ class RealDuckAiModelManager @Inject constructor(
                 val attachmentLimits = resolveAttachmentLimits(response.attachmentLimits, userTier)
                 val resetForNewChats = resetsModelForNewChats()
                 stateMutex.withLock {
-                    // Selection is resolved before sorting so the derived default keeps following
-                    // endpoint order, and only the picker's display order changes.
-                    val newChatDefault = if (resetForNewChats) NewChatDefaults.preferred(userTier, response.newChatDefault) else null
-                    val selectedModelId = if (newChatDefault != null) {
-                        NewChatDefaults.modelId(userTier, newChatDefault, models)
-                    } else {
-                        resolveSelection(models)
-                    }
-                    val displayModels = models.sortLabelledFirst()
-                    val selectedModel = models.find { it.id == selectedModelId }
-                    val available = ReasoningResolver.availableModes(
-                        supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
-                        effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
-                        isEligible = isSubscriptionEligible,
-                    )
-                    val nextReasoningMode = if (newChatDefault != null) {
-                        NewChatDefaults.reasoningMode(newChatDefault, selectedModelId, available)
-                    } else {
-                        validateAndPersistReasoningMode(_modelState.value.selectedReasoningMode, available)
-                    }
-
-                    _modelState.value = _modelState.value.copy(
-                        models = displayModels,
-                        selectedModelId = selectedModelId,
-                        selectedModelShortName = selectedModel?.shortName,
+                    val fetched = _modelState.value.copy(
+                        models = models.sortLabelledFirst(),
                         userTier = userTier,
                         isSubscriptionEligible = isSubscriptionEligible,
                         isFreeTrialEligible = isFreeTrialEligible,
                         attachmentLimits = attachmentLimits,
-                        selectedReasoningMode = nextReasoningMode,
-                        availableReasoningModes = available,
-                        newChatDefault = newChatDefault,
                     )
-                    logcat { "Duck.ai Model Manager: fetched ${displayModels.size} models, tier=$userTier, selected=$selectedModelId" }
+                    _modelState.value = if (resetForNewChats) {
+                        endpointModels = models
+                        remoteNewChatDefault = response.newChatDefault
+                        fetched.withNewChatDefault()
+                    } else {
+                        // Selection is resolved on the endpoint order so the derived default keeps following
+                        // it, and only the picker's display order changes.
+                        val selectedModelId = resolveSelection(models)
+                        val selectedModel = models.find { it.id == selectedModelId }
+                        val available = ReasoningResolver.availableModes(
+                            supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
+                            effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+                            isEligible = isSubscriptionEligible,
+                        )
+                        fetched.copy(
+                            selectedModelId = selectedModelId,
+                            selectedModelShortName = selectedModel?.shortName,
+                            selectedReasoningMode = validateAndPersistReasoningMode(fetched.selectedReasoningMode, available),
+                            availableReasoningModes = available,
+                            newChatDefault = null,
+                        )
+                    }
+                    logcat {
+                        "Duck.ai Model Manager: fetched ${models.size} models, tier=$userTier, selected=${_modelState.value.selectedModelId}"
+                    }
                 }
             } catch (e: Exception) {
                 logcat { "Duck.ai Model Manager: failed to fetch models: ${e.message}" }
                 if (resetsModelForNewChats()) stateMutex.withLock { selectHardcodedDefaultWhileModelsMissing() }
             }
         }
+    }
+
+    /**
+     * Selects the new-chat default from the last fetch: the over-limit default while its model is accessible,
+     * else the server's, then the tier default, then the first accessible model. Callers hold [stateMutex].
+     */
+    private fun ModelState.withNewChatDefault(): ModelState {
+        val newChatDefault = NewChatDefaults.preferred(userTier, remoteNewChatDefault, overLimitDefault, endpointModels)
+        val selectedModelId = NewChatDefaults.modelId(userTier, newChatDefault, endpointModels)
+        val selectedModel = endpointModels.find { it.id == selectedModelId }
+        val available = ReasoningResolver.availableModes(
+            supported = selectedModel?.supportedReasoningEfforts.orEmpty(),
+            effortAccess = selectedModel?.reasoningEffortAccess.orEmpty(),
+            isEligible = isSubscriptionEligible,
+        )
+        return copy(
+            selectedModelId = selectedModelId,
+            selectedModelShortName = selectedModel?.shortName,
+            selectedReasoningMode = NewChatDefaults.reasoningMode(newChatDefault, selectedModelId, available),
+            availableReasoningModes = available,
+            newChatDefault = newChatDefault,
+        )
+    }
+
+    /** Before a fetch the hardcoded default stands, and with the flag off there is no new-chat default to move. */
+    private suspend fun applyOverLimitDefault(overLimit: OverLimitNewChatDefault?) = stateMutex.withLock {
+        overLimitDefault = overLimit
+        if (endpointModels.isEmpty() || _modelState.value.newChatDefault == null) return@withLock
+        _modelState.value = _modelState.value.withNewChatDefault()
+        logcat { "Duck.ai Model Manager: over-limit default ${overLimit?.modelId}, selected=${_modelState.value.selectedModelId}" }
     }
 
     /**

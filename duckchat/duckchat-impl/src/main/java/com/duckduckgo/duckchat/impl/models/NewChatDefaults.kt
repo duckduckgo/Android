@@ -17,20 +17,38 @@
 package com.duckduckgo.duckchat.impl.models
 
 import com.duckduckgo.duckchat.api.nativeinput.NativeInputState
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
 
 /** The model and effort a new chat starts on before checking them against the models endpoint. */
 data class NewChatDefault(val modelId: String, val mode: ReasoningMode)
 
 /**
- * Where a new chat starts when `resetModelForNewChats` is on: the models endpoint's `newChatDefault`, with the
- * hardcoded tier default as the fallback when the endpoint sends none or has not loaded.
+ * Where a new chat starts when `resetModelForNewChats` is on: the over-limit default web sends while the user is
+ * over their limit, else the models endpoint's `newChatDefault`, with the hardcoded tier default as the fallback
+ * when the endpoint sends none or has not loaded.
  */
 internal object NewChatDefaults {
 
     /** The server's default when it names a model, an unknown or missing effort counting as fast; else the tier default on fast. */
     fun preferred(tier: UserTier, remote: RemoteNewChatDefault?): NewChatDefault {
         val modelId = remote?.modelId?.takeUnless { it.isBlank() } ?: return NewChatDefault(tierDefaultModelId(tier), ReasoningMode.FAST)
-        val mode = ReasoningEffort.from(remote.reasoningEffort)?.let { ReasoningMode.forEffort(it) } ?: ReasoningMode.FAST
+        return newChatDefault(modelId, remote.reasoningEffort)
+    }
+
+    /** [overLimit] while its model is accessible in [models], else the [preferred] server or tier default. */
+    fun preferred(
+        tier: UserTier,
+        remote: RemoteNewChatDefault?,
+        overLimit: OverLimitNewChatDefault?,
+        models: List<AIChatModel>,
+    ): NewChatDefault {
+        val overLimitModelId = overLimit?.modelId?.takeIf { id -> models.any { it.id == id && it.isAccessible } }
+            ?: return preferred(tier, remote)
+        return newChatDefault(overLimitModelId, overLimit.reasoningEffort)
+    }
+
+    private fun newChatDefault(modelId: String, reasoningEffort: String?): NewChatDefault {
+        val mode = ReasoningEffort.from(reasoningEffort)?.let { ReasoningMode.forEffort(it) } ?: ReasoningMode.FAST
         return NewChatDefault(modelId, mode)
     }
 
