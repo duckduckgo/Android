@@ -22,6 +22,7 @@ import com.duckduckgo.duckchat.impl.models.ReasoningEffort.NONE
 import com.duckduckgo.duckchat.impl.models.ReasoningMode.EXTENDED_REASONING
 import com.duckduckgo.duckchat.impl.models.ReasoningMode.FAST
 import com.duckduckgo.duckchat.impl.models.ReasoningMode.REASONING
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
@@ -233,6 +234,98 @@ class NewChatModelSourceTest {
     }
 
     @Test
+    fun whenUserDefaultSentUnchangedThenUserDefault() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), userDefault = UserDefaultModel(terra.id))
+
+        assertEquals(ModelSource.USER_DEFAULT, sourceFor(global))
+    }
+
+    @Test
+    fun whenUserDefaultModelMissingThenUserDefaultUnavailable() {
+        val global = globalSelection(UserTier.FREE, listOf(luna), userDefault = UserDefaultModel(terra.id))
+
+        assertEquals(ModelSource.USER_DEFAULT_UNAVAILABLE, sourceFor(global))
+    }
+
+    @Test
+    fun whenUserDefaultIsMalformedThenUserDefaultUnavailable() {
+        val global = globalSelection(UserTier.FREE, listOf(luna), userDefault = UserDefaultModel(null))
+
+        assertEquals(ModelSource.USER_DEFAULT_UNAVAILABLE, sourceFor(global))
+    }
+
+    @Test
+    fun whenOverLimitModelDiffersFromUserDefaultThenUserDefaultUnavailable() {
+        val global = globalSelection(
+            UserTier.FREE,
+            listOf(luna, terra),
+            overLimit = OverLimitNewChatDefault(luna.id, "low", resetsAtMillis = 100),
+            userDefault = UserDefaultModel(terra.id),
+        )
+
+        assertEquals(ModelSource.USER_DEFAULT_UNAVAILABLE, sourceFor(global))
+    }
+
+    @Test
+    fun whenOverLimitModelMatchesUserDefaultThenUserDefault() {
+        val global = globalSelection(
+            UserTier.FREE,
+            listOf(luna, terra),
+            overLimit = OverLimitNewChatDefault(terra.id, "low", resetsAtMillis = 100),
+            userDefault = UserDefaultModel(terra.id),
+        )
+
+        assertEquals(ModelSource.USER_DEFAULT, sourceFor(global))
+    }
+
+    @Test
+    fun whenUserDefaultModelMatchesHardcodedDefaultBeforeModelsLoadThenFallback() {
+        val default = NewChatDefaults.preferred(
+            UserTier.FREE,
+            remote = null,
+            overLimit = null,
+            models = emptyList(),
+            nowMillis = 0,
+            userDefault = UserDefaultModel(luna.id),
+        )
+        val global = ModelState(selectedModelId = luna.id, selectedReasoningMode = FAST, newChatDefault = default)
+
+        assertEquals(ModelSource.FALLBACK, sourceFor(global))
+    }
+
+    @Test
+    fun whenUserDefaultModelPickedAgainThenUserDefault() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), userDefault = UserDefaultModel(terra.id))
+
+        assertEquals(ModelSource.USER_DEFAULT, sourceFor(global, pickedModelId = terra.id))
+    }
+
+    @Test
+    fun whenUserDefaultEffortChangedThenPicked() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), userDefault = UserDefaultModel(terra.id))
+
+        assertEquals(ModelSource.PICKED, sourceFor(global, pickedMode = REASONING))
+    }
+
+    @Test
+    fun whenOnboardingModelSentWithAUserDefaultThenOnboarding() {
+        val global = globalSelection(UserTier.FREE, listOf(luna, terra), userDefault = UserDefaultModel(terra.id))
+
+        assertEquals(ModelSource.ONBOARDING, sourceFor(global, pickedModelId = luna.id, onboardingModelId = luna.id))
+    }
+
+    @Test
+    fun whenOverLimitModelSentWithoutAUserDefaultThenDefault() {
+        val global = globalSelection(
+            UserTier.FREE,
+            listOf(luna, terra),
+            overLimit = OverLimitNewChatDefault(terra.id, "low", resetsAtMillis = 100),
+        )
+
+        assertEquals(ModelSource.DEFAULT, sourceFor(global))
+    }
+
+    @Test
     fun whenNoNewChatDefaultInStateThenJudgedAgainstTheHardcodedDefault() {
         val global = freeGlobal.copy(newChatDefault = null)
 
@@ -283,8 +376,14 @@ class NewChatModelSourceTest {
     }
 
     /** The global selection the model manager publishes with `resetModelForNewChats` on. */
-    private fun globalSelection(tier: UserTier, models: List<AIChatModel>, server: RemoteNewChatDefault? = null): ModelState {
-        val default = NewChatDefaults.preferred(tier, server)
+    private fun globalSelection(
+        tier: UserTier,
+        models: List<AIChatModel>,
+        server: RemoteNewChatDefault? = null,
+        overLimit: OverLimitNewChatDefault? = null,
+        userDefault: UserDefaultModel? = null,
+    ): ModelState {
+        val default = NewChatDefaults.preferred(tier, server, overLimit, models, nowMillis = 0, userDefault = userDefault)
         val selectedId = NewChatDefaults.modelId(tier, default, models)
         val selected = models.firstOrNull { it.id == selectedId }
         val available = ReasoningResolver.availableModes(selected?.supportedReasoningEfforts.orEmpty())
