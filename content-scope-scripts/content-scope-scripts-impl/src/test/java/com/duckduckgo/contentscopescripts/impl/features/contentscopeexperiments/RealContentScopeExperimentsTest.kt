@@ -128,6 +128,22 @@ class RealContentScopeExperimentsTest {
     }
 
     @Test
+    fun whenAssignedCohortIsNoLongerInConfigThenRawStoredStateIsReEnrolledBeforeReturning() = runTest {
+        fakeContentScopeExperimentsFeature.self().setRawStoredState(Toggle.State(true))
+        fakeContentScopeExperimentsFeature.test().setRawStoredState(
+            Toggle.State(
+                remoteEnableState = true,
+                cohorts = listOf(Cohort(name = TREATMENT.cohortName, weight = 1)),
+                assignedCohort = Cohort(name = CONTROL.cohortName, weight = 1),
+            ),
+        )
+
+        val experiments = testee.getActiveExperiments()
+
+        assertEquals(TREATMENT.cohortName, experiments[0].getRawStoredState()?.assignedCohort?.name)
+    }
+
+    @Test
     fun whenCachingEnabledThenRepeatedCallsResolveOnce() = runTest {
         givenExperimentsFeatureEnabled()
 

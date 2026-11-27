@@ -107,6 +107,8 @@ class RealContentScopeExperiments @Inject constructor(
                 }
             experiments.mapNotNull {
                 it.enroll()
+                // Re-enrols a cohort the config no longer lists, so consumers reading the raw stored state agree with content scope scripts.
+                it.getCohort()
                 if (it.isEnabled()) {
                     it
                 } else {
