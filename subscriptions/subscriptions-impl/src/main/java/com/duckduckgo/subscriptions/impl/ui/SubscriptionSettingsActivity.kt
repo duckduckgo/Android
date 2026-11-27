@@ -35,6 +35,7 @@ import com.duckduckgo.common.ui.view.button.ButtonType.GHOST_ALT
 import com.duckduckgo.common.ui.view.dialog.TextAlertDialogBuilder
 import com.duckduckgo.common.ui.view.getColorFromAttr
 import com.duckduckgo.common.ui.view.gone
+import com.duckduckgo.common.ui.view.listitem.TwoLineListItem
 import com.duckduckgo.common.ui.view.show
 import com.duckduckgo.common.ui.view.text.DaxTextView
 import com.duckduckgo.common.ui.viewbinding.viewBinding
@@ -195,6 +196,10 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.cancelSubscription.setClickListener {
             viewModel.onCancelSubscriptionClicked()
         }
+        binding.manageSubscription.setClickListener {
+            pixelSender.reportSubscriptionSettingsChangePlanOrBillingClick()
+            viewModel.onManagePlayStoreSubscriptionClicked()
+        }
 
         if (savedInstanceState == null) {
             pixelSender.reportSubscriptionSettingsShown()
@@ -237,6 +242,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         binding.pendingDowngradeInfoPanel.gone()
         binding.undoCancellationContainer.isVisible = false
         binding.cancelSubscription.isVisible = false
+        binding.manageSubscription.isVisible = false
         val changePlanTitle = if (viewState.isCancellationFlowAvailable) {
             string.subscriptionSettingManageSubscription
         } else {
@@ -256,7 +262,8 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
             binding.subscriptionExpiredStatusText.text = getString(string.subscriptionsExpiredData, viewState.date)
         } else {
             binding.viewPlans.isVisible = false
-            binding.changePlan.isVisible = true
+            binding.changePlan.isVisible = !viewState.showCancelSubscription
+            binding.manageSubscription.isVisible = viewState.showCancelSubscription
             binding.cancelSubscription.isVisible = viewState.showCancelSubscription
             binding.subscriptionActiveStatusContainer.isVisible = true
             binding.subscriptionExpiredStatusContainer.isVisible = false
@@ -297,7 +304,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                         getString(string.freeTrialYearlyActiveSubscriptionsData, viewState.date)
                     else -> getString(string.freeTrialCancelledSubscriptionsData, viewState.date)
                 }
-                binding.changePlan.setSecondaryText(subscriptionRenewalDetailsRes)
+                subscriptionDetailsItem(viewState).setSecondaryText(subscriptionRenewalDetailsRes)
 
                 // Override with pending plan message if there's a deferred change
                 showPendingPlanMessageIfPresent(viewState)
@@ -314,7 +321,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                     Yearly -> string.subscriptionsDataYearly
                 }
 
-                binding.changePlan.setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
+                subscriptionDetailsItem(viewState).setSecondaryText(getString(subscriptionsDataStringResId, status, viewState.date))
 
                 // Override with pending plan message if there's a deferred change
                 showPendingPlanMessageIfPresent(viewState)
@@ -558,6 +565,9 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
         )
     }
 
+    private fun subscriptionDetailsItem(viewState: ViewState.Ready): TwoLineListItem =
+        if (viewState.showCancelSubscription) binding.cancelSubscription else binding.changePlan
+
     private fun showPendingPlanMessageIfPresent(viewState: ViewState.Ready) {
         if (viewState.pendingPlanDisplayNameResId != null && viewState.pendingEffectiveDate != null) {
             val changeTypeString = if (viewState.isPendingDowngrade == true) {
@@ -566,7 +576,7 @@ class SubscriptionSettingsActivity : DuckDuckGoActivity() {
                 string.subscriptionPendingPlanChangeUpgrade
             }
             val pendingPlanDisplayName = getString(viewState.pendingPlanDisplayNameResId)
-            binding.changePlan.setSecondaryText(
+            subscriptionDetailsItem(viewState).setSecondaryText(
                 getString(changeTypeString, pendingPlanDisplayName, viewState.pendingEffectiveDate),
             )
             if (viewState.isPendingDowngrade == true &&

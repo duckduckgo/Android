@@ -115,8 +115,8 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
-import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ShowNotificationsDeniedDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ShowFeatureInfo
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ShowNotificationsDeniedDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionChangeSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.PurchaseStateView

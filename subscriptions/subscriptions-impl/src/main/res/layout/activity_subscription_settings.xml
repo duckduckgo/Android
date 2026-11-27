@@ -357,11 +357,19 @@
                     tools:visibility="visible" />
 
                 <com.duckduckgo.common.ui.view.listitem.OneLineListItem
+                    android:id="@+id/manageSubscription"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone"
+                    app:primaryText="@string/subscriptionSettingManageSubscription" />
+
+                <com.duckduckgo.common.ui.view.listitem.TwoLineListItem
                     android:id="@+id/cancelSubscription"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone"
                     app:primaryText="@string/subscriptionSettingCancelSubscription"
+                    tools:secondaryText="Your monthly subscription renews on April 20, 2027."
                     tools:visibility="visible" />
 
                 <com.duckduckgo.common.ui.view.listitem.OneLineListItem
