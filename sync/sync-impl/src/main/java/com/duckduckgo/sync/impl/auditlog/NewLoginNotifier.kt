@@ -57,6 +57,7 @@ class RealNewLoginNotifier @Inject constructor(
     private val stateStore: AuditLogCheckStateStore,
     private val loginAuditLogFeature: LoginAuditLogFeature,
     private val globalActivityStarter: GlobalActivityStarter,
+    private val newLoginNotificationSetting: NewLoginNotificationSetting,
     private val dispatchers: DispatcherProvider,
 ) : NewLoginNotifier, SyncEngineLifecycle {
 
@@ -67,6 +68,10 @@ class RealNewLoginNotifier @Inject constructor(
         }
         if (!loginAuditLogFeature.isNotificationEnabled()) {
             logcat { "Sync-AuditLog: notification flag off, new login notification not posted" }
+            return
+        }
+        if (!newLoginNotificationSetting.isEnabled()) {
+            logcat { "Sync-AuditLog: user turned new login notifications off, not posted" }
             return
         }
 

@@ -23,11 +23,13 @@ plugins {
 apply from: "$rootProject.projectDir/gradle/android-library.gradle"
 
 dependencies {
+    implementation project(':app-database')
     implementation project(':browser-api')
     implementation project(':codegen-annotations')
     implementation project(':common-utils')
     implementation project(':di')
     implementation project(':feature-toggles-api')
+    implementation project(':httpsupgrade-api')
     implementation project(':privacy-config-api')
     implementation project(':request-interception-api')
     implementation project(':user-agent-api')

@@ -16,11 +16,11 @@
 
 package com.duckduckgo.fingerprintprotection.impl.di
 
-import android.content.Context
-import androidx.room.Room
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.app.di.IsMainProcess
 import com.duckduckgo.common.utils.DispatcherProvider
+import com.duckduckgo.data.store.api.DatabaseProvider
+import com.duckduckgo.data.store.api.RoomDatabaseConfig
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.fingerprintprotection.store.ALL_MIGRATIONS
 import com.duckduckgo.fingerprintprotection.store.FingerprintProtectionDatabase
@@ -48,11 +48,15 @@ object FingerprintProtectionModule {
 
     @SingleIn(AppScope::class)
     @Provides
-    fun provideFingerprintProtectionDatabase(context: Context): FingerprintProtectionDatabase {
-        return Room.databaseBuilder(context, FingerprintProtectionDatabase::class.java, "fingerprint_protection.db")
-            .fallbackToDestructiveMigration()
-            .addMigrations(*ALL_MIGRATIONS.toTypedArray())
-            .build()
+    fun provideFingerprintProtectionDatabase(databaseProvider: DatabaseProvider): FingerprintProtectionDatabase {
+        return databaseProvider.buildRoomDatabase(
+            FingerprintProtectionDatabase::class.java,
+            "fingerprint_protection.db",
+            config = RoomDatabaseConfig(
+                fallbackToDestructiveMigration = true,
+                migrations = ALL_MIGRATIONS,
+            ),
+        )
     }
 
     @SingleIn(AppScope::class)

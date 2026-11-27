@@ -94,7 +94,7 @@ class CachedTdsEntityLookupPerfAndroidTest {
         domainEntityDao.insertAll(tdsJson.jsonToDomainEntities())
 
         legacy = TdsEntityLookup(entityDao, domainEntityDao)
-        cached = CachedTdsEntityLookup(entityDao, domainEntityDao).also { it.refresh() }
+        cached = CachedTdsEntityLookup(db).also { it.refresh() }
     }
 
     @After

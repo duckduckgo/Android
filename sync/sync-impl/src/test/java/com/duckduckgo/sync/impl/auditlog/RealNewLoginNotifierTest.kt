@@ -65,6 +65,7 @@ class RealNewLoginNotifierTest {
     private val globalActivityStarter: GlobalActivityStarter = mock<GlobalActivityStarter>().also {
         whenever(it.startIntent(any(), eq(SyncAuditLogScreenParams(openedFromNotification = true)))).thenReturn(deviceActivityIntent)
     }
+    private val setting = FakeNotificationSetting()
 
     private val notifier = RealNewLoginNotifier(
         context = context,
@@ -72,6 +73,7 @@ class RealNewLoginNotifierTest {
         stateStore = stateStore,
         loginAuditLogFeature = feature,
         globalActivityStarter = globalActivityStarter,
+        newLoginNotificationSetting = setting,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -203,6 +205,16 @@ class RealNewLoginNotifierTest {
     }
 
     @Test
+    fun whenUserTurnedNotificationsOffThenDoesNotPost() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+        setting.enabled = false
+
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0))
+
+        assertNull(postedNotification())
+    }
+
+    @Test
     fun whenPendingListIsEmptyThenDoesNotPost() = runTest {
         notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0))
 
@@ -281,6 +293,20 @@ class RealNewLoginNotifierTest {
         override suspend fun isAuditLogEnabled(): Boolean = true
 
         override suspend fun isNotificationEnabled(): Boolean = notificationEnabled
+    }
+
+    private class FakeNotificationSetting : NewLoginNotificationSetting {
+        var enabled = true
+
+        override suspend fun isEnabled(): Boolean = enabled
+
+        override suspend fun setEnabled(enabled: Boolean) {
+            this.enabled = enabled
+        }
+
+        override suspend fun isCardDismissed(): Boolean = false
+
+        override suspend fun dismissCard() = Unit
     }
 
     private class FakeStateStore : AuditLogCheckStateStore {

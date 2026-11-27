@@ -66,7 +66,6 @@ import com.duckduckgo.app.fire.fireproofwebsite.data.FireproofWebsiteRepository
 import com.duckduckgo.app.global.events.db.UserEventsStore
 import com.duckduckgo.app.global.install.AppInstallStore
 import com.duckduckgo.app.lifecycle.MainProcessLifecycleObserver
-import com.duckduckgo.app.privacy.db.PrivacyProtectionCountDao
 import com.duckduckgo.app.settings.db.SettingsDataStore
 import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.store.StatisticsDataStore
@@ -86,11 +85,11 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.api.DuckChat
 import com.duckduckgo.experiments.api.VariantManager
-import com.duckduckgo.httpsupgrade.api.HttpsUpgrader
 import com.duckduckgo.privacy.config.api.AmpLinks
 import com.duckduckgo.privacy.config.api.TrackingParameters
 import com.duckduckgo.referral.api.AppReferrer
 import com.duckduckgo.request.filterer.api.RequestFilterer
+import com.duckduckgo.request.interception.impl.HttpsUpgradeStep
 import com.duckduckgo.request.interception.impl.RequestExemptions
 import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.subscriptions.api.Subscriptions
@@ -178,8 +177,7 @@ class BrowserModule {
     fun webViewRequestInterceptor(
         resourceSurrogates: ResourceSurrogates,
         trackerDetector: TrackerDetector,
-        httpsUpgrader: HttpsUpgrader,
-        privacyProtectionCountDao: PrivacyProtectionCountDao,
+        httpsUpgradeStep: HttpsUpgradeStep,
         adClickManager: AdClickManager,
         cloakedCnameDetector: CloakedCnameDetector,
         requestFilterer: RequestFilterer,
@@ -196,8 +194,7 @@ class BrowserModule {
         WebViewRequestInterceptor(
             resourceSurrogates,
             trackerDetector,
-            httpsUpgrader,
-            privacyProtectionCountDao,
+            httpsUpgradeStep,
             adClickManager,
             cloakedCnameDetector,
             requestFilterer,

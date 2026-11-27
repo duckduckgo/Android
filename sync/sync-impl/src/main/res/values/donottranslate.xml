@@ -23,9 +23,10 @@
     <string name="syncAuditLogError">Device activity is temporarily unavailable.</string>
     <string name="syncAuditLogLoadMoreError">Older activity is temporarily unavailable. Tap to retry.</string>
     <string name="syncAuditLogEmpty">You have no recent activity.</string>
+    <string name="syncAuditLogOnlyThisDevice">Only this device is synced</string>
     <string name="syncAuditLogSynced">Synced</string>
     <string name="syncAuditLogRemoved">Removed</string>
-    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity. First placeholder is how long ago it happened, for example 3 days ago. Second placeholder is Synced or Removed">%1$s · %2$s</string>
+    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity, for example Removed · iPhone. First placeholder is Synced or Removed. Second placeholder is the device name. Keep Synced or Removed first: a long device name is cut at the end of the line">%1$s · %2$s</string>
     <plurals name="syncNewDeviceBannerTitle" instruction="Title of a message in Sync settings. The number is how many new devices synced with this account. Do not show the number">
         <item quantity="one">New synced device</item>
         <item quantity="other">New synced devices</item>
@@ -67,4 +68,10 @@
         <item quantity="one">%1$d year ago</item>
         <item quantity="other">%1$d years ago</item>
     </plurals>
+    <string name="syncNewLoginNotificationsTitle">Notify on New Connections</string>
+    <string name="syncNewLoginNotificationsDescription">Get notified whenever a new device is added to Sync &amp; Backup.</string>
+    <string name="syncNewLoginNotificationsEnable">Enable Notifications</string>
+    <string name="syncNewLoginNotificationsSettingsDialogTitle">Requires notification permission for DuckDuckGo</string>
+    <string name="syncNewLoginNotificationsSettingsDialogMessage">Enable notifications for DuckDuckGo in system Settings to turn on New Device Notifications.</string>
+    <string name="syncNewLoginNotificationsSettingsDialogConfirm">Go to Settings…</string>
 </resources>

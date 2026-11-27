@@ -65,6 +65,7 @@ import com.duckduckgo.privacy.config.api.Gpc
 import com.duckduckgo.privacy.config.api.TrackerAllowlist
 import com.duckduckgo.request.filterer.api.RequestFilterer
 import com.duckduckgo.request.interception.api.RequestBlocklist
+import com.duckduckgo.request.interception.impl.HttpsUpgradeStep
 import com.duckduckgo.request.interception.impl.RequestExemptions
 import com.duckduckgo.request.interception.impl.RequestRewriteDecision
 import com.duckduckgo.tracker.detection.api.TrackerDetector
@@ -177,9 +178,13 @@ class SurrogatesReferenceTest(private val testCase: TestCase) {
 
         testee = WebViewRequestInterceptor(
             trackerDetector = trackerDetector,
-            httpsUpgrader = mockHttpsUpgrader,
+            httpsUpgradeStep = HttpsUpgradeStep(
+                mockHttpsUpgrader,
+                mockPrivacyProtectionCountDao,
+                coroutinesTestRule.testScope,
+                coroutinesTestRule.testDispatcherProvider,
+            ),
             resourceSurrogates = resourceSurrogates,
-            privacyProtectionCountDao = mockPrivacyProtectionCountDao,
             requestRewriteDecision = RequestRewriteDecision(
                 gpc = mockGpc,
                 userAgentProvider = userAgentProvider,
