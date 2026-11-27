@@ -85,8 +85,19 @@ class UsageLimitFooterPlugin @Inject constructor(
         val dismissals: Map<UsageWindow, UsageNoticeDismissal>,
         val actedOn: UsageNoticeActedOn?,
         val modelState: ModelState,
+        val isNewChat: Boolean,
     ) {
         val selectedModelId: String? get() = modelState.selectedModelId
+
+        /**
+         * A new chat already starting on web's over-limit default has no model left to switch to, so the reached
+         * notice would block it with no way out. Only true while `resetModelForNewChats` applied that default.
+         */
+        val isOnOverLimitDefault: Boolean
+            get() {
+                val overLimitModelId = snapshot?.newChatDefault?.modelId ?: return false
+                return isNewChat && modelState.newChatDefault?.modelId == overLimitModelId && selectedModelId == overLimitModelId
+            }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -117,7 +128,7 @@ class UsageLimitFooterPlugin @Inject constructor(
                     modelManager.modelState,
                     nativeInputStateProvider.state,
                 ) { snapshot, dismissals, actedOn, modelState, inputState ->
-                    Inputs(snapshot, dismissals, actedOn, modelState.forTab(inputState))
+                    Inputs(snapshot, dismissals, actedOn, modelState.forTab(inputState), isNewChat = inputState.chatId == null)
                 }
             } else {
                 flowOf(null)
@@ -143,7 +154,7 @@ class UsageLimitFooterPlugin @Inject constructor(
             ) {
                 return@combine NativeInputFooterState(visible = false)
             }
-            if (input.actedOn?.applies(notice) == true) return@combine NativeInputFooterState(visible = false)
+            if (input.actedOn?.applies(notice) == true || input.isOnOverLimitDefault) return@combine NativeInputFooterState(visible = false)
             if (!footerContext.isInputFocused) return@combine NativeInputFooterState(visible = false)
 
             val resolvedCta = ctaResolver.resolve(snapshot.cta, input.modelState, host.draft(), input.modelState.isFreeTrialEligible)

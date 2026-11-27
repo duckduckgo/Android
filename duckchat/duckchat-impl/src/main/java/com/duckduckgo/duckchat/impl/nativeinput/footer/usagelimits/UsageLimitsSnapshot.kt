@@ -23,6 +23,17 @@ package com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits
 data class UsageLimitsSnapshot(
     val notice: UsageNotice,
     val cta: UsageCta?,
+    val newChatDefault: OverLimitNewChatDefault? = null,
+)
+
+/**
+ * The model web wants new chats to start on while the user is over their limit. Only sent next to a reached
+ * notice, and lapses when that notice resets. [reasoningEffort] is the raw effort, unknown values included.
+ */
+data class OverLimitNewChatDefault(
+    val modelId: String,
+    val reasoningEffort: String?,
+    val resetsAtMillis: Long,
 )
 
 data class UsageNotice(

@@ -19,9 +19,16 @@ package com.duckduckgo.duckchat.impl.models
 import android.webkit.CookieManager
 import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.cookies.api.CookieManagerProvider
 import com.duckduckgo.duckchat.api.DuckAiHostProvider
 import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.DuckAiUsageLimitsRepository
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.OverLimitNewChatDefault
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageLimitsSnapshot
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNotice
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageNoticeId
+import com.duckduckgo.duckchat.impl.nativeinput.footer.usagelimits.UsageWindow
 import com.duckduckgo.duckchat.impl.pixel.DuckChatPixels
 import com.duckduckgo.duckchat.impl.store.DuckChatDataStore
 import com.duckduckgo.duckchat.impl.store.SelectedModel
@@ -36,6 +43,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -76,6 +84,13 @@ class RealDuckAiModelManagerTest {
     private val subscriptionStatusFlow = MutableStateFlow(SubscriptionStatus.UNKNOWN)
     private val duckChatFeature = FakeFeatureToggleFactory.create(DuckChatFeature::class.java)
     private val duckChatPixels: DuckChatPixels = mock()
+    private val usageLimits = MutableStateFlow<UsageLimitsSnapshot?>(null)
+    private val usageLimitsRepository: DuckAiUsageLimitsRepository = mock {
+        whenever(it.usageLimits(any())).thenReturn(usageLimits)
+    }
+    private val currentTimeProvider: CurrentTimeProvider = mock {
+        whenever(it.currentTimeMillis()).thenReturn(NOW_MILLIS)
+    }
 
     private lateinit var testee: RealDuckAiModelManager
 
@@ -97,6 +112,8 @@ class RealDuckAiModelManagerTest {
             duckChatFeature = lazy { duckChatFeature },
             duckChatPixels = lazy { duckChatPixels },
             cookiesManager = cookiesManager,
+            usageLimitsRepository = usageLimitsRepository,
+            currentTimeProvider = currentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             appCoroutineScope = coroutineRule.testScope,
         )
@@ -719,6 +736,119 @@ class RealDuckAiModelManagerTest {
         assertEquals("first", testee.modelState.value.selectedModelId)
         assertNull(testee.modelState.value.newChatDefault)
     }
+
+    @Test
+    fun whenResetModelForNewChatsAndOverLimitDefaultArrivesThenNewChatsStartOnIt() = runTest {
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+
+        usageLimits.value = overLimitSnapshot("gpt-6-luna", effort = "low")
+
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+        assertEquals(ReasoningMode.REASONING, testee.modelState.value.selectedReasoningMode)
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.REASONING), testee.modelState.value.newChatDefault)
+        verify(usageLimitsRepository).usageLimits(BrowserMode.REGULAR)
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndOverLimitDefaultClearedThenBackToServerDefault() = runTest {
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+        usageLimits.value = overLimitSnapshot("gpt-6-luna")
+
+        usageLimits.value = null
+
+        assertEquals("server-model", testee.modelState.value.selectedModelId)
+        assertEquals(NewChatDefault("server-model", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndOverLimitResetsThenBackToServerDefaultOnTime() = runTest {
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+        usageLimits.value = overLimitSnapshot("gpt-6-luna", resetsAtMillis = NOW_MILLIS + 1_000)
+
+        coroutineRule.testScope.advanceTimeBy(999)
+        assertEquals("gpt-6-luna", testee.modelState.value.selectedModelId)
+
+        coroutineRule.testScope.advanceTimeBy(2)
+        assertEquals("server-model", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndOverLimitModelUnusableThenServerDefault() = runTest {
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+
+        usageLimits.value = overLimitSnapshot("not-a-model")
+
+        assertEquals("server-model", testee.modelState.value.selectedModelId)
+        assertEquals(NewChatDefault("server-model", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndOverLimitDefaultSentBeforeModelsLoadThenAppliedOnFetch() = runTest {
+        usageLimits.value = overLimitSnapshot("first")
+        givenResetModelForNewChatsWithServerDefault()
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenThrow(RuntimeException("offline"))
+
+        testee.fetchModels()
+        assertEquals(NewChatDefault("gpt-6-luna", ReasoningMode.FAST), testee.modelState.value.newChatDefault)
+
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            serverDefaultResponse(RemoteNewChatDefault(modelId = "server-model")),
+        )
+        testee.fetchModels()
+        assertEquals("first", testee.modelState.value.selectedModelId)
+    }
+
+    @Test
+    fun whenResetModelForNewChatsAndOverLimitDefaultThenModelSourceIsDefaultUnlessPicked() = runTest {
+        givenResetModelForNewChatsWithServerDefault()
+        testee.fetchModels()
+        usageLimits.value = overLimitSnapshot("gpt-6-luna", effort = "low")
+        val state = testee.modelState.value
+
+        assertEquals(ModelSource.DEFAULT, modelSourceFor(true, state, null, "gpt-6-luna", "low"))
+        assertEquals(ModelSource.PICKED, modelSourceFor(true, state, null, "server-model", "none"))
+    }
+
+    @Test
+    fun whenResetModelForNewChatsOffThenOverLimitDefaultIgnored() = runTest {
+        whenever(dataStore.getSelectedModel()).thenReturn(SelectedModel("server-model", "server-model"))
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(serverDefaultResponse(null))
+        usageLimits.value = overLimitSnapshot("gpt-6-luna")
+
+        testee = createManager()
+        testee.fetchModels()
+
+        assertEquals("server-model", testee.modelState.value.selectedModelId)
+        assertNull(testee.modelState.value.newChatDefault)
+        verify(usageLimitsRepository, never()).usageLimits(any())
+        verify(dataStore, never()).setSelectedModel(anyOrNull())
+    }
+
+    private suspend fun givenResetModelForNewChatsWithServerDefault() {
+        duckChatFeature.resetModelForNewChats().setRawStoredState(Toggle.State(enable = true))
+        whenever(dataStore.getSelectedModel()).thenReturn(null)
+        whenever(subscriptions.getSubscriptionStatus()).thenReturn(SubscriptionStatus.INACTIVE)
+        whenever(modelsService.getModels(any(), anyOrNull(), anyOrNull())).thenReturn(
+            serverDefaultResponse(RemoteNewChatDefault(modelId = "server-model")),
+        )
+        testee = createManager()
+    }
+
+    private fun overLimitSnapshot(
+        modelId: String,
+        effort: String? = null,
+        resetsAtMillis: Long = NOW_MILLIS + 60_000,
+    ) = UsageLimitsSnapshot(
+        notice = UsageNotice(UsageNoticeId.DAILY_REACHED, UsageWindow.DAILY, 100, resetsAtMillis, reached = true, dismissible = false),
+        cta = null,
+        newChatDefault = OverLimitNewChatDefault(modelId, effort, resetsAtMillis),
+    )
 
     /** The first accessible model differs from both the tier default and the server's model, so a leak would show. */
     private fun serverDefaultResponse(newChatDefault: RemoteNewChatDefault?) = AIChatModelsResponse(
@@ -2240,5 +2370,9 @@ class RealDuckAiModelManagerTest {
                 Unit
             }
         }
+    }
+
+    private companion object {
+        const val NOW_MILLIS = 1_000_000L
     }
 }

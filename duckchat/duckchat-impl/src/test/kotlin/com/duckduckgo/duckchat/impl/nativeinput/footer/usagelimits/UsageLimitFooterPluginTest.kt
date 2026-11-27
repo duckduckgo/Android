@@ -35,6 +35,8 @@ import com.duckduckgo.duckchat.impl.feature.DuckChatFeature
 import com.duckduckgo.duckchat.impl.models.AIChatModel
 import com.duckduckgo.duckchat.impl.models.DuckAiModelManager
 import com.duckduckgo.duckchat.impl.models.ModelState
+import com.duckduckgo.duckchat.impl.models.NewChatDefault
+import com.duckduckgo.duckchat.impl.models.ReasoningMode
 import com.duckduckgo.duckchat.impl.nativeinput.footer.FakeNativeInputFooterHost
 import com.duckduckgo.duckchat.impl.nativeinput.footer.NativeInputFooterContext
 import com.duckduckgo.duckchat.impl.nativeinput.footer.usagewarnings.FakeUsageWarningPixelSender
@@ -367,6 +369,58 @@ class UsageLimitFooterPluginTest {
     }
 
     @Test
+    fun whenNewChatStartsOnTheOverLimitDefaultThenReachedCardHidesAndComposerIsOpen() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            val state = awaitItem()
+            assertFalse(state.visible)
+            assertFalse(state.blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenNewChatIsPickedAwayFromTheOverLimitDefaultThenReachedCardBlocks() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        inputState.value = NativeInputState.zero().copy(newChatModelId = SONNET.id)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenExistingChatIsOnTheOverLimitModelThenReachedCardBlocks() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = NewChatDefault(HAIKU.id, ReasoningMode.FAST))
+        inputState.value = NativeInputState.zero().copy(chatId = "chat")
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun whenResetModelForNewChatsOffThenOverLimitModelStillBlocks() = runTest {
+        snapshot.value = reachedWithOverLimitDefault(HAIKU.id)
+        modelState.value = modelState.value.copy(selectedModelId = HAIKU.id, newChatDefault = null)
+        val footer = testee.createFooter(context, hostContext, host)
+
+        footer.state.test {
+            assertTrue(awaitItem().blocksComposer)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
     fun whenWeeklyHandoffIsTappedThenEntriesAreWrittenAndPageIsToldAndSnapshotIsActedOn() = runTest {
         val entries = listOf(UsageCtaPutEntry("duckai.fixedCostWindowBypassResetAtById", """{"day":"x"}"""))
         snapshot.value = reached().copy(cta = UsageCta(UsageCtaId.BYPASS_WEEKLY, null, emptyList(), emptyMap(), entries))
@@ -686,6 +740,9 @@ class UsageLimitFooterPluginTest {
         ),
         cta = null,
     )
+
+    private fun reachedWithOverLimitDefault(modelId: String) =
+        reached().copy(newChatDefault = OverLimitNewChatDefault(modelId, reasoningEffort = null, resetsAtMillis = RESETS_AT))
 
     private fun duckAiContext(
         isEditing: Boolean = false,
