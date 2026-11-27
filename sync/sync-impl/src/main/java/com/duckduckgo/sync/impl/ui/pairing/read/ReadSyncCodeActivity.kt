@@ -113,6 +113,11 @@ class ReadSyncCodeActivity : DuckDuckGoActivity() {
         observeViewModel()
     }
 
+    override fun onResume() {
+        super.onResume()
+        viewModel.onCodeEntryShown()
+    }
+
     private fun observeViewModel() {
         viewModel
             .commands

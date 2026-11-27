@@ -22,6 +22,8 @@ import com.duckduckgo.app.statistics.wideevents.FlowStatus
 import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.DispatchOutcome
 import com.duckduckgo.sync.impl.SyncBuildConfig
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Denial
@@ -40,7 +42,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
 import com.duckduckgo.sync.impl.pixels.toKnownLaunchSource
-import com.duckduckgo.sync.impl.ui.dashboard.SyncActivity.Companion.LAUNCH_SOURCE_OTHER
+import com.duckduckgo.sync.impl.pixels.toSetupFailureReason
+import com.duckduckgo.sync.impl.ui.pairing.read.camera.CameraAccess
 import com.duckduckgo.sync.store.SyncStore
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
@@ -59,11 +62,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 interface SyncSetupWideEvent {
-    fun onFlowStarted(
-        launchSource: String = LAUNCH_SOURCE_OTHER,
-        setupMode: SetupMode = SetupMode.SINGLE_DEVICE,
-    )
-
+    fun onFlowStarted(launchSource: String, setupMode: SetupMode)
     fun onDeviceAuthNotEnrolled()
     fun onUserAuthSuccess()
     fun onIntroScreenShown()
@@ -80,6 +79,7 @@ interface SyncSetupWideEvent {
     fun onSyncRestoreStarted()
 
     // Unified wide event API
+    fun onPairingSessionReset()
     fun onStep(step: SetupStep)
     fun onUpdate(change: (SetupFields) -> SetupFields)
     fun onSucceeded()
@@ -87,19 +87,24 @@ interface SyncSetupWideEvent {
     fun onCancelled(reason: SetupCancellationReason)
 }
 
-internal val SHARED_LATENCY_BUCKETS = setOf(
-    1.seconds,
-    2.seconds,
-    3.seconds,
-    5.seconds,
-    10.seconds,
-    30.seconds,
-    1.minutes,
-    2.minutes,
-    3.minutes,
-    5.minutes,
-    10.minutes,
-)
+internal fun SyncSetupWideEvent.onPairingOutcome(outcome: DispatchOutcome) {
+    when (outcome) {
+        DispatchOutcome.AlreadyConnected -> {
+            onCancelled(SetupCancellationReason.ALREADY_PAIRED)
+        }
+        is DispatchOutcome.UpgradeRequired -> {
+            onFailed(SetupFailureReason.NEEDS_UPGRADE)
+        }
+        is DispatchOutcome.Failed -> {
+            val cancelled = outcome.cancellationReason ?: when (outcome.code) {
+                AccountErrorCodes.PAIRING_CANCELLED.code, AccountErrorCodes.PAIRING_REJECTED.code -> SetupCancellationReason.SYNC_CONFIRMATION_DENIED
+                else -> null
+            }
+            if (cancelled != null) onCancelled(cancelled) else onFailed(outcome.code.toSetupFailureReason(), outcome.timeoutStage)
+        }
+        else -> Unit
+    }
+}
 
 data class SetupFields(
     val setupMode: SetupMode,
@@ -121,6 +126,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     private val buildConfig: SyncBuildConfig,
     private val syncStore: SyncStore,
     private val advertisedExchangeVersion: AdvertisedExchangeV2Version,
+    private val cameraAccess: CameraAccess,
     @AppCoroutineScope private val appCoroutineScope: CoroutineScope,
 ) : SyncSetupWideEvent {
     private val serialDispatcher = dispatchers.io().limitedParallelism(1)
@@ -263,7 +269,16 @@ class SyncSetupWideEventImpl @Inject constructor(
                 false
             }
         }
-        return copy(lastStep = step, isPreparingSyncRunning = preparingSyncRunning)
+        return copy(lastStep = step, isPreparingSyncRunning = preparingSyncRunning, sawCodeEntry = sawCodeEntry || step == SetupStep.CODE_ENTRY)
+    }
+
+    override fun onPairingSessionReset() = enqueue {
+        val openAttempt = currentData ?: return@enqueue
+        val unified = openAttempt.unified ?: return@enqueue
+        val fields = unified.fields.copy(role = null, peerKind = null, flowVersion = advertisedExchangeVersion.resolve())
+        val updated = unified.copy(fields = fields)
+        currentData = openAttempt.copy(unified = updated)
+        updated.appendLastStep(openAttempt.flowId)
     }
 
     override fun onUpdate(change: (SetupFields) -> SetupFields) = enqueue {
@@ -338,7 +353,16 @@ class SyncSetupWideEventImpl @Inject constructor(
         endInterval(flowId, SetupInterval.Total)
         endInterval(flowId, SetupInterval.LastStep)
         if (unified.isPreparingSyncRunning) endInterval(flowId, SetupInterval.PreparingSync)
-        wideEventClient.flowFinish(wideEventId = flowId, status = status, metadata = metadata)
+        val sessionMetadata = buildMap {
+            unified.fields.role?.let { put(KEY_ROLE, it.value) }
+            unified.fields.peerKind?.let { put(KEY_PEER_KIND, it.value) }
+        }
+        val finalMetadata = sessionMetadata + if (unified.sawCodeEntry) {
+            metadata + ("camera_permission" to if (cameraAccess.isPermissionGranted()) "granted" else "denied")
+        } else {
+            metadata
+        }
+        wideEventClient.flowFinish(wideEventId = flowId, status = status, metadata = finalMetadata)
     }
 
     private suspend fun startInterval(flowId: Long, interval: SetupInterval) {
@@ -369,8 +393,6 @@ class SyncSetupWideEventImpl @Inject constructor(
         put(KEY_DEVICE_AUTH_SHOWN, fields.deviceAuthShown.toString())
         put(KEY_SETUP_MODE, fields.setupMode.value)
         put(KEY_INITIAL_SETUP_MODE, initialSetupMode.value)
-        fields.role?.let { put(KEY_ROLE, it.value) }
-        fields.peerKind?.let { put(KEY_PEER_KIND, it.value) }
         fields.connectMethod?.let { put(KEY_CONNECT_METHOD, it.value) }
     }
 
@@ -398,6 +420,7 @@ class SyncSetupWideEventImpl @Inject constructor(
         val existingAccount: Boolean,
         val lastStep: SetupStep,
         val isPreparingSyncRunning: Boolean = false,
+        val sawCodeEntry: Boolean = false,
     )
 
     private enum class SetupInterval(val key: String, val buckets: Set<Duration>) {
@@ -434,3 +457,17 @@ class SyncSetupWideEventImpl @Inject constructor(
         const val KEY_CONNECT_METHOD = "connect_method"
     }
 }
+
+internal val SHARED_LATENCY_BUCKETS = setOf(
+    1.seconds,
+    2.seconds,
+    3.seconds,
+    5.seconds,
+    10.seconds,
+    30.seconds,
+    1.minutes,
+    2.minutes,
+    3.minutes,
+    5.minutes,
+    10.minutes,
+)

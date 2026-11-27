@@ -57,6 +57,8 @@ import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Response
 import com.duckduckgo.sync.impl.auth.FakeSyncDeviceAuthenticator
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.pixels.SyncPixels
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command
 import com.duckduckgo.sync.impl.ui.dashboard.SyncActivityViewModel.Command.AskEditDevice
@@ -101,7 +103,6 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import java.lang.String.format
 import java.time.Instant
@@ -253,7 +254,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenSyncWithAnotherDeviceThenEmitCommandSyncWithAnotherDevice() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
-        testee.onSyncWithAnotherDevice()
+        testee.onSyncWithAnotherDevice(launchSource = "other")
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.SyncWithAnotherDevice::class)
@@ -266,7 +267,7 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
-            testee.onSyncWithAnotherDevice()
+            testee.onSyncWithAnotherDevice(launchSource = "other")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -275,7 +276,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenSyncWithAnotherDeviceAndCanRestoreThenShowPreviousSessionReady() = runViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
-        testee.onSyncWithAnotherDevice()
+        testee.onSyncWithAnotherDevice(launchSource = "other")
 
         testee.commands().test {
             val command = awaitItem()
@@ -288,7 +289,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenScanAnotherDeviceQRCodeThenEmitCommandAddAnotherDevice() = runViewModelTest {
         givenUserHasDeviceAuthentication(true)
-        testee.onAddAnotherDevice()
+        testee.onAddAnotherDevice(launchSource = "other")
 
         testee.commands().test {
             awaitItem().assertCommandType(Command.AddAnotherDevice::class)
@@ -301,7 +302,7 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
         testee.commands().test {
-            testee.onAddAnotherDevice()
+            testee.onAddAnotherDevice(launchSource = "other")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -468,7 +469,7 @@ class SyncActivityViewModelTest {
         givenUserHasDeviceAuthentication(true)
 
         testee.commands().test {
-            testee.onSyncWithDesktopSelected()
+            testee.onSyncWithDesktopSelected(launchSource = "other")
             awaitItem().assertCommandType(Command.AddAnotherDevice::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -653,7 +654,7 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             testee.onSyncThisDevice(launchSource = "other")
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(launchSource = "other")
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -664,18 +665,18 @@ class SyncActivityViewModelTest {
         testee.commands().test {
             testee.onSyncThisDevice(launchSource = "promotion_passwords")
             awaitItem()
-            verify(syncSetupWideEvent).onFlowStarted(launchSource = "promotion_passwords")
+            verify(syncSetupWideEvent).onFlowStarted(launchSource = "promotion_passwords", setupMode = SetupMode.SINGLE_DEVICE)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun whenAddAnotherDeviceWithoutDeviceAuthThenSetupWideEventNotTouched() = runViewModelTest {
+    fun whenAddAnotherDeviceWithoutDeviceAuthThenMultiDeviceAttemptStarts() = runViewModelTest {
         givenUserHasDeviceAuthentication(false)
 
-        testee.onAddAnotherDevice()
+        testee.onAddAnotherDevice("promotion_passwords")
 
-        verifyNoInteractions(syncSetupWideEvent)
+        verify(syncSetupWideEvent).onFlowStarted("promotion_passwords", SetupMode.MULTI_DEVICE)
     }
 
     @Test
@@ -683,7 +684,7 @@ class SyncActivityViewModelTest {
         whenever(syncAutoRestore.canRestore()).thenReturn(true)
 
         testee.commands().test {
-            testee.onSyncWithAnotherDevice()
+            testee.onSyncWithAnotherDevice(launchSource = "other")
             assertEquals(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE), awaitItem())
             assertTrue(deviceAuthenticator.requests.isEmpty())
             cancelAndIgnoreRemainingEvents()
@@ -715,12 +716,15 @@ class SyncActivityViewModelTest {
     }
 
     @Test
-    fun whenSyncWithAnotherDeviceVerificationDismissedThenSetupWideEventNotTouched() = runViewModelTest {
+    fun whenSyncWithAnotherDeviceVerificationDismissedThenMultiDeviceAttemptEnds() = runViewModelTest {
         deviceAuthenticator.response = Response.Cancelled.VerificationDismissed
 
-        testee.onSyncWithAnotherDevice()
+        testee.onSyncWithAnotherDevice(launchSource = "other")
 
-        verifyNoInteractions(syncSetupWideEvent)
+        org.mockito.kotlin.inOrder(syncSetupWideEvent) {
+            verify(syncSetupWideEvent).onFlowStarted("other", SetupMode.MULTI_DEVICE)
+            verify(syncSetupWideEvent).onCancelled(SetupCancellationReason.USER_CLOSED)
+        }
     }
 
     @Test
@@ -728,7 +732,7 @@ class SyncActivityViewModelTest {
         deviceAuthenticator.response = Response.Failed(FailureReason.HwUnavailable, "reason")
 
         testee.commands().test {
-            testee.onAddAnotherDevice()
+            testee.onAddAnotherDevice(launchSource = "other")
             val command = awaitItem()
             command.assertCommandType(Command.ShowError::class)
             assertEquals("reason", (command as Command.ShowError).reason)
@@ -1994,7 +1998,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.parseSyncAuthCode(url)).thenReturn(SyncAuthCode.Exchange(mock()))
 
         testee.commands().test {
-            testee.processSetupDeepLink(url)
+            testee.processSetupDeepLink(url, launchSource = "other")
             awaitItem().assertCommandType(Command.AskSetupSyncDeepLink::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -2006,7 +2010,7 @@ class SyncActivityViewModelTest {
         whenever(syncAccountRepository.parseSyncAuthCode(url)).thenReturn(SyncAuthCode.Unknown("code"))
 
         testee.commands().test {
-            testee.processSetupDeepLink(url)
+            testee.processSetupDeepLink(url, launchSource = "other")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -2021,7 +2025,7 @@ class SyncActivityViewModelTest {
         ).asUrl()
 
         testee.commands().test {
-            testee.processSetupDeepLink(url)
+            testee.processSetupDeepLink(url, launchSource = "other")
             awaitItem().assertCommandType(Command.DeepLinkIntoSetup::class)
             cancelAndIgnoreRemainingEvents()
         }
@@ -2036,7 +2040,7 @@ class SyncActivityViewModelTest {
             protocolVersion = SyncBarcodeUrl.ProtocolVersion.V2,
         ).asUrl()
 
-        testee.processSetupDeepLink(url)
+        testee.processSetupDeepLink(url, launchSource = "other")
 
         val request = deviceAuthenticator.requests.single()
         assertEquals(R.string.sync_simplified_deep_link_auth_prompt_title, request.verifyPromptTitle)
@@ -2052,7 +2056,7 @@ class SyncActivityViewModelTest {
         ).asUrl()
 
         testee.commands().test {
-            testee.processSetupDeepLink(url)
+            testee.processSetupDeepLink(url, launchSource = "other")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }
@@ -2061,7 +2065,7 @@ class SyncActivityViewModelTest {
     @Test
     fun whenProcessSetupDeepLinkWithMalformedUrlThenNoCommandIsSent() = runViewModelTest {
         testee.commands().test {
-            testee.processSetupDeepLink("not-a-sync-url")
+            testee.processSetupDeepLink("not-a-sync-url", launchSource = "other")
             expectNoEvents()
             cancelAndIgnoreRemainingEvents()
         }

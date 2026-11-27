@@ -35,6 +35,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.AnotherDevicePromptOption
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import dev.zacsweers.metro.Assisted
@@ -78,6 +79,8 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
 
     fun syncThisDevice(launchSource: String) {
         if (syncThisDeviceJob?.isActive == true) return
+        syncSetupWideEvent.onPairingSessionReset()
+        syncSetupWideEvent.onUpdate { it.copy(setupMode = SetupMode.SINGLE_DEVICE) }
         syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.THIS_DEVICE_ONLY)
 
         syncThisDeviceJob = viewModelScope.launch(dispatchers.io()) {
@@ -129,12 +132,19 @@ class SyncThisDeviceViewModel @AssistedInject constructor(
 
     fun onSyncWithAnotherDeviceClicked() {
         if (syncThisDeviceJob?.isActive == true) return
+        syncSetupWideEvent.onUpdate { it.copy(setupMode = SetupMode.MULTI_DEVICE) }
         syncPixels.fireSyncAnotherDevicePromptOptionTapped(AnotherDevicePromptOption.WITH_ANOTHER_DEVICE)
         viewModelScope.launch {
             if (authenticate()) {
                 _commands.send(Command.SyncWithAnotherDevice)
             }
         }
+    }
+
+    fun onPairingDismissed() {
+        syncSetupWideEvent.onPairingSessionReset()
+        syncSetupWideEvent.onUpdate { it.copy(setupMode = SetupMode.SINGLE_DEVICE) }
+        syncSetupWideEvent.onStep(SetupStep.CHOICE_SCREEN)
     }
 
     fun onCloseClicked() {

@@ -47,6 +47,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
+import com.duckduckgo.sync.impl.wideevents.SyncSetupPairingObserver
 import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import com.squareup.moshi.Moshi
 import dev.zacsweers.metro.ContributesBinding
@@ -97,6 +98,7 @@ class RealSyncCodeDispatcher @Inject constructor(
      * this device as either Host or Joiner.
      */
     override fun presentV2(): Flow<DispatchOutcome> = flow {
+        val observer = SyncSetupPairingObserver(setupEvent)
         val sessionStartMs = System.currentTimeMillis()
         logcat { "$TAG: V2 Presenter starting runner.startPresent (scoped to events since $sessionStartMs)" }
         runner.startPresent()
@@ -117,6 +119,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                             return@transformWhile false
                         }
                     }
+                    observer.onEvent(event)
                     runner.peerKind.toPeerKind()?.let { peerKind = it }
                     val outcome = (mapV2PresentEventToOutcome(event, peerKind) ?: return@transformWhile true)
                         .withFailureContext(SetupPath.PAIRING, roleFromTerminalState(event), peerKind)
@@ -254,6 +257,7 @@ class RealSyncCodeDispatcher @Inject constructor(
      * terminal outcome that completes the Flow.
      */
     private fun driveV2Linking(pastedCode: String): Flow<DispatchOutcome> = flow {
+        val observer = SyncSetupPairingObserver(setupEvent)
         val sessionStartMs = System.currentTimeMillis()
         logcat { "$TAG: V2 LinkingV2 starting runner.startScan (scoped to events since $sessionStartMs)" }
         runner.startScan(pastedCode)
@@ -274,6 +278,7 @@ class RealSyncCodeDispatcher @Inject constructor(
                             return@transformWhile false
                         }
                     }
+                    observer.onEvent(event)
                     runner.peerKind.toPeerKind()?.let { peerKind = it }
                     val outcome = (mapV2LinkingEventToOutcome(event, peerKind) ?: return@transformWhile true)
                         .withFailureContext(SetupPath.PAIRING, roleFromTerminalState(event), peerKind)

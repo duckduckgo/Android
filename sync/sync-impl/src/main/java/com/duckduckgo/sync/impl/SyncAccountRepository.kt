@@ -380,6 +380,7 @@ class AppSyncAccountRepository @Inject constructor(
             val error = Error(code = ALREADY_SIGNED_IN.code, reason = "Already signed in").alsoFireAlreadySignedInErrorPixel()
             val deviceCount = runBlocking { connectedDevicesRepository.latestConnectedDeviceCount() }
             if (deviceCount == 1) {
+                syncSetupWideEvent.onUpdate { it.copy(accountSwitch = true) }
                 val thisDeviceId = syncStore.deviceId.orEmpty()
                 val result = logout(thisDeviceId)
                 if (result is Error) {
@@ -805,6 +806,7 @@ class AppSyncAccountRepository @Inject constructor(
     override fun cachedIsSignedIn() = syncStore.cachedIsSignedIn()
 
     override fun logoutAndJoinNewAccount(stringCode: String): Result<Boolean> {
+        syncSetupWideEvent.onUpdate { it.copy(accountSwitch = true) }
         val thisDeviceId = syncStore.deviceId.orEmpty()
         return when (val result = logout(thisDeviceId)) {
             is Error -> {

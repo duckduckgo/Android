@@ -185,7 +185,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 handlePairingResult(output.result)
             }
 
-            is ReadSyncCodeContract.Output.Dismissed -> Unit
+            is ReadSyncCodeContract.Output.Dismissed -> viewModel.onPairingDismissed()
         }
     }
 
@@ -326,7 +326,7 @@ class SyncActivity : DuckDuckGoActivity() {
             val setupUrl = syncSetupUrl
             val startSyncFlow = startSyncFlowParams
             when {
-                setupUrl != null -> viewModel.processSetupDeepLink(setupUrl)
+                setupUrl != null -> viewModel.processSetupDeepLink(setupUrl, launchSource)
                 startSyncFlow != null -> {
                     // The Sync flow opens only after a background check, so we hide the settings to stop them from flashing until it does.
                     // We can't rely solely on the view state for that, because it arrives asynchronously and misses the first frame.
@@ -614,10 +614,10 @@ class SyncActivity : DuckDuckGoActivity() {
 
     private fun configureSyncWithAnotherDeviceCta() {
         binding.includeDisabledView.syncWithAnotherDeviceButton.setOnClickListener {
-            viewModel.onSyncWithAnotherDevice()
+            viewModel.onSyncWithAnotherDevice(launchSource)
         }
         binding.includeEnabledView.syncWithAnotherDeviceItem.setOnClickListener {
-            viewModel.onAddAnotherDevice()
+            viewModel.onAddAnotherDevice(launchSource)
         }
     }
 
@@ -748,7 +748,7 @@ class SyncActivity : DuckDuckGoActivity() {
                 SyncWithDesktopBottomSheetDialog.Choice::class.java,
             )
             when (choice) {
-                SyncWithDesktopBottomSheetDialog.Choice.SyncWithDesktop -> viewModel.onSyncWithDesktopSelected()
+                SyncWithDesktopBottomSheetDialog.Choice.SyncWithDesktop -> viewModel.onSyncWithDesktopSelected(launchSource)
                 SyncWithDesktopBottomSheetDialog.Choice.NoDesktopApp -> viewModel.onNoDesktopAppSelected()
                 null -> Unit
             }
@@ -840,6 +840,10 @@ class SyncActivity : DuckDuckGoActivity() {
                 object : TextAlertDialogBuilder.EventListener() {
                     override fun onPositiveButtonClicked() {
                         viewModel.onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl)
+                    }
+
+                    override fun onNegativeButtonClicked() {
+                        viewModel.onUserDeclinedDeepLinkIntoSync()
                     }
                 },
             )

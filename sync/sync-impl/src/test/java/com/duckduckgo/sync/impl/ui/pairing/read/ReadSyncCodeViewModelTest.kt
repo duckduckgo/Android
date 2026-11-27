@@ -54,6 +54,7 @@ class ReadSyncCodeViewModelTest {
     private val codeDispatcher = mock<SyncCodeDispatcher>()
 
     private val testee = ReadSyncCodeViewModel(
+        setupEvent = mock(),
         entryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         launchSource = "promotion_passwords",
         clipboard = clipboard,
