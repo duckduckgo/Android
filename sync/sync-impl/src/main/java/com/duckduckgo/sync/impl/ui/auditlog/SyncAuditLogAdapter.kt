@@ -116,8 +116,8 @@ private class EntryViewHolder(private val binding: ItemSyncAuditLogEntryBinding)
             SyncAuditLogAction.REMOVED -> R.string.syncAuditLogRemoved
         }
         with(binding.syncAuditLogEntry) {
-            setPrimaryText(context.getString(R.string.syncAuditLogRowTitle, row.time.format(context.resources), context.getString(action)))
-            setSecondaryText(row.item.deviceName)
+            setPrimaryText(context.getString(R.string.syncAuditLogRowTitle, context.getString(action), row.item.deviceName))
+            setSecondaryText(row.time.format(context.resources))
             setLeadingIconDrawable(icon(row.item))
             if (row.highlighted) setBackgroundColor(context.getColorFromAttr(CommonR.attr.daxColorAccentAltPrimary)) else background = null
         }

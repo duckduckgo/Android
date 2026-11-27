@@ -26,7 +26,7 @@
     <string name="syncAuditLogOnlyThisDevice">Only this device is synced</string>
     <string name="syncAuditLogSynced">Synced</string>
     <string name="syncAuditLogRemoved">Removed</string>
-    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity. First placeholder is how long ago it happened, for example 3 days ago. Second placeholder is Synced or Removed">%1$s · %2$s</string>
+    <string name="syncAuditLogRowTitle" instruction="Title of one row in a list of device activity, for example Removed · iPhone. First placeholder is Synced or Removed. Second placeholder is the device name. Keep Synced or Removed first: a long device name is cut at the end of the line">%1$s · %2$s</string>
     <plurals name="syncNewDeviceBannerTitle" instruction="Title of a message in Sync settings. The number is how many new devices synced with this account. Do not show the number">
         <item quantity="one">New synced device</item>
         <item quantity="other">New synced devices</item>
