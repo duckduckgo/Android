@@ -21,7 +21,7 @@ import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
 import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import java.util.concurrent.ConcurrentHashMap
 import javax.inject.Inject
 
@@ -54,7 +54,8 @@ class RealLanguagePackDownload @Inject constructor(
         try {
             scheduler.download(pair.key)
             // the flow can replay the terminal state of an earlier download of this pair before the new work shows up
-            return scheduler.getDownloadStateFlow(pair.key).dropWhile { !it.isActive() }.first { it.isTerminal() }
+            return scheduler.getDownloadStateFlow(pair.key).dropWhile { !it.isActive() }.firstOrNull { it.isTerminal() }
+                ?: LanguagePackDownloadState.Failed(LanguagePackDownloadState.Failed.Reason.DOWNLOAD_ERROR)
         } finally {
             inFlight.remove(pair)
         }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -42,6 +43,14 @@ class LanguagePackDownloadTest {
 
     private fun statesOf(initial: LanguagePackDownloadState = LanguagePackDownloadState.Idle) =
         MutableStateFlow(initial).also { whenever(scheduler.getDownloadStateFlow(pair.key)).thenReturn(it) }
+
+    @Test
+    fun whenStateFlowCompletesWithoutTerminalStateThenReturnsFailure() = runTest {
+        whenever(scheduler.getDownloadStateFlow(pair.key)).thenReturn(emptyFlow())
+
+        assertEquals(failed, testee.download(pair))
+        assertFalse(testee.isDownloading(pair))
+    }
 
     @Test
     fun whenDownloadedThenReturnsDownloaded() = runTest(UnconfinedTestDispatcher()) {
