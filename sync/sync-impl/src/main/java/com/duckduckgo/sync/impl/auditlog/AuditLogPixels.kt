@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel.PixelType
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import dev.zacsweers.metro.ContributesBinding
+import java.time.Duration
 import javax.inject.Inject
 
 /** The daily pixels keep only the first fire of the day, so for [fireUndecryptable] the first reason of the day is the one sent. */
@@ -33,6 +34,16 @@ interface AuditLogPixels {
     fun fireUnknownVersion()
 
     fun fireUndecryptable(reason: AuditLogUndecryptableReason)
+
+    /** [delay] is sent only as a bucket. */
+    fun fireNotificationShown(delay: Duration)
+
+    fun fireNotificationDisabled()
+
+    fun fireNotificationTapped()
+
+    /** [canNotify] is false when the user turned new login notifications off or the system does not let the app post them. */
+    fun fireNotificationPermission(canNotify: Boolean)
 }
 
 fun AuditLogPixels.fireFetchErrorIfFailed(result: AuditLogResult) {
@@ -85,8 +96,45 @@ class RealAuditLogPixels @Inject constructor(
         )
     }
 
+    override fun fireNotificationShown(delay: Duration) {
+        pixel.fire(
+            SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_SHOWN,
+            parameters = mapOf(DELAY_BUCKET to delayBucket(delay)),
+            type = PixelType.Count,
+        )
+    }
+
+    override fun fireNotificationDisabled() {
+        pixel.fire(SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_DISABLED, type = PixelType.Daily())
+    }
+
+    override fun fireNotificationTapped() {
+        pixel.fire(SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_TAPPED, type = PixelType.Count)
+    }
+
+    override fun fireNotificationPermission(canNotify: Boolean) {
+        pixel.fire(
+            SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_PERMISSION,
+            parameters = mapOf(STATE to if (canNotify) "enabled" else "disabled"),
+            type = PixelType.Daily(),
+        )
+    }
+
+    // Each bucket includes its lower bound and excludes its upper one. A negative delay comes from a wrong device clock.
+    private fun delayBucket(delay: Duration): String = when {
+        delay.isNegative -> "invalid"
+        delay < Duration.ofMinutes(1) -> "0-1m"
+        delay < Duration.ofMinutes(5) -> "1-5m"
+        delay < Duration.ofMinutes(30) -> "5-30m"
+        delay < Duration.ofHours(2) -> "30m-2h"
+        delay < Duration.ofHours(24) -> "2-24h"
+        else -> "24h+"
+    }
+
     private companion object {
         const val STATUS_CODE = "status_code"
         const val REASON = "reason"
+        const val DELAY_BUCKET = "delay_bucket"
+        const val STATE = "state"
     }
 }

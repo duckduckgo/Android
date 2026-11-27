@@ -30,6 +30,7 @@ import logcat.LogPriority.INFO
 import logcat.LogPriority.VERBOSE
 import logcat.LogPriority.WARN
 import logcat.logcat
+import java.time.Instant
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
@@ -49,8 +50,16 @@ sealed interface AuditLogCheckResult {
     data object AlreadyRunning : AuditLogCheckResult
     data object Initialised : AuditLogCheckResult
 
-    /** [logouts] counts every `logout` entry in the check. They are never stored or notified. */
-    data class Checked(val newLogins: Int, val renamedLogins: Int, val logouts: Int = 0) : AuditLogCheckResult
+    /**
+     * [logouts] counts every `logout` entry in the check. They are never stored or notified.
+     * [oldestNewLoginAt] is the earliest `occurredAt` of the [newLogins], or null when there are none.
+     */
+    data class Checked(
+        val newLogins: Int,
+        val renamedLogins: Int,
+        val logouts: Int = 0,
+        val oldestNewLoginAt: Instant? = null,
+    ) : AuditLogCheckResult
 
     /** The account or the stored cursor changed while the check ran, so nothing was written. */
     data object Discarded : AuditLogCheckResult
@@ -203,13 +212,15 @@ class RealAuditLogChecker @Inject constructor(
     ): AuditLogCheckResult {
         var added = 0
         var renamed = 0
+        var oldestAddedAt: Instant? = null
         val written = updateIfUnchanged(deviceId, expectedCursor = fromCursor) { state ->
             val applied = update.applyTo(state.pendingLogins)
             added = applied.added
             renamed = applied.renamed
+            oldestAddedAt = applied.oldestAddedAt
             state.copy(cursor = toCursor, pendingLogins = applied.pendingLogins)
         }
-        return if (written) AuditLogCheckResult.Checked(added, renamed, logouts) else AuditLogCheckResult.Discarded
+        return if (written) AuditLogCheckResult.Checked(added, renamed, logouts, oldestAddedAt) else AuditLogCheckResult.Discarded
     }
 
     /**

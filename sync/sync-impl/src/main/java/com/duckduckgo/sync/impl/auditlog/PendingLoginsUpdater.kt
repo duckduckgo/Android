@@ -27,6 +27,7 @@ import com.duckduckgo.sync.impl.auditlog.AuditLogEntryType.LOGIN
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import dev.zacsweers.metro.ContributesBinding
 import kotlinx.coroutines.withContext
+import java.time.Instant
 import javax.inject.Inject
 
 /** Finds the new logins and the late device names in one check's entries. */
@@ -48,7 +49,8 @@ data class PendingLoginsUpdate(
     /** Device id to name, for pending logins from an earlier check. */
     val lateNames: Map<String, String>,
 ) {
-    data class Applied(val pendingLogins: List<PendingLogin>, val added: Int, val renamed: Int)
+    /** [oldestAddedAt] is the earliest `occurredAt` of the logins this call added, or null if it added none. */
+    data class Applied(val pendingLogins: List<PendingLogin>, val added: Int, val renamed: Int, val oldestAddedAt: Instant? = null)
 
     /**
      * Adds the logins that [current] does not already have, by entry id, and sets the late names.
@@ -61,6 +63,7 @@ data class PendingLoginsUpdate(
         return Applied(
             pendingLogins = renamed + added,
             added = added.size,
+            oldestAddedAt = added.minOfOrNull { it.occurredAt },
             renamed = renamed.zip(current).count { (after, before) -> after != before },
         )
     }

@@ -21,6 +21,7 @@ import android.app.PendingIntent
 import android.content.Context
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.common.utils.notification.checkPermissionAndNotify
 import com.duckduckgo.di.scopes.AppScope
@@ -35,6 +36,8 @@ import dev.zacsweers.metro.binding
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.VERBOSE
 import logcat.logcat
+import java.time.Duration
+import java.time.Instant
 import javax.inject.Inject
 
 /** One system notification for every unseen login by another device. */
@@ -42,6 +45,7 @@ interface NewLoginNotifier {
     /**
      * Posts the notification when [result] added logins to the pending list. If it is showing, it is replaced, not added again,
      * and it alerts again. A late device name can change the device count: that updates a showing notification without an alert.
+     * Also reports, once a day, whether the notification can be shown.
      */
     suspend fun onCheckFinished(result: AuditLogCheckResult)
 
@@ -58,20 +62,29 @@ class RealNewLoginNotifier @Inject constructor(
     private val loginAuditLogFeature: LoginAuditLogFeature,
     private val globalActivityStarter: GlobalActivityStarter,
     private val newLoginNotificationSetting: NewLoginNotificationSetting,
+    private val permission: NewLoginNotificationPermission,
+    private val auditLogPixels: AuditLogPixels,
+    private val currentTimeProvider: CurrentTimeProvider,
     private val dispatchers: DispatcherProvider,
 ) : NewLoginNotifier, SyncEngineLifecycle {
 
     override suspend fun onCheckFinished(result: AuditLogCheckResult) {
-        if (result !is AuditLogCheckResult.Checked || (result.newLogins == 0 && result.renamedLogins == 0)) {
-            logcat(VERBOSE) { "Sync-AuditLog: no new logins or names, new login notification not posted" }
-            return
-        }
+        if (result is AuditLogCheckResult.Disabled || result is AuditLogCheckResult.NotSignedIn) return
         if (!loginAuditLogFeature.isNotificationEnabled()) {
             logcat { "Sync-AuditLog: notification flag off, new login notification not posted" }
             return
         }
-        if (!newLoginNotificationSetting.isEnabled()) {
-            logcat { "Sync-AuditLog: user turned new login notifications off, not posted" }
+        val canNotify = newLoginNotificationSetting.isEnabled() && permission.canPost()
+        auditLogPixels.fireNotificationPermission(canNotify)
+
+        if (result !is AuditLogCheckResult.Checked || (result.newLogins == 0 && result.renamedLogins == 0)) {
+            logcat(VERBOSE) { "Sync-AuditLog: no new logins or names, new login notification not posted" }
+            return
+        }
+        val alert = result.newLogins > 0
+        if (!canNotify) {
+            logcat { "Sync-AuditLog: new login notifications are off (setting or system), not posted" }
+            if (alert) auditLogPixels.fireNotificationDisabled()
             return
         }
 
@@ -83,19 +96,18 @@ class RealNewLoginNotifier @Inject constructor(
                 logcat { "Sync-AuditLog: no unseen logins left, new login notification not posted" }
                 return@withContext
             }
-            val alert = result.newLogins > 0
             if (!alert && !isShowing()) {
                 logcat(VERBOSE) { "Sync-AuditLog: late device name, new login notification not showing" }
-                return@withContext
-            }
-            if (!canPost()) {
-                logcat { "Sync-AuditLog: notifications are off, new login notification not posted" }
                 return@withContext
             }
             notificationManager.checkPermissionAndNotify(context, NEW_LOGIN_NOTIFICATION_ID, buildNotification(deviceCount, alert))
             logcat {
                 "Sync-AuditLog: new login notification posted (alert=$alert, new logins=${result.newLogins}, " +
                     "renamed=${result.renamedLogins}, unseen logins=${pending.size})"
+            }
+            // The internal test notification has no real login time, so it sends no pixel.
+            if (alert && result.oldestNewLoginAt != null) {
+                auditLogPixels.fireNotificationShown(Duration.between(result.oldestNewLoginAt, now()))
             }
         }
     }
@@ -112,11 +124,7 @@ class RealNewLoginNotifier @Inject constructor(
         logcat { "Sync-AuditLog: new login notification cancelled (Sync turned off)" }
     }
 
-    private fun canPost(): Boolean {
-        if (!notificationManager.areNotificationsEnabled()) return false
-        val channel = notificationManager.getNotificationChannelCompat(SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID)
-        return channel?.importance != NotificationManagerCompat.IMPORTANCE_NONE
-    }
+    private fun now(): Instant = Instant.ofEpochMilli(currentTimeProvider.currentTimeMillis())
 
     private fun isShowing() = notificationManager.activeNotifications.any { it.id == NEW_LOGIN_NOTIFICATION_ID }
 

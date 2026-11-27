@@ -108,6 +108,7 @@ class SyncAuditLogViewModel @AssistedInject constructor(
     init {
         if (params.openedFromNotification) {
             viewModelScope.launch {
+                auditLogPixels.fireNotificationTapped()
                 if (loginAuditLogFeature.isAuditLogEnabled()) {
                     open()
                 } else {

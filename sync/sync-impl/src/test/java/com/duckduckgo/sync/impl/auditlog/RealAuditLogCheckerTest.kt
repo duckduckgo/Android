@@ -118,7 +118,7 @@ class RealAuditLogCheckerTest {
 
         val result = testee.check()
 
-        assertEquals(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0), result)
+        assertEquals(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0, oldestNewLoginAt = Instant.ofEpochSecond(10)), result)
         assertEquals(AuditLogCheckState(cursor = "c2", pendingLogins = listOf(pending("e1", OTHER_DEVICE, "Laptop", 10))), stateStore.read())
     }
 
@@ -194,7 +194,7 @@ class RealAuditLogCheckerTest {
 
         val result = testee.check()
 
-        assertEquals(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0, logouts = 1), result)
+        assertEquals(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0, logouts = 1, oldestNewLoginAt = Instant.ofEpochSecond(10)), result)
         assertEquals(listOf(pending("e1", OTHER_DEVICE, "Laptop", 10)), stateStore.read().pendingLogins)
     }
 

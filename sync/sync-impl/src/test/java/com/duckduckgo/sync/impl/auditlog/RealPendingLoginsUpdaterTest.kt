@@ -31,6 +31,7 @@ import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Decoded
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry.Skipped
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -188,6 +189,26 @@ class RealPendingLoginsUpdaterTest {
         assertEquals(listOf(pending("e1", OTHER_DEVICE, "Laptop", 1), pending("e2", THIRD_DEVICE, "Tablet", 2)), applied.pendingLogins)
         assertEquals(1, applied.added)
         assertEquals(0, applied.renamed)
+    }
+
+    @Test
+    fun whenAppliedThenOldestAddedLoginTimeIgnoresLoginsAlreadyInList() = runTest {
+        val current = listOf(pending("e1", OTHER_DEVICE, "Laptop", 1))
+        val newLogins =
+            listOf(pending("e1", OTHER_DEVICE, "Laptop", 1), pending("e2", THIRD_DEVICE, "Tablet", 2), pending("e3", OTHER_DEVICE, "Laptop", 3))
+
+        val applied = PendingLoginsUpdate(newLogins, lateNames = emptyMap()).applyTo(current)
+
+        assertEquals(Instant.ofEpochSecond(2), applied.oldestAddedAt)
+    }
+
+    @Test
+    fun whenAppliedWithNothingAddedThenNoOldestAddedLoginTime() = runTest {
+        val current = listOf(pending("e1", OTHER_DEVICE, "Laptop", 1))
+
+        val applied = PendingLoginsUpdate(newLogins = current, lateNames = emptyMap()).applyTo(current)
+
+        assertNull(applied.oldestAddedAt)
     }
 
     private fun login(id: String, deviceId: String, info: String? = null, at: Long = 0) =
