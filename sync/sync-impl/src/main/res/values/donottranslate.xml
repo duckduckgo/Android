@@ -67,4 +67,10 @@
         <item quantity="one">%1$d year ago</item>
         <item quantity="other">%1$d years ago</item>
     </plurals>
+    <string name="syncNewLoginNotificationsTitle">Notify on New Connections</string>
+    <string name="syncNewLoginNotificationsDescription">Get notified whenever a new device is added to Sync &amp; Backup.</string>
+    <string name="syncNewLoginNotificationsEnable">Enable Notifications</string>
+    <string name="syncNewLoginNotificationsSettingsDialogTitle">Requires notification permission for DuckDuckGo</string>
+    <string name="syncNewLoginNotificationsSettingsDialogMessage">Enable notifications for DuckDuckGo in system Settings to turn on New Device Notifications.</string>
+    <string name="syncNewLoginNotificationsSettingsDialogConfirm">Go to Settings…</string>
 </resources>

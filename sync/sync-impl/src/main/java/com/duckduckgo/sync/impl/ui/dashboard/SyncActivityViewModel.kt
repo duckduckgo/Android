@@ -17,6 +17,7 @@
 package com.duckduckgo.sync.impl.ui.dashboard
 
 import android.content.Context
+import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -42,6 +43,9 @@ import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncFeatureToggle
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationPermission.Step
+import com.duckduckgo.sync.impl.auditlog.NewLoginNotificationSetting
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
 import com.duckduckgo.sync.impl.auth.AuthPrompt
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Request
@@ -123,12 +127,15 @@ class SyncActivityViewModel @Inject constructor(
     private val loginAuditLogFeature: LoginAuditLogFeature,
     private val auditLogStateStore: AuditLogCheckStateStore,
     private val newLoginNotifier: NewLoginNotifier,
+    private val newLoginNotificationPermission: NewLoginNotificationPermission,
+    private val newLoginNotificationSetting: NewLoginNotificationSetting,
 ) : ViewModel() {
 
     private val syncStateObserverJob = ConflatedJob()
     private val backgroundRefreshJob = ConflatedJob()
     private val fetchDevicesJob = ConflatedJob()
     private val newDeviceBannerJob = ConflatedJob()
+    private val newLoginNotificationsJob = ConflatedJob()
 
     // @Volatile because loadAutoRestoreState() writes these on the IO dispatcher while
     // onScreenExit() reads them from a different coroutine launched on the IO dispatcher.
@@ -145,6 +152,8 @@ class SyncActivityViewModel @Inject constructor(
     private val isContentHidden = MutableStateFlow(false)
 
     private val newDeviceBanner = MutableStateFlow<NewDeviceBanner?>(null)
+
+    private val newLoginNotifications = MutableStateFlow<NewLoginNotificationsLoad>(NewLoginNotificationsLoad.Loading)
 
     val authPrompts: StateFlow<AuthPrompt?> = deviceAuthenticator.currentPrompt
 
@@ -163,6 +172,12 @@ class SyncActivityViewModel @Inject constructor(
             state.copy(isContentHidden = isContentHidden)
         }.combine(newDeviceBanner) { state, banner ->
             state.copy(newDeviceBanner = banner)
+        }.combine(newLoginNotifications) { state, load ->
+            val notifications = (load as? NewLoginNotificationsLoad.Loaded)?.state
+            state.copy(
+                newLoginNotifications = notifications,
+                showNotifyMe = state.showAccount && load is NewLoginNotificationsLoad.Loaded && notifications == null,
+            )
         }.flowOn(dispatchers.io())
 
     private fun observeState() {
@@ -178,7 +193,9 @@ class SyncActivityViewModel @Inject constructor(
                 } else {
                     updateSignedInState()
                 }
+                refreshNewLoginNotifications()
             }.onStart {
+                refreshNewLoginNotifications()
                 initViewStateThisDeviceState()
                 fetchRemoteDevices()
                 syncEngine.triggerSync(FEATURE_READ)
@@ -204,6 +221,22 @@ class SyncActivityViewModel @Inject constructor(
         val canShow = syncAccountRepository.isSignedIn() && loginAuditLogFeature.isNotificationEnabled()
         if (!canShow) return flowOf(null)
         return auditLogStateStore.pendingLogins().map { NewDeviceBanner.from(it) }
+    }
+
+    private fun refreshNewLoginNotifications() {
+        newLoginNotificationsJob += viewModelScope.launch(dispatchers.io()) {
+            newLoginNotifications.value = NewLoginNotificationsLoad.Loaded(loadNewLoginNotifications())
+        }
+    }
+
+    private suspend fun loadNewLoginNotifications(): NewLoginNotificationsViewState? {
+        if (!syncAccountRepository.isSignedIn() || !loginAuditLogFeature.isNotificationEnabled()) return null
+        val enabled = newLoginNotificationSetting.isEnabled()
+        val canPost = newLoginNotificationPermission.canPost()
+        return NewLoginNotificationsViewState(
+            switchOn = enabled && canPost,
+            showCard = enabled && !canPost && !newLoginNotificationSetting.isCardDismissed(),
+        )
     }
 
     private fun schedulePeriodicRefresh() {
@@ -283,6 +316,18 @@ class SyncActivityViewModel @Inject constructor(
         val isContentHidden: Boolean = false,
         val showDeviceActivity: Boolean = false,
         val newDeviceBanner: NewDeviceBanner? = null,
+        val newLoginNotifications: NewLoginNotificationsViewState? = null,
+        val showNotifyMe: Boolean = false,
+    )
+
+    private sealed interface NewLoginNotificationsLoad {
+        data object Loading : NewLoginNotificationsLoad
+        data class Loaded(val state: NewLoginNotificationsViewState?) : NewLoginNotificationsLoad
+    }
+
+    data class NewLoginNotificationsViewState(
+        val switchOn: Boolean,
+        val showCard: Boolean,
     )
 
     sealed class SetupFlows {
@@ -320,6 +365,9 @@ class SyncActivityViewModel @Inject constructor(
         data class LaunchSyncGetOnOtherPlatforms(val source: SyncGetOnOtherPlatformsLaunchSource) : Command()
         data class LaunchLearnMore(val url: String) : Command()
         data object LaunchDeviceActivity : Command()
+        data object RequestNotificationPermission : Command()
+        data object AskOpenNotificationSettings : Command()
+        data class OpenNotificationSettings(val intent: Intent) : Command()
         data class ShowPreviousSessionReady(val syncEntryPoint: SyncEntryPoint) : Command()
         data class LaunchOriginalFlow(
             val syncEntryPoint: SyncEntryPoint,
@@ -686,6 +734,47 @@ class SyncActivityViewModel @Inject constructor(
             auditLogStateStore.update { state -> state.copy(pendingLogins = state.pendingLogins.filterNot { it.entryId in shown }) }
             newLoginNotifier.cancel()
         }
+    }
+
+    fun onNewLoginNotificationsToggled(enabled: Boolean, shouldShowRationale: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            newLoginNotificationSetting.setEnabled(enabled)
+            if (enabled) {
+                when (newLoginNotificationPermission.nextStep(shouldShowRationale)) {
+                    Step.NONE -> Unit
+                    Step.REQUEST_PERMISSION -> command.send(Command.RequestNotificationPermission)
+                    Step.OPEN_SETTINGS -> command.send(Command.AskOpenNotificationSettings)
+                }
+            }
+            refreshNewLoginNotifications()
+        }
+    }
+
+    fun onOpenNotificationSettingsConfirmed() {
+        viewModelScope.launch(dispatchers.io()) {
+            command.send(Command.OpenNotificationSettings(newLoginNotificationPermission.settingsIntent()))
+        }
+    }
+
+    fun onEnableNotificationsClicked(shouldShowRationale: Boolean) {
+        viewModelScope.launch(dispatchers.io()) {
+            when (newLoginNotificationPermission.nextStep(shouldShowRationale)) {
+                Step.NONE -> refreshNewLoginNotifications()
+                Step.REQUEST_PERMISSION -> command.send(Command.RequestNotificationPermission)
+                Step.OPEN_SETTINGS -> command.send(Command.OpenNotificationSettings(newLoginNotificationPermission.settingsIntent()))
+            }
+        }
+    }
+
+    fun onEnableNotificationsCardCloseClicked() {
+        viewModelScope.launch(dispatchers.io()) {
+            newLoginNotificationSetting.dismissCard()
+            refreshNewLoginNotifications()
+        }
+    }
+
+    fun onNotificationPermissionResult() {
+        refreshNewLoginNotifications()
     }
 
     fun onLearnMoreClicked() {
