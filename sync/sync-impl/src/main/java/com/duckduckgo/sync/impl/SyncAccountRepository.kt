@@ -818,7 +818,7 @@ class AppSyncAccountRepository @Inject constructor(
                 if (loginResult is Error) {
                     syncPixels.fireUserSwitchedLoginError()
                 }
-                Success(true)
+                loginResult
             }
         }
     }
