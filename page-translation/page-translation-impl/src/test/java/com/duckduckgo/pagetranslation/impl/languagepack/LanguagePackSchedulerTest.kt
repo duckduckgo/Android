@@ -179,6 +179,18 @@ class LanguagePackSchedulerTest {
     }
 
     @Test
+    fun keepTheQueuedDeleteOnRetry() = runTest {
+        scheduler.download(PAIR)
+        val stopped = getActiveWork(PAIR).single().id
+        scheduler.delete(PAIR)
+
+        scheduler.retry(PAIR)
+
+        assertEquals(listOf(stopped), getActiveWork(PAIR).filter { it.isDownload() }.map { it.id })
+        assertEquals(listOf(PAIR to DELETE), getQueuedOperations())
+    }
+
+    @Test
     fun runDownloadsOfDifferentPairsSeparately() = runTest {
         scheduler.download(PAIR)
         scheduler.download(OTHER_PAIR)

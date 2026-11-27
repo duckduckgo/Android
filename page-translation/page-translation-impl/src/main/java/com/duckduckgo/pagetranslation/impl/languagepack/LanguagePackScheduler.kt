@@ -72,8 +72,11 @@ interface LanguagePackScheduler {
      */
     suspend fun download(pair: String)
 
-    /** Starts the download at once, replacing a pending rerun of a download the system stopped. */
-    fun retry(pair: String)
+    /**
+     * Starts the download at once, replacing a pending rerun of a download the system stopped.
+     * Does nothing when a delete or removal is queued after that download.
+     */
+    suspend fun retry(pair: String)
 
     /** Uninstalls the pair's pack, keeping it until [confirmDelete] so [undoDelete] can restore it. */
     fun delete(pair: String)
@@ -104,15 +107,20 @@ class RealLanguagePackScheduler @Inject constructor(
     override suspend fun download(pair: String) {
         if (!canDownload()) return
 
-        val infos = workManager.getWorkInfosForUniqueWorkFlow(getWorkName(pair)).firstOrNull().orEmpty()
+        val infos = getWorkInfos(pair)
         val newestDownload = infos.getNewestDownload()
-        if (newestDownload != null && !newestDownload.state.isFinished && infos.none { it.isUninstall() && it.order > newestDownload.order }) return
+        if (newestDownload != null && !newestDownload.state.isFinished && !infos.hasUninstallAfter(newestDownload)) return
 
         enqueue(pair, createDownloadRequest(pair))
     }
 
-    override fun retry(pair: String) {
+    override suspend fun retry(pair: String) {
         if (!canDownload()) return
+
+        // REPLACE cancels every unfinished work of the pair, so it would also cancel the uninstall
+        val infos = getWorkInfos(pair)
+        val newestDownload = infos.getNewestDownload()
+        if (newestDownload != null && infos.hasUninstallAfter(newestDownload)) return
 
         workManager.enqueueUniqueWork(getWorkName(pair), ExistingWorkPolicy.REPLACE, createDownloadRequest(pair))
     }
@@ -136,7 +144,11 @@ class RealLanguagePackScheduler @Inject constructor(
             infos.getNewestDownload()?.toLanguagePackDownloadState() ?: LanguagePackDownloadState.Idle
         }
 
+    private suspend fun getWorkInfos(pair: String) = workManager.getWorkInfosForUniqueWorkFlow(getWorkName(pair)).firstOrNull().orEmpty()
+
     private fun List<WorkInfo>.getNewestDownload() = filter { it.isDownload() }.maxByOrNull { it.order }
+
+    private fun List<WorkInfo>.hasUninstallAfter(download: WorkInfo) = any { it.isUninstall() && it.order > download.order }
 
     // before Android 12 a queued job would show its download notification before the worker sees the feature is off
     private fun canDownload() = feature.translation().isEnabled() && deviceSupport.isSupported()
