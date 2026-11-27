@@ -534,9 +534,7 @@ class RealDuckChat @Inject constructor(
     private var isContextualModeEnabled: Boolean = false
     private var contextualMenuAllChatsEnabled: Boolean = false
     private var isAutomaticContextAttachmentEnabled: Boolean = false
-
-    @Volatile
-    private var duckAiNativeStorage = false
+    private var duckAiNativeStorage: Boolean = false
     private var areMultipleContentAttachmentsEnabled: Boolean = false
     private var isNativeChatInputEnabled: Boolean = false
     private var isContextualNativeInputEnabled: Boolean = false

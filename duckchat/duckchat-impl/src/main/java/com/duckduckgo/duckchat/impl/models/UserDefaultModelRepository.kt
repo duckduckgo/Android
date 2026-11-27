@@ -71,7 +71,10 @@ class UserDefaultModelRepository @Inject constructor(
     }
 
     private companion object {
-        // Moshi's reader also accepts unescaped control characters and certain non-JSON escapes in strings.
+        // Web stores the model ID as one JSON string, such as "gpt-6-luna". This accepts only that: optional whitespace around
+        // one quoted string that has no unescaped control characters and only the escapes JSON allows. Any other value counts
+        // as no user default. Moshi's reader isn't enough on its own, since it also accepts unescaped control characters and
+        // some escapes that JSON doesn't allow.
         val JSON_STRING = Regex("""[ \t\r\n]*"(?:[^"\\\x00-\x1F]|\\(?:["\\/bfnrt]|u[0-9a-fA-F]{4}))*+"[ \t\r\n]*""")
     }
 }
