@@ -79,6 +79,29 @@ class SyncAuditLogViewModelTest {
     }
 
     @Test
+    fun whenOpenedFromNotificationThenTappedPixelFired() = runTest {
+        viewModel(openedFromNotification = true)
+
+        verify(auditLogPixels).fireNotificationTapped()
+    }
+
+    @Test
+    fun whenOpenedFromNotificationAndAuditLogIsOffThenTappedPixelStillFired() = runTest {
+        loginAuditLogFeature.auditLogEnabled = false
+
+        viewModel(openedFromNotification = true)
+
+        verify(auditLogPixels).fireNotificationTapped()
+    }
+
+    @Test
+    fun whenNotOpenedFromNotificationThenTappedPixelNotFired() = runTest {
+        viewModel()
+
+        verify(auditLogPixels, never()).fireNotificationTapped()
+    }
+
+    @Test
     fun whenOpenedThenScreenShownPixelFiredOnce() = runTest {
         val testee = viewModel()
         loader.result.complete(loaded(ITEM_1, before = "b1"))

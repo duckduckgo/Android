@@ -41,5 +41,49 @@
                 "enum": ["key_not_found", "payload_decrypt_error", "device_info_decrypt_error", "legacy_name_type_decrypt_error"]
             }
         ]
+    },
+    "sync_device_login_notification_shown": {
+        "description": "Fired each time the app posts the new synced device notification because a check of the Sync login audit log found logins from other devices. Not fired when a showing notification is updated without an alert",
+        "owners": ["CDRussell"],
+        "triggers": ["impression"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "delay_bucket",
+                "type": "string",
+                "description": "Time from the oldest login found by the check that posted the notification to posting it. Each bucket includes its lower bound and excludes its upper bound. invalid when the delay is negative, for example because of a wrong device clock",
+                "enum": ["0-1m", "1-5m", "5-30m", "30m-2h", "2-24h", "24h+", "invalid"]
+            }
+        ]
+    },
+    "sync_device_login_notification_disabled": {
+        "description": "Fired daily when a check of the Sync login audit log finds logins from other devices, but the notification about them cannot be posted because Notify on New Connections is off in Sync & Backup settings, the notification permission is missing, or the app's notifications or the new synced device channel are turned off",
+        "owners": ["CDRussell"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_device_login_notification_tapped": {
+        "description": "Fired each time the user taps the new synced device notification, which opens the Device Activity screen",
+        "owners": ["CDRussell"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_device_login_notification_permission": {
+        "description": "Fired daily after a check of the Sync login audit log, for every Sync user, whether or not there are new logins. Reports whether the new synced device notification can be posted",
+        "owners": ["CDRussell"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "state",
+                "type": "string",
+                "description": "enabled when Notify on New Connections is on in Sync & Backup settings and the system lets the app post the notification (permission granted, app notifications on, channel on). disabled otherwise",
+                "enum": ["enabled", "disabled"]
+            }
+        ]
     }
 }

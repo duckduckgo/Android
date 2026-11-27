@@ -22,6 +22,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelName
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
+import java.time.Duration
 
 class RealAuditLogPixelsTest {
 
@@ -75,6 +76,79 @@ class RealAuditLogPixelsTest {
     fun whenUndecryptableLegacyNameTypeThenReasonSent() {
         assertUndecryptableSends(AuditLogUndecryptableReason.LEGACY_NAME_TYPE_DECRYPT_ERROR, "legacy_name_type_decrypt_error")
     }
+
+    @Test
+    fun whenNotificationShownWithNoDelayThenBucketIsUnderOneMinute() = assertShownBucket(Duration.ZERO, "0-1m")
+
+    @Test
+    fun whenNotificationShownJustUnderOneMinuteThenBucketIsUnderOneMinute() = assertShownBucket(justUnder(Duration.ofMinutes(1)), "0-1m")
+
+    @Test
+    fun whenNotificationShownAtOneMinuteThenBucketIsOneToFiveMinutes() = assertShownBucket(Duration.ofMinutes(1), "1-5m")
+
+    @Test
+    fun whenNotificationShownJustUnderFiveMinutesThenBucketIsOneToFiveMinutes() = assertShownBucket(justUnder(Duration.ofMinutes(5)), "1-5m")
+
+    @Test
+    fun whenNotificationShownAtFiveMinutesThenBucketIsFiveToThirtyMinutes() = assertShownBucket(Duration.ofMinutes(5), "5-30m")
+
+    @Test
+    fun whenNotificationShownJustUnderThirtyMinutesThenBucketIsFiveToThirtyMinutes() =
+        assertShownBucket(justUnder(Duration.ofMinutes(30)), "5-30m")
+
+    @Test
+    fun whenNotificationShownAtThirtyMinutesThenBucketIsThirtyMinutesToTwoHours() = assertShownBucket(Duration.ofMinutes(30), "30m-2h")
+
+    @Test
+    fun whenNotificationShownJustUnderTwoHoursThenBucketIsThirtyMinutesToTwoHours() = assertShownBucket(justUnder(Duration.ofHours(2)), "30m-2h")
+
+    @Test
+    fun whenNotificationShownAtTwoHoursThenBucketIsTwoToTwentyFourHours() = assertShownBucket(Duration.ofHours(2), "2-24h")
+
+    @Test
+    fun whenNotificationShownJustUnderOneDayThenBucketIsTwoToTwentyFourHours() = assertShownBucket(justUnder(Duration.ofHours(24)), "2-24h")
+
+    @Test
+    fun whenNotificationShownAtOneDayThenBucketIsOverOneDay() = assertShownBucket(Duration.ofHours(24), "24h+")
+
+    @Test
+    fun whenNotificationShownWithNegativeDelayThenBucketIsInvalid() = assertShownBucket(Duration.ofMillis(-1), "invalid")
+
+    @Test
+    fun whenNotificationDisabledThenDailyPixelFired() {
+        pixels.fireNotificationDisabled()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_DISABLED, emptyMap(), emptyMap(), PixelType.Daily())
+    }
+
+    @Test
+    fun whenNotificationTappedThenCountPixelFired() {
+        pixels.fireNotificationTapped()
+
+        verify(pixel).fire(SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_TAPPED, emptyMap(), emptyMap(), PixelType.Count)
+    }
+
+    @Test
+    fun whenNotificationPermissionEnabledThenDailyPixelFiredWithEnabledState() {
+        pixels.fireNotificationPermission(canNotify = true)
+
+        verify(pixel).fire(SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_PERMISSION, mapOf("state" to "enabled"), emptyMap(), PixelType.Daily())
+    }
+
+    @Test
+    fun whenNotificationPermissionDisabledThenDailyPixelFiredWithDisabledState() {
+        pixels.fireNotificationPermission(canNotify = false)
+
+        verify(pixel).fire(SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_PERMISSION, mapOf("state" to "disabled"), emptyMap(), PixelType.Daily())
+    }
+
+    private fun assertShownBucket(delay: Duration, bucket: String) {
+        pixels.fireNotificationShown(delay)
+
+        verify(pixel).fire(SyncPixelName.SYNC_DEVICE_LOGIN_NOTIFICATION_SHOWN, mapOf("delay_bucket" to bucket), emptyMap(), PixelType.Count)
+    }
+
+    private fun justUnder(duration: Duration) = duration.minusMillis(1)
 
     private fun assertUndecryptableSends(reason: AuditLogUndecryptableReason, value: String) {
         pixels.fireUndecryptable(reason)

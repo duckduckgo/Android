@@ -26,6 +26,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.navigation.api.GlobalActivityStarter
 import com.duckduckgo.sync.impl.auditlog.RealNewLoginNotifier.Companion.NEW_LOGIN_NOTIFICATION_ID
 import com.duckduckgo.sync.impl.auditlog.RealNewLoginNotifier.Companion.SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID
@@ -47,8 +48,12 @@ import org.junit.runner.RunWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.robolectric.Shadows.shadowOf
+import java.time.Duration
 import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
@@ -66,6 +71,10 @@ class RealNewLoginNotifierTest {
         whenever(it.startIntent(any(), eq(SyncAuditLogScreenParams(openedFromNotification = true)))).thenReturn(deviceActivityIntent)
     }
     private val setting = FakeNotificationSetting()
+    private val pixels: AuditLogPixels = mock()
+    private val timeProvider: CurrentTimeProvider = mock<CurrentTimeProvider>().also {
+        whenever(it.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
+    }
 
     private val notifier = RealNewLoginNotifier(
         context = context,
@@ -74,6 +83,9 @@ class RealNewLoginNotifierTest {
         loginAuditLogFeature = feature,
         globalActivityStarter = globalActivityStarter,
         newLoginNotificationSetting = setting,
+        permission = RealNewLoginNotificationPermission(context, notificationManager, coroutineTestRule.testDispatcherProvider),
+        auditLogPixels = pixels,
+        currentTimeProvider = timeProvider,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -275,6 +287,157 @@ class RealNewLoginNotifierTest {
         assertNull(postedNotification())
     }
 
+    @Test
+    fun whenNotificationIsPostedForNewLoginsThenShownPixelHasTheDelaySinceTheOldestNewLogin() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+
+        notifier.onCheckFinished(checkedWithNewLogin(oldestNewLoginAt = NOW.minus(Duration.ofMinutes(3))))
+
+        verify(pixels).fireNotificationShown(Duration.ofMinutes(3))
+    }
+
+    @Test
+    fun whenALateNameUpdatesTheShowingNotificationThenShownPixelIsNotFiredAgain() = runTest {
+        stateStore.givenPending(pendingLogin(1, name = "Unknown device"), pendingLogin(2, name = "Unknown device"))
+        notifier.onCheckFinished(checkedWithNewLogin(newLogins = 2))
+
+        stateStore.givenPending(pendingLogin(1, name = "Unknown device"), pendingLogin(2, name = "Laptop"))
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 1))
+
+        verify(pixels).fireNotificationShown(any())
+    }
+
+    @Test
+    fun whenPostedWithoutATimeForTheNewLoginsThenShownPixelIsNotFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 1, renamedLogins = 0))
+
+        assertNotNull(postedNotification())
+        verify(pixels, never()).fireNotificationShown(any())
+    }
+
+    @Test
+    fun whenPermissionIsMissingForNewLoginsThenDisabledPixelFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+        shadowOf(context as Application).denyPermissions(POST_NOTIFICATIONS)
+
+        notifier.onCheckFinished(checkedWithNewLogin())
+
+        verify(pixels).fireNotificationDisabled()
+        verify(pixels, never()).fireNotificationShown(any())
+    }
+
+    @Test
+    fun whenAppNotificationsAreOffForNewLoginsThenDisabledPixelFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+        shadowOf(context.getSystemService(NotificationManager::class.java)).setNotificationsEnabled(false)
+
+        notifier.onCheckFinished(checkedWithNewLogin())
+
+        verify(pixels).fireNotificationDisabled()
+    }
+
+    @Test
+    fun whenChannelIsBlockedForNewLoginsThenDisabledPixelFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+        blockChannel()
+
+        notifier.onCheckFinished(checkedWithNewLogin())
+
+        verify(pixels).fireNotificationDisabled()
+    }
+
+    @Test
+    fun whenUserTurnedNotificationsOffForNewLoginsThenDisabledPixelFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+        setting.enabled = false
+
+        notifier.onCheckFinished(checkedWithNewLogin())
+
+        verify(pixels).fireNotificationDisabled()
+    }
+
+    @Test
+    fun whenOnlyALateNameArrivesAndNotificationsAreOffThenDisabledPixelNotFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+        setting.enabled = false
+
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 1))
+
+        verify(pixels, never()).fireNotificationDisabled()
+    }
+
+    @Test
+    fun whenNotificationIsPostedThenDisabledPixelNotFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+
+        notifier.onCheckFinished(checkedWithNewLogin())
+
+        verify(pixels, never()).fireNotificationDisabled()
+    }
+
+    @Test
+    fun whenCheckRanAndNotificationsCanBeShownThenPermissionStateIsEnabled() = runTest {
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0))
+
+        verify(pixels).fireNotificationPermission(canNotify = true)
+    }
+
+    @Test
+    fun whenCheckRanAndPermissionIsMissingThenPermissionStateIsDisabled() = runTest {
+        shadowOf(context as Application).denyPermissions(POST_NOTIFICATIONS)
+
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0))
+
+        verify(pixels).fireNotificationPermission(canNotify = false)
+    }
+
+    @Test
+    fun whenCheckRanAndUserTurnedNotificationsOffThenPermissionStateIsDisabled() = runTest {
+        setting.enabled = false
+
+        notifier.onCheckFinished(AuditLogCheckResult.Checked(newLogins = 0, renamedLogins = 0))
+
+        verify(pixels).fireNotificationPermission(canNotify = false)
+    }
+
+    @Test
+    fun whenCheckFailedThenPermissionStateIsStillSent() = runTest {
+        notifier.onCheckFinished(AuditLogCheckResult.Failed(AuditLogCheckResult.FailureReason.NETWORK))
+
+        verify(pixels).fireNotificationPermission(canNotify = true)
+    }
+
+    @Test
+    fun whenNotificationFlagIsOffThenNoPixelFired() = runTest {
+        stateStore.givenPending(pendingLogin(1))
+        feature.notificationEnabled = false
+
+        notifier.onCheckFinished(checkedWithNewLogin())
+
+        verifyNoInteractions(pixels)
+    }
+
+    @Test
+    fun whenSignedOutOrCheckIsOffThenNoPixelFired() = runTest {
+        notifier.onCheckFinished(AuditLogCheckResult.NotSignedIn)
+        notifier.onCheckFinished(AuditLogCheckResult.Disabled)
+
+        verifyNoInteractions(pixels)
+    }
+
+    private fun checkedWithNewLogin(newLogins: Int = 1, oldestNewLoginAt: Instant = NOW) =
+        AuditLogCheckResult.Checked(newLogins = newLogins, renamedLogins = 0, oldestNewLoginAt = oldestNewLoginAt)
+
+    private fun blockChannel() {
+        notificationManager.createNotificationChannel(
+            NotificationChannelCompat.Builder(SYNC_NEW_LOGIN_NOTIFICATION_CHANNEL_ID, NotificationManagerCompat.IMPORTANCE_NONE)
+                .setName("blocked")
+                .build(),
+        )
+    }
+
     private fun postedNotification(): Notification? =
         notificationManager.activeNotifications.find { it.id == NEW_LOGIN_NOTIFICATION_ID }?.notification
 
@@ -323,5 +486,9 @@ class RealNewLoginNotifierTest {
         }
 
         override fun pendingLogins(): Flow<List<PendingLogin>> = state.map { it.pendingLogins }
+    }
+
+    private companion object {
+        val NOW: Instant = Instant.parse("2026-11-27T12:00:00Z")
     }
 }
