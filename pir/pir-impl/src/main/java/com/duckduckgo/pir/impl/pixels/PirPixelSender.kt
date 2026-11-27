@@ -21,6 +21,7 @@ import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason
+import com.duckduckgo.pir.impl.common.PirGatedActionDelayProvider
 import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.pixels.PirPixel.PIR_APP_SETTINGS_CLICK
@@ -808,6 +809,7 @@ class RealPirPixelSender @Inject constructor(
     private val pixelSender: Pixel,
     private val networkProtectionState: NetworkProtectionState,
     private val pirRemoteFeatures: PirRemoteFeatures,
+    private val gatedActionDelayProvider: PirGatedActionDelayProvider,
 ) : PirPixelSender {
     override suspend fun reportManualScanStarted(
         isPowerSavingEnabled: Boolean,
@@ -1314,6 +1316,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_PARENT to parentUrl,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_GATED_ACTION_DELAY to gatedActionDelayProvider.getGatedActionDelayMs().toString(),
         ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_MATCHES, params)
@@ -1339,6 +1342,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_GATED_ACTION_DELAY to gatedActionDelayProvider.getGatedActionDelayMs().toString(),
         ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_NO_MATCH, params)
@@ -1368,6 +1372,7 @@ class RealPirPixelSender @Inject constructor(
             PARAM_KEY_ACTION_TYPE to actionType,
             PARAM_KEY_VPN_STATE to networkProtectionState.safeIsVpnRunning().toVpnConnectionState(),
             PARAM_KEY_TRACKER_BLOCKING to trackerBlockingState(),
+            PARAM_KEY_GATED_ACTION_DELAY to gatedActionDelayProvider.getGatedActionDelayMs().toString(),
         ) + usageParams(isAuthenticated = !isFreeScan)
 
         fire(PIR_SCAN_STAGE_RESULT_ERROR, params)
@@ -2030,6 +2035,7 @@ class RealPirPixelSender @Inject constructor(
         private const val PARAM_KEY_TOTAL_OPTOUT = "total_optout"
         private const val PARAM_KEY_BROKER_COUNT = "broker_count"
         private const val PARAM_KEY_TRACKER_BLOCKING = "tracker_blocking_state"
+        private const val PARAM_KEY_GATED_ACTION_DELAY = "gated_action_delay_ms"
         private const val PARAM_KEY_SCAN_TRIGGER = "scan_trigger"
         private const val PARAM_KEY_NOTIFICATIONS_PERMISSION = "notifications_permission_granted"
         private const val PARAM_KEY_DID_CRASH = "did_crash"

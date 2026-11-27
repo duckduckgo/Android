@@ -22,6 +22,7 @@ import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.networkprotection.api.NetworkProtectionState
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.brokers.BrokerJsonUpdateFailureReason
+import com.duckduckgo.pir.impl.common.FakePirGatedActionDelayProvider
 import com.duckduckgo.pir.impl.models.RemovedProfileWithIdentifierFound.ChangedField
 import com.duckduckgo.pir.impl.models.scheduling.JobRecord.OptOutJobRecord.OptOutJobStatus
 import com.duckduckgo.pir.impl.scheduling.PirExecutionType
@@ -44,6 +45,7 @@ class RealPirPixelSenderTest {
     private val mockPixelSender: Pixel = mock()
     private val mockNetworkProtectionState: NetworkProtectionState = mock()
     private val mockPirRemoteFeatures: PirRemoteFeatures = mock()
+    private val fakeGatedActionDelayProvider = FakePirGatedActionDelayProvider()
     private val mockToggle: Toggle = mock()
     private val mockScanWebViewSizeToggle: Toggle = mock()
 
@@ -53,7 +55,7 @@ class RealPirPixelSenderTest {
         whenever(mockToggle.isEnabled()).thenReturn(false)
         whenever(mockPirRemoteFeatures.scanWebViewSize()).thenReturn(mockScanWebViewSizeToggle)
         whenever(mockScanWebViewSizeToggle.isEnabled()).thenReturn(false)
-        testee = RealPirPixelSender(mockPixelSender, mockNetworkProtectionState, mockPirRemoteFeatures)
+        testee = RealPirPixelSender(mockPixelSender, mockNetworkProtectionState, mockPirRemoteFeatures, fakeGatedActionDelayProvider)
     }
 
     @Test
@@ -892,6 +894,7 @@ class RealPirPixelSenderTest {
         assert(params["is_authenticated"] == "true")
         assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["gated_action_delay_ms"] == "3000")
     }
 
     @Test
@@ -928,6 +931,7 @@ class RealPirPixelSenderTest {
         assert(params["is_authenticated"] == "true")
         assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["gated_action_delay_ms"] == "3000")
     }
 
     @Test
@@ -968,6 +972,7 @@ class RealPirPixelSenderTest {
         assert(params["is_authenticated"] == "true")
         assert(params["free_scan"] == "false")
         assert(params["tracker_blocking_state"] == "disabled")
+        assert(params["gated_action_delay_ms"] == "3000")
     }
 
     @Test
@@ -1043,6 +1048,35 @@ class RealPirPixelSenderTest {
         )
 
         assert(paramsCaptor.firstValue["tracker_blocking_state"] == "enabled")
+    }
+
+    @Test
+    fun whenReportScanErrorWithRemoteDelayThenIncludesConfiguredDelay() = runTest {
+        whenever(mockNetworkProtectionState.isRunning()).thenReturn(false)
+        fakeGatedActionDelayProvider.delayMs = 1_500L
+
+        testee.reportScanError(
+            brokerUrl = "https://broker.com",
+            brokerVersion = "1.0",
+            durationMs = 1000L,
+            errorCategory = "client-error",
+            errorDetails = "details",
+            inManualStarted = false,
+            parentUrl = "https://parent.com",
+            actionId = "action-1",
+            actionType = "expectation",
+            isFreeScan = false,
+        )
+
+        val paramsCaptor = argumentCaptor<Map<String, String>>()
+        verify(mockPixelSender).fire(
+            pixelName = any(),
+            parameters = paramsCaptor.capture(),
+            encodedParameters = any(),
+            type = any(),
+        )
+
+        assert(paramsCaptor.firstValue["gated_action_delay_ms"] == "1500")
     }
 
     @Test

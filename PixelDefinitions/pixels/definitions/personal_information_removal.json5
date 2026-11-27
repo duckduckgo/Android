@@ -519,6 +519,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirGatedActionDelayMs",
             "pirScanWebViewSizeState",
             "appVersion",
             "pirIsAuthenticated",
@@ -574,6 +575,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirGatedActionDelayMs",
             "pirScanWebViewSizeState",
             "appVersion",
             "pirIsAuthenticated",
@@ -653,6 +655,7 @@
         "triggers": ["feature_lifecycle"],
         "suffixes": ["daily_count_short", "form_factor"],
         "parameters": [
+            "pirGatedActionDelayMs",
             "pirScanWebViewSizeState",
             "appVersion",
             "pirIsAuthenticated",

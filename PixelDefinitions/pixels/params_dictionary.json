@@ -353,6 +353,11 @@
         "description": "Whether the scanWebViewSize remote flag was on, laying out PIR scan WebViews at a desktop-width viewport instead of 0x0.",
         "enum": ["enabled", "disabled"]
     },
+    "pirGatedActionDelayMs": {
+        "key": "gated_action_delay_ms",
+        "type": "integer",
+        "description": "Milliseconds PIR waited before each Click and Expectation action. Comes from the pir remote config setting gatedActionDelayMs (default 3000, clamped to 0-15000), so every user on the same config sends the same value."
+    },
     "pirNotificationPromptType": {
         "key": "prompt_type",
         "type": "string",

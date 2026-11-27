@@ -19,7 +19,6 @@ package com.duckduckgo.pir.impl.common
 import com.duckduckgo.di.scopes.AppScope
 import com.duckduckgo.pir.impl.PirRemoteFeatures
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep
-import com.duckduckgo.pir.impl.common.PirJobConstants.GATED_ACTION_PUSH_DELAY_MS
 import com.duckduckgo.pir.impl.common.PirJobConstants.OPT_OUT_FILL_FORM_PUSH_DELAY_MS
 import com.duckduckgo.pir.impl.models.ProfileQuery
 import com.duckduckgo.pir.impl.scripts.models.BrokerAction.Click
@@ -59,6 +58,7 @@ interface PirWorkDistributor {
 @ContributesBinding(AppScope::class)
 class RealPirWorkDistributor @Inject constructor(
     private val pirRemoteFeatures: PirRemoteFeatures,
+    private val gatedActionDelayProvider: PirGatedActionDelayProvider,
 ) : PirWorkDistributor {
 
     override suspend fun executeAll(
@@ -83,7 +83,7 @@ class RealPirWorkDistributor @Inject constructor(
         work: List<Pair<ProfileQuery, BrokerStep>>,
         onStepCompleted: suspend () -> Unit,
     ) {
-        val queue = ConcurrentLinkedQueue(work.orderedForDispatch())
+        val queue = ConcurrentLinkedQueue(work.orderedForDispatch(gatedActionDelayProvider.getGatedActionDelayMs()))
 
         val workers = minOf(runners.size, work.size)
         logcat { "PIR-DISTRIBUTOR: Distributing ${work.size} steps across $workers runners" }
@@ -134,11 +134,11 @@ class RealPirWorkDistributor @Inject constructor(
      * with same actions in parallel can cause resource starvation issues with anti-bot challenges, which in turn causes timeouts,
      * so the scan reports no matches for sites that do hold records.
      */
-    private fun List<Pair<ProfileQuery, BrokerStep>>.orderedForDispatch(): List<Pair<ProfileQuery, BrokerStep>> {
+    private fun List<Pair<ProfileQuery, BrokerStep>>.orderedForDispatch(gatedActionDelayMs: Long): List<Pair<ProfileQuery, BrokerStep>> {
         val perParentBroker = groupBy { (_, brokerStep) -> brokerStep.parentBroker() }
             .values
-            .map { steps -> steps.sortedByDescending { (_, brokerStep) -> brokerStep.estimatedCostMs() } }
-            .sortedByDescending { steps -> steps.first().second.estimatedCostMs() }
+            .map { steps -> steps.sortedByDescending { (_, brokerStep) -> brokerStep.estimatedCostMs(gatedActionDelayMs) } }
+            .sortedByDescending { steps -> steps.first().second.estimatedCostMs(gatedActionDelayMs) }
 
         val deepest = perParentBroker.maxOfOrNull { it.size } ?: 0
         return (0 until deepest).flatMap { index ->
@@ -148,8 +148,8 @@ class RealPirWorkDistributor @Inject constructor(
 
     private fun BrokerStep.parentBroker(): String = broker.parent ?: broker.url
 
-    private fun BrokerStep.estimatedCostMs(): Long =
-        step.actions.count { it is Click || it is Expectation } * GATED_ACTION_PUSH_DELAY_MS +
+    private fun BrokerStep.estimatedCostMs(gatedActionDelayMs: Long): Long =
+        step.actions.count { it is Click || it is Expectation } * gatedActionDelayMs +
             step.actions.count { it is FillForm } * OPT_OUT_FILL_FORM_PUSH_DELAY_MS +
             step.actions.count { it is SolveCaptcha } * CAPTCHA_SOLVE_COST_MS +
             step.actions.size * ACTION_BASE_COST_MS

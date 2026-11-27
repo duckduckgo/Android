@@ -27,6 +27,7 @@ import com.duckduckgo.pir.impl.callbacks.PirCallbacks
 import com.duckduckgo.pir.impl.common.BrokerStepsParser
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStep.OptOutStep
 import com.duckduckgo.pir.impl.common.BrokerStepsParser.BrokerStepActions.OptOutStepActions
+import com.duckduckgo.pir.impl.common.FakePirGatedActionDelayProvider
 import com.duckduckgo.pir.impl.common.PirJob.RunType.OPTOUT
 import com.duckduckgo.pir.impl.common.PirWebViewCountProvider
 import com.duckduckgo.pir.impl.common.PirWebViewDataCleaner
@@ -91,7 +92,7 @@ class RealPirOptOutTest {
             pirActionsRunnerFactory = mockPirActionsRunnerFactory,
             currentTimeProvider = mockCurrentTimeProvider,
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            pirWorkDistributor = RealPirWorkDistributor(mockPirRemoteFeatures),
+            pirWorkDistributor = RealPirWorkDistributor(mockPirRemoteFeatures, FakePirGatedActionDelayProvider()),
             callbacks = mockCallbacks,
             webViewDataCleaner = mockWebViewDataCleaner,
             pirWebViewCountProvider = mockPirWebViewCountProvider,

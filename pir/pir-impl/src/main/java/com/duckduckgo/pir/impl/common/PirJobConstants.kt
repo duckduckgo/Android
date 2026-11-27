@@ -21,10 +21,16 @@ object PirJobConstants {
     const val RECOVERY_URL = "https://duckduckgo.com/"
 
     /**
-     * Fixed delay applied before pushing Click and Expectation actions to the page, giving the
-     * site time to finish loading (mirrors macOS).
+     * Delay applied before pushing Click and Expectation actions to the page, giving the site time
+     * to finish loading (mirrors macOS). Remote config can override it within the bounds below.
      */
-    const val GATED_ACTION_PUSH_DELAY_MS = 3_000L
+    const val DEFAULT_GATED_ACTION_PUSH_DELAY_MS = 3_000L
+    const val MIN_GATED_ACTION_PUSH_DELAY_MS = 0L
+
+    /**
+     * Stays well under the 60s local timeout that starts before the delay in [PirActionsRunner].
+     */
+    const val MAX_GATED_ACTION_PUSH_DELAY_MS = 15_000L
 
     /**
      * Fixed delay applied before pushing FillForm actions during opt-out and email-confirmation
