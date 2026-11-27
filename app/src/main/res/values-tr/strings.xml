@@ -948,6 +948,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Atla</string>
 
     <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportYourPasswordsTitle">Şifrelerini içe aktar</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Onları Google\'dan veya başka bir şifre yöneticisinden aktaracağım. Telefonunun kilidini açman veya oturum açman gerekebilir.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Şifreleri İçe Aktar</string>
     <string name="preOnboardingImportCompleteTitle">İçe aktarma tamamlandı</string>
     <string name="preOnboardingImportCompleteCta">Devam et</string>
     <string name="preOnboardingImportCompleteParsingTitle">Şifreler içe aktarılıyor</string>
