@@ -21,6 +21,7 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.BuildFlavor
 import com.duckduckgo.browsermode.api.BrowserMode
+import com.duckduckgo.dataclearing.api.plugin.ClearableData
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import kotlinx.coroutines.async
@@ -320,6 +321,141 @@ class ClientToolPixelsTest {
         requestAccess("listOpenTabs")
 
         assertEquals(listOf(mapOf("decision" to "unavailable")), pixel.fired.map { it.parameters })
+    }
+
+    @Test
+    fun whenQueuedCallIsWithdrawnBeforeItsPromptOpensThenItReportsNoPermissionPath() = runTest {
+        val executor = executor()
+        val first = async { executor.execute(request("searchHistory"), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val queued = async { executor.execute(request("searchBookmarks"), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+
+        executor.cancelPendingCalls(CHAT_TAB_ID, contextual = false)
+        first.await()
+        queued.await()
+
+        assertEquals(
+            listOf("search_history" to "prompt", "search_bookmarks" to "none"),
+            pixel.named(ClientToolPixels.CALL).map { it.parameters["tool"] to it.parameters["permission_path"] },
+        )
+        assertEquals(listOf("search_history"), pixel.named(ClientToolPixels.PROMPT_ANSWERED).map { it.parameters["tool"] })
+    }
+
+    @Test
+    fun whenCallerIsCancelledWithPromptOpenThenPromptIsWithdrawn() = runTest {
+        val reply = executeAsync("searchHistory")
+
+        reply.cancel()
+        runCurrent()
+
+        assertEquals("withdrawn", pixel.named(ClientToolPixels.PROMPT_ANSWERED).single().parameters["answer"])
+    }
+
+    @Test
+    fun whenBatchRequestTimesOutBeforeItsPromptOpensThenNothingCountsAsAsked() = runTest {
+        enableRequestAccess()
+        val executor = executor { testScheduler.currentTime }
+        val call = async { executor.execute(request("searchHistory"), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        val input = JSONObject().put("capabilities", JSONArray(listOf("searchBookmarks"))).toString()
+        val access = async { executor.execute(request("requestAccess", 1, input), DUCK_AI_URL, CHAT_TAB_ID, BrowserMode.REGULAR) }
+        runCurrent()
+
+        advanceTimeBy(120_001)
+        call.await()
+        access.await()
+
+        assertEquals(
+            mapOf("decision" to "timeout", "requested" to "1", "asked" to "0", "removed" to "0"),
+            pixel.named(ClientToolPixels.ACCESS_REQUESTED).single().parameters,
+        )
+        assertEquals("denied", pixel.named(ClientToolPixels.ACCESS_RESULT).single().parameters["access"])
+    }
+
+    @Test
+    fun whenFireClearsChatsThenPromptNumbersRestartButResetAllKeepsThem() = runTest {
+        enableRequestAccess()
+        suspend fun denyPrompt() {
+            val reply = executeAsync("searchHistory")
+            prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+            reply.await()
+        }
+
+        denyPrompt()
+        chatGrants.revokeAll()
+        denyPrompt()
+        ClientToolChatGrantsClearingPlugin(chatGrants).onClearData(setOf(ClearableData.BrowserData.All))
+        denyPrompt()
+
+        assertEquals(
+            listOf("1", "2", "1"),
+            pixel.named(ClientToolPixels.PROMPT_ANSWERED).map { it.parameters["prompt_number_in_chat"] },
+        )
+    }
+
+    @Test
+    fun whenToolIsAlwaysAllowedThenCallTakesTheAlwaysPath() = runTest {
+        store.choices["searchHistory"] = ClientToolPermission.ALWAYS_ALLOW
+
+        execute("searchHistory")
+
+        assertEquals("always", pixel.named(ClientToolPixels.CALL).single().parameters["permission_path"])
+    }
+
+    @Test
+    fun whenToolRunsThenDurationIsBucketedAtEachEdge() = runTest {
+        val buckets = listOf(
+            99L to "lt_100ms",
+            100L to "lt_500ms",
+            499L to "lt_500ms",
+            500L to "lt_2s",
+            1_999L to "lt_2s",
+            2_000L to "lt_10s",
+            9_999L to "lt_10s",
+            10_000L to "gte_10s",
+        )
+
+        buckets.forEach { (millis, _) ->
+            listOpenTabs.result = {
+                now += millis
+                ClientToolResult.Success(JSONObject().put("tabs", JSONArray()))
+            }
+            execute("listOpenTabs")
+        }
+
+        assertEquals(buckets.map { it.second }, pixel.named(ClientToolPixels.CALL).map { it.parameters["duration"] })
+    }
+
+    @Test
+    fun whenToolReturnsResultsThenCountIsBucketedAtEachEdge() = runTest {
+        val buckets = listOf(0 to "0", 1 to "1-5", 5 to "1-5", 6 to "6-20", 20 to "6-20", 21 to "21_plus")
+
+        buckets.forEach { (count, _) ->
+            listOpenTabs.result = { ClientToolResult.Success(JSONObject().put("tabs", JSONArray(List(count) { it }))) }
+            execute("listOpenTabs")
+        }
+
+        assertEquals(buckets.map { it.second }, pixel.named(ClientToolPixels.CALL).map { it.parameters["result_count"] })
+    }
+
+    @Test
+    fun whenPromptIsAnsweredThenTimeToAnswerIsBucketedAtEachEdge() = runTest {
+        val buckets = listOf(
+            1_999L to "lt_2s",
+            2_000L to "lt_10s",
+            9_999L to "lt_10s",
+            10_000L to "lt_60s",
+            59_999L to "lt_60s",
+            60_000L to "gte_60s",
+        )
+
+        buckets.forEach { (millis, _) ->
+            val reply = executeAsync("searchHistory")
+            now += millis
+            prompt.current.answer(ClientToolPermissionAnswer.DontAllow)
+            reply.await()
+        }
+
+        assertEquals(buckets.map { it.second }, pixel.named(ClientToolPixels.PROMPT_ANSWERED).map { it.parameters["time_to_answer"] })
     }
 
     private suspend fun execute(

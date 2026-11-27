@@ -198,8 +198,10 @@ class RealClientToolsExecutor @Inject constructor(
         }
         val path = when (val decision = permissionGate.decide(tool, context, promptDetail)) {
             is ClientToolPermissionDecision.Denied -> return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.DENIED), decision.path)
-            ClientToolPermissionDecision.Cancelled ->
-                return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.CANCELLED), ClientToolPermissionPath.PROMPT)
+            is ClientToolPermissionDecision.Cancelled -> {
+                val path = ClientToolPermissionPath.PROMPT.takeIf { decision.promptShown }
+                return FinishedCall(ClientToolResult.Failure(ClientToolErrorCode.CANCELLED), path)
+            }
             is ClientToolPermissionDecision.Allowed -> decision.path
         }
         // Remote config can turn the tool off while its prompt is open.

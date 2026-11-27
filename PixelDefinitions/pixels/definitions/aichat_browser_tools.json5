@@ -116,7 +116,7 @@
             {
                 "key": "permission_path",
                 "type": "string",
-                "description": "What let the call run or stopped it: auto = the tool doesn't ask, always = stored Always Allow, chat = allowed for this chat earlier, prompt = the user was asked for this call, never = stored Never Allow, none = refused before permission was looked at",
+                "description": "What let the call run or stopped it: auto = the tool doesn't ask, always = stored Always Allow, chat = allowed for this chat earlier, prompt = the user was asked for this call, never = stored Never Allow, none = refused before permission was looked at, or ended while still waiting behind another prompt in the chat",
                 "enum": ["auto", "always", "chat", "prompt", "never", "none"]
             },
             {
@@ -136,7 +136,7 @@
     "m_aichat_tools_prompt_answered": {
         "description": "Fired when a Duck.ai browser tool permission prompt for one tool closes, answered or not. requestAccess prompts are not included.",
         "owners": ["malmstein"],
-        "triggers": ["user_interaction"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
@@ -180,7 +180,7 @@
     "m_aichat_tools_access_requested": {
         "description": "Fired when a Duck.ai requestAccess call finishes: Duck.ai asked once for the browser tools a chat expects to use. Not fired in Fire mode.",
         "owners": ["malmstein"],
-        "triggers": ["user_interaction"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
@@ -208,7 +208,7 @@
             {
                 "key": "decision",
                 "type": "string",
-                "description": "allow or dont_allow = the user's answer, timeout = unanswered until the 120 s deadline, withdrawn = closed because the call was cancelled or its chat went away, no_prompt = nothing needed asking, invalid = the call could not be read or named a tool that asks every time, unavailable = batch access is off",
+                "description": "allow or dont_allow = the user's answer, timeout = unanswered until the 120 s deadline, withdrawn = closed because the call was cancelled or its chat went away, no_prompt = nothing needed asking, invalid = the call could not be read, carried no chat ID or named a tool that asks every time, unavailable = batch access is off or the call named a version this app does not know",
                 "enum": ["allow", "dont_allow", "timeout", "withdrawn", "no_prompt", "invalid", "unavailable"]
             }
         ]
@@ -216,7 +216,7 @@
     "m_aichat_tools_access_result": {
         "description": "Fired once per requested tool when a Duck.ai requestAccess call finishes, after m_aichat_tools_access_requested. Names this app doesn't know are not sent. Not fired in Fire mode.",
         "owners": ["malmstein"],
-        "triggers": ["user_interaction"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
         "suffixes": ["form_factor"],
         "parameters": [
             "appVersion",
@@ -240,7 +240,7 @@
             {
                 "key": "access",
                 "type": "string",
-                "description": "granted = allowed for the chat in this prompt, removed = taken out by the user, denied = the prompt didn't allow it, already_allowed = allowed without asking, never = set to Never, unavailable = turned off",
+                "description": "granted = allowed for the chat in this prompt, removed = taken out by the user, denied = the prompt didn't allow it, or the request ended before its prompt opened, already_allowed = allowed without asking, never = set to Never, unavailable = turned off",
                 "enum": ["granted", "removed", "denied", "already_allowed", "never", "unavailable"]
             }
         ]

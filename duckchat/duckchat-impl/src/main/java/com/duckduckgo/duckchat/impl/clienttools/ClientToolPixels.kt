@@ -186,7 +186,9 @@ class ClientToolPixels @Inject constructor(
         else -> when (outcome.access[toolName]) {
             ClientToolAccessLevel.DEFAULT, ClientToolAccessLevel.ALWAYS, ClientToolAccessLevel.CHAT -> "already_allowed"
             ClientToolAccessLevel.NEVER -> "never"
-            ClientToolAccessLevel.NOT_GRANTED, null -> "unavailable"
+            // Still needing an answer: the request ended before its prompt opened.
+            ClientToolAccessLevel.NOT_GRANTED -> "denied"
+            null -> "unavailable"
         }
     }
 

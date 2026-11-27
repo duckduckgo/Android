@@ -22,6 +22,7 @@ import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -61,8 +62,11 @@ sealed interface ClientToolPermissionDecision {
 
     data class Denied(val path: ClientToolPermissionPath) : ClientToolPermissionDecision
 
-    /** The prompt went unanswered: it timed out, or the call was cancelled. */
-    data object Cancelled : ClientToolPermissionDecision
+    /**
+     * The call timed out or was cancelled before an answer.
+     * @param promptShown whether its prompt had opened, rather than the call still waiting behind another prompt in the chat.
+     */
+    data class Cancelled(val promptShown: Boolean) : ClientToolPermissionDecision
 }
 
 /** What let a call run or stopped it. */
@@ -183,26 +187,30 @@ class RealClientToolPermissionGate @Inject constructor(
         }
         var shown: ShownPrompt? = null
         fun show() = ShownPrompt(promptNumber(context), timeProvider.elapsedRealtime()).also { shown = it }
-        // Re-checked once the lock is ours: the prompt this call queued behind may have settled it.
-        val turn = awaitTurn(context.chatHost()) {
-            when (val now = standing(tool, context)) {
-                is Standing.Allowed -> now.decision()
-                Standing.Denied -> DENIED_BY_NEVER
-                is Standing.NeedsPrompt -> ask(now.tool, context, show())
-                is Standing.NeedsPromptEveryTime -> askOnce(now.copy, promptDetail.orEmpty(), context, show())
-            }
+        fun closed(answer: ClientToolPromptAnswer?) {
+            val prompt = shown ?: return
+            val closedAs = prompt.answer ?: answer ?: return
+            pixels.promptClosed(tool.name, closedAs, prompt.numberInChat, timeProvider.elapsedRealtime() - prompt.shownAt)
         }
-        shown?.let { prompt ->
-            val answer = when (turn) {
-                is Turn.Decided -> prompt.answer
-                Turn.TimedOut -> ClientToolPromptAnswer.TIMEOUT
-                Turn.Withdrawn -> ClientToolPromptAnswer.WITHDRAWN
+        // Re-checked once the lock is ours: the prompt this call queued behind may have settled it.
+        val turn = try {
+            awaitTurn(context.chatHost()) {
+                when (val now = standing(tool, context)) {
+                    is Standing.Allowed -> now.decision()
+                    Standing.Denied -> DENIED_BY_NEVER
+                    is Standing.NeedsPrompt -> ask(now.tool, context, show())
+                    is Standing.NeedsPromptEveryTime -> askOnce(now.copy, promptDetail.orEmpty(), context, show())
+                }
             }
-            answer?.let { pixels.promptClosed(tool.name, it, prompt.numberInChat, timeProvider.elapsedRealtime() - prompt.shownAt) }
+        } catch (e: CancellationException) {
+            // The caller went away, such as a closed Duck.ai tab, which withdraws its open prompt.
+            closed(ClientToolPromptAnswer.WITHDRAWN)
+            throw e
         }
         return when (turn) {
-            is Turn.Decided -> turn.value
-            Turn.TimedOut, Turn.Withdrawn -> ClientToolPermissionDecision.Cancelled
+            is Turn.Decided -> turn.value.also { closed(null) }
+            Turn.TimedOut -> ClientToolPermissionDecision.Cancelled(shown != null).also { closed(ClientToolPromptAnswer.TIMEOUT) }
+            Turn.Withdrawn -> ClientToolPermissionDecision.Cancelled(shown != null).also { closed(ClientToolPromptAnswer.WITHDRAWN) }
         }
     }
 
@@ -212,13 +220,16 @@ class RealClientToolPermissionGate @Inject constructor(
         context: ClientToolCallContext,
     ): ClientToolAccessOutcome {
         val accessContext = context.copy(chatId = chatId)
-        var asked = tools.filter { standing(it, accessContext) is Standing.NeedsPrompt }.map { it.name }
-        if (asked.isEmpty()) return ClientToolAccessOutcome(ClientToolAccessAnswer.NO_PROMPT, accessNow(tools, accessContext))
+        if (tools.none { standing(it, accessContext) is Standing.NeedsPrompt }) {
+            return ClientToolAccessOutcome(ClientToolAccessAnswer.NO_PROMPT, accessNow(tools, accessContext))
+        }
+        // Only set once the prompt opens, so a request that ends while queued behind another prompt reports none asked.
+        var asked = emptySet<String>()
         var removed = emptySet<String>()
         val turn = awaitTurn(context.chatHost()) {
             val toAsk = tools.mapNotNull { (standing(it, accessContext) as? Standing.NeedsPrompt)?.tool }
-            asked = toAsk.map { it.name }
             if (toAsk.isEmpty()) return@awaitTurn ClientToolAccessAnswer.NO_PROMPT
+            asked = toAsk.map { it.name }.toSet()
             val request = ClientToolPermissionRequest.GrantAccess(
                 context.chatTabId,
                 context.browserMode,
@@ -228,7 +239,7 @@ class RealClientToolPermissionGate @Inject constructor(
             )
             when (val answer = prompt.request(request)) {
                 is ClientToolPermissionAnswer.AllowForChat -> {
-                    removed = answer.removedTools intersect asked.toSet()
+                    removed = answer.removedTools intersect asked
                     chatGrants.grant(chatId, asked - removed)
                     ClientToolAccessAnswer.ALLOW
                 }
@@ -240,8 +251,7 @@ class RealClientToolPermissionGate @Inject constructor(
             Turn.TimedOut -> ClientToolAccessAnswer.TIMEOUT
             Turn.Withdrawn -> ClientToolAccessAnswer.WITHDRAWN
         }
-        val shown = if (answer == ClientToolAccessAnswer.NO_PROMPT) emptySet() else asked.toSet()
-        return ClientToolAccessOutcome(answer, accessNow(tools, accessContext), shown, removed)
+        return ClientToolAccessOutcome(answer, accessNow(tools, accessContext), asked, removed)
     }
 
     override fun cancelPending(
