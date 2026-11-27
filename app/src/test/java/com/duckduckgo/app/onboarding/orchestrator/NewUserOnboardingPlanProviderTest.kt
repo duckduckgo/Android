@@ -1867,6 +1867,12 @@ class NewUserOnboardingPlanProviderTest {
     }
 
     @Test
+    fun whenDefaultPlanInPasswordImportTreatmentThenNoImportSteps() = runTest {
+        whenever(passwordImportExperiment.enroll()).thenReturn(OnboardingPasswordImportVariant.TREATMENT)
+        assertNoPasswordImportSteps(stepIds())
+    }
+
+    @Test
     fun whenSegmentedSearchPathInPasswordImportTreatmentThenImportStepsPrecedeAddressBarStep() = runTest {
         assertPasswordImportStepsRightBeforeAddressBarStep(
             segmentedPlanStepIds(DownloadReasonSelection.SEARCH, OnboardingPasswordImportVariant.TREATMENT),
@@ -1990,12 +1996,8 @@ class NewUserOnboardingPlanProviderTest {
 
     private suspend fun startAtPasswordImport() {
         whenever(passwordImportExperiment.enroll()).thenReturn(OnboardingPasswordImportVariant.TREATMENT)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        startSegmentedAtTogglePosition()
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(togglePositionOptions.first()))
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
     }
 

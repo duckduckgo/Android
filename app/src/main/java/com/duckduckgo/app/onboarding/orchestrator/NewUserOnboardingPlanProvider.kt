@@ -178,8 +178,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
 
         val quickSetupPlan = quickSetupPlan(ctx)
 
-        val showPasswordImport = onboardingPasswordImportExperimentManager.enroll() == OnboardingPasswordImportVariant.TREATMENT
-
         return rootPlan(
             ctx = ctx,
             onCompleted = onCompleted,
@@ -193,7 +191,6 @@ class NewUserOnboardingPlanProvider @Inject constructor(
                 add(comparisonChartStep())
                 add(defaultBrowserPromptStep())
                 addAll(widgetSteps(ctx))
-                addAll(passwordImportSteps(ctx, showPasswordImport))
                 add(addressBarPositionStep())
                 add(inputScreenStep(ctx))
                 add(
