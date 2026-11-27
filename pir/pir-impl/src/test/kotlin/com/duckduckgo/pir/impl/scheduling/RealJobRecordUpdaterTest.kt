@@ -692,7 +692,7 @@ class RealJobRecordUpdaterTest {
         }
 
     @Test
-    fun whenMarkReappearedProfilesWithReappearedRemovedProfileThenRevertsToRequestedAndClearsRemovedDate() =
+    fun whenMarkReappearedProfilesWithReappearedRemovedProfileThenRevertsToNotExecutedAndClearsRemovedDate() =
         runTest {
             // Stored profile1 was previously marked REMOVED; the new scan re-finds it -> reappearance
             val storedProfiles = listOf(testExtractedProfile1)
@@ -712,7 +712,7 @@ class RealJobRecordUpdaterTest {
             val result = toTest.markReappearedOptOutJobRecords(newProfiles, testBrokerName, testProfileQueryId)
 
             val expectedRecord = removedOptOutJobRecord.copy(
-                status = OptOutJobStatus.REQUESTED,
+                status = OptOutJobStatus.NOT_EXECUTED,
                 optOutRemovedDateInMillis = 0L,
             )
             verify(mockSchedulingRepository).saveOptOutJobRecord(expectedRecord)
