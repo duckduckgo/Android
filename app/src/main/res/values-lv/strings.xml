@@ -966,6 +966,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Izlaist</string>
 
     <!-- Pre-onboarding: import passwords -->
+    <string name="preOnboardingImportYourPasswordsTitle">Importē savas paroles</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Es tās importēšu no Google vai cita paroļu pārvaldnieka. Iespējams, tev vajadzēs atbloķēt tālruni vai pierakstīties.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Importēt paroles</string>
     <string name="preOnboardingImportCompleteTitle">Importēšana pabeigta</string>
     <string name="preOnboardingImportCompleteCta">Turpināt</string>
     <string name="preOnboardingImportCompleteParsingTitle">Paroļu importēšana</string>
