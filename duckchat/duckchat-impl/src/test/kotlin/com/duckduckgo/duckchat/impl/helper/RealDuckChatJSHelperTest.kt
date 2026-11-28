@@ -3134,7 +3134,22 @@ class RealDuckChatJSHelperTest {
         )
 
         verify(mockResponseWaitWideEvent).onResponseState("tab-1", "start_stream:restart_stream")
-        verify(mockAttentionTracker).onResponseState("tab-1", "start_stream:restart_stream")
+        verify(mockAttentionTracker).onResponseState("tab-1", "start_stream:restart_stream", BrowserMode.REGULAR)
+    }
+
+    @Test
+    fun `responseState in full mode passes browser mode to the tracker`() = runTest {
+        testee.processJsCallbackMessage(
+            "aiChat",
+            "responseState",
+            "123",
+            JSONObject(mapOf("status" to "streaming")),
+            pageContext = viewModel.updatedPageContext,
+            tabId = "tab",
+            browserMode = BrowserMode.FIRE,
+        )
+
+        verify(mockAttentionTracker).onResponseState("tab", "streaming", BrowserMode.FIRE)
     }
 
     @Test

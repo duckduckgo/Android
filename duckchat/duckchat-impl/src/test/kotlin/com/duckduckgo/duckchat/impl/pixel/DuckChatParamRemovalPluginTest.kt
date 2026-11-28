@@ -37,4 +37,9 @@ class DuckChatParamRemovalPluginTest {
             .filter { it.name.startsWith("DUCK_CHAT_CONTEXTUAL_ADDRESS_BAR_MENU_") }
             .forEach { assertEquals(it.pixelName, PixelParameter.removeAtb(), names[it.pixelName]) }
     }
+
+    @Test
+    fun whenResponseReadyWaitTimedOutThenAtbIsRemoved() {
+        assertEquals(PixelParameter.removeAtb(), names[DuckChatPixelName.DUCK_CHAT_RESPONSE_READY_WAIT_TIMED_OUT.pixelName])
+    }
 }

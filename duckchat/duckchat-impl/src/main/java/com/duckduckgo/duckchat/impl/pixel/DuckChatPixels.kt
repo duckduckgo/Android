@@ -234,6 +234,7 @@ interface DuckChatPixels {
     fun reportRespondingServiceStartFailed(reason: RespondingServiceStartFailure)
     fun reportRespondingServiceInterrupted(restricted: Boolean)
     fun reportRespondingServiceTimedOut()
+    fun reportResponseReadyWaitTimedOut()
 
     fun fireImageGenerationSelected(surface: DuckChatPixelSurface)
     fun fireImageGenerationDeselected(surface: DuckChatPixelSurface)
@@ -1017,6 +1018,10 @@ class RealDuckChatPixels @Inject constructor(
         pixel.fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT)
     }
 
+    override fun reportResponseReadyWaitTimedOut() {
+        pixel.fire(DuckChatPixelName.DUCK_CHAT_RESPONSE_READY_WAIT_TIMED_OUT)
+    }
+
     override fun fireImageGenerationSelected(surface: DuckChatPixelSurface) = fireCountAndDaily(
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_COUNT,
         DuckChatPixelName.DUCK_CHAT_UNIFIED_INPUT_IMAGE_GENERATION_SELECTED_DAILY,
@@ -1731,7 +1736,8 @@ enum class DuckChatPixelName(override val pixelName: String) : Pixel.PixelName {
     DUCK_CHAT_RESPONDING_SERVICE_STARTED("aichat_responding-service_started"),
     DUCK_CHAT_RESPONDING_SERVICE_START_FAILED("aichat_responding-service_start_failed"),
     DUCK_CHAT_RESPONDING_SERVICE_INTERRUPTED("aichat_responding-service_interrupted"),
-    DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT("aichat_responding-service_timed_out"),
+    DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT("aichat_responding-service_timed-out"),
+    DUCK_CHAT_RESPONSE_READY_WAIT_TIMED_OUT("aichat_response-ready_wait_timed-out"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST("m_aichat_contextual_fire_button_tapped_first"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_DAILY("m_aichat_contextual_fire_button_tapped_daily"),
     DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_COUNT("m_aichat_contextual_fire_button_tapped_count"),
@@ -2163,6 +2169,7 @@ class DuckChatParamRemovalPlugin @Inject constructor() : PixelParamRemovalPlugin
             DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_START_FAILED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_INTERRUPTED.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT.pixelName to PixelParameter.removeAtb(),
+            DuckChatPixelName.DUCK_CHAT_RESPONSE_READY_WAIT_TIMED_OUT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_COUNT.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_SETTINGS_DEFAULT_TOGGLE_POSITION_CHANGED_DAILY.pixelName to PixelParameter.removeAtb(),
             DuckChatPixelName.DUCK_CHAT_CONTEXTUAL_FIRE_BUTTON_TAPPED_FIRST.pixelName to PixelParameter.removeAtb(),

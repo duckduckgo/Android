@@ -1227,4 +1227,11 @@ class RealDuckChatPixelsTest {
 
         verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONDING_SERVICE_TIMED_OUT)
     }
+
+    @Test
+    fun `when response ready wait timed out then pixel sent`() {
+        testee.reportResponseReadyWaitTimedOut()
+
+        verify(mockPixel).fire(DuckChatPixelName.DUCK_CHAT_RESPONSE_READY_WAIT_TIMED_OUT)
+    }
 }

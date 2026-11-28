@@ -1038,8 +1038,15 @@
             }
         ]
     },
-    "aichat_responding-service_timed_out": {
-        "description": "Android's shortService time limit ended the Duck.ai responding foreground service before the app stopped it.",
+    "aichat_responding-service_timed-out": {
+        "description": "The 3-minute limit (Android's onTimeout or the app's own timer) ended the Duck.ai responding foreground service before the app stopped it.",
+        "owners": ["LukasPaczos"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "aichat_response-ready_wait_timed-out": {
+        "description": "The app stopped awaiting a Duck.ai response the user left because the time limit passed before the response was ready.",
         "owners": ["LukasPaczos"],
         "triggers": ["feature_lifecycle"],
         "suffixes": ["form_factor"],
