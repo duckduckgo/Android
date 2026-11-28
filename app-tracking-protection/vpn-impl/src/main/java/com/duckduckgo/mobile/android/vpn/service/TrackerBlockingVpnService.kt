@@ -72,9 +72,7 @@ import dev.zacsweers.metro.ContributesTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import logcat.LogPriority.ERROR
@@ -163,6 +161,31 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     private val serviceDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
 
+    // Scope handed to VpnServiceCallbacks. Plugins launch long-lived work in it (e.g. collectors), so it must not be the scope of the
+    // running VPN operation: that operation would then never complete and block every queued operation behind it
+    private val vpnCallbacksScope = CoroutineScope(coroutineContext + serviceDispatcher)
+
+    // Start, restart and stop requests each suspend at several points, so they run here one at a time, to completion
+    private val vpnOperations = VpnOperationQueue(scope = this, dispatcher = serviceDispatcher) { operation ->
+        when (operation) {
+            is VpnOperation.Start -> {
+                if (operation.waitForForeground) {
+                    // Give Android a moment to complete foreground transition
+                    // You might think this is a hack (and it kind of is)
+                    // but it's a workaround to avoid early establish() binding failures
+                    delay(100)
+                }
+                startVpn(operation.alwaysOnTriggered, operation.startId)
+            }
+            is VpnOperation.Stop -> stopVpn(operation.reason, operation.startId)
+            VpnOperation.Destroy -> vpnNetworkStack.onDestroyVpn()
+        }
+    }
+
+    // Start id of the latest onStartCommand. Written on the main thread, read by onRevoke, which can run on a binder thread
+    @Volatile
+    private var latestStartId = 0
+
     private var vpnNetworkStack: VpnNetworkStack by VpnNetworkStackDelegate(
         provider = {
             runBlocking { vpnNetworkStackProvider.provideNetworkStack() }
@@ -224,7 +247,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     override fun onDestroy() {
         logcat { "VPN log: onDestroy" }
-        vpnNetworkStack.onDestroyVpn()
+        vpnOperations.submit(VpnOperation.Destroy)
         super.onDestroy()
     }
 
@@ -239,23 +262,16 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             }.getOrElse { false }
         }
 
-        logcat { "VPN log: onStartCommand: ${intent?.action}" }
+        logcat { "VPN log: onStartCommand: ${intent?.action}, startId=$startId" }
+        latestStartId = startId
 
         when (val action = intent?.action) {
             null, ACTION_START_VPN, ACTION_ALWAYS_ON_START -> {
                 if (notifyVpnStart()) {
                     vpnEnableWideEvent.onNotifyVpnStartSuccess()
-                    synchronized(this) {
-                        launch(serviceDispatcher) {
-                            // Give Android a moment to complete foreground transition
-                            // You might think this is a hack (and it kind of is)
-                            // but it's a workaround to avoid early establish() binding failures
-                            delay(100)
-                            async {
-                                startVpn(intent.alwaysOnTriggered())
-                            }.await()
-                        }
-                    }
+                    vpnOperations.submit(
+                        VpnOperation.Start(alwaysOnTriggered = intent.alwaysOnTriggered(), waitForForeground = true, startId = startId),
+                    )
                 } else {
                     logcat(ERROR) { "notifyStart return error, aborting" }
                     vpnEnableWideEvent.onNotifyVpnStartFailed()
@@ -266,23 +282,11 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 }
             }
             ACTION_STOP_VPN, ACTION_SNOOZE_VPN -> {
-                synchronized(this) {
-                    launch(serviceDispatcher) {
-                        async {
-                            val snoozeTriggerAtMillisExtra = intent.getLongExtra(ACTION_SNOOZE_VPN_EXTRA, 0L)
-                            stopVpn(VpnStopReason.SELF_STOP(snoozeTriggerAtMillisExtra))
-                        }.await()
-                    }
-                }
+                val snoozeTriggerAtMillisExtra = intent.getLongExtra(ACTION_SNOOZE_VPN_EXTRA, 0L)
+                vpnOperations.submit(VpnOperation.Stop(VpnStopReason.SELF_STOP(snoozeTriggerAtMillisExtra), startId))
             }
             ACTION_RESTART_VPN -> {
-                synchronized(this) {
-                    launch(serviceDispatcher) {
-                        async {
-                            startVpn()
-                        }.await()
-                    }
-                }
+                vpnOperations.submit(VpnOperation.Start(alwaysOnTriggered = false, waitForForeground = false, startId = startId))
             }
             else -> logcat(ERROR) { "Unknown intent action: $action" }
         }
@@ -298,25 +302,35 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         }
     }
 
-    private suspend fun startVpn(isAlwaysOnTriggered: Boolean = false) = withContext(serviceDispatcher) {
-        suspend fun updateNetworkStackUponRestart() {
+    private suspend fun startVpn(
+        isAlwaysOnTriggered: Boolean,
+        startId: Int,
+    ) = withContext(serviceDispatcher) {
+        /** Returns the failure when the current stack could not be stopped: it is then left running, not destroyed. */
+        suspend fun updateNetworkStackUponRestart(): Result<Unit> {
             logcat { "VPN log: updating the networking stack" }
             logcat { "VPN log: CURRENT network ${vpnNetworkStack.name}" }
-            // stop the current networking stack
-            vpnNetworkStack.onStopVpn(VpnStopReason.RESTART)
-            vpnNetworkStack.onDestroyVpn()
             // maybe we have changed the networking stack. Read it again: the main process registers VPN features in multiprocess
-            // prefs right before restarting, and this process may only see that write by now
-            vpnNetworkStack = vpnNetworkStackProvider.provideNetworkStack()
+            // prefs right before restarting, and this process may only see that write by now. It's read before the current stack
+            // is stopped so that nothing suspends between destroying the current stack and creating the next one
+            val nextNetworkStack = vpnNetworkStackProvider.provideNetworkStack()
+            // stop the current networking stack
+            vpnNetworkStack.onStopVpn(VpnStopReason.RESTART).onFailure {
+                logcat(ERROR) { "VPN log: error stopping ${vpnNetworkStack.name} for restart: ${it.asLog()}" }
+                return Result.failure(it)
+            }
+            vpnNetworkStack.onDestroyVpn()
+            vpnNetworkStack = nextNetworkStack
             vpnNetworkStack.onCreateVpnWithErrorReporting()
             logcat { "VPN log: NEW network ${vpnNetworkStack.name}" }
+            return Result.success(Unit)
         }
         deviceShieldPixels.reportVpnStartAttempt()
 
         runCatching {
             vpnServiceStateStatsDao.insert(createVpnState(state = ENABLING))
         }.onFailure {
-            stopVpn(VpnStopReason.ERROR, false)
+            stopVpn(VpnStopReason.ERROR, startId, false)
         }
 
         logcat { "VPN log: Starting VPN" }
@@ -329,7 +343,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         if (!restarting) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
                 logcat { "VPN log: onVpnStarting ${it.javaClass} callback" }
-                it.onVpnStarting(this)
+                it.onVpnStarting(vpnCallbacksScope)
             }
         } else {
             logcat { "VPN log: skipping service callbacks while restarting" }
@@ -382,7 +396,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
                 logcat(ERROR) { "VPN log: Failed to establish the null TUN interface" }
                 deviceShieldPixels.vpnEstablishNullTunInterfaceError()
                 vpnRestartWideEvent.onRestartFailed(FailureReason.NULL_TUNNEL_FAILED)
-                stopVpn(VpnStopReason.ERROR, false)
+                stopVpn(VpnStopReason.ERROR, startId, false)
                 return@withContext
             }
 
@@ -391,7 +405,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             if (restarting) {
                 logcat { "VPN log: restarting the tunnel" }
                 vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_SWITCH)
-                updateNetworkStackUponRestart()
+                if (updateNetworkStackUponRestart().isFailure) {
+                    runCatching { nullTun.close() }
+                    vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_STOP_FAILED)
+                    stopVpn(VpnStopReason.ERROR, startId, false)
+                    return@withContext
+                }
                 vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
             }
             activeTun = nullTun
@@ -405,7 +424,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             logcat(ERROR) { "VPN log: Failed to obtain config needed to establish the TUN interface" }
             vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_PREPARE_FAILED)
             handover?.abort()
-            stopVpn(VpnStopReason.ERROR, false)
+            stopVpn(VpnStopReason.ERROR, startId, false)
             return@withContext
         }
         vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_PREPARE)
@@ -424,14 +443,20 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             deviceShieldPixels.vpnEstablishTunInterfaceError()
             vpnRestartWideEvent.onRestartFailed(FailureReason.TUNNEL_ESTABLISH_FAILED)
             handover?.abort()
-            stopVpn(VpnStopReason.ERROR, false)
+            stopVpn(VpnStopReason.ERROR, startId, false)
             return@withContext
         }
         vpnRestartWideEvent.onPhaseCompleted(Phase.TUNNEL_ESTABLISH)
 
         handover?.let {
             vpnRestartWideEvent.onPhaseStarted(Phase.NETWORK_STACK_SWITCH)
-            it.switch()
+            if (it.switch().isFailure) {
+                runCatching { newTun.close() }
+                vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_STOP_FAILED)
+                it.abort()
+                stopVpn(VpnStopReason.ERROR, startId, false)
+                return@withContext
+            }
             vpnNetworkStack = it.next
             vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_SWITCH)
         }
@@ -449,7 +474,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnNetworkStack.onStartVpn(activeTun!!).getOrElse {
             logcat(ERROR) { "VPN log: Failed to start VPN" }
             vpnRestartWideEvent.onRestartFailed(FailureReason.NETWORK_STACK_START_FAILED)
-            stopVpn(VpnStopReason.ERROR, false)
+            stopVpn(VpnStopReason.ERROR, startId, false)
             return@withContext
         }
         vpnRestartWideEvent.onPhaseCompleted(Phase.NETWORK_STACK_START)
@@ -458,10 +483,10 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         vpnServiceCallbacksPluginPoint.getPlugins().forEach {
             if (restarting) {
                 logcat { "VPN log: onVpnReconfigured ${it.javaClass} callback" }
-                it.onVpnReconfigured(this)
+                it.onVpnReconfigured(vpnCallbacksScope)
             } else {
                 logcat { "VPN log: onVpnStarted ${it.javaClass} callback" }
-                it.onVpnStarted(this)
+                it.onVpnStarted(vpnCallbacksScope)
             }
         }
 
@@ -474,7 +499,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             vpnServiceStateStatsDao.insert(createVpnState(state = ENABLED))
         }.onFailure {
             // onVpnStarted or onVpnReconfigured already called, ie. hasVpnAlreadyStarted = true
-            stopVpn(VpnStopReason.ERROR, true)
+            stopVpn(VpnStopReason.ERROR, startId, true)
         }
 
         deviceShieldPixels.reportVpnStartAttemptSuccess()
@@ -672,6 +697,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     private suspend fun stopVpn(
         reason: VpnStopReason,
+        startId: Int,
         hasVpnAlreadyStarted: Boolean = true,
     ) = withContext(serviceDispatcher) {
         logcat { "VPN log: Stopping VPN. $reason" }
@@ -688,12 +714,12 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
         if (hasVpnAlreadyStarted) {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
                 logcat { "VPN log: stopping ${it.javaClass} callback" }
-                it.onVpnStopped(this, reason)
+                it.onVpnStopped(vpnCallbacksScope, reason)
             }
         } else {
             vpnServiceCallbacksPluginPoint.getPlugins().forEach {
                 logcat { "VPN log: onVpnStartFailed ${it.javaClass} callback" }
-                it.onVpnStartFailed(this)
+                it.onVpnStartFailed(vpnCallbacksScope)
             }
         }
 
@@ -706,8 +732,13 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
             runCatching { unbindService(vpnStateServiceConnection).also { vpnStateServiceReference = null } }
         }
 
-        stopForeground(true)
-        stopSelf()
+        // stopSelfResult, not stopSelf: stopSelf would destroy the service even when a start command arrived after this
+        // operation's, and onDestroy would then tear down the network stack under the start queued behind this stop
+        if (stopSelfResult(startId)) {
+            stopForeground(true)
+        } else {
+            logcat { "VPN log: a newer start command is queued, keeping the service in the foreground" }
+        }
     }
 
     private fun sendStopPixels(reason: VpnStopReason) {
@@ -727,7 +758,7 @@ class TrackerBlockingVpnService : VpnService(), CoroutineScope by MainScope(), V
 
     override fun onRevoke() {
         logcat(WARN) { "VPN log: onRevoke called" }
-        launch { stopVpn(VpnStopReason.REVOKED) }
+        vpnOperations.submit(VpnOperation.Stop(VpnStopReason.REVOKED, latestStartId))
     }
 
     override fun onLowMemory() {

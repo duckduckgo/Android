@@ -16,19 +16,23 @@
 
 package com.duckduckgo.mobile.android.vpn.integration
 
+import android.os.ParcelFileDescriptor
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.mobile.android.app.tracking.AppTrackerDetector
 import com.duckduckgo.mobile.android.vpn.apps.TrackingProtectionAppsRepository
 import com.duckduckgo.mobile.android.vpn.feature.AppTpLocalFeature
 import com.duckduckgo.mobile.android.vpn.network.FakeDnsProvider
 import com.duckduckgo.mobile.android.vpn.pixels.DeviceShieldPixels
+import com.duckduckgo.mobile.android.vpn.state.VpnStateMonitor.VpnStopReason
 import com.duckduckgo.vpn.network.api.*
 import com.duckduckgo.vpn.network.api.AddressRR
 import com.duckduckgo.vpn.network.api.DnsRR
 import com.duckduckgo.vpn.network.api.VpnNetwork
 import kotlinx.coroutines.test.runTest
+import org.junit.After
 import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Before
@@ -37,6 +41,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.*
 import java.net.InetAddress
+import java.util.concurrent.CopyOnWriteArrayList
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 
 private const val TRACKER_HOSTNAME = "api2.branch.com"
 
@@ -54,6 +61,10 @@ class NgVpnNetworkStackTest {
     private val trackingProtectionAppsRepository: TrackingProtectionAppsRepository = mock()
     private val appTpLocalFeature: AppTpLocalFeature = mock()
     private val deviceShieldPixels: DeviceShieldPixels = mock()
+
+    private val verboseLoggingToggle: Toggle = mock()
+    private val tunfd: ParcelFileDescriptor = mock()
+    private val fakeVpnNetwork = FakeVpnNetwork()
 
     private lateinit var fakeDnsProvider: FakeDnsProvider
     private lateinit var ngVpnNetworkStack: NgVpnNetworkStack
@@ -76,6 +87,140 @@ class NgVpnNetworkStackTest {
             coroutineRule.testDispatcherProvider,
             fakeDnsProvider,
         )
+        whenever(appTpLocalFeature.verboseLogging()).thenReturn(verboseLoggingToggle)
+        whenever(tunfd.fd).thenReturn(42)
+    }
+
+    @After
+    fun tearDown() {
+        fakeVpnNetwork.releaseStuckThreads()
+    }
+
+    private fun stackWith(network: VpnNetwork): NgVpnNetworkStack {
+        return NgVpnNetworkStack(
+            appBuildConfig,
+            lazy { network },
+            runtime,
+            appTrackerDetector,
+            trackingProtectionAppsRepository,
+            appTpLocalFeature,
+            deviceShieldPixels,
+            coroutineRule.testScope,
+            coroutineRule.testDispatcherProvider,
+            fakeDnsProvider,
+        )
+    }
+
+    @Test
+    fun whenOnCreateVpnWhileTunnelRunsThenTunnelThreadExitsBeforeContextIsDestroyed() {
+        val stack = stackWith(fakeVpnNetwork)
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+
+        assertTrue(stack.onCreateVpn().isSuccess)
+
+        assertEquals(
+            listOf("create:1", "start:1", "run:1", "stop:1", "run-exited:1", "destroy:1", "create:2"),
+            fakeVpnNetwork.events,
+        )
+    }
+
+    @Test
+    fun whenOnDestroyVpnWhileTunnelRunsThenTunnelThreadExitsBeforeContextIsDestroyed() {
+        val stack = stackWith(fakeVpnNetwork)
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+
+        assertTrue(stack.onDestroyVpn().isSuccess)
+
+        assertEquals(
+            listOf("create:1", "start:1", "run:1", "stop:1", "run-exited:1", "destroy:1"),
+            fakeVpnNetwork.events,
+        )
+    }
+
+    @Test
+    fun whenTunnelThreadNeverExitsThenStopFailsAfterBoundAndTheStuckPairIsDetachedWithoutDestroyingTheContext() {
+        fakeVpnNetwork.ignoreStop = true
+        val stack = stackWith(fakeVpnNetwork).apply { tunnelThreadJoinBoundMillis = 200 }
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+
+        val stopResult = stack.onStopVpn(VpnStopReason.RESTART)
+        fakeVpnNetwork.ignoreStop = false
+        val secondStopStartedAt = System.nanoTime()
+        val secondStopResult = stack.onStopVpn(VpnStopReason.RESTART)
+        val secondStopMillis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - secondStopStartedAt)
+        val destroyResult = stack.onDestroyVpn()
+
+        assertTrue(stopResult.exceptionOrNull() is TunnelThreadStopTimeoutException)
+        assertTrue(secondStopResult.isSuccess)
+        assertTrue("second stop joined the stuck thread for ${secondStopMillis}ms", secondStopMillis < 100)
+        assertTrue(destroyResult.isSuccess)
+        // context 1 is leaked: stopped once, never destroyed, and never stopped again
+        assertEquals(listOf("create:1", "start:1", "run:1", "stop:1"), fakeVpnNetwork.events)
+        verify(deviceShieldPixels, times(1)).reportTunnelThreadJoinBoundExceeded()
+    }
+
+    @Test
+    fun whenTheStuckTunnelThreadWasDetachedThenANewContextIsCreatedAndStarted() {
+        fakeVpnNetwork.ignoreStop = true
+        val stack = stackWith(fakeVpnNetwork).apply { tunnelThreadJoinBoundMillis = 200 }
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+        assertTrue(stack.onStopVpn(VpnStopReason.RESTART).exceptionOrNull() is TunnelThreadStopTimeoutException)
+        fakeVpnNetwork.ignoreStop = false
+
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+        assertTrue(stack.onStopVpn(VpnStopReason.RESTART).isSuccess)
+
+        assertEquals(
+            listOf("create:1", "start:1", "run:1", "stop:1", "create:2", "start:2", "run:2", "stop:2", "run-exited:2"),
+            fakeVpnNetwork.events,
+        )
+        verify(deviceShieldPixels, times(1)).reportTunnelThreadJoinBoundExceeded()
+    }
+
+    @Test
+    fun whenOnStartVpnWhileTunnelThreadAliveThenReturnFailure() {
+        val stack = stackWith(fakeVpnNetwork)
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+
+        assertTrue(stack.onStartVpn(tunfd).isFailure)
+        assertEquals(1, fakeVpnNetwork.events.count { it.startsWith("run:") })
+    }
+
+    @Test
+    fun whenStartStopDestroyCreateStartThenNewTunnelRunsOnNewContext() {
+        val stack = stackWith(fakeVpnNetwork)
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+
+        assertTrue(stack.onStopVpn(VpnStopReason.RESTART).isSuccess)
+        assertTrue(stack.onDestroyVpn().isSuccess)
+        assertTrue(stack.onCreateVpn().isSuccess)
+        assertTrue(stack.onStartVpn(tunfd).isSuccess)
+        fakeVpnNetwork.awaitRunning()
+
+        assertEquals(
+            listOf(
+                "create:1", "start:1", "run:1",
+                "stop:1", "run-exited:1", // onStopVpn
+                "stop:1", "destroy:1", // onDestroyVpn signals stop again, harmless with no thread running
+                "create:2", "start:2", "run:2",
+            ),
+            fakeVpnNetwork.events,
+        )
+        verify(deviceShieldPixels, never()).reportTunnelThreadJoinBoundExceeded()
     }
 
     @Test
@@ -220,5 +365,65 @@ class NgVpnNetworkStackTest {
             resource = address,
             ttl = 0,
         )
+    }
+}
+
+/**
+ * Native layer fake whose run() blocks until stop() is called for the same context, like netguard's jni_run.
+ * With [ignoreStop] set, run() never returns on stop(), simulating a wedged tunnel thread.
+ */
+private class FakeVpnNetwork : VpnNetwork {
+    val events: MutableList<String> = CopyOnWriteArrayList()
+
+    @Volatile var ignoreStop = false
+
+    private var nextContext = 0L
+    private val stopLatches = mutableMapOf<Long, CountDownLatch>()
+    private val releaseStuck = CountDownLatch(1)
+
+    @Volatile private var running = CountDownLatch(1)
+
+    override fun create(): Long = synchronized(this) {
+        val context = ++nextContext
+        stopLatches[context] = CountDownLatch(1)
+        events += "create:$context"
+        context
+    }
+
+    override fun start(contextId: Long, logLevel: VpnNetworkLog) {
+        events += "start:$contextId"
+    }
+
+    override fun run(contextId: Long, tunfd: Int) {
+        events += "run:$contextId"
+        running.countDown()
+        if (ignoreStop) {
+            releaseStuck.await()
+        } else {
+            synchronized(this) { stopLatches.getValue(contextId) }.await()
+        }
+        events += "run-exited:$contextId"
+    }
+
+    override fun stop(contextId: Long) {
+        events += "stop:$contextId"
+        synchronized(this) { stopLatches[contextId] }?.countDown()
+    }
+
+    override fun destroy(contextId: Long) {
+        events += "destroy:$contextId"
+    }
+
+    override fun mtu(): Int = 1500
+
+    override fun addCallback(callback: VpnNetworkCallback?) {}
+
+    fun awaitRunning() {
+        assertTrue("tunnel thread never called run()", running.await(5, TimeUnit.SECONDS))
+        running = CountDownLatch(1)
+    }
+
+    fun releaseStuckThreads() {
+        releaseStuck.countDown()
     }
 }

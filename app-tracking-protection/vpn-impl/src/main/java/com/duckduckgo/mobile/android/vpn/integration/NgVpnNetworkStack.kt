@@ -18,6 +18,7 @@ package com.duckduckgo.mobile.android.vpn.integration
 
 import android.os.ParcelFileDescriptor
 import android.util.LruCache
+import androidx.annotation.VisibleForTesting
 import com.duckduckgo.app.di.AppCoroutineScope
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -44,10 +45,19 @@ import logcat.asLog
 import logcat.logcat
 import java.lang.IllegalStateException
 import java.net.InetAddress
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 private const val LRU_CACHE_SIZE = 2048
 private const val EMFILE_ERRNO = 24
+private const val TUNNEL_THREAD_JOIN_SLICE_MILLIS = 5_000L
+private const val TUNNEL_THREAD_JOIN_BOUND_MILLIS = 15_000L
+
+/**
+ * The tunnel thread did not exit within the join bound after being signalled to stop.
+ * Its native context is leaked and detached, never freed: freeing it under the running thread would crash.
+ */
+internal class TunnelThreadStopTimeoutException(message: String) : IllegalStateException(message)
 
 @ContributesIntoSet(
     scope = VpnScope::class,
@@ -71,9 +81,13 @@ class NgVpnNetworkStack @Inject constructor(
     private val dnsProvider: DnsProvider,
 ) : VpnNetworkStack, VpnNetworkCallback {
 
-    private var tunnelThread: Thread? = null
-    private var jniContext = 0L
+    // jniContext and tunnelThread are one piece of state: always read and written together under jniLock
     private val jniLock = Any()
+    private var jniContext = 0L
+    private var tunnelThread: Thread? = null
+
+    @VisibleForTesting
+    internal var tunnelThreadJoinBoundMillis = TUNNEL_THREAD_JOIN_BOUND_MILLIS
     private val addressLookupLruCache = LruCache<String, String>(LRU_CACHE_SIZE)
 
     override val name: String = AppTpVpnFeature.APPTP_VPN.featureName
@@ -83,14 +97,9 @@ class NgVpnNetworkStack @Inject constructor(
 
         vpnNetwork.addCallback(this)
 
-        if (jniContext != 0L) {
-            vpnNetwork.stop(jniContext)
-            synchronized(jniLock) {
-                vpnNetwork.destroy(jniContext)
-                jniContext = 0
-            }
-        }
-        jniContext = vpnNetwork.create()
+        destroyNative(vpnNetwork).onFailure { return Result.failure(it) }
+        val context = vpnNetwork.create()
+        synchronized(jniLock) { jniContext = context }
 
         return Result.success(Unit)
     }
@@ -117,21 +126,15 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     override fun onStopVpn(reason: VpnStopReason): Result<Unit> {
-        return stopNative()
+        val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
+        return stopAndJoinTunnel(vpnNetwork)
     }
 
     override fun onDestroyVpn(): Result<Unit> {
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
 
-        if (jniContext != 0L) {
-            synchronized(jniLock) {
-                vpnNetwork.destroy(jniContext)
-                jniContext = 0
-                logcat { "VPN network destroyed" }
-            }
-        } else {
-            logcat { "VPN network already destroyed...noop" }
-        }
+        // On failure the tunnel thread may still be running and calling back into us, so keep the callback registered
+        destroyNative(vpnNetwork).onFailure { return Result.failure(it) }
         vpnNetwork.addCallback(null)
 
         return Result.success(Unit)
@@ -195,71 +198,115 @@ class NgVpnNetworkStack @Inject constructor(
     }
 
     private fun startNative(tunfd: Int): Result<Unit> {
-        if (jniContext == 0L) {
-            logcat(ERROR) { "Trying to start VPN Network without previously creating it" }
-            return Result.failure(IllegalStateException("Trying to start VPN Network without previously creating it"))
-        }
-
         val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
-        if (tunnelThread == null) {
+
+        synchronized(jniLock) {
+            val context = jniContext
+            if (context == 0L) {
+                logcat(ERROR) { "Trying to start VPN Network without previously creating it" }
+                return Result.failure(IllegalStateException("Trying to start VPN Network without previously creating it"))
+            }
+            if (tunnelThread != null) {
+                logcat(ERROR) { "Trying to start VPN Network while a tunnel thread is still running" }
+                return Result.failure(IllegalStateException("Trying to start VPN Network while a tunnel thread is still running"))
+            }
+
             logcat { "Start native runtime" }
             val level = if (appBuildConfig.isDebug || appTpLocalFeature.verboseLogging().isEnabled()) VpnNetworkLog.DEBUG else VpnNetworkLog.ASSERT
-
-            vpnNetwork.start(jniContext, level)
+            vpnNetwork.start(context, level)
 
             tunnelThread = Thread {
-                logcat { "Running tunnel in context $jniContext" }
+                logcat { "Running tunnel in context $context" }
                 try {
-                    vpnNetwork.run(jniContext, tunfd)
+                    vpnNetwork.run(context, tunfd)
                 } catch (t: Throwable) {
                     logcat(ERROR) { "Tunnel thread crashed: ${t.asLog()}" }
                     deviceShieldPixels.reportTunnelThreadAbnormalCrash()
                 } finally {
-                    tunnelThread = null
+                    // a late exit, e.g. of a detached thread, must not clear the reference to a newer tunnel thread
+                    synchronized(jniLock) {
+                        if (tunnelThread === Thread.currentThread()) tunnelThread = null
+                    }
                     logcat(WARN) { "Tunnel exited" }
                 }
             }.also { it.start() }
-
-            logcat { "Started tunnel thread" }
         }
 
+        logcat { "Started tunnel thread" }
         return Result.success(Unit)
     }
 
-    private fun stopNative(): Result<Unit> {
+    /**
+     * Signals the native layer to stop and waits up to [tunnelThreadJoinBoundMillis] for the tunnel thread to exit.
+     * jniLock is not held while joining because the exiting thread needs it in its finally block.
+     *
+     * If the thread outlives the bound, its context is leaked and detached, never freed: jniContext and tunnelThread are
+     * cleared so later calls don't join it again and a new context can be created and started.
+     */
+    private fun stopAndJoinTunnel(vpnNetwork: VpnNetwork): Result<Unit> {
+        val (context, thread) = synchronized(jniLock) { jniContext to tunnelThread }
+        if (context == 0L) return Result.success(Unit)
+
         logcat { "Stop native runtime" }
-        val vpnNetwork = vpnNetwork.safeGet().getOrElse { return Result.failure(it) }
+        // if the jniContext is invalid the stop() call may fail, we log and still wait for the thread
+        runCatching { vpnNetwork.stop(context) }.onFailure {
+            logcat(ERROR) { "Error stopping the VPN network ${it.asLog()}" }
+        }
+        if (thread == null) return Result.success(Unit)
 
-        tunnelThread?.let {
-            logcat { "Stopping tunnel thread" }
-
-            // In this case we don't check for jniContext == 0 and rather runCatching because we want to make sure we stop the tunnelThread
-            // if the jniContext is invalid the stop() call should fail, we log and continue
-            runCatching { vpnNetwork.stop(jniContext) }.onFailure {
-                logcat(ERROR) { "Error stopping the VPN network ${it.asLog()}" }
-            }
-
-            var thread = tunnelThread
-            while (thread != null && thread.isAlive) {
-                try {
-                    logcat { "Joining tunnel thread context $jniContext" }
-                    thread.join(5000)
-
-                    // Check if we timed out and are stuck
-                    if (thread.isAlive) {
-                        logcat { "Timed out waiting for tunnel thread" }
-                        deviceShieldPixels.reportTunnelThreadStopTimeout()
-                    }
-                } catch (t: InterruptedException) {
-                    logcat { "Interrupted while waiting" }
+        logcat { "Joining tunnel thread context $context" }
+        val deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(tunnelThreadJoinBoundMillis)
+        var interrupted = false
+        while (thread.isAlive) {
+            val remainingMillis = TimeUnit.NANOSECONDS.toMillis(deadline - System.nanoTime())
+            if (remainingMillis <= 0) break
+            try {
+                thread.join(minOf(TUNNEL_THREAD_JOIN_SLICE_MILLIS, remainingMillis))
+                if (thread.isAlive) {
+                    logcat { "Timed out waiting for tunnel thread" }
+                    deviceShieldPixels.reportTunnelThreadStopTimeout()
                 }
-                thread = tunnelThread
+            } catch (e: InterruptedException) {
+                logcat { "Interrupted while waiting" }
+                interrupted = true
             }
-            tunnelThread = null
+        }
+        if (interrupted) Thread.currentThread().interrupt()
 
-            logcat { "Stopped tunnel thread" }
+        if (thread.isAlive) {
+            synchronized(jniLock) {
+                if (tunnelThread === thread) {
+                    jniContext = 0
+                    tunnelThread = null
+                }
+            }
+            logcat(ERROR) { "Tunnel thread still alive after ${tunnelThreadJoinBoundMillis}ms, leaked and detached context $context" }
+            deviceShieldPixels.reportTunnelThreadJoinBoundExceeded()
+            return Result.failure(TunnelThreadStopTimeoutException("Tunnel thread did not exit within ${tunnelThreadJoinBoundMillis}ms"))
         }
 
+        logcat { "Stopped tunnel thread" }
+        return Result.success(Unit)
+    }
+
+    /**
+     * Stops and joins the tunnel thread, then frees the native context. The context is only freed once no tunnel thread runs on it.
+     */
+    private fun destroyNative(vpnNetwork: VpnNetwork): Result<Unit> {
+        stopAndJoinTunnel(vpnNetwork).onFailure { return Result.failure(it) }
+
+        synchronized(jniLock) {
+            if (tunnelThread != null) {
+                return Result.failure(IllegalStateException("Tunnel thread started while destroying the VPN network"))
+            }
+            if (jniContext == 0L) {
+                logcat { "VPN network already destroyed...noop" }
+            } else {
+                vpnNetwork.destroy(jniContext)
+                jniContext = 0
+                logcat { "VPN network destroyed" }
+            }
+        }
         return Result.success(Unit)
     }
 

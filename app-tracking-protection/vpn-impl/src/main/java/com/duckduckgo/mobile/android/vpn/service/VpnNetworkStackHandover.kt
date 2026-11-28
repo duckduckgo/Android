@@ -37,10 +37,16 @@ internal class VpnNetworkStackHandover(
     val isSameStack: Boolean
         get() = current === next
 
-    /** Stops and tears down [current], recreating it when it is also the stack the restart brings up. */
-    fun switch() {
+    /**
+     * Stops and tears down [current], recreating it when it is also the stack the restart brings up.
+     *
+     * Returns the failure when [current] could not be stopped. It is then left as it is, not destroyed, because a stack
+     * that failed to stop can still be using its native state, and the restart must not go on.
+     */
+    fun switch(): Result<Unit> {
         current.onStopVpn(VpnStopReason.RESTART).onFailure {
             logcat(ERROR) { "VPN log: error stopping ${current.name} for restart: ${it.asLog()}" }
+            return Result.failure(it)
         }
         current.onDestroyVpn()
         if (isSameStack) {
@@ -48,6 +54,7 @@ internal class VpnNetworkStackHandover(
                 logcat(ERROR) { "VPN log: error recreating ${current.name} for restart: ${it.asLog()}" }
             }
         }
+        return Result.success(Unit)
     }
 
     /** Releases [next] when the restart fails before it is started and [next] is not the running stack. */

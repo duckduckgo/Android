@@ -48,14 +48,36 @@ class VpnNetworkStackHandoverTest {
     }
 
     @Test
-    fun whenStoppingCurrentFailsThenSwitchStillDestroysReplacedStack() {
+    fun whenStoppingCurrentFailsThenSwitchFailsWithoutDestroyingCurrent() {
         whenever(current.onStopVpn(any())).thenReturn(Result.failure(IllegalStateException("boom")))
-        whenever(current.onDestroyVpn()).thenReturn(Result.success(Unit))
         val handover = VpnNetworkStackHandover(current = current, next = next)
 
-        handover.switch()
+        val result = handover.switch()
 
-        verify(current).onDestroyVpn()
+        assertTrue(result.isFailure)
+        verify(current, never()).onDestroyVpn()
+    }
+
+    @Test
+    fun whenStoppingSameStackFailsThenSwitchFailsWithoutDestroyingOrRecreatingIt() {
+        whenever(current.onStopVpn(any())).thenReturn(Result.failure(IllegalStateException("boom")))
+        val handover = VpnNetworkStackHandover(current = current, next = current)
+
+        val result = handover.switch()
+
+        assertTrue(result.isFailure)
+        verify(current, never()).onDestroyVpn()
+        verify(current, never()).onCreateVpn()
+    }
+
+    @Test
+    fun whenRecreatingSameStackFailsThenSwitchStillSucceeds() {
+        whenever(current.onStopVpn(any())).thenReturn(Result.success(Unit))
+        whenever(current.onDestroyVpn()).thenReturn(Result.success(Unit))
+        whenever(current.onCreateVpn()).thenReturn(Result.failure(IllegalStateException("boom")))
+        val handover = VpnNetworkStackHandover(current = current, next = current)
+
+        assertTrue(handover.switch().isSuccess)
     }
 
     @Test
@@ -65,7 +87,7 @@ class VpnNetworkStackHandoverTest {
         whenever(current.onCreateVpn()).thenReturn(Result.success(Unit))
         val handover = VpnNetworkStackHandover(current = current, next = current)
 
-        handover.switch()
+        assertTrue(handover.switch().isSuccess)
 
         inOrder(current) {
             verify(current).onStopVpn(VpnStopReason.RESTART)
@@ -80,7 +102,7 @@ class VpnNetworkStackHandoverTest {
         whenever(current.onDestroyVpn()).thenReturn(Result.success(Unit))
         val handover = VpnNetworkStackHandover(current = current, next = next)
 
-        handover.switch()
+        assertTrue(handover.switch().isSuccess)
 
         inOrder(current) {
             verify(current).onStopVpn(VpnStopReason.RESTART)

@@ -28,7 +28,8 @@
                             "null_tunnel_failed",
                             "network_stack_prepare_failed",
                             "tunnel_establish_failed",
-                            "network_stack_start_failed"
+                            "network_stack_start_failed",
+                            "network_stack_stop_failed"
                         ]
                     },
                     "restart_duration_ms_bucketed": {

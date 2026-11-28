@@ -63,6 +63,7 @@ interface VpnRestartWideEvent {
         NETWORK_STACK_PREPARE_FAILED("network_stack_prepare_failed"),
         TUNNEL_ESTABLISH_FAILED("tunnel_establish_failed"),
         NETWORK_STACK_START_FAILED("network_stack_start_failed"),
+        NETWORK_STACK_STOP_FAILED("network_stack_stop_failed"),
     }
 }
 
