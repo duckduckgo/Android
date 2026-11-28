@@ -34,6 +34,7 @@ import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.TabSwitcherData.LayoutType
 import com.duckduckgo.app.tabs.model.TabSwitcherData.UserState
 import com.duckduckgo.app.tabs.store.TabSwitcherDataStore
+import com.duckduckgo.browsermode.api.BrowserMode
 import com.duckduckgo.common.utils.ConflatedJob
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.common.utils.DispatcherProvider
@@ -80,6 +81,7 @@ class TabDataRepository(
     private val duckAiTabSessionRepository: DuckAiTabSessionRepository,
     private val pageTitleFetcher: PageTitleFetcher,
     private val pageContextJSHelper: DuckAiPageContextLifecycle,
+    private val browserMode: BrowserMode,
 ) : TabRepository, TabAtomicOperations {
 
     override val liveTabs: LiveData<List<TabEntity>> = tabsDao.liveTabs().distinctUntilChanged()
@@ -370,12 +372,9 @@ class TabDataRepository(
 
     override suspend fun delete(tab: TabEntity) {
         databaseExecutor().scheduleDirect {
-            deleteOldPreviewImages(tab.tabId)
-            deleteOldFavicon(tab.tabId)
             tabsDao.deleteTabAndUpdateSelection(tab)
-            lastUpdatedTabState.remove(tab.tabId)
+            clearAllSiteData(listOf(tab.tabId))
         }
-        siteData.remove(tab.tabId)
         tabVisitedSitesRepository.clearTab(tab.tabId)
         nativeInputStatePublisher.clearTab(tab.tabId)
         pageContextJSHelper.clearTab(tab.tabId)
@@ -429,7 +428,7 @@ class TabDataRepository(
             deleteOldFavicon(tabId)
             siteData.remove(tabId)
             lastUpdatedTabState.remove(tabId)
-            duckChatContextualDataStore.clearTabChatUrl(tabId)
+            duckChatContextualDataStore.clearTab(tabId)
         }
     }
 
@@ -483,15 +482,13 @@ class TabDataRepository(
         databaseExecutor().scheduleDirect {
             val tabToDelete = tabsDao.tab(tabId) ?: return@scheduleDirect
 
-            deleteOldPreviewImages(tabToDelete.tabId)
             val tabToSelect = tabToDelete.sourceTabId
                 .takeUnless { it.isNullOrBlank() }
                 ?.let {
                     tabsDao.tab(it)
                 }
             tabsDao.deleteTabAndUpdateSelection(tabToDelete, tabToSelect)
-            siteData.remove(tabToDelete.tabId)
-            lastUpdatedTabState.remove(tabToDelete.tabId)
+            clearAllSiteData(listOf(tabToDelete.tabId))
 
             tabToSelect?.let {
                 appCoroutineScope.launch(dispatchers.io()) {
@@ -505,6 +502,35 @@ class TabDataRepository(
     }
 
     override suspend fun deleteAll() = withContext(dispatchers.io()) {
+        when (browserMode) {
+            BrowserMode.REGULAR -> deleteAllTabsAndSharedData()
+            BrowserMode.FIRE -> deleteAllTabsAndTheirData()
+        }
+    }
+
+    /**
+     * The shared stores also hold Regular tabs' entries, so Fire clears only its own tabs' entries.
+     * File and DB deletes are awaited because several callers kill the process right afterwards.
+     */
+    private suspend fun deleteAllTabsAndTheirData() {
+        val tabIds = (tabsDao.tabs().map { it.tabId } + tabsDao.getDeletableTabIds()).distinct()
+        logcat(INFO) { "Deleting ${tabIds.size} $browserMode tabs right now" }
+        tabsDao.deleteAllTabs()
+        webViewSessionStorage.deleteAllSessions()
+        siteData.clear()
+        lastUpdatedTabState.clear()
+        tabIds.forEach { tabId ->
+            webViewPreviewPersister.deletePreviewsForTab(tabId, null)
+            faviconManager.deleteOldTempFavicon(tabId, null)
+            tabVisitedSitesRepository.clearTab(tabId)
+            adClickManager.clearTabId(tabId)
+            duckChatContextualDataStore.clearTab(tabId)
+            nativeInputStatePublisher.clearTab(tabId)
+            pageContextJSHelper.clearTab(tabId)
+        }
+    }
+
+    private suspend fun deleteAllTabsAndSharedData() {
         logcat(INFO) { "Deleting tabs right now" }
         pageContextJSHelper.clearAll()
         tabsDao.deleteAllTabs()

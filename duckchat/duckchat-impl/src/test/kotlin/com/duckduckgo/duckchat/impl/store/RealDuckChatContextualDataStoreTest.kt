@@ -129,6 +129,34 @@ class RealDuckChatContextualDataStoreTest {
     }
 
     @Test
+    fun whenClearTabThenUrlAndTimestampRemovedOnlyForThatTab() = runTest {
+        testee.persistTabChatUrl("tab-a", "https://example.com/a")
+        testee.persistTabChatUrl("tab-b", "https://example.com/b")
+        testee.persistTabClosedTimestamp("tab-a", 111L)
+        testee.persistTabClosedTimestamp("tab-b", 222L)
+
+        testee.clearTab("tab-a")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNull(testee.getTabChatUrl("tab-a"))
+        assertNull(testee.getTabClosedTimestamp("tab-a"))
+        assertEquals("https://example.com/b", testee.getTabChatUrl("tab-b"))
+        assertEquals(222L, testee.getTabClosedTimestamp("tab-b"))
+    }
+
+    @Test
+    fun whenClearTabWithNoEntriesThenOtherEntriesUnchanged() = runTest {
+        testee.persistTabChatUrl("tab-b", "https://example.com/b")
+        testee.persistTabClosedTimestamp("tab-b", 222L)
+
+        testee.clearTab("tab-unknown")
+        coroutineRule.testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("https://example.com/b", testee.getTabChatUrl("tab-b"))
+        assertEquals(222L, testee.getTabClosedTimestamp("tab-b"))
+    }
+
+    @Test
     fun whenClearAllThenAllEntriesAreRemoved() = runTest {
         testee.persistTabChatUrl("tab-1", "https://example.com/one")
         testee.persistTabChatUrl("tab-2", "https://example.com/two")

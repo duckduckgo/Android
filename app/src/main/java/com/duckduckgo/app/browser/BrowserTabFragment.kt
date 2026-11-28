@@ -187,7 +187,6 @@ import com.duckduckgo.app.browser.print.CachedPdfPrintDocumentAdapter
 import com.duckduckgo.app.browser.print.PrintDocumentAdapterFactory
 import com.duckduckgo.app.browser.print.PrintInjector
 import com.duckduckgo.app.browser.progressbar.MainFrameCommitNavigationClient
-import com.duckduckgo.app.browser.session.WebViewSessionStorage
 import com.duckduckgo.app.browser.shortcut.ShortcutBuilder
 import com.duckduckgo.app.browser.suggestredirect.RedirectSuggestion
 import com.duckduckgo.app.browser.tabpreview.WebViewPreviewGenerator
@@ -484,9 +483,6 @@ class BrowserTabFragment :
 
     @Inject
     lateinit var fileDownloader: FileDownloader
-
-    @Inject
-    lateinit var webViewSessionStorage: WebViewSessionStorage
 
     @Inject
     lateinit var shortcutBuilder: ShortcutBuilder

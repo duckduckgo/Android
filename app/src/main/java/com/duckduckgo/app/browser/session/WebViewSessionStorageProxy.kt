@@ -18,14 +18,8 @@ package com.duckduckgo.app.browser.session
 
 import android.webkit.WebView
 import com.duckduckgo.browser.feature.toggles.AndroidBrowserConfigFeature
-import com.duckduckgo.di.scopes.AppScope
-import dev.zacsweers.metro.ContributesBinding
-import dev.zacsweers.metro.SingleIn
-import javax.inject.Inject
 
-@SingleIn(AppScope::class)
-@ContributesBinding(AppScope::class)
-class WebViewSessionStorageProxy @Inject constructor(
+class WebViewSessionStorageProxy(
     private val roomBacked: RoomWebViewSessionStorage,
     private val inMemory: WebViewSessionInMemoryStorage,
     private val browserConfig: AndroidBrowserConfigFeature,

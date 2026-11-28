@@ -43,6 +43,7 @@ interface DuckChatContextualDataStore {
     suspend fun getTabClosedTimestamp(tabId: String): Long?
     fun clearTabChatUrl(tabId: String)
     fun clearTabClosedTimestamp(tabId: String)
+    fun clearTab(tabId: String)
     fun clearAll()
 }
 
@@ -140,6 +141,16 @@ class RealDuckChatContextualDataStore @Inject constructor(
                         .toMutableMap()
                         .apply { remove(tabId) }
                 prefs[Keys.TAB_CLOSE_TIMESTAMPS] = timestampMapAdapter.toJson(updated)
+            }
+        }
+    }
+
+    override fun clearTab(tabId: String) {
+        contextualEntryPromptStore.clear(tabId)
+        coroutineScope.launch(dispatchers.io()) {
+            store.edit { prefs ->
+                prefs[Keys.TAB_CHAT_URLS] = mapAdapter.toJson(load(prefs[Keys.TAB_CHAT_URLS]) - tabId)
+                prefs[Keys.TAB_CLOSE_TIMESTAMPS] = timestampMapAdapter.toJson(loadTimestamps(prefs[Keys.TAB_CLOSE_TIMESTAMPS]) - tabId)
             }
         }
     }

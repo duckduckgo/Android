@@ -126,7 +126,12 @@ object DaoModule {
     fun syncRelationsDao(database: AppDatabase): SavedSitesRelationsDao = database.syncRelationsDao()
 
     @Provides
+    @RegularMode
     fun webViewSessionDao(database: AppDatabase): WebViewSessionDao = database.webViewSessionDao()
+
+    @Provides
+    @FireMode
+    fun fireWebViewSessionDao(database: FireModeDatabase): WebViewSessionDao = database.webViewSessionDao()
 
     @SingleIn(AppScope::class)
     @Provides

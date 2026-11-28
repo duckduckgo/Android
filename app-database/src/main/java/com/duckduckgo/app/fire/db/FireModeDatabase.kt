@@ -16,9 +16,12 @@
 
 package com.duckduckgo.app.fire.db
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.duckduckgo.app.browser.session.WebViewSessionDao
+import com.duckduckgo.app.browser.session.WebViewSessionEntity
 import com.duckduckgo.app.tabs.db.TabsDao
 import com.duckduckgo.app.tabs.model.LocalDateTimeTypeConverter
 import com.duckduckgo.app.tabs.model.TabEntity
@@ -27,20 +30,26 @@ import com.duckduckgo.app.tabs.model.TabSelectionEntity
 /**
  * Standalone database used during Fire mode to retain tab state across the wipe of [AppDatabase].
  *
- * Shares [TabEntity] and [TabSelectionEntity] with [com.duckduckgo.app.global.db.AppDatabase].
+ * Shares [TabEntity], [TabSelectionEntity] and [WebViewSessionEntity] with [com.duckduckgo.app.global.db.AppDatabase].
  * Any schema change to these entities must be accompanied by a migration in BOTH databases —
  * forgetting one will result in a runtime crash for the affected users.
  */
 @Database(
     exportSchema = true,
-    version = 1,
+    version = 2,
     entities = [
         TabEntity::class,
         TabSelectionEntity::class,
+        WebViewSessionEntity::class,
+    ],
+    autoMigrations = [
+        AutoMigration(from = 1, to = 2),
     ],
 )
 @TypeConverters(LocalDateTimeTypeConverter::class)
 abstract class FireModeDatabase : RoomDatabase() {
 
     abstract fun tabsDao(): TabsDao
+
+    abstract fun webViewSessionDao(): WebViewSessionDao
 }
