@@ -34,6 +34,8 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
@@ -44,6 +46,8 @@ import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2UpgradeRequiredError
 import com.duckduckgo.sync.impl.ui.pairing.toExchangeV2PairingError
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import com.duckduckgo.sync.impl.wideevents.onPairingOutcome
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -65,6 +69,7 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     private val clipboard: ClipboardInteractor,
     private val switchedAccountDetector: SwitchedAccountDetector,
     private val dispatchers: DispatcherProvider,
+    private val setupEvent: SyncSetupWideEvent,
 ) : ViewModel() {
     private val _commands = Channel<Command>(Channel.BUFFERED)
     internal val commands = _commands.receiveAsFlow()
@@ -112,10 +117,12 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
     }
 
     fun onConnectingCancelled() {
+        setupEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
         closeWithoutPairing()
     }
 
     fun onCheckOtherDeviceCancelled() {
+        setupEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
         closeWithoutPairing()
     }
 
@@ -147,12 +154,14 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
 
     private suspend fun startV2Presentation() {
         codeDispatcher.presentV2().collect { outcome ->
+            setupEvent.onPairingOutcome(outcome)
             pixels.fireSetupFailed(syncType, launchSource, outcome)
             pixels.fireSetupCancelledIfDenied(syncType, launchSource, outcome)
 
             when (outcome) {
                 is DispatchOutcome.LinkingCodeReady -> {
                     showQrCode(outcome.linkingCode)
+                    setupEvent.onStep(SetupStep.CODE_SCREEN)
                 }
 
                 is DispatchOutcome.HostConfirmationRequested -> {
@@ -168,7 +177,9 @@ class DisplayQrCodeViewModel @AssistedInject constructor(
                     pixels.fireLoginPixel()
                     switchedAccountDetector.onPaired()
                     pixels.fireSyncSetupFinishedSuccessfully(syncType, launchSource, outcome.path, outcome.myRole, outcome.peerKind)
-                    _commands.send(Command.SetPairingResult(pairingResult()))
+                    val result = pairingResult()
+                    if (syncEntryPoint == SyncEntryPoint.ADD_DEVICE || result == SyncPairingResult.Failure) setupEvent.onSucceeded()
+                    _commands.send(Command.SetPairingResult(result))
                     _commands.send(Command.Close)
                 }
 

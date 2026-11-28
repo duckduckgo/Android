@@ -18,6 +18,7 @@ package com.duckduckgo.sync.impl
 
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
@@ -202,5 +203,10 @@ sealed interface DispatchOutcome {
          * `reason=session_timeout` by user-facing stage.
          */
         val timeoutStage: TimeoutStage? = null,
+        /**
+         * Classifies this outcome as a cancellation in the Sync setup wide event.
+         * When null, telemetry falls back to [code] to distinguish cancellation from failure.
+         */
+        val cancellationReason: SetupCancellationReason? = null,
     ) : DispatchOutcome
 }

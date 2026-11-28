@@ -29,8 +29,10 @@ import com.duckduckgo.sync.impl.Result.Error
 import com.duckduckgo.sync.impl.RouteDecision
 import com.duckduckgo.sync.impl.SyncAccountRepository
 import com.duckduckgo.sync.impl.SyncAuthCode.Exchange
+import com.duckduckgo.sync.impl.SyncAuthCode.Recovery
 import com.duckduckgo.sync.impl.SyncAuthCode.Unknown
 import com.duckduckgo.sync.impl.SyncCodeDispatcher
+import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.autorestore.SyncAutoRestoreManager
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.onFailure
@@ -39,15 +41,20 @@ import com.duckduckgo.sync.impl.pixels.SwitchedAccountDetector
 import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.fireSetupCancelledIfDenied
 import com.duckduckgo.sync.impl.pixels.fireSetupFailed
+import com.duckduckgo.sync.impl.pixels.toSetupFailureReason
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.ExchangeV1PairingErrorContent
@@ -57,6 +64,8 @@ import com.duckduckgo.sync.impl.ui.pairing.exchangeV2AlreadyPairedError
 import com.duckduckgo.sync.impl.ui.pairing.exchangeV2UpgradeRequiredError
 import com.duckduckgo.sync.impl.ui.pairing.toExchangeV1PairingError
 import com.duckduckgo.sync.impl.ui.pairing.toExchangeV2PairingError
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
+import com.duckduckgo.sync.impl.wideevents.onPairingOutcome
 import dev.zacsweers.metro.Assisted
 import dev.zacsweers.metro.AssistedFactory
 import dev.zacsweers.metro.AssistedInject
@@ -80,6 +89,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     private val syncAutoRestoreManager: SyncAutoRestoreManager,
     private val switchedAccountDetector: SwitchedAccountDetector,
     private val dispatchers: DispatcherProvider,
+    private val setupEvent: SyncSetupWideEvent,
 ) : ViewModel() {
     private val _commands = Channel<Command>(Channel.BUFFERED)
     internal val commands = _commands.receiveAsFlow()
@@ -103,6 +113,14 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             syncPixels.fireSetupDeepLinkFlowStarted()
         }
 
+        val method = when (codeSource) {
+            is SyncCodeSource.Scanned -> ConnectMethod.SCAN_CODE
+            is SyncCodeSource.Pasted -> ConnectMethod.PASTE_CODE
+            is SyncCodeSource.DeepLink -> ConnectMethod.LINK
+            is SyncCodeSource.Restored -> null
+        }
+        setupEvent.onPairingSessionReset()
+        if (method != null) setupEvent.onUpdate { it.copy(connectMethod = method) }
         viewModelScope.launch(dispatchers.io()) {
             switchedAccountDetector.onPairingStarted()
             val decision = codeDispatcher.route(syncCode)
@@ -117,6 +135,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     fun onUserCanceled() {
         when (codeSource) {
             is SyncCodeSource.DeepLink -> {
+                setupEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
                 syncPixels.fireSetupDeepLinkFlowAbandoned()
             }
 
@@ -166,22 +185,24 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     }
 
     fun onUserAcceptedSwitchingAccount(encodedStringCode: String) {
+        setupEvent.onStep(SetupStep.SYNC_CONFIRMATION)
+        setupEvent.onStep(SetupStep.PREPARING_SYNC)
         _viewState.update { it.copy(dialog = null) }
         viewModelScope.launch(dispatchers.io()) {
             syncPixels.fireUserAcceptedSwitchingAccount()
             accountRepository.logoutAndJoinNewAccount(encodedStringCode)
                 .onSuccess {
                     syncPixels.fireUserSwitchedAccount()
-                    animationCompletionSignal.await()
                     sendSuccess()
                 }
                 .onFailure { failure ->
-                    _commands.send(Command.ShowV1Error(failure.toExchangeV1PairingError()))
+                    showV1Error(failure)
                 }
         }
     }
 
     fun onUserCancelledSwitchingAccount() {
+        setupEvent.onCancelled(SetupCancellationReason.ACCOUNT_SWITCH_DECLINED)
         _viewState.update { it.copy(dialog = null) }
         viewModelScope.launch {
             syncPixels.fireUserCancelledSwitchingAccount()
@@ -193,6 +214,17 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
     private suspend fun handleV1CodeDecision(decision: RouteDecision.Legacy) {
         _commands.send(Command.RunAcknowledgmentAnimation)
         val authCode = decision.authCode
+        when (authCode) {
+            is Unknown -> setupEvent.onCancelled(SetupCancellationReason.CODE_REJECTED)
+            is Recovery -> {
+                setupEvent.onUpdate { it.copy(setupMode = SetupMode.RECOVERY) }
+                setupEvent.onStep(SetupStep.PREPARING_SYNC)
+            }
+            else -> {
+                setupEvent.onUpdate { it.copy(setupMode = SetupMode.MULTI_DEVICE, flowVersion = ExchangeProtocolVersion.V1_0) }
+                setupEvent.onStep(SetupStep.PREPARING_SYNC)
+            }
+        }
         withContext(dispatchers.io()) {
             val existingDeviceId = if (codeSource is SyncCodeSource.Restored) {
                 syncAutoRestoreManager.retrieveRecoveryPayload()?.deviceId
@@ -208,7 +240,6 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
 
                         else -> {
                             switchedAccountDetector.onPaired()
-                            animationCompletionSignal.await()
                             sendSuccess()
                         }
                     }
@@ -227,6 +258,7 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
                 .onSuccess { result ->
                     when (result) {
                         is AccountSwitchingRequired -> {
+                            setupEvent.onStep(SetupStep.CONFIRMATION_SCREEN)
                             syncPixels.fireAskUserToSwitchAccount()
                             _viewState.update { it.copy(dialog = DialogType.SwitchAccount(result.recoveryCode)) }
                             isPolling = false
@@ -234,7 +266,6 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
 
                         is LoggedIn -> {
                             switchedAccountDetector.onPaired()
-                            animationCompletionSignal.await()
                             sendSuccess()
                             isPolling = false
                         }
@@ -254,18 +285,30 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
             fireAutoRestoreFailurePixels(failure.code.toString(), failure.reason)
         }
         if (failure.code == ALREADY_SIGNED_IN.code) {
+            setupEvent.onStep(SetupStep.CONFIRMATION_SCREEN)
             syncPixels.fireAskUserToSwitchAccount()
             _viewState.update { it.copy(dialog = DialogType.SwitchAccount(syncCode)) }
         } else {
-            _commands.send(Command.ShowV1Error(failure.toExchangeV1PairingError()))
+            showV1Error(failure)
         }
     }
 
+    private suspend fun showV1Error(failure: Error) {
+        setupEvent.onFailed(failure.code.toSetupFailureReason())
+        _commands.send(Command.ShowV1Error(failure.toExchangeV1PairingError()))
+    }
+
     private suspend fun handleV2CodeDecision(decision: RouteDecision.V2InProgress) {
+        if (decision.codeType == SyncCodeType.RECOVERY) {
+            setupEvent.onUpdate { it.copy(setupMode = SetupMode.RECOVERY) }
+        } else {
+            setupEvent.onUpdate { it.copy(setupMode = SetupMode.MULTI_DEVICE) }
+        }
         decision.outcomes.collect(::processV2Outcome)
     }
 
     private suspend fun processV2Outcome(outcome: DispatchOutcome) {
+        setupEvent.onPairingOutcome(outcome)
         syncPixels.fireSetupFailed(screenType, launchSource, outcome)
         syncPixels.fireSetupCancelledIfDenied(screenType, launchSource, outcome)
 
@@ -306,8 +349,6 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
                     _commands.send(Command.RunAcknowledgmentAnimation)
                 }
                 switchedAccountDetector.onPaired()
-                animationCompletionSignal.await()
-
                 sendSuccess(outcome.path, outcome.myRole, outcome.peerKind)
             }
 
@@ -351,8 +392,12 @@ class ProcessSyncCodeViewModel @AssistedInject constructor(
         myRole: SetupRole? = null,
         peerKind: PeerKind? = null,
     ) {
+        if (codeSource.entryPoint == SyncEntryPoint.ADD_DEVICE) setupEvent.onSucceeded()
+        animationCompletionSignal.await()
         fireLoginSuccessPixels(path, myRole, peerKind)
-        _commands.send(Command.SetPairingResult(pairingResult()))
+        val result = pairingResult()
+        if (result == SyncPairingResult.Failure && codeSource.entryPoint != SyncEntryPoint.ADD_DEVICE) setupEvent.onSucceeded()
+        _commands.send(Command.SetPairingResult(result))
         _commands.send(Command.Close)
     }
 

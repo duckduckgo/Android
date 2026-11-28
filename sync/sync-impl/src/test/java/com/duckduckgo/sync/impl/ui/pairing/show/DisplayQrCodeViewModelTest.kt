@@ -110,6 +110,7 @@ class DisplayQrCodeViewModelTest {
     }
 
     private fun createTestee(source: String = "other") = DisplayQrCodeViewModel(
+        setupEvent = mock(),
         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         launchSource = source,
         accountRepository = accountRepository,

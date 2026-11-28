@@ -43,6 +43,7 @@ import com.duckduckgo.sync.impl.pixels.SyncPixelParameters
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CodeVersion
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
@@ -57,6 +58,7 @@ import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Comm
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowV1Error
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.Command.ShowV2Error
 import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel.DialogType
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -92,6 +94,7 @@ class ProcessSyncCodeViewModelTest {
     private val thisParcelableDevice = ParcelableDevice.fromConnectedDevice(thisDevice)
 
     private val accountRepository = mock<SyncAccountRepository>()
+    private val setupEvent = mock<SyncSetupWideEvent>()
     private val codeDispatcher = mock<SyncCodeDispatcher>()
     private val syncPixels = mock<SyncPixels>()
     private val syncAutoRestoreManager = mock<SyncAutoRestoreManager>()
@@ -105,6 +108,7 @@ class ProcessSyncCodeViewModelTest {
     ): ProcessSyncCodeViewModel {
         whenever(accountRepository.getAccountInfo()).thenReturn(accountInfo)
         return ProcessSyncCodeViewModel(
+            setupEvent = setupEvent,
             codeSource = codeSource,
             launchSource = launchSource,
             accountRepository = accountRepository,
@@ -1048,6 +1052,7 @@ class ProcessSyncCodeViewModelTest {
             cancel()
         }
         verify(syncPixels).fireUserCancelledSwitchingAccount()
+        verify(setupEvent).onCancelled(SetupCancellationReason.ACCOUNT_SWITCH_DECLINED)
     }
 
     private fun givenProcessCodeSucceeds() {

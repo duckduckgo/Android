@@ -22,32 +22,57 @@ import com.duckduckgo.app.statistics.wideevents.WideEventClient
 import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
+import com.duckduckgo.sync.impl.AccountErrorCodes
+import com.duckduckgo.sync.impl.Clipboard
+import com.duckduckgo.sync.impl.DispatchOutcome
+import com.duckduckgo.sync.impl.RouteDecision
+import com.duckduckgo.sync.impl.SyncAccountRepository
+import com.duckduckgo.sync.impl.SyncAuthCode
 import com.duckduckgo.sync.impl.SyncBuildConfig
+import com.duckduckgo.sync.impl.SyncCodeDispatcher
+import com.duckduckgo.sync.impl.SyncCodeType
 import com.duckduckgo.sync.impl.SyncFeature
 import com.duckduckgo.sync.impl.auth.DeviceAuthenticator.Denial
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
 import com.duckduckgo.sync.impl.exchange.v2.AdvertisedExchangeV2Version
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
+import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
+import com.duckduckgo.sync.impl.exchange.v2.PairingRole
+import com.duckduckgo.sync.impl.exchange.v2.Role
+import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
 import com.duckduckgo.sync.impl.pixels.SyncPixels.PeerKind
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TimeoutStage
+import com.duckduckgo.sync.impl.ui.SyncEntryPoint
+import com.duckduckgo.sync.impl.ui.pairing.process.ProcessSyncCodeViewModel
+import com.duckduckgo.sync.impl.ui.pairing.process.SyncCodeSource
+import com.duckduckgo.sync.impl.ui.pairing.read.ReadSyncCodeViewModel
+import com.duckduckgo.sync.impl.ui.pairing.read.camera.CameraAccess
+import com.duckduckgo.sync.impl.ui.setup.SyncThisDeviceViewModel
 import com.duckduckgo.sync.store.SyncStore
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
 import com.google.testing.junit.testparameterinjector.TestParameterValuesProvider
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.doAnswer
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.inOrder
@@ -58,6 +83,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import com.duckduckgo.sync.impl.Result as AccountResult
 
 @RunWith(TestParameterInjector::class)
 class SyncSetupWideEventImplTest {
@@ -65,6 +91,7 @@ class SyncSetupWideEventImplTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule(StandardTestDispatcher())
 
+    private val cameraAccess: CameraAccess = mock()
     private val wideEventClient: WideEventClient = mock()
     private val syncFeature = FakeFeatureToggleFactory.create(SyncFeature::class.java)
 
@@ -95,6 +122,7 @@ class SyncSetupWideEventImplTest {
             buildConfig = buildConfig,
             syncStore = syncStore,
             advertisedExchangeVersion = advertisedExchangeVersion,
+            cameraAccess = cameraAccess,
             appCoroutineScope = coroutineRule.testScope,
         )
     }
@@ -104,7 +132,7 @@ class SyncSetupWideEventImplTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
@@ -120,7 +148,7 @@ class SyncSetupWideEventImplTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
-        wideEvent.onFlowStarted(launchSource = "promotion_passwords")
+        wideEvent.onFlowStarted(launchSource = "promotion_passwords", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
@@ -136,7 +164,7 @@ class SyncSetupWideEventImplTest {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
             .thenReturn(Result.success(1L))
 
-        wideEvent.onFlowStarted(launchSource = "duckai_card")
+        wideEvent.onFlowStarted(launchSource = "duckai_card", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowStart(
@@ -151,7 +179,7 @@ class SyncSetupWideEventImplTest {
     fun `onFlowStarted finishes existing flow with Unknown before starting new one`() = runTest {
         startFlow(flowId = 99L)
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(
@@ -164,7 +192,7 @@ class SyncSetupWideEventImplTest {
     fun `feature disabled results in no interactions`() = runTest {
         syncFeature.sendSyncSetupWideEvent().setRawStoredState(State(false))
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onIntroScreenShown()
         advanceUntilIdle()
 
@@ -370,12 +398,53 @@ class SyncSetupWideEventImplTest {
     }
 
     @Test
-    fun `non back up attempt sends nothing without the unified event`() = runTest {
-        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
-        wideEvent.onIntroScreenShown()
+    fun `non back up attempt sends nothing without the unified event`(
+        @TestParameter("MULTI_DEVICE", "RECOVERY") setupMode: SetupMode,
+    ) = runTest {
+        syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(false))
+
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = setupMode)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        wideEvent.onUpdate { it.copy(role = SetupRole.JOINER) }
+        wideEvent.onPairingSessionReset()
+        wideEvent.onSucceeded()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        process(RouteDecision.V2InProgress(SyncCodeType.LINKING, flowOf(DispatchOutcome.UpgradeRequired(3))))
         advanceUntilIdle()
 
-        verifyNoInteractions(wideEventClient)
+        verifyNoInteractions(wideEventClient, cameraAccess)
+    }
+
+    @Test
+    fun `non back up attempt preserves legacy reporting without the unified event`(
+        @TestParameter("MULTI_DEVICE", "RECOVERY") setupMode: SetupMode,
+    ) = runTest {
+        syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(false))
+        whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Result.success(1L))
+
+        wideEvent.onFlowStarted(launchSource = "promotion_passwords", setupMode = SetupMode.SINGLE_DEVICE)
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = setupMode)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        wideEvent.onUpdate { it.copy(role = SetupRole.JOINER) }
+        wideEvent.onPairingSessionReset()
+        wideEvent.onSucceeded()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        wideEvent.onRecoveryCodeShown()
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowStart(
+            name = "sync-setup",
+            flowEntryPoint = "promotion_passwords",
+            metadata = mapOf("user_auth_required" to "true", "ui_version" to "v2", "flow_version" to "v2.1"),
+            cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
+        )
+        verify(wideEventClient).flowStep(wideEventId = 1L, stepName = "recovery_code_shown", success = true)
+        verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success)
+        verifyNoMoreInteractions(wideEventClient)
+        verifyNoInteractions(cameraAccess)
     }
 
     @Test
@@ -416,7 +485,7 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
         isSignedIn = true
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowAppendToPath(
@@ -431,7 +500,7 @@ class SyncSetupWideEventImplTest {
         enableUnifiedEvent()
         whenever(advertisedExchangeVersion.resolve()).thenReturn(ExchangeProtocolVersion.V2_0)
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowAppendToPath(
@@ -444,7 +513,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `onStep appends the step with the current fields`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
@@ -456,7 +525,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `onUpdate re-appends the last step with the changed fields`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
         advanceUntilIdle()
 
@@ -484,8 +553,6 @@ class SyncSetupWideEventImplTest {
                 "device_auth_shown" to "true",
                 "setup_mode" to "multi_device",
                 "initial_setup_mode" to "single_device",
-                "role" to "joiner",
-                "peer_kind" to "3party",
                 "connect_method" to "scan_code",
             ),
         )
@@ -494,7 +561,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `unified attempt gets the original fields and keeps its own outcome`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onIntroScreenShown()
@@ -515,10 +582,10 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `second start finishes the unified attempt as duplicated and starts a new one`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
-        wideEvent.onFlowStarted(launchSource = "promotion_passwords")
+        wideEvent.onFlowStarted(launchSource = "promotion_passwords", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
@@ -534,7 +601,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `unified attempt keeps its fields after the unified event is disabled`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
         syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(false))
 
@@ -550,7 +617,7 @@ class SyncSetupWideEventImplTest {
         syncFeature.sendUnifiedSyncSetupWideEvent().setRawStoredState(State(true))
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(2L))
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Unknown)
@@ -560,7 +627,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `onSucceeded finishes the unified attempt as success without a reason`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onSucceeded()
@@ -574,7 +641,7 @@ class SyncSetupWideEventImplTest {
         @TestParameter(valuesProvider = FailureReasonsProvider::class) reason: SetupFailureReason,
     ) = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onFailed(reason)
@@ -592,7 +659,7 @@ class SyncSetupWideEventImplTest {
         @TestParameter(valuesProvider = CancellingFailureReasonsProvider::class) reason: SetupFailureReason,
     ) = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onFailed(reason)
@@ -610,7 +677,7 @@ class SyncSetupWideEventImplTest {
         @TestParameter(valuesProvider = CodeRejectingFailureReasonsProvider::class) reason: SetupFailureReason,
     ) = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onFailed(reason)
@@ -628,7 +695,7 @@ class SyncSetupWideEventImplTest {
         @TestParameter(valuesProvider = PersonTimeoutStagesProvider::class) stage: TimeoutStage,
     ) = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT, stage)
@@ -646,7 +713,7 @@ class SyncSetupWideEventImplTest {
         @TestParameter(valuesProvider = SoftwareTimeoutStagesProvider::class) stage: TimeoutStage,
     ) = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT, stage)
@@ -662,7 +729,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `session timeout without a stage finishes the unified attempt as failure at an unknown stage`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT)
@@ -678,7 +745,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `onFailed ignores the timeout stage for other reasons`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE, TimeoutStage.WAITING_FOR_PEER_HELLO)
@@ -696,7 +763,7 @@ class SyncSetupWideEventImplTest {
         @TestParameter reason: SetupCancellationReason,
     ) = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onCancelled(reason)
@@ -712,13 +779,13 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `finished unified attempt is not finished again`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onSucceeded()
         advanceUntilIdle()
 
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(any(), any(), any())
@@ -754,7 +821,7 @@ class SyncSetupWideEventImplTest {
     fun `unified attempt starts total and last step latencies`() = runTest {
         enableUnifiedEvent()
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         verify(wideEventClient).intervalStart(wideEventId = 1L, key = "total_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS)
@@ -771,7 +838,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `new step restarts the last step latency`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
@@ -785,7 +852,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `repeating the last step keeps its latency running`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
         advanceUntilIdle()
 
@@ -798,7 +865,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `finished attempt ends its latencies before it finishes`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         wideEvent.onSucceeded()
@@ -813,10 +880,10 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `duplicated attempt ends its latencies before it finishes`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
 
         val order = inOrder(wideEventClient)
@@ -832,7 +899,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `preparing sync latency runs through account created and stops on the next step`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onStep(SetupStep.PREPARING_SYNC)
         wideEvent.onStep(SetupStep.ACCOUNT_CREATED)
         advanceUntilIdle()
@@ -849,7 +916,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `preparing sync latency ends when the attempt ends on preparing sync`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onStep(SetupStep.PREPARING_SYNC)
         advanceUntilIdle()
 
@@ -864,7 +931,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `returning to preparing sync restarts its latency`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onStep(SetupStep.PREPARING_SYNC)
         wideEvent.onStep(SetupStep.ERROR_SCREEN)
         advanceUntilIdle()
@@ -881,7 +948,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `attempt that never reached preparing sync doesn't end its latency`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onStep(SetupStep.CHOICE_SCREEN)
         advanceUntilIdle()
 
@@ -896,7 +963,7 @@ class SyncSetupWideEventImplTest {
         @TestParameter reason: Denial.Reason,
     ) = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(reason, "sub_reason")) }
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
         advanceUntilIdle()
@@ -916,7 +983,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `device auth passing after a denial clears the denial`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
         wideEvent.onUpdate { it.copy(deviceAuthDenial = null) }
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
@@ -932,7 +999,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `device auth denial does not replace a cancellation other than user closed`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
         wideEvent.onCancelled(SetupCancellationReason.CODE_REJECTED)
         advanceUntilIdle()
@@ -947,7 +1014,7 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `device auth denial does not finish the attempt on its own`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
         advanceUntilIdle()
 
@@ -957,12 +1024,379 @@ class SyncSetupWideEventImplTest {
     @Test
     fun `success after a device auth denial finishes as success`() = runTest {
         enableUnifiedEvent()
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         wideEvent.onUpdate { it.copy(deviceAuthDenial = Denial(Denial.Reason.Canceled, "user_canceled")) }
         wideEvent.onSucceeded()
         advanceUntilIdle()
 
         verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success, metadata = emptyMap())
+    }
+
+    @Test
+    fun `camera permission is read at the outcome after leaving code entry`(@TestParameter granted: Boolean) = runTest {
+        enableUnifiedEvent()
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(!granted)
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        wideEvent.onStep(SetupStep.PREPARING_SYNC)
+        advanceUntilIdle()
+        verifyNoInteractions(cameraAccess)
+
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(granted)
+        wideEvent.onSucceeded()
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Success,
+            metadata = mapOf("camera_permission" to if (granted) "granted" else "denied"),
+        )
+    }
+
+    @Test
+    fun `code rejection ends the scan attempt with its camera permission even if the user subsequently closes the flow`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        val vm = process(RouteDecision.Legacy(SyncAuthCode.Unknown("unrecognized")), AccountResult.Error(AccountErrorCodes.INVALID_CODE.code))
+        advanceUntilIdle()
+        vm.onErrorDialogDismissed()
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("camera_permission" to "denied", "status_reason" to "code_rejected"),
+        )
+        verify(wideEventClient).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `pasting a v1 linking code with no success screen finishes on login with no elected role`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+
+        process(RouteDecision.Legacy(SyncAuthCode.Connect(mock())))
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowAppendToPath(
+            wideEventId = 1L,
+            step = "preparing_sync",
+            metadata = unifiedMetadata(setupMode = "multi_device", initialSetupMode = "multi_device") +
+                mapOf("flow_version" to "v1", "connect_method" to "paste_code"),
+        )
+        verify(wideEventClient).flowFinish(wideEventId = 1L, status = FlowStatus.Success, metadata = mapOf("camera_permission" to "denied"))
+    }
+
+    @Test
+    fun `blocked switch on entering a recovery code keeps the initial pairing mode`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        val blocked = DispatchOutcome.Failed(
+            "internal detail",
+            AccountErrorCodes.ALREADY_SIGNED_IN.code,
+            cancellationReason = SetupCancellationReason.ACCOUNT_SWITCH_BLOCKED,
+        )
+
+        process(RouteDecision.V2InProgress(SyncCodeType.RECOVERY, flowOf(blocked)))
+        advanceUntilIdle()
+
+        assertEquals("recovery", payload["setup_mode"])
+        assertEquals("multi_device", payload["initial_setup_mode"])
+        assertEquals("paste_code", payload["connect_method"])
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Cancelled,
+            metadata = mapOf("status_reason" to "account_switch_blocked", "camera_permission" to "denied"),
+        )
+    }
+
+    @Test
+    fun `nonretryable protocol upgrade dialog finishes with needs_upgrade before dismissal`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        val vm = process(RouteDecision.V2InProgress(SyncCodeType.LINKING, flowOf(DispatchOutcome.UpgradeRequired(3))))
+        advanceUntilIdle()
+        verify(wideEventClient).flowFinish(
+            wideEventId = 1L,
+            status = FlowStatus.Failure("needs_upgrade"),
+            metadata = mapOf("status_reason" to "needs_upgrade"),
+        )
+
+        vm.onErrorDialogDismissed()
+        advanceUntilIdle()
+        verify(wideEventClient).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `new legacy pairing code replaces recovery mode and the v2 session fields in the merged payload`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startV2Session()
+
+        wideEvent.onUpdate { it.copy(setupMode = SetupMode.RECOVERY) }
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        process(RouteDecision.Legacy(SyncAuthCode.Connect(mock())))
+        advanceUntilIdle()
+
+        assertEquals("v1", payload["flow_version"])
+        assertEquals("multi_device", payload["setup_mode"])
+        assertEquals("multi_device", payload["initial_setup_mode"])
+        assertEquals("preparing_sync", payload["last_step"])
+        assertFalse(payload.containsKey("role"))
+        assertFalse(payload.containsKey("peer_kind"))
+    }
+
+    @Test
+    fun `new v2 linking input restores pairing mode after recovery`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onUpdate { it.copy(setupMode = SetupMode.RECOVERY) }
+
+        process(RouteDecision.V2InProgress(SyncCodeType.LINKING, flowOf()))
+        advanceUntilIdle()
+
+        assertEquals("multi_device", payload["setup_mode"])
+        assertEquals("multi_device", payload["initial_setup_mode"])
+    }
+
+    @Test
+    fun `direct recovery after v2 resets its version and pairing fields and reads final permission`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startV2Session()
+
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        process(RouteDecision.Legacy(SyncAuthCode.Recovery(mock())))
+        whenever(cameraAccess.isPermissionGranted()).thenReturn(true)
+        advanceUntilIdle()
+
+        assertEquals("v2.1", payload["flow_version"])
+        assertEquals("recovery", payload["setup_mode"])
+        assertEquals("multi_device", payload["initial_setup_mode"])
+        assertEquals("granted", payload["camera_permission"])
+        assertFalse(payload.containsKey("role"))
+        assertFalse(payload.containsKey("peer_kind"))
+    }
+
+    @Test
+    fun `returning from pairing to backup clears pairing fields and restores the advertised version`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        wideEvent.onUpdate {
+            it.copy(
+                setupMode = SetupMode.MULTI_DEVICE,
+                role = SetupRole.JOINER,
+                peerKind = PeerKind.THIRD_PARTY,
+                flowVersion = ExchangeProtocolVersion.V2_0,
+            )
+        }
+        val viewModel = SyncThisDeviceViewModel(
+            isAuthRequired = false,
+            deviceAuthenticator = mock(),
+            syncAccountRepository = mock(),
+            syncPixels = mock(),
+            dispatchers = coroutineRule.testDispatcherProvider,
+            syncSetupWideEvent = wideEvent,
+        )
+
+        viewModel.onPairingDismissed()
+        wideEvent.onSucceeded()
+        advanceUntilIdle()
+
+        assertEquals("single_device", payload["setup_mode"])
+        assertEquals("single_device", payload["initial_setup_mode"])
+        assertEquals("v2.1", payload["flow_version"])
+        assertEquals("denied", payload["camera_permission"])
+        assertFalse(payload.containsKey("role"))
+        assertFalse(payload.containsKey("peer_kind"))
+    }
+
+    @Test
+    fun `v2 session sends role and peer only when the attempt finishes`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startV2Session()
+        assertFalse(payload.containsKey("role"))
+        assertFalse(payload.containsKey("peer_kind"))
+
+        wideEvent.onSucceeded()
+        advanceUntilIdle()
+
+        assertEquals("joiner", payload["role"])
+        assertEquals("3party", payload["peer_kind"])
+        assertEquals("v2", payload["flow_version"])
+    }
+
+    @Test
+    fun `fatal pairing timeout preserves its operational last step`(
+        @TestParameter("WAITING_FOR_CONFIRMATION", "PREPARING_SYNC") step: SetupStep,
+    ) = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onStep(step)
+        val stage = if (step == SetupStep.WAITING_FOR_CONFIRMATION) {
+            TimeoutStage.WAITING_FOR_CONFIRMATION
+        } else {
+            TimeoutStage.WAITING_FOR_RECOVERY_CODE
+        }
+
+        process(
+            RouteDecision.V2InProgress(
+                SyncCodeType.LINKING,
+                flowOf(DispatchOutcome.Failed("timeout", AccountErrorCodes.SESSION_TIMEOUT.code, timeoutStage = stage)),
+            ),
+        )
+        advanceUntilIdle()
+
+        assertEquals(step.value, payload["last_step"])
+        assertFalse(payload.getValue("steps").contains("error_screen"))
+        assertEquals("session_timeout", payload["status_reason"])
+        assertEquals(stage.value, payload["timeout_stage"])
+    }
+
+    @Test
+    fun `observed joiner timeout ends once before the unchanged dispatcher outcome`(
+        @TestParameter("false", "true") hostConfirmed: Boolean,
+    ) = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        val observer = SyncSetupPairingObserver(wideEvent)
+        observer.onEvent(
+            ExchangeV2Event.RoleElected(
+                timestampMs = 0,
+                role = Role.Joiner,
+                ownPairingRole = PairingRole.Scanner,
+                ownSignedIn = false,
+                ownKind = "ddg",
+                peerKind = "ddg",
+                peerSignedIn = true,
+            ),
+        )
+        wideEvent.onStep(SetupStep.WAITING_FOR_CONFIRMATION)
+        if (hostConfirmed) {
+            observer.onEvent(
+                ExchangeV2Event.Transition(
+                    timestampMs = 0,
+                    from = ExchangeV2State.Joiner.Waiting,
+                    to = ExchangeV2State.Joiner.Waiting,
+                    trigger = ExchangeV2Message.RecoveryCodeConfirmed.create(),
+                    localTrigger = null,
+                ),
+            )
+        }
+
+        observer.onEvent(ExchangeV2Event.SessionError(0, "timeout", SessionErrorKind.SessionTimeout, TimeoutStage.WAITING_FOR_RECOVERY_CODE))
+        wideEvent.onPairingOutcome(
+            DispatchOutcome.Failed("timeout", AccountErrorCodes.SESSION_TIMEOUT.code, timeoutStage = TimeoutStage.WAITING_FOR_RECOVERY_CODE),
+        )
+        advanceUntilIdle()
+
+        val expectedStatus = if (hostConfirmed) FlowStatus.Failure("session_timeout") else FlowStatus.Cancelled
+        assertEquals(if (hostConfirmed) "waiting_for_recovery_code" else "waiting_for_confirmation", payload["timeout_stage"])
+        assertEquals(if (hostConfirmed) "preparing_sync" else "waiting_for_confirmation", payload["last_step"])
+        verify(wideEventClient).flowFinish(eq(1L), eq(expectedStatus), any())
+        verify(wideEventClient).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `fatal legacy failure preserves preparing sync as the last step`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        process(RouteDecision.Legacy(SyncAuthCode.Connect(mock())), AccountResult.Error(AccountErrorCodes.CONNECT_FAILED.code))
+        advanceUntilIdle()
+
+        assertEquals("preparing_sync", payload["last_step"])
+        assertFalse(payload.getValue("steps").contains("error_screen"))
+    }
+
+    @Test
+    fun `empty paste followed by valid pairing sends the successful outcome`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        val clipboard = mock<Clipboard> {
+            on { pasteFromClipboard() } doAnswer { "" }
+        }
+        val reader = ReadSyncCodeViewModel(
+            entryPoint = SyncEntryPoint.ADD_DEVICE,
+            launchSource = "other",
+            clipboard = clipboard,
+            syncPixels = mock(),
+            codeDispatcher = mock(),
+            setupEvent = wideEvent,
+        )
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        reader.onCodeEntryShown()
+
+        reader.pasteSyncCode()
+        advanceUntilIdle()
+        process(RouteDecision.V2InProgress(SyncCodeType.LINKING, flowOf(DispatchOutcome.LoggedIn(SetupPath.PAIRING))))
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(eq(1L), eq(FlowStatus.Success), any())
+        verify(wideEventClient).flowFinish(any(), any(), any())
+        assertEquals("paste_code", payload["connect_method"])
+        assertFalse(payload.containsKey("status_reason"))
+    }
+
+    private suspend fun TestScope.startV2Session() {
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.MULTI_DEVICE)
+        wideEvent.onStep(SetupStep.CODE_ENTRY)
+        wideEvent.onUpdate { it.copy(role = SetupRole.JOINER, peerKind = PeerKind.THIRD_PARTY, flowVersion = ExchangeProtocolVersion.V2_0) }
+        wideEvent.onStep(SetupStep.WAITING_FOR_CONFIRMATION)
+        advanceUntilIdle()
+    }
+
+    private suspend fun captureMergedMetadata(): MutableMap<String, String> {
+        val payload = mutableMapOf<String, String>()
+        val steps = mutableListOf<String>()
+        whenever(wideEventClient.flowAppendToPath(any(), any(), any())).thenAnswer { invocation ->
+            payload.putAll(invocation.getArgument<Map<String, String>>(2))
+            val step = invocation.getArgument<String>(1)
+            if (steps.lastOrNull() != step) steps.add(step)
+            payload["steps"] = steps.joinToString(",")
+            payload["last_step"] = step
+            Result.success(Unit)
+        }
+        whenever(wideEventClient.flowFinish(any(), any(), any())).thenAnswer { invocation ->
+            payload.putAll(invocation.getArgument<Map<String, String>>(2))
+            Result.success(Unit)
+        }
+        return payload
+    }
+
+    private fun process(
+        decision: RouteDecision,
+        result: AccountResult<Boolean> = AccountResult.Success(true),
+    ): ProcessSyncCodeViewModel {
+        val dispatcher = mock<SyncCodeDispatcher> {
+            on { route(any()) } doAnswer { decision }
+        }
+        val accounts = mock<SyncAccountRepository> {
+            on { processCode(any(), anyOrNull()) } doAnswer { result }
+        }
+        return ProcessSyncCodeViewModel(
+            codeSource = SyncCodeSource.Pasted("test code", SyncEntryPoint.ADD_DEVICE),
+            launchSource = "other",
+            accountRepository = accounts,
+            codeDispatcher = dispatcher,
+            syncPixels = mock(),
+            syncAutoRestoreManager = mock(),
+            switchedAccountDetector = mock(),
+            dispatchers = coroutineRule.testDispatcherProvider,
+            setupEvent = wideEvent,
+        )
     }
 
     private suspend fun enableUnifiedEvent() {
@@ -986,7 +1420,7 @@ class SyncSetupWideEventImplTest {
 
     private suspend fun TestScope.startFlow(flowId: Long) {
         whenever(wideEventClient.flowStart(any(), any(), any(), any(), any(), any())).thenReturn(Result.success(flowId))
-        wideEvent.onFlowStarted()
+        wideEvent.onFlowStarted(launchSource = "other", setupMode = SetupMode.SINGLE_DEVICE)
         advanceUntilIdle()
     }
 

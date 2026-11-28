@@ -19,6 +19,8 @@ package com.duckduckgo.sync.impl.exchange.v2
 import android.util.Base64
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.duckduckgo.sync.impl.exchange.ExchangeProtocolVersion
+import org.json.JSONArray
+import org.json.JSONObject
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -83,8 +85,59 @@ class RealExchangeV2QrCodeTest {
 
         assertTrue(result is ExchangeV2CodeParseResult.RecoveryCode)
         result as ExchangeV2CodeParseResult.RecoveryCode
-        assertEquals("u", result.rawJson.getString("user_id"))
-        assertEquals("ddg", result.rawJson.getString("cid"))
+        assertEquals("u", result.userId)
+        assertEquals("ddg", result.cid)
+        assertEquals("s", result.secret)
+        assertEquals(ExchangeProtocolVersion.V2_0, result.version)
+    }
+
+    @Test fun `parse rejects invalid recovery fields`() {
+        for (field in listOf("user_id", "secret", "v", "cid")) {
+            for (value in listOf(JSONObject.NULL, 42, true, JSONObject(), JSONArray())) {
+                val recovery = JSONObject()
+                    .put("user_id", "user")
+                    .put("secret", "secret")
+                    .put("v", "2.0")
+                    .put("cid", "ddg")
+                    .put(field, value)
+                val payload = JSONObject().put("recovery", recovery).toString()
+                assertEquals("field=$field value=$value", ExchangeV2CodeParseResult.InvalidRecoveryCode, qrCode.parse(encodeUrl(payload)))
+            }
+        }
+    }
+
+    @Test fun `parse rejects missing or blank recovery credentials`() {
+        for (field in listOf("user_id", "secret")) {
+            for (value in listOf(null, "", " \t")) {
+                val recovery = JSONObject().put("user_id", "user").put("secret", "secret").put(field, value)
+                val payload = JSONObject().put("recovery", recovery).toString()
+                assertEquals(ExchangeV2CodeParseResult.InvalidRecoveryCode, qrCode.parse(encodeUrl(payload)))
+            }
+        }
+    }
+
+    @Test fun `parse rejects unsupported recovery versions`() {
+        for (version in listOf("1.0", "3.0", "", "invalid", "2.invalid", "2.")) {
+            val payload = """{"recovery":{"user_id":"u","secret":"s","v":"$version"}}"""
+            assertEquals(ExchangeV2CodeParseResult.InvalidRecoveryCode, qrCode.parse(encodeUrl(payload)))
+        }
+    }
+
+    @Test fun `parse defaults recovery version and credential type`() {
+        val parsed = qrCode.parse(encodeUrl("""{"recovery":{"user_id":"u","secret":"s"}}"""))
+        assertEquals(ExchangeV2CodeParseResult.RecoveryCode("u", "s", "ddg", ExchangeProtocolVersion.V2_0), parsed)
+    }
+
+    @Test fun `parse accepts same major recovery versions`() {
+        for ((version, expected) in listOf(
+            "2" to ExchangeProtocolVersion.V2_0,
+            "2.0" to ExchangeProtocolVersion.V2_0,
+            "2.1" to ExchangeProtocolVersion.V2_1,
+            "2.99" to ExchangeProtocolVersion.V2(99),
+        )) {
+            val payload = """{"recovery":{"user_id":"u","secret":"s","cid":"3party","v":"$version"}}"""
+            assertEquals(ExchangeV2CodeParseResult.RecoveryCode("u", "s", "3party", expected), qrCode.parse(encodeUrl(payload)))
+        }
     }
 
     @Test fun `parse rejects v1 recovery codes (primary_key) so they fall through to legacy stack`() {

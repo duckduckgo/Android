@@ -57,6 +57,10 @@ import com.duckduckgo.sync.impl.onSuccess
 import com.duckduckgo.sync.impl.pixels.SyncAccountOperation
 import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.AuthenticationSource
+import com.duckduckgo.sync.impl.pixels.SyncPixels.ConnectMethod
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupMode
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.pixels.SyncPixels.TurnOffOption
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource
 import com.duckduckgo.sync.impl.promotion.SyncGetOnOtherPlatformsLaunchSource.SOURCE_PROMOTION_BOOKMARK_ADDED_DIALOG
@@ -375,21 +379,23 @@ class SyncActivityViewModel @Inject constructor(
         ) : Command()
     }
 
-    fun onSyncWithAnotherDevice() {
+    fun onSyncWithAnotherDevice(launchSource: String) {
+        syncSetupWideEvent.onFlowStarted(launchSource, SetupMode.MULTI_DEVICE)
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {
                 command.send(ShowPreviousSessionReady(SyncEntryPoint.ADD_DEVICE))
             } else {
-                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED) {
+                withAuthentication(AuthenticationSource.SETTINGS_NOT_SYNCED, pairing = true) {
                     command.send(Command.SyncWithAnotherDevice)
                 }
             }
         }
     }
 
-    fun onAddAnotherDevice() {
+    fun onAddAnotherDevice(launchSource: String) {
+        syncSetupWideEvent.onFlowStarted(launchSource, SetupMode.MULTI_DEVICE)
         viewModelScope.launch {
-            withAuthentication(AuthenticationSource.SETTINGS_SYNCED) {
+            withAuthentication(AuthenticationSource.SETTINGS_SYNCED, pairing = true) {
                 command.send(Command.AddAnotherDevice)
             }
         }
@@ -403,7 +409,7 @@ class SyncActivityViewModel @Inject constructor(
     private fun startSyncThisDevice(launchSource: String) {
         viewState.update { it.setThisDeviceSyncInProgress() }
         viewModelScope.launch(dispatchers.io()) {
-            syncSetupWideEvent.onFlowStarted(launchSource)
+            syncSetupWideEvent.onFlowStarted(launchSource, SetupMode.SINGLE_DEVICE)
             if (syncAutoRestore.canRestore()) {
                 command.send(ShowPreviousSessionReady(SyncEntryPoint.SYNC_NEW_ACCOUNT))
             } else {
@@ -412,7 +418,8 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onRecoverYourSyncedData() {
+    fun onRecoverYourSyncedData(launchSource: String) {
+        syncSetupWideEvent.onFlowStarted(launchSource, SetupMode.RECOVERY)
         syncPixels.fireRecoverSyncDataTapped()
         viewModelScope.launch(dispatchers.io()) {
             if (syncAutoRestore.canRestore()) {
@@ -487,7 +494,12 @@ class SyncActivityViewModel @Inject constructor(
         showAccountDetailsIfNeeded()
     }
 
+    fun onPairingDismissed() {
+        syncSetupWideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+    }
+
     fun onConnectionCancelled() {
+        onPairingDismissed()
         syncSetupWideEvent.onFlowCancelled()
         showAccountDetailsIfNeeded()
     }
@@ -707,8 +719,8 @@ class SyncActivityViewModel @Inject constructor(
         }
     }
 
-    fun onSyncWithDesktopSelected() {
-        onAddAnotherDevice()
+    fun onSyncWithDesktopSelected(launchSource: String) {
+        onAddAnotherDevice(launchSource)
     }
 
     fun onNoDesktopAppSelected() {
@@ -812,11 +824,13 @@ class SyncActivityViewModel @Inject constructor(
     private suspend fun withAuthentication(
         source: AuthenticationSource,
         request: Request = Request(),
+        pairing: Boolean = false,
         action: suspend () -> Unit,
     ) {
         // We show the settings because the prompt would otherwise appear over a blank screen.
         isContentHidden.value = false
         val response = deviceAuthenticator.authenticate(source, request)
+        if (pairing && response !is Response.Allowed) syncSetupWideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
 
         when (response) {
             is Response.Allowed -> action()
@@ -858,7 +872,7 @@ class SyncActivityViewModel @Inject constructor(
     private fun ViewState.setThisDeviceSyncInProgress() = copy(isThisDeviceSyncing = true)
     private fun ViewState.setThisDeviceSyncIdle() = copy(isThisDeviceSyncing = false)
 
-    fun processSetupDeepLink(setupUrl: String) {
+    fun processSetupDeepLink(setupUrl: String, launchSource: String) {
         logcat { "Sync-setup: got setup deep link $setupUrl" }
         viewModelScope.launch(dispatchers.io()) {
             val parsed = SyncBarcodeUrl.parseUrl(setupUrl)
@@ -866,20 +880,24 @@ class SyncActivityViewModel @Inject constructor(
                 logcat { "Sync-setup: failed to parse setup URL $setupUrl" }
                 return@launch
             }
+            syncSetupWideEvent.onFlowStarted(launchSource, SetupMode.MULTI_DEVICE)
+            syncSetupWideEvent.onUpdate { it.copy(connectMethod = ConnectMethod.LINK) }
             when (parsed.protocolVersion) {
                 SyncBarcodeUrl.ProtocolVersion.V1 -> {
                     // V1 URL-based sync setup only accepts exchange codes
                     if (syncAccountRepository.parseSyncAuthCode(setupUrl) !is SyncAuthCode.Exchange) {
+                        syncSetupWideEvent.onCancelled(SetupCancellationReason.CODE_REJECTED)
                         logcat { "Sync-setup: v1 deep-link URL does not carry an exchange code; ignoring silently" }
                         return@launch
                     }
+                    syncSetupWideEvent.onStep(SetupStep.CONFIRMATION_SCREEN)
                     command.send(Command.AskSetupSyncDeepLink(parsed))
                 }
                 SyncBarcodeUrl.ProtocolVersion.V2 -> {
                     // V2 exchanges have their own user confirmation built into the protocol
                     // (the Joiner/Host confirmation surfaced by the runner)
                     logcat { "Sync-setup: v2 deep link; bypassing legacy confirmation dialog" }
-                    withAuthentication(AuthenticationSource.DEEP_LINK, DEEP_LINK_AUTH_REQUEST) {
+                    withAuthentication(AuthenticationSource.DEEP_LINK, DEEP_LINK_AUTH_REQUEST, pairing = true) {
                         command.send(Command.DeepLinkIntoSetup(parsed, syncAccountRepository.isSignedIn()))
                     }
                 }
@@ -905,18 +923,23 @@ class SyncActivityViewModel @Inject constructor(
                     isContentHidden.value = false
                     command.send(Command.AskSyncWithDesktop)
                 }
-                isSignedIn -> onAddAnotherDevice()
+                isSignedIn -> onAddAnotherDevice(launchSource)
                 setupFlow in disabledSetupFlows() -> isContentHidden.value = false
-                joinExistingAccount -> onSyncWithAnotherDevice()
+                joinExistingAccount -> onSyncWithAnotherDevice(launchSource)
                 else -> startSyncThisDevice(launchSource)
             }
         }
         return hidesContent
     }
 
+    fun onUserDeclinedDeepLinkIntoSync() {
+        syncSetupWideEvent.onCancelled(SetupCancellationReason.SYNC_CONFIRMATION_DENIED)
+    }
+
     fun onUserAgreedToDeepLinkIntoSync(barcodeSyncUrl: SyncBarcodeUrl) {
+        syncSetupWideEvent.onStep(SetupStep.SYNC_CONFIRMATION)
         viewModelScope.launch(dispatchers.io()) {
-            withAuthentication(AuthenticationSource.DEEP_LINK, DEEP_LINK_AUTH_REQUEST) {
+            withAuthentication(AuthenticationSource.DEEP_LINK, DEEP_LINK_AUTH_REQUEST, pairing = true) {
                 command.send(Command.DeepLinkIntoSetup(barcodeSyncUrl, syncAccountRepository.isSignedIn()))
             }
         }

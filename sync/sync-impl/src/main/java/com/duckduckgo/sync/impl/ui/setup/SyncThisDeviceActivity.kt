@@ -87,7 +87,7 @@ class SyncThisDeviceActivity : DuckDuckGoActivity() {
                 finish()
             }
 
-            is ReadSyncCodeContract.Output.Dismissed -> Unit
+            is ReadSyncCodeContract.Output.Dismissed -> viewModel.onPairingDismissed()
         }
     }
 

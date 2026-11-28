@@ -544,6 +544,24 @@ class AppSyncAccountRepositoryTest {
     }
 
     @Test
+    fun whenLogoutSucceedsAndJoinNewAccountFailsThenReturnLoginError() {
+        givenAuthenticatedDevice()
+        doAnswer {
+            givenUnauthenticatedDevice()
+            logoutSuccess
+        }.`when`(syncApi).logout(token, deviceId)
+        prepareForLoginSuccess()
+        whenever(syncApi.login(userId, hashedPassword, deviceId, deviceName, deviceFactor)).thenReturn(loginFailed)
+
+        val result = syncRepo.logoutAndJoinNewAccount(jsonRecoveryKeyEncoded) as Error
+
+        assertEquals(LOGIN_FAILED.code, result.code)
+        verify(syncApi).logout(token, deviceId)
+        verify(syncApi).login(userId, hashedPassword, deviceId, deviceName, deviceFactor)
+        verify(syncPixels).fireUserSwitchedLoginError()
+    }
+
+    @Test
     fun whenGenerateKeysFromRecoveryCodeFailsThenReturnLoginFailedError() {
         prepareToProvideDeviceIds()
         whenever(nativeLib.prepareForLogin(primaryKey = primaryKey)).thenReturn(failedLoginKeys)
