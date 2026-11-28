@@ -28,6 +28,7 @@ import com.duckduckgo.common.test.CoroutineTestRule
 import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle.State
 import com.duckduckgo.pagetranslation.impl.PageTranslationFeature
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadState.Failed.Reason
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.DOWNLOADED_BYTES_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.FAILURE_REASON_KEY
@@ -205,7 +206,7 @@ class LanguagePackDownloadWorkerTest {
     private val progressUpdates = mutableListOf<Data>()
 
     private fun createWorker() = TestListenableWorkerBuilder<LanguagePackDownloadWorker>(context)
-        .setInputData(workDataOf(PAIR_KEY to PAIR))
+        .setInputData(workDataOf(PAIR_KEY to PAIR.key))
         .setProgressUpdater { _, _, data ->
             progressUpdates += data
             CallbackToFutureAdapter.getFuture { it.set(null) }
@@ -221,7 +222,7 @@ class LanguagePackDownloadWorkerTest {
         }
 
     private companion object {
-        const val PAIR = "fr-en"
+        val PAIR = LanguagePair("fr", "en")
         const val BASE_URL = "https://models.test/"
         const val STAGING_PATH = "page-translation/packs/fr-en.tmp"
         const val PACK_PATH = "page-translation/packs/fr-en"
@@ -238,6 +239,6 @@ class LanguagePackDownloadWorkerTest {
 
         val DOWNLOAD_ERROR_RESULT = Result.success(workDataOf(FAILURE_REASON_KEY to Reason.DOWNLOAD_ERROR.name))
 
-        val MANIFEST = ModelsManifest(schemaVersion = 1, baseUrl = BASE_URL, models = mapOf(PAIR to MODEL))
+        val MANIFEST = ModelsManifest(schemaVersion = 1, baseUrl = BASE_URL, models = mapOf(PAIR.key to MODEL))
     }
 }

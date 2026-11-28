@@ -19,6 +19,7 @@ package com.duckduckgo.pagetranslation.impl.languagepack
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -36,26 +37,36 @@ class LanguagePackDirectoriesTest {
 
     @Test
     fun listNoPairsWhenNothingWasDownloaded() {
-        assertEquals(emptySet<String>(), directories.getInstalledPairs())
-        assertEquals(emptySet<String>(), directories.getPairsWithOldDirectory())
+        assertEquals(emptySet<LanguagePair>(), directories.getInstalledPairs())
+        assertEquals(emptySet<LanguagePair>(), directories.getPairsWithOldDirectory())
     }
 
     @Test
     fun listOnlyPairsWithoutSuffixAsInstalled() {
-        directories.getPackDirectory("fr-en").mkdirs()
-        directories.getStagingDirectory("de-en").mkdirs()
-        directories.getOldDirectory("es-en").mkdirs()
+        directories.getPackDirectory(LanguagePair("fr", "en")).mkdirs()
+        directories.getStagingDirectory(LanguagePair("de", "en")).mkdirs()
+        directories.getOldDirectory(LanguagePair("es", "en")).mkdirs()
 
-        assertEquals(setOf("fr-en"), directories.getInstalledPairs())
+        assertEquals(setOf(LanguagePair("fr", "en")), directories.getInstalledPairs())
     }
 
     @Test
     fun listPairsWithOldDirectory() {
-        directories.getPackDirectory("fr-en").mkdirs()
-        directories.getStagingDirectory("de-en").mkdirs()
-        directories.getOldDirectory("es-en").mkdirs()
-        directories.getOldDirectory("fr-en").mkdirs()
+        directories.getPackDirectory(LanguagePair("fr", "en")).mkdirs()
+        directories.getStagingDirectory(LanguagePair("de", "en")).mkdirs()
+        directories.getOldDirectory(LanguagePair("es", "en")).mkdirs()
+        directories.getOldDirectory(LanguagePair("fr", "en")).mkdirs()
 
-        assertEquals(setOf("es-en", "fr-en"), directories.getPairsWithOldDirectory())
+        assertEquals(setOf(LanguagePair("es", "en"), LanguagePair("fr", "en")), directories.getPairsWithOldDirectory())
+    }
+
+    @Test
+    fun skipDirectoriesThatDoNotNameAPair() {
+        directories.getPackDirectory(LanguagePair("fr", "en")).mkdirs()
+        context.filesDir.resolve("page-translation/packs/unknown").mkdirs()
+        context.filesDir.resolve("page-translation/packs/unknown.old").mkdirs()
+
+        assertEquals(setOf(LanguagePair("fr", "en")), directories.getInstalledPairs())
+        assertEquals(emptySet<LanguagePair>(), directories.getPairsWithOldDirectory())
     }
 }

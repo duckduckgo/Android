@@ -23,6 +23,7 @@ import androidx.work.ListenableWorker.Result
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.workDataOf
 import com.duckduckgo.common.test.CoroutineTestRule
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackDownloadWorker.Companion.PAIR_KEY
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.DELETE
 import com.duckduckgo.pagetranslation.impl.languagepack.LanguagePackFileOperation.REMOVE
@@ -128,7 +129,7 @@ class LanguagePackFileWorkerTest {
 
         assertEquals(Result.success(), run(REMOVE))
 
-        assertEquals(setOf(OTHER_PAIR), context.filesDir.resolve("page-translation/packs").list()!!.toSet())
+        assertEquals(setOf(OTHER_PAIR.key), context.filesDir.resolve("page-translation/packs").list()!!.toSet())
         assertEquals("other", directories.getPackDirectory(OTHER_PAIR).readFile())
     }
 
@@ -171,7 +172,7 @@ class LanguagePackFileWorkerTest {
     }
 
     private suspend fun run(operation: LanguagePackFileOperation) = TestListenableWorkerBuilder<LanguagePackFileWorker>(context)
-        .setInputData(workDataOf(PAIR_KEY to PAIR, OPERATION_KEY to operation.name))
+        .setInputData(workDataOf(PAIR_KEY to PAIR.key, OPERATION_KEY to operation.name))
         .build()
         .also {
             it.directories = directories
@@ -183,7 +184,7 @@ class LanguagePackFileWorkerTest {
     private class FakeLanguagePackInstaller : LanguagePackInstaller {
         var isPackIntact = true
 
-        override suspend fun install(pair: String, model: TranslationModel, stagingDirectory: File, packDirectory: File) = error("unused")
+        override suspend fun install(pair: LanguagePair, model: TranslationModel, stagingDirectory: File, packDirectory: File) = error("unused")
 
         override suspend fun isIntact(packDirectory: File) = isPackIntact
     }
@@ -196,8 +197,8 @@ class LanguagePackFileWorkerTest {
     private fun File.readFile() = resolve(FILE_NAME).readText()
 
     private companion object {
-        const val PAIR = "fr-en"
-        const val OTHER_PAIR = "de-en"
+        val PAIR = LanguagePair("fr", "en")
+        val OTHER_PAIR = LanguagePair("de", "en")
         const val FILE_NAME = "model"
     }
 }

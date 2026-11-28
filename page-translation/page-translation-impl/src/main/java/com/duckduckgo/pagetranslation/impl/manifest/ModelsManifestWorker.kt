@@ -52,7 +52,7 @@ internal class ModelsManifestWorker(
 
         val result = fetcher.value.fetch()
         if (result == Result.success()) {
-            store.readManifest()?.let { manifest -> languagePackScheduler.removeUnlisted(manifest.models.keys) }
+            store.readManifest()?.let { manifest -> languagePackScheduler.removeUnlisted(manifest.pairs) }
         }
 
         result

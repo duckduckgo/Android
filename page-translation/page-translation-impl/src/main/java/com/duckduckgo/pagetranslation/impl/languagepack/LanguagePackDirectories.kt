@@ -18,6 +18,7 @@ package com.duckduckgo.pagetranslation.impl.languagepack
 
 import android.content.Context
 import com.duckduckgo.di.scopes.AppScope
+import com.duckduckgo.pagetranslation.impl.language.LanguagePair
 import dev.zacsweers.metro.ContributesBinding
 import java.io.File
 import javax.inject.Inject
@@ -25,33 +26,36 @@ import javax.inject.Inject
 /** Where a pair's language pack lives: only a directory named after the pair, without a suffix, is an installed pack. */
 interface LanguagePackDirectories {
     /** Where a download of [pair] is assembled before it's installed. */
-    fun getStagingDirectory(pair: String): File
+    fun getStagingDirectory(pair: LanguagePair): File
 
     /** Where [pair]'s installed pack lives. */
-    fun getPackDirectory(pair: String): File
+    fun getPackDirectory(pair: LanguagePair): File
 
     /** Where [pair]'s pack waits after it was deleted, until it's restored or removed. */
-    fun getOldDirectory(pair: String): File
+    fun getOldDirectory(pair: LanguagePair): File
 
-    fun getInstalledPairs(): Set<String>
+    fun getInstalledPairs(): Set<LanguagePair>
 
-    fun getPairsWithOldDirectory(): Set<String>
+    fun getPairsWithOldDirectory(): Set<LanguagePair>
 }
 
 @ContributesBinding(AppScope::class)
 class RealLanguagePackDirectories @Inject constructor(
     private val context: Context,
 ) : LanguagePackDirectories {
-    override fun getStagingDirectory(pair: String): File = getPacksDirectory().resolve(pair + STAGING_SUFFIX)
+    override fun getStagingDirectory(pair: LanguagePair): File = getPacksDirectory().resolve(pair.key + STAGING_SUFFIX)
 
-    override fun getPackDirectory(pair: String): File = getPacksDirectory().resolve(pair)
+    override fun getPackDirectory(pair: LanguagePair): File = getPacksDirectory().resolve(pair.key)
 
-    override fun getOldDirectory(pair: String): File = getPacksDirectory().resolve(pair + OLD_SUFFIX)
+    override fun getOldDirectory(pair: LanguagePair): File = getPacksDirectory().resolve(pair.key + OLD_SUFFIX)
 
-    override fun getInstalledPairs(): Set<String> = getDirectoryNames().filterTo(mutableSetOf()) { '.' !in it }
+    override fun getInstalledPairs(): Set<LanguagePair> = getDirectoryNames().filter { '.' !in it }.mapNotNullTo(
+        mutableSetOf(),
+        LanguagePair::fromKey,
+    )
 
-    override fun getPairsWithOldDirectory(): Set<String> =
-        getDirectoryNames().filter { it.endsWith(OLD_SUFFIX) }.mapTo(mutableSetOf()) { it.removeSuffix(OLD_SUFFIX) }
+    override fun getPairsWithOldDirectory(): Set<LanguagePair> =
+        getDirectoryNames().filter { it.endsWith(OLD_SUFFIX) }.mapNotNullTo(mutableSetOf()) { LanguagePair.fromKey(it.removeSuffix(OLD_SUFFIX)) }
 
     private fun getDirectoryNames(): List<String> = getPacksDirectory().listFiles()?.filter { it.isDirectory }?.map { it.name }.orEmpty()
 
