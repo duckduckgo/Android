@@ -18,9 +18,11 @@ package com.duckduckgo.sync.impl.ui.dashboard
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.duckduckgo.sync.impl.auditlog.PendingLogin
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Instant
 
 @RunWith(AndroidJUnit4::class)
 class NewDeviceBannerTextTest {
@@ -29,43 +31,56 @@ class NewDeviceBannerTextTest {
 
     @Test
     fun whenOneDeviceThenSingularTitleAndOneName() {
-        val banner = banner("Laptop")
+        val banner = bannerFor("Laptop")
 
         assertEquals("New synced device", banner.title(resources))
         assertEquals("This phone has synced with Laptop.", banner.body(resources))
     }
 
     @Test
-    fun whenTwoDevicesThenPluralTitleAndBothNames() {
-        val banner = banner("Laptop", "Phone")
+    fun whenTwoDevicesThenPluralTitleAndNoComma() {
+        val banner = bannerFor("Laptop", "Phone")
 
         assertEquals("New synced devices", banner.title(resources))
         assertEquals("This phone has synced with Laptop and Phone.", banner.body(resources))
     }
 
     @Test
-    fun whenSeveralDevicesThenCommasThenAndBeforeLastName() {
+    fun whenThreeDevicesThenCommaBeforeAnd() {
         assertEquals(
-            "This phone has synced with Laptop, Phone, Tablet and Desktop.",
-            banner("Laptop", "Phone", "Tablet", "Desktop").body(resources),
+            "This phone has synced with Laptop, Phone, and Tablet.",
+            bannerFor("Laptop", "Phone", "Tablet").body(resources),
         )
     }
 
     @Test
-    fun whenMoreThanShownThenAllNamesThenMoreCount() {
-        val banner = banner("A", "B", "C", "D", "E", "F", "G", "H", moreCount = 3)
+    fun whenEightDevicesThenAllNamesAndCommaBeforeAnd() {
+        assertEquals(
+            "This phone has synced with A, B, C, D, E, F, G, and H.",
+            bannerFor("A", "B", "C", "D", "E", "F", "G", "H").body(resources),
+        )
+    }
+
+    @Test
+    fun whenElevenDevicesThenEightNamesThenCommaBeforeMoreCount() {
+        val banner = bannerFor("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K")
 
         assertEquals("New synced devices", banner.title(resources))
-        assertEquals("This phone has synced with A, B, C, D, E, F, G, H and 3 more.", banner.body(resources))
+        assertEquals("This phone has synced with A, B, C, D, E, F, G, H, and 3 more.", banner.body(resources))
     }
 
     @Test
-    fun whenOneMoreThanShownThenOneMore() {
+    fun whenNineDevicesThenOneMore() {
         assertEquals(
-            "This phone has synced with A, B, C, D, E, F, G, H and 1 more.",
-            banner("A", "B", "C", "D", "E", "F", "G", "H", moreCount = 1).body(resources),
+            "This phone has synced with A, B, C, D, E, F, G, H, and 1 more.",
+            bannerFor("A", "B", "C", "D", "E", "F", "G", "H", "I").body(resources),
         )
     }
 
-    private fun banner(vararg names: String, moreCount: Int = 0) = NewDeviceBanner(names.toList(), moreCount, emptySet())
+    private fun bannerFor(vararg namesNewestFirst: String): NewDeviceBanner {
+        val oldestFirst = namesNewestFirst.reversed().mapIndexed { index, name ->
+            PendingLogin("entry-$index", "device-$index", name, Instant.ofEpochSecond(index.toLong()))
+        }
+        return NewDeviceBanner.from(oldestFirst)!!
+    }
 }

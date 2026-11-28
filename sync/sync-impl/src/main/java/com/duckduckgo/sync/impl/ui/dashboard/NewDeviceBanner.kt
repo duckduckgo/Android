@@ -56,6 +56,7 @@ fun NewDeviceBanner.body(resources: Resources): String {
             moreCount,
         )
         deviceNames.size == 1 -> deviceNames.single()
+        deviceNames.size == 2 -> resources.getString(R.string.syncNewDeviceBannerTwoNames, deviceNames[0], deviceNames[1])
         else -> resources.getString(R.string.syncNewDeviceBannerLastName, deviceNames.dropLast(1).joinToString(NAME_SEPARATOR), deviceNames.last())
     }
     return resources.getString(R.string.syncNewDeviceBannerBody, names)
