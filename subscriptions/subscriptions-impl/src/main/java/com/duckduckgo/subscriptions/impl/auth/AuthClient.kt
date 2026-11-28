@@ -111,6 +111,15 @@ interface AuthClient {
      * @param accessTokenV2 access token obtained from auth API v2
      */
     suspend fun tryLogout(accessTokenV2: String)
+
+    /**
+     * Makes the backend treat the given refresh token as already used, so the next refresh with it is rejected.
+     * Only the staging auth backend serves this endpoint; production responds with 404.
+     *
+     * @param refreshToken refresh token obtained from auth API v2
+     * @throws HttpException if the backend responds with a non-2xx code
+     */
+    suspend fun invalidateRefreshToken(refreshToken: String)
 }
 
 data class TokenPair(
@@ -247,6 +256,11 @@ class AuthClientImpl @Inject constructor(
         } catch (e: Exception) {
             logcat { "Logout request failed" }
         }
+    }
+
+    override suspend fun invalidateRefreshToken(refreshToken: String) {
+        val response = authService.invalidate(refreshToken = refreshToken)
+        if (!response.isSuccessful) throw HttpException(response)
     }
 
     private fun Response<Unit>.getAuthorizationCode(): String {
