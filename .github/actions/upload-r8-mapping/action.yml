@@ -1,0 +1,83 @@
+name: 'Upload R8 mapping file'
+description: >
+  Uploads a release's R8 mapping file to S3 as <prefix>/mapping-<versionName>.txt. The credentials are
+  upload-only, so the object is never listed or read back.
+
+inputs:
+  mapping_path:
+    description: 'Path to the mapping file to upload'
+    required: true
+  version_name:
+    description: 'Version name the app reports at runtime; used verbatim in the object key'
+    required: true
+  aws_access_key_id:
+    description: 'AWS access key ID with upload access to the mappings prefix'
+    required: true
+  aws_secret_access_key:
+    description: 'AWS secret access key with upload access to the mappings prefix'
+    required: true
+  aws_region:
+    description: 'AWS region of the mappings bucket'
+    required: true
+  bucket:
+    description: 'Name of the mappings bucket'
+    required: true
+  prefix:
+    description: 'Key prefix for mapping files in the bucket'
+    required: true
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Upload mapping file to S3
+      shell: bash
+      env:
+        MAPPING_PATH: ${{ inputs.mapping_path }}
+        VERSION_NAME: ${{ inputs.version_name }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws_access_key_id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws_secret_access_key }}
+        AWS_REGION: ${{ inputs.aws_region }}
+        AWS_DEFAULT_REGION: ${{ inputs.aws_region }}
+        AWS_EC2_METADATA_DISABLED: 'true'
+        BUCKET: ${{ inputs.bucket }}
+        PREFIX: ${{ inputs.prefix }}
+      run: |
+        set -euo pipefail
+
+        missing=()
+        [ -n "$AWS_ACCESS_KEY_ID" ] || missing+=("MAPPINGS_AWS_ACCESS_KEY_ID")
+        [ -n "$AWS_SECRET_ACCESS_KEY" ] || missing+=("MAPPINGS_AWS_SECRET_ACCESS_KEY")
+        [ -n "$AWS_REGION" ] || missing+=("MAPPINGS_AWS_REGION")
+        [ -n "$BUCKET" ] || missing+=("MAPPINGS_BUCKET_NAME")
+        [ -n "$PREFIX" ] || missing+=("MAPPINGS_BUCKET_PREFIX")
+        if [ ${#missing[@]} -gt 0 ]; then
+          echo "::error::R8 mapping upload is not configured for this run; empty: ${missing[*]}"
+          exit 1
+        fi
+
+        if [ -z "$VERSION_NAME" ]; then
+          echo "::error::Version name is empty"
+          exit 1
+        fi
+        if [ ! -s "$MAPPING_PATH" ]; then
+          echo "::error::R8 mapping file is missing or empty: '$MAPPING_PATH'"
+          exit 1
+        fi
+
+        # A stray slash would produce a different object key.
+        prefix="${PREFIX#/}"
+        prefix="${prefix%/}"
+        destination="s3://$BUCKET/$prefix/mapping-$VERSION_NAME.txt"
+
+        if ! aws s3 cp "$MAPPING_PATH" "$destination" \
+          --content-type "text/plain" \
+          --only-show-errors; then
+          echo "::error::R8 mapping upload for $VERSION_NAME failed. Download the deobfuscation file for this" \
+            "version from Play Console (App bundle explorer) and upload it manually; a rebuilt bundle's mapping" \
+            "may not match the published one."
+          echo "### :warning: R8 mapping upload for $VERSION_NAME failed" >> "$GITHUB_STEP_SUMMARY"
+          exit 1
+        fi
+
+        echo "Uploaded R8 mapping for $VERSION_NAME to $destination"
+        echo "R8 mapping for $VERSION_NAME uploaded to \`$destination\`." >> "$GITHUB_STEP_SUMMARY"

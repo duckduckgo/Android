@@ -1,0 +1,62 @@
+name: 'Prepare R8 mapping file'
+description: >
+  Checks that a release build wrote its R8 mapping file and copies it out of the checkout as
+  mapping-<versionName>.txt, where versionName is the variant's final version name (the one the app
+  reports at runtime). The build must also run the write<Flavor>ReleaseVersionName task.
+
+inputs:
+  project_dir:
+    description: 'Directory of the Gradle project that built the bundle'
+    required: false
+    default: '.'
+  flavor:
+    description: 'Store flavor of the release build (play, internal)'
+    required: true
+
+outputs:
+  mapping_path:
+    description: 'Path to the copy of the mapping file, named mapping-<versionName>.txt'
+    value: ${{ steps.prepare.outputs.mapping_path }}
+  version_name:
+    description: 'Version name of the built variant'
+    value: ${{ steps.prepare.outputs.version_name }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Validate and copy mapping file
+      id: prepare
+      shell: bash
+      env:
+        PROJECT_DIR: ${{ inputs.project_dir }}
+        FLAVOR: ${{ inputs.flavor }}
+      run: |
+        set -euo pipefail
+
+        mapping_file="$PROJECT_DIR/app/build/outputs/mapping/${FLAVOR}Release/mapping.txt"
+        if [ ! -s "$mapping_file" ]; then
+          echo "::error::R8 mapping file is missing or empty: $mapping_file"
+          exit 1
+        fi
+
+        version_file="$PROJECT_DIR/app/build/outputs/version-name/${FLAVOR}Release.txt"
+        if [ ! -s "$version_file" ]; then
+          echo "::error::Version name file is missing or empty: $version_file." \
+            "Run the write<Flavor>ReleaseVersionName task in the same Gradle invocation as the bundle task."
+          exit 1
+        fi
+        version_name=$(<"$version_file")
+
+        if [[ ! "$version_name" =~ ^[0-9]+\.[0-9]+\.[0-9]+[0-9A-Za-z._-]*$ ]]; then
+          echo "::error::Unexpected version name '$version_name' in $version_file"
+          exit 1
+        fi
+
+        out_dir="$RUNNER_TEMP/r8-mapping"
+        mkdir -p "$out_dir"
+        mapping_path="$out_dir/mapping-$version_name.txt"
+        cp "$mapping_file" "$mapping_path"
+
+        echo "R8 mapping for $version_name: $(wc -c < "$mapping_path") bytes"
+        echo "mapping_path=$mapping_path" >> "$GITHUB_OUTPUT"
+        echo "version_name=$version_name" >> "$GITHUB_OUTPUT"

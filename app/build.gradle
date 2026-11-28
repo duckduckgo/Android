@@ -624,6 +624,20 @@ tasks.register('fastlaneVersionCode') {
     }
 }
 
+// Writes each release variant's final versionName (what the app reports at runtime, including flavor and build type
+// suffixes) to build/outputs/version-name/<variant>.txt. CI uses it to name the R8 mapping file.
+androidComponents {
+    onVariants(selector().withBuildType('release')) { variant ->
+        def versionName = variant.outputs.first().versionName
+        def outFile = layout.buildDirectory.file("outputs/version-name/${variant.name}.txt")
+        tasks.register("write${variant.name.capitalize()}VersionName") {
+            inputs.property('versionName', versionName)
+            outputs.file(outFile)
+            doLast { outFile.get().asFile.text = versionName.get() }
+        }
+    }
+}
+
 tasks.register('checks') {
     dependsOn 'jvm_checks', 'android_checks'
 }
