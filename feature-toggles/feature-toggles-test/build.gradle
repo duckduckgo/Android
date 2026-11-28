@@ -24,6 +24,7 @@ apply from: "$rootProject.projectDir/code-formatting.gradle"
 dependencies {
     implementation project(':feature-toggles-api')
     implementation KotlinX.coroutines.core
+    implementation Square.okHttp3.okHttp
 }
 
 java {
