@@ -32,6 +32,18 @@ appId: com.duckduckgo.mobile.android
 - assertVisible:
     id: "widgetPromptTitle"
 - tapOn: "Not Now"
+- extendedWaitUntil:
+    visible:
+      id: "importPasswordsTitle"
+    timeout: 3000
+    optional: true
+- runFlow:
+    when:
+      visible:
+        id: "importPasswordsTitle"
+    commands:
+      - tapOn:
+          id: "secondaryCta"
 - assertVisible:
     id: "inputScreenTitle"
 - tapOn: "next"
