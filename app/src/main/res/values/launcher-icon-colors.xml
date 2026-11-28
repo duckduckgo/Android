@@ -20,7 +20,7 @@
     <color name="ic_launcher_gold_background">#E8932C</color>
     <color name="ic_launcher_green_background">@color/lilypad60</color>
     <color name="ic_launcher_purple_background">@color/blossom70</color>
-    <color name="ic_launcher_blue_background">@color/pondwater60</color>
+    <color name="ic_launcher_blue_background">#081321</color>
     <color name="ic_launcher_black_background">#212121</color>
     <color name="ic_launcher_pink_background">#D576A4</color>
 </resources>
