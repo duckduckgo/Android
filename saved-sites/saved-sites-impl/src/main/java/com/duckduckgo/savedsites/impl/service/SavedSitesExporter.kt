@@ -79,7 +79,7 @@ class RealSavedSitesExporter(
     @VisibleForTesting
     fun getTreeFolderStructure(): TreeNode<FolderTreeItem> {
         val node = TreeNode(FolderTreeItem(SavedSitesNames.BOOKMARKS_ROOT, RealSavedSitesParser.BOOKMARKS_FOLDER, "", null))
-        populateNode(node, SavedSitesNames.BOOKMARKS_ROOT, 1)
+        populateNode(node, SavedSitesNames.BOOKMARKS_ROOT, 1, mutableSetOf(SavedSitesNames.BOOKMARKS_ROOT))
         return node
     }
 
@@ -87,13 +87,17 @@ class RealSavedSitesExporter(
         parentNode: TreeNode<FolderTreeItem>,
         parentId: String,
         currentDepth: Int,
+        visitedFolderIds: MutableSet<String>,
     ) {
         val combinedContent = savedSitesRepository.getFolderTreeItems(parentId)
         combinedContent.forEach { item ->
             if (item.url == null) {
-                val childNode = TreeNode(item.copy(depth = currentDepth))
-                parentNode.add(childNode)
-                populateNode(childNode, item.id, currentDepth + 1)
+                // folder relations can form a loop, so a folder already on this branch is never descended into again
+                if (visitedFolderIds.add(item.id)) {
+                    val childNode = TreeNode(item.copy(depth = currentDepth))
+                    parentNode.add(childNode)
+                    populateNode(childNode, item.id, currentDepth + 1, visitedFolderIds)
+                }
             } else {
                 val childNode = TreeNode(item.copy(depth = currentDepth))
                 parentNode.add(childNode)
