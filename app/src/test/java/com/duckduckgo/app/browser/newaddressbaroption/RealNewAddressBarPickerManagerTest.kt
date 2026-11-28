@@ -28,9 +28,13 @@ import com.duckduckgo.feature.toggles.api.FakeFeatureToggleFactory
 import com.duckduckgo.feature.toggles.api.Toggle
 import com.duckduckgo.promptscoordinator.api.PromptExposureReporter
 import com.google.android.material.bottomsheet.BottomSheetDialog
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.runCurrent
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -39,6 +43,7 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 
 class RealNewAddressBarPickerManagerTest {
     @get:Rule
@@ -53,6 +58,8 @@ class RealNewAddressBarPickerManagerTest {
     private val promptExposureReporterMock: PromptExposureReporter = mock()
     private val dialogMock: BottomSheetDialog = mock()
     private val toggleMigrationFeature = FakeFeatureToggleFactory.create(DuckAiToggleMigrationFeature::class.java)
+
+    private val migrationGate = DuckAiToggleMigrationGate()
 
     private lateinit var testee: RealNewAddressBarPickerManager
 
@@ -73,10 +80,13 @@ class RealNewAddressBarPickerManagerTest {
                     appThemeMock,
                     promptExposureReporterMock,
                     toggleMigrationFeature,
+                    migrationGate,
                     coroutineTestRule.testScope,
                     coroutineTestRule.testDispatcherProvider,
                 )
         }
+
+    private fun migrationDecides() = migrationGate.open()
 
     @Test
     fun `when all conditions met then shows dialog`() =
@@ -90,16 +100,55 @@ class RealNewAddressBarPickerManagerTest {
         }
 
     @Test
-    fun `when confirmed with search only and the parent toggle is off then leaves the setting unwritten`() =
+    fun `when the migration has not decided yet then waits for it before showing`() =
         runTest {
-            toggleMigrationFeature.self().setRawStoredState(Toggle.State(enable = false))
-            val callback = showPickerAndCaptureCallback()
+            givenEligibleWhileMigrationIsUndecided()
 
-            callback.onConfirmed(false)
-            coroutineTestRule.testScope.advanceUntilIdle()
+            val showing = coroutineTestRule.testScope.launch { testee.showChoiceScreen(mock()) }
+            coroutineTestRule.testScope.advanceTimeBy(1.seconds)
+            verify(dialogFactoryMock, never()).create(any(), any(), any())
 
-            verify(duckChatMock, never()).setInputScreenUserSetting(any())
-            verify(dataStoreMock).setAsShown()
+            migrationDecides()
+            showing.join()
+
+            verify(dialogMock).show()
+        }
+
+    @Test
+    fun `when the migration does not decide within the timeout then does not show this time`() =
+        runTest {
+            givenEligibleWhileMigrationIsUndecided()
+
+            val showing = coroutineTestRule.testScope.launch { testee.showChoiceScreen(mock()) }
+            coroutineTestRule.testScope.advanceTimeBy(3.seconds)
+
+            assertTrue(showing.isCompleted)
+            verify(dialogFactoryMock, never()).create(any(), any(), any())
+        }
+
+    @Test
+    fun `when the migration flips the user while the picker waits then does not show`() =
+        runTest {
+            givenEligibleWhileMigrationIsUndecided()
+
+            val showing = coroutineTestRule.testScope.launch { testee.showChoiceScreen(mock()) }
+            whenever(duckChatMock.isInputScreenEverEnabled()).thenReturn(true)
+            migrationDecides()
+            showing.join()
+
+            verify(dialogFactoryMock, never()).create(any(), any(), any())
+        }
+
+    @Test
+    fun `when Duck AI is disabled then returns without waiting for the migration`() =
+        runTest {
+            givenEligibleWhileMigrationIsUndecided()
+            whenever(duckChatMock.isEnabled()).thenReturn(false)
+
+            val showing = coroutineTestRule.testScope.launch { testee.showChoiceScreen(mock()) }
+            coroutineTestRule.testScope.runCurrent()
+
+            assertTrue(showing.isCompleted)
         }
 
     @Test
@@ -327,7 +376,15 @@ class RealNewAddressBarPickerManagerTest {
         return checkNotNull(capturedCallback)
     }
 
+    private suspend fun givenEligibleWhileMigrationIsUndecided() {
+        whenever(duckChatMock.isEnabled()).thenReturn(true)
+        whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
+        whenever(duckChatMock.isInputScreenEverEnabled()).thenReturn(false)
+        whenever(dataStoreMock.wasShown()).thenReturn(false)
+    }
+
     private suspend fun setupAllConditionsMet() {
+        migrationDecides()
         whenever(duckChatMock.isEnabled()).thenReturn(true)
         whenever(userStageStoreMock.getUserAppStage()).thenReturn(AppStage.ESTABLISHED)
         whenever(duckChatMock.isInputScreenEverEnabled()).thenReturn(false)

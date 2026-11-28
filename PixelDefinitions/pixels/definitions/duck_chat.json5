@@ -772,6 +772,36 @@
             }
         ]
     },
+    "m_aichat_duckai_toggle_migration_flipped": {
+        "description": "The address bar toggle migration turned Search & Duck.ai on for an existing Duck.ai user whose input screen setting was never written and who was never asked. Fires once per install, on cold start.",
+        "owners": ["aitorvs"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"],
+        "expires": "2027-06-01"
+    },
+    "m_aichat_duckai_toggle_migration_reverted": {
+        "description": "A user whose Search & Duck.ai toggle was turned on by the address bar toggle migration undid it, by turning the toggle off or by turning Duck.ai off entirely. Fires once per install, for whichever happens first. A remote Duck.ai feature being off does not count.",
+        "owners": ["aitorvs"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "days_since_flip",
+                "type": "string",
+                "description": "Time from the migration turning the toggle on to the user turning it off, bucketed.",
+                "enum": ["le_1d", "le_7d", "le_30d", "gt_30d"]
+            },
+            {
+                "key": "how",
+                "type": "string",
+                "description": "How the user undid the migration: toggle_off when the Search & Duck.ai setting was turned off, duckai_off when Duck.ai was turned off entirely while that setting stayed on.",
+                "enum": ["toggle_off", "duckai_off"]
+            }
+        ],
+        "expires": "2027-06-01"
+    },
     "m_aichat_contextual_fire_button_tapped": {
         "description": "User tapped the fire button in the contextual Duck.ai sheet",
         "owners": ["aitorvs"],
