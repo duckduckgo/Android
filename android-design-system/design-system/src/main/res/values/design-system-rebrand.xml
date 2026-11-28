@@ -159,29 +159,6 @@
         <item name="rippleColor">@color/rebrand_button_destructive_ghost_ripple_selector</item>
     </style>
 
-    <style name="ThemeOverlay.Rebrand" parent="">
-        <item name="daxColorAccentBlue">?attr/daxColorRebrandAccentBlue</item>
-        <item name="daxButtonPrimary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Primary</item>
-        <item name="daxButtonSecondary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.SecondaryFill</item>
-        <item name="daxButtonGhost">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Ghost</item>
-        <item name="daxButtonGhostAlt">@style/Widget.DuckDuckGo.DaxButton.Rebrand.Ghost</item>
-        <item name="daxButtonDestructive">@style/Widget.DuckDuckGo.DaxButton.Rebrand.DestructivePrimary</item>
-        <item name="daxButtonDestructiveSecondary">@style/Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveSecondary</item>
-        <item name="daxButtonGhostDestructive">@style/Widget.DuckDuckGo.DaxButton.Rebrand.DestructiveGhost</item>
-        <item name="textAppearanceButton">@style/Typography.DuckDuckGo.Rebrand.Button</item>
-        <item name="textAppearanceButtonLarge">@style/Typography.DuckDuckGo.Rebrand.ButtonLarge</item>
-        <item name="daxButtonSmallHeight">@dimen/rebrandButtonSmallHeight</item>
-        <item name="daxButtonLargeHeight">@dimen/rebrandButtonLargeHeight</item>
-        <item name="daxButtonSmallSidePadding">@dimen/keyline_4</item>
-        <item name="daxButtonLargeSidePadding">@dimen/keyline_5</item>
-        <item name="daxButtonSmallTopPadding">@dimen/rebrandButtonSmallTopPadding</item>
-        <item name="daxButtonLargeTopPadding">@dimen/rebrandButtonLargeTopPadding</item>
-        <item name="daxButtonSmallVerticalInset">@dimen/rebrandButtonSmallVerticalInset</item>
-        <item name="daxButtonLargeVerticalInset">@dimen/rebrandButtonLargeVerticalInset</item>
-        <item name="daxColorStatusIndicatorOn">@color/rb_green40</item>
-        <item name="daxColorStatusIndicatorOff">?attr/daxColorRebrandStatusIndicatorOff</item>
-    </style>
-
     <style name="ThemeOverlay.Rebrand.AddressBarAnimation" parent="">
         <item name="cookiesAnimationRadius">@dimen/rebrandInputRadius</item>
     </style>

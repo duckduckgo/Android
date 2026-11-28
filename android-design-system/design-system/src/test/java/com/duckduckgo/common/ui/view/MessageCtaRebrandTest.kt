@@ -157,7 +157,6 @@ class MessageCtaRebrandTest {
     fun actionsKeepThePrimaryButtonAppearanceInBothThemes() {
         listOf(R.style.Theme_DuckDuckGo_Light, R.style.Theme_DuckDuckGo_Dark).forEach { theme ->
             val context = ContextThemeWrapper(RuntimeEnvironment.getApplication(), theme).apply {
-                getTheme().applyStyle(R.style.ThemeOverlay_Rebrand, true)
                 getTheme().applyStyle(R.style.ThemeOverlay_Rebrand_RmfCards, true)
             }
             val cta = MessageCta(context).apply { setMessage(MessageCta.Message(action = "Go", action2 = "Later")) }
@@ -203,7 +202,7 @@ class MessageCtaRebrandTest {
             val secondary = binding.remoteMessage.secondaryActionButton
             assertEquals("Later", secondary.text.toString())
             val expectedSecondary = if (enabled) {
-                DaxButtonSecondary(ContextThemeWrapper(context, R.style.ThemeOverlay_Rebrand), null)
+                DaxButtonSecondary(context, null)
             } else {
                 DaxButtonGhost(context, null)
             }
