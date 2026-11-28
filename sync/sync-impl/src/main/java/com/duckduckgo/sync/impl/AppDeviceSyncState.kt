@@ -30,8 +30,12 @@ import javax.inject.*
 )
 class AppDeviceSyncState @Inject constructor(
     private val syncFeatureToggle: SyncFeatureToggle,
-    private val syncAccountRepository: SyncAccountRepository,
+    // Many classes built while the app starts depend on this, and the repository's own dependency graph is large.
+    private val syncAccountRepositoryLazy: Lazy<SyncAccountRepository>,
 ) : DeviceSyncState {
+
+    private val syncAccountRepository: SyncAccountRepository
+        get() = syncAccountRepositoryLazy.value
 
     override fun isUserSignedInOnDevice(): Boolean = syncAccountRepository.isSignedIn()
 

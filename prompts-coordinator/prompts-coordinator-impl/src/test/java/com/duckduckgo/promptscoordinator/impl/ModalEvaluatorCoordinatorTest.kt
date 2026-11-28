@@ -57,7 +57,7 @@ class ModalEvaluatorCoordinatorTest {
         whenever(mockPromptsCoordinator.isEnabled()).thenReturn(false)
         testee = ModalEvaluatorCoordinator(
             appCoroutineScope = coroutinesTestRule.testScope,
-            modalEvaluatorPluginPoint = mockPluginPoint,
+            modalEvaluatorPluginPoint = lazy { mockPluginPoint },
             completionStore = mockCompletionStore,
             promptsCoordinator = mockPromptsCoordinator,
             dispatchers = coroutinesTestRule.testDispatcherProvider,
