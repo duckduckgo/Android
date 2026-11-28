@@ -31,4 +31,4 @@ abstract class WebCompatDatabase : RoomDatabase() {
     abstract fun webCompatDao(): WebCompatDao
 }
 
-val ALL_MIGRATIONS = emptyArray<Migration>()
+val ALL_MIGRATIONS = emptyList<Migration>()
