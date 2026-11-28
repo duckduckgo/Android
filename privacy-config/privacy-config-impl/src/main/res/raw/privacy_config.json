@@ -1179,6 +1179,29 @@
                     ]
                 }
             }
+        },
+        "nextStepsItems": {
+            "state": "enabled",
+            "features": {
+                "nextStepsItemsExperiment": {
+                    "state": "enabled",
+                    "minSupportedVersion": 53020000,
+                    "cohorts": [
+                        {
+                            "name": "control",
+                            "weight": 1
+                        },
+                        {
+                            "name": "stacked_cards",
+                            "weight": 1
+                        },
+                        {
+                            "name": "check_list",
+                            "weight": 1
+                        }
+                    ]
+                }
+            }
         }
     },
     "unprotectedTemporary": []
