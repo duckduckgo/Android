@@ -948,9 +948,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Hoppa över</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Importera lösenord från Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google kan be dig att logga in eller ange ditt lösenord för att bekräfta åtgärden.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importera från Google</string>
+    <string name="preOnboardingImportYourPasswordsTitle">Importera dina lösenord</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Jag flyttar över dem från Google eller en annan lösenordshanterare. Du kan behöva låsa upp telefonen eller logga in.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Importera lösenord</string>
     <string name="preOnboardingImportCompleteTitle">Importen är klar</string>
     <string name="preOnboardingImportCompleteCta">Fortsätt</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importerar lösenord</string>

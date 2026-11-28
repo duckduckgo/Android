@@ -984,9 +984,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Preskočiť</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Importovanie hesiel z Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google ťa môže požiadať, aby si sa prihlásil/-a alebo zadal/-a svoje heslo na potvrdenie.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importovať z Google</string>
+    <string name="preOnboardingImportYourPasswordsTitle">Importovať svoje heslá</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Prenesiem ich z Googlu alebo iného správcu hesiel. Možno budeš musieť odomknúť telefón alebo sa prihlásiť.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Importovať heslá</string>
     <string name="preOnboardingImportCompleteTitle">Import bol dokončený</string>
     <string name="preOnboardingImportCompleteCta">Pokračovať</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importovanie hesiel</string>

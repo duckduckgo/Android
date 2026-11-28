@@ -234,11 +234,11 @@ class DialogConfigResolver @Inject constructor(
             embellishment = Embellishment.RightWing,
             cardArrow = CardArrowConfig.AtStartMirrored,
             content = ContentConfig.ImportPasswords(
-                title = TextConfig.Resource(R.string.preOnboardingImportPasswordsTitle),
-                body = TextConfig.Resource(R.string.preOnboardingImportPasswordsBody),
+                title = TextConfig.Resource(R.string.preOnboardingImportYourPasswordsTitle),
+                body = TextConfig.Resource(R.string.preOnboardingImportYourPasswordsUnlockBody),
             ),
             primaryCta = CtaConfig(
-                text = TextConfig.Resource(R.string.preOnboardingImportPasswordsPrimaryCta),
+                text = TextConfig.Resource(R.string.preOnboardingImportYourPasswordsPrimaryCta),
                 action = CtaAction.Emit(NewUserOnboardingEvent.PasswordImportRequested),
             ),
             secondaryCta = CtaConfig(

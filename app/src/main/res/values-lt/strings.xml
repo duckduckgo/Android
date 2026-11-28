@@ -984,9 +984,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Praleisti</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Importuokite slaptažodžius iš „Google“</string>
-    <string name="preOnboardingImportPasswordsBody">„Google“ gali paprašyti prisijungti arba įvesti slaptažodį patvirtinimui.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importuokite iš „Google“</string>
+    <string name="preOnboardingImportYourPasswordsTitle">Importuokite savo slaptažodžius</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Perkelsiu juos iš „Google“ ar kitos slaptažodžių tvarkyklės. Gali tekti atrakinti telefoną arba prisijungti.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Importuoti slaptažodžius</string>
     <string name="preOnboardingImportCompleteTitle">Importavimas baigtas</string>
     <string name="preOnboardingImportCompleteCta">Tęsti</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importuojami slaptažodžiai</string>

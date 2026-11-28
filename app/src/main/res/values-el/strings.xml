@@ -948,9 +948,6 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Παράλειψη</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Εισαγωγή κωδικών πρόσβασης από το Google</string>
-    <string name="preOnboardingImportPasswordsBody">Η Google μπορεί να σου ζητήσει να συνδεθείς ή να εισαγάγεις τον κωδικό πρόσβασής σου για επιβεβαίωση.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Εισαγωγή από το Google</string>
     <string name="preOnboardingImportCompleteTitle">Η εισαγωγή ολοκληρώθηκε</string>
     <string name="preOnboardingImportCompleteCta">Συνέχεια</string>
     <string name="preOnboardingImportCompleteParsingTitle">Γίνεται εισαγωγή κωδικών πρόσβασης</string>

@@ -947,9 +947,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Skip</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Import passwords from Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google may ask you to sign in or enter your password to confirm.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Import From Google</string>
+    <string name="preOnboardingImportYourPasswordsTitle">Import your passwords</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">I\'ll bring them over from Google or another password manager. You may need to unlock your phone or sign in.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Import Passwords</string>
     <string name="preOnboardingImportCompleteTitle">Import complete</string>
     <string name="preOnboardingImportCompleteCta">Continue</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importing passwords</string>

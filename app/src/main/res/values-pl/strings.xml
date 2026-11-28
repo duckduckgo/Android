@@ -984,9 +984,9 @@
     <string name="preOnboardingWidgetPromptSecondaryCta">Pomiń</string>
 
     <!-- Pre-onboarding: import passwords -->
-    <string name="preOnboardingImportPasswordsTitle">Importuj hasła z Google</string>
-    <string name="preOnboardingImportPasswordsBody">Google może poprosić o zalogowanie lub podanie hasła, aby potwierdzić.</string>
-    <string name="preOnboardingImportPasswordsPrimaryCta">Importuj z Google</string>
+    <string name="preOnboardingImportYourPasswordsTitle">Importuj swoje hasła</string>
+    <string name="preOnboardingImportYourPasswordsUnlockBody">Przeniosę je z Google lub innego menedżera haseł. Może być konieczne odblokowanie telefonu lub zalogowanie się.</string>
+    <string name="preOnboardingImportYourPasswordsPrimaryCta">Importuj hasła</string>
     <string name="preOnboardingImportCompleteTitle">Import zakończony</string>
     <string name="preOnboardingImportCompleteCta">Kontynuuj</string>
     <string name="preOnboardingImportCompleteParsingTitle">Importowanie haseł</string>
