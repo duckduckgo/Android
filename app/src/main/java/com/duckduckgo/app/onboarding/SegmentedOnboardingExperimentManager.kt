@@ -40,7 +40,6 @@ interface SegmentedOnboardingExperimentManager {
 @SingleIn(AppScope::class)
 class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
     private val segmentedOnboardingFeatureToggles: SegmentedOnboardingFeatureToggles,
-    private val onboardingPasswordImportToggles: OnboardingPasswordImportToggles,
     private val appBuildConfig: AppBuildConfig,
     private val dispatcherProvider: DispatcherProvider,
     private val onboardingPrivacyConfigPersistedGate: OnboardingPrivacyConfigPersistedGate,
@@ -60,7 +59,5 @@ class SegmentedOnboardingExperimentManagerImpl @Inject constructor(
         }
     }
 
-    private suspend fun checkPrerequisites() =
-        !onboardingPasswordImportToggles.passwordImportExperimentAug25().isEnabled() &&
-            !appBuildConfig.isAppReinstall()
+    private suspend fun checkPrerequisites() = !appBuildConfig.isAppReinstall()
 }

@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewGroupCompat
@@ -60,7 +61,9 @@ import com.duckduckgo.app.onboardingquicksetup.ui.RemoveWidgetInstructionsBottom
 import com.duckduckgo.app.widget.AddWidgetLauncher
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.autofill.api.AutofillImportLaunchSource.Onboarding
-import com.duckduckgo.autofill.api.AutofillScreens.AutofillImportPasswordsScreen
+import com.duckduckgo.autofill.api.ImportPasswords
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsParams
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsRequest
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.store.AppBrandDesignUpdateToggles
 import com.duckduckgo.common.ui.store.AppTheme
@@ -72,9 +75,9 @@ import com.duckduckgo.common.utils.FragmentViewModelFactory
 import com.duckduckgo.common.utils.device.DeviceInfo
 import com.duckduckgo.common.utils.device.isTablet
 import com.duckduckgo.di.scopes.FragmentScope
-import com.duckduckgo.navigation.api.GlobalActivityStarter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import logcat.LogPriority.WARN
 import logcat.asLog
 import logcat.logcat
@@ -103,7 +106,7 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
     lateinit var addWidgetLauncher: AddWidgetLauncher
 
     @Inject
-    lateinit var globalActivityStarter: GlobalActivityStarter
+    lateinit var importPasswords: ImportPasswords
 
     private val binding: ContentOnboardingWelcomePageBinding by viewBinding()
     private val viewModel by lazy {
@@ -143,13 +146,14 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
         viewModel.onMigrationDefaultBrowserPromptFinished()
     }
 
-    private val passwordImportFlow = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-        viewModel.onPasswordImportResult(result.resultCode, result.data)
-    }
+    private lateinit var passwordImport: ActivityResultLauncher<ImportPasswordsRequest>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         requireActivity().enableEdgeToEdge()
+        passwordImport = registerForActivityResult(importPasswords.importContract()) { result ->
+            viewModel.onPasswordImportResult(result)
+        }
     }
 
     override fun onGetLayoutInflater(savedInstanceState: Bundle?): LayoutInflater {
@@ -338,13 +342,17 @@ class WelcomePageFragment : OnboardingPageFragment(R.layout.content_onboarding_w
                 QuickSetupSearchOptionsBottomSheet
                     .newInstance(initialWithAi = command.initialWithAi)
                     .show(childFragmentManager, QuickSetupSearchOptionsBottomSheet.TAG)
-            WelcomePageViewModel.Command.LaunchPasswordImport -> passwordImportFlow.launch(
-                globalActivityStarter.startIntent(requireContext(), AutofillImportPasswordsScreen(Onboarding)),
-            )
+            WelcomePageViewModel.Command.LaunchPasswordImport -> launchPasswordImport()
             is WelcomePageViewModel.Command.ShowMigrationDefaultBrowserDialog -> launchMigrationDefaultBrowserPrompt(command.intent)
             WelcomePageViewModel.Command.OpenMigrationDefaultBrowserSettings ->
                 launchMigrationDefaultBrowserPrompt(DefaultBrowserSystemSettings.intent())
             WelcomePageViewModel.Command.FinishToBrowser -> (activity as? OnboardingActivity)?.handOffToBrowserActivity()
+        }
+    }
+
+    private fun launchPasswordImport() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            importPasswords.launchImport(ImportPasswordsParams(Onboarding), passwordImport)
         }
     }
 

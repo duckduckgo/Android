@@ -17,7 +17,6 @@
 package com.duckduckgo.app.onboarding.ui.page.welcome
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
@@ -42,9 +41,9 @@ import com.duckduckgo.app.statistics.pixels.Pixel
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelParameter
 import com.duckduckgo.app.statistics.pixels.Pixel.PixelType.Unique
 import com.duckduckgo.app.widget.ui.WidgetCapabilities
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsResult
-import com.duckduckgo.autofill.api.ImportPasswordsFromGoogle.ImportPasswordsStatus
+import com.duckduckgo.autofill.api.ImportPasswords
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsResult
+import com.duckduckgo.autofill.api.ImportPasswords.ImportPasswordsStatus
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.DispatcherProvider
 import com.duckduckgo.di.scopes.FragmentScope
@@ -61,6 +60,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -87,7 +87,7 @@ class WelcomePageViewModel @Inject constructor(
     private val pixel: Pixel,
     private val appInstallStore: AppInstallStore,
     private val customAiOnboardingStore: CustomAiOnboardingStore,
-    private val importPasswordsFromGoogle: ImportPasswordsFromGoogle,
+    private val importPasswords: ImportPasswords,
 ) : ViewModel() {
 
     data class ViewState(
@@ -164,6 +164,10 @@ class WelcomePageViewModel @Inject constructor(
     private var addWidgetPromptFlowStarted = false
 
     private var quickSetupDefaultBrowserDialogShown = false
+
+    private var passwordImportJob: Job? = null
+
+    private val savedPasswordsResult = MutableStateFlow<PasswordImportResult.Terminal?>(null)
 
     private var importOutcomeJob: Job? = null
 
@@ -360,17 +364,13 @@ class WelcomePageViewModel @Inject constructor(
     /** The alert was cancelled without choosing: the import card underneath still offers both actions. */
     fun onPasswordImportErrorDismissed() = dismissPasswordImportError()
 
-    fun onPasswordImportResult(resultCode: Int, data: Intent?) {
-        if (resultCode != Activity.RESULT_OK) {
-            cancelPasswordImport()
-            return
-        }
-        when (importPasswordsFromGoogle.parseResult(data)) {
-            is ImportPasswordsResult.Success -> emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
-            is ImportPasswordsResult.UserCancelled -> cancelPasswordImport()
-            is ImportPasswordsResult.Error.Transient -> showImportErrorDialog()
-            is ImportPasswordsResult.Error.Permanent -> emit(
-                NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR),
+    fun onPasswordImportResult(result: ImportPasswordsResult) {
+        when (result) {
+            ImportPasswordsResult.Success -> onPasswordsReceived()
+            ImportPasswordsResult.UserCancelled -> cancelPasswordImport()
+            ImportPasswordsResult.Error.Transient -> showImportErrorDialog()
+            ImportPasswordsResult.Error.Permanent, ImportPasswordsResult.Unavailable -> emit(
+                NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.PERMANENT_ERROR),
             )
         }
     }
@@ -379,15 +379,23 @@ class WelcomePageViewModel @Inject constructor(
         viewModelScope.launch { _commands.send(Command.LaunchPasswordImport) }
     }
 
+    /** Moves to the import outcome card, which shows its loading state until [resolveImportOutcome] has the counts. */
+    private fun onPasswordsReceived() {
+        passwordImportJob?.cancel()
+        savedPasswordsResult.value = null
+        passwordImportJob = viewModelScope.launch {
+            val saved = importPasswords.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
+            savedPasswordsResult.value = saved?.let { PasswordImportResult.Terminal.Imported(imported = it.imported, skipped = it.skipped) }
+                ?: PasswordImportResult.Terminal.Failed
+        }
+        emit(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS))
+    }
+
     private fun resolveImportOutcome(state: MutableStateFlow<ImportCompleteContentState>) {
         if (state.value !is ImportCompleteContentState.Parsing) return
         if (importOutcomeJob?.isActive == true) return
         importOutcomeJob = viewModelScope.launch {
-            val finished = withTimeoutOrNull(IMPORT_STATUS_TIMEOUT) {
-                importPasswordsFromGoogle.importStatus().filterIsInstance<ImportPasswordsStatus.Finished>().firstOrNull()
-            }
-            val result = finished
-                ?.let { PasswordImportResult.Terminal.Imported(imported = it.imported, skipped = it.skipped) }
+            val result = withTimeoutOrNull(IMPORT_STATUS_TIMEOUT) { savedPasswordsResult.filterNotNull().firstOrNull() }
                 ?: PasswordImportResult.Terminal.Failed
             state.value = when (result) {
                 is PasswordImportResult.Terminal.Imported -> ImportCompleteContentState.Finished(result.imported, result.skipped)
@@ -399,7 +407,7 @@ class WelcomePageViewModel @Inject constructor(
 
     private fun showImportErrorDialog() {
         _viewState.update { it.copy(showPasswordImportError = true) }
-        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+        emit(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.TRANSIENT_ERROR))
     }
 
     private fun dismissPasswordImportError() {
@@ -407,7 +415,7 @@ class WelcomePageViewModel @Inject constructor(
     }
 
     private fun cancelPasswordImport() {
-        emit(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.CANCELLED))
+        emit(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.CANCELLED))
     }
 
     private fun requestDefaultBrowser() {

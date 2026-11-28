@@ -1846,6 +1846,110 @@ class NewUserOnboardingPlanProviderTest {
         assertWidgetStepsBetween(ids, NewUserOnboardingStepIds.PREFERENCE_SELECTOR, NewUserOnboardingStepIds.INPUT_SCREEN)
     }
 
+    private val passwordImportStepIds = listOf(
+        NewUserOnboardingStepIds.PASSWORD_IMPORT,
+        NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH,
+        NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE,
+    )
+
+    private fun assertPasswordImportStepsRightAfterWidgetSteps(ids: List<String>) {
+        val afterWidget = ids.indexOf(NewUserOnboardingStepIds.ADD_WIDGET) + 1
+        assertEquals(passwordImportStepIds, ids.subList(afterWidget, afterWidget + passwordImportStepIds.size))
+    }
+
+    private suspend fun segmentedPlanStepIds(reason: DownloadReasonSelection, variant: OnboardingPasswordImportVariant?): List<String> {
+        whenever(passwordImportExperiment.enroll()).thenReturn(variant)
+        return segmentedPlanStepIds(reason)
+    }
+
+    private fun assertNoPasswordImportSteps(ids: List<String>) {
+        assertTrue(ids.toString(), ids.none { it in passwordImportStepIds })
+    }
+
+    @Test
+    fun whenDefaultPlanInPasswordImportTreatmentThenNoImportSteps() = runTest {
+        whenever(passwordImportExperiment.enroll()).thenReturn(OnboardingPasswordImportVariant.TREATMENT)
+        assertNoPasswordImportSteps(stepIds())
+    }
+
+    @Test
+    fun whenSegmentedSearchPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
+            segmentedPlanStepIds(DownloadReasonSelection.SEARCH, OnboardingPasswordImportVariant.TREATMENT),
+        )
+    }
+
+    @Test
+    fun whenSegmentedSearchPathInPasswordImportControlThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.SEARCH, OnboardingPasswordImportVariant.CONTROL))
+    }
+
+    @Test
+    fun whenSegmentedSearchPathNotEnrolledInPasswordImportThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.SEARCH, variant = null))
+    }
+
+    @Test
+    fun whenSegmentedAiPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
+            segmentedPlanStepIds(DownloadReasonSelection.AI_CHAT, OnboardingPasswordImportVariant.TREATMENT),
+        )
+    }
+
+    @Test
+    fun whenSegmentedAiPathInPasswordImportControlThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.AI_CHAT, OnboardingPasswordImportVariant.CONTROL))
+    }
+
+    @Test
+    fun whenSegmentedAiPathNotEnrolledInPasswordImportThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.AI_CHAT, variant = null))
+    }
+
+    @Test
+    fun whenSegmentedNoAiPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
+            segmentedPlanStepIds(DownloadReasonSelection.NO_AI, OnboardingPasswordImportVariant.TREATMENT),
+        )
+    }
+
+    @Test
+    fun whenSegmentedNoAiPathInPasswordImportControlThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.NO_AI, OnboardingPasswordImportVariant.CONTROL))
+    }
+
+    @Test
+    fun whenSegmentedNoAiPathNotEnrolledInPasswordImportThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.NO_AI, variant = null))
+    }
+
+    @Test
+    fun whenSegmentedBlockAdsPathInPasswordImportTreatmentThenImportStepsFollowWidgetSteps() = runTest {
+        assertPasswordImportStepsRightAfterWidgetSteps(
+            segmentedPlanStepIds(DownloadReasonSelection.BLOCK_ADS, OnboardingPasswordImportVariant.TREATMENT),
+        )
+    }
+
+    @Test
+    fun whenSegmentedBlockAdsPathInPasswordImportControlThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.BLOCK_ADS, OnboardingPasswordImportVariant.CONTROL))
+    }
+
+    @Test
+    fun whenSegmentedBlockAdsPathNotEnrolledInPasswordImportThenNoImportSteps() = runTest {
+        assertNoPasswordImportSteps(segmentedPlanStepIds(DownloadReasonSelection.BLOCK_ADS, variant = null))
+    }
+
+    @Test
+    fun whenSegmentedPlanBuiltThenPasswordImportEnrolledOnceBeforeAnyPathIsChosen() = runTest {
+        startSegmentedAtDownloadReason()
+        verify(passwordImportExperiment, times(1)).enroll()
+
+        orchestrator.onEvent(NewUserOnboardingEvent.DownloadReasonConfirmed(DownloadReasonSelection.SEARCH))
+
+        verify(passwordImportExperiment, times(1)).enroll()
+    }
+
     @Test
     fun whenSegmentedPlanAndUserAlreadyHasWidgetThenWidgetStepsNotInserted() = runTest {
         startSegmentedAtDownloadReason()
@@ -1890,15 +1994,15 @@ class NewUserOnboardingPlanProviderTest {
 
     // endregion
 
-    private suspend fun startAtPasswordImportLaunch() {
+    private suspend fun startAtPasswordImport() {
         whenever(passwordImportExperiment.enroll()).thenReturn(OnboardingPasswordImportVariant.TREATMENT)
-        start()
-        orchestrator.onEvent(NewUserOnboardingEvent.IntroAnimationFinished)
-        orchestrator.onEvent(NewUserOnboardingEvent.NotificationPermissionFinished(granted = null))
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
-        orchestrator.onEvent(NewUserOnboardingEvent.DefaultBrowserPromptFinished(isDefaultBrowser = false))
+        startSegmentedAtTogglePosition()
+        orchestrator.onEvent(NewUserOnboardingEvent.SingleChoiceConfirmed(togglePositionOptions.first()))
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
+    }
+
+    private suspend fun startAtPasswordImportLaunch() {
+        startAtPasswordImport()
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportRequested)
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_LAUNCH)
     }
@@ -1907,7 +2011,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when the password import fails transiently then goes back to the import step`() = runTest {
         startAtPasswordImportLaunch()
 
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
         verify(onboardingPixelSender).fire(
@@ -1920,7 +2024,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when the import is cancelled from the web flow then reports nothing`() = runTest {
         startAtPasswordImportLaunch()
 
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.CANCELLED))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.CANCELLED))
 
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT)
         verify(onboardingPixelSender, never()).fire(eq(ONBOARDING_PASSWORD_IMPORT_ERROR), any())
@@ -1929,7 +2033,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the retry alert is retried then reports it to the error pixel and returns to the launch step`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportErrorRetryRequested)
 
@@ -1945,7 +2049,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the retry alert is cancelled then reports it to the error pixel and skips past the import`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportErrorCancelled)
 
@@ -1960,7 +2064,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the import is requested again after a transient failure then returns to the launch step`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportRequested)
 
@@ -1970,7 +2074,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the import is skipped after a transient failure then skips past the import and its outcome step`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.TRANSIENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.TRANSIENT_ERROR))
 
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportSkipped)
 
@@ -1981,7 +2085,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when the password import fails permanently then advances to the outcome step`() = runTest {
         startAtPasswordImportLaunch()
 
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.PERMANENT_ERROR))
 
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
     }
@@ -1989,7 +2093,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the import outcome is reported more than once then reports it to telemetry once`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS))
         assertStep(NewUserOnboardingStepIds.PASSWORD_IMPORT_COMPLETE)
 
         // The outcome card resolves itself every time it is presented, so it can report an outcome it already reported.
@@ -2002,7 +2106,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the outcome step is presented before the import is parsed then reports nothing yet`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS))
 
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
 
@@ -2013,7 +2117,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the import completed screen is continued then reports the click to the complete pixel`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS))
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Imported(imported = 3, skipped = 1)))
 
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
@@ -2025,7 +2129,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the import is parsed as failed then reports a permanent error`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS))
 
         orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportParsed(PasswordImportResult.Terminal.Failed))
 
@@ -2038,7 +2142,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the failed screen is presented and continued then both are reported to the error pixel`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.PERMANENT_ERROR))
 
         orchestrator.onEvent(NewUserOnboardingEvent.Presented)
         orchestrator.onEvent(NewUserOnboardingEvent.ContinueClicked)
@@ -2056,7 +2160,7 @@ class NewUserOnboardingPlanProviderTest {
     @Test
     fun `when the import outcome is reported then the outcome step seeds its card with it`() = runTest {
         startAtPasswordImportLaunch()
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.SUCCESS))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.SUCCESS))
         assertEquals(
             NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.InProgress),
             currentDialog(),
@@ -2075,7 +2179,7 @@ class NewUserOnboardingPlanProviderTest {
     fun `when the password import fails permanently then the outcome step seeds its card as failed`() = runTest {
         startAtPasswordImportLaunch()
 
-        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportWebFlowFinished(PasswordImportOutcome.PERMANENT_ERROR))
+        orchestrator.onEvent(NewUserOnboardingEvent.PasswordImportFinished(PasswordImportOutcome.PERMANENT_ERROR))
 
         assertEquals(NewUserOnboardingActivityDialog.ImportComplete(PasswordImportResult.Terminal.Failed), currentDialog())
     }

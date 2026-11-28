@@ -39,14 +39,11 @@ class SegmentedOnboardingExperimentManagerTest {
 
     private val segmentedToggles: SegmentedOnboardingFeatureToggles =
         FakeFeatureToggleFactory.create(SegmentedOnboardingFeatureToggles::class.java)
-    private val passwordImportToggles: OnboardingPasswordImportToggles =
-        FakeFeatureToggleFactory.create(OnboardingPasswordImportToggles::class.java)
     private val privacyConfigPersistedGate = OnboardingPrivacyConfigPersistedGateImpl()
     private val appBuildConfig: AppBuildConfig = mock()
 
     private val testee = SegmentedOnboardingExperimentManagerImpl(
         segmentedOnboardingFeatureToggles = segmentedToggles,
-        onboardingPasswordImportToggles = passwordImportToggles,
         appBuildConfig = appBuildConfig,
         dispatcherProvider = coroutineRule.testDispatcherProvider,
         onboardingPrivacyConfigPersistedGate = privacyConfigPersistedGate,
@@ -111,20 +108,8 @@ class SegmentedOnboardingExperimentManagerTest {
         assertEquals(testee.enroll(), testee.enroll())
     }
 
-    @Test
-    fun `when password import experiment enabled then enroll returns null`() = runTest {
-        givenPrerequisitesMet()
-        passwordImportToggles.passwordImportExperimentAug25().setRawStoredState(Toggle.State(enable = true))
-        givenCohortEnabled(Cohorts.TREATMENT)
-
-        privacyConfigPersistedGate.onPrivacyConfigPersisted()
-
-        assertNull(testee.enroll())
-    }
-
     private suspend fun givenPrerequisitesMet() {
         whenever(appBuildConfig.isAppReinstall()).thenReturn(false)
-        passwordImportToggles.passwordImportExperimentAug25().setRawStoredState(Toggle.State(enable = false))
     }
 
     private fun givenCohortEnabled(winner: Cohorts?) {
