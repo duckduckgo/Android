@@ -165,7 +165,8 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
         removeTopPadding()
         addBottomPaddingToButtons()
 
-        animationEnabled = isAnimationEnabled()
+        // A single Duck.ai chat delete confirms without the burn animation, as on iOS.
+        animationEnabled = isAnimationEnabled() && readOriginFromArguments() !is FireDialogProvider.FireDialogOrigin.ChatAutocomplete
         canFinish = !animationEnabled
         if (animationEnabled) {
             configureFireAnimationView()
@@ -319,7 +320,7 @@ class SingleTabFireDialog : BottomSheetDialogFragment(), FireDialog {
                     requireContext().getString(R.string.singleTabFireDialogDeleteChats)
             } else if (state.isSingleChatDeletion) {
                 binding.deleteAllPrimaryButton.text =
-                    requireContext().getString(R.string.singleTabFireDialogDeleteChat)
+                    requireContext().getString(com.duckduckgo.mobile.android.R.string.delete)
             }
         } else {
             binding.deleteAllPrimaryButton.gone()

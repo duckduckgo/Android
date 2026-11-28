@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class ChatHistoryAdapter(
     private val onChatClicked: (ChatHistoryItem) -> Unit,
+    private val onChatFireClicked: (ChatHistoryItem) -> Unit,
     private val onChatMoreClicked: (ChatHistoryItem, android.view.View) -> Unit,
     private val onChatLongClicked: (ChatHistoryItem) -> Boolean = { false },
 ) : ListAdapter<ChatHistoryListEntry, RecyclerView.ViewHolder>(Diff) {
@@ -44,7 +45,9 @@ class ChatHistoryAdapter(
             is ChatHistoryListEntry.Row -> (holder as ChatHistoryViewHolder).bind(
                 item = entry.item,
                 selected = entry.selected,
+                showFireButton = !entry.selectMode,
                 onClick = onChatClicked,
+                onFireClick = onChatFireClicked,
                 onMoreClick = onChatMoreClicked,
                 onLongClick = onChatLongClicked,
             )
@@ -53,9 +56,11 @@ class ChatHistoryAdapter(
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int, payloads: MutableList<Any>) {
         val selectionChange = payloads.firstOrNull { it is RowChange.SelectionChanged } as? RowChange.SelectionChanged
+        val selectModeChanged = payloads.any { it is RowChange.SelectModeChanged }
         val entry = getItem(position)
-        if (selectionChange != null && holder is ChatHistoryViewHolder && entry is ChatHistoryListEntry.Row) {
-            holder.animateSelectionChange(entry.item, selectionChange.selected)
+        if ((selectionChange != null || selectModeChanged) && holder is ChatHistoryViewHolder && entry is ChatHistoryListEntry.Row) {
+            selectionChange?.let { holder.animateSelectionChange(entry.item, it.selected) }
+            holder.setFireButtonVisible(!entry.selectMode)
         } else {
             onBindViewHolder(holder, position)
         }
@@ -63,6 +68,7 @@ class ChatHistoryAdapter(
 
     private sealed interface RowChange {
         data class SelectionChanged(val selected: Boolean) : RowChange
+        data object SelectModeChanged : RowChange
     }
 
     private object Diff : DiffUtil.ItemCallback<ChatHistoryListEntry>() {
@@ -82,6 +88,11 @@ class ChatHistoryAdapter(
                 oldItem.item == newItem.item && oldItem.selected != newItem.selected
             ) {
                 return RowChange.SelectionChanged(newItem.selected)
+            }
+            if (oldItem is ChatHistoryListEntry.Row && newItem is ChatHistoryListEntry.Row &&
+                oldItem.item == newItem.item && oldItem.selectMode != newItem.selectMode
+            ) {
+                return RowChange.SelectModeChanged
             }
             return null
         }

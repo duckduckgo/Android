@@ -48,6 +48,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
@@ -851,10 +852,10 @@ class ChatHistoryViewModelTest {
         }
     }
 
-    // --- Per-row overflow Delete ---
+    // --- Per-row Fire Button / overflow Delete (both call onDeleteSingleChat) ---
 
     @Test
-    fun `onDeleteSingleChat dispatches DuckChats Selected with that one chat url and no confirmation`() = runTest {
+    fun `onDeleteSingleChat asks for confirmation and does not delete or fire pixels`() = runTest {
         source.value = listOf(item("a"), item("b"))
 
         viewModel.uiState.test {
@@ -862,13 +863,87 @@ class ChatHistoryViewModelTest {
 
             viewModel.onDeleteSingleChat("a")
 
-            expectNoEvents() // no confirmation state set
+            val confirming = awaitItem() as Loaded
+            assertEquals(ChatHistoryUiState.PendingConfirmation.DeleteSingle(chatId = "a"), confirming.confirmation)
+            assertEquals(listOf("a", "b"), confirming.recent.map { it.chatId })
         }
-        assertEquals(
-            listOf(setOf(ClearableData.DuckChats.SelectedForMode(setOf("https://duck.ai?chatID=a"), BrowserMode.REGULAR))),
-            dataClearingTrigger.calls,
-        )
+        assertEquals(setOf("https://duck.ai?chatID=a"), viewModel.chatUrlsForDialog())
+        assertTrue(dataClearingTrigger.calls.isEmpty())
         assertTrue(repository.deletedChatIds.isEmpty())
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `cancelling the single chat confirmation keeps the chat and fires no pixel`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onDeleteSingleChat("a")
+            awaitItem()
+
+            viewModel.onConfirmationCancelled()
+
+            val cancelled = awaitItem() as Loaded
+            assertEquals(null, cancelled.confirmation)
+            assertEquals(listOf("a", "b"), cancelled.recent.map { it.chatId })
+        }
+        assertTrue(dataClearingTrigger.calls.isEmpty())
+        assertTrue(repository.deletedChatIds.isEmpty())
+        verifyNoInteractions(pixel)
+    }
+
+    @Test
+    fun `confirming the single chat deletion fires count and daily and clears the confirmation`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onDeleteSingleChat("a")
+            awaitItem()
+            // The dialog deletes exactly the URLs it was opened with — only chat "a".
+            assertEquals(setOf("https://duck.ai?chatID=a"), viewModel.chatUrlsForDialog())
+
+            viewModel.onDeleteSingleConfirmed()
+
+            assertEquals(null, (awaitItem() as Loaded).confirmation)
+        }
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_DELETED_COUNT)
+        verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_DELETED_DAILY, type = Daily())
+        // Deletion is driven by the dialog, not dispatched a second time by the view model.
+        assertTrue(dataClearingTrigger.calls.isEmpty())
+    }
+
+    @Test
+    fun `a second single chat delete while one is pending keeps the first confirmation`() = runTest {
+        source.value = listOf(item("a"), item("b"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onDeleteSingleChat("a")
+            awaitItem()
+
+            viewModel.onDeleteSingleChat("b")
+
+            expectNoEvents()
+        }
+        assertEquals(setOf("https://duck.ai?chatID=a"), viewModel.chatUrlsForDialog())
+    }
+
+    @Test
+    fun `onDeleteSingleConfirmed without a pending single chat confirmation fires nothing`() = runTest {
+        source.value = listOf(item("a"))
+
+        viewModel.uiState.test {
+            awaitInitialLoaded()
+            viewModel.onFireAllRequested()
+            awaitItem()
+
+            viewModel.onDeleteSingleConfirmed()
+
+            expectNoEvents()
+        }
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_DELETED_COUNT)
     }
 
     @Test
@@ -884,6 +959,7 @@ class ChatHistoryViewModelTest {
             expectNoEvents()
         }
         assertTrue(dataClearingTrigger.calls.isEmpty())
+        verify(pixel, never()).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_CHAT_DELETED_COUNT)
     }
 
     @Test
@@ -1343,17 +1419,6 @@ class ChatHistoryViewModelTest {
         }
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_COUNT)
         verify(pixel).fire(DuckChatPixelName.DUCK_CHAT_HISTORY_SELECT_ALL_TOGGLED_DAILY, type = Daily())
-    }
-
-    @Test
-    fun `onDeleteSingleChat fires no pixel`() = runTest {
-        source.value = listOf(item("a"))
-        viewModel.uiState.test {
-            awaitInitialLoaded()
-            viewModel.onDeleteSingleChat("a")
-            cancelAndIgnoreRemainingEvents()
-        }
-        verifyNoInteractions(pixel)
     }
 
     @Test

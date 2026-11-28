@@ -53,11 +53,31 @@
         android:paddingStart="@dimen/keyline_4"
         android:paddingEnd="@dimen/keyline_2"
         app:layout_constraintBottom_toBottomOf="@+id/chatHistoryIconContainer"
-        app:layout_constraintEnd_toStartOf="@+id/chatHistoryMoreContainer"
+        app:layout_constraintEnd_toStartOf="@+id/chatHistoryFireContainer"
         app:layout_constraintStart_toEndOf="@+id/chatHistoryIconContainer"
         app:layout_constraintTop_toTopOf="@+id/chatHistoryIconContainer"
         app:typography="body1"
         tools:text="My very long chat title that should be truncated when it overflows" />
+
+    <!-- Same glyph and tint as the Fire accessory on Duck.ai recent-chat suggestion rows
+         (item_chat_suggestion.xml); the whole 52x48dp cell is the tap target. -->
+    <FrameLayout
+        android:id="@+id/chatHistoryFireContainer"
+        android:layout_width="@dimen/listItemTrailingIconWidth"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/chatHistoryIconContainer"
+        app:layout_constraintEnd_toStartOf="@+id/chatHistoryMoreContainer"
+        app:layout_constraintTop_toTopOf="@+id/chatHistoryIconContainer">
+
+        <ImageView
+            android:id="@+id/chatHistoryFire"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/duck_ai_chat_history_action_delete"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_fire_outline_16" />
+    </FrameLayout>
 
     <FrameLayout
         android:id="@+id/chatHistoryMoreContainer"

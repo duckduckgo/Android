@@ -169,6 +169,13 @@
         "suffixes": ["form_factor"],
         "parameters": ["appVersion"]
     },
+    "m_aichat_history_chat_deleted": {
+        "description": "User deleted a single chat on the chat history screen. Fires after the user confirms the deletion dialog opened from the Fire Button on the chat's row or Delete in its overflow menu; cancelling or dismissing the dialog fires nothing",
+        "owners": ["aitorvs"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["first_daily_count", "form_factor"],
+        "parameters": ["appVersion"]
+    },
     "m_aichat_history_select_mode_entered_count": {
         "description": "User entered select mode on the chat history screen, via the toolbar overflow or a long press",
         "owners": ["GerardPaligot"],
