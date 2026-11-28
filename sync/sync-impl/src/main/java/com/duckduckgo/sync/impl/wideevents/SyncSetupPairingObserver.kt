@@ -60,8 +60,30 @@ internal class SyncSetupPairingObserver(private val setupEvent: SyncSetupWideEve
                     it.copy(role = role, peerKind = kind, connectMethod = if (presenter) ConnectMethod.SHOW_CODE else it.connectMethod)
                 }
             }
+            is ExchangeV2Event.MessageSent -> {
+                if (event.message is ExchangeV2Message.RecoveryCodeResponse) setupEvent.onHostCodeSent()
+            }
             is ExchangeV2Event.Transition -> {
                 when {
+                    event.trigger is ExchangeV2Message.Bye -> {
+                        val outcome = when (event.trigger.reason) {
+                            ExchangeV2Message.Bye.Reason.Cancelled -> SetupPeerOutcome.CANCELLED
+                            ExchangeV2Message.Bye.Reason.Error -> SetupPeerOutcome.FAILURE
+                            else -> SetupPeerOutcome.UNKNOWN
+                        }
+                        if (event.from is ExchangeV2State.Host) setupEvent.onPeerLeft(outcome)
+                    }
+                    event.to == ExchangeV2State.Host.Done && event.trigger is ExchangeV2Message.RecoveryCodeDone -> {
+                        val outcome = when (event.trigger.reason) {
+                            ExchangeV2Message.RecoveryCodeDone.Reason.Success -> SetupPeerOutcome.SUCCESS
+                            ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed,
+                            ExchangeV2Message.RecoveryCodeDone.Reason.ScopeRejected,
+                            -> SetupPeerOutcome.FAILURE
+                            is ExchangeV2Message.RecoveryCodeDone.Reason.Unknown -> SetupPeerOutcome.UNKNOWN
+                        }
+                        setupEvent.onHostWaitFinished(outcome)
+                    }
+                    event.to == ExchangeV2State.Host.Unknown -> setupEvent.onHostWaitFinished(SetupPeerOutcome.UNKNOWN)
                     event.from == ExchangeV2State.Bootstrapped && event.to == ExchangeV2State.Negotiating &&
                         event.trigger is ExchangeV2Message.Hello -> {
                         setupEvent.onUpdate { it.copy(connectMethod = ConnectMethod.SHOW_CODE) }

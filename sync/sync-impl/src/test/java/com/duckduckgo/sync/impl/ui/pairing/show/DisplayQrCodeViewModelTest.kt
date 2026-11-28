@@ -36,9 +36,11 @@ import com.duckduckgo.sync.impl.pixels.SyncPixels
 import com.duckduckgo.sync.impl.pixels.SyncPixels.CancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_CONNECT
 import com.duckduckgo.sync.impl.pixels.SyncPixels.ScreenType.SYNC_EXCHANGE
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupCancellationReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupFailureReason
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupPath
 import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupRole
+import com.duckduckgo.sync.impl.pixels.SyncPixels.SetupStep
 import com.duckduckgo.sync.impl.ui.SyncEntryPoint
 import com.duckduckgo.sync.impl.ui.devices.ParcelableDevice
 import com.duckduckgo.sync.impl.ui.pairing.SyncPairingResult
@@ -53,6 +55,7 @@ import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.Command.S
 import com.duckduckgo.sync.impl.ui.pairing.show.DisplayQrCodeViewModel.DialogType
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl
 import com.duckduckgo.sync.impl.ui.qrcode.SyncBarcodeUrl.ProtocolVersion.V2
+import com.duckduckgo.sync.impl.wideevents.SyncSetupWideEvent
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flowOf
@@ -98,6 +101,7 @@ class DisplayQrCodeViewModelTest {
     private val accountRepository = mock<SyncAccountRepository>()
     private val codeDispatcher = mock<SyncCodeDispatcher>()
     private val pixels = mock<SyncPixels>()
+    private val setupEvent = mock<SyncSetupWideEvent>()
     private val qrEncoder = mock<QREncoder>()
     private val clipboard = mock<ClipboardInteractor>()
     private val switchedAccountDetector = mock<SwitchedAccountDetector>()
@@ -110,7 +114,7 @@ class DisplayQrCodeViewModelTest {
     }
 
     private fun createTestee(source: String = "other") = DisplayQrCodeViewModel(
-        setupEvent = mock(),
+        setupEvent = setupEvent,
         syncEntryPoint = SyncEntryPoint.SYNC_NEW_ACCOUNT,
         launchSource = source,
         accountRepository = accountRepository,
@@ -121,6 +125,35 @@ class DisplayQrCodeViewModelTest {
         switchedAccountDetector = switchedAccountDetector,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
+
+    @Test
+    fun `user closing presentation notifies the attempt owner`() = runTest {
+        val testee = createTestee()
+        testee.onScreenClosed()
+        verify(setupEvent).onCancelled(SetupCancellationReason.USER_CLOSED)
+    }
+
+    @Test
+    fun `programmatic close after joiner login preserves the attempt for its recovery screen`() = runTest {
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LoggedIn(path = SetupPath.PAIRING)))
+        val testee = createTestee()
+        testee.commands.test {
+            assertTrue(awaitItem() is SetPairingResult)
+            assertEquals(Close, awaitItem())
+            testee.onScreenClosed()
+            verify(setupEvent, never()).onCancelled(any())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `preparing code precedes the rendered code screen`() = runTest {
+        whenever(codeDispatcher.presentV2()).thenReturn(flowOf(DispatchOutcome.LinkingCodeReady(linkingUrl)))
+        createTestee()
+        val order = org.mockito.kotlin.inOrder(setupEvent)
+        order.verify(setupEvent).onStep(SetupStep.PREPARING_CODE)
+        order.verify(setupEvent).onStep(SetupStep.CODE_SCREEN)
+    }
 
     @Test
     fun `when this device is signed in then v2 pixels report the exchange screen`() = runTest {

@@ -193,6 +193,45 @@ class SyncSetupPairingObserverTest {
         verifyNoInteractions(setupEvent)
     }
 
+    @Test fun `only a successfully sent recovery code starts host completion`() {
+        clearInvocations(setupEvent)
+        observer.onEvent(ExchangeV2Event.MessageReceived(1, ExchangeV2Message.RecoveryCodeResponse.create("synthetic")))
+        verifyNoInteractions(setupEvent)
+        observer.onEvent(ExchangeV2Event.MessageSent(1, ExchangeV2Message.RecoveryCodeResponse.create("synthetic")))
+        verify(setupEvent).onHostCodeSent()
+    }
+
+    @Test fun `accepted reports map bounded outcomes and never report host failure`() {
+        val reports = listOf(
+            ExchangeV2Message.RecoveryCodeDone.Reason.Success to SetupPeerOutcome.SUCCESS,
+            ExchangeV2Message.RecoveryCodeDone.Reason.LoginFailed to SetupPeerOutcome.FAILURE,
+            ExchangeV2Message.RecoveryCodeDone.Reason.ScopeRejected to SetupPeerOutcome.FAILURE,
+            ExchangeV2Message.RecoveryCodeDone.Reason.Unknown("opaque") to SetupPeerOutcome.UNKNOWN,
+        )
+        for ((reason, expected) in reports) {
+            clearInvocations(setupEvent)
+            val message = ExchangeV2Message.RecoveryCodeDone.create(reason)
+            observer.onEvent(ExchangeV2Event.MessageReceived(1, message))
+            verifyNoInteractions(setupEvent)
+            observer.onEvent(transition(ExchangeV2State.Host.AwaitingStatus, ExchangeV2State.Host.Done, message))
+            verify(setupEvent).onHostWaitFinished(expected)
+        }
+    }
+
+    @Test fun `host peer leave maps cancelled error and missing report to bounded outcomes`() {
+        val byes = listOf(
+            ExchangeV2Message.Bye.Reason.Cancelled to SetupPeerOutcome.CANCELLED,
+            ExchangeV2Message.Bye.Reason.Error to SetupPeerOutcome.FAILURE,
+            ExchangeV2Message.Bye.Reason.Done to SetupPeerOutcome.UNKNOWN,
+            ExchangeV2Message.Bye.Reason.Unknown("opaque") to SetupPeerOutcome.UNKNOWN,
+        )
+        for ((reason, expected) in byes) {
+            clearInvocations(setupEvent)
+            observer.onEvent(transition(ExchangeV2State.Host.AwaitingStatus, ExchangeV2State.Host.Aborted, ExchangeV2Message.Bye.create(reason)))
+            verify(setupEvent).onPeerLeft(expected)
+        }
+    }
+
     private fun election(role: Role, pairingRole: PairingRole = PairingRole.Scanner, kind: String = "ddg") =
         ExchangeV2Event.RoleElected(1, role, pairingRole, false, "ddg", kind, true)
 

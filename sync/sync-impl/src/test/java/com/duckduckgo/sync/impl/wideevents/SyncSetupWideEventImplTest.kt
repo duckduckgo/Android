@@ -38,6 +38,7 @@ import com.duckduckgo.sync.impl.exchange.v2.AdvertisedExchangeV2Version
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Event
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2Message
 import com.duckduckgo.sync.impl.exchange.v2.ExchangeV2State
+import com.duckduckgo.sync.impl.exchange.v2.LocalTrigger
 import com.duckduckgo.sync.impl.exchange.v2.PairingRole
 import com.duckduckgo.sync.impl.exchange.v2.Role
 import com.duckduckgo.sync.impl.exchange.v2.SessionErrorKind
@@ -83,6 +84,7 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.verifyNoMoreInteractions
 import org.mockito.kotlin.whenever
+import kotlin.time.Duration.Companion.seconds
 import com.duckduckgo.sync.impl.Result as AccountResult
 
 @RunWith(TestParameterInjector::class)
@@ -407,6 +409,11 @@ class SyncSetupWideEventImplTest {
         wideEvent.onStep(SetupStep.CODE_ENTRY)
         wideEvent.onUpdate { it.copy(role = SetupRole.JOINER) }
         wideEvent.onPairingSessionReset()
+        wideEvent.onHostCodeSent()
+        wideEvent.onHostWaitFinished(SetupPeerOutcome.FAILURE)
+        wideEvent.onPeerLeft(SetupPeerOutcome.CANCELLED)
+        wideEvent.onRecoveryCodeScreenShown()
+        wideEvent.onRecoveryCodeScreenFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
         wideEvent.onSucceeded()
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
@@ -429,6 +436,11 @@ class SyncSetupWideEventImplTest {
         wideEvent.onStep(SetupStep.CODE_ENTRY)
         wideEvent.onUpdate { it.copy(role = SetupRole.JOINER) }
         wideEvent.onPairingSessionReset()
+        wideEvent.onHostCodeSent()
+        wideEvent.onHostWaitFinished(SetupPeerOutcome.FAILURE)
+        wideEvent.onPeerLeft(SetupPeerOutcome.CANCELLED)
+        wideEvent.onRecoveryCodeScreenShown()
+        wideEvent.onRecoveryCodeScreenFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
         wideEvent.onSucceeded()
         wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
         wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
@@ -1348,6 +1360,165 @@ class SyncSetupWideEventImplTest {
         verify(wideEventClient).flowFinish(any(), any(), any())
         assertEquals("paste_code", payload["connect_method"])
         assertFalse(payload.containsKey("status_reason"))
+    }
+
+    @Test
+    fun `host finishes immediately after sending code to a v2 peer`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startHost(ExchangeProtocolVersion.V2_0)
+
+        wideEvent.onHostCodeSent()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(1L, FlowStatus.Success, mapOf("role" to "host", "peer_kind" to "ddg", "peer_outcome" to "unknown"))
+        verify(wideEventClient).flowFinish(any(), any(), any())
+        assertEquals("preparing_sync", payload["last_step"])
+    }
+
+    @Test
+    fun `host awaits report after send and finishes once with the peer outcome`(@TestParameter peerOutcome: SetupPeerOutcome) = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startHost()
+        wideEvent.onHostCodeSent()
+        advanceUntilIdle()
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        assertEquals("host_awaiting_joiner", payload["last_step"])
+        verify(wideEventClient).intervalEnd(1L, "preparing_sync_latency_ms_bucketed")
+
+        wideEvent.onHostWaitFinished(peerOutcome)
+        wideEvent.onSucceeded()
+        wideEvent.onFailed(SetupFailureReason.TRANSPORT_FAILURE)
+        wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(1L, FlowStatus.Success, mapOf("role" to "host", "peer_kind" to "ddg", "peer_outcome" to peerOutcome.value))
+        verify(wideEventClient).flowFinish(any(), any(), any())
+        verify(wideEventClient).intervalEnd(1L, "preparing_sync_latency_ms_bucketed")
+        assertFalse(payload.containsKey("status_reason"))
+        assertFalse(payload.containsKey("timeout_stage"))
+    }
+
+    @Test
+    fun `host close or failure after send remains success without timeout metadata`(@TestParameter close: Boolean) = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startHost()
+        wideEvent.onHostCodeSent()
+        if (close) {
+            wideEvent.onCancelled(SetupCancellationReason.USER_CLOSED)
+        } else {
+            wideEvent.onFailed(SetupFailureReason.SESSION_TIMEOUT, TimeoutStage.WAITING_FOR_PEER_STATUS)
+        }
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(1L, FlowStatus.Success, mapOf("role" to "host", "peer_kind" to "ddg", "peer_outcome" to "unknown"))
+        assertFalse(payload.containsKey("status_reason"))
+        assertFalse(payload.containsKey("timeout_stage"))
+    }
+
+    @Test
+    fun `host peer leaving before send cancels with peer_left`() = runTest {
+        enableUnifiedEvent()
+        startHost()
+        wideEvent.onPeerLeft(SetupPeerOutcome.CANCELLED)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(1L, FlowStatus.Cancelled, mapOf("role" to "host", "peer_kind" to "ddg", "status_reason" to "peer_left"))
+    }
+
+    @Test
+    fun `host peer leaving after send finishes success`(@TestParameter peerOutcome: SetupPeerOutcome) = runTest {
+        enableUnifiedEvent()
+        startHost()
+        wideEvent.onHostCodeSent()
+        wideEvent.onPeerLeft(peerOutcome)
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(1L, FlowStatus.Success, mapOf("role" to "host", "peer_kind" to "ddg", "peer_outcome" to peerOutcome.value))
+    }
+
+    @Test
+    fun `host account and recovery callbacks keep mode role and preparing interval until code send`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startHost()
+        wideEvent.onStep(SetupStep.ACCOUNT_CREATED)
+        wideEvent.onRecoveryCodeShown()
+        wideEvent.onRecoveryCodeScreenShown()
+        wideEvent.onRecoveryCodeScreenFailed(SetupFailureReason.ACCOUNT_CREATION_FAILED)
+        wideEvent.onSucceeded()
+        advanceUntilIdle()
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+        verify(wideEventClient, never()).intervalEnd(1L, "preparing_sync_latency_ms_bucketed")
+        assertEquals("account_created", payload["last_step"])
+        assertEquals("multi_device", payload["setup_mode"])
+
+        wideEvent.onHostCodeSent()
+        wideEvent.onStep(SetupStep.PREPARING_SYNC)
+        wideEvent.onStep(SetupStep.RECOVERY_CODE_SHOWN)
+        wideEvent.onHostWaitFinished(SetupPeerOutcome.SUCCESS)
+        advanceUntilIdle()
+        assertEquals("host_awaiting_joiner", payload["last_step"])
+        assertEquals("host", payload["role"])
+        verify(wideEventClient).intervalEnd(1L, "preparing_sync_latency_ms_bucketed")
+    }
+
+    @Test
+    fun `recovery screen cannot complete v2 pairing before role election`() = runTest {
+        enableUnifiedEvent()
+        wideEvent.onFlowStarted("other", SetupMode.MULTI_DEVICE)
+        wideEvent.onRecoveryCodeScreenShown()
+        wideEvent.onRecoveryCodeScreenFailed(SetupFailureReason.RECOVERY_CODE_GENERATION_FAILED)
+        advanceUntilIdle()
+        verify(wideEventClient, never()).flowFinish(any(), any(), any())
+    }
+
+    @Test
+    fun `recovery screen completes the current non host attempt`(@TestParameter setupMode: SetupMode) = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        wideEvent.onFlowStarted("other", setupMode)
+        if (setupMode == SetupMode.MULTI_DEVICE) wideEvent.onUpdate { it.copy(role = SetupRole.JOINER) }
+        wideEvent.onRecoveryCodeScreenShown()
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(eq(1L), eq(FlowStatus.Success), any())
+        assertEquals("recovery_code_shown", payload["last_step"])
+        assertEquals(setupMode.value, payload["setup_mode"])
+    }
+
+    @Test
+    fun `accepted host protocol events finish report deadline as success`() = runTest {
+        enableUnifiedEvent()
+        val payload = captureMergedMetadata()
+        startHost()
+        val observer = SyncSetupPairingObserver(wideEvent)
+        observer.onEvent(ExchangeV2Event.RoleElected(1, Role.Host, PairingRole.Presenter, true, "ddg", "ddg", false))
+        observer.onEvent(ExchangeV2Event.MessageSent(1, ExchangeV2Message.RecoveryCodeResponse.create("synthetic")))
+        observer.onEvent(
+            ExchangeV2Event.Transition(
+                1,
+                ExchangeV2State.Host.AwaitingStatus,
+                ExchangeV2State.Host.Unknown,
+                null,
+                LocalTrigger.HostStatusDeadlineElapsed(30.seconds),
+            ),
+        )
+        advanceUntilIdle()
+
+        verify(wideEventClient).flowFinish(1L, FlowStatus.Success, mapOf("role" to "host", "peer_kind" to "ddg", "peer_outcome" to "unknown"))
+        assertEquals("host_awaiting_joiner", payload["last_step"])
+        assertFalse(payload.containsKey("timeout_stage"))
+    }
+
+    private fun startHost(version: ExchangeProtocolVersion.Supported = ExchangeProtocolVersion.V2_1) {
+        wideEvent.onFlowStarted("other", SetupMode.MULTI_DEVICE)
+        wideEvent.onUpdate { it.copy(role = SetupRole.HOST, peerKind = PeerKind.DDG, flowVersion = version) }
+        wideEvent.onStep(SetupStep.PREPARING_SYNC)
     }
 
     private suspend fun TestScope.startV2Session() {

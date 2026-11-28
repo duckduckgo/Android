@@ -79,6 +79,11 @@ interface SyncSetupWideEvent {
     fun onSyncRestoreStarted()
 
     // Unified wide event API
+    fun onRecoveryCodeScreenShown()
+    fun onRecoveryCodeScreenFailed(reason: SetupFailureReason)
+    fun onHostCodeSent()
+    fun onHostWaitFinished(peerOutcome: SetupPeerOutcome)
+    fun onPeerLeft(peerOutcome: SetupPeerOutcome)
     fun onPairingSessionReset()
     fun onStep(step: SetupStep)
     fun onUpdate(change: (SetupFields) -> SetupFields)
@@ -104,6 +109,13 @@ internal fun SyncSetupWideEvent.onPairingOutcome(outcome: DispatchOutcome) {
         }
         else -> Unit
     }
+}
+
+enum class SetupPeerOutcome(val value: String) {
+    SUCCESS("success"),
+    FAILURE("failure"),
+    CANCELLED("cancelled"),
+    UNKNOWN("unknown"),
 }
 
 data class SetupFields(
@@ -249,6 +261,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     override fun onStep(step: SetupStep) = enqueue {
         val openAttempt = currentData ?: return@enqueue
         val previous = openAttempt.unified ?: return@enqueue
+        if (previous.hostProgress == HostProgress.AwaitingJoiner) return@enqueue
         val unified = if (step == previous.lastStep) previous else previous.moveToStep(openAttempt.flowId, step)
         currentData = openAttempt.copy(unified = unified)
         unified.appendLastStep(openAttempt.flowId)
@@ -272,11 +285,58 @@ class SyncSetupWideEventImpl @Inject constructor(
         return copy(lastStep = step, isPreparingSyncRunning = preparingSyncRunning, sawCodeEntry = sawCodeEntry || step == SetupStep.CODE_ENTRY)
     }
 
+    override fun onRecoveryCodeScreenShown() = enqueue {
+        val attempt = currentData ?: return@enqueue
+        val unified = attempt.unified?.takeIf { it.canFinishOnRecoveryCodeScreen() } ?: return@enqueue
+        val updated = unified.moveToStep(attempt.flowId, SetupStep.RECOVERY_CODE_SHOWN)
+        currentData = attempt.copy(unified = updated)
+        updated.appendLastStep(attempt.flowId)
+        finishUnifiedAttempt(FlowStatus.Success, emptyMap())
+    }
+
+    override fun onRecoveryCodeScreenFailed(reason: SetupFailureReason) = enqueue {
+        val unified = currentData?.unified ?: return@enqueue
+        if (unified.canFinishOnRecoveryCodeScreen()) {
+            finishUnifiedAttempt(FlowStatus.Failure(reason.value), mapOf(KEY_STATUS_REASON to reason.value))
+        }
+    }
+
+    private fun UnifiedData.canFinishOnRecoveryCodeScreen(): Boolean = fields.role != SetupRole.HOST &&
+        (fields.setupMode != SetupMode.MULTI_DEVICE || fields.role == SetupRole.JOINER || fields.flowVersion < ExchangeProtocolVersion.V2_0)
+
+    override fun onHostCodeSent() = enqueue {
+        val attempt = currentData ?: return@enqueue
+        val unified = attempt.unified ?: return@enqueue
+        if (unified.fields.role != SetupRole.HOST || unified.hostProgress != HostProgress.BeforeCodeSent) return@enqueue
+        if (unified.fields.flowVersion < ExchangeProtocolVersion.V2_1) {
+            finishUnifiedAttempt(FlowStatus.Success, mapOf(KEY_PEER_OUTCOME to SetupPeerOutcome.UNKNOWN.value))
+        } else {
+            val updated = unified.moveToStep(attempt.flowId, SetupStep.HOST_AWAITING_JOINER)
+                .copy(hostProgress = HostProgress.AwaitingJoiner)
+            currentData = attempt.copy(unified = updated)
+            updated.appendLastStep(attempt.flowId)
+        }
+    }
+
+    override fun onHostWaitFinished(peerOutcome: SetupPeerOutcome) = enqueue {
+        finishHostAfterCodeSent(peerOutcome)
+    }
+
+    override fun onPeerLeft(peerOutcome: SetupPeerOutcome) = enqueue {
+        if (!finishHostAfterCodeSent(peerOutcome)) cancel(SetupCancellationReason.PEER_LEFT)
+    }
+
+    private suspend fun finishHostAfterCodeSent(peerOutcome: SetupPeerOutcome): Boolean {
+        if (currentData?.unified?.hostProgress != HostProgress.AwaitingJoiner) return false
+        finishUnifiedAttempt(FlowStatus.Success, mapOf(KEY_PEER_OUTCOME to peerOutcome.value))
+        return true
+    }
+
     override fun onPairingSessionReset() = enqueue {
         val openAttempt = currentData ?: return@enqueue
         val unified = openAttempt.unified ?: return@enqueue
         val fields = unified.fields.copy(role = null, peerKind = null, flowVersion = advertisedExchangeVersion.resolve())
-        val updated = unified.copy(fields = fields)
+        val updated = unified.copy(fields = fields, hostProgress = HostProgress.BeforeCodeSent)
         currentData = openAttempt.copy(unified = updated)
         updated.appendLastStep(openAttempt.flowId)
     }
@@ -288,9 +348,12 @@ class SyncSetupWideEventImpl @Inject constructor(
         unified.appendLastStep(openAttempt.flowId)
     }
 
-    override fun onSucceeded() = enqueue { finishUnifiedAttempt(FlowStatus.Success, metadata = emptyMap()) }
+    override fun onSucceeded() = enqueue {
+        if (currentData?.unified?.fields?.role != SetupRole.HOST) finishUnifiedAttempt(FlowStatus.Success, metadata = emptyMap())
+    }
 
     override fun onFailed(reason: SetupFailureReason, timeoutStage: TimeoutStage?) = enqueue {
+        if (finishHostAfterCodeSent(SetupPeerOutcome.UNKNOWN)) return@enqueue
         when (reason) {
             SetupFailureReason.ALREADY_PAIRED -> cancel(SetupCancellationReason.ALREADY_PAIRED)
             SetupFailureReason.ALREADY_UPGRADED -> cancel(SetupCancellationReason.ALREADY_UPGRADED)
@@ -305,6 +368,7 @@ class SyncSetupWideEventImpl @Inject constructor(
     override fun onCancelled(reason: SetupCancellationReason) = enqueue { cancel(reason) }
 
     private suspend fun cancel(reason: SetupCancellationReason) {
+        if (finishHostAfterCodeSent(SetupPeerOutcome.UNKNOWN)) return
         val denial = currentData?.unified?.fields?.deviceAuthDenial
         // A user who leaves after device auth stopped them didn't get past it, so we report why instead of user_closed.
         if (reason == SetupCancellationReason.USER_CLOSED && denial != null) {
@@ -421,7 +485,13 @@ class SyncSetupWideEventImpl @Inject constructor(
         val lastStep: SetupStep,
         val isPreparingSyncRunning: Boolean = false,
         val sawCodeEntry: Boolean = false,
+        val hostProgress: HostProgress = HostProgress.BeforeCodeSent,
     )
+
+    private enum class HostProgress {
+        BeforeCodeSent,
+        AwaitingJoiner,
+    }
 
     private enum class SetupInterval(val key: String, val buckets: Set<Duration>) {
         Total(key = "total_latency_ms_bucketed", buckets = SHARED_LATENCY_BUCKETS),
@@ -452,6 +522,7 @@ class SyncSetupWideEventImpl @Inject constructor(
         const val KEY_DEVICE_AUTH_SHOWN = "device_auth_shown"
         const val KEY_SETUP_MODE = "setup_mode"
         const val KEY_INITIAL_SETUP_MODE = "initial_setup_mode"
+        const val KEY_PEER_OUTCOME = "peer_outcome"
         const val KEY_ROLE = "role"
         const val KEY_PEER_KIND = "peer_kind"
         const val KEY_CONNECT_METHOD = "connect_method"

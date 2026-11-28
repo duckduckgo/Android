@@ -112,6 +112,7 @@ class DisplayQrCodeActivity : DuckDuckGoActivity() {
     }
 
     override fun onDestroy() {
+        if (isFinishing) viewModel.onScreenClosed()
         super.onDestroy()
         visibleDialog?.dismiss()
         visibleDialog = null
