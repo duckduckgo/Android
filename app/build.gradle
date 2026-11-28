@@ -439,6 +439,7 @@ dependencies {
     implementation project(":test-seeder-api")
     implementation project(':tracker-detection-api')
     implementation project(':tracker-detection-impl')
+    implementation project(':unified-url-model-impl')
     implementation project(':user-agent-api')
     implementation project(':user-agent-impl')
     implementation project(':user-agent-store')
