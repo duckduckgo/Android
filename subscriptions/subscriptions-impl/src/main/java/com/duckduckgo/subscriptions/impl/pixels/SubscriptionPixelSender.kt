@@ -71,6 +71,10 @@ import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.RESTORE_USING_
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVATED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ACTIVE
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_ADD_EMAIL_SUCCESS
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_CANCEL_CLICK
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_FEATURE_INFO_FAILURE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_FLOW_LOAD_FAILURE
+import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_CANCELLATION_PLAY_STORE_CANCELLED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_INACTIVE_SUBSCRIPTION
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_NOT_FIRED_PERMISSIONS_REJECTED
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixel.SUBSCRIPTION_EXPIRATION_REMINDER_SCHEDULED
@@ -139,6 +143,14 @@ interface SubscriptionPixelSender {
     fun reportSubscriptionSettingsWithdrawalDialogDismissed()
     fun reportSubscriptionSettingsUndoCancellationShown(isFreeTrial: Boolean)
     fun reportSubscriptionSettingsUndoCancellationClick(isFreeTrial: Boolean)
+    fun reportCancellationFlowCancelClick()
+    fun reportCancellationFlowPlayStoreCancelled(
+        entry: CancellationEntry,
+        isFreeTrial: Boolean,
+        daysSincePurchase: DaysSincePurchaseBucket,
+    )
+    fun reportCancellationFlowLoadFailure(reason: CancellationFlowLoadFailureReason, errorCode: Int)
+    fun reportCancellationFlowFeatureInfoFailure()
     fun reportMonthlyPriceClick()
     fun reportYearlyPriceClick()
     fun reportOnboardingFaqClick()
@@ -320,6 +332,34 @@ class SubscriptionPixelSenderImpl @Inject constructor(
 
     override fun reportSubscriptionSettingsUndoCancellationClick(isFreeTrial: Boolean) =
         fire(SUBSCRIPTION_SETTINGS_UNDO_CANCELLATION_CLICK, mapOf(SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString()))
+
+    override fun reportCancellationFlowCancelClick() =
+        fire(SUBSCRIPTION_CANCELLATION_CANCEL_CLICK)
+
+    override fun reportCancellationFlowPlayStoreCancelled(
+        entry: CancellationEntry,
+        isFreeTrial: Boolean,
+        daysSincePurchase: DaysSincePurchaseBucket,
+    ) = fire(
+        SUBSCRIPTION_CANCELLATION_PLAY_STORE_CANCELLED,
+        mapOf(
+            SubscriptionPixelParameter.ENTRY to entry.pixelValue,
+            SubscriptionPixelParameter.FREE_TRIAL to isFreeTrial.toString(),
+            SubscriptionPixelParameter.DAYS_SINCE_PURCHASE to daysSincePurchase.pixelValue,
+        ),
+    )
+
+    override fun reportCancellationFlowLoadFailure(reason: CancellationFlowLoadFailureReason, errorCode: Int) =
+        fire(
+            SUBSCRIPTION_CANCELLATION_FLOW_LOAD_FAILURE,
+            mapOf(
+                SubscriptionPixelParameter.REASON to reason.pixelValue,
+                SubscriptionPixelParameter.ERROR_CODE to errorCode.toString(),
+            ),
+        )
+
+    override fun reportCancellationFlowFeatureInfoFailure() =
+        fire(SUBSCRIPTION_CANCELLATION_FEATURE_INFO_FAILURE)
 
     override fun reportSubscriptionSettingsWithdrawalDialogShown() =
         fire(SUBSCRIPTION_SETTINGS_WITHDRAWAL_DIALOG_SHOWN)

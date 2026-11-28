@@ -223,6 +223,26 @@ enum class SubscriptionPixel(
         types = setOf(Count, Daily()),
         includedParameters = setOf(APP_VERSION),
     ),
+    SUBSCRIPTION_CANCELLATION_CANCEL_CLICK(
+        baseName = "subscription_cancellation_cancel_click",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_CANCELLATION_PLAY_STORE_CANCELLED(
+        baseName = "subscription_cancellation_play_store_cancelled",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_CANCELLATION_FLOW_LOAD_FAILURE(
+        baseName = "subscription_cancellation_flow_load_failure",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
+    SUBSCRIPTION_CANCELLATION_FEATURE_INFO_FAILURE(
+        baseName = "subscription_cancellation_feature-info_failure",
+        types = setOf(Count, Daily()),
+        includedParameters = setOf(APP_VERSION),
+    ),
     SUBSCRIPTION_PRICE_MONTHLY_CLICK(
         baseName = "m_privacy-pro_offer_monthly-price_click",
         type = Count,
@@ -402,6 +422,9 @@ object SubscriptionPixelParameter {
     const val PRIVACY_DASHBOARD_EVER_OPENED = "privacy_dashboard_opened"
     const val SUBSCRIPTION_PROMO_SHOWN = "subscription_promo_shown"
     const val FREE_TRIAL = "free_trial"
+    const val ENTRY = "entry"
+    const val DAYS_SINCE_PURCHASE = "days_since_purchase"
+    const val ERROR_CODE = "error_code"
 }
 
 internal val PixelType.pixelNameSuffix: String

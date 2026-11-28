@@ -170,6 +170,7 @@ class RealPaywallUrlResolverTest {
         assertEquals(subscriptionsUrlProvider.manageUrl, testee.resolve(subscriptionsUrlProvider.manageUrl))
         assertEquals(subscriptionsUrlProvider.plansUrl, testee.resolve(subscriptionsUrlProvider.plansUrl))
         assertEquals(subscriptionsUrlProvider.upgradeToProUrl, testee.resolve(subscriptionsUrlProvider.upgradeToProUrl))
+        assertEquals(subscriptionsUrlProvider.cancelUrl, testee.resolve(subscriptionsUrlProvider.cancelUrl))
     }
 
     @Test

@@ -60,6 +60,44 @@ class SubscriptionPixelSenderImplTest {
     }
 
     @Test
+    fun whenReportCancellationFlowCancelClickThenFiresCountAndDaily() {
+        testee.reportCancellationFlowCancelClick()
+
+        verify(pixel).fire(pixelName = "subscription_cancellation_cancel_click_c", type = Count, parameters = emptyMap())
+        verify(pixel).fire(pixelName = "subscription_cancellation_cancel_click_d", type = Daily(), parameters = emptyMap())
+    }
+
+    @Test
+    fun whenReportCancellationFlowPlayStoreCancelledThenFiresWithEntryTrialAndPurchaseAge() {
+        testee.reportCancellationFlowPlayStoreCancelled(
+            entry = CancellationEntry.CANCELLATION,
+            isFreeTrial = true,
+            daysSincePurchase = DaysSincePurchaseBucket.D1_7,
+        )
+
+        val params = mapOf("entry" to "cancellation", "free_trial" to "true", "days_since_purchase" to "d1_7")
+        verify(pixel).fire(pixelName = "subscription_cancellation_play_store_cancelled_c", type = Count, parameters = params)
+        verify(pixel).fire(pixelName = "subscription_cancellation_play_store_cancelled_d", type = Daily(), parameters = params)
+    }
+
+    @Test
+    fun whenReportCancellationFlowLoadFailureThenFiresWithReasonAndErrorCode() {
+        testee.reportCancellationFlowLoadFailure(CancellationFlowLoadFailureReason.HTTP, 500)
+
+        val params = mapOf("reason" to "http", "error_code" to "500")
+        verify(pixel).fire(pixelName = "subscription_cancellation_flow_load_failure_c", type = Count, parameters = params)
+        verify(pixel).fire(pixelName = "subscription_cancellation_flow_load_failure_d", type = Daily(), parameters = params)
+    }
+
+    @Test
+    fun whenReportCancellationFlowFeatureInfoFailureThenFiresCountAndDaily() {
+        testee.reportCancellationFlowFeatureInfoFailure()
+
+        verify(pixel).fire(pixelName = "subscription_cancellation_feature-info_failure_c", type = Count, parameters = emptyMap())
+        verify(pixel).fire(pixelName = "subscription_cancellation_feature-info_failure_d", type = Daily(), parameters = emptyMap())
+    }
+
+    @Test
     fun whenReportExpirationReminderScheduledThenFiresScheduledPixel() {
         testee.reportExpirationReminderScheduled()
 

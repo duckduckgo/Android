@@ -614,6 +614,32 @@ class SubscriptionMessagingInterfaceTest {
     }
 
     @Test
+    fun `when process and show feature info then callback executed`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"showFeatureInfo","params":{"feature":"Network Protection"}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
+    fun `when process and request cancellation then callback executed`() = runTest {
+        givenInterfaceIsRegistered()
+
+        val message = """
+            {"context":"subscriptionPages","featureName":"useSubscription","method":"requestCancellation","params":{}}
+        """.trimIndent()
+
+        messagingInterface.process(message, "duckduckgo-android-messaging-secret")
+
+        assertEquals(1, callback.counter)
+    }
+
+    @Test
     fun `when process and monthly price clicked then pixel sent`() = runTest {
         givenInterfaceIsRegistered()
 

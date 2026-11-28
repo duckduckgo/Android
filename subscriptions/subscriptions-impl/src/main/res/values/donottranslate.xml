@@ -165,4 +165,10 @@
     <string name="subscriptionOnboardingSettingsCardDescription">Some premium protections aren\'t active yet.</string>
     <string name="subscriptionOnboardingSettingsCardButton">Continue Setup</string>
 
+    <!-- Subscription Cancellation Flow (en-US only, not translated) -->
+    <string name="subscriptionSettingManageSubscription">Manage Subscription</string>
+    <string name="subscriptionSettingCancelSubscription">Cancel Subscription</string>
+    <string name="subscriptionCancellationFlowErrorTitle">Something went wrong</string>
+    <string name="subscriptionCancellationFlowErrorMessage">We\'re having trouble connecting. Continue to the Play Store to manage your subscription.</string>
+
 </resources>

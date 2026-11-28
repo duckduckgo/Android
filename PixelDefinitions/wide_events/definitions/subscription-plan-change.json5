@@ -101,6 +101,7 @@
                 "funnel_appmenu_android",
                 "funnel_appmenu_android__chat",
                 "funnel_appsettings_android",
+                "funnel_appsettings_android_cancellationflow",
                 "funnel_duckai_android__freelabel",
                 "funnel_duckai_android__modelpicker",
                 "funnel_duckai_android__reasoningdropdown",

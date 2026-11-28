@@ -23,11 +23,13 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.codegen.annotations.ContributesViewModel
 import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.ActivityScope
 import com.duckduckgo.subscriptions.api.ActiveOfferType
 import com.duckduckgo.subscriptions.api.SubscriptionStatus
+import com.duckduckgo.subscriptions.api.SubscriptionStatus.AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionStatus.NOT_AUTO_RENEWABLE
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback
 import com.duckduckgo.subscriptions.api.SubscriptionUnifiedFeedback.SubscriptionFeedbackSource.SUBSCRIPTION_SETTINGS
@@ -41,6 +43,8 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsManager
 import com.duckduckgo.subscriptions.impl.UndoCancellationResult
 import com.duckduckgo.subscriptions.impl.onboarding.SubscriptionOnboardingProgress
 import com.duckduckgo.subscriptions.impl.onboarding.experiment.SubscriptionOnboardingExperiments
+import com.duckduckgo.subscriptions.impl.pixels.CancellationEntry
+import com.duckduckgo.subscriptions.impl.pixels.DaysSincePurchaseBucket
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.repository.PendingPlan
 import com.duckduckgo.subscriptions.impl.repository.Subscription
@@ -53,6 +57,7 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Comman
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPlayStoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToPortal
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.GoToWithdrawalHelp
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchCancellationFlow
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.LaunchOnboarding
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionSettingsViewModel.Command.ShowWithdrawalDialogError
@@ -78,6 +83,7 @@ import java.math.BigDecimal
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
 
 @SuppressLint("NoLifecycleObserver") // we don't observe app lifecycle
@@ -92,6 +98,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private val subscriptionOnboardingExperiments: SubscriptionOnboardingExperiments,
     private val currentTimeProvider: CurrentTimeProvider,
     private val subscriptionWithdrawal: SubscriptionWithdrawal,
+    private val appBuildConfig: AppBuildConfig,
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val command = Channel<Command>(1, DROP_OLDEST)
@@ -105,6 +112,9 @@ class SubscriptionSettingsViewModel @Inject constructor(
     private var withdrawalInProgress = false
     private var undoCancellationInProgress = false
     private var undoCancellationShownReported = false
+    private var cancellationFlowOpen = false
+    private var pendingPlayStoreReturn: PendingPlayStoreReturn? = null
+    private var leftForPlayStore = false
 
     override fun onCreate(owner: LifecycleOwner) {
         super.onCreate(owner)
@@ -121,10 +131,72 @@ class SubscriptionSettingsViewModel @Inject constructor(
     }
 
     override fun onResume(owner: LifecycleOwner) {
+        val returnedFromPlayStore = pendingPlayStoreReturn?.takeIf { leftForPlayStore }
+        if (returnedFromPlayStore != null) {
+            pendingPlayStoreReturn = null
+            leftForPlayStore = false
+        }
         viewModelScope.launch {
             emitChanges()
-            refreshIfCancelled()
+            if (returnedFromPlayStore != null) {
+                refreshAndReportCancellation(returnedFromPlayStore)
+            } else {
+                refreshIfCancelled()
+            }
         }
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        if (pendingPlayStoreReturn != null) leftForPlayStore = true
+    }
+
+    fun onCancelSubscriptionClicked() {
+        if (cancellationFlowOpen) return
+        cancellationFlowOpen = true
+        pixelSender.reportCancellationFlowCancelClick()
+        viewModelScope.launch { command.send(LaunchCancellationFlow) }
+    }
+
+    fun onCancellationFlowFinished(storeCancellationRequested: Boolean) {
+        cancellationFlowOpen = false
+        if (storeCancellationRequested) openPlayStoreSubscription(CancellationEntry.CANCELLATION)
+    }
+
+    fun onManagePlayStoreSubscriptionClicked() {
+        openPlayStoreSubscription(CancellationEntry.MANAGE)
+    }
+
+    private fun openPlayStoreSubscription(entry: CancellationEntry) {
+        viewModelScope.launch {
+            val subscription = subscriptionsManager.getSubscription()
+            if (subscription?.status == AUTO_RENEWABLE) {
+                pendingPlayStoreReturn = PendingPlayStoreReturn(entry, subscription)
+                leftForPlayStore = false
+            }
+            command.send(GoToPlayStoreSubscription)
+        }
+    }
+
+    private suspend fun refreshAndReportCancellation(pending: PendingPlayStoreReturn) {
+        runCatching { subscriptionsManager.refreshSubscriptionData() }
+        val subscription = subscriptionsManager.getSubscription()
+        if (subscription?.status == NOT_AUTO_RENEWABLE) {
+            val before = pending.subscriptionBefore
+            pixelSender.reportCancellationFlowPlayStoreCancelled(
+                entry = pending.entry,
+                isFreeTrial = before.activeOffers.contains(ActiveOfferType.TRIAL),
+                daysSincePurchase = DaysSincePurchaseBucket.from(before.startedAt, currentTimeProvider.currentTimeMillis()),
+            )
+        }
+        emitChanges()
+    }
+
+    private fun isCancellationFlowAvailable(subscription: Subscription): Boolean {
+        val locale = appBuildConfig.deviceLocale
+        return subscription.platform == "google" &&
+            locale.language == Locale.US.language &&
+            locale.country == Locale.US.country &&
+            subscriptionsFeature.subscriptionCancellationFlow().isEnabled()
     }
 
     private suspend fun refreshIfCancelled() {
@@ -215,6 +287,7 @@ class SubscriptionSettingsViewModel @Inject constructor(
             subscription.tier
         }
 
+        val cancellationFlowAvailable = isCancellationFlowAvailable(subscription)
         _viewState.emit(
             Ready(
                 date = date,
@@ -236,6 +309,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
                 onboardingEntryPoint = onboardingEntryPoint(subscription),
                 withdrawal = withdrawalOption.takeIf { subscriptionWithdrawal.isWithdrawable(subscription) },
                 showUndoCancellation = canUndoCancellation(subscription),
+                isCancellationFlowAvailable = cancellationFlowAvailable,
+                showCancelSubscription = cancellationFlowAvailable && subscription.status == AUTO_RENEWABLE,
             ),
         )
 
@@ -442,9 +517,15 @@ class SubscriptionSettingsViewModel @Inject constructor(
         data object DismissWithdrawalDialog : Command()
         data object ShowWithdrawalDialogError : Command()
         data object GoToPlayStoreSubscription : Command()
+        data object LaunchCancellationFlow : Command()
     }
 
     data class OnboardingEntryPoint(val percentage: Int)
+
+    private data class PendingPlayStoreReturn(
+        val entry: CancellationEntry,
+        val subscriptionBefore: Subscription,
+    )
 
     data class CompletedWithdrawalState(
         val date: String,
@@ -481,6 +562,8 @@ class SubscriptionSettingsViewModel @Inject constructor(
             val withdrawal: WithdrawalOption? = null,
             val completedWithdrawal: CompletedWithdrawalState? = null,
             val showUndoCancellation: Boolean = false,
+            val isCancellationFlowAvailable: Boolean = false,
+            val showCancelSubscription: Boolean = false,
         ) : ViewState()
     }
 

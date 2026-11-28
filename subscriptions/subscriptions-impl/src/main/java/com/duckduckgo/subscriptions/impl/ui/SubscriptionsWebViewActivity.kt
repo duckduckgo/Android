@@ -81,7 +81,9 @@ import com.duckduckgo.navigation.api.GlobalActivityStarter.ActivityParams
 import com.duckduckgo.navigation.api.getActivityParams
 import com.duckduckgo.pir.api.PirScreens.PirDashboardWebViewScreen
 import com.duckduckgo.pir.api.PirScreens.PirDesktopScreen
+import com.duckduckgo.subscriptions.api.SubscriptionOnboardingFeature
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.RestoreSubscriptionScreenWithParams
+import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingFeatureInfoScreen
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionOnboardingScreenWithEmptyParams
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionPurchase
 import com.duckduckgo.subscriptions.api.SubscriptionScreens.SubscriptionUpgrade
@@ -95,6 +97,7 @@ import com.duckduckgo.subscriptions.impl.SubscriptionsFeature
 import com.duckduckgo.subscriptions.impl.appendFunnelOriginParam
 import com.duckduckgo.subscriptions.impl.databinding.ActivitySubscriptionsWebviewBinding
 import com.duckduckgo.subscriptions.impl.internal.SubscriptionsUrlProvider
+import com.duckduckgo.subscriptions.impl.pixels.CancellationFlowLoadFailureReason
 import com.duckduckgo.subscriptions.impl.pixels.SubscriptionPixelSender
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.BackToSettings
@@ -108,9 +111,11 @@ import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.OpenNotificationSettings
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.Reload
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestNotificationsPermission
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RequestStoreCancellation
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.RestoreSubscription
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendJsEvent
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SendResponseToJs
+import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ShowFeatureInfo
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.ShowNotificationsDeniedDialog
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionChangeSelected
 import com.duckduckgo.subscriptions.impl.ui.SubscriptionWebViewViewModel.Command.SubscriptionSelected
@@ -135,6 +140,9 @@ import java.io.Serializable
 import javax.inject.Inject
 import javax.inject.Named
 
+/** Finishes with [SubscriptionsWebViewActivity.RESULT_STORE_CANCELLATION_REQUESTED] when the user continues to cancel */
+data object SubscriptionCancellationFlowScreen : ActivityParams
+
 data class SubscriptionsWebViewActivityWithParams(
     val url: String,
     val toolbarConfig: ToolbarConfig = DaxSubscription,
@@ -157,6 +165,7 @@ data class SubscriptionsWebViewActivityWithParams(
 @ContributeToActivityStarter(SubscriptionPurchase::class, screenName = "subscriptions.purchase")
 @ContributeToActivityStarter(SubscriptionUpgrade::class, screenName = "subscriptions.upgrade")
 @ContributeToActivityStarter(SubscriptionsWebViewActivityWithParams::class)
+@ContributeToActivityStarter(SubscriptionCancellationFlowScreen::class)
 class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationDialogListener {
 
     @Inject
@@ -220,6 +229,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     private val binding: ActivitySubscriptionsWebviewBinding by viewBinding()
 
     private lateinit var params: SubscriptionsWebViewActivityWithParams
+    private var isCancellationFlow = false
+    private var cancellationFlowLoadFailed = false
 
     // Used to represent a file to download, but may first require permission
     private var pendingFileDownload: PendingFileDownload? = null
@@ -232,6 +243,11 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         }
         pendingNotificationsPermissionRequestId = null
     }
+    private var isShowingFeatureInfo = false
+    private val featureInfoLauncher = registerForActivityResult(StartActivityForResult()) {
+        isShowingFeatureInfo = false
+    }
+
     private val toolbar
         get() = binding.includeToolbar.toolbar
 
@@ -302,6 +318,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                 context = this,
                 onRenderProcessCrash = ::recoverFromRenderProcessCrash,
                 subscriptionRestoreWideEvent = subscriptionRestoreWideEvent,
+                onMainFrameLoadError = if (isCancellationFlow) ::onCancellationFlowLoadError else null,
             )
             it.settings.apply {
                 userAgentString = CUSTOM_UA
@@ -400,6 +417,15 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
                     webViewActivityWithParams
                 }
             }.appendFunnelOriginToUrl()
+        }
+
+        intent.getActivityParams(SubscriptionCancellationFlowScreen::class.java)?.let {
+            isCancellationFlow = true
+            return SubscriptionsWebViewActivityWithParams(
+                url = subscriptionsUrlProvider.cancelUrl,
+                toolbarConfig = CustomTitle(getString(string.subscriptionSettingCancelSubscription)),
+                origin = CANCELLATION_FLOW_ORIGIN,
+            )
         }
 
         intent.getActivityParams(SubscriptionUpgrade::class.java)?.let { params ->
@@ -570,7 +596,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
 
     private fun processCommand(command: Command) {
         when (command) {
-            is BackToSettings, BackToSettingsActivateSuccess -> finishToSettings()
+            is BackToSettings, BackToSettingsActivateSuccess -> if (isCancellationFlow) finish() else finishToSettings()
             is SendJsEvent -> sendJsEvent(command.event)
             is SendResponseToJs -> sendResponseToJs(command.data)
             is SubscriptionSelected -> selectSubscription(command.id, command.offerId, command.experiments)
@@ -586,6 +612,8 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             is ShowNotificationsDeniedDialog -> showNotificationsDeniedDialog(command.id, command.days)
             is OpenNotificationSettings -> openNotificationSettings()
             Reload -> binding.webview.reload()
+            is ShowFeatureInfo -> showFeatureInfo(command.feature)
+            RequestStoreCancellation -> if (isCancellationFlow) finishRequestingStoreCancellation()
         }
     }
 
@@ -594,6 +622,37 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
             "SubscriptionsWebViewActivity: Loading subscriptions webview with URL: $url"
         }
         binding.webview.loadUrl(url)
+    }
+
+    private fun finishRequestingStoreCancellation() {
+        if (isFinishing) return
+        setResult(RESULT_STORE_CANCELLATION_REQUESTED)
+        finish()
+    }
+
+    private fun onCancellationFlowLoadError(reason: CancellationFlowLoadFailureReason, errorCode: Int) {
+        if (cancellationFlowLoadFailed || isFinishing) return
+        cancellationFlowLoadFailed = true
+        pixelSender.reportCancellationFlowLoadFailure(reason, errorCode)
+        TextAlertDialogBuilder(this)
+            .setTitle(string.subscriptionCancellationFlowErrorTitle)
+            .setMessage(string.subscriptionCancellationFlowErrorMessage)
+            .setPositiveButton(string.ok)
+            .addEventListener(
+                object : TextAlertDialogBuilder.EventListener() {
+                    override fun onDialogDismissed() {
+                        finishRequestingStoreCancellation()
+                    }
+                },
+            )
+            .show()
+    }
+
+    private fun showFeatureInfo(feature: SubscriptionOnboardingFeature) {
+        if (isShowingFeatureInfo) return
+        val intent = globalActivityStarter.startIntent(this, SubscriptionOnboardingFeatureInfoScreen(feature)) ?: return
+        isShowingFeatureInfo = true
+        featureInfoLauncher.launch(intent)
     }
 
     private fun goToPIRDashboard() {
@@ -818,7 +877,7 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                super.onBackPressed()
+                if (isCancellationFlow) onBackPressed() else super.onBackPressed()
                 return true
             }
         }
@@ -873,6 +932,10 @@ class SubscriptionsWebViewActivity : DuckDuckGoActivity(), DownloadConfirmationD
         private const val PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 200
         private const val CUSTOM_UA =
             "Mozilla/5.0 (Linux; Android 12) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/124.0.0.0 Mobile DuckDuckGo/5 Safari/537.36"
+        const val RESULT_STORE_CANCELLATION_REQUESTED = RESULT_FIRST_USER + 1
+
+        // Attributes plan changes started from the cancellation flow in the plan change wide event
+        private const val CANCELLATION_FLOW_ORIGIN = "funnel_appsettings_android_cancellationflow"
         private const val ACTIVITY_LAUNCHED_AFTER_WEBVIEW_RENDER_PROCESS_CRASH = "activity_launched_after_webview_render_process_crash"
     }
 }
