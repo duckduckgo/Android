@@ -763,6 +763,134 @@
     }
   };
 
+  // ../messaging/lib/extension.js
+  var ExtensionMessagingTransport = class {
+    /**
+     * @param {ExtensionMessagingConfig} config
+     * @param {import('../index.js').MessagingContext} messagingContext
+     * @internal
+     */
+    constructor(config, messagingContext) {
+      this.messagingContext = messagingContext;
+      this.config = config;
+    }
+    /**
+     * @param {import('../index.js').NotificationMessage} msg
+     */
+    notify(msg) {
+      this.config.postMessage(msg);
+    }
+    /**
+     * @param {import('../index.js').RequestMessage} msg
+     * @param {{signal?: AbortSignal}} opts
+     * @return {Promise<any>}
+     */
+    request(msg, { signal } = {}) {
+      return new Promise((resolve, reject) => {
+        if (signal?.aborted) return reject(new DOMException("Aborted", "AbortError"));
+        const off = this.config.onMessage((data) => {
+          if (data.id !== msg.id || data.context !== msg.context || data.featureName !== msg.featureName) return;
+          cleanup();
+          if (data.error) return reject(new Error(String(data.error.message || "unknown error")));
+          resolve(data.result);
+        });
+        const onAbort = () => {
+          cleanup();
+          reject(new DOMException("Aborted", "AbortError"));
+        };
+        const onDisconnect = () => {
+          cleanup();
+          reject(new Error(`${msg.method}: disconnected before a response was received`));
+        };
+        const port = this.config.postMessage(msg);
+        const cleanup = () => {
+          off();
+          signal?.removeEventListener("abort", onAbort);
+          port.onDisconnect.removeListener(onDisconnect);
+        };
+        port.onDisconnect.addListener(onDisconnect);
+        signal?.addEventListener("abort", onAbort);
+      });
+    }
+    /**
+     * @param {import('../index.js').Subscription} msg
+     * @param {(value: unknown | undefined) => void} callback
+     */
+    subscribe(msg, callback) {
+      return this.config.onMessage((data) => {
+        if (data.subscriptionName !== msg.subscriptionName || data.context !== msg.context || data.featureName !== msg.featureName)
+          return;
+        callback(data.params);
+      });
+    }
+  };
+  var ExtensionMessagingConfig = class {
+    /** @type {chrome.runtime.Port?} */
+    port = null;
+    /** @type {Set<(data: any) => void>} */
+    handlers = /* @__PURE__ */ new Set();
+    /** Whether the runtime.onMessage listener is registered. */
+    listening = false;
+    /**
+     * @param {object} params
+     * @param {string} params.portName
+     * @internal
+     */
+    constructor(params) {
+      this.platform = "chrome-mv3";
+      this.portName = params.portName;
+    }
+    connect() {
+      const port = chrome.runtime.connect({ name: this.portName });
+      this.port = port;
+      port.onMessage.addListener((msg) => {
+        for (const handler of this.handlers) {
+          handler(msg);
+        }
+      });
+      port.onDisconnect.addListener(() => {
+        if (this.port === port) this.port = null;
+      });
+      return port;
+    }
+    /**
+     * Post a message, connecting first if there is no open port.
+     * @param {any} msg
+     * @returns {chrome.runtime.Port} the port the message was posted on
+     */
+    postMessage(msg) {
+      if (this.port) {
+        try {
+          this.port.postMessage(msg);
+          return this.port;
+        } catch {
+          this.port = null;
+        }
+      }
+      const port = this.connect();
+      port.postMessage(msg);
+      return port;
+    }
+    /**
+     * @param {(data: any) => void} handler
+     * @returns {() => void}
+     */
+    onMessage(handler) {
+      if (!this.listening) {
+        this.listening = true;
+        chrome.runtime.onMessage.addListener((msg) => {
+          if (msg?.subscriptionName) {
+            for (const fn of this.handlers) {
+              fn(msg);
+            }
+          }
+        });
+      }
+      this.handlers.add(handler);
+      return () => this.handlers.delete(handler);
+    }
+  };
+
   // ../injected/src/features.js
   var baseFeatures = (
     /** @type {FeatureName[]} */
@@ -1306,6 +1434,9 @@
     if (config instanceof AndroidAdsjsMessagingConfig) {
       return new AndroidAdsjsMessagingTransport(config, messagingContext);
     }
+    if (config instanceof ExtensionMessagingConfig) {
+      return new ExtensionMessagingTransport(config, messagingContext);
+    }
     if (config instanceof TestTransportConfig) {
       return new TestTransport(config, messagingContext);
     }
@@ -1452,7 +1583,12 @@
       env: opts.env
     });
     try {
-      if (opts.injectName === "windows") {
+      if (opts.injectName === "chrome-mv3") {
+        const extensionMessagingConfig = new ExtensionMessagingConfig({
+          portName: "specialPages"
+        });
+        return new Messaging(messageContext, extensionMessagingConfig);
+      } else if (opts.injectName === "windows") {
         const opts2 = new WindowsMessagingConfig({
           methods: {
             // @ts-expect-error - not in @types/chrome
