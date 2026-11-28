@@ -15,8 +15,11 @@ appId: com.duckduckgo.mobile.android
       visible:
         id: "skipOnboardingButton"
     commands:
+      # The default settle wait adds several seconds before and after this tap while
+      # the onboarding and browser screens animate, on every test that skips onboarding.
       - tapOn:
           id: "skipOnboardingButton"
+          waitToSettleTimeoutMs: 500
       - runScript: onboarding_scripts/skipped_onboarding.js
 
 - runFlow:
