@@ -59,6 +59,7 @@ private const val TOGGLE_BADGES = "badges"
 private const val TOGGLE_INFO_PANELS = "infoPanels"
 private const val TOGGLE_DIALOG_SPACING = "dialogSpacing"
 private const val TOGGLE_BOTTOM_SHEETS = "bottomSheets"
+private const val TOGGLE_RMF_CARDS = "rmfCards"
 private const val EXTRA_FIRE_THEME = "fireTheme"
 
 private class TestThemingDataStore(override var theme: DuckDuckGoTheme = DuckDuckGoTheme.LIGHT) : ThemingDataStore {
@@ -72,6 +73,7 @@ private fun configuredToggles(enabled: Set<String>): AppBrandDesignUpdateToggles
     val infoPanelsToggle = enabledToggle(TOGGLE_INFO_PANELS in enabled)
     val dialogSpacingToggle = enabledToggle(TOGGLE_DIALOG_SPACING in enabled)
     val bottomSheetsToggle = enabledToggle(TOGGLE_BOTTOM_SHEETS in enabled)
+    val rmfCardsToggle = enabledToggle(TOGGLE_RMF_CARDS in enabled)
     return mock<AppBrandDesignUpdateToggles>().also { toggles ->
         whenever(toggles.theme()).thenReturn(themeToggle)
         whenever(toggles.radius()).thenReturn(radiusToggle)
@@ -79,6 +81,7 @@ private fun configuredToggles(enabled: Set<String>): AppBrandDesignUpdateToggles
         whenever(toggles.infoPanels()).thenReturn(infoPanelsToggle)
         whenever(toggles.dialogSpacing()).thenReturn(dialogSpacingToggle)
         whenever(toggles.bottomSheets()).thenReturn(bottomSheetsToggle)
+        whenever(toggles.rmfCards()).thenReturn(rmfCardsToggle)
     }
 }
 
@@ -469,6 +472,20 @@ class ThemingRebrandOverlayTest {
         val activity = toggleAwareActivity(null)
 
         assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandBottomSheets))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityRmfCardsToggleIsEnabledThenRmfCardsOverlayIsApplied() {
+        val activity = toggleAwareActivity(TOGGLE_RMF_CARDS)
+
+        assertTrue(activity.isRebrandAreaEnabled(R.attr.daxRebrandRmfCards))
+    }
+
+    @Test
+    fun whenDuckDuckGoActivityRmfCardsToggleIsDisabledThenRmfCardsOverlayIsNotApplied() {
+        val activity = toggleAwareActivity(null)
+
+        assertFalse(activity.isRebrandAreaEnabled(R.attr.daxRebrandRmfCards))
     }
 
     @Test

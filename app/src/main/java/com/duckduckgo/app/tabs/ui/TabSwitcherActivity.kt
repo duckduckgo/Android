@@ -92,6 +92,7 @@ import com.duckduckgo.codegen.annotations.ContributeToActivityStarter
 import com.duckduckgo.codegen.annotations.InjectWith
 import com.duckduckgo.common.ui.DuckDuckGoActivity
 import com.duckduckgo.common.ui.menu.PopupMenu
+import com.duckduckgo.common.ui.view.applyRmfCloseButtonStyle
 import com.duckduckgo.common.ui.view.button.ButtonType
 import com.duckduckgo.common.ui.view.button.ButtonType.DESTRUCTIVE
 import com.duckduckgo.common.ui.view.button.ButtonType.GHOST
@@ -336,6 +337,7 @@ class TabSwitcherActivity :
             getString(R.string.fireTabsPromoTabSwitcherText),
             HtmlCompat.FROM_HTML_MODE_LEGACY,
         )
+        binding.fireTabsPromoBanner.firePromoClose.applyRmfCloseButtonStyle()
         binding.fireTabsPromoBanner.firePromoClose.setOnClickListener {
             viewModel.onFireTabsPromoDismissed()
         }

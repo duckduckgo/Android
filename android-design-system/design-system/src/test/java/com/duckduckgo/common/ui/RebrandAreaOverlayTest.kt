@@ -33,6 +33,7 @@ class RebrandAreaOverlayTest {
         R.attr.daxRebrandInfoPanels to R.style.ThemeOverlay_Rebrand_InfoPanels,
         R.attr.daxRebrandDialogSpacing to R.style.ThemeOverlay_Rebrand_DialogSpacing,
         R.attr.daxRebrandBottomSheets to R.style.ThemeOverlay_Rebrand_BottomSheets,
+        R.attr.daxRebrandRmfCards to R.style.ThemeOverlay_Rebrand_RmfCards,
     )
 
     @Test

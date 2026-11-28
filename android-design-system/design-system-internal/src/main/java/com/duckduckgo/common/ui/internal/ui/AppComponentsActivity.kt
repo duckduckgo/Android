@@ -96,6 +96,7 @@ class AppComponentsActivity : AppCompatActivity() {
                     CommonR.style.ThemeOverlay_Rebrand_InfoPanels.takeIf { brandDesignUpdateEnabled },
                     CommonR.style.ThemeOverlay_Rebrand_DialogSpacing.takeIf { brandDesignUpdateEnabled },
                     CommonR.style.ThemeOverlay_Rebrand_BottomSheets.takeIf { brandDesignUpdateEnabled },
+                    CommonR.style.ThemeOverlay_Rebrand_RmfCards.takeIf { brandDesignUpdateEnabled },
                 ),
             )
             selectedTheme to brandDesignUpdateEnabled
