@@ -1,2 +1,2 @@
-GitPython>=3.1.40
+GitPython>=3.2.1
 asana>=3.2.2
