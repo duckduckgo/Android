@@ -413,6 +413,58 @@ class NativeInputLayoutCoordinatorTest {
 
     private fun idle() = shadowOf(Looper.getMainLooper()).idle()
 
+    @Test
+    fun whenTopModeCardCoversTheLogoOnlyNtpThenLogoSettlesJustBelowTheCard() {
+        val (ntp, logo, card) = logoOnlyNtpUnderTopCard(cardHeightPx = LOGO_TOP_MARGIN_PX + 90)
+        val cardBottom = card.topInWindow() + card.height
+
+        assertEquals(cardBottom + LOGO_GAP_PX, logo.topInWindow())
+        // Another layout pass must not move it again: the inset is computed from the logo's resting position.
+        ntp.requestLayout()
+        shadowOf(Looper.getMainLooper()).idle()
+        assertEquals(cardBottom + LOGO_GAP_PX, logo.topInWindow())
+    }
+
+    @Test
+    fun whenTopModeCardClearsTheLogoOnlyNtpThenContentIsNotInset() {
+        val (ntp, _, _) = logoOnlyNtpUnderTopCard(cardHeightPx = LOGO_TOP_MARGIN_PX - 60)
+
+        assertEquals(0, ntp.paddingTop)
+    }
+
+    private fun logoOnlyNtpUnderTopCard(cardHeightPx: Int): Triple<FrameLayout, View, View> {
+        val activity = Robolectric.buildActivity(Activity::class.java).setup().get()
+        val logo = View(activity).apply { id = R.id.ddgLogo }
+        val ntp = FrameLayout(activity).apply {
+            id = R.id.newTabPage
+            addView(
+                FrameLayout(activity).apply {
+                    addView(logo, FrameLayout.LayoutParams(LOGO_SIZE_PX, LOGO_SIZE_PX).apply { topMargin = LOGO_TOP_MARGIN_PX })
+                },
+                FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT),
+            )
+        }
+        val card = View(activity).apply { id = R.id.inputModeWidgetCard }
+        val widget = FrameLayout(activity).apply { addView(card, FrameLayout.LayoutParams(MATCH_PARENT, cardHeightPx)) }
+        val resources: Resources = spy(activity.resources)
+        doReturn(LOGO_GAP_PX).whenever(resources).getDimensionPixelSize(CommonR.dimen.keyline_4)
+        val root = object : FrameLayout(activity) {
+            override fun getResources(): Resources = resources
+        }.apply {
+            addView(ntp, FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT))
+            addView(widget, FrameLayout.LayoutParams(MATCH_PARENT, cardHeightPx, Gravity.TOP))
+        }
+        activity.setContentView(root)
+        shadowOf(Looper.getMainLooper()).idle()
+
+        NativeInputLayoutCoordinator(root, mock(), recalculateContentPaddingOnTabSwitch = true)
+            .configureContentOffset(widget, isBottom = false)
+        shadowOf(Looper.getMainLooper()).idle()
+        return Triple(ntp, logo, card)
+    }
+
+    private fun View.topInWindow(): Int = IntArray(2).also { getLocationInWindow(it) }[1]
+
     private companion object {
         private const val NAV_BAR_HEIGHT_PX = 56
         private const val CARD_TOP_MARGIN_PX = 20
@@ -422,5 +474,8 @@ class NativeInputLayoutCoordinatorTest {
         private const val RESIZED_WIDGET_HEIGHT_PX = 120
         private const val OTHER_SESSION_PADDING_PX = 123
         private const val OMNIBAR_HEIGHT_PX = 168
+        private const val LOGO_TOP_MARGIN_PX = 150
+        private const val LOGO_SIZE_PX = 100
+        private const val LOGO_GAP_PX = 16
     }
 }
