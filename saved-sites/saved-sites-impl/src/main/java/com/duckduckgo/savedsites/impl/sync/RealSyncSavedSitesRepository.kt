@@ -273,7 +273,8 @@ class RealSyncSavedSitesRepository(
     }
 
     override fun getFolderDiff(folderId: String): SyncFolderChildren {
-        val entitiesId = savedSitesRelationsDao.relationsByFolderId(folderId).map { it.entityId }
+        // Older builds saved the bookmarks empty-state hint as a "" child, which the backend rejects
+        val entitiesId = savedSitesRelationsDao.relationsByFolderId(folderId).map { it.entityId }.filter { it.isNotBlank() }
         val existingEntities = savedSitesEntitiesDao.allEntitiesInFolderSync(folderId)
         val deletedChildren = existingEntities.filter { it.deleted }.map { it.entityId }
         val childrenLocal = entitiesId.filterNot { deletedChildren.contains(it) }

@@ -35,6 +35,7 @@ class BookmarkItemTouchHelperCallback(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder,
     ): Int {
+        if (viewHolder !is BookmarksViewHolder && viewHolder !is BookmarkFoldersViewHolder) return 0
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
         return makeMovementFlags(dragFlags, 0)
     }

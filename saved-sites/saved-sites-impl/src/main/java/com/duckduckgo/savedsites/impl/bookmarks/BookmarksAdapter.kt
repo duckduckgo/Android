@@ -201,7 +201,7 @@ class BookmarksAdapter(
                     parentId = item.bookmarkFolder.parentId
                     item.bookmarkFolder.id
                 }
-                else -> ""
+                else -> null
             }
         }
         viewModel.updateBookmarks(reorderedBookmarks, parentId)
