@@ -1,0 +1,45 @@
+{
+    "sync_device_activity_screen_shown": {
+        "description": "Fired each time the Device Activity screen opens, from the Device Activity row in Sync & Backup settings, the new synced device banner or the new synced device notification",
+        "owners": ["CDRussell"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_audit_log_fetch_error": {
+        "description": "Fired daily when reading the Sync login audit log fails, while checking for new logins after a sync or while loading a page of the Device Activity screen. Also fired when fetching the account_info key needed to read the entries fails, and when the server rejects the stored cursor (400)",
+        "owners": ["CDRussell"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "status_code",
+                "type": "integer",
+                "description": "HTTP status code of the failed request: the audit log request, or the keys request when the account_info key could not be fetched. For example 418 when rate limited, or 400 for a rejected cursor. Omitted when no HTTP response was received, for example with no network connection"
+            }
+        ]
+    },
+    "sync_audit_log_unknown_version": {
+        "description": "Fired daily when a read of the Sync login audit log has an entry whose envelope version this app does not support, so the entry is skipped",
+        "owners": ["CDRussell"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "sync_audit_log_undecryptable": {
+        "description": "Fired daily when the app cannot decrypt the Sync login audit log entries, an entry, or the device details in an entry. The reason parameter carries the first failure of the day",
+        "owners": ["CDRussell"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "key_not_found: this device has no usable account_info key. payload_decrypt_error: an entry's payload does not decrypt or is not a valid event. device_info_decrypt_error: a device's info does not decrypt, so another name source is used. legacy_name_type_decrypt_error: a device's legacy name or type does not decrypt, so the device shows as unknown",
+                "enum": ["key_not_found", "payload_decrypt_error", "device_info_decrypt_error", "legacy_name_type_decrypt_error"]
+            }
+        ]
+    }
+}

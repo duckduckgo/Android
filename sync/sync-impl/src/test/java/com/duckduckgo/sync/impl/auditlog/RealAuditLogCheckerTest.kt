@@ -45,6 +45,8 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.clearInvocations
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
 import org.mockito.kotlin.verify
@@ -64,6 +66,7 @@ class RealAuditLogCheckerTest {
     private val deviceFieldDecryptor: DeviceFieldDecryptor = mock()
     private val deviceInfoDecryptor = FakeDeviceInfoDecryptor()
     private val stateStore = RealAuditLogCheckStateStore(syncStore, coroutineTestRule.testDispatcherProvider)
+    private val auditLogPixels: AuditLogPixels = mock()
 
     private val testee = RealAuditLogChecker(
         syncStore = syncStore,
@@ -72,10 +75,12 @@ class RealAuditLogCheckerTest {
         stateStore = stateStore,
         entryDecoder = decoder,
         pendingLoginsUpdater = RealPendingLoginsUpdater(
-            RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, coroutineTestRule.testDispatcherProvider),
+            RealAuditLogDeviceNameResolver(deviceInfoDecryptor, deviceFieldDecryptor, mock(), mock(), coroutineTestRule.testDispatcherProvider),
             deviceInfoDecryptor,
+            mock(),
             coroutineTestRule.testDispatcherProvider,
         ),
+        auditLogPixels = auditLogPixels,
         dispatchers = coroutineTestRule.testDispatcherProvider,
     )
 
@@ -259,6 +264,57 @@ class RealAuditLogCheckerTest {
             assertEquals(AuditLogCheckResult.Failed(reason), testee.check())
             assertEquals(AuditLogCheckState(cursor = "c1", pendingLogins = listOf(pending("e1", OTHER_DEVICE, "Laptop", 1))), stateStore.read())
         }
+    }
+
+    @Test
+    fun whenCheckRequestFailsThenFetchErrorPixelFiredWithStatusCode() = runTest {
+        val failures = mapOf(
+            AuditLogResult.RateLimited(418) to 418,
+            AuditLogResult.ServerError(500) to 500,
+            AuditLogResult.ServerError(null) to null,
+            AuditLogResult.AuthError(401) to 401,
+            AuditLogResult.NetworkError to null,
+        )
+        failures.forEach { (apiResult, statusCode) ->
+            givenCursor("c1")
+            whenever(syncApi.getAuditLogAfter(TOKEN, "c1")).thenReturn(apiResult)
+
+            testee.check()
+
+            verify(auditLogPixels).fireFetchError(statusCode)
+            clearInvocations(auditLogPixels)
+        }
+    }
+
+    @Test
+    fun whenInitRequestFailsThenFetchErrorPixelFired() = runTest {
+        whenever(syncApi.getAuditLogLatest(TOKEN, 1)).thenReturn(AuditLogResult.ServerError(503))
+
+        testee.check()
+
+        verify(auditLogPixels).fireFetchError(503)
+    }
+
+    @Test
+    fun whenCursorIsInvalidThenFetchErrorPixelFiredWith400() = runTest {
+        givenCursor("bad")
+        whenever(syncApi.getAuditLogAfter(TOKEN, "bad")).thenReturn(AuditLogResult.InvalidCursor)
+        whenever(syncApi.getAuditLogLatest(TOKEN, 1)).thenReturn(page(after = "fresh"))
+
+        testee.check()
+
+        verify(auditLogPixels).fireFetchError(400)
+    }
+
+    @Test
+    fun whenCheckSucceedsThenNoFetchErrorPixel() = runTest {
+        givenCursor("c1")
+        whenever(syncApi.getAuditLogAfter(TOKEN, "c1")).thenReturn(page(after = "c2", login("e1", OTHER_DEVICE, info = "info:Laptop")))
+        whenever(syncApi.getAuditLogAfter(TOKEN, "c2")).thenReturn(page(after = "c2"))
+
+        testee.check()
+
+        verify(auditLogPixels, never()).fireFetchError(anyOrNull())
     }
 
     @Test

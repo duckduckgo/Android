@@ -90,6 +90,7 @@ data class PendingLoginsUpdate(
 class RealPendingLoginsUpdater @Inject constructor(
     private val deviceNameResolver: AuditLogDeviceNameResolver,
     private val deviceInfoDecryptor: DeviceInfoDecryptor,
+    private val auditLogPixels: AuditLogPixels,
     private val dispatchers: DispatcherProvider,
 ) : PendingLoginsUpdater {
 
@@ -122,9 +123,14 @@ class RealPendingLoginsUpdater @Inject constructor(
         if (infoByDevice.isEmpty()) return emptyMap()
 
         val session = (deviceInfoDecryptor.openSession() as? DeviceInfoSessionResult.Available)?.session ?: return emptyMap()
-        return infoByDevice.mapNotNull { (deviceId, infos) ->
-            infos.firstNotNullOfOrNull { (session.decrypt(it) as? Result.Success)?.data?.name }?.let { deviceId to it }
+        var decryptFailed = false
+        val names = infoByDevice.mapNotNull { (deviceId, infos) ->
+            infos.firstNotNullOfOrNull { info ->
+                (session.decrypt(info) as? Result.Success)?.data?.name.also { if (it == null) decryptFailed = true }
+            }?.let { deviceId to it }
         }.toMap()
+        if (decryptFailed) auditLogPixels.fireUndecryptable(AuditLogUndecryptableReason.DEVICE_INFO_DECRYPT_ERROR)
+        return names
     }
 
     /**

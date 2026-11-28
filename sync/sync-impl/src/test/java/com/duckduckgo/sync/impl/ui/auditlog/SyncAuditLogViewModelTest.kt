@@ -23,6 +23,7 @@ import com.duckduckgo.sync.impl.DeviceType
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckState
 import com.duckduckgo.sync.impl.auditlog.AuditLogCheckStateStore
 import com.duckduckgo.sync.impl.auditlog.AuditLogEntrySkipReason
+import com.duckduckgo.sync.impl.auditlog.AuditLogPixels
 import com.duckduckgo.sync.impl.auditlog.DecodedAuditLogEntry
 import com.duckduckgo.sync.impl.auditlog.LoginAuditLogFeature
 import com.duckduckgo.sync.impl.auditlog.NewLoginNotifier
@@ -44,6 +45,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.never
+import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import java.time.Duration
@@ -58,6 +60,7 @@ class SyncAuditLogViewModelTest {
     private val stateStore = FakeStateStore()
     private val newLoginNotifier: NewLoginNotifier = mock()
     private val loginAuditLogFeature = FakeLoginAuditLogFeature()
+    private val auditLogPixels: AuditLogPixels = mock()
     private val connectedDevicesRepository = FakeConnectedDevicesRepository()
     private val timeProvider: CurrentTimeProvider = mock<CurrentTimeProvider>().also {
         whenever(it.currentTimeMillis()).thenReturn(NOW.toEpochMilli())
@@ -72,6 +75,23 @@ class SyncAuditLogViewModelTest {
         assertEquals(Command.Close, testee.commands.first())
         assertEquals(0, loader.calls)
         verify(newLoginNotifier, never()).cancel()
+        verify(auditLogPixels, never()).fireDeviceActivityScreenShown()
+    }
+
+    @Test
+    fun whenOpenedThenScreenShownPixelFiredOnce() = runTest {
+        val testee = viewModel()
+        loader.result.complete(loaded(ITEM_1, before = "b1"))
+        testee.onNearListEnd()
+
+        verify(auditLogPixels, times(1)).fireDeviceActivityScreenShown()
+    }
+
+    @Test
+    fun whenOpenedFromNotificationAndAuditLogIsOnThenScreenShownPixelFired() = runTest {
+        viewModel(openedFromNotification = true)
+
+        verify(auditLogPixels).fireDeviceActivityScreenShown()
     }
 
     @Test
@@ -521,6 +541,7 @@ class SyncAuditLogViewModelTest {
             stateStore,
             newLoginNotifier,
             loginAuditLogFeature,
+            auditLogPixels,
             connectedDevicesRepository,
         )
 
