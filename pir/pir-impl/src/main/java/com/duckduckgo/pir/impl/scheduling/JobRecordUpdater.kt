@@ -117,7 +117,7 @@ interface JobRecordUpdater {
      * associated to [brokerName] and [profileQueryId]. For every stored [ExtractedProfile] that IS
      * part of the [newExtractedProfiles] and whose associated [OptOutJobRecord] is currently
      * [OptOutJobStatus.REMOVED], we treat it as a reappearance: we revert the status back to
-     * [OptOutJobStatus.REQUESTED] and clear [OptOutJobRecord.optOutRemovedDateInMillis].
+     * [OptOutJobStatus.NOT_EXECUTED] so the opt-out runs again, and clear [OptOutJobRecord.optOutRemovedDateInMillis].
      *
      * This method should be called before we store [newExtractedProfiles] locally.
      *
@@ -525,7 +525,7 @@ class RealJobRecordUpdater @Inject constructor(
                 ?: return@withContext null
 
             val updatedRecord = record.copy(
-                status = OptOutJobStatus.REQUESTED,
+                status = OptOutJobStatus.NOT_EXECUTED,
                 optOutRemovedDateInMillis = 0L,
             )
             schedulingRepository.saveOptOutJobRecord(updatedRecord)

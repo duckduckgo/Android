@@ -676,6 +676,49 @@ class PirEndToEndTest {
             PirPixel.PIR_SCAN_STAGE_RESULT_MATCHES,
             PirPixel.PIR_SCHEDULED_RUN_COMPLETED,
         )
+
+        val removedOptOutJobs = pirSchedulingRepository.getAllValidOptOutJobRecords()
+        assertTrue("Should have opt-out jobs", removedOptOutJobs.isNotEmpty())
+        removedOptOutJobs.forEach { job ->
+            assertEquals("Opt-out job should be REMOVED after confirmation", OptOutJobStatus.REMOVED, job.status)
+        }
+
+        fakePixel.clear()
+        fakePirMessagingInterface.clearPushedActions()
+
+        println("==================== STEP 9: Maintenance Scan Finds Reappeared Profile ====================")
+
+        // maintenanceScan is 120 hours from scheduling config; the next extract returns the same profile again
+        fakeTimeProvider.advanceByHours(121)
+
+        val maintenanceResult = pirJobsRunner.runEligibleJobs(context, PirExecutionType.SCHEDULED, PirRunMode.SCAN_AND_OPT_OUT)
+        assertTrue("Maintenance scan should succeed", maintenanceResult.isSuccess)
+
+        assertPixelsWereFired(PirPixel.PIR_BROKER_CUSTOM_STATS_OPTOUT_PROFILE_REAPPEARED)
+
+        // The reappeared profile's opt-out runs again in the same run, up to the email confirmation step
+        assertCorrectActionsWerePushedToJsLayer(
+            scanStepActionsFilter = { it },
+            optOutStepActionsFilter = {
+                it.takeWhile { action -> action !is BrokerAction.EmailConfirmation }
+            },
+        )
+        assertPixelsWereFired(
+            PirPixel.PIR_OPTOUT_STAGE_START,
+            PirPixel.PIR_OPTOUT_STAGE_SUBMIT,
+            PirPixel.PIR_OPTOUT_STAGE_PENDING_EMAIL_CONFIRMATION,
+        )
+
+        val reappearedOptOutJobs = pirSchedulingRepository.getAllValidOptOutJobRecords()
+        assertEquals(removedOptOutJobs.size, reappearedOptOutJobs.size)
+        reappearedOptOutJobs.forEach { job ->
+            assertEquals(
+                "Reappeared opt-out job should be re-submitted and wait for email confirmation",
+                OptOutJobStatus.PENDING_EMAIL_CONFIRMATION,
+                job.status,
+            )
+            assertEquals("optOutRemovedDate should be cleared", 0L, job.optOutRemovedDateInMillis)
+        }
     }
 
     @Test
