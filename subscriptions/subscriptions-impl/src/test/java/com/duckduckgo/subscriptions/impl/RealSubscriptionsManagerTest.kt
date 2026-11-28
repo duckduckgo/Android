@@ -50,6 +50,8 @@ import com.duckduckgo.subscriptions.impl.auth.RefreshTokenClaims
 import com.duckduckgo.subscriptions.impl.auth.TokenPair
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationException
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason
+import com.duckduckgo.subscriptions.impl.billing.BillingConnect
+import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseLookup
 import com.duckduckgo.subscriptions.impl.billing.LatestPurchaseResult
 import com.duckduckgo.subscriptions.impl.billing.PlayBillingManager
 import com.duckduckgo.subscriptions.impl.billing.PurchaseState
@@ -390,12 +392,18 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(error = "invalid_token")
-        givenNoActivePurchase()
+        givenNoActivePurchase(billingConnect = BillingConnect.CONNECTED)
 
         val result = subscriptionsManager.getAccessToken()
 
         assertTrue(result is AccessTokenResult.Failure)
         assertFalse(subscriptionsManager.isSignedIn())
+        verify(tokenRefreshWideEvent).onPlayLoginFailure(
+            signedOut = eq(true),
+            refreshException = any(),
+            loginError = eq("NoActivePurchase"),
+            billingConnect = eq(BillingConnect.CONNECTED),
+        )
         assertNull(authRepository.getAccessTokenV2())
         assertNull(authRepository.getRefreshTokenV2())
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
@@ -409,12 +417,18 @@ class RealSubscriptionsManagerTest {
         givenSubscriptionExists()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(error = "invalid_token")
-        givenPurchaseInfoUnknown()
+        givenPurchaseInfoUnknown(cause = "billing_connect_timeout", billingConnect = null)
 
         val result = subscriptionsManager.getAccessToken()
 
         assertTrue(result is AccessTokenResult.Failure)
         assertTrue(subscriptionsManager.isSignedIn())
+        verify(tokenRefreshWideEvent).onPlayLoginFailure(
+            signedOut = eq(false),
+            refreshException = any(),
+            loginError = eq("PurchaseInfoNotAvailable - billing_connect_timeout"),
+            billingConnect = isNull(),
+        )
         assertEquals(FAKE_REFRESH_TOKEN_V2, authDataStore.refreshTokenV2)
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender, never()).reportAuthV2InvalidRefreshTokenSignedOut()
@@ -426,13 +440,14 @@ class RealSubscriptionsManagerTest {
         givenUserIsSignedIn()
         givenAccessTokenIsExpired()
         givenV2AccessTokenRefreshFails(error = "invalid_token")
-        givenActivePurchase()
+        givenActivePurchase(billingConnect = BillingConnect.ALREADY_CONNECTED)
         givenStoreLoginSucceeds(newAccessToken = "new access token")
 
         val result = subscriptionsManager.getAccessToken()
 
         assertTrue(result is AccessTokenResult.Success)
         assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
+        verify(tokenRefreshWideEvent).onPlayLoginSuccess(billingConnect = BillingConnect.ALREADY_CONNECTED)
         verify(pixelSender).reportAuthV2InvalidRefreshTokenDetected()
         verify(pixelSender).reportAuthV2InvalidRefreshTokenRecovered()
     }
@@ -2592,7 +2607,7 @@ class RealSubscriptionsManagerTest {
 
         assertEquals("new access token", (result as AccessTokenResult.Success).accessToken)
         verify(tokenRefreshWideEvent).onBackupRecovery(BackupRecoveryResult.Failure.Rejected)
-        verify(tokenRefreshWideEvent).onPlayLoginSuccess()
+        verify(tokenRefreshWideEvent).onPlayLoginSuccess(billingConnect = BillingConnect.FLAG_OFF)
     }
 
     @Test
@@ -2806,23 +2821,33 @@ class RealSubscriptionsManagerTest {
             whenever(it.originalJson).thenReturn("originalJson")
         }
         whenever(playBillingManager.products).thenReturn(emptyList())
-        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Present(purchase))
+        givenLatestPurchase(result = LatestPurchaseResult.Present(purchase))
     }
 
-    private suspend fun givenActivePurchase() {
+    private suspend fun givenActivePurchase(billingConnect: BillingConnect? = BillingConnect.FLAG_OFF) {
         val purchase: Purchase = mock {
             whenever(it.signature).thenReturn("signature")
             whenever(it.originalJson).thenReturn("originalJson")
         }
-        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Present(purchase))
+        givenLatestPurchase(result = LatestPurchaseResult.Present(purchase), billingConnect = billingConnect)
     }
 
-    private suspend fun givenNoActivePurchase() {
-        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Absent)
+    private suspend fun givenNoActivePurchase(billingConnect: BillingConnect? = BillingConnect.FLAG_OFF) {
+        givenLatestPurchase(result = LatestPurchaseResult.Absent, billingConnect = billingConnect)
     }
 
-    private suspend fun givenPurchaseInfoUnknown(cause: String = "billing_client_not_ready") {
-        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Unknown(cause = cause))
+    private suspend fun givenPurchaseInfoUnknown(
+        cause: String = "billing_client_not_ready",
+        billingConnect: BillingConnect? = BillingConnect.FLAG_OFF,
+    ) {
+        givenLatestPurchase(result = LatestPurchaseResult.Unknown(cause = cause), billingConnect = billingConnect)
+    }
+
+    private suspend fun givenLatestPurchase(
+        result: LatestPurchaseResult,
+        billingConnect: BillingConnect? = BillingConnect.FLAG_OFF,
+    ) {
+        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseLookup(result = result, billingConnect = billingConnect))
     }
 
     private suspend fun givenStoreLoginSucceeds(newAccessToken: String = FAKE_ACCESS_TOKEN_V2) {
@@ -3995,7 +4020,7 @@ class RealSubscriptionsManagerTest {
             whenever(it.accountIdentifiers).thenReturn(identifiers)
             whenever(it.purchaseToken).thenReturn("owned_purchase_token")
         }
-        whenever(playBillingManager.getLatestPurchase()).thenReturn(LatestPurchaseResult.Present(purchase))
+        givenLatestPurchase(result = LatestPurchaseResult.Present(purchase))
     }
 
     private suspend fun givenNoActiveSubscription() {

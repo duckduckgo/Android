@@ -4,7 +4,7 @@
         "owners": ["lmac012", "Kyriakos-Georgiopoulos"],
         "meta": {
             "type": "android-auth-token-refresh",
-            "version": "1.5"
+            "version": "1.6"
         },
         "feature": {
             "name": "auth-token-refresh",
@@ -106,6 +106,11 @@
                         "description": "Why the Play store login fallback failed. PurchaseInfoNotAvailable carries the reason Play could not be queried.",
                         "pattern": "^(NoActivePurchase|AccountExternalIdMismatch|AuthenticationError|TokenValidationFailed|UnknownError|PurchaseInfoNotAvailable - .+)$",
                         "examples": ["NoActivePurchase", "AuthenticationError", "PurchaseInfoNotAvailable - billing_client_not_ready"]
+                    },
+                    "billing_connect": {
+                        "type": "string",
+                        "description": "How the Play store login found the billing client before querying purchases. 'flag_off' means connecting before the query is disabled, so the app queried only a client that was already connected. 'already_connected' means the client was connected when the login started. 'connected' means the app connected it for the login. Absent when the client was not connected and the app did not connect it, outside the main process or because the connection failed; play_login_error then gives the cause. Only present on step.play_login.",
+                        "enum": ["flag_off", "already_connected", "connected"]
                     },
                     "recovery_strategy": {
                         "type": "string",

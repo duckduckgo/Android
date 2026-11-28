@@ -123,6 +123,11 @@
                 ]
             },
             {
+                "key": "feature.data.ext.billing_connect",
+                "description": "How the Play store login found the billing client before querying purchases. 'flag_off' means connecting before the query is disabled, so the app queried only a client that was already connected. 'already_connected' means the client was connected when the login started. 'connected' means the app connected it for the login. Absent when the client was not connected and the app did not connect it, outside the main process or because the connection failed; play_login_error then gives the cause. Only present on step.play_login.",
+                "enum": ["flag_off", "already_connected", "connected"]
+            },
+            {
                 "key": "feature.data.ext.backup_recovery_result",
                 "description": "What the backup refresh token gave after the backend rejected the main refresh token. 'not_available' means there was no backup the app could use, so it was not sent. 'rejected' means the backend refused the backup, or answered with tokens the app could not accept, and the backup was deleted. 'network_error' means the call did not complete or the backend had an outage, and the backup was kept for the next refresh. 'recovered' means the backup returned a new token pair.",
                 "enum": ["not_available", "rejected", "network_error", "recovered"]

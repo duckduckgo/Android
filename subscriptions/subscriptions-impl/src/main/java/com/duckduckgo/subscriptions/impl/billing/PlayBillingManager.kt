@@ -124,9 +124,10 @@ interface PlayBillingManager {
     /**
      * Returns the latest active (PURCHASED) subscription purchase. Queries Play Billing
      * directly on every call so the result reflects current state (no cache staleness).
-     * See [LatestPurchaseResult] for the meaning of each outcome.
+     * See [LatestPurchaseResult] for the meaning of each outcome, and [BillingConnect] for how the
+     * billing client was connected before the query.
      */
-    suspend fun getLatestPurchase(): LatestPurchaseResult
+    suspend fun getLatestPurchase(): LatestPurchaseLookup
 }
 
 @SingleIn(AppScope::class)
@@ -504,18 +505,27 @@ class RealPlayBillingManager @Inject constructor(
         }
     }
 
-    override suspend fun getLatestPurchase(): LatestPurchaseResult = withContext(dispatcherProvider.io()) {
-        if (!billingClient.ready) {
-            if (!shouldConnectBeforeQuery()) {
-                return@withContext LatestPurchaseResult.Unknown(cause = "billing_client_not_ready")
-            }
-            val connectFailureCause = connectWithTimeout()
-            if (connectFailureCause != null) {
-                return@withContext LatestPurchaseResult.Unknown(cause = connectFailureCause)
-            }
+    override suspend fun getLatestPurchase(): LatestPurchaseLookup = withContext(dispatcherProvider.io()) {
+        val flagIsOn = subscriptionsFeature.value.connectBillingBeforeQueryingPurchases().isEnabled()
+        if (billingClient.ready) {
+            val billingConnect = if (flagIsOn) BillingConnect.ALREADY_CONNECTED else BillingConnect.FLAG_OFF
+            return@withContext LatestPurchaseLookup(result = queryLatestPurchase(), billingConnect = billingConnect)
         }
+        if (!flagIsOn) {
+            return@withContext LatestPurchaseLookup(result = BILLING_CLIENT_NOT_READY, billingConnect = BillingConnect.FLAG_OFF)
+        }
+        if (!isMainProcess) {
+            return@withContext LatestPurchaseLookup(result = BILLING_CLIENT_NOT_READY, billingConnect = null)
+        }
+        val connectFailureCause = connectWithTimeout()
+        if (connectFailureCause != null) {
+            return@withContext LatestPurchaseLookup(result = LatestPurchaseResult.Unknown(cause = connectFailureCause), billingConnect = null)
+        }
+        LatestPurchaseLookup(result = queryLatestPurchase(), billingConnect = BillingConnect.CONNECTED)
+    }
 
-        when (val result = billingClient.queryPurchases()) {
+    private suspend fun queryLatestPurchase(): LatestPurchaseResult {
+        return when (val result = billingClient.queryPurchases()) {
             is QueryPurchasesResult.Success -> {
                 val latest = result.purchases
                     .filter { purchase ->
@@ -530,11 +540,6 @@ class RealPlayBillingManager @Inject constructor(
                 LatestPurchaseResult.Unknown(cause = "query_purchases_failed:${result.billingError?.name ?: "unknown"}")
             }
         }
-    }
-
-    private fun shouldConnectBeforeQuery(): Boolean {
-        val flagIsOn = subscriptionsFeature.value.connectBillingBeforeQueryingPurchases().isEnabled()
-        return isMainProcess && flagIsOn
     }
 
     private suspend fun connectWithTimeout(): String? {
@@ -555,7 +560,21 @@ class RealPlayBillingManager @Inject constructor(
 
     private companion object {
         val CONNECT_BEFORE_QUERY_TIMEOUT = 5.seconds
+        val BILLING_CLIENT_NOT_READY = LatestPurchaseResult.Unknown(cause = "billing_client_not_ready")
     }
+}
+
+data class LatestPurchaseLookup(
+    val result: LatestPurchaseResult,
+    /** Null when the client was not connected and the app did not connect it: outside the main process, or the connection failed. */
+    val billingConnect: BillingConnect?,
+)
+
+/** How the billing client came to be connected for a purchase query, as reported in the auth-token-refresh wide event. */
+enum class BillingConnect(val paramValue: String) {
+    FLAG_OFF("flag_off"),
+    ALREADY_CONNECTED("already_connected"),
+    CONNECTED("connected"),
 }
 
 sealed class LatestPurchaseResult {

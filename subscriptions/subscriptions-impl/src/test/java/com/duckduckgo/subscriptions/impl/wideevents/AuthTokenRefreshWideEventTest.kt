@@ -50,6 +50,7 @@ import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Missi
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.NotYetValid
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Other
 import com.duckduckgo.subscriptions.impl.auth.TokenValidationFailureReason.Unsupported
+import com.duckduckgo.subscriptions.impl.billing.BillingConnect
 import com.duckduckgo.subscriptions.impl.repository.FakeSubscriptionsDataStore
 import com.duckduckgo.subscriptions.impl.repository.RealAuthRepository
 import com.duckduckgo.subscriptions.impl.repository.RefreshToken
@@ -192,7 +193,7 @@ class AuthTokenRefreshWideEventTest {
                 "last_refresh_process" to "unknown",
             ),
             cleanupPolicy = CleanupPolicy.OnProcessStart(ignoreIfIntervalTimeoutPresent = false),
-            definition = WideEventDefinition(version = Version(minor = 1, patch = 5)),
+            definition = WideEventDefinition(version = Version(minor = 1, patch = 6)),
         )
 
         verify(wideEventClient).intervalStart(123L, "total_duration_ms_bucketed", null)
@@ -598,7 +599,7 @@ class AuthTokenRefreshWideEventTest {
             .thenReturn(Result.success(15L))
         startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
-        authWideEvent.onPlayLoginSuccess()
+        authWideEvent.onPlayLoginSuccess(billingConnect = null)
 
         verify(wideEventClient).flowStep(
             wideEventId = 15L,
@@ -609,13 +610,67 @@ class AuthTokenRefreshWideEventTest {
     }
 
     @Test
+    fun `onPlayLoginSuccess records how the billing client was connected`() = runTest {
+        val expectedValues = mapOf(
+            BillingConnect.FLAG_OFF to "flag_off",
+            BillingConnect.ALREADY_CONNECTED to "already_connected",
+            BillingConnect.CONNECTED to "connected",
+        )
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(15L))
+
+        expectedValues.forEach { (billingConnect, paramValue) ->
+            startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
+
+            authWideEvent.onPlayLoginSuccess(billingConnect = billingConnect)
+
+            verify(wideEventClient).flowStep(
+                wideEventId = 15L,
+                stepName = "play_login",
+                success = true,
+                metadata = mapOf(
+                    "recovery_strategy" to "play_login",
+                    "recovery_outcome" to "recovered",
+                    "billing_connect" to paramValue,
+                ),
+            )
+        }
+    }
+
+    @Test
+    fun `onPlayLoginFailure records how the billing client was connected next to the login error`() = runTest {
+        whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
+            .thenReturn(Result.success(21L))
+        startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
+
+        authWideEvent.onPlayLoginFailure(
+            signedOut = true,
+            refreshException = IllegalStateException("boom"),
+            loginError = "NoActivePurchase",
+            billingConnect = BillingConnect.CONNECTED,
+        )
+
+        verify(wideEventClient).flowStep(
+            wideEventId = 21L,
+            stepName = "play_login",
+            success = false,
+            metadata = mapOf(
+                "play_login_error" to "NoActivePurchase",
+                "recovery_strategy" to "play_login",
+                "recovery_outcome" to "signed_out",
+                "billing_connect" to "connected",
+            ),
+        )
+    }
+
+    @Test
     fun `onPlayLoginFailure sends failure step, finishes flow and clears id`() = runTest {
         whenever(wideEventClient.flowStart(any(), anyOrNull(), any(), any(), any(), any()))
             .thenReturn(Result.success(16L))
         startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
         val ex = IllegalStateException("boom")
-        authWideEvent.onPlayLoginFailure(signedOut = true, refreshException = ex, loginError = "sign-in-required")
+        authWideEvent.onPlayLoginFailure(signedOut = true, refreshException = ex, loginError = "sign-in-required", billingConnect = null)
 
         verify(wideEventClient).flowStep(
             wideEventId = 16L,
@@ -643,7 +698,12 @@ class AuthTokenRefreshWideEventTest {
             .thenReturn(Result.success(20L))
         startFlow(subscriptionStatus = SubscriptionStatus.UNKNOWN)
 
-        authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = IllegalStateException("boom"), loginError = "UnknownError")
+        authWideEvent.onPlayLoginFailure(
+            signedOut = false,
+            refreshException = IllegalStateException("boom"),
+            loginError = "UnknownError",
+            billingConnect = null,
+        )
 
         verify(wideEventClient).flowStep(
             wideEventId = 20L,
@@ -990,7 +1050,7 @@ class AuthTokenRefreshWideEventTest {
         startFlowWithId(wideEventId = 45L)
         val refreshException = httpException(code = 400)
 
-        authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = refreshException, loginError = "UnknownError")
+        authWideEvent.onPlayLoginFailure(signedOut = false, refreshException = refreshException, loginError = "UnknownError", billingConnect = null)
         authWideEvent.onFailure(refreshException)
 
         assertEquals(2, store.getRefreshHistory().failureStreak)
@@ -1002,7 +1062,12 @@ class AuthTokenRefreshWideEventTest {
         startFlowWithId(wideEventId = 46L)
         val refreshException = httpException(code = 400)
 
-        authWideEvent.onPlayLoginFailure(signedOut = true, refreshException = refreshException, loginError = "NoActivePurchase")
+        authWideEvent.onPlayLoginFailure(
+            signedOut = true,
+            refreshException = refreshException,
+            loginError = "NoActivePurchase",
+            billingConnect = null,
+        )
         authWideEvent.onFailure(refreshException)
 
         assertEquals(1, store.getRefreshHistory().failureStreak)
