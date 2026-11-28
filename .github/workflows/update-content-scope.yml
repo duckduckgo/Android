@@ -46,21 +46,12 @@ jobs:
         if: ${{ steps.update-check.outcome == 'failure' }}
         run: npm update
 
-      - name: Find latest release version of Content Scope scripts in package.json
+      - name: Extract release version of Content Scope scripts from package.json
         if: ${{ steps.update-check.outcome == 'failure' }}
-        id: find-latest-release
-        uses: notiz-dev/github-action-json-property@release
-        with:
-          path: 'package.json'
-          prop_path: 'dependencies.@duckduckgo/content-scope-scripts'
-
-      - name: Extract release version
-        if: ${{ steps.update-check.outcome == 'failure' }}
-        uses: rishabhgupta/split-by@v1
         id: extract-release-version
-        with:
-          string: ${{steps.find-latest-release.outputs.prop}}
-          split-by: '#'
+        run: |
+          version=$(jq -r '.dependencies["@duckduckgo/content-scope-scripts"]' package.json | cut -d'#' -f2)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
       - name: Create Asana task in Android App project
         if: ${{ steps.update-check.outcome == 'failure' }}
@@ -70,7 +61,7 @@ jobs:
           asana-pat: ${{ secrets.ASANA_ACCESS_TOKEN }}
           asana-project: ${{ vars.GH_ANDROID_APP_PROJECT_ID }}
           asana-section: ${{ vars.GH_ANDROID_APP_INCOMING_SECTION_ID }}
-          asana-task-name: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
+          asana-task-name: Update content scope scripts to version ${{ steps.extract-release-version.outputs.version }}
           asana-task-description: |
             Content scope scripts have been updated and a PR will be created.
 
@@ -93,17 +84,17 @@ jobs:
       - name: Create Pull Request in Android repo
         if: ${{ steps.update-check.outcome == 'failure' }}
         env:
-          RELEASE_VERSION: ${{ steps.extract-release-version.outputs._1}}
+          RELEASE_VERSION: ${{ steps.extract-release-version.outputs.version }}
         id: create-pr
         uses: peter-evans/create-pull-request@v6.1.0
         with:
           base: "develop"
-          title: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
+          title: Update content scope scripts to version ${{ steps.extract-release-version.outputs.version }}
           author: daxmobile <daxmobile@users.noreply.github.com>
           token: ${{ secrets.GT_DAXMOBILE }}
-          commit-message: Update content scope scripts to version ${{ steps.extract-release-version.outputs._1}}
+          commit-message: Update content scope scripts to version ${{ steps.extract-release-version.outputs.version }}
           labels: content scope scripts, automated pr
-          branch: automated/update-content-scope-scripts-dependencies-${{ steps.extract-release-version.outputs._1}}
+          branch: automated/update-content-scope-scripts-dependencies-${{ steps.extract-release-version.outputs.version }}
           body: |
             Task/Issue URL: ${{ steps.get-task-permalink.outputs.asanaTaskPermalink }}
 
