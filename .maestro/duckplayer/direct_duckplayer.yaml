@@ -6,16 +6,12 @@ tags:
 - retry:
     maxRetries: 3
     commands:
-      - launchApp:
-          clearState: true
-
-      - runFlow: ../shared/skip_all_onboarding.yaml
+      # Maestro Cloud requires launchApp first; clearState then drops the onboarding it starts.
+      - launchApp
+      - clearState
       - runFlow: common/enable_duck_player_ask.yaml
 
-      - runFlow: ../shared/dismiss_native_input.yaml
-      - tapOn:
-          id: "omnibarTextInput|inputField"
-      - inputText: "duck://player/3ml7yeKBUhc"
-      - pressKey: Enter
+      - openLink:
+          link: "duck://player/3ml7yeKBUhc"
 
       - runFlow: common/assert_duckplayer_visible.yaml
