@@ -165,6 +165,12 @@ class AdBlockingSettingsViewModel @Inject constructor(
         }
     }
 
+    fun onInterferenceLearnMoreClicked() {
+        viewModelScope.launch {
+            commandChannel.send(OpenLearnMore(INTERFERENCE_LEARN_MORE_URL))
+        }
+    }
+
     fun onDuckPlayerClicked() {
         viewModelScope.launch {
             commandChannel.send(OpenDuckPlayerSettings)
@@ -201,5 +207,6 @@ class AdBlockingSettingsViewModel @Inject constructor(
 
     private companion object {
         const val LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/ad-blocking"
+        const val INTERFERENCE_LEARN_MORE_URL = "https://duckduckgo.com/duckduckgo-help-pages/privacy/detecting-ad-blocking-interference-anonymously"
     }
 }

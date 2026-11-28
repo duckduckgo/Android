@@ -228,6 +228,22 @@ class AdBlockingSettingsViewModelTest {
     }
 
     @Test
+    fun whenInterferenceLearnMoreClickedThenOpensInterferenceHelpPage() = runTest {
+        whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
+        val viewModel = createViewModel()
+
+        viewModel.commands.test {
+            viewModel.onInterferenceLearnMoreClicked()
+            assertEquals(
+                AdBlockingSettingsViewModel.Command.OpenLearnMore(
+                    "https://duckduckgo.com/duckduckgo-help-pages/privacy/detecting-ad-blocking-interference-anonymously",
+                ),
+                awaitItem(),
+            )
+        }
+    }
+
+    @Test
     fun whenDuckPlayerClickedThenOpensDuckPlayerSettings() = runTest {
         whenever(statusChecker.observeState()).thenReturn(flowOf(AdBlockingState.Enabled.Default))
         val viewModel = createViewModel(duckPlayerSettingsPlacement = DuckPlayerSettingsPlacement.Standalone)
