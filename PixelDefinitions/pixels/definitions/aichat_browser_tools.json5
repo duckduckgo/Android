@@ -1,0 +1,332 @@
+{
+    "m_aichat_tools_enabled_daily": {
+        "description": "Fired at most once a day, when the app offers Duck.ai at least one browser tool. Not fired in Fire mode.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_daily": {
+        "description": "Fired at most once a day, on the first successful Duck.ai browser tool call of any tool.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_list_open_tabs_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool list_open_tabs.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_read_tab_content_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool read_tab_content.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_search_history_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool search_history.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_find_in_page_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool find_in_page.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_switch_to_tab_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool switch_to_tab.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_open_tab_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool open_tab.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_bookmark_tab_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool bookmark_tab.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_close_tabs_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool close_tabs.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_search_downloads_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool search_downloads.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_used_search_bookmarks_daily": {
+        "description": "Fired at most once a day, on the first successful call of the Duck.ai browser tool search_bookmarks.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    },
+    "m_aichat_tools_call": {
+        "description": "Fired when a Duck.ai browser tool call finishes, whatever its result. Not fired for requestAccess or in Fire mode.",
+        "owners": ["malmstein"],
+        "triggers": ["feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "tool",
+                "type": "string",
+                "description": "The tool called",
+                "enum": [
+                    "list_open_tabs",
+                    "read_tab_content",
+                    "search_history",
+                    "find_in_page",
+                    "switch_to_tab",
+                    "open_tab",
+                    "bookmark_tab",
+                    "close_tabs",
+                    "search_downloads",
+                    "search_bookmarks"
+                ]
+            },
+            {
+                "key": "result",
+                "type": "string",
+                "description": "The result Duck.ai received",
+                "enum": ["success", "denied", "cancelled", "unavailable", "not_found", "invalid_arguments", "execution_failed"]
+            },
+            {
+                "key": "permission_path",
+                "type": "string",
+                "description": "What let the call run or stopped it: auto = the tool doesn't ask, always = stored Always Allow, chat = allowed for this chat earlier, prompt = the user was asked for this call, never = stored Never Allow, none = refused before permission was looked at, or ended while still waiting behind another prompt in the chat",
+                "enum": ["auto", "always", "chat", "prompt", "never", "none"]
+            },
+            {
+                "key": "duration",
+                "type": "string",
+                "description": "How long the tool ran, without the wait for permission. Absent when it never ran",
+                "enum": ["lt_100ms", "lt_500ms", "lt_2s", "lt_10s", "gte_10s"]
+            },
+            {
+                "key": "result_count",
+                "type": "string",
+                "description": "How many items a successful list_open_tabs, search_history, search_downloads or search_bookmarks call returned. Absent for other tools and failed calls",
+                "enum": ["0", "1-5", "6-20", "21_plus"]
+            }
+        ]
+    },
+    "m_aichat_tools_prompt_answered": {
+        "description": "Fired when a Duck.ai browser tool permission prompt for one tool closes, answered or not. requestAccess prompts are not included.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "tool",
+                "type": "string",
+                "description": "The tool the prompt asked for",
+                "enum": [
+                    "list_open_tabs",
+                    "read_tab_content",
+                    "search_history",
+                    "find_in_page",
+                    "switch_to_tab",
+                    "open_tab",
+                    "bookmark_tab",
+                    "close_tabs",
+                    "search_downloads",
+                    "search_bookmarks"
+                ]
+            },
+            {
+                "key": "answer",
+                "type": "string",
+                "description": "How the prompt closed: allow_once, allow_for_chat or dont_allow = that button (dont_allow refuses this call and remembers nothing), timeout = unanswered until the 120 s deadline, withdrawn = closed because the call was cancelled or its chat went away",
+                "enum": ["allow_once", "allow_for_chat", "dont_allow", "timeout", "withdrawn"]
+            },
+            {
+                "key": "prompt_number_in_chat",
+                "type": "string",
+                "description": "Which single-tool prompt this was in its Duck.ai chat since launch or the last Fire. Sent only while batch access (requestAccess) is on",
+                "enum": ["1", "2", "3", "4_plus"]
+            },
+            {
+                "key": "time_to_answer",
+                "type": "string",
+                "description": "Time from showing the prompt to closing it",
+                "enum": ["lt_2s", "lt_10s", "lt_60s", "gte_60s"]
+            }
+        ]
+    },
+    "m_aichat_tools_access_requested": {
+        "description": "Fired when a Duck.ai requestAccess call finishes: Duck.ai asked once for the browser tools a chat expects to use. Not fired in Fire mode.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "requested",
+                "type": "integer",
+                "description": "How many tools Duck.ai asked for. Absent when decision is invalid or unavailable",
+                "minimum": 1,
+                "maximum": 12
+            },
+            {
+                "key": "asked",
+                "type": "integer",
+                "description": "How many of them the prompt showed: the rest were already allowed, set to Never or unavailable. Absent when decision is invalid or unavailable",
+                "minimum": 0,
+                "maximum": 12
+            },
+            {
+                "key": "removed",
+                "type": "integer",
+                "description": "How many shown tools the user took out before allowing. Absent when decision is invalid or unavailable",
+                "minimum": 0,
+                "maximum": 12
+            },
+            {
+                "key": "decision",
+                "type": "string",
+                "description": "allow or dont_allow = the user's answer, timeout = unanswered until the 120 s deadline, withdrawn = closed because the call was cancelled or its chat went away, no_prompt = nothing needed asking, invalid = the call could not be read, carried no chat ID or named a tool that asks every time, unavailable = batch access is off or the call named a version this app does not know",
+                "enum": ["allow", "dont_allow", "timeout", "withdrawn", "no_prompt", "invalid", "unavailable"]
+            }
+        ]
+    },
+    "m_aichat_tools_access_result": {
+        "description": "Fired once per requested tool when a Duck.ai requestAccess call finishes, after m_aichat_tools_access_requested. Names this app doesn't know are not sent. Not fired in Fire mode.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction", "feature_lifecycle"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "tool",
+                "type": "string",
+                "description": "The tool requested",
+                "enum": [
+                    "list_open_tabs",
+                    "read_tab_content",
+                    "search_history",
+                    "find_in_page",
+                    "switch_to_tab",
+                    "open_tab",
+                    "bookmark_tab",
+                    "close_tabs",
+                    "search_downloads",
+                    "search_bookmarks"
+                ]
+            },
+            {
+                "key": "access",
+                "type": "string",
+                "description": "granted = allowed for the chat in this prompt, removed = taken out by the user, denied = the prompt didn't allow it, or the request ended before its prompt opened, already_allowed = allowed without asking, never = set to Never, unavailable = turned off",
+                "enum": ["granted", "removed", "denied", "already_allowed", "never", "unavailable"]
+            }
+        ]
+    },
+    "m_aichat_tools_protocol_error": {
+        "description": "Fired when Duck.ai sends a browser tool call the app cannot read, or one for a capability name or version this app does not know. A known tool turned off remotely is not an error. Not fired in Fire mode.",
+        "owners": ["malmstein"],
+        "triggers": ["exception"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "reason",
+                "type": "string",
+                "description": "invalid_request = the call could not be read, unknown_capability = the capability name or version is not one this app knows",
+                "enum": ["invalid_request", "unknown_capability"]
+            },
+            {
+                "key": "tool",
+                "type": "string",
+                "description": "The tool the call named, or unknown when it named none this app knows. The raw name is never sent",
+                "enum": [
+                    "list_open_tabs",
+                    "read_tab_content",
+                    "search_history",
+                    "find_in_page",
+                    "switch_to_tab",
+                    "open_tab",
+                    "bookmark_tab",
+                    "close_tabs",
+                    "search_downloads",
+                    "search_bookmarks",
+                    "unknown"
+                ]
+            }
+        ]
+    },
+    "m_aichat_tools_permission_changed": {
+        "description": "Fired when the user changes a Duck.ai browser tool's permission in Browser Access settings. Not fired when the choice stays the same.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": [
+            "appVersion",
+            {
+                "key": "tool",
+                "type": "string",
+                "description": "The tool whose permission changed",
+                "enum": [
+                    "list_open_tabs",
+                    "read_tab_content",
+                    "search_history",
+                    "find_in_page",
+                    "switch_to_tab",
+                    "open_tab",
+                    "bookmark_tab",
+                    "close_tabs",
+                    "search_downloads",
+                    "search_bookmarks"
+                ]
+            },
+            {
+                "key": "from",
+                "type": "string",
+                "description": "The permission shown before the change",
+                "enum": ["ask", "allow", "deny"]
+            },
+            {
+                "key": "to",
+                "type": "string",
+                "description": "The permission shown after the change",
+                "enum": ["ask", "allow", "deny"]
+            },
+            {
+                "key": "source",
+                "type": "string",
+                "description": "Where the user changed it. Android only has the Browser Access settings screen",
+                "enum": ["settings"]
+            }
+        ]
+    },
+    "m_aichat_tools_permissions_reset": {
+        "description": "Fired when the user resets every Duck.ai browser tool permission in Browser Access settings.",
+        "owners": ["malmstein"],
+        "triggers": ["user_interaction"],
+        "suffixes": ["form_factor"],
+        "parameters": ["appVersion"]
+    }
+}

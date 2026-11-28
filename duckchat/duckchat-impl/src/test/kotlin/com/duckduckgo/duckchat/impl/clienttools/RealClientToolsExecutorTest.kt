@@ -59,13 +59,18 @@ class RealClientToolsExecutorTest {
     private val store = FakeClientToolPermissionStore()
     private val prompt = FakeClientToolPermissionPrompt()
     private val chatGrants = ClientToolChatGrants()
-    private val permissionGate = RealClientToolPermissionGate(appBuildConfig, feature, store, chatGrants, prompt)
+    private val pixel = RecordingPixel()
+    private val pixels = ClientToolPixels(pixel)
+    private val timeProvider = FakeElapsedTimeProvider()
+    private val permissionGate = RealClientToolPermissionGate(appBuildConfig, feature, store, chatGrants, prompt, pixels, timeProvider)
 
     private fun executor(vararg tools: ClientTool = arrayOf(autoTool, askTool, otherAskTool)) = RealClientToolsExecutor(
         tools = FakeClientToolPluginPoint(*tools),
         permissionGate = permissionGate,
         duckAiHostProvider = FakeDuckAiHostProvider(),
         browserToolsFeature = feature,
+        pixels = pixels,
+        timeProvider = timeProvider,
     )
 
     @Test
@@ -110,6 +115,8 @@ class RealClientToolsExecutorTest {
             permissionGate = permissionGate,
             duckAiHostProvider = FakeDuckAiHostProvider("dev.duck.ai"),
             browserToolsFeature = feature,
+            pixels = pixels,
+            timeProvider = timeProvider,
         )
 
         assertNull(executor.clientToolsConfig(DUCK_AI_URL, BrowserMode.REGULAR))

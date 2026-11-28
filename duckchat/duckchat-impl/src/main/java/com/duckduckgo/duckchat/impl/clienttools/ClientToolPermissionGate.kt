@@ -18,9 +18,11 @@ package com.duckduckgo.duckchat.impl.clienttools
 
 import com.duckduckgo.appbuildconfig.api.AppBuildConfig
 import com.duckduckgo.appbuildconfig.api.isInternalBuild
+import com.duckduckgo.common.utils.CurrentTimeProvider
 import com.duckduckgo.di.scopes.AppScope
 import dev.zacsweers.metro.ContributesBinding
 import dev.zacsweers.metro.SingleIn
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -46,7 +48,7 @@ interface ClientToolPermissionGate {
         tools: List<ClientTool>,
         chatId: String,
         context: ClientToolCallContext,
-    ): ClientToolAccessDecision
+    ): ClientToolAccessOutcome
 
     /** Settles every call of the chat in [chatTabId], hosted in the contextual sheet when [contextual], still waiting for a decision as cancelled. */
     fun cancelPending(
@@ -55,10 +57,30 @@ interface ClientToolPermissionGate {
     )
 }
 
-enum class ClientToolPermissionDecision {
-    ALLOWED,
-    DENIED,
-    CANCELLED,
+sealed interface ClientToolPermissionDecision {
+    data class Allowed(val path: ClientToolPermissionPath) : ClientToolPermissionDecision
+
+    data class Denied(val path: ClientToolPermissionPath) : ClientToolPermissionDecision
+
+    /**
+     * The call timed out or was cancelled before an answer.
+     * @param promptShown whether its prompt had opened, rather than the call still waiting behind another prompt in the chat.
+     */
+    data class Cancelled(val promptShown: Boolean) : ClientToolPermissionDecision
+}
+
+/** What let a call run or stopped it. */
+enum class ClientToolPermissionPath(val pixelValue: String) {
+    /** The tool doesn't ask. */
+    AUTO("auto"),
+    ALWAYS("always"),
+
+    /** Allowed for this chat earlier. */
+    CHAT("chat"),
+
+    /** The user was asked for this call. */
+    PROMPT("prompt"),
+    NEVER("never"),
 }
 
 /** How a `requestAccess` reply reports each requested tool. */
@@ -79,14 +101,28 @@ enum class ClientToolAccessLevel(val wireName: String) {
     NOT_GRANTED("notGranted"),
 }
 
-sealed interface ClientToolAccessDecision {
-    /** Each requested tool's level, in the order they were requested. */
-    data class Granted(val access: Map<String, ClientToolAccessLevel>) : ClientToolAccessDecision
+/** How a `requestAccess` prompt ended. */
+enum class ClientToolAccessAnswer {
+    /** Every tool was already decided, so nothing was asked. */
+    NO_PROMPT,
+    ALLOW,
+    DONT_ALLOW,
+    TIMEOUT,
 
-    data object Denied : ClientToolAccessDecision
-
-    data object Cancelled : ClientToolAccessDecision
+    /** Closed unanswered because the call was cancelled or its chat went away. */
+    WITHDRAWN,
 }
+
+/**
+ * @param access each tool's level once the request is over, in the order they were requested.
+ * @param asked the tools the prompt asked for, and [removed] the ones the user took out of it before allowing the rest.
+ */
+data class ClientToolAccessOutcome(
+    val answer: ClientToolAccessAnswer,
+    val access: Map<String, ClientToolAccessLevel>,
+    val asked: Set<String> = emptySet(),
+    val removed: Set<String> = emptySet(),
+)
 
 @SingleIn(AppScope::class)
 @ContributesBinding(AppScope::class)
@@ -96,6 +132,8 @@ class RealClientToolPermissionGate @Inject constructor(
     private val store: ClientToolPermissionStore,
     private val chatGrants: ClientToolChatGrants,
     private val prompt: ClientToolPermissionPrompt,
+    private val pixels: ClientToolPixels,
+    private val timeProvider: CurrentTimeProvider,
 ) : ClientToolPermissionGate {
 
     private sealed interface Standing {
@@ -122,24 +160,57 @@ class RealClientToolPermissionGate @Inject constructor(
 
     private val queues = mutableMapOf<ChatHost, ChatQueue>()
 
+    private sealed interface Turn<out T> {
+        data class Decided<T>(val value: T) : Turn<T>
+
+        data object TimedOut : Turn<Nothing>
+
+        data object Withdrawn : Turn<Nothing>
+    }
+
+    private class ShownPrompt(
+        val numberInChat: Int?,
+        val shownAt: Long,
+    ) {
+        var answer: ClientToolPromptAnswer? = null
+    }
+
     override suspend fun decide(
         tool: ClientTool,
         context: ClientToolCallContext,
         promptDetail: String?,
     ): ClientToolPermissionDecision {
-        when (standing(tool, context)) {
-            is Standing.Allowed -> return ClientToolPermissionDecision.ALLOWED
-            Standing.Denied -> return ClientToolPermissionDecision.DENIED
+        when (val standing = standing(tool, context)) {
+            is Standing.Allowed -> return standing.decision()
+            Standing.Denied -> return DENIED_BY_NEVER
             is Standing.NeedsPrompt, is Standing.NeedsPromptEveryTime -> Unit
         }
+        var shown: ShownPrompt? = null
+        fun show() = ShownPrompt(promptNumber(context), timeProvider.elapsedRealtime()).also { shown = it }
+        fun closed(answer: ClientToolPromptAnswer?) {
+            val prompt = shown ?: return
+            val closedAs = prompt.answer ?: answer ?: return
+            pixels.promptClosed(tool.name, closedAs, prompt.numberInChat, timeProvider.elapsedRealtime() - prompt.shownAt)
+        }
         // Re-checked once the lock is ours: the prompt this call queued behind may have settled it.
-        return awaitTurn(context.chatHost(), ClientToolPermissionDecision.CANCELLED) {
-            when (val now = standing(tool, context)) {
-                is Standing.Allowed -> ClientToolPermissionDecision.ALLOWED
-                Standing.Denied -> ClientToolPermissionDecision.DENIED
-                is Standing.NeedsPrompt -> ask(now.tool, context)
-                is Standing.NeedsPromptEveryTime -> askOnce(now.copy, promptDetail.orEmpty(), context)
+        val turn = try {
+            awaitTurn(context.chatHost()) {
+                when (val now = standing(tool, context)) {
+                    is Standing.Allowed -> now.decision()
+                    Standing.Denied -> DENIED_BY_NEVER
+                    is Standing.NeedsPrompt -> ask(now.tool, context, show())
+                    is Standing.NeedsPromptEveryTime -> askOnce(now.copy, promptDetail.orEmpty(), context, show())
+                }
             }
+        } catch (e: CancellationException) {
+            // The caller went away, such as a closed Duck.ai tab, which withdraws its open prompt.
+            closed(ClientToolPromptAnswer.WITHDRAWN)
+            throw e
+        }
+        return when (turn) {
+            is Turn.Decided -> turn.value.also { closed(null) }
+            Turn.TimedOut -> ClientToolPermissionDecision.Cancelled(shown != null).also { closed(ClientToolPromptAnswer.TIMEOUT) }
+            Turn.Withdrawn -> ClientToolPermissionDecision.Cancelled(shown != null).also { closed(ClientToolPromptAnswer.WITHDRAWN) }
         }
     }
 
@@ -147,12 +218,18 @@ class RealClientToolPermissionGate @Inject constructor(
         tools: List<ClientTool>,
         chatId: String,
         context: ClientToolCallContext,
-    ): ClientToolAccessDecision {
+    ): ClientToolAccessOutcome {
         val accessContext = context.copy(chatId = chatId)
-        if (tools.none { standing(it, accessContext) is Standing.NeedsPrompt }) return accessNow(tools, accessContext)
-        return awaitTurn(context.chatHost(), ClientToolAccessDecision.Cancelled) {
+        if (tools.none { standing(it, accessContext) is Standing.NeedsPrompt }) {
+            return ClientToolAccessOutcome(ClientToolAccessAnswer.NO_PROMPT, accessNow(tools, accessContext))
+        }
+        // Only set once the prompt opens, so a request that ends while queued behind another prompt reports none asked.
+        var asked = emptySet<String>()
+        var removed = emptySet<String>()
+        val turn = awaitTurn(context.chatHost()) {
             val toAsk = tools.mapNotNull { (standing(it, accessContext) as? Standing.NeedsPrompt)?.tool }
-            if (toAsk.isEmpty()) return@awaitTurn accessNow(tools, accessContext)
+            if (toAsk.isEmpty()) return@awaitTurn ClientToolAccessAnswer.NO_PROMPT
+            asked = toAsk.map { it.name }.toSet()
             val request = ClientToolPermissionRequest.GrantAccess(
                 context.chatTabId,
                 context.browserMode,
@@ -162,12 +239,19 @@ class RealClientToolPermissionGate @Inject constructor(
             )
             when (val answer = prompt.request(request)) {
                 is ClientToolPermissionAnswer.AllowForChat -> {
-                    chatGrants.grant(chatId, toAsk.map { it.name } - answer.removedTools)
-                    accessNow(tools, accessContext)
+                    removed = answer.removedTools intersect asked
+                    chatGrants.grant(chatId, asked - removed)
+                    ClientToolAccessAnswer.ALLOW
                 }
-                ClientToolPermissionAnswer.AllowOnce, ClientToolPermissionAnswer.DontAllow -> ClientToolAccessDecision.Denied
+                ClientToolPermissionAnswer.AllowOnce, ClientToolPermissionAnswer.DontAllow -> ClientToolAccessAnswer.DONT_ALLOW
             }
         }
+        val answer = when (turn) {
+            is Turn.Decided -> turn.value
+            Turn.TimedOut -> ClientToolAccessAnswer.TIMEOUT
+            Turn.Withdrawn -> ClientToolAccessAnswer.WITHDRAWN
+        }
+        return ClientToolAccessOutcome(answer, accessNow(tools, accessContext), asked, removed)
     }
 
     override fun cancelPending(
@@ -207,16 +291,26 @@ class RealClientToolPermissionGate @Inject constructor(
     private suspend fun accessNow(
         tools: List<ClientTool>,
         context: ClientToolCallContext,
-    ): ClientToolAccessDecision = ClientToolAccessDecision.Granted(
-        tools.associate { tool ->
-            val level = when (val standing = standing(tool, context)) {
-                is Standing.Allowed -> standing.level
-                Standing.Denied -> ClientToolAccessLevel.NEVER
-                is Standing.NeedsPrompt, is Standing.NeedsPromptEveryTime -> ClientToolAccessLevel.NOT_GRANTED
-            }
-            tool.name to level
+    ): Map<String, ClientToolAccessLevel> = tools.associate { tool ->
+        val level = when (val standing = standing(tool, context)) {
+            is Standing.Allowed -> standing.level
+            Standing.Denied -> ClientToolAccessLevel.NEVER
+            is Standing.NeedsPrompt, is Standing.NeedsPromptEveryTime -> ClientToolAccessLevel.NOT_GRANTED
+        }
+        tool.name to level
+    }
+
+    private fun Standing.Allowed.decision() = ClientToolPermissionDecision.Allowed(
+        when (level) {
+            ClientToolAccessLevel.ALWAYS -> ClientToolPermissionPath.ALWAYS
+            ClientToolAccessLevel.CHAT -> ClientToolPermissionPath.CHAT
+            ClientToolAccessLevel.DEFAULT, ClientToolAccessLevel.NEVER, ClientToolAccessLevel.NOT_GRANTED -> ClientToolPermissionPath.AUTO
         },
     )
+
+    // Prompts are numbered only with batch access on, the one case where every call names its chat.
+    private fun promptNumber(context: ClientToolCallContext): Int? =
+        context.chatId?.takeIf { browserToolsFeature.requestAccess().isEnabled() }?.let(chatGrants::countPrompt)
 
     private fun skipsPromptForDevelopment(): Boolean =
         appBuildConfig.isInternalBuild() && browserToolsFeature.devSkipPermissionPrompt().isEnabled()
@@ -224,49 +318,57 @@ class RealClientToolPermissionGate @Inject constructor(
     private suspend fun ask(
         tool: AskingTool,
         context: ClientToolCallContext,
+        shown: ShownPrompt,
     ): ClientToolPermissionDecision =
         when (prompt.request(ClientToolPermissionRequest.RunTool(context.chatTabId, context.browserMode, tool, context.contextual))) {
             is ClientToolPermissionAnswer.AllowForChat -> {
+                shown.answer = ClientToolPromptAnswer.ALLOW_FOR_CHAT
                 // Without a chat ID there is no chat to remember the answer for, so it covers this call only.
                 context.chatId?.let { chatGrants.grant(it, listOf(tool.name)) }
-                ClientToolPermissionDecision.ALLOWED
+                ClientToolPermissionDecision.Allowed(ClientToolPermissionPath.PROMPT)
             }
-            ClientToolPermissionAnswer.AllowOnce, ClientToolPermissionAnswer.DontAllow -> ClientToolPermissionDecision.DENIED
+            ClientToolPermissionAnswer.AllowOnce, ClientToolPermissionAnswer.DontAllow -> {
+                shown.answer = ClientToolPromptAnswer.DONT_ALLOW
+                ClientToolPermissionDecision.Denied(ClientToolPermissionPath.PROMPT)
+            }
         }
 
     private suspend fun askOnce(
         copy: ClientToolPermissionMode.AskEveryTime,
         detail: String,
         context: ClientToolCallContext,
+        shown: ShownPrompt,
     ): ClientToolPermissionDecision =
         when (prompt.request(ClientToolPermissionRequest.RunToolOnce(context.chatTabId, context.browserMode, copy, detail, context.contextual))) {
-            ClientToolPermissionAnswer.AllowOnce -> ClientToolPermissionDecision.ALLOWED
-            is ClientToolPermissionAnswer.AllowForChat, ClientToolPermissionAnswer.DontAllow -> ClientToolPermissionDecision.DENIED
+            ClientToolPermissionAnswer.AllowOnce -> {
+                shown.answer = ClientToolPromptAnswer.ALLOW_ONCE
+                ClientToolPermissionDecision.Allowed(ClientToolPermissionPath.PROMPT)
+            }
+            is ClientToolPermissionAnswer.AllowForChat, ClientToolPermissionAnswer.DontAllow -> {
+                shown.answer = ClientToolPromptAnswer.DONT_ALLOW
+                ClientToolPermissionDecision.Denied(ClientToolPermissionPath.PROMPT)
+            }
         }
 
-    /**
-     * Runs [decide] holding the chat's prompt lock, so each chat has one prompt open at a time.
-     * Gives [cancelled] when the deadline passes or the chat goes away first.
-     */
+    /** Runs [decide] holding the chat's prompt lock, so each chat has one prompt open at a time, unless the deadline passes or the chat goes away first. */
     private suspend fun <T> awaitTurn(
         host: ChatHost,
-        cancelled: T,
         decide: suspend () -> T,
-    ): T {
+    ): Turn<T> {
         val (queue, chatGone) = startWaiting(host)
         try {
             return withTimeoutOrNull(DECISION_DEADLINE_MILLIS) {
                 coroutineScope {
                     val decision = async { queue.promptLock.withLock { decide() } }
-                    select {
-                        decision.onAwait { it }
+                    select<Turn<T>> {
+                        decision.onAwait { Turn.Decided(it) }
                         chatGone.onAwait {
                             decision.cancel()
-                            cancelled
+                            Turn.Withdrawn
                         }
                     }
                 }
-            } ?: cancelled
+            } ?: Turn.TimedOut
         } finally {
             stopWaiting(host, chatGone)
         }
@@ -294,5 +396,6 @@ class RealClientToolPermissionGate @Inject constructor(
     private companion object {
         // Measured from the call's arrival, so time spent queued behind another prompt counts.
         const val DECISION_DEADLINE_MILLIS = 120_000L
+        val DENIED_BY_NEVER = ClientToolPermissionDecision.Denied(ClientToolPermissionPath.NEVER)
     }
 }

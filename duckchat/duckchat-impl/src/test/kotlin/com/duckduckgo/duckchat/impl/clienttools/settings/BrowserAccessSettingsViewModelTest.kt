@@ -27,14 +27,18 @@ import com.duckduckgo.duckchat.impl.clienttools.ClientToolChatGrants
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermission
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionDecision
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionMode
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionPath
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolPermissionRequest
+import com.duckduckgo.duckchat.impl.clienttools.ClientToolPixels
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolSettingsListing
 import com.duckduckgo.duckchat.impl.clienttools.ClientToolSettingsSection
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientTool
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPermissionPrompt
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPermissionStore
 import com.duckduckgo.duckchat.impl.clienttools.FakeClientToolPluginPoint
+import com.duckduckgo.duckchat.impl.clienttools.FakeElapsedTimeProvider
 import com.duckduckgo.duckchat.impl.clienttools.RealClientToolPermissionGate
+import com.duckduckgo.duckchat.impl.clienttools.RecordingPixel
 import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessChoice.ALWAYS_ALLOW
 import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessChoice.ALWAYS_ASK
 import com.duckduckgo.duckchat.impl.clienttools.settings.BrowserAccessChoice.NEVER_ALLOW
@@ -61,6 +65,7 @@ class BrowserAccessSettingsViewModelTest {
     private val store = FakeClientToolPermissionStore()
     private val chatGrants = ClientToolChatGrants()
     private val prompt = FakeClientToolPermissionPrompt()
+    private val pixel = RecordingPixel()
     private val appBuildConfig: AppBuildConfig = mock {
         on { flavor } doReturn BuildFlavor.PLAY
     }
@@ -70,6 +75,8 @@ class BrowserAccessSettingsViewModelTest {
         store,
         chatGrants,
         prompt,
+        ClientToolPixels(pixel),
+        FakeElapsedTimeProvider(),
     )
 
     private val listOpenTabs = tool("listOpenTabs", ClientToolSettingsSection.SEE, ClientToolPermissionMode.Ask(1, 2, 3))
@@ -170,10 +177,41 @@ class BrowserAccessSettingsViewModelTest {
     }
 
     @Test
+    fun whenChoiceChangedThenPermissionChangedPixelCarriesBothChoices() = runTest {
+        store.choices["listOpenTabs"] = ClientToolPermission.NEVER_ALLOW
+        val testee = testee(listOpenTabs)
+
+        testee.onChoiceSelected("listOpenTabs", ALWAYS_ALLOW)
+
+        assertEquals(
+            listOf(mapOf("tool" to "list_open_tabs", "from" to "deny", "to" to "allow", "source" to "settings")),
+            pixel.named(ClientToolPixels.PERMISSION_CHANGED).map { it.parameters },
+        )
+    }
+
+    @Test
+    fun whenSameChoiceSelectedThenNoPermissionChangedPixel() = runTest {
+        val testee = testee(listOpenTabs)
+
+        testee.onChoiceSelected("listOpenTabs", ALWAYS_ASK)
+
+        assertTrue(pixel.named(ClientToolPixels.PERMISSION_CHANGED).isEmpty())
+    }
+
+    @Test
+    fun whenResetAllConfirmedThenPermissionsResetPixelFires() = runTest {
+        val testee = testee(listOpenTabs)
+
+        testee.onResetAllConfirmed()
+
+        assertEquals(1, pixel.named(ClientToolPixels.PERMISSIONS_RESET).size)
+    }
+
+    @Test
     fun whenChatGrantedToolSetToAlwaysAskThenNextCallInThatChatPrompts() = runTest {
         val testee = testee(listOpenTabs)
         chatGrants.grant(CHAT_ID, listOf("listOpenTabs"))
-        assertEquals(ClientToolPermissionDecision.ALLOWED, gate.decide(listOpenTabs, callContext, null))
+        assertEquals(ClientToolPermissionDecision.Allowed(ClientToolPermissionPath.CHAT), gate.decide(listOpenTabs, callContext, null))
 
         testee.onChoiceSelected("listOpenTabs", ALWAYS_ASK)
 
@@ -187,7 +225,7 @@ class BrowserAccessSettingsViewModelTest {
 
         testee.onChoiceSelected("listOpenTabs", NEVER_ALLOW)
 
-        assertEquals(ClientToolPermissionDecision.ALLOWED, gate.decide(searchBookmarks, callContext, null))
+        assertEquals(ClientToolPermissionDecision.Allowed(ClientToolPermissionPath.CHAT), gate.decide(searchBookmarks, callContext, null))
         assertTrue(prompt.prompts.isEmpty())
     }
 
@@ -239,6 +277,7 @@ class BrowserAccessSettingsViewModelTest {
         tools = FakeClientToolPluginPoint(*tools),
         permissionStore = store,
         chatGrants = chatGrants,
+        pixels = ClientToolPixels(pixel),
         dispatcherProvider = coroutineRule.testDispatcherProvider,
     ).also { viewModel -> backgroundScope.launch(coroutineRule.testDispatcher) { viewModel.viewState.collect() } }
 
